@@ -25,17 +25,19 @@ namespace Thelia\Controller\Front;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\LostPasswordEvent;
+use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
-use Thelia\Form\CustomerCreation;
+use Thelia\Form\CustomerCreateForm;
 use Thelia\Form\CustomerLogin;
 use Thelia\Form\CustomerLostPasswordForm;
-use Thelia\Form\CustomerUpdateForm;
+use Thelia\Form\CustomerPasswordUpdateForm;
+use Thelia\Form\CustomerProfilUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\CustomerQuery;
+use Thelia\Model\NewsletterQuery;
 use Thelia\Tools\URL;
 use Thelia\Log\Tlog;
 use Thelia\Core\Security\Exception\WrongPasswordException;
@@ -48,6 +50,7 @@ use Thelia\Core\Security\Exception\WrongPasswordException;
 class CustomerController extends BaseFrontController
 {
     use \Thelia\Cart\CartTrait;
+
 
     public function newPasswordAction()
     {
@@ -93,7 +96,7 @@ class CustomerController extends BaseFrontController
 
             $message = false;
 
-            $customerCreation = new CustomerCreation($this->getRequest());
+            $customerCreation = new CustomerCreateForm($this->getRequest());
 
             try {
                 $form = $this->validateForm($customerCreation, "post");
@@ -129,12 +132,6 @@ class CustomerController extends BaseFrontController
         }
     }
 
-    protected function getExistingCustomer($customer_id)
-    {
-        return CustomerQuery::create()
-            ->findOneById($customer_id);
-    }
-
     /**
      * Update customer data. On success, redirect to success_url if exists.
      * Otherwise, display the same view again.
@@ -150,12 +147,51 @@ class CustomerController extends BaseFrontController
             'firstname'    => $customer->getFirstName(),
             'lastname'     => $customer->getLastName(),
             'email'        => $customer->getEmail(),
+            'newsletter'   => null !== NewsletterQuery::create()->findOneByEmail($customer->getEmail()),
         );
 
-        $customerUpdateForm = new CustomerUpdateForm($this->getRequest(), 'form', $data);
+        $customerProfilUpdateForm = new CustomerProfilUpdateForm($this->getRequest(), 'form', $data);
 
         // Pass it to the parser
-        $this->getParserContext()->addForm($customerUpdateForm);
+        $this->getParserContext()->addForm($customerProfilUpdateForm);
+    }
+
+
+    public function updatePasswordAction()
+    {
+        if ($this->getSecurityContext()->hasCustomerUser()) {
+            $message = false;
+
+            $customerPasswordUpdateForm = new CustomerPasswordUpdateForm($this->getRequest());
+
+            try {
+                $customer = $this->getSecurityContext()->getCustomerUser();
+
+                $form = $this->validateForm($customerPasswordUpdateForm, "post");
+
+                $customerChangeEvent = $this->createEventInstance($form->getData());
+                $customerChangeEvent->setCustomer($customer);
+                $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFIL, $customerChangeEvent);
+
+                $this->redirectSuccess($customerPasswordUpdateForm);
+
+            } catch (FormValidationException $e) {
+                $message = sprintf("Please check your input: %s", $e->getMessage());
+            } catch (\Exception $e) {
+                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+            }
+
+            if ($message !== false) {
+                Tlog::getInstance()->error(sprintf("Error during customer password modification process : %s.", $message));
+
+                $customerPasswordUpdateForm->setErrorMessage($message);
+
+                $this->getParserContext()
+                    ->addForm($customerPasswordUpdateForm)
+                    ->setGeneralError($message)
+                ;
+            }
+        }
     }
 
     public function updateAction()
@@ -164,21 +200,43 @@ class CustomerController extends BaseFrontController
 
             $message = false;
 
-            $customerUpdateForm = new CustomerUpdateForm($this->getRequest());
+            $customerProfilUpdateForm = new CustomerProfilUpdateForm($this->getRequest());
 
             try {
-
                 $customer = $this->getSecurityContext()->getCustomerUser();
+                $newsletterOldEmail = $customer->getEmail();
 
-                $form = $this->validateForm($customerUpdateForm, "post");
+                $form = $this->validateForm($customerProfilUpdateForm, "post");
 
                 $customerChangeEvent = $this->createEventInstance($form->getData());
                 $customerChangeEvent->setCustomer($customer);
-                $this->dispatch(TheliaEvents::CUSTOMER_UPDATEACCOUNT, $customerChangeEvent);
+                $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFIL, $customerChangeEvent);
 
-                $this->processLogin($customerChangeEvent->getCustomer());
+                $updatedCustomer = $customerChangeEvent->getCustomer();
 
-                $this->redirectSuccess($customerUpdateForm);
+                // Newsletter
+                if (true === $form->get('newsletter')->getData()) {
+                    $nlEvent = new NewsletterEvent($updatedCustomer->getEmail(), $this->getRequest()->getSession()->getLang()->getLocale());
+                    $nlEvent->setFirstname($updatedCustomer->getFirstname());
+                    $nlEvent->setLastname($updatedCustomer->getLastname());
+
+                    if(null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterOldEmail)) {
+                        $nlEvent->setId($newsletter->getId());
+                        $this->dispatch(TheliaEvents::NEWSLETTER_UPDATE, $nlEvent);
+                    } else {
+                        $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $nlEvent);
+                    }
+                } else {
+                    if(null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterOldEmail)) {
+                        $nlEvent = new NewsletterEvent($updatedCustomer->getEmail(), $this->getRequest()->getSession()->getLang()->getLocale());
+                        $nlEvent->setId($newsletter->getId());
+                        $this->dispatch(TheliaEvents::NEWSLETTER_UNSUBSCRIBE, $nlEvent);
+                    }
+                }
+
+                $this->processLogin($updatedCustomer);
+
+                $this->redirectSuccess($customerProfilUpdateForm);
 
             } catch (FormValidationException $e) {
                 $message = sprintf("Please check your input: %s", $e->getMessage());
@@ -189,10 +247,10 @@ class CustomerController extends BaseFrontController
             if ($message !== false) {
                 Tlog::getInstance()->error(sprintf("Error during customer modification process : %s.", $message));
 
-                $customerUpdateForm->setErrorMessage($message);
+                $customerProfilUpdateForm->setErrorMessage($message);
 
                 $this->getParserContext()
-                    ->addForm($customerUpdateForm)
+                    ->addForm($customerProfilUpdateForm)
                     ->setGeneralError($message)
                 ;
             }
@@ -289,9 +347,9 @@ class CustomerController extends BaseFrontController
     private function createEventInstance($data)
     {
         $customerCreateEvent = new CustomerCreateOrUpdateEvent(
-            $data["title"],
-            $data["firstname"],
-            $data["lastname"],
+            isset($data["title"])?$data["title"]:null,
+            isset($data["firstname"])?$data["firstname"]:null,
+            isset($data["lastname"])?$data["lastname"]:null,
             isset($data["address1"])?$data["address1"]:null,
             isset($data["address2"])?$data["address2"]:null,
             isset($data["address3"])?$data["address3"]:null,

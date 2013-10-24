@@ -17,4 +17,8 @@ use Thelia\Model\Base\CustomerQuery as BaseCustomerQuery;
  */
 class CustomerQuery extends BaseCustomerQuery {
 
+    public static function getCustomerByEmail($email)
+    {
+        return self::create()->findOneByEmail($email);
+    }
 } // CustomerQuery

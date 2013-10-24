@@ -8,6 +8,7 @@ use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use \Smarty;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Template\ParserInterface;
 
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
@@ -139,7 +140,7 @@ class SmartyParser extends Smarty implements ParserInterface
         try {
             $templateFile = $this->getTemplateFilePath();
         } catch (\RuntimeException $e) {
-            return new Response($e->getMessage(), "404");
+            return new Response($this->render(\Thelia\Model\ConfigQuery::getPageNotFoundView()), "404");
         }
 
         return $this->render($templateFile);

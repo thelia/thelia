@@ -62,17 +62,32 @@ class NewsletterController extends BaseFrontController
             $error_message = $e->getMessage();
         }
 
-        if($error_message !== false) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during newsletter subscription : %s', $error_message));
+        \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during newsletter subscription : %s', $error_message));
 
+        // If Ajax Request
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            if ($error_message) {
+                $response = $this->jsonResponse(json_encode(array(
+                            "success" => false,
+                            "message" => $error_message
+                        )));
+            } else {
+                $response = $this->jsonResponse(json_encode(array(
+                            "success" => true,
+                            "message" => "Thanks for signing up! We'll keep you posted whenever we have any new updates."
+                        )));;
+            }
+
+            return $response;
+
+        } else {
             $newsletterForm->setErrorMessage($error_message);
 
             $this->getParserContext()
                 ->addForm($newsletterForm)
                 ->setGeneralError($error_message)
             ;
-        } else {
-            $this->redirectToRoute('newsletter.success');
         }
+
     }
 }

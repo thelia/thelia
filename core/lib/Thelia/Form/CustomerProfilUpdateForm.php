@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,82 +17,74 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Model\CustomerQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\NewsletterQuery;
-
 
 /**
- * Class NewsletterForm
+ * Class CustomerProfilUpdateForm
  * @package Thelia\Form
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Christophe Laffont <claffont@openstudio.fr>
  */
-class NewsletterForm extends BaseForm
+class CustomerProfilUpdateForm extends CustomerCreateForm
 {
 
-    /**
-     *
-     * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
-     *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
-     *           "attr" => array(
-     *               "class" => "field"
-     *           ),
-     *           "label" => "email",
-     *           "constraints" => array(
-     *               new \Symfony\Component\Validator\Constraints\NotBlank()
-     *           )
-     *       )
-     *   )
-     *   ->add('age', 'integer');
-     *
-     * @return null
-     */
     protected function buildForm()
     {
+        parent::buildForm();
+
         $this->formBuilder
-            ->add('email', 'email', array(
-                'constraints' => array(
-                    new NotBlank(),
-                    new Email(),
-                    new Callback(array(
-                        "methods" => array(
-                            array($this,
-                                "verifyExistingEmail")
-                        )
-                    ))
+            ->remove("auto_login")
+            // Remove From Personal Informations
+            ->remove("phone")
+            ->remove("cellphone")
+            // Remove Delivery Informations
+            ->remove("company")
+            ->remove("address1")
+            ->remove("address2")
+            ->remove("address3")
+            ->remove("city")
+            ->remove("zipcode")
+            ->remove("country")
+            // Remove Login Information
+            ->remove("password")
+            ->remove("password_confirm")
+            // Remove Terms & conditions
+            ->remove("agreed")
+
+            // Add Newsletter
+            ->add("newsletter", "checkbox", array(
+                "label" => "I would like to receive the newsletter our the latest news.",
+                "label_attr" => array(
+                    "for" => "newsletter"
                 ),
-                'label' => Translator::getInstance()->trans('Email address'),
-                'label_attr' => array(
-                    'for' => 'email_newsletter'
-                )
+                "required" => false
             ));
     }
 
+
+    /**
+     * @param $value
+     * @param ExecutionContextInterface $context
+     */
     public function verifyExistingEmail($value, ExecutionContextInterface $context)
     {
-        $customer = NewsletterQuery::create()->findOneByEmail($value);
-        if ($customer) {
-            $context->addViolation("You are already subscribed!");
+        $customer = CustomerQuery::getCustomerByEmail($value);
+        // If there is already a customer for this email address and if the customer is different from the current user, do a violation
+        if ($customer && $customer->getId() != $this->getRequest()->getSession()->getCustomerUser()->getId()) {
+            $context->addViolation("This email already exists.");
         }
     }
 
-    /**
-     * @return string the name of you form. This name must be unique
-     */
     public function getName()
     {
-        return 'thelia_newsletter';
+        return "thelia_customer_profil_update";
     }
 }

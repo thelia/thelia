@@ -59,22 +59,13 @@ class ContactForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('firstname', 'text', array(
+            ->add('name', 'text', array(
                 'constraints' => array(
                     new NotBlank()
                 ),
-                'label' => Translator::getInstance()->trans('firstname'),
+                'label' => Translator::getInstance()->trans('Full Name'),
                 'label_attr' => array(
-                    'for' => 'firstname_contact'
-                )
-            ))
-            ->add('lastname', 'text', array(
-                'constraints' => array(
-                    new NotBlank()
-                ),
-                'label' => Translator::getInstance()->trans('lastname'),
-                'label_attr' => array(
-                    'for' => 'lastname_contact'
+                    'for' => 'name_contact'
                 )
             ))
             ->add('email', 'email', array(
@@ -82,7 +73,7 @@ class ContactForm extends BaseForm
                     new NotBlank(),
                     new Email()
                 ),
-                'label' => Translator::getInstance()->trans('email'),
+                'label' => Translator::getInstance()->trans('Your Email Address'),
                 'label_attr' => array(
                     'for' => 'email_contact'
                 )
@@ -91,7 +82,7 @@ class ContactForm extends BaseForm
                 'constraints' => array(
                     new NotBlank()
                 ),
-                'label' => Translator::getInstance()->trans('subject'),
+                'label' => Translator::getInstance()->trans('Subject'),
                 'label_attr' => array(
                     'for' => 'subject_contact'
                 )
@@ -100,7 +91,7 @@ class ContactForm extends BaseForm
                 'constraints' => array(
                     new NotBlank()
                 ),
-                'label' => Translator::getInstance()->trans('message'),
+                'label' => Translator::getInstance()->trans('Your Message'),
                 'label_attr' => array(
                     'for' => 'message_contact'
                 )

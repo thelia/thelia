@@ -148,7 +148,7 @@ label { font-weight: 600; }
 }
 
 // Align the navbar with carousel
-.container > .navbar-collapse { margin-left: -15px; }
+.container > .navbar-collapse { margin-left: -15px;  margin-right: -15px; }
 
 // Search
 header {
@@ -164,7 +164,7 @@ header {
 
 
 /* Custom button */
-.page .btn-primary {
+.btn-primary {
     border-left: 3px solid lighten(@brand-primary, 20%);
     .border-radius(0);
     color: #fff;
@@ -1213,4 +1213,15 @@ td.product,
             + .btn-step { border-left: 1px solid @text-color; }
          }
      }
+}
+
+// Page Contact
+#google-map {
+  margin-bottom: @line-height-computed;
+  @filter-map: ~"grayscale(100%)";
+  -webkit-filter: @filter-map;
+  -moz-filter: @filter-map;
+  -ms-filter: @filter-map;
+  -o-filter: @filter-map;
+  filter: @filter-map;
 }

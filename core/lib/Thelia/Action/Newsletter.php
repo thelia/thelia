@@ -26,6 +26,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Action\BaseAction;
+use Thelia\Model\NewsletterQuery;
 use Thelia\Model\Newsletter as NewsletterModel;
 
 
@@ -47,6 +48,24 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
             ->setLastname($event->getLastname())
             ->setLocale($event->getLocale())
             ->save();
+    }
+
+    public function unsubscribe(NewsletterEvent $event)
+    {
+        if(null !== $nl = NewsletterQuery::create()->findPk($event->getId())) {
+            $nl->delete();
+        }
+    }
+
+    public function update(NewsletterEvent $event)
+    {
+        if(null !== $nl = NewsletterQuery::create()->findPk($event->getId())) {
+            $nl->setEmail($event->getEmail())
+                ->setFirstname($event->getFirstname())
+                ->setLastname($event->getLastname())
+                ->setLocale($event->getLocale())
+                ->save();
+        }
     }
 
     /**
@@ -72,7 +91,9 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::NEWSLETTER_SUBSCRIBE => array('subscribe', 128)
+            TheliaEvents::NEWSLETTER_SUBSCRIBE => array('subscribe', 128),
+            TheliaEvents::NEWSLETTER_UPDATE => array('update', 128),
+            TheliaEvents::NEWSLETTER_UNSUBSCRIBE => array('unsubscribe', 128)
         );
     }
 }
