@@ -129,7 +129,12 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $couponModel = $couponQuery->findOneByCode($coupon->getCode());
             $couponManager->decrementeQuantity($couponModel);
 
-            $request->getSession()->getCart()->setDiscount($totalDiscount);
+            $request
+                ->getSession()
+                ->getCart()
+                ->setDiscount($totalDiscount)
+                ->save()
+            ;
 
         }
 
