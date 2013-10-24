@@ -33,7 +33,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
     public function testCopyUploadedFile()
     {
         $this->markTestIncomplete(
-            'Mock issue'
+            'This test has not been implemented yet : Mock issue'
         );
 
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
@@ -112,7 +112,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
     public function testCopyUploadedFileExceptionImageException()
     {
         $this->markTestIncomplete(
-            'Mock issue'
+            'This test has not been implemented yet : Mock issue'
         );
 
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')

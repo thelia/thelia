@@ -32,7 +32,7 @@
     	                        <caption>
     	                           {intl l='Thelia product templates'}
 
-                                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.templates.create"}
+                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.template" access="CREATE"}
                                     <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new product template'}" href="#creation_dialog" data-toggle="modal">
                                         <span class="glyphicon glyphicon-plus-sign"></span>
                                     </a>
@@ -72,7 +72,7 @@
                                         <td>{$ID}</td>
 
                                         <td>
-                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.templates.change"}
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.template" access="UPDATE"}
                                                 <a title="{intl l='Change this template'}" href="{url path='/admin/configuration/templates/update' template_id=$ID}">{$NAME}</a>
                                             {/loop}
                                             {elseloop rel="can_change"}
@@ -84,11 +84,11 @@
 
                                         <td class="actions">
                                             <div class="btn-group">
-    	                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.templates.change"}
+    	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.template" access="UPDATE"}
     	                                            <a class="btn btn-default btn-xs template-change" title="{intl l='Change this product template'}" href="{url path='/admin/configuration/templates/update' template_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
     	                                        {/loop}
 
-    	                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.templates.delete"}
+    	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.template" access="DELETE"}
     	                                            <a class="btn btn-default btn-xs template-delete" title="{intl l='Delete this product template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
     	                                        {/loop}
                                             </div>

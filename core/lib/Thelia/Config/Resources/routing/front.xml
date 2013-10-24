@@ -131,6 +131,11 @@
         <default key="_view">order-invoice</default>
     </route>
 
+    <route id="order.coupon.process" path="/order/coupon" methods="post">
+        <default key="_controller">Thelia\Controller\Front\CouponController::consumeAction</default>
+        <default key="_view">order-invoice</default>
+    </route>
+
     <route id="order.payment.process" path="/order/pay">
         <default key="_controller">Thelia\Controller\Front\OrderController::pay</default>
     </route>

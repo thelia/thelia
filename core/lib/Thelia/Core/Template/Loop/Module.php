@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -56,6 +57,13 @@ class Module extends BaseI18nLoop
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
+            Argument::createIntTypeArgument('profile'),
+            new Argument(
+                'code',
+                new Type\TypeCollection(
+                    new Type\AlphaNumStringListType()
+                )
+            ),
             new Argument(
                 'module_type',
                 new Type\TypeCollection(
@@ -87,6 +95,20 @@ class Module extends BaseI18nLoop
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
+        }
+
+        $profile = $this->getProfile();
+
+        if (null !== $profile) {
+            $search->leftJoinProfileModule('profile_module')
+                ->addJoinCondition('profile_module', 'profile_module.PROFILE_ID=?', $profile, null, \PDO::PARAM_INT)
+                ->withColumn('profile_module.access', 'access');
+        }
+
+        $code = $this->getCode();
+
+        if(null !== $code) {
+            $search->filterByCode($code, Criteria::IN);
         }
 
         $moduleType = $this->getModule_type();
@@ -128,6 +150,16 @@ class Module extends BaseI18nLoop
                 ->set("ACTIVE", $module->getActivate())
                 ->set("CLASS", $module->getFullNamespace())
                 ->set("POSITION", $module->getPosition());
+
+            if (null !== $profile) {
+                $accessValue = $module->getVirtualColumn('access');
+                $manager = new AccessManager($accessValue);
+
+                $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW)? 1 : 0)
+                    ->set("CREATABLE", $manager->can(AccessManager::CREATE) ? 1 : 0)
+                    ->set("UPDATABLE", $manager->can(AccessManager::UPDATE)? 1 : 0)
+                    ->set("DELETABLE", $manager->can(AccessManager::DELETE)? 1 : 0);
+            }
 
             $loopResult->addRow($loopResultRow);
         }

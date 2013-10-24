@@ -96,7 +96,10 @@ class Thelia extends Kernel
     {
         parent::boot();
 
-        $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
+        if (file_exists(THELIA_ROOT . '/local/config/database.yml') === true) {
+            $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
+        }
+
     }
 
     /**

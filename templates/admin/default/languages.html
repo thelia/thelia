@@ -19,7 +19,7 @@
         {module_include location='languages_top'}
 
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <div class="general-block-decorator">
                     
                     <form action="" method="">
@@ -27,7 +27,7 @@
                         <table class="table table-striped table-condensed table-left-aligned">
                             <caption>
                                {intl l="Languages management"}
-                               {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.languages.create"}
+                               {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.language" access="CREATE"}
                                 <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new language'}" href="#creation_dialog" data-toggle="modal">
                                     <span class="glyphicon glyphicon-plus-sign"></span>
                                 </a>
@@ -38,61 +38,43 @@
                                 <tr>
                                     <th>{intl l="Language name"}</th>
                                     <th>{intl l="ISO 639 Code"}</th>
+                                    <th>{intl l="Locale"}</th>
+                                    <th>{intl l="date form"}</th>
+                                    <th>{intl l="time form"}</th>
                                     <th>{intl l="Default"}</th>
                                     <th>{intl l="Actions"}</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                {loop type="lang" name="lang.list" backend_context="1"}
                                 <tr>
-                                    <td><input type="text" class="form-control" name="" value="France"></td>
-                                    <td><input type="text" class="form-control" name="" value="fr"></td>
+                                    <td>{$TITLE}</td>
+                                    <td>{$CODE}</td>
+                                    <td>{$LOCALE}</td>
+                                    <td>{$DATE_FORMAT}</td>
+                                    <td>{$TIME_FORMAT}</td>
                                     <td>
-                                        <div class="make-switch switch-small switch-radio" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
-                                            <input type="radio" name="" checked>
+                                        <div class="make-switch switch-small switch-radio lang-default-change" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                            <input type="radio" name="is_default" {if $IS_DEFAULT}checked{/if}>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td class="actions">
                                         <div class="btn-group">
-                                            <a href="#delete_dialog" data-toggle="modal" class="btn btn-default btn-xs" title="{intl l="Delete this language"}"><span class="glyphicon glyphicon-trash"></span></a>
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.language" access="UPDATE"}
+                                                <a class="btn btn-default btn-xs lang-change" data-id="{$ID}" title="{intl l='Change this language'}">
+                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                </a>
+                                            {/loop}
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.language" access="DELETE"}
+                                                <a href="#delete_dialog" data-toggle="modal" data-id="{$ID}" class="btn btn-default btn-xs lang-delete" title="{intl l="Delete this language"}">
+                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                </a>
+                                            {/loop}
                                         </div>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td><input type="text" class="form-control" name="" value="English"></td>
-                                    <td><input type="text" class="form-control" name="" value="en"></td>
-                                    <td>
-                                        <div class="make-switch switch-small switch-radio" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
-                                            <input type="radio" name="">
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <a href="#delete_dialog" data-toggle="modal" class="btn btn-default btn-xs" title="{intl l="Delete this language"}"><span class="glyphicon glyphicon-trash"></span></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><input type="text" class="form-control" name="" value="Spanish"></td>
-                                    <td><input type="text" class="form-control" name="" value="es"></td>
-                                    <td>
-                                        <div class="make-switch switch-small switch-radio" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
-                                            <input type="radio" name="">
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <a href="#delete_dialog" data-toggle="modal" class="btn btn-default btn-xs" title="{intl l="Delete this language"}"><span class="glyphicon glyphicon-trash"></span></a>
-                                        </div>
-                                    </td>
-                                </tr>
+                                {/loop}
                             </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="4">
-                                        <button type="submit" class="btn btn-default btn-primary pull-right"><span class="glyphicon glyphicon-check"></span> {intl l="Save"}</button>
-                                    </td>
-                                </tr>                                
-                            </tfoot>
                         </table>
 
                     </form>
@@ -100,78 +82,76 @@
                 </div>
             </div>
 
+
+
+        </div>
+
+        <div class="row">
             <div class="col-md-6">
                 <div class="general-block-decorator">
-                    
-                    <div class="title title-without-tabs">{intl l="Parameters"}</div>
 
-                    <form action="" method="post">
-                        
-                        <div class="form-group">
-                            <label for="" class="label-control">{intl l="If a translation is missing or incomplete :"}</label>
+                    <div class="title title-without-tabs">{intl l="Parameters"}</div>
+                    {form name="thelia.lang.defaultBehavior"}
+                    <form action="{url path="/admin/configuration/languages/defaultBehavior"}" method="post">
+                        {form_hidden_fields form=$form}
+                        {form_field form=$form field="behavior"}
+                        <div class="form-group {if $error}has-error{/if}" >
+                            <label for="{$label_attr.for}" class="label-control">{intl l="If a translation is missing or incomplete :"}</label>
                             <div class="input-group">
-                                <select name="" id="" data-toggle="selectpicker">
-                                    <option value="">Replace by the default language</option>
-                                    <option value="">Strictly use the requested language</option>
+                                <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
+                                    {foreach $choices as $choice}
+                                        <option value="{$choice->value}" {if $lang_without_translation == $choice->value}selected="selected"{/if}>{$choice->label}</option>
+                                    {/foreach}
                                 </select>
                                 <div class="input-group-btn">
                                     <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span></button>
                                 </div>
                             </div>
                         </div>
-
+                        {/form_field}
                     </form>
-
+                    {/form}
                 </div>
             </div>
-
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-6">
                 <div class="general-block-decorator clearfix">
                     
-                    <div class="title title-without-tabs">{intl l="Association language/URL"}</div>
-                    
-                    <form action="" method="post">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="" class="label-control"><input type="radio" name="" checked> {intl l="Using a same domain for all languages"}</label>
-                                <input type="url" class="form-control" name="" placeholder="http://www.domain.com">                            
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">                            
-                            <div class="form-group">
-                                <label for="" class="label-control"><input type="radio" name=""> {intl l="Using a domain or subdomain for each language"}</label>
-                            </div>
+                    <div class="title title-without-tabs">{intl l="Using a domain or subdomain for each language"}</div>
+                    {form name="thelia.lang.url"}
+                    <form action="{url path="/admin/configuration/languages/updateUrl"}" method="post">
+                        {form_hidden_fields form=$form}
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <tbody>
+                            {form_tagged_fields form=$form tag='url'}
+                                {if $attr_list.url_id}
+                                <tr>
+                                    <th>{$attr_list.url_title}</th>
+                                    <td>
+                                        <div class="form-group {if $error}has-error{/if}">
+                                        <input type="text" class="form-control" name="{$name}" value="{$value}" placeholder="http://www.domain.com" {if $one_domain_per_lang == 0}readonly{/if}>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {/if}
+                            {/form_tagged_fields}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td class="pull-right">
+                                        {if $one_domain_per_lang == 0}
+                                            <a href="{url path="/admin/configuration/languages/domain/activate"}" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok-sign"></span> {intl l="activate"}</a>
+                                        {else}
+                                            <a href="{url path="/admin/configuration/languages/domain/deactivate"}" class="btn btn-default btn-danger"><span class="glyphicon glyphicon-ok-sign"></span> {intl l="deactivate"}</a>
+                                        {/if}
 
-                            <table class="table table-striped table-condensed table-left-aligned">
-                                <tbody>
-                                    <tr>
-                                        <th>{intl l="France"}</th>
-                                        <td><input type="text" class="form-control" name="" placeholder="http://www.domain.com" readonly></td>
-                                    </tr>
-                                    <tr>
-                                        <th>{intl l="English"}</th>
-                                        <td><input type="text" class="form-control" name="" placeholder="http://www.domain.com" readonly></td>
-                                    </tr>
-                                    <tr>
-                                        <th>{intl l="Spanish"}</th>
-                                        <td><input type="text" class="form-control" name="" placeholder="http://www.domain.com" readonly></td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="2">
-                                            <button type="submit" disabled class="btn btn-default btn-primary pull-right"><span class="glyphicon glyphicon-check"></span> {intl l="Save"}</button>
-                                        </td>
-                                    </tr>                                
-                                </tfoot>
-                            </table>        
-                        </div>
+                                        <button type="submit" {if $one_domain_per_lang == 0}disabled{/if} class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Save"}</button>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </form>
-
+                    {/form}
                 </div>
             </div>
         </div>
@@ -181,20 +161,12 @@
     </div>
 </div>
 
-{form name="thelia.admin.language.creation"}
+{form name="thelia.lang.create"}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "creation_dialog"}
 
         {form_hidden_fields form=$form}
-
-        {* Be sure to get the language_id, even if the form could not be validated *}
-        <input type="hidden" name="language_id" value="{$language_id}" />
-
-        {form_field form=$form field='success_url'}
-           {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
-           <input type="hidden" name="{$name}" value="{url path='/admin/configuration/languages/update' language_id='_ID_'}" />
-        {/form_field}
 
         {form_field form=$form field='title'}
             <div class="form-group {if $error}has-error{/if}">
@@ -202,11 +174,28 @@
                 <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Language title'}">
             </div>
         {/form_field}
-
-        {form_field form=$form field='isocode'}
+        {form_field form=$form field='code'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
                 <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='ISO Code'}">
+            </div>
+        {/form_field}
+        {form_field form=$form field='locale'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='en_US'}">
+            </div>
+        {/form_field}
+        {form_field form=$form field='date_format'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='d-m-Y'}">
+            </div>
+        {/form_field}
+        {form_field form=$form field='time_format'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='H:i:s'}">
             </div>
         {/form_field}
 
@@ -223,7 +212,7 @@
 
         dialog_ok_label     = {intl l="Create this language"}
 
-        form_action        = {url path='/admin/configuration/languages/create'}
+        form_action        = {url path='/admin/configuration/languages/add'}
         form_enctype       = {form_enctype form=$form}
         form_error_message = $form_error_message
     }
@@ -232,7 +221,7 @@
 {* Delete confirmation dialog *}
 
 {capture "delete_dialog"}
-    <input type="hidden" name="message_id" id="language_delete_id" value="" />
+    <input type="hidden" name="language_id" id="language_delete_id" value="" />
 
     {module_include location='languages_delete_form'}
 
@@ -247,20 +236,32 @@
 
     form_action         = {url path='/admin/configuration/languages/delete'}
     form_content        = {$smarty.capture.delete_dialog nofilter}
+    form_error_message  = $error_delete_message
 }
 
+    <div id="lang-update-modal"></div>
+
+    <div class="modal fade" id="toggle-default-failed" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content alert alert-block alert-danger ">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h2>{intl l="Error"}</h2>
+                </div>
+                <div class="modal-body">
+                    <strong>{intl l="Impossible to change default languages. Please contact your administrator or try later"}</strong>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
 {/block}
 
 {block name="javascript-initialization"}
     {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
         <script src="{$asset_url}"></script>
-
-        <script>
-            // Toogle switch on input radio
-            $('.switch-radio').on('switch-change', function () {
-                $('.switch-radio').bootstrapSwitch('toggleRadioState');
-            });
-        </script>
     {/javascripts}
 
     {javascripts file='assets/js/main.js'}
@@ -270,4 +271,39 @@
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
+
+    <script>
+        $(document).ready(function(){
+            $("a.lang-change").click(function(e){
+                var baseUrl = "{url path="/admin/configuration/languages/update/"}";
+                $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+                $.ajax({
+                    method: 'get',
+                    url: baseUrl+$(this).data('id')
+                }).done(function(data){
+                    $("#loading-event").remove();
+                    $("#lang-update-modal").html(data);
+                    $("#edit_lang_dialog").modal("show");
+                }).fail(function(){
+                    $("#loading-event").remove();
+                });
+            });
+
+            $(".lang-default-change").on("switch-change", function(e, data){
+                $('.lang-default-change').bootstrapSwitch('toggleRadioState');
+                var baseUrl = "{url path='/admin/configuration/languages/toggleDefault/'}";
+                if(data.value) {
+                    $.ajax({
+                        url : baseUrl+$(this).data('id')
+                    }).fail(function(){
+                        $('#toggle-default-failed').modal('show');
+                    });
+                }
+            });
+
+            $(".lang-delete").click(function(){
+                $("#language_delete_id").val($(this).data("id"));
+            });
+        });
+    </script>
 {/block}

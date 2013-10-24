@@ -26,3 +26,4 @@ phpunit.phar
 phpmyadmin
 templates/default-esi
 local/modules/TemplateEsiModule
+composer.phar

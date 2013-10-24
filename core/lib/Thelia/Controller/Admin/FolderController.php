@@ -48,10 +48,7 @@ class FolderController extends AbstractCrudController
             'manual',
             'folder_order',
 
-            AdminResources::FOLDER_VIEW,
-            AdminResources::FOLDER_CREATE,
-            AdminResources::FOLDER_UPDATE,
-            AdminResources::FOLDER_DELETE,
+            AdminResources::FOLDER,
 
             TheliaEvents::FOLDER_CREATE,
             TheliaEvents::FOLDER_UPDATE,

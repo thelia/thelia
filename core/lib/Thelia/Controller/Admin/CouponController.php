@@ -28,8 +28,6 @@ use Symfony\Component\Routing\Router;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\ConditionManagerInterface;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Condition\ConditionCreateOrUpdateEvent;
-use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
@@ -209,10 +207,7 @@ class CouponController extends BaseAdminController
             $conditions = $conditionFactory->unserializeConditionCollection(
                 $coupon->getSerializedConditions()
             );
-var_dump($coupon->getIsEnabled());;
-var_dump($coupon->getIsAvailableOnSpecialOffers());;
-var_dump($coupon->getIsCumulative());;
-var_dump($coupon->getIsRemovingPostage());;
+
             $data = array(
                 'code' => $coupon->getCode(),
                 'title' => $coupon->getTitle(),
@@ -220,11 +215,11 @@ var_dump($coupon->getIsRemovingPostage());;
                 'type' => $coupon->getType(),
                 'shortDescription' => $coupon->getShortDescription(),
                 'description' => $coupon->getDescription(),
-                'isEnabled' => ($coupon->getIsEnabled() == 1),
+                'isEnabled' => $coupon->getIsEnabled(),
                 'expirationDate' => $coupon->getExpirationDate('Y-m-d'),
-                'isAvailableOnSpecialOffers' => ($coupon->getIsAvailableOnSpecialOffers() == 1),
-                'isCumulative' => ($coupon->getIsCumulative() == 1),
-                'isRemovingPostage' => ($coupon->getIsRemovingPostage() == 1),
+                'isAvailableOnSpecialOffers' => $coupon->getIsAvailableOnSpecialOffers(),
+                'isCumulative' => $coupon->getIsCumulative(),
+                'isRemovingPostage' => $coupon->getIsRemovingPostage(),
                 'maxUsage' => $coupon->getMaxUsage(),
                 'conditions' => $conditions,
                 'locale' => $coupon->getLocale(),
@@ -265,7 +260,7 @@ var_dump($coupon->getIsRemovingPostage());;
             Router::ABSOLUTE_URL
         );
 
-        $args['formAction'] = 'admin/coupon/update' . $couponId;
+        $args['formAction'] = 'admin/coupon/update/' . $couponId;
 
         return $this->render('coupon-update', $args);
     }
@@ -335,27 +330,36 @@ var_dump($coupon->getIsRemovingPostage());;
             $conditions->add(clone $condition);
         }
 
-//        $coupon->setSerializedConditions(
-//            $conditionFactory->serializeCouponConditionCollection($conditions)
-//        );
-
-        $conditionEvent = new ConditionCreateOrUpdateEvent(
-            $conditions
+        $couponEvent = new CouponCreateOrUpdateEvent(
+            $coupon->getCode(),
+            $coupon->getTitle(),
+            $coupon->getAmount(),
+            $coupon->getType(),
+            $coupon->getShortDescription(),
+            $coupon->getDescription(),
+            $coupon->getIsEnabled(),
+            $coupon->getExpirationDate(),
+            $coupon->getIsAvailableOnSpecialOffers(),
+            $coupon->getIsCumulative(),
+            $coupon->getIsRemovingPostage(),
+            $coupon->getMaxUsage(),
+            $coupon->getLocale()
         );
-        $conditionEvent->setCouponModel($coupon);
+        $couponEvent->setCouponModel($coupon);
+        $couponEvent->setConditions($conditions);
 
         $eventToDispatch = TheliaEvents::COUPON_CONDITION_UPDATE;
         // Dispatch Event to the Action
         $this->dispatch(
             $eventToDispatch,
-            $conditionEvent
+            $couponEvent
         );
 
         $this->adminLogAppend(
             sprintf(
                 'Coupon %s (ID %s) conditions updated',
-                $conditionEvent->getCouponModel()->getTitle(),
-                $conditionEvent->getCouponModel()->getServiceId()
+                $couponEvent->getCouponModel()->getTitle(),
+                $couponEvent->getCouponModel()->getType()
             )
         );
 
@@ -370,31 +374,6 @@ var_dump($coupon->getIsRemovingPostage());;
                 'urlDelete' => $couponId
             )
         );
-    }
-
-    /**
-     * Test Coupon consuming
-     *
-     * @param string $couponCode Coupon code
-     *
-     * @todo remove (event dispatcher testing purpose)
-     *
-     */
-    public function consumeAction($couponCode)
-    {
-        // @todo remove (event dispatcher testing purpose)
-        $couponConsumeEvent = new CouponConsumeEvent($couponCode);
-        $eventToDispatch = TheliaEvents::COUPON_CONSUME;
-
-        // Dispatch Event to the Action
-        $this->dispatch(
-            $eventToDispatch,
-            $couponConsumeEvent
-        );
-
-        var_dump('test', $couponConsumeEvent->getCode(), $couponConsumeEvent->getDiscount(), $couponConsumeEvent->getIsValid());
-
-        exit();
     }
 
     /**
@@ -492,14 +471,14 @@ var_dump($coupon->getIsRemovingPostage());;
                 sprintf(
                     'Coupon %s (ID ) ' . $log,
                     $couponEvent->getTitle(),
-                    $couponEvent->getCoupon()->getId()
+                    $couponEvent->getCouponModel()->getId()
                 )
             );
 
             $this->redirect(
                 str_replace(
                     '{id}',
-                    $couponEvent->getCoupon()->getId(),
+                    $couponEvent->getCouponModel()->getId(),
                     $creationForm->getSuccessUrl()
                 )
             );
@@ -590,27 +569,5 @@ var_dump($coupon->getIsRemovingPostage());;
 
         return $cleanedConditions;
     }
-
-//    /**
-//     * Validation Condition creation
-//     *
-//     * @param string $type     Condition class type
-//     * @param string $operator Condition operator (<, >, =, etc)
-//     * @param array  $values   Condition values
-//     *
-//     * @return bool
-//     */
-//    protected function validateConditionsCreation($type, $operator, $values)
-//    {
-//        /** @var AdapterInterface $adapter */
-//        $adapter = $this->container->get('thelia.adapter');
-//        $validator = new PriceParam()
-//        try {
-//            $condition = new AvailableForTotalAmount($adapter, $validators);
-//            $condition = new $type($adapter, $validators);
-//        } catch (\Exception $e) {
-//            return false;
-//        }
-//    }
 
 }

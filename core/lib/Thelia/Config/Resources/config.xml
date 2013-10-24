@@ -35,6 +35,7 @@
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
         <loop class="Thelia\Core\Template\Loop\ProductSaleElements" name="product_sale_elements"/>
         <loop class="Thelia\Core\Template\Loop\Profile" name="profile"/>
+        <loop class="Thelia\Core\Template\Loop\Resource" name="resource"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>
         <loop class="Thelia\Core\Template\Loop\Title" name="title"/>
         <loop class="Thelia\Core\Template\Loop\Lang" name="lang"/>
@@ -87,6 +88,9 @@
         <form name="thelia.admin.product.image.modification" class="Thelia\Form\ProductImageModification"/>
         <form name="thelia.admin.product.document.modification" class="Thelia\Form\ProductDocumentModification"/>
 
+        <form name="thelia.admin.product_sale_element.update" class="Thelia\Form\ProductSaleElementUpdateForm"/>
+        <form name="thelia.admin.product_default_sale_element.update" class="Thelia\Form\ProductDefaultSaleElementUpdateForm"/>
+
         <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>
 
         <form name="thelia.admin.folder.creation" class="Thelia\Form\FolderCreationForm"/>
@@ -104,6 +108,8 @@
         <form name="thelia.order.delivery" class="Thelia\Form\OrderDelivery"/>
         <form name="thelia.order.payment" class="Thelia\Form\OrderPayment"/>
         <form name="thelia.order.update.address" class="Thelia\Form\OrderUpdateAddress"/>
+
+        <form name="thelia.order.coupon" class="Thelia\Form\CouponCode"/>
 
         <form name="thelia.admin.config.creation" class="Thelia\Form\ConfigCreationForm"/>
         <form name="thelia.admin.config.modification" class="Thelia\Form\ConfigModificationForm"/>
@@ -136,16 +142,17 @@
 
         <form name="thelia.admin.profile.add" class="Thelia\Form\ProfileCreationForm"/>
         <form name="thelia.admin.profile.modification" class="Thelia\Form\ProfileModificationForm"/>
+        <form name="thelia.admin.profile.resource-access.modification" class="Thelia\Form\ProfileUpdateResourceAccessForm"/>
+        <form name="thelia.admin.profile.module-access.modification" class="Thelia\Form\ProfileUpdateModuleAccessForm"/>
+
+        <form name="thelia.admin.administrator.add" class="Thelia\Form\AdministratorCreationForm"/>
+        <form name="thelia.admin.administrator.update" class="Thelia\Form\AdministratorModificationForm"/>
 
         <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
         <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>
 
         <form name="thelia.admin.country.creation" class="Thelia\Form\CountryCreationForm"/>
         <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
-        
-        <form name="thelia.admin.language.creation" class="Thelia\Form\LanguageCreationForm"/>
-
-        <form name="thelia.admin.admin-profile.creation" class="Thelia\Form\AdminProfileCreationForm"/>
 
         <form name="thelia.admin.area.create" class="Thelia\Form\Area\AreaCreateForm"/>
         <form name="thelia.admin.area.modification" class="Thelia\Form\Area\AreaModificationForm"/>
@@ -154,6 +161,11 @@
 
         <form name="thelia.shopping_zone_area" class="Thelia\Form\ShippingZone\ShippingZoneAddArea"/>
         <form name="thelia.shopping_zone_remove_area" class="Thelia\Form\ShippingZone\ShippingZoneRemoveArea"/>
+
+        <form name="thelia.lang.update" class="Thelia\Form\Lang\LangUpdateForm"/>
+        <form name="thelia.lang.create" class="Thelia\Form\Lang\LangCreateForm"/>
+        <form name="thelia.lang.defaultBehavior" class="Thelia\Form\Lang\LangDefaultBehaviorForm"/>
+        <form name="thelia.lang.url" class="Thelia\Form\Lang\LangUrlForm"/>
     </forms>
 
 
@@ -312,7 +324,7 @@
         <service id="kernel" synthetic="true" />
 
         <!-- Coupon module -->
-        <service id="thelia.adapter" class="Thelia\Coupon\BaseAdapter">
+        <service id="thelia.adapter" class="Thelia\Coupon\BaseFacade">
             <argument type="service" id="service_container" />
         </service>
         <service id="thelia.coupon.manager" class="Thelia\Coupon\CouponManager">

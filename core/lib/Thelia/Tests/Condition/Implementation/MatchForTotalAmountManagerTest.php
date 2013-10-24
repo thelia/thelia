@@ -25,7 +25,7 @@ namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
 use Thelia\Model\Currency;
 
@@ -42,7 +42,7 @@ use Thelia\Model\Currency;
  */
 class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var AdapterInterface $stubTheliaAdapter */
+    /** @var FacadeInterface $stubTheliaAdapter */
     protected $stubTheliaAdapter = null;
 
     /**
@@ -55,19 +55,19 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function generateAdapterStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR')
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getCartTotalPrice')
             ->will($this->returnValue($cartTotalPrice));
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue($checkoutCurrency));
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
@@ -75,11 +75,11 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         $currency1->setCode('EUR');
         $currency2 = new Currency();
         $currency2->setCode('USD');
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
             ->will($this->returnValue(array($currency1, $currency2)));
 
-        return $stubAdapter;
+        return $stubFacade;
     }
 
     /**
@@ -100,10 +100,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputOperator()
     {
-        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
+        $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        /** @var AdapterInterface $stubAdapter */
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::IN,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -129,10 +129,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputOperator2()
     {
-        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
+        $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        /** @var AdapterInterface $stubAdapter */
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
             MatchForTotalAmountManager::INPUT2 => Operators::INFERIOR
@@ -158,10 +158,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputValue()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -187,10 +187,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputValue2()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -215,10 +215,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingConditionInferior()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -243,10 +243,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingConditionInferior()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(400, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -271,10 +271,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingConditionInferiorEquals()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(400, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR_OR_EQUAL,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -299,10 +299,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingConditionInferiorEquals2()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR_OR_EQUAL,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -327,10 +327,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingConditionInferiorEquals()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(401, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(401, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR_OR_EQUAL,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -355,10 +355,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingConditionEqual()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(400, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -383,10 +383,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingConditionEqual()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -411,10 +411,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingConditionSuperiorEquals()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(401, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(401, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -439,10 +439,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingConditionSuperiorEquals2()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(400, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -467,10 +467,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingConditionSuperiorEquals()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -495,10 +495,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingConditionSuperior()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(401, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(401, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -523,10 +523,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingConditionSuperior()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -551,10 +551,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingConditionCurrency()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(400, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -579,10 +579,10 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingConditionCurrency()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->generateAdapterStub(400.00, 'EUR');
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->generateAdapterStub(400.00, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL

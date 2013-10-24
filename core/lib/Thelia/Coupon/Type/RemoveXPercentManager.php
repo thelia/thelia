@@ -98,7 +98,7 @@ class RemoveXPercentManager extends CouponAbstract
      * @throws \InvalidArgumentException
      * @return float
      */
-    public function getDiscount()
+    public function exec()
     {
         if ($this->percent >= 100) {
             throw new \InvalidArgumentException(

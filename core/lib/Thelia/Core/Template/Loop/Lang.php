@@ -99,7 +99,8 @@ class Lang extends BaseLoop
                 ->set("LOCALE", $result->getLocale())
                 ->set("URL", $result->getUrl())
                 ->set("IS_DEFAULT", $result->getByDefault())
-                ->set("URL", $result->getUrl())
+                ->set("DATE_FORMAT", $result->getDateFormat())
+                ->set("TIME_FORMAT", $result->getTimeFormat())
                 ->set("POSITION", $result->getPosition())
             ;
 

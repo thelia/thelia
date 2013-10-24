@@ -57,7 +57,7 @@ class ProfileModuleTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -67,12 +67,7 @@ class ProfileModuleTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
-
-    /**
-     * the column name for the ID field
-     */
-    const ID = 'profile_module.ID';
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the PROFILE_ID field
@@ -111,12 +106,12 @@ class ProfileModuleTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ProfileId', 'ModuleId', 'Access', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'profileId', 'moduleId', 'access', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ProfileModuleTableMap::ID, ProfileModuleTableMap::PROFILE_ID, ProfileModuleTableMap::MODULE_ID, ProfileModuleTableMap::ACCESS, ProfileModuleTableMap::CREATED_AT, ProfileModuleTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'PROFILE_ID', 'MODULE_ID', 'ACCESS', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'profile_id', 'module_id', 'access', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('ProfileId', 'ModuleId', 'Access', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('profileId', 'moduleId', 'access', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ProfileModuleTableMap::PROFILE_ID, ProfileModuleTableMap::MODULE_ID, ProfileModuleTableMap::ACCESS, ProfileModuleTableMap::CREATED_AT, ProfileModuleTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('PROFILE_ID', 'MODULE_ID', 'ACCESS', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('profile_id', 'module_id', 'access', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -126,12 +121,12 @@ class ProfileModuleTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ProfileId' => 1, 'ModuleId' => 2, 'Access' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'profileId' => 1, 'moduleId' => 2, 'access' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(ProfileModuleTableMap::ID => 0, ProfileModuleTableMap::PROFILE_ID => 1, ProfileModuleTableMap::MODULE_ID => 2, ProfileModuleTableMap::ACCESS => 3, ProfileModuleTableMap::CREATED_AT => 4, ProfileModuleTableMap::UPDATED_AT => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PROFILE_ID' => 1, 'MODULE_ID' => 2, 'ACCESS' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'profile_id' => 1, 'module_id' => 2, 'access' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('ProfileId' => 0, 'ModuleId' => 1, 'Access' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('profileId' => 0, 'moduleId' => 1, 'access' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(ProfileModuleTableMap::PROFILE_ID => 0, ProfileModuleTableMap::MODULE_ID => 1, ProfileModuleTableMap::ACCESS => 2, ProfileModuleTableMap::CREATED_AT => 3, ProfileModuleTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('PROFILE_ID' => 0, 'MODULE_ID' => 1, 'ACCESS' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('profile_id' => 0, 'module_id' => 1, 'access' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -148,11 +143,10 @@ class ProfileModuleTableMap extends TableMap
         $this->setPhpName('ProfileModule');
         $this->setClassName('\\Thelia\\Model\\ProfileModule');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('PROFILE_ID', 'ProfileId', 'INTEGER', 'profile', 'ID', true, null, null);
-        $this->addForeignKey('MODULE_ID', 'ModuleId', 'INTEGER', 'module', 'ID', false, null, null);
+        $this->addForeignPrimaryKey('PROFILE_ID', 'ProfileId', 'INTEGER' , 'profile', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('MODULE_ID', 'ModuleId', 'INTEGER' , 'module', 'ID', true, null, null);
         $this->addColumn('ACCESS', 'Access', 'TINYINT', false, null, 0);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -181,6 +175,59 @@ class ProfileModuleTableMap extends TableMap
     } // getBehaviors()
 
     /**
+     * Adds an object to the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
+     *
+     * @param \Thelia\Model\ProfileModule $obj A \Thelia\Model\ProfileModule object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
+     */
+    public static function addInstanceToPool($obj, $key = null)
+    {
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize(array((string) $obj->getProfileId(), (string) $obj->getModuleId()));
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \Thelia\Model\ProfileModule object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \Thelia\Model\ProfileModule) {
+                $key = serialize(array((string) $value->getProfileId(), (string) $value->getModuleId()));
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize(array((string) $value[0], (string) $value[1]));
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\ProfileModule object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
+            }
+
+            unset(self::$instances[$key]);
+        }
+    }
+
+    /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
      *
      * For tables with a single-column primary key, that simple pkey value will be returned.  For tables with
@@ -194,11 +241,11 @@ class ProfileModuleTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ModuleId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ModuleId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -216,11 +263,7 @@ class ProfileModuleTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return (int) $row[
-                            $indexType == TableMap::TYPE_NUM
-                            ? 0 + $offset
-                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-                        ];
+            return $pks;
     }
 
     /**
@@ -318,14 +361,12 @@ class ProfileModuleTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ProfileModuleTableMap::ID);
             $criteria->addSelectColumn(ProfileModuleTableMap::PROFILE_ID);
             $criteria->addSelectColumn(ProfileModuleTableMap::MODULE_ID);
             $criteria->addSelectColumn(ProfileModuleTableMap::ACCESS);
             $criteria->addSelectColumn(ProfileModuleTableMap::CREATED_AT);
             $criteria->addSelectColumn(ProfileModuleTableMap::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.PROFILE_ID');
             $criteria->addSelectColumn($alias . '.MODULE_ID');
             $criteria->addSelectColumn($alias . '.ACCESS');
@@ -382,7 +423,17 @@ class ProfileModuleTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(ProfileModuleTableMap::DATABASE_NAME);
-            $criteria->add(ProfileModuleTableMap::ID, (array) $values, Criteria::IN);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(ProfileModuleTableMap::PROFILE_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(ProfileModuleTableMap::MODULE_ID, $value[1]));
+                $criteria->addOr($criterion);
+            }
         }
 
         $query = ProfileModuleQuery::create()->mergeWith($criteria);
@@ -426,10 +477,6 @@ class ProfileModuleTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from ProfileModule object
-        }
-
-        if ($criteria->containsKey(ProfileModuleTableMap::ID) && $criteria->keyContainsValue(ProfileModuleTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProfileModuleTableMap::ID.')');
         }
 
 

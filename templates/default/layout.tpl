@@ -67,7 +67,7 @@ URL: http://www.thelia.net
             <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="{intl l="Main Navigation"}">
                 {nocache}
                 <ul class="nav navbar-nav navbar-cart navbar-right">
-                    {loop type="auth" name="customer_info_block" roles="CUSTOMER" context="front"}
+                    {loop type="auth" name="customer_info_block" role="CUSTOMER" context="front"}
                         <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
                         <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
                     {/loop}

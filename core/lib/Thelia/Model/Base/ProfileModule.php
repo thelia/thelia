@@ -59,12 +59,6 @@ abstract class ProfileModule implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the id field.
-     * @var        int
-     */
-    protected $id;
-
-    /**
      * The value for the profile_id field.
      * @var        int
      */
@@ -385,17 +379,6 @@ abstract class ProfileModule implements ActiveRecordInterface
     }
 
     /**
-     * Get the [id] column value.
-     *
-     * @return   int
-     */
-    public function getId()
-    {
-
-        return $this->id;
-    }
-
-    /**
      * Get the [profile_id] column value.
      *
      * @return   int
@@ -467,27 +450,6 @@ abstract class ProfileModule implements ActiveRecordInterface
             return $this->updated_at instanceof \DateTime ? $this->updated_at->format($format) : null;
         }
     }
-
-    /**
-     * Set the value of [id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProfileModule The current object (for fluent API support)
-     */
-    public function setId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[] = ProfileModuleTableMap::ID;
-        }
-
-
-        return $this;
-    } // setId()
 
     /**
      * Set the value of [profile_id] column.
@@ -643,25 +605,22 @@ abstract class ProfileModule implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProfileModuleTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProfileModuleTableMap::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProfileModuleTableMap::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->profile_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProfileModuleTableMap::translateFieldName('ModuleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProfileModuleTableMap::translateFieldName('ModuleId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->module_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProfileModuleTableMap::translateFieldName('Access', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProfileModuleTableMap::translateFieldName('Access', TableMap::TYPE_PHPNAME, $indexType)];
             $this->access = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProfileModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProfileModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProfileModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProfileModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -674,7 +633,7 @@ abstract class ProfileModule implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = ProfileModuleTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = ProfileModuleTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\ProfileModule object", 0, $e);
@@ -915,15 +874,8 @@ abstract class ProfileModule implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ProfileModuleTableMap::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProfileModuleTableMap::ID . ')');
-        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ProfileModuleTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
-        }
         if ($this->isColumnModified(ProfileModuleTableMap::PROFILE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'PROFILE_ID';
         }
@@ -950,9 +902,6 @@ abstract class ProfileModule implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
                     case 'PROFILE_ID':
                         $stmt->bindValue($identifier, $this->profile_id, PDO::PARAM_INT);
                         break;
@@ -975,13 +924,6 @@ abstract class ProfileModule implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
-
-        try {
-            $pk = $con->lastInsertId();
-        } catch (Exception $e) {
-            throw new PropelException('Unable to get autoincrement id.', 0, $e);
-        }
-        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -1031,21 +973,18 @@ abstract class ProfileModule implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
                 return $this->getProfileId();
                 break;
-            case 2:
+            case 1:
                 return $this->getModuleId();
                 break;
-            case 3:
+            case 2:
                 return $this->getAccess();
                 break;
-            case 4:
+            case 3:
                 return $this->getCreatedAt();
                 break;
-            case 5:
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1071,18 +1010,17 @@ abstract class ProfileModule implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['ProfileModule'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['ProfileModule'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['ProfileModule'][$this->getPrimaryKey()] = true;
+        $alreadyDumpedObjects['ProfileModule'][serialize($this->getPrimaryKey())] = true;
         $keys = ProfileModuleTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getProfileId(),
-            $keys[2] => $this->getModuleId(),
-            $keys[3] => $this->getAccess(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[0] => $this->getProfileId(),
+            $keys[1] => $this->getModuleId(),
+            $keys[2] => $this->getAccess(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1131,21 +1069,18 @@ abstract class ProfileModule implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
                 $this->setProfileId($value);
                 break;
-            case 2:
+            case 1:
                 $this->setModuleId($value);
                 break;
-            case 3:
+            case 2:
                 $this->setAccess($value);
                 break;
-            case 4:
+            case 3:
                 $this->setCreatedAt($value);
                 break;
-            case 5:
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1172,12 +1107,11 @@ abstract class ProfileModule implements ActiveRecordInterface
     {
         $keys = ProfileModuleTableMap::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setProfileId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setModuleId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setAccess($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[0], $arr)) $this->setProfileId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setModuleId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setAccess($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -1189,7 +1123,6 @@ abstract class ProfileModule implements ActiveRecordInterface
     {
         $criteria = new Criteria(ProfileModuleTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ProfileModuleTableMap::ID)) $criteria->add(ProfileModuleTableMap::ID, $this->id);
         if ($this->isColumnModified(ProfileModuleTableMap::PROFILE_ID)) $criteria->add(ProfileModuleTableMap::PROFILE_ID, $this->profile_id);
         if ($this->isColumnModified(ProfileModuleTableMap::MODULE_ID)) $criteria->add(ProfileModuleTableMap::MODULE_ID, $this->module_id);
         if ($this->isColumnModified(ProfileModuleTableMap::ACCESS)) $criteria->add(ProfileModuleTableMap::ACCESS, $this->access);
@@ -1210,29 +1143,36 @@ abstract class ProfileModule implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(ProfileModuleTableMap::DATABASE_NAME);
-        $criteria->add(ProfileModuleTableMap::ID, $this->id);
+        $criteria->add(ProfileModuleTableMap::PROFILE_ID, $this->profile_id);
+        $criteria->add(ProfileModuleTableMap::MODULE_ID, $this->module_id);
 
         return $criteria;
     }
 
     /**
-     * Returns the primary key for this object (row).
-     * @return   int
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        $pks = array();
+        $pks[0] = $this->getProfileId();
+        $pks[1] = $this->getModuleId();
+
+        return $pks;
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Set the [composite] primary key.
      *
-     * @param       int $key Primary key.
+     * @param      array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
-    public function setPrimaryKey($key)
+    public function setPrimaryKey($keys)
     {
-        $this->setId($key);
+        $this->setProfileId($keys[0]);
+        $this->setModuleId($keys[1]);
     }
 
     /**
@@ -1242,7 +1182,7 @@ abstract class ProfileModule implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return null === $this->getId();
+        return (null === $this->getProfileId()) && (null === $this->getModuleId());
     }
 
     /**
@@ -1265,7 +1205,6 @@ abstract class ProfileModule implements ActiveRecordInterface
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1398,7 +1337,6 @@ abstract class ProfileModule implements ActiveRecordInterface
      */
     public function clear()
     {
-        $this->id = null;
         $this->profile_id = null;
         $this->module_id = null;
         $this->access = null;

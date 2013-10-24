@@ -108,6 +108,7 @@ class OrderProduct extends BaseLoop
                 ->set("TAX_RULE_TITLE", $product->getTaxRuleTitle())
                 ->set("TAX_RULE_DESCRIPTION", $product->getTaxRuledescription())
                 ->set("PARENT", $product->getParent())
+                ->set("EAN_CODE", $product->getEanCode())
             ;
 
             $loopResult->addRow($loopResultRow);

@@ -28,7 +28,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Thelia\Command\ContainerAwareCommand;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Model\Admin;
+use Thelia\Model\Map\ResourceI18nTableMap;
 use Thelia\Model\Map\ResourceTableMap;
 
 class GenerateResources extends ContainerAwareCommand
@@ -46,7 +48,7 @@ class GenerateResources extends ContainerAwareCommand
                 'output',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Output format amid (string, sql)',
+                'Output format amid (string, sql, sql-i18n)',
                 null
             )
         ;
@@ -55,7 +57,7 @@ class GenerateResources extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $class = new \ReflectionClass('Thelia\Core\Event\AdminResources');
+        $class = new \ReflectionClass('Thelia\Core\Security\Resource\AdminResources');
 
         $constants = $class->getConstants();
 
@@ -69,18 +71,42 @@ class GenerateResources extends ContainerAwareCommand
                 $output->writeln(
                     'INSERT INTO ' . ResourceTableMap::TABLE_NAME . ' (`id`, `code`, `created_at`, `updated_at`) VALUES '
                 );
+                $compteur = 0;
                 foreach($constants as $constant => $value) {
-                    if($constant == 'SUPERADMINISTRATOR') {
+                    if($constant == AdminResources::SUPERADMINISTRATOR) {
                         continue;
                     }
+                    $compteur++;
                     $output->writeln(
-                        "(NULL, '$value', NOW(), NOW())" . ($constant === key( array_slice( $constants, -1, 1, TRUE ) ) ? '' : ',')
+                        "($compteur, '$value', NOW(), NOW())" . ($constant === key( array_slice( $constants, -1, 1, true ) ) ? ';' : ',')
+                    );
+                }
+                break;
+            case 'sql-i18n':
+                $output->writeln(
+                    'INSERT INTO ' . ResourceI18nTableMap::TABLE_NAME . ' (`id`, `locale`, `title`) VALUES '
+                );
+                $compteur = 0;
+                foreach($constants as $constant => $value) {
+                    if($constant == AdminResources::SUPERADMINISTRATOR) {
+                        continue;
+                    }
+
+                    $compteur++;
+
+                    $title = ucwords( str_replace('.', ' / ', str_replace('admin.', '', $value) ) );
+
+                    $output->writeln(
+                        "($compteur, 'en_US', '$title'),"
+                    );
+                    $output->writeln(
+                        "($compteur, 'fr_FR', '$title')" . ($constant === key( array_slice( $constants, -1, 1, true ) ) ? ';' : ',')
                     );
                 }
                 break;
             default :
                 foreach($constants as $constant => $value) {
-                    if($constant == 'SUPERADMINISTRATOR') {
+                    if($constant == AdminResources::SUPERADMINISTRATOR) {
                         continue;
                     }
                     $output->writeln('[' . $constant . "] => " . $value);

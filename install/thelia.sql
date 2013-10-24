@@ -98,7 +98,8 @@ CREATE TABLE `country`
     `isocode` VARCHAR(4) NOT NULL,
     `isoalpha2` VARCHAR(2),
     `isoalpha3` VARCHAR(4),
-    `by_default` TINYINT,
+    `by_default` TINYINT DEFAULT 0,
+    `shop_country` TINYINT(1) DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -983,7 +984,7 @@ CREATE TABLE `admin`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `fk_admin_profile_id` (`profile_id`),
+    INDEX `idx_admin_profile_id` (`profile_id`),
     CONSTRAINT `fk_admin_profile_id`
         FOREIGN KEY (`profile_id`)
         REFERENCES `profile` (`id`)
@@ -999,14 +1000,13 @@ DROP TABLE IF EXISTS `profile_resource`;
 
 CREATE TABLE `profile_resource`
 (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `profile_id` INTEGER NOT NULL,
     `resource_id` INTEGER NOT NULL,
     `access` INTEGER DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`,`profile_id`,`resource_id`),
-    INDEX `id_profile_resource_profile_id` (`profile_id`),
+    PRIMARY KEY (`profile_id`,`resource_id`),
+    INDEX `idx_profile_resource_profile_id` (`profile_id`),
     INDEX `idx_profile_resource_resource_id` (`resource_id`),
     CONSTRAINT `fk_profile_resource_profile_id`
         FOREIGN KEY (`profile_id`)
@@ -1028,13 +1028,12 @@ DROP TABLE IF EXISTS `profile_module`;
 
 CREATE TABLE `profile_module`
 (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `profile_id` INTEGER NOT NULL,
-    `module_id` INTEGER,
+    `module_id` INTEGER NOT NULL,
     `access` TINYINT DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`profile_id`,`module_id`),
     INDEX `idx_profile_module_profile_id` (`profile_id`),
     INDEX `idx_profile_module_module_id` (`module_id`),
     CONSTRAINT `fk_profile_module_profile_id`
@@ -1200,16 +1199,24 @@ CREATE TABLE `cart`
     INDEX `idx_cart_currency_id` (`currency_id`),
     CONSTRAINT `fk_cart_customer_id`
         FOREIGN KEY (`customer_id`)
-        REFERENCES `customer` (`id`),
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
     CONSTRAINT `fk_cart_address_delivery_id`
         FOREIGN KEY (`address_delivery_id`)
-        REFERENCES `address` (`id`),
+        REFERENCES `address` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
     CONSTRAINT `fk_cart_address_invoice_id`
         FOREIGN KEY (`address_invoice_id`)
-        REFERENCES `address` (`id`),
+        REFERENCES `address` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
     CONSTRAINT `fk_cart_currency_id`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1238,13 +1245,19 @@ CREATE TABLE `cart_item`
     INDEX `idx_cart_item_product_sale_elements_id` (`product_sale_elements_id`),
     CONSTRAINT `fk_cart_item_cart_id`
         FOREIGN KEY (`cart_id`)
-        REFERENCES `cart` (`id`),
+        REFERENCES `cart` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
     CONSTRAINT `fk_cart_item_product_id`
         FOREIGN KEY (`product_id`)
-        REFERENCES `product` (`id`),
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
     CONSTRAINT `fk_cart_item_product_sale_elements_id`
         FOREIGN KEY (`product_sale_elements_id`)
         REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1259,6 +1272,7 @@ CREATE TABLE `product_price`
     `currency_id` INTEGER NOT NULL,
     `price` FLOAT NOT NULL,
     `promo_price` FLOAT,
+    `from_default_currency` TINYINT(1) DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`product_sale_elements_id`,`currency_id`),
@@ -1593,9 +1607,6 @@ CREATE TABLE `newsletter`
     `email` VARCHAR(255) NOT NULL,
     `firstname` VARCHAR(255),
     `lastname` VARCHAR(255),
-    `locale` VARCHAR(45),
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 

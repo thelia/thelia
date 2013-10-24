@@ -28,6 +28,7 @@ use Thelia\Model\Map\CountryTableMap;
  * @method     ChildCountryQuery orderByIsoalpha2($order = Criteria::ASC) Order by the isoalpha2 column
  * @method     ChildCountryQuery orderByIsoalpha3($order = Criteria::ASC) Order by the isoalpha3 column
  * @method     ChildCountryQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
+ * @method     ChildCountryQuery orderByShopCountry($order = Criteria::ASC) Order by the shop_country column
  * @method     ChildCountryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCountryQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -37,6 +38,7 @@ use Thelia\Model\Map\CountryTableMap;
  * @method     ChildCountryQuery groupByIsoalpha2() Group by the isoalpha2 column
  * @method     ChildCountryQuery groupByIsoalpha3() Group by the isoalpha3 column
  * @method     ChildCountryQuery groupByByDefault() Group by the by_default column
+ * @method     ChildCountryQuery groupByShopCountry() Group by the shop_country column
  * @method     ChildCountryQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCountryQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -69,6 +71,7 @@ use Thelia\Model\Map\CountryTableMap;
  * @method     ChildCountry findOneByIsoalpha2(string $isoalpha2) Return the first ChildCountry filtered by the isoalpha2 column
  * @method     ChildCountry findOneByIsoalpha3(string $isoalpha3) Return the first ChildCountry filtered by the isoalpha3 column
  * @method     ChildCountry findOneByByDefault(int $by_default) Return the first ChildCountry filtered by the by_default column
+ * @method     ChildCountry findOneByShopCountry(boolean $shop_country) Return the first ChildCountry filtered by the shop_country column
  * @method     ChildCountry findOneByCreatedAt(string $created_at) Return the first ChildCountry filtered by the created_at column
  * @method     ChildCountry findOneByUpdatedAt(string $updated_at) Return the first ChildCountry filtered by the updated_at column
  *
@@ -78,6 +81,7 @@ use Thelia\Model\Map\CountryTableMap;
  * @method     array findByIsoalpha2(string $isoalpha2) Return ChildCountry objects filtered by the isoalpha2 column
  * @method     array findByIsoalpha3(string $isoalpha3) Return ChildCountry objects filtered by the isoalpha3 column
  * @method     array findByByDefault(int $by_default) Return ChildCountry objects filtered by the by_default column
+ * @method     array findByShopCountry(boolean $shop_country) Return ChildCountry objects filtered by the shop_country column
  * @method     array findByCreatedAt(string $created_at) Return ChildCountry objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCountry objects filtered by the updated_at column
  *
@@ -168,7 +172,7 @@ abstract class CountryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, AREA_ID, ISOCODE, ISOALPHA2, ISOALPHA3, BY_DEFAULT, CREATED_AT, UPDATED_AT FROM country WHERE ID = :p0';
+        $sql = 'SELECT ID, AREA_ID, ISOCODE, ISOALPHA2, ISOALPHA3, BY_DEFAULT, SHOP_COUNTRY, CREATED_AT, UPDATED_AT FROM country WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -467,6 +471,33 @@ abstract class CountryQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CountryTableMap::BY_DEFAULT, $byDefault, $comparison);
+    }
+
+    /**
+     * Filter the query on the shop_country column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByShopCountry(true); // WHERE shop_country = true
+     * $query->filterByShopCountry('yes'); // WHERE shop_country = true
+     * </code>
+     *
+     * @param     boolean|string $shopCountry The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function filterByShopCountry($shopCountry = null, $comparison = null)
+    {
+        if (is_string($shopCountry)) {
+            $shop_country = in_array(strtolower($shopCountry), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(CountryTableMap::SHOP_COUNTRY, $shopCountry, $comparison);
     }
 
     /**

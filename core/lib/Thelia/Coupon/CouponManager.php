@@ -26,6 +26,7 @@ namespace Thelia\Coupon;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionManagerInterface;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Model\Coupon;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -40,7 +41,7 @@ use Thelia\Coupon\Type\CouponInterface;
  */
 class CouponManager
 {
-    /** @var AdapterInterface Provides necessary value from Thelia */
+    /** @var FacadeInterface Provides necessary value from Thelia */
     protected $adapter = null;
 
     /** @var ContainerInterface Service Container */
@@ -183,37 +184,10 @@ class CouponManager
         $discount = 0.00;
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
-            // @todo modify Cart with discount for each cart item
-            $discount += $coupon->getDiscount($this->adapter);
+            $discount += $coupon->exec($this->adapter);
         }
 
         return $discount;
-    }
-
-    /**
-     * Build a ConditionManagerInterface from data coming from a form
-     *
-     * @param string $conditionServiceId Condition service id you want to instantiate
-     * @param array  $operators          Condition Operator set by the Admin
-     * @param array  $values             Condition Values set by the Admin
-     *
-     * @return ConditionManagerInterface
-     */
-    public function buildRuleFromForm($conditionServiceId, array $operators, array $values)
-    {
-        $condition = false;
-        try {
-
-            if ($this->container->has($conditionServiceId)) {
-                /** @var ConditionManagerInterface $condition */
-                $condition = $this->container->get($conditionServiceId);
-                $condition->populateFromForm($operators, $values);
-            }
-        } catch (\InvalidArgumentException $e) {
-
-        }
-
-        return $condition;
     }
 
     /**
@@ -241,7 +215,7 @@ class CouponManager
      *
      * @param ConditionManagerInterface $condition ConditionManagerInterface
      */
-    public function addAvailableRule(ConditionManagerInterface $condition)
+    public function addAvailableCondition(ConditionManagerInterface $condition)
     {
         $this->availableConditions[] = $condition;
     }
@@ -254,5 +228,35 @@ class CouponManager
     public function getAvailableConditions()
     {
         return $this->availableConditions;
+    }
+
+    /**
+     * Decrement this coupon quantity
+     *
+     * To call when a coupon is consumed
+     *
+     * @param \Thelia\Model\Coupon $coupon Coupon consumed
+     *
+     * @return bool
+     */
+    public function decrementeQuantity(Coupon $coupon)
+    {
+        $ret = true;
+        try {
+
+        $oldMaxUsage = $coupon->getMaxUsage();
+
+        if ($oldMaxUsage > 0) {
+            $oldMaxUsage--;
+            $coupon->setMaxUsage($$oldMaxUsage);
+
+            $coupon->save();
+        }
+
+        } catch(\Exception $e) {
+            $ret = false;
+        }
+
+        return $ret;
     }
 }

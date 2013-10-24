@@ -10,6 +10,7 @@ use Thelia\Core\Security\Role\Role;
 
 use Thelia\Model\Base\Admin as BaseAdmin;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
 
 /**
  * Skeleton subclass for representing a row from the 'admin' table.
@@ -24,6 +25,8 @@ use Propel\Runtime\Connection\ConnectionInterface;
  */
 class Admin extends BaseAdmin implements UserInterface
 {
+    use ModelEventDispatcherTrait;
+
     public function getPermissions()
     {
         $profileId = $this->getProfileId();

@@ -251,6 +251,6 @@ class CountryController extends AbstractCrudController
 
         }
 
-        return $this->nullResponse($content, 500);
+        return $this->nullResponse(500);
     }
 }

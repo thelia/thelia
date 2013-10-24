@@ -24,13 +24,6 @@
         <default key="_controller">Thelia\Controller\Admin\SessionController::checkLoginAction</default>
     </route>
 
-    <!-- Route to edit admin profile -->
-    <route id="admin.profile.update.view" path="/admin/profile/update" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\AdminController::updateAction</default>
-    </route>
-
-
-
     <!-- Route to the catalog controller -->
 
     <route id="admin.catalog" path="/admin/catalog">
@@ -310,6 +303,10 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::updateContentPositionAction</default>
     </route>
 
+    <route id="admin.product.update-content-position" path="/admin/product/calculate-price">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::priceCaclulator</default>
+    </route>
+
     <!-- accessories -->
 
     <route id="admin.products.accessories.add" path="/admin/products/accessory/add">
@@ -356,19 +353,19 @@
     </route>
 
     <route id="admin.product.combination.add" path="/admin/product/combination/add">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::addCombinationAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ProductController::addProductSaleElementAction</default>
     </route>
 
     <route id="admin.product.combination.delete" path="/admin/product/combination/delete">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::deleteCombinationAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ProductController::deleteProductSaleElementAction</default>
     </route>
 
     <route id="admin.product.combination.update" path="/admin/product/combination/update">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::updateCombinationAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updateProductSaleElementAction</default>
     </route>
 
     <route id="admin.product.combination.defaut-price.update" path="/admin/product/default-price/update">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::updateDefaultPriceAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updateProductDefaultSaleElementAction</default>
     </route>
 
 
@@ -777,11 +774,39 @@
         <default key="_controller">Thelia\Controller\Admin\ProfileController::processUpdateAction</default>
     </route>
 
+    <route id="admin.configuration.profiles.saveResourceAccess" path="/admin/configuration/profiles/saveResourceAccess">
+        <default key="_controller">Thelia\Controller\Admin\ProfileController::processUpdateResourceAccess</default>
+    </route>
+
+    <route id="admin.configuration.profiles.saveModuleAccess" path="/admin/configuration/profiles/saveModuleAccess">
+        <default key="_controller">Thelia\Controller\Admin\ProfileController::processUpdateModuleAccess</default>
+    </route>
+
     <route id="admin.configuration.profiles.delete" path="/admin/configuration/profiles/delete">
         <default key="_controller">Thelia\Controller\Admin\ProfileController::deleteAction</default>
     </route>
 
     <!-- end profiles management -->
+
+    <!-- administrator management -->
+
+    <route id="admin.configuration.administrators.view" path="/admin/configuration/administrators">
+        <default key="_controller">Thelia\Controller\Admin\AdministratorController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.administrators.add" path="/admin/configuration/administrators/add">
+        <default key="_controller">Thelia\Controller\Admin\AdministratorController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.administrators.save" path="/admin/configuration/administrators/save">
+        <default key="_controller">Thelia\Controller\Admin\AdministratorController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.configuration.administrators.delete" path="/admin/configuration/administrators/delete">
+        <default key="_controller">Thelia\Controller\Admin\AdministratorController::deleteAction</default>
+    </route>
+
+    <!-- end administrator management -->
 
     <!-- feature and features value management -->
 
@@ -912,6 +937,50 @@
 
     <!-- end tax rules management -->
 
+    <!-- language management -->
+
+    <route id="admin.configuration.languages" path="/admin/configuration/languages">
+        <default key="_controller">Thelia\Controller\Admin\LangController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.languages.update" path="/admin/configuration/languages/update/{lang_id}">
+        <default key="_controller">Thelia\Controller\Admin\LangController::updateAction</default>
+        <requirement key="lang_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.languages.update.process" path="/admin/configuration/languages/save/{lang_id}">
+        <default key="_controller">Thelia\Controller\Admin\LangController::processUpdateAction</default>
+        <requirement key="lang_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.languages.toggleDefault" path="/admin/configuration/languages/toggleDefault/{lang_id}">
+        <default key="_controller">Thelia\Controller\Admin\LangController::toggleDefaultAction</default>
+        <requirement key="lang_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.languages.add" path="/admin/configuration/languages/add">
+        <default key="_controller">Thelia\Controller\Admin\LangController::addAction</default>
+    </route>
+
+    <route id="admin.configuration.languages.delete" path="/admin/configuration/languages/delete">
+        <default key="_controller">Thelia\Controller\Admin\LangController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.languages.defaultBehavior" path="/admin/configuration/languages/defaultBehavior">
+        <default key="_controller">Thelia\Controller\Admin\LangController::defaultBehaviorAction</default>
+    </route>
+
+    <route id="admin.configuration.languages.updateUrl" path="/admin/configuration/languages/updateUrl">
+        <default key="_controller">Thelia\Controller\Admin\LangController::domainAction</default>
+    </route>
+
+    <route id="admin.configuration.languages.domain.activation" path="/admin/configuration/languages/domain/activate">
+        <default key="_controller">Thelia\Controller\Admin\LangController::activateDomainAction</default>
+    </route>
+
+    <route id="admin.configuration.languages.domain.deactivation" path="/admin/configuration/languages/domain/deactivate">
+        <default key="_controller">Thelia\Controller\Admin\LangController::deactivateDomainAction</default>
+    </route>
 
     <!-- The default route, to display a template -->
 
