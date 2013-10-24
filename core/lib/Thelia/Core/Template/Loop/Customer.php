@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -44,7 +45,7 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Customer extends BaseLoop
+class Customer extends BaseLoop implements SearchLoopInterface
 {
     public $timestampable = true;
 
@@ -65,6 +66,47 @@ class Customer extends BaseLoop
             Argument::createBooleanTypeArgument('reseller'),
             Argument::createIntTypeArgument('sponsor')
         );
+    }
+
+    public function getSearchIn()
+    {
+        return array(
+            "ref",
+            "firstname",
+            "lastname",
+            "email",
+        );
+    }
+
+    /**
+     * @param CustomerQuery $search
+     * @param $searchTerm
+     * @param $searchIn
+     * @param $searchCriteria
+     */
+    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
+    {
+
+        $search->_and();
+        foreach($searchIn as $index => $searchInElement) {
+            if($index > 0) {
+                $search->_or();
+            }
+            switch($searchInElement) {
+                case "ref":
+                    $search->filterByRef($searchTerm, $searchCriteria);
+                    break;
+                case "firstname":
+                    $search->filterByFirstname($searchTerm, $searchCriteria);
+                    break;
+                case "lastname":
+                    $search->filterByLastname($searchTerm, $searchCriteria);
+                    break;
+                case "email":
+                    $search->filterByEmail($searchTerm, $searchCriteria);
+                    break;
+            }
+        }
     }
 
     /**
