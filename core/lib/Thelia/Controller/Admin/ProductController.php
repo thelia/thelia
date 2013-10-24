@@ -65,6 +65,8 @@ use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Tools\NumberFormat;
+use Thelia\Model\Product;
+use Thelia\Model\CurrencyQuery;
 
 /**
  * Manages products
@@ -187,6 +189,23 @@ class ProductController extends AbstractCrudController
         return $event->hasProduct();
     }
 
+    protected function updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency) {
+
+        // Get price for default currency
+        $priceForDefaultCurrency = ProductPriceQuery::create()
+        ->filterByCurrency($defaultCurrency)
+        ->filterByProductSaleElements($saleElement)
+        ->findOne()
+        ;
+
+        if ($priceForDefaultCurrency !== null) {
+            $productPrice
+            ->setPrice($priceForDefaultCurrency->getPrice() * $currentCurrency->getRate())
+            ->setPromoPrice($priceForDefaultCurrency->getPromoPrice() * $currentCurrency->getRate())
+            ;
+        }
+    }
+
     protected function hydrateObjectForm($object)
     {
         $defaultPseData = $combinationPseData = array();
@@ -196,17 +215,36 @@ class ProductController extends AbstractCrudController
             ->filterByProduct($object)
             ->find();
 
+        $defaultCurrency = Currency::getDefaultCurrency();
+        $currentCurrency = $this->getCurrentEditionCurrency();
+
         foreach($saleElements as $saleElement) {
 
             // Get the product price for the current currency
-
             $productPrice = ProductPriceQuery::create()
-                ->filterByCurrency($this->getCurrentEditionCurrency())
+                ->filterByCurrency($currentCurrency)
                 ->filterByProductSaleElements($saleElement)
                 ->findOne()
             ;
 
-            if ($productPrice == null) $productPrice = new ProductPrice();
+            // No one exists ?
+            if ($productPrice === null) {
+                $productPrice = new ProductPrice();
+
+                // If the current currency is not the default one, calculate the price
+                // using default currency price and current currency rate
+                if ($currentCurrency->getId() != $defaultCurrency->getId()) {
+
+                    $productPrice->setFromDefaultCurrency(true);
+
+                    $this->updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency);
+                }
+            }
+
+            // Caclulate prices if we have to use the rate * defaulkt currency price
+            if ($productPrice->getFromDefaultCurrency() == true) {
+                $this->updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency);
+            }
 
             $isDefaultPse = count($saleElement->getAttributeCombinations()) == 0;
 
@@ -219,18 +257,19 @@ class ProductController extends AbstractCrudController
                     "product_sale_element_id" => $saleElement->getId(),
                     "reference"               => $saleElement->getRef(),
                     "price"                   => $productPrice->getPrice(),
+                    "price_with_tax"          => $this->computePrice($productPrice->getPrice(), 'without_tax', $object),
                     "use_exchange_rate"       => $productPrice->getFromDefaultCurrency() ? 1 : 0,
                     "tax_rule"                => $object->getTaxRuleId(),
                     "currency"                => $productPrice->getCurrencyId(),
                     "weight"                  => $saleElement->getWeight(),
                     "quantity"                => $saleElement->getQuantity(),
                     "sale_price"              => $productPrice->getPromoPrice(),
+                    "sale_price_with_tax"     => $this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object),
                     "onsale"                  => $saleElement->getPromo() > 0 ? 1 : 0,
                     "isnew"                   => $saleElement->getNewness() > 0 ? 1 : 0,
                     "isdefault"               => $saleElement->getIsDefault() > 0 ? 1 : 0,
                     "ean_code"                => $saleElement->getEanCode()
                 );
-
             }
             else {
             }
@@ -240,9 +279,13 @@ class ProductController extends AbstractCrudController
 
             $combinationPseForm = new ProductSaleElementUpdateForm($this->getRequest(), "form", $combinationPseData);
             $this->getParserContext()->addForm($combinationPseForm);
+
+            var_dump($defaultPseData);
+
+            var_dump($combinationPseData);
         }
 
-        // Prepare the data that will hydrate the form
+        // Prepare the data that will hydrate the form(s)
         $data = array(
             'id'               => $object->getId(),
             'ref'              => $object->getRef(),
@@ -254,8 +297,6 @@ class ProductController extends AbstractCrudController
             'visible'          => $object->getVisible(),
             'url'              => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
             'default_category' => $object->getDefaultCategoryId()
-
-            // A terminer pour les prix
         );
 
         // Setup the object form
@@ -847,7 +888,7 @@ class ProductController extends AbstractCrudController
     protected function processProductSaleElementUpdate($changeForm) {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
 
@@ -875,7 +916,8 @@ class ProductController extends AbstractCrudController
                 ->setIsnew($data['isnew'])
                 ->setIsdefault($data['isdefault'])
                 ->setEanCode($data['ean_code'])
-                ->setTaxrule($data['tax_rule'])
+                ->setTaxRuleId($data['tax_rule'])
+                ->setFromDefaultCurrency($data['use_exchange_rate'])
             ;
 
             $this->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $event);
@@ -928,24 +970,102 @@ class ProductController extends AbstractCrudController
         );
     }
 
+    /**
+     * Invoked through Ajax; this methow calculate the taxed price from the unaxed price, and
+     * vice versa.
+     */
     public function priceCaclulator() {
 
-        $price     = floatval($this->getRequest()->get('price', 0));
-        $tax_rule  = intval($this->getRequest()->get('tax_rule_id', 0)); // The tax rule ID
-        $action    = $this->getRequest()->get('action', ''); // With ot without tax
-        $convert   = intval($this->getRequest()->get('convert_from_default_currency', 0));
+        $return_price = 0;
+
+        $price      = floatval($this->getRequest()->get('price', 0));
+        $product_id = intval($this->getRequest()->get('product_id', 0));
+        $action     = $this->getRequest()->get('action', ''); // With ot without tax
+        $convert    = intval($this->getRequest()->get('convert_from_default_currency', 0));
+
+        if (null !== $product = ProductQuery::create()->findPk($product_id)) {
+
+            if ($action == 'to_tax') {
+                $return_price = $this->computePrice($price, 'without_tax', $product);
+            }
+            else if ($action == 'from_tax') {
+                $return_price = $this->computePrice($price, 'with_tax', $product);
+            }
+            else {
+                $return_price = $price;
+            }
+
+            if ($convert != 0) {
+                $return_price = $prix * Currency::getDefaultCurrency()->getRate();
+            }
+        }
+
+        return new JsonResponse(array('result' => $return_price));
+    }
+
+    public function loadConvertedPrices() {
+
+        $product_sale_element_id  = intval($this->getRequest()->get('product_sale_element_id', 0));
+        $currency_id = intval($this->getRequest()->get('currency_id', 0));
+
+        $price_with_tax = $price_without_tax = $sale_price_with_tax = $sale_price_without_tax = 0;
+
+        if (null !== $pse = ProductSaleElementsQuery::create()->findPk($product_sale_element_id)) {
+            if ($currency_id > 0
+                &&
+                $currency_id != Currency::getDefaultCurrency()->getId()
+                &&
+                null !== $currency = CurrencyQuery::create()->findPk($currency_id)) {
+
+                // Get the default currency price
+                $productPrice = ProductPriceQuery::create()
+                    ->filterByCurrency(Currency::getDefaultCurrency())
+                    ->filterByProductSaleElementsId($product_sale_element_id)
+                    ->findOne()
+                ;
+
+                // Calculate the converted price
+                if (null !== $productPrice) {
+                    $price_without_tax = $productPrice->getPrice() * $currency->getRate();
+                    $sale_price_without_tax = $productPrice->getPromoPrice() * $currency->getRate();
+                }
+            }
+
+            if (null !== $product = $pse->getProduct()) {
+                $price_with_tax = $this->computePrice($price_without_tax, 'with_tax', $product);
+                $sale_price_with_tax = $this->computePrice($sale_price_without_tax, 'with_tax', $product);
+            }
+        }
+
+        return new JsonResponse(array(
+            'price_with_tax'         => NumberFormat::getInstance($this->getRequest())->format($price_with_tax, null, '.'),
+            'price_without_tax'      => NumberFormat::getInstance($this->getRequest())->format($price_without_tax, null, '.'),
+            'sale_price_with_tax'    => NumberFormat::getInstance($this->getRequest())->format($sale_price_with_tax, null, '.'),
+            'sale_price_without_tax' => NumberFormat::getInstance($this->getRequest())->format($sale_price_without_tax, null, '.')
+        ));
+    }
+
+    /**
+     * Calculate taxed/untexted price for a product
+     *
+     * @param unknown $price
+     * @param unknown $price_type
+     * @param Product $product
+     * @return Ambigous <unknown, number>
+     */
+    protected function computePrice($price, $price_type, Product $product, $convert = false) {
 
         $calc = new Calculator();
 
-        $calc->loadTaxRule(
-                TaxRuleQuery::create()->findPk($tax_rule),
+        $calc->load(
+                $product,
                 Country::getShopLocation()
         );
 
-        if ($action == 'to_tax') {
+        if ($price_type == 'without_tax') {
             $return_price = $calc->getTaxedPrice($price);
         }
-        else if ($action == 'from_tax') {
+        else if ($price_type == 'with_tax') {
             $return_price = $calc->getUntaxedPrice($price);
         }
         else {
@@ -955,10 +1075,7 @@ class ProductController extends AbstractCrudController
         if ($convert != 0) {
             $return_price = $prix * Currency::getDefaultCurrency()->getRate();
         }
-
         // Format the number using '.', to perform further calculation
-        $return_price = NumberFormat::getInstance($this->getRequest())->format($return_price, null, '.');
-
-        return new JsonResponse(array('result' => $return_price));
+        return NumberFormat::getInstance($this->getRequest())->format($return_price, null, '.');
     }
 }

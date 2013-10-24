@@ -1270,9 +1270,9 @@ CREATE TABLE `product_price`
 (
     `product_sale_elements_id` INTEGER NOT NULL,
     `currency_id` INTEGER NOT NULL,
-    `price` FLOAT NOT NULL,
-    `promo_price` FLOAT,
-    `from_default_currency` TINYINT(1) DEFAULT 0 NOT NULL,
+    `price` FLOAT DEFAULT 0 NOT NULL,
+    `promo_price` FLOAT DEFAULT 0 NOT NULL,
+    `from_default_currency` TINYINT(1) DEFAULT 1 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`product_sale_elements_id`,`currency_id`),
@@ -1607,7 +1607,11 @@ CREATE TABLE `newsletter`
     `email` VARCHAR(255) NOT NULL,
     `firstname` VARCHAR(255),
     `lastname` VARCHAR(255),
-    PRIMARY KEY (`id`)
+    `locale` VARCHAR(5),
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `email_UNIQUE` (`email`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

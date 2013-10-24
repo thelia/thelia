@@ -67,11 +67,11 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->findOne($con);
 
             if ($salesElement == null) {
-                // Create a new product sale element
+                // Create a new default product sale element
                 $salesElement = $event->getProduct()->createDefaultProductSaleElement($con, 0, 0, $event->getCurrencyId(), true);
             }
             else {
-                // This one is the default
+                // This (new) one is the default
                 $salesElement->setIsDefault(true)->save($con);
             }
 
@@ -122,6 +122,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
         try {
 
+            // Update the product's tax rule
+            $event->getProduct()->setTaxRuleId($event->getTaxRuleId())->save($con);
+
             // If product sale element is not defined, create it.
             if ($salesElement == null) {
                 $salesElement = new ProductSaleElements();
@@ -158,11 +161,25 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ;
             }
 
-            $productPrice
-                ->setPromoPrice($event->getSalePrice())
-                ->setPrice($event->getPrice())
-                ->save($con)
-            ;
+            // Check if we have to store the price
+            $productPrice->setFromDefaultCurrency($event->getFromDefaultCurrency());
+
+            if ($event->getFromDefaultCurrency() == 0) {
+                // Store the price
+                $productPrice
+                    ->setPromoPrice($event->getSalePrice())
+                    ->setPrice($event->getPrice())
+                ;
+            }
+            else {
+                // Do not store the price.
+                $productPrice
+                    ->setPromoPrice(0)
+                    ->setPrice(0)
+                ;
+            }
+
+            $productPrice->save($con);
 
             // Store all the stuff !
             $con->commit();

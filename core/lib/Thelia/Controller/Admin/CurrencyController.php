@@ -32,6 +32,7 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Form\CurrencyModificationForm;
 use Thelia\Form\CurrencyCreationForm;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Security\AccessManager;
 
 /**
  * Manages currencies
