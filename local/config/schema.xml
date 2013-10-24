@@ -931,16 +931,16 @@
     <column name="address_invoice_id" type="INTEGER" />
     <column name="currency_id" type="INTEGER" />
     <column defaultValue="0" name="discount" type="FLOAT" />
-    <foreign-key foreignTable="customer" name="fk_cart_customer_id">
+    <foreign-key foreignTable="customer" name="fk_cart_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
     </foreign-key>
-    <foreign-key foreignTable="address" name="fk_cart_address_delivery_id">
+    <foreign-key foreignTable="address" name="fk_cart_address_delivery_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="address_delivery_id" />
     </foreign-key>
-    <foreign-key foreignTable="address" name="fk_cart_address_invoice_id">
+    <foreign-key foreignTable="address" name="fk_cart_address_invoice_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="address_invoice_id" />
     </foreign-key>
-    <foreign-key foreignTable="currency" name="fk_cart_currency_id">
+    <foreign-key foreignTable="currency" name="fk_cart_currency_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="currency_id" />
     </foreign-key>
     <index name="idx_cart_customer_id">
@@ -971,13 +971,13 @@
     <column name="price_end_of_life" type="TIMESTAMP" />
     <column defaultValue="0" name="discount" type="FLOAT" />
     <column name="promo" type="INTEGER" />
-    <foreign-key foreignTable="cart" name="fk_cart_item_cart_id">
+    <foreign-key foreignTable="cart" name="fk_cart_item_cart_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="cart_id" />
     </foreign-key>
-    <foreign-key foreignTable="product" name="fk_cart_item_product_id">
+    <foreign-key foreignTable="product" name="fk_cart_item_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>
-    <foreign-key foreignTable="product_sale_elements" name="fk_cart_item_product_sale_elements_id">
+    <foreign-key foreignTable="product_sale_elements" name="fk_cart_item_product_sale_elements_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_sale_elements_id" />
     </foreign-key>
     <index name="idx_cart_item_cart_id">
@@ -994,9 +994,9 @@
   <table name="product_price" namespace="Thelia\Model">
     <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="currency_id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="price" required="true" type="FLOAT" />
-    <column name="promo_price" type="FLOAT" />
-    <column defaultValue="0" name="from_default_currency" required="true" type="BOOLEAN" />
+    <column defaultValue="0" name="price" required="true" type="FLOAT" />
+    <column defaultValue="0" name="promo_price" required="true" type="FLOAT" />
+    <column defaultValue="1" name="from_default_currency" required="true" type="BOOLEAN" />
     <foreign-key foreignTable="product_sale_elements" name="fk_product_price_product_sale_elements_id" onDelete="CASCADE">
       <reference foreign="id" local="product_sale_elements_id" />
     </foreign-key>
@@ -1245,7 +1245,7 @@
     </index>
     <behavior name="timestampable" />
   </table>
-  <table name="newsletter">
+  <table name="newsletter" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="email" required="true" size="255" type="VARCHAR" />
     <column name="firstname" size="255" type="VARCHAR" />

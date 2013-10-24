@@ -1199,16 +1199,24 @@ CREATE TABLE `cart`
     INDEX `idx_cart_currency_id` (`currency_id`),
     CONSTRAINT `fk_cart_customer_id`
         FOREIGN KEY (`customer_id`)
-        REFERENCES `customer` (`id`),
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
     CONSTRAINT `fk_cart_address_delivery_id`
         FOREIGN KEY (`address_delivery_id`)
-        REFERENCES `address` (`id`),
+        REFERENCES `address` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
     CONSTRAINT `fk_cart_address_invoice_id`
         FOREIGN KEY (`address_invoice_id`)
-        REFERENCES `address` (`id`),
+        REFERENCES `address` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
     CONSTRAINT `fk_cart_currency_id`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1237,13 +1245,19 @@ CREATE TABLE `cart_item`
     INDEX `idx_cart_item_product_sale_elements_id` (`product_sale_elements_id`),
     CONSTRAINT `fk_cart_item_cart_id`
         FOREIGN KEY (`cart_id`)
-        REFERENCES `cart` (`id`),
+        REFERENCES `cart` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
     CONSTRAINT `fk_cart_item_product_id`
         FOREIGN KEY (`product_id`)
-        REFERENCES `product` (`id`),
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
     CONSTRAINT `fk_cart_item_product_sale_elements_id`
         FOREIGN KEY (`product_sale_elements_id`)
         REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1256,9 +1270,9 @@ CREATE TABLE `product_price`
 (
     `product_sale_elements_id` INTEGER NOT NULL,
     `currency_id` INTEGER NOT NULL,
-    `price` FLOAT NOT NULL,
-    `promo_price` FLOAT,
-    `from_default_currency` TINYINT(1) DEFAULT 0 NOT NULL,
+    `price` FLOAT DEFAULT 0 NOT NULL,
+    `promo_price` FLOAT DEFAULT 0 NOT NULL,
+    `from_default_currency` TINYINT(1) DEFAULT 1 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`product_sale_elements_id`,`currency_id`),

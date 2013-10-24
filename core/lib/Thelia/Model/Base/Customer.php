@@ -1350,10 +1350,9 @@ abstract class Customer implements ActiveRecordInterface
 
             if ($this->cartsScheduledForDeletion !== null) {
                 if (!$this->cartsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->cartsScheduledForDeletion as $cart) {
-                        // need to save related object because we set the relation to null
-                        $cart->save($con);
-                    }
+                    \Thelia\Model\CartQuery::create()
+                        ->filterByPrimaryKeys($this->cartsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
                     $this->cartsScheduledForDeletion = null;
                 }
             }

@@ -275,48 +275,83 @@ $(function() {
     });
 
     // In details tab, process exchange rate usage checkbox changes
-    $('use_exchange_rate_box').change(function(ev) {
-        $('.')
+    $('.use_exchange_rate_box').change(function(ev) {
+
+    	if ($(this).is(':checked')) {
+
+    		var pse_id = $(this).data('pse-id');
+
+    	    $('.price_field').prop('readonly', true);
+
+    	    // Reload prices
+            $.ajax({
+                url      : '{url path="/admin/product/load-converted-prices"}',
+                data     : {
+                    product_sale_element_id : pse_id,
+                    currency_id             : {$edit_currency_id}
+                },
+                type     : 'get',
+                dataType : 'json',
+                success  : function(json) {
+                	console.log(json);
+
+                    $('input[data-pse-id="'+pse_id+'"][data-price-type="price-with-tax"]').val(json.price_with_tax);
+                    $('input[data-pse-id="'+pse_id+'"][data-price-type="price-without-tax"]').val(json.price_without_tax);
+                    $('input[data-pse-id="'+pse_id+'"][data-price-type="sale-price-with-tax"]').val(json.sale_price_with_tax);
+                    $('input[data-pse-id="'+pse_id+'"][data-price-type="sale-price-without-tax"]').val(json.sale_price_without_tax);
+                },
+                error : function(jqXHR, textStatus, errorThrown) {
+                	alert("{intl l='Failed to get converted prices. Please try again.'} (" +errorThrown+ ")");
+                }
+           });
+
+    	}
+    	else {
+    	    $('.price_field').prop('readonly', false)
+    	}
     });
+
+    function update_price(price, price_type, dest_field_id) {
+        var tax_rule_id = $('#tax_rule_field').val();
+
+        if (tax_rule_id != "") {
+
+            var operation;
+
+            if (price_type.indexOf('with-tax') != -1)
+                operation = 'from_tax';
+            else if (price_type.indexOf('without-tax') != -1)
+                operation = 'to_tax';
+            else
+                operation = '';
+
+            $.ajax({
+                url      : '{url path="/admin/product/calculate-price"}',
+                data     : {
+                    price      : price,
+                    action     : operation,
+                    product_id : {$product_id}
+                },
+                type     : 'get',
+                dataType : 'json',
+                success  : function(json) {
+                    $('#' + dest_field_id).val(json.result);
+                },
+                error : function(jqXHR, textStatus, errorThrown) {
+                    alert("{intl l='Failed to get prices. Please try again.'} (" +errorThrown+ ")");
+                }
+           });
+        }
+    }
 
     // Automatic update of price fields: any change in the taxed (resp. untaxed) price
     // will update the untaxed (resp. taxed) one
     $('.automatic_price_field').typeWatch({
     	captureLength: 1,
     	callback: function () {
-
-    		var tax_rule_id = $('#tax_rule_field').val();
-
-    		if (tax_rule_id != "") {
-		     	var priceType = $(this).data('price-type');
-		    	var dest_field_id = $(this).data('rel-price');
-
-		    	var operation;
-
-		    	if (priceType == 'with-tax')
-		    		operation = 'from_tax';
-		    	else if (priceType == 'without-tax')
-		    		operation = 'to_tax';
-		    	else
-		    		operation = '';
-
-		        $.ajax({
-		            url      : '{url path="/admin/product/calculate-price"}',
-		            data     : {
-		            	price       : $(this).val(),
-		            	action      : operation,
-		            	tax_rule_id : $('#tax_rule_field').val()
-		            },
-		            type     : 'get',
-		            dataType : 'json',
-		            success  : function(json) {
-		            	$('#' + dest_field_id).val(json.result);
-		            }
-		       });
-    		}
+    		update_price($(this).val(), $(this).data('price-type'), $(this).data('rel-price'));
     	}
     });
-
 });
 </script>
 

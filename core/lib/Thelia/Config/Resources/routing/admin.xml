@@ -303,8 +303,12 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::updateContentPositionAction</default>
     </route>
 
-    <route id="admin.product.update-content-position" path="/admin/product/calculate-price">
+    <route id="admin.product.calculate-price" path="/admin/product/calculate-price">
         <default key="_controller">Thelia\Controller\Admin\ProductController::priceCaclulator</default>
+    </route>
+
+    <route id="admin.product.load-converted-prices" path="/admin/product/load-converted-prices">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::loadConvertedPrices</default>
     </route>
 
     <!-- accessories -->

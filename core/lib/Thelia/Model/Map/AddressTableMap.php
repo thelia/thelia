@@ -238,8 +238,8 @@ class AddressTableMap extends TableMap
         $this->addRelation('Customer', '\\Thelia\\Model\\Customer', RelationMap::MANY_TO_ONE, array('customer_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('CustomerTitle', '\\Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_ONE, array('country_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('CartRelatedByAddressDeliveryId', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'address_delivery_id', ), null, null, 'CartsRelatedByAddressDeliveryId');
-        $this->addRelation('CartRelatedByAddressInvoiceId', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'address_invoice_id', ), null, null, 'CartsRelatedByAddressInvoiceId');
+        $this->addRelation('CartRelatedByAddressDeliveryId', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'address_delivery_id', ), 'RESTRICT', 'RESTRICT', 'CartsRelatedByAddressDeliveryId');
+        $this->addRelation('CartRelatedByAddressInvoiceId', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'address_invoice_id', ), 'RESTRICT', 'RESTRICT', 'CartsRelatedByAddressInvoiceId');
     } // buildRelations()
 
     /**
