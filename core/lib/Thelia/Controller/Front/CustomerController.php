@@ -109,7 +109,7 @@ class CustomerController extends BaseFrontController
 
                 $cart = $this->getCart($this->getRequest());
                 if ($cart->getCartItems()->count() > 0) {
-                    $this->redirectToRoute("cart.view");
+                    $this->redirectToRoute('default', array('view'=>'cart'));
                 } else {
                     $this->redirectSuccess($customerCreation);
                 }
@@ -278,7 +278,7 @@ class CustomerController extends BaseFrontController
 
                 // If User is a new customer
                 if ($form->get('account')->getData() == 0 && !$form->get("email")->getErrors()) {
-                    $this->redirectToRoute("customer.create.view", array("email" => $form->get("email")->getData()));
+                    $this->redirectToRoute("default", array("view" => "register","email" => $form->get("email")->getData()));
                 } else {
 
                     try {
