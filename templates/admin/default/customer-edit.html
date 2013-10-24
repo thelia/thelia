@@ -29,7 +29,7 @@
                             <div class="form-container">
                                 <div class="col-md-12">
 
-        						    {form name="thelia.customer.modification"}
+        						    {form name="thelia.admin.customer.modification"}
         						    	<form method="POST" action="{url path="/admin/customer/update/{$ID}"}" {form_enctype form=$form} class="clearfix">
 
                                             <div class="row inner-toolbar clearfix">
@@ -261,7 +261,7 @@
     <div id="address-update-modal"></div>
     {* Add an Address *}
 
-    {form name="thelia.address.create"}
+    {form name="thelia.admin.address.create"}
 
         {* Capture the dialog body, to pass it to the generic dialog *}
         {capture "address_creation_dialog"}

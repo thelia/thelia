@@ -3,6 +3,19 @@
 // Main Title
 .page-header { margin-top: 0; }
 
+// 404 Page
+.page_404{
+  color: @brand-primary;
+  font-size: 9em; font-weight: bold;
+  text-align: center;
+
+  span{
+    color : #CCC;
+    display: block;
+    font-size: 15px; font-weight: normal;
+  }
+}
+
 // Collapse
 .no-js .collapse { display: block!important; }
 
@@ -100,4 +113,23 @@ ul {
             }
         }
     }
+}
+
+
+.modal-dialog{
+  td{vertical-align: middle}
+
+  .close{
+    margin: 10px;
+    position: relative; z-index: 10;
+  }
+
+  .btn{
+    margin-left: 10px;
+  }
+}
+@media screen and (min-width: 768px){
+  .modal-dialog{
+    width: 800px;
+  }
 }

@@ -124,11 +124,17 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             // @todo insert false product in cart with the name of the coupon and the discount as negative price
 
             // Decrement coupon quantity
+            // @todo move this part in after order event
             $couponQuery = CouponQuery::create();
             $couponModel = $couponQuery->findOneByCode($coupon->getCode());
             $couponManager->decrementeQuantity($couponModel);
 
-            $request->getSession()->getCart()->setDiscount($totalDiscount);
+            $request
+                ->getSession()
+                ->getCart()
+                ->setDiscount($totalDiscount)
+                ->save()
+            ;
 
         }
 

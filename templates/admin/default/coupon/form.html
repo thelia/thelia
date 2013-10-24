@@ -107,7 +107,7 @@
                                 <select name="{$name}" id="type" class="col-md-12 form-control">
                                     <option value="-1" data-description="">{intl l='Please select a coupon type'}</option>
                                     {foreach from=$availableCoupons item=availableCoupon}
-                                        <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}" {if $value == $availableCoupon.serviceId}selected{/if}>
+                                        <option value="{$availableCoupon.serviceId}" {if $value == $availableCoupon.serviceId}selected{/if}>
                                             {$availableCoupon.name}
                                         </option>
                                     {/foreach}

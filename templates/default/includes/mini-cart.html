@@ -1,5 +1,5 @@
 {ifloop rel="cartloop"}
-<li class="dropdown pull-right cart-not-empty">
+<li class="dropdown pull-right cart-not-empty cart-container">
     <a href="{url path="/cart"}" rel="nofollow" class="cart">
         {intl l="Cart"} <span class="badge">{cart attr="count_item"}</span>
     </a>
@@ -60,7 +60,7 @@
 </li>
 {/ifloop}
 {elseloop rel="cartloop"}
-<li class="dropdown pull-right">
+<li class="dropdown pull-right  cart-container">
     <a href="{url path="/cart"}" rel="nofollow" class="cart">
         {intl l="Cart"} <span class="badge">0</span>
     </a>

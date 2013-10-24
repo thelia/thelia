@@ -76,7 +76,7 @@ URL: http://www.thelia.net
                     <li class="dropdown">
                         <a href="{url path="/login"}" class="login">{intl l="Log In!"}</a>
                         <div class="dropdown-menu">
-                            {form name="thelia.customer.login"}
+                            {form name="thelia.front.customer.login"}
                             <form id="form-login-mini" action="{url path="/login"}" method="post" role="form" {form_enctype form=$form}>
                                 {form_hidden_fields form=$form}
                                 {form_field form=$form field="email"}
@@ -297,12 +297,13 @@ URL: http://www.thelia.net
                         <div class="block-heading"><h3 class="block-title">{intl l="Newsletter"}</h3></div>
                         <div class="block-content">
                             <p id="newletter-describe">{intl l="Sign up to receive our latest news."}</p>
-                            {form name="thelia.newsletter"}
-                            <form id="form-newsletter" action="{url path="/newsletter"}" method="post" role="form">
+                            {form name="thelia.front.newsletter"}
+                            <form id="form-newsletter-mini" action="{url path="/newsletter"}" method="post" role="form">
+                                {form_hidden_fields form=$form}
                                 {form_field form=$form field="email"}
                                 <div class="form-group">
-                                    <label for="{$label_attr.for}">{intl l="Email address"}</label>
-                                    <input type="email" name="{$name}" id="{$label_attr.for}" class="form-control" placeholder="{intl l="Your email address"}" aria-describedby="newletter-describe" {if $required} aria-required="true" required{/if} autocomplete="off">
+                                    <label for="{$label_attr.for}-mini">{intl l="Email address"}</label>
+                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" placeholder="{intl l="Your email address"}" aria-describedby="newletter-describe" {if $required} aria-required="true" required{/if} autocomplete="off">
                                 </div>
                                 {/form_field}
                                 <button type="submit" class="btn btn-subscribe">{intl l="Subscribe"}</button>
@@ -348,9 +349,9 @@ URL: http://www.thelia.net
                         {loop name="footer_links" type="content" folder="2"}
                             <li><a href="{$URL}">{$TITLE}</a></li>
                         {/loop}
-                        <li><a href="#">Site Map</a></li>
-                        <li><a href="#">Terms & Conditions</a></li>
-                        <li><a href="#">Contact Us</a></li>
+                        {*<li><a href="#">Site Map</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>*}
+                        <li><a href="{url path="/contact"}">Contact Us</a></li>
                     </ul>
                 </nav>
 
@@ -374,6 +375,9 @@ URL: http://www.thelia.net
         {/javascripts}
     }
 </script>
+
+<script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+
 
 {javascripts file='assets/js/bootstrap/bootstrap.js'}
     <script src="{$asset_url}"></script>

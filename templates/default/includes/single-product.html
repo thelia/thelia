@@ -56,9 +56,9 @@
                 {/if}
 
             </div>
-
+            {if $hasBtn == true}
             {form name="thelia.cart.add" }
-            <form id="form-product-details" action="{url path="/cart/add" }" method="post" role="form">
+            <form id="form-product-details" action="{url path="/cart/add" }" method="post" role="form" class="form-product">
                 {form_hidden_fields form=$form}
                 <input type="hidden" name="view" value="product">
                 <input type="hidden" name="product_id" value="{$ID}">
@@ -115,11 +115,12 @@
                     </div>
                     <div>
                         <div class="product-btn">
-                            {if $hasSubmit == true}
-                                <button type="submit" class="btn btn-cart">{intl l="Add to cart"}</button>
-                            {else}
-                                <a href="{$URL}" class="btn btn-cart">{intl l="View product"}</a>
-                            {/if}
+
+                                {if $hasSubmit == true}
+                                    <button type="submit" class="btn btn-cart">{intl l="Add to cart"}</button>
+                                {else}
+                                    <a href="{$URL}" class="btn btn-cart">{intl l="View product"}</a>
+                                {/if}
 
                         </div>
                     </div>
@@ -127,7 +128,7 @@
                 </fieldset>
             </form>
             {/form}
-
+            {/if}
         </div>
     </article><!-- /product -->
 </li>

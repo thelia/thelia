@@ -27,9 +27,19 @@
                 $(this).addClass('open');
             })
             .on('mouseleave.subnav', '.dropdown', function(){
-                if(!$(this).hasClass('open'))
+                var $this = $(this);
+
+                if(!$this.hasClass('open'))
                     return;
-                $(this).removeClass('open');
+
+                //This will check if an input child has focus. If no then remove class open
+                if ($this.find(":input:focus").length == 0){
+                    $this.removeClass('open');
+                } else {
+                    $this.find(":input:focus").one('blur', function(){
+                        $this.trigger('mouseleave.subnav');
+                    });
+                }
             });
 
         // Tooltip
@@ -65,7 +75,6 @@
         if($category_products.size() > 0){
             var $parent = $category_products.parent();
 
-
             $parent.on('click.view-mode', '[data-toggle=view]', function(){
                 if( ($(this).hasClass('btn-grid') && $parent.hasClass('grid')) || ($(this).hasClass('btn-list') && $parent.hasClass('list')))
                     return;
@@ -88,6 +97,32 @@
                     $('#password', $form_login).prop('disabled', false); // Enabled
             }).find(':radio:checked').trigger('change.account');
         }
+
+        // Mini Newsletter Subscription
+        var $form_newsletter = $('#form-newsletter-mini');
+        if($form_newsletter.size() > 0) {
+            $form_newsletter.on('submit.newsletter', function(){
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: $(this).attr('method'),
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    success: function(json) {
+                        var $msg = '';
+                        if(json.success){
+                            $msg = json.message;
+                        }else{
+                            $msg = json.message;
+                        }
+                        bootbox.alert($msg);
+                    }
+                });
+
+                return false;
+            });
+        }
+
 
         // Forgot Password
         /*
@@ -159,6 +194,25 @@
             }).filter(':has(:checked)').addClass('active');
         });
 
+        // Apply validation
+        $('#form-contact, #form-register').validate({
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+            },
+            errorElement: 'span',
+            errorClass: 'help-block',
+            errorPlacement: function(error, element) {
+                if(element.parent('.input-group').length || element.prop('type') === 'checkbox' || element.prop('type') === 'radio'){
+                    error.prepend('<i class="icon-remove"></i> ').insertAfter(element.parent());
+                }else{
+                    error.prepend('<i class="icon-remove"></i> ').insertAfter(element);
+                }
+            }
+        });
+
 
         if($("body").is(".page-product")){
 
@@ -174,10 +228,12 @@
 
             var $old_price_container    = $(".old-price", $("#product-details"));
 
+            var $select_quantity        = $(this).find(":selected").attr("data-quantity");
+
 
             // Switch Quantity in product page
             $("select", $(".product-options")).change(function(){
-                var $select_quantity        = $(this).find(":selected").attr("data-quantity");
+                $select_quantity        = $(this).find(":selected").attr("data-quantity");
                 var $old_price              = $(this).find(":selected").attr("data-old-price");
 
                 var $best_price             = $(this).find(":selected").attr("data-price");
@@ -229,7 +285,31 @@
             });
         }
 
+        $(".form-product").submit(function(){
+            var url_action      = $(this).attr("action");
+            var $cartContainer  = $(".cart-container");
 
+            $.ajax({type:"POST", data: $(this).serialize(), url:url_action,
+                    success: function(data){
+
+                        $cartContainer.html($(data).html());
+
+                        $.ajax({url:"ajax/addCartMessage",
+                            success: function(data){
+                                bootbox.dialog({
+                                    message : data,
+                                    buttons : {}
+                                });
+                            }
+                        });
+                },
+                error: function(){
+                    console.log('Error.');
+                }
+            });
+
+        return false;
+        });
 
         $('#limit-top').change(function(e){
             window.location = $(this).val()

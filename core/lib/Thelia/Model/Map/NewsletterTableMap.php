@@ -57,7 +57,7 @@ class NewsletterTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class NewsletterTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the ID field
@@ -90,6 +90,21 @@ class NewsletterTableMap extends TableMap
     const LASTNAME = 'newsletter.LASTNAME';
 
     /**
+     * the column name for the LOCALE field
+     */
+    const LOCALE = 'newsletter.LOCALE';
+
+    /**
+     * the column name for the CREATED_AT field
+     */
+    const CREATED_AT = 'newsletter.CREATED_AT';
+
+    /**
+     * the column name for the UPDATED_AT field
+     */
+    const UPDATED_AT = 'newsletter.UPDATED_AT';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -101,12 +116,12 @@ class NewsletterTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Email', 'Firstname', 'Lastname', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'email', 'firstname', 'lastname', ),
-        self::TYPE_COLNAME       => array(NewsletterTableMap::ID, NewsletterTableMap::EMAIL, NewsletterTableMap::FIRSTNAME, NewsletterTableMap::LASTNAME, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'EMAIL', 'FIRSTNAME', 'LASTNAME', ),
-        self::TYPE_FIELDNAME     => array('id', 'email', 'firstname', 'lastname', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'Email', 'Firstname', 'Lastname', 'Locale', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'email', 'firstname', 'lastname', 'locale', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(NewsletterTableMap::ID, NewsletterTableMap::EMAIL, NewsletterTableMap::FIRSTNAME, NewsletterTableMap::LASTNAME, NewsletterTableMap::LOCALE, NewsletterTableMap::CREATED_AT, NewsletterTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'EMAIL', 'FIRSTNAME', 'LASTNAME', 'LOCALE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'email', 'firstname', 'lastname', 'locale', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -116,12 +131,12 @@ class NewsletterTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Email' => 1, 'Firstname' => 2, 'Lastname' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'email' => 1, 'firstname' => 2, 'lastname' => 3, ),
-        self::TYPE_COLNAME       => array(NewsletterTableMap::ID => 0, NewsletterTableMap::EMAIL => 1, NewsletterTableMap::FIRSTNAME => 2, NewsletterTableMap::LASTNAME => 3, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'EMAIL' => 1, 'FIRSTNAME' => 2, 'LASTNAME' => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'email' => 1, 'firstname' => 2, 'lastname' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Email' => 1, 'Firstname' => 2, 'Lastname' => 3, 'Locale' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'email' => 1, 'firstname' => 2, 'lastname' => 3, 'locale' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(NewsletterTableMap::ID => 0, NewsletterTableMap::EMAIL => 1, NewsletterTableMap::FIRSTNAME => 2, NewsletterTableMap::LASTNAME => 3, NewsletterTableMap::LOCALE => 4, NewsletterTableMap::CREATED_AT => 5, NewsletterTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'EMAIL' => 1, 'FIRSTNAME' => 2, 'LASTNAME' => 3, 'LOCALE' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'email' => 1, 'firstname' => 2, 'lastname' => 3, 'locale' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -144,6 +159,9 @@ class NewsletterTableMap extends TableMap
         $this->addColumn('EMAIL', 'Email', 'VARCHAR', true, 255, null);
         $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', false, 255, null);
         $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', false, 255, null);
+        $this->addColumn('LOCALE', 'Locale', 'VARCHAR', false, 5, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -152,6 +170,19 @@ class NewsletterTableMap extends TableMap
     public function buildRelations()
     {
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -295,11 +326,17 @@ class NewsletterTableMap extends TableMap
             $criteria->addSelectColumn(NewsletterTableMap::EMAIL);
             $criteria->addSelectColumn(NewsletterTableMap::FIRSTNAME);
             $criteria->addSelectColumn(NewsletterTableMap::LASTNAME);
+            $criteria->addSelectColumn(NewsletterTableMap::LOCALE);
+            $criteria->addSelectColumn(NewsletterTableMap::CREATED_AT);
+            $criteria->addSelectColumn(NewsletterTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.EMAIL');
             $criteria->addSelectColumn($alias . '.FIRSTNAME');
             $criteria->addSelectColumn($alias . '.LASTNAME');
+            $criteria->addSelectColumn($alias . '.LOCALE');
+            $criteria->addSelectColumn($alias . '.CREATED_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 

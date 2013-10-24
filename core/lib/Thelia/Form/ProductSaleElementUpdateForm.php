@@ -52,6 +52,10 @@ class ProductSaleElementUpdateForm extends BaseForm
                 "label"      => Translator::getInstance()->trans("Product price excluding taxes *"),
                 "label_attr" => array("for" => "price_field")
             ))
+            ->add("price_with_tax", "number", array(
+                "label"      => Translator::getInstance()->trans("Product price including taxes"),
+                "label_attr" => array("for" => "price_with_tax_field")
+            ))
             ->add("currency", "integer", array(
                 "constraints" => array(new NotBlank()),
                 "label"      => Translator::getInstance()->trans("Price currency *"),
@@ -73,8 +77,12 @@ class ProductSaleElementUpdateForm extends BaseForm
                 "label_attr" => array("for" => "quantity_field")
             ))
             ->add("sale_price", "number", array(
-                "label"      => Translator::getInstance()->trans("Sale price without taxes *"),
+                "label"      => Translator::getInstance()->trans("Sale price without taxes"),
                 "label_attr" => array("for" => "price_with_tax_field")
+            ))
+            ->add("sale_price_with_tax", "number", array(
+                "label"      => Translator::getInstance()->trans("Sale price including taxes"),
+                "label_attr" => array("for" => "sale_price_with_tax_field")
             ))
             ->add("onsale", "integer", array(
                     "label"      => Translator::getInstance()->trans("This product is on sale"),
@@ -88,7 +96,7 @@ class ProductSaleElementUpdateForm extends BaseForm
                     "label"      => Translator::getInstance()->trans("Is it the default product sale element ?"),
                     "label_attr" => array("for" => "isdefault_field")
             ))
-            ->add("ean_code", "integer", array(
+            ->add("ean_code", "text", array(
                     "label"      => Translator::getInstance()->trans("EAN Code"),
                     "label_attr" => array("for" => "ean_code_field")
             ))

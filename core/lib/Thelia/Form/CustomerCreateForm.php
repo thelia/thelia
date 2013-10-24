@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,114 +17,108 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\CustomerQuery;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Base\CustomerQuery;
 
 /**
- * Class CustomerLogin
+ * Class CustomerCreateForm
  * @package Thelia\Form
- * @author  Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CustomerLogin extends BaseForm
+class CustomerCreateForm extends AddressCreateForm
 {
+
     protected function buildForm()
     {
+        parent::buildForm();
+
         $this->formBuilder
+            // Remove From Address create form
+            ->remove("label")
+            ->remove("is_default")
+
+            // Add
+            ->add("auto_login", "integer")
+            // Add Email address
             ->add("email", "email", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
                     new Constraints\Callback(array(
                         "methods" => array(
-                            array($this, "verifyExistingEmail")
+                            array($this,
+                                "verifyExistingEmail")
                         )
                     ))
                 ),
-                "label" => Translator::getInstance()->trans("Please enter your email address"),
+                "label" => Translator::getInstance()->trans("Email Address"),
                 "label_attr" => array(
                     "for" => "email"
                 )
             ))
-            ->add("account", "choice", array(
-                "constraints" => array(
-                    new Constraints\Callback(array(
-                        "methods" => array(
-                            array($this, "verifyAccount")
-                        )
-                    ))
-                ),
-                "choices" => array(
-                    0 => Translator::getInstance()->trans("No, I am a new customer."),
-                    1 => Translator::getInstance()->trans("Yes, I have a password :")
-                ),
-                "label_attr" => array(
-                    "for" => "account"
-                ),
-                "data" => 0
-            ))
+            // Add Login Information
             ->add("password", "password", array(
                 "constraints" => array(
-                    new Constraints\NotBlank(array(
-                        'groups' => array('existing_customer'),
-                    ))
+                    new Constraints\NotBlank(),
+                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4)))
                 ),
-                "label" => Translator::getInstance()->trans("Please enter your password"),
+                "label" => Translator::getInstance()->trans("Password"),
                 "label_attr" => array(
                     "for" => "password"
+                )
+            ))
+            ->add("password_confirm", "password", array(
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
+                    new Constraints\Callback(array("methods" => array(
+                        array($this, "verifyPasswordField")
+                    )))
                 ),
-                "required"    => false
+                "label" => "Password confirmation",
+                "label_attr" => array(
+                    "for" => "password_confirmation"
+                )
+            ))
+            // Add terms & conditions
+            ->add("agreed", "checkbox", array(
+                "constraints" => array(
+                    new Constraints\True(array("message" => "Please accept the Terms and conditions in order to register."))
+                ),
+                "label_attr" => array(
+                    "for" => "agreed"
+                )
             ));
     }
 
-    /**
-     * If the user select "Yes, I have a password", we check the password.
-     */
-    public function verifyAccount($value, ExecutionContextInterface $context)
+    public function verifyPasswordField($value, ExecutionContextInterface $context)
     {
-        if ($value == 1) {
-            $data = $context->getRoot()->getData();
-            if (false === $data['password'] || (empty($data['password']) && '0' != $data['password'])) {
+        $data = $context->getRoot()->getData();
 
-                $context->getViolations()->add(new ConstraintViolation(
-                    'This value should not be blank.',
-                    'account_password',
-                    array(),
-                    $context->getRoot(),
-                    'children[password].data',
-                    'propertyPath'
-                ));
-
-            }
+        if ($data["password"] != $data["password_confirm"]) {
+            $context->addViolation("password confirmation is not the same as password field.");
         }
     }
 
-    /**
-     * If the user select "I'am a new customer", we make sure is email address does not exit in the database.
-     */
     public function verifyExistingEmail($value, ExecutionContextInterface $context)
     {
-        $data = $context->getRoot()->getData();
-        if ($data["account"] == 0) {
-            $customer = CustomerQuery::create()->findOneByEmail($value);
-            if ($customer) {
-                $context->addViolation("A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password.");
-            }
+        $customer = CustomerQuery::getCustomerByEmail($value);
+        if ($customer) {
+            $context->addViolation("This email already exists.");
         }
     }
 
     public function getName()
     {
-        return "thelia_customer_login";
+        return "thelia_customer_create";
     }
-
 }

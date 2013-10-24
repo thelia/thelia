@@ -2,6 +2,7 @@
 
 namespace Thelia\Model\Base;
 
+use \DateTime;
 use \Exception;
 use \PDO;
 use Propel\Runtime\Propel;
@@ -14,6 +15,8 @@ use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
+use Propel\Runtime\Util\PropelDateTime;
+use Thelia\Model\Newsletter as ChildNewsletter;
 use Thelia\Model\NewsletterQuery as ChildNewsletterQuery;
 use Thelia\Model\Map\NewsletterTableMap;
 
@@ -74,6 +77,24 @@ abstract class Newsletter implements ActiveRecordInterface
      * @var        string
      */
     protected $lastname;
+
+    /**
+     * The value for the locale field.
+     * @var        string
+     */
+    protected $locale;
+
+    /**
+     * The value for the created_at field.
+     * @var        string
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     * @var        string
+     */
+    protected $updated_at;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -386,6 +407,57 @@ abstract class Newsletter implements ActiveRecordInterface
     }
 
     /**
+     * Get the [locale] column value.
+     *
+     * @return   string
+     */
+    public function getLocale()
+    {
+
+        return $this->locale;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
+     *
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->created_at;
+        } else {
+            return $this->created_at instanceof \DateTime ? $this->created_at->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
+     *
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->updated_at;
+        } else {
+            return $this->updated_at instanceof \DateTime ? $this->updated_at->format($format) : null;
+        }
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param      int $v new value
@@ -470,6 +542,69 @@ abstract class Newsletter implements ActiveRecordInterface
     } // setLastname()
 
     /**
+     * Set the value of [locale] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Newsletter The current object (for fluent API support)
+     */
+    public function setLocale($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->locale !== $v) {
+            $this->locale = $v;
+            $this->modifiedColumns[] = NewsletterTableMap::LOCALE;
+        }
+
+
+        return $this;
+    } // setLocale()
+
+    /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\Newsletter The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            if ($dt !== $this->created_at) {
+                $this->created_at = $dt;
+                $this->modifiedColumns[] = NewsletterTableMap::CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\Newsletter The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            if ($dt !== $this->updated_at) {
+                $this->updated_at = $dt;
+                $this->modifiedColumns[] = NewsletterTableMap::UPDATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setUpdatedAt()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -517,6 +652,21 @@ abstract class Newsletter implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : NewsletterTableMap::translateFieldName('Lastname', TableMap::TYPE_PHPNAME, $indexType)];
             $this->lastname = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : NewsletterTableMap::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->locale = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : NewsletterTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            if ($col === '0000-00-00 00:00:00') {
+                $col = null;
+            }
+            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : NewsletterTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            if ($col === '0000-00-00 00:00:00') {
+                $col = null;
+            }
+            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -525,7 +675,7 @@ abstract class Newsletter implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = NewsletterTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = NewsletterTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Newsletter object", 0, $e);
@@ -656,8 +806,19 @@ abstract class Newsletter implements ActiveRecordInterface
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(NewsletterTableMap::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(NewsletterTableMap::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(NewsletterTableMap::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -746,6 +907,15 @@ abstract class Newsletter implements ActiveRecordInterface
         if ($this->isColumnModified(NewsletterTableMap::LASTNAME)) {
             $modifiedColumns[':p' . $index++]  = 'LASTNAME';
         }
+        if ($this->isColumnModified(NewsletterTableMap::LOCALE)) {
+            $modifiedColumns[':p' . $index++]  = 'LOCALE';
+        }
+        if ($this->isColumnModified(NewsletterTableMap::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
+        }
+        if ($this->isColumnModified(NewsletterTableMap::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
+        }
 
         $sql = sprintf(
             'INSERT INTO newsletter (%s) VALUES (%s)',
@@ -768,6 +938,15 @@ abstract class Newsletter implements ActiveRecordInterface
                         break;
                     case 'LASTNAME':
                         $stmt->bindValue($identifier, $this->lastname, PDO::PARAM_STR);
+                        break;
+                    case 'LOCALE':
+                        $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
+                        break;
+                    case 'CREATED_AT':
+                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                        break;
+                    case 'UPDATED_AT':
+                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -843,6 +1022,15 @@ abstract class Newsletter implements ActiveRecordInterface
             case 3:
                 return $this->getLastname();
                 break;
+            case 4:
+                return $this->getLocale();
+                break;
+            case 5:
+                return $this->getCreatedAt();
+                break;
+            case 6:
+                return $this->getUpdatedAt();
+                break;
             default:
                 return null;
                 break;
@@ -875,6 +1063,9 @@ abstract class Newsletter implements ActiveRecordInterface
             $keys[1] => $this->getEmail(),
             $keys[2] => $this->getFirstname(),
             $keys[3] => $this->getLastname(),
+            $keys[4] => $this->getLocale(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -926,6 +1117,15 @@ abstract class Newsletter implements ActiveRecordInterface
             case 3:
                 $this->setLastname($value);
                 break;
+            case 4:
+                $this->setLocale($value);
+                break;
+            case 5:
+                $this->setCreatedAt($value);
+                break;
+            case 6:
+                $this->setUpdatedAt($value);
+                break;
         } // switch()
     }
 
@@ -954,6 +1154,9 @@ abstract class Newsletter implements ActiveRecordInterface
         if (array_key_exists($keys[1], $arr)) $this->setEmail($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setFirstname($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setLastname($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setLocale($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
 
     /**
@@ -969,6 +1172,9 @@ abstract class Newsletter implements ActiveRecordInterface
         if ($this->isColumnModified(NewsletterTableMap::EMAIL)) $criteria->add(NewsletterTableMap::EMAIL, $this->email);
         if ($this->isColumnModified(NewsletterTableMap::FIRSTNAME)) $criteria->add(NewsletterTableMap::FIRSTNAME, $this->firstname);
         if ($this->isColumnModified(NewsletterTableMap::LASTNAME)) $criteria->add(NewsletterTableMap::LASTNAME, $this->lastname);
+        if ($this->isColumnModified(NewsletterTableMap::LOCALE)) $criteria->add(NewsletterTableMap::LOCALE, $this->locale);
+        if ($this->isColumnModified(NewsletterTableMap::CREATED_AT)) $criteria->add(NewsletterTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(NewsletterTableMap::UPDATED_AT)) $criteria->add(NewsletterTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1035,6 +1241,9 @@ abstract class Newsletter implements ActiveRecordInterface
         $copyObj->setEmail($this->getEmail());
         $copyObj->setFirstname($this->getFirstname());
         $copyObj->setLastname($this->getLastname());
+        $copyObj->setLocale($this->getLocale());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1072,6 +1281,9 @@ abstract class Newsletter implements ActiveRecordInterface
         $this->email = null;
         $this->firstname = null;
         $this->lastname = null;
+        $this->locale = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1103,6 +1315,20 @@ abstract class Newsletter implements ActiveRecordInterface
     public function __toString()
     {
         return (string) $this->exportTo(NewsletterTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     ChildNewsletter The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = NewsletterTableMap::UPDATED_AT;
+
+        return $this;
     }
 
     /**

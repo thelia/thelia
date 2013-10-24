@@ -61,6 +61,13 @@ class CartController extends BaseFrontController
             $message = $e->getMessage();
         }
 
+        // If Ajax Request
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $request = $this->getRequest();
+            $request->attributes->set('_view', "includes/mini-cart");
+        }
+
+
         if ($message) {
             $cartAdd->setErrorMessage($message);
             $this->getParserContext()->addForm($cartAdd);

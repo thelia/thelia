@@ -22,11 +22,17 @@ use Thelia\Model\Map\NewsletterTableMap;
  * @method     ChildNewsletterQuery orderByEmail($order = Criteria::ASC) Order by the email column
  * @method     ChildNewsletterQuery orderByFirstname($order = Criteria::ASC) Order by the firstname column
  * @method     ChildNewsletterQuery orderByLastname($order = Criteria::ASC) Order by the lastname column
+ * @method     ChildNewsletterQuery orderByLocale($order = Criteria::ASC) Order by the locale column
+ * @method     ChildNewsletterQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildNewsletterQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildNewsletterQuery groupById() Group by the id column
  * @method     ChildNewsletterQuery groupByEmail() Group by the email column
  * @method     ChildNewsletterQuery groupByFirstname() Group by the firstname column
  * @method     ChildNewsletterQuery groupByLastname() Group by the lastname column
+ * @method     ChildNewsletterQuery groupByLocale() Group by the locale column
+ * @method     ChildNewsletterQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildNewsletterQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method     ChildNewsletterQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildNewsletterQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -39,11 +45,17 @@ use Thelia\Model\Map\NewsletterTableMap;
  * @method     ChildNewsletter findOneByEmail(string $email) Return the first ChildNewsletter filtered by the email column
  * @method     ChildNewsletter findOneByFirstname(string $firstname) Return the first ChildNewsletter filtered by the firstname column
  * @method     ChildNewsletter findOneByLastname(string $lastname) Return the first ChildNewsletter filtered by the lastname column
+ * @method     ChildNewsletter findOneByLocale(string $locale) Return the first ChildNewsletter filtered by the locale column
+ * @method     ChildNewsletter findOneByCreatedAt(string $created_at) Return the first ChildNewsletter filtered by the created_at column
+ * @method     ChildNewsletter findOneByUpdatedAt(string $updated_at) Return the first ChildNewsletter filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildNewsletter objects filtered by the id column
  * @method     array findByEmail(string $email) Return ChildNewsletter objects filtered by the email column
  * @method     array findByFirstname(string $firstname) Return ChildNewsletter objects filtered by the firstname column
  * @method     array findByLastname(string $lastname) Return ChildNewsletter objects filtered by the lastname column
+ * @method     array findByLocale(string $locale) Return ChildNewsletter objects filtered by the locale column
+ * @method     array findByCreatedAt(string $created_at) Return ChildNewsletter objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildNewsletter objects filtered by the updated_at column
  *
  */
 abstract class NewsletterQuery extends ModelCriteria
@@ -132,7 +144,7 @@ abstract class NewsletterQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, EMAIL, FIRSTNAME, LASTNAME FROM newsletter WHERE ID = :p0';
+        $sql = 'SELECT ID, EMAIL, FIRSTNAME, LASTNAME, LOCALE, CREATED_AT, UPDATED_AT FROM newsletter WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -350,6 +362,121 @@ abstract class NewsletterQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the locale column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLocale('fooValue');   // WHERE locale = 'fooValue'
+     * $query->filterByLocale('%fooValue%'); // WHERE locale LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $locale The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildNewsletterQuery The current query, for fluid interface
+     */
+    public function filterByLocale($locale = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($locale)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $locale)) {
+                $locale = str_replace('*', '%', $locale);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(NewsletterTableMap::LOCALE, $locale, $comparison);
+    }
+
+    /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildNewsletterQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(NewsletterTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(NewsletterTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(NewsletterTableMap::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildNewsletterQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(NewsletterTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(NewsletterTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(NewsletterTableMap::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   ChildNewsletter $newsletter Object to remove from the list of results
@@ -438,6 +565,72 @@ abstract class NewsletterQuery extends ModelCriteria
             $con->rollBack();
             throw $e;
         }
+    }
+
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     ChildNewsletterQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(NewsletterTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     ChildNewsletterQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(NewsletterTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     ChildNewsletterQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(NewsletterTableMap::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     ChildNewsletterQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(NewsletterTableMap::UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     ChildNewsletterQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(NewsletterTableMap::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     ChildNewsletterQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(NewsletterTableMap::CREATED_AT);
     }
 
 } // NewsletterQuery
