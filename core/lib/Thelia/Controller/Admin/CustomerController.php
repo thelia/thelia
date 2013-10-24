@@ -30,7 +30,7 @@ use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
-use Thelia\Form\CustomerModification;
+use Thelia\Form\CustomerUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
 use Thelia\Core\Translation\Translator;
@@ -68,7 +68,7 @@ class CustomerController extends BaseAdminController
 
         $message = false;
 
-        $customerModification = new CustomerModification($this->getRequest());
+        $customerUpdateForm = new CustomerUpdateForm($this->getRequest());
 
         try {
             $customer = CustomerQuery::create()->findPk($customer_id);
@@ -77,7 +77,7 @@ class CustomerController extends BaseAdminController
                 throw new \InvalidArgumentException(sprintf("%d customer id does not exist", $customer_id));
             }
 
-            $form = $this->validateForm($customerModification);
+            $form = $this->validateForm($customerUpdateForm);
 
             $event = $this->createEventInstance($form->getData());
             $event->setCustomer($customer);
@@ -91,7 +91,7 @@ class CustomerController extends BaseAdminController
             if ($this->getRequest()->get("save_mode") == "close") {
                 $this->redirectToRoute("admin.customers");
             } else {
-                $this->redirectSuccess($customerModification);
+                $this->redirectSuccess($customerUpdateForm);
             }
 
         } catch (FormValidationException $e) {
@@ -105,10 +105,10 @@ class CustomerController extends BaseAdminController
         if ($message !== false) {
             \Thelia\Log\Tlog::getInstance()->error(sprintf("Error during customer login process : %s.", $message));
 
-            $customerModification->setErrorMessage($message);
+            $customerUpdateForm->setErrorMessage($message);
 
             $this->getParserContext()
-                ->addForm($customerModification)
+                ->addForm($customerUpdateForm)
                 ->setGeneralError($message)
             ;
         }
