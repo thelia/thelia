@@ -222,22 +222,29 @@ URL: http://www.thelia.net
                 </div>
                 <div class="col">
                     <section class="block block-default">
-                        <div class="block-heading"><h3 class="block-title">Usefull links</h3></div>
+                        <div class="block-heading"><h3 class="block-title">{intl l="Usefull links"}</h3></div>
                         <div class="block-content">
                             <ul>
                                 {loop name="footer_links" type="content" folder="2"}
                                     <li><a href="{$URL}">{$TITLE}</a></li>
                                 {/loop}
-                                <li><a href="{url path="/login"}">Login</a></li>
-                                <li><a href="{url path="/register"}">Register</a></li>
-                                <li><a href="{url path="/order/delivery"}">Checkout</a></li>
+                                {loop type="auth" name="customer_is_logged" role="CUSTOMER" context="front"}
+                                    <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
+                                    <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
+                                {/loop}
+                                {elseloop rel="customer_is_logged"}
+                                <li><a href="{url path="/login"}">{intl l="Login"}</a></li>
+                                <li><a href="{url path="/register"}">{intl l="Register"}</a></li>
+                                {/elseloop}
+                                <li><a href="{url path="/Cart"}">{intl l="Cart"}</a></li>
+                                <li><a href="{url path="/order/delivery"}">{intl l="Checkout"}</a></li>
                             </ul>
                         </div>
                     </section>
                 </div>
                 <div class="col">
                     <section class="block block-social">
-                        <div class="block-heading"><h3 class="block-title">Follow us</h3></div>
+                        <div class="block-heading"><h3 class="block-title">{intl l="Follow us"}</h3></div>
                         <div class="block-content">
                             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
                             <ul role="presentation">
@@ -315,7 +322,7 @@ URL: http://www.thelia.net
 
                 <div class="col">
                     <section class="block block-contact" itemscope itemtype="http://schema.org/Organization">
-                        <div class="block-heading"><h3 class="block-title">Contact Us</h3></div>
+                        <div class="block-heading"><h3 class="block-title">{intl l="Contact Us"}</h3></div>
                         <div class="block-content">
                             <meta itemprop="name" content="{config key="company_name"}">
                             <ul>
@@ -351,7 +358,7 @@ URL: http://www.thelia.net
                         {/loop}
                         {*<li><a href="#">Site Map</a></li>
                         <li><a href="#">Terms & Conditions</a></li>*}
-                        <li><a href="{url path="/contact"}">Contact Us</a></li>
+                        <li><a href="{url path="/contact"}">{intl l="Contact Us"}</a></li>
                     </ul>
                 </nav>
 
