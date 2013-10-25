@@ -151,7 +151,8 @@ class Content extends BaseI18nLoop
 
         $visible = $this->getVisible();
 
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
+
 
         $orders  = $this->getOrder();
 
