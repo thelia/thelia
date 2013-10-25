@@ -58,10 +58,8 @@
                                 <th>
                                     <div class="radio">
                                         <label for="delivery-address_{$ID}">
-
-                                                <input type="radio" name="{$name}" value="{$ID}" {if $value == $ID}checked="checked"{/if} id="delivery-address_{$ID}">
-
-                                            {$LABEL}
+                                            <input type="radio" name="{$name}" value="{$ID}" {if $value == $ID}checked="checked"{/if} id="delivery-address_{$ID}">
+                                            {$LABEL|default:"{intl l='Address %nb' nb={$LOOP_COUNT}}"}
                                         </label>
                                     </div>
                                 </th>
