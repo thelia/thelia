@@ -73,7 +73,7 @@ class Format extends AbstractSmartyPlugin
         $date = $this->getParam($params, "date", false);
 
         if ($date === false) {
-            throw new SmartyPluginException("date is a mandatory parameter in format_date function");
+            return '';
         }
 
         if (!$date instanceof \DateTime) {
