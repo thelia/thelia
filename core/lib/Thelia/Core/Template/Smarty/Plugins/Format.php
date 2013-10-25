@@ -76,7 +76,7 @@ class Format extends AbstractSmartyPlugin
             return "";
         }
 
-        if (!$date instanceof \DateTime) {
+        if (!($date instanceof \DateTime)) {
             return "";
         }
 
