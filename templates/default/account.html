@@ -118,7 +118,7 @@
                                         <div class="group-btn">
                                             <a href="{url path="/address/update/{$ID}"}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
                                             {if $DEFAULT != 1}
-                                                <a href="{url path="/address/delete/s{$ID}"}" class="btn btn-remove-address" data-toggle="popover" title="Do you really want to delete this address ?" data-content="And here's some amazing content. It's very engaging. right?" title="{intl l="Remove this address"}" ><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
+                                                <a href="{url path="/address/delete/{$ID}"}" class="btn btn-remove-address" data-toggle="popover" title="Do you really want to delete this address ?" data-content="And here's some amazing content. It's very engaging. right?" title="{intl l="Remove this address"}" ><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
                                             {/if}
                                         </div>
                                     </td>
