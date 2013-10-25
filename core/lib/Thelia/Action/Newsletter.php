@@ -29,7 +29,6 @@ use Thelia\Action\BaseAction;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\Newsletter as NewsletterModel;
 
-
 /**
  * Class Newsletter
  * @package Thelia\Action
@@ -52,14 +51,14 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
 
     public function unsubscribe(NewsletterEvent $event)
     {
-        if(null !== $nl = NewsletterQuery::create()->findPk($event->getId())) {
+        if (null !== $nl = NewsletterQuery::create()->findPk($event->getId())) {
             $nl->delete();
         }
     }
 
     public function update(NewsletterEvent $event)
     {
-        if(null !== $nl = NewsletterQuery::create()->findPk($event->getId())) {
+        if (null !== $nl = NewsletterQuery::create()->findPk($event->getId())) {
             $nl->setEmail($event->getEmail())
                 ->setFirstname($event->getFirstname())
                 ->setLastname($event->getLastname())

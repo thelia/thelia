@@ -41,7 +41,7 @@ class ModuleController extends BaseAdminController
     public function indexAction()
     {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, AccessManager::VIEW)) return $response;
-        
+
         $modulemanagement = new ModuleManagement();
         $modulemanagement->updateModules();
 
@@ -100,7 +100,7 @@ class ModuleController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::MODULE_DELETE, $deleteEvent);
 
-            if($deleteEvent->hasModule() === false) {
+            if ($deleteEvent->hasModule() === false) {
                 throw new \LogicException(
                     $this->getTranslator()->trans("No %obj was updated.", array('%obj' => 'Module')));
             }
@@ -110,7 +110,7 @@ class ModuleController extends BaseAdminController
             $message = $e->getMessage();
         }
 
-        if($message) {
+        if ($message) {
             return $this->render("modules", array(
                 "error_message" => $message
             ));

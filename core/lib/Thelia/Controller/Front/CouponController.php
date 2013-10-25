@@ -24,21 +24,11 @@ namespace Thelia\Controller\Front;
 
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
-use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\CouponCode;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Form\OrderDelivery;
-use Thelia\Form\OrderPayment;
 use Thelia\Log\Tlog;
-use Thelia\Model\AddressQuery;
-use Thelia\Model\AreaDeliveryModuleQuery;
-use Thelia\Model\Base\OrderQuery;
-use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
-use Thelia\Tools\URL;
 
 /**
  * Class CouponController

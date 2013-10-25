@@ -26,7 +26,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
 use Thelia\Model\LangQuery;
 
-
 /**
  * Class LangUrlForm
  * @package Thelia\Form\Lang

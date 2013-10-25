@@ -39,9 +39,9 @@
                     <td>
                         <div class="btn-group">
 
-                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.modules" access="VIEW"}
+{*                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.modules" access="VIEW"}
                                 <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"><span class="glyphicon glyphicon-book"></span></a>
-                            {/loop}
+                            {/loop}*}
 
                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.modules" access="UPDATE"}
                                 <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>

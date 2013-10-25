@@ -56,7 +56,7 @@ abstract class AbstractCrudController extends BaseAdminController
      * @param string $defaultListOrder          the default object list order, or null if list is not sortable. Example: manual
      * @param string $orderRequestParameterName Name of the request parameter that set the list order (null if list is not sortable)
      *
-     * @param string $resourceCode   the 'resource' code. Example: "admin.configuration.message"
+     * @param string $resourceCode the 'resource' code. Example: "admin.configuration.message"
      *
      * @param string $createEventIdentifier the dispatched create TheliaEvent identifier. Example: TheliaEvents::MESSAGE_CREATE
      * @param string $updateEventIdentifier the dispatched update TheliaEvent identifier. Example: TheliaEvents::MESSAGE_UPDATE

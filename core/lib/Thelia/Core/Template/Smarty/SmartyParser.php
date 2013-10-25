@@ -8,7 +8,6 @@ use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use \Smarty;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Template\ParserInterface;
 
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;

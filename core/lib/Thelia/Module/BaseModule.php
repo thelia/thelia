@@ -142,12 +142,11 @@ abstract class BaseModule extends ContainerAware
         } catch (\UnexpectedValueException $e) {
             throw $e;
         }
-        if(null === $con) {
+        if (null === $con) {
             $con = \Propel\Runtime\Propel::getConnection(
                 ModuleImageTableMap::DATABASE_NAME
             );
         }
-
 
         /* browse the directory */
         $imagePosition = 1;

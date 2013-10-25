@@ -23,7 +23,7 @@
 
 namespace Thelia\Core\Security\Exception;
 
-class ResourceException extends \RuntimeException
+class RessourceException extends \RuntimeException
 {
     const UNKNOWN_EXCEPTION = 0;
 

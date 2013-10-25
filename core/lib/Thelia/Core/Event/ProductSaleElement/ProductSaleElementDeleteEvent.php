@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\ProductSaleElement;
 use Thelia\Model\Product;
-use Thelia\Core\Event\Product\ProductEvent;
 
 class ProductSaleElementDeleteEvent extends ProductSaleElementEvent
 {
@@ -58,6 +57,7 @@ class ProductSaleElementDeleteEvent extends ProductSaleElementEvent
     public function setCurrencyId($currency_id)
     {
         $this->currency_id = $currency_id;
+
         return $this;
     }
 

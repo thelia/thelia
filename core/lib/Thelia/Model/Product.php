@@ -41,11 +41,16 @@ class Product extends BaseProduct
         return $amount;
     }
 
-    public function getTaxedPrice(Country $country)
+    public function getTaxedPrice(Country $country, $price)
     {
         $taxCalculator = new Calculator();
+        return round($taxCalculator->load($this, $country)->getTaxedPrice($price), 2);
+    }
 
-        return $taxCalculator->load($this, $country)->getTaxedPrice($this->getRealLowestPrice());
+    public function getTaxedPromoPrice(Country $country, $price)
+    {
+        $taxCalculator = new Calculator();
+        return round($taxCalculator->load($this, $country)->getTaxedPrice($price), 2);
     }
 
     /**
@@ -192,6 +197,7 @@ class Product extends BaseProduct
             ->setNewness(0)
             ->setWeight($weight)
             ->setIsDefault($isDefault)
+            ->setEanCode('')
             ->save($con)
         ;
 

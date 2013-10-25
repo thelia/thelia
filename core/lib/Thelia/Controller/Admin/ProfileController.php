@@ -29,7 +29,6 @@ use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\ProfileCreationForm;
 use Thelia\Form\ProfileModificationForm;
-use Thelia\Form\ProfileProfileListUpdateForm;
 use Thelia\Form\ProfileUpdateModuleAccessForm;
 use Thelia\Form\ProfileUpdateResourceAccessForm;
 use Thelia\Model\ProfileQuery;
@@ -201,8 +200,8 @@ class ProfileController extends AbstractCrudController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param  ProfileEvent  $createEvent the create event
-     * @return Response a response, or null to continue normal processing
+     * @param  ProfileEvent $createEvent the create event
+     * @return Response     a response, or null to continue normal processing
      */
     protected function performAdditionalCreateAction($createEvent)
     {
@@ -263,8 +262,8 @@ class ProfileController extends AbstractCrudController
     protected function getResourceAccess($formData)
     {
         $requirements = array();
-        foreach($formData as $data => $value) {
-            if(!strstr($data, ':')) {
+        foreach ($formData as $data => $value) {
+            if (!strstr($data, ':')) {
                 continue;
             }
 
@@ -272,7 +271,7 @@ class ProfileController extends AbstractCrudController
 
             $prefix = array_shift ( $explosion );
 
-            if($prefix != ProfileUpdateResourceAccessForm::RESOURCE_ACCESS_FIELD_PREFIX) {
+            if ($prefix != ProfileUpdateResourceAccessForm::RESOURCE_ACCESS_FIELD_PREFIX) {
                 continue;
             }
 
@@ -285,8 +284,8 @@ class ProfileController extends AbstractCrudController
     protected function getModuleAccess($formData)
     {
         $requirements = array();
-        foreach($formData as $data => $value) {
-            if(!strstr($data, ':')) {
+        foreach ($formData as $data => $value) {
+            if (!strstr($data, ':')) {
                 continue;
             }
 
@@ -294,7 +293,7 @@ class ProfileController extends AbstractCrudController
 
             $prefix = array_shift ( $explosion );
 
-            if($prefix != ProfileUpdateModuleAccessForm::MODULE_ACCESS_FIELD_PREFIX) {
+            if ($prefix != ProfileUpdateModuleAccessForm::MODULE_ACCESS_FIELD_PREFIX) {
                 continue;
             }
 

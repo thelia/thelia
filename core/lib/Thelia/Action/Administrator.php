@@ -23,11 +23,9 @@
 
 namespace Thelia\Action;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Security\AccessManager;
 use Thelia\Model\Admin as AdminModel;
 use Thelia\Model\AdminQuery;
 
@@ -69,7 +67,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
                 ->setProfileId($event->getProfile())
             ;
 
-            if('' !== $event->getPassword()) {
+            if ('' !== $event->getPassword()) {
                 $administrator->setPassword($event->getPassword());
             }
 

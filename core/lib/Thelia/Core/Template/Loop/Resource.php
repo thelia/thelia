@@ -34,7 +34,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\ResourceQuery;
 use Thelia\Type;
-use Thelia\Type\BooleanOrBothType;
 
 /**
  *
@@ -87,7 +86,7 @@ class Resource extends BaseI18nLoop
 
         $code = $this->getCode();
 
-        if(null !== $code) {
+        if (null !== $code) {
             $search->filterByCode($code, Criteria::IN);
         }
 

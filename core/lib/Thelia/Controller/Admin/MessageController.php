@@ -45,10 +45,7 @@ class MessageController extends AbstractCrudController
             null, // no sort order change
             null, // no sort order change
 
-            AdminResources::MESSAGE_VIEW,
-            AdminResources::MESSAGE_CREATE,
-            AdminResources::MESSAGE_UPDATE,
-            AdminResources::MESSAGE_DELETE,
+            AdminResources::MESSAGE,
 
             TheliaEvents::MESSAGE_CREATE,
             TheliaEvents::MESSAGE_UPDATE,

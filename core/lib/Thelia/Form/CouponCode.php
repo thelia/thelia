@@ -23,8 +23,6 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-use Thelia\Model\ModuleQuery;
-use Thelia\Module\BaseModule;
 
 /**
  * Class CouponCode

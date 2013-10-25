@@ -22,9 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\ProductSaleElement;
-use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Model\Product;
-use Thelia\Core\Event\Product\ProductEvent;
 
 class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 {
@@ -41,7 +39,8 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
     protected $isnew;
     protected $isdefault;
     protected $ean_code;
-    protected $taxrule;
+    protected $tax_rule_id;
+    protected $from_default_currency;
 
     public function __construct(Product $product, $product_sale_element_id)
     {
@@ -196,14 +195,26 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
         return $this;
     }
 
-    public function getTaxrule()
+    public function getTaxRuleId()
     {
-        return $this->taxrule;
+        return $this->tax_rule_id;
     }
 
-    public function setTaxrule($taxrule)
+    public function setTaxRuleId($tax_rule_id)
     {
-        $this->taxrule = $taxrule;
+        $this->tax_rule_id = $tax_rule_id;
+
+        return $this;
+    }
+
+    public function getFromDefaultCurrency()
+    {
+        return $this->from_default_currency;
+    }
+
+    public function setFromDefaultCurrency($from_default_currency)
+    {
+        $this->from_default_currency = $from_default_currency;
 
         return $this;
     }

@@ -25,9 +25,6 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Thelia\Model\ProductQuery;
-use Thelia\Model\Product as ProductModel;
-
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
@@ -49,7 +46,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new product sale element, with or without combination
      *
-     * @param ProductSaleElementCreateEvent $event
+     * @param  ProductSaleElementCreateEvent $event
      * @throws Exception
      */
     public function create(ProductSaleElementCreateEvent $event)
@@ -67,11 +64,10 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->findOne($con);
 
             if ($salesElement == null) {
-                // Create a new product sale element
+                // Create a new default product sale element
                 $salesElement = $event->getProduct()->createDefaultProductSaleElement($con, 0, 0, $event->getCurrencyId(), true);
-            }
-            else {
-                // This one is the default
+            } else {
+                // This (new) one is the default
                 $salesElement->setIsDefault(true)->save($con);
             }
 
@@ -98,8 +94,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
 
             $con->rollback();
 
@@ -121,6 +116,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         try {
+
+            // Update the product's tax rule
+            $event->getProduct()->setTaxRuleId($event->getTaxRuleId())->save($con);
 
             // If product sale element is not defined, create it.
             if ($salesElement == null) {
@@ -158,16 +156,28 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ;
             }
 
-            $productPrice
-                ->setPromoPrice($event->getSalePrice())
-                ->setPrice($event->getPrice())
-                ->save($con)
-            ;
+            // Check if we have to store the price
+            $productPrice->setFromDefaultCurrency($event->getFromDefaultCurrency());
+
+            if ($event->getFromDefaultCurrency() == 0) {
+                // Store the price
+                $productPrice
+                    ->setPromoPrice($event->getSalePrice())
+                    ->setPrice($event->getPrice())
+                ;
+            } else {
+                // Do not store the price.
+                $productPrice
+                    ->setPromoPrice(0)
+                    ->setPrice(0)
+                ;
+            }
+
+            $productPrice->save($con);
 
             // Store all the stuff !
             $con->commit();
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
 
             $con->rollback();
 
@@ -197,19 +207,21 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 if ($product->countSaleElements() <= 0) {
                     // If we just deleted the last PSE, create a default one
                     $product->createDefaultProductSaleElement($con, 0, 0, $event->getCurrencyId(), true);
-                }
-                else if ($product->getDefaultSaleElements() == null) {
+                } elseif ($pse->getIsDefault()) {
 
                     // If we deleted the default PSE, make the last created one the default
-                    $pse = ProductSaleElementsQuery::create()->filterByProductId($this->id)->orderByCreatedAt(Criteria::DESC)->findOne($con);
+                    $pse = ProductSaleElementsQuery::create()
+                        ->filterByProductId($product->getId())
+                        ->orderByCreatedAt(Criteria::DESC)
+                        ->findOne($con)
+                    ;
 
                     $pse->setIsDefault(true)->save($con);
                 }
 
                 // Store all the stuff !
                 $con->commit();
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
 
                 $con->rollback();
 

@@ -26,7 +26,6 @@ use Thelia\Form\ContactForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\ConfigQuery;
 
-
 /**
  * Class ContactController
  * @package Thelia\Controller\Front
@@ -53,7 +52,7 @@ class ContactController extends BaseFrontController
 
             $this->getMailer()->send($message);
 
-        } catch(FormValidationException $e) {
+        } catch (FormValidationException $e) {
             $error_message = $e->getMessage();
         }
 

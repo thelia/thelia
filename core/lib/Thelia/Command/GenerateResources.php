@@ -61,19 +61,19 @@ class GenerateResources extends ContainerAwareCommand
 
         $constants = $class->getConstants();
 
-        if(count($constants) == 0) {
+        if (count($constants) == 0) {
             $output->writeln('No resources found');
             exit;
         }
 
-        switch($input->getOption("output")) {
+        switch ($input->getOption("output")) {
             case 'sql':
                 $output->writeln(
                     'INSERT INTO ' . ResourceTableMap::TABLE_NAME . ' (`id`, `code`, `created_at`, `updated_at`) VALUES '
                 );
                 $compteur = 0;
-                foreach($constants as $constant => $value) {
-                    if($constant == AdminResources::SUPERADMINISTRATOR) {
+                foreach ($constants as $constant => $value) {
+                    if ($constant == AdminResources::SUPERADMINISTRATOR) {
                         continue;
                     }
                     $compteur++;
@@ -87,8 +87,8 @@ class GenerateResources extends ContainerAwareCommand
                     'INSERT INTO ' . ResourceI18nTableMap::TABLE_NAME . ' (`id`, `locale`, `title`) VALUES '
                 );
                 $compteur = 0;
-                foreach($constants as $constant => $value) {
-                    if($constant == AdminResources::SUPERADMINISTRATOR) {
+                foreach ($constants as $constant => $value) {
+                    if ($constant == AdminResources::SUPERADMINISTRATOR) {
                         continue;
                     }
 
@@ -105,8 +105,8 @@ class GenerateResources extends ContainerAwareCommand
                 }
                 break;
             default :
-                foreach($constants as $constant => $value) {
-                    if($constant == AdminResources::SUPERADMINISTRATOR) {
+                foreach ($constants as $constant => $value) {
+                    if ($constant == AdminResources::SUPERADMINISTRATOR) {
                         continue;
                     }
                     $output->writeln('[' . $constant . "] => " . $value);

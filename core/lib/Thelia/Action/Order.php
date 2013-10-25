@@ -32,6 +32,8 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\MessageQuery;
 use Thelia\Model\OrderProductAttributeCombination;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderProduct;
@@ -291,7 +293,50 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function sendOrderEmail(OrderEvent $event)
     {
-        /* @todo */
+        $contact_email = ConfigQuery::read('contact_email');
+        if($contact_email) {
+            $order = $event->getOrder();
+            $customer = $order->getCustomer();
+
+            $parser = $this->container->get("thelia.parser");
+
+            $parser->assign('order_id', $order->getId());
+            $parser->assign('order_ref', $order->getRef());
+
+            $message = MessageQuery::create()
+                ->filterByName('order_confirmation')
+                ->findOne();
+
+            $message
+                ->setLocale($order->getLang()->getLocale());
+
+            $subject = $parser->fetch(sprintf("string:%s", $message->getSubject()));
+            $htmlMessage = $parser->fetch(sprintf("string:%s", $message->getHtmlMessage()));
+            $textMessage = $parser->fetch(sprintf("string:%s", $message->getTextMessage()));
+
+            $instance = \Swift_Message::newInstance($subject)
+                ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
+                ->addFrom(ConfigQuery::read('contact_email'), ConfigQuery::read('company_name'))
+            ;
+            $instance
+                ->setBody($htmlMessage, 'text/html')
+                ->addPart($textMessage, 'text/plain');
+
+            $mail = $this->getMailer()->send($instance);
+        }
+    }
+
+    /**
+     *
+     * return an instance of \Swift_Mailer with good Transporter configured.
+     *
+     * @return \Swift_Mailer
+     */
+    public function getMailer()
+    {
+        $mailer = $this->container->get('mailer');
+
+        return $mailer->getSwiftMailer();
     }
 
     /**

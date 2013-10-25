@@ -115,7 +115,7 @@ class BaseAdminController extends BaseController
      * Check current admin user authorisations. An ADMIN role is assumed.
      *
      * @param mixed $resources a single resource or an array of resources.
-     * @param mixed $accesses a single access or an array of accesses.
+     * @param mixed $accesses  a single access or an array of accesses.
      *
      * @return mixed null if authorization is granted, or a Response object which contains the error page otherwise
      *
@@ -369,8 +369,8 @@ class BaseAdminController extends BaseController
      * Render the given template, and returns the result as an Http Response.
      *
      * @param $templateName the complete template name, with extension
-     * @param  array $args the template arguments
-     * @param int $status http code status
+     * @param  array                                      $args   the template arguments
+     * @param  int                                        $status http code status
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function render($templateName, $args = array(), $status = 200)

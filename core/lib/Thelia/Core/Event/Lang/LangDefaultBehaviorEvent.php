@@ -24,7 +24,6 @@
 namespace Thelia\Core\Event\Lang;
 use Thelia\Core\Event\ActionEvent;
 
-
 /**
  * Class LangDefaultBehaviorEvent
  * @package Thelia\Core\Event\Lang
@@ -37,7 +36,7 @@ class LangDefaultBehaviorEvent extends ActionEvent
      */
     protected $defaultBehavior;
 
-    function __construct($defaultBehavior)
+    public function __construct($defaultBehavior)
     {
         $this->defaultBehavior = $defaultBehavior;
     }
@@ -57,8 +56,5 @@ class LangDefaultBehaviorEvent extends ActionEvent
     {
         return $this->defaultBehavior;
     }
-
-
-
 
 }

@@ -21,25 +21,20 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Form\Lang;
-use Thelia\Core\Event\ActionEvent;
+namespace Thelia\Core\Template\Element\Exception;
 
-/**
- * Class LangUrlEvent
- * @package Thelia\Form\Lang
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class LangUrlEvent extends ActionEvent
+class SearchLoopException extends \RuntimeException
 {
-    protected $url = array();
+    const UNKNOWN_EXCEPTION = 0;
 
-    public function addUrl($id, $url)
+    public function __construct($message, $code = null, $arguments = array(), $previous = null)
     {
-        $this->url[$id] = $url;
-    }
-
-    public function getUrl()
-    {
-        return $this->url;
+        if (is_array($arguments)) {
+            $this->arguments = $arguments;
+        }
+        if ($code === null) {
+            $code = self::UNKNOWN_EXCEPTION;
+        }
+        parent::__construct($message, $code, $previous);
     }
 }

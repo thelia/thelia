@@ -26,7 +26,6 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Translation\Translator;
 use Thelia\Model\ProfileQuery;
 use Thelia\Model\ResourceQuery;
 
@@ -57,7 +56,7 @@ class ProfileUpdateResourceAccessForm extends BaseForm
             ))
         ;
 
-        foreach(ResourceQuery::create()->find() as $resource) {
+        foreach (ResourceQuery::create()->find() as $resource) {
             $this->formBuilder->add(
                 self::RESOURCE_ACCESS_FIELD_PREFIX . ':' . str_replace(".", ":", $resource->getCode()),
                 "choice",

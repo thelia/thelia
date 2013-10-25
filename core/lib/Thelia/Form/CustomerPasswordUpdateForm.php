@@ -26,7 +26,6 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\CustomerQuery;
 
 /**
  * Class CustomerPasswordUpdateForm

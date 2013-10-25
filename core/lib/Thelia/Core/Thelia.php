@@ -54,9 +54,7 @@ use Propel\Runtime\Connection\ConnectionManagerSingle;
 class Thelia extends Kernel
 {
 
-    const THELIA_VERSION = 0.1;
-
-    protected $tpexConfig;
+    const THELIA_VERSION = '2.0.0-beta1';
 
     public function init()
     {

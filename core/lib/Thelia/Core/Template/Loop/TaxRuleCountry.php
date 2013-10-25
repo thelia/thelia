@@ -85,10 +85,10 @@ class TaxRuleCountry extends BaseI18nLoop
         $country = $this->getCountry();
         $taxRule = $this->getTax_rule();
 
-        if($ask === 'countries') {
+        if ($ask === 'countries') {
             $taxCountForOriginCountry = TaxRuleCountryQuery::create()->filterByCountryId($country)->count();
 
-            if($taxCountForOriginCountry > 0) {
+            if ($taxCountForOriginCountry > 0) {
                 $search->groupByCountryId();
 
                 $originalCountryJoin = new Join();
@@ -127,7 +127,7 @@ class TaxRuleCountry extends BaseI18nLoop
 
                 $search->addAscendingOrderByColumn('i18n_TITLE');
             }
-        } elseif($ask === 'taxes') {
+        } elseif ($ask === 'taxes') {
             $search->filterByCountryId($country);
 
             /* manage tax translation */
@@ -151,8 +151,8 @@ class TaxRuleCountry extends BaseI18nLoop
 
             $loopResultRow = new LoopResultRow($loopResult, $taxRuleCountry, $this->versionable, $this->timestampable, $this->countable);
 
-            if($ask === 'countries') {
-                if($taxCountForOriginCountry > 0) {
+            if ($ask === 'countries') {
+                if ($taxCountForOriginCountry > 0) {
                     $loopResultRow
                         ->set("COUNTRY"             , $taxRuleCountry->getCountryId())
                         ->set("COUNTRY_TITLE"               , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_TITLE'))
@@ -167,7 +167,7 @@ class TaxRuleCountry extends BaseI18nLoop
                         ->set("COUNTRY_DESCRIPTION"         , $taxRuleCountry->getVirtualColumn('i18n_DESCRIPTION'))
                         ->set("COUNTRY_POSTSCRIPTUM"         , $taxRuleCountry->getVirtualColumn('i18n_POSTSCRIPTUM'));
                 }
-            } elseif($ask === 'taxes') {
+            } elseif ($ask === 'taxes') {
                 $loopResultRow
                     ->set("TAX_RULE"            , $taxRuleCountry->getTaxRuleId())
                     ->set("COUNTRY"             , $taxRuleCountry->getCountryId())
@@ -177,8 +177,6 @@ class TaxRuleCountry extends BaseI18nLoop
                     ->set("TAX_DESCRIPTION"         , $taxRuleCountry->getVirtualColumn(TaxTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
                 ;
             }
-
-
 
             $loopResult->addRow($loopResultRow);
         }

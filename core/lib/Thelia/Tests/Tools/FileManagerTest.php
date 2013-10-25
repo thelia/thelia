@@ -30,7 +30,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Thelia\Tools\FileManager::copyUploadedFile
      */
-    public function testCopyUploadedFile()
+/*    public function testCopyUploadedFile()
     {
         $this->markTestIncomplete(
             'This test has not been implemented yet : Mock issue'
@@ -103,13 +103,13 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $actual = $fileManager->copyUploadedFile(24, FileManager::TYPE_PRODUCT, $stubProductImage, $stubUploadedFile, $newUploadedFiles, FileManager::FILE_TYPE_IMAGES);
 
         $this->assertCount(1, $actual);
-    }
+    }*/
 
     /**
      * @covers Thelia\Tools\FileManager::copyUploadedFile
      * @expectedException \Thelia\Exception\ImageException
      */
-    public function testCopyUploadedFileExceptionImageException()
+    /*public function testCopyUploadedFileExceptionImageException()
     {
         $this->markTestIncomplete(
             'This test has not been implemented yet : Mock issue'
@@ -181,7 +181,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
 
         $actual = $fileManager->copyUploadedFile(24, FileManager::TYPE_PRODUCT, $stubProductImage, $stubUploadedFile, $newUploadedFiles, FileManager::FILE_TYPE_DOCUMENTS);
 
-    }
+    }*/
 
     /**
      * @covers Thelia\Tools\FileManager::saveImage
@@ -650,23 +650,23 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Thelia\Tools\FileManager::getImageForm
      */
-    public function testGetImageForm()
+/*    public function testGetImageForm()
     {
         // Mock issue
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
-    }
+    }*/
     /**
      * @covers Thelia\Tools\FileManager::getDocumentForm
      */
-    public function testGetDocumentForm()
+/*    public function testGetDocumentForm()
     {
         // Mock issue
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
-    }
+    }*/
 
     /**
      * @covers Thelia\Tools\FileManager::getUploadDir
@@ -879,21 +879,21 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Thelia\Tools\FileManager::adminLogAppend
      */
-    public function testAdminLogAppend()
+/*    public function testAdminLogAppend()
     {
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
-    }
+    }*/
 
     /**
      * @covers Thelia\Tools\FileManager::deleteFile
      */
-    public function testDeleteFile()
+ /*   public function testDeleteFile()
     {
         // @todo see http://tech.vg.no/2011/03/09/mocking-the-file-system-using-phpunit-and-vfsstream/
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
-    }
+    }*/
 }

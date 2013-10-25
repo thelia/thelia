@@ -25,12 +25,9 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ExecutionContextInterface;
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\AdminQuery;
 use Thelia\Model\ProfileQuery;
-use Thelia\Model\ConfigQuery;
 
 class AdministratorCreationForm extends BaseForm
 {
@@ -110,7 +107,7 @@ class AdministratorCreationForm extends BaseForm
     {
         $data = $context->getRoot()->getData();
 
-        if($data["password"] === '' && $data["password_confirm"] === '') {
+        if ($data["password"] === '' && $data["password_confirm"] === '') {
             $context->addViolation("password can't be empty");
         }
 
@@ -118,7 +115,7 @@ class AdministratorCreationForm extends BaseForm
             $context->addViolation("password confirmation is not the same as password field");
         }
 
-        if(strlen($data["password"]) < 4) {
+        if (strlen($data["password"]) < 4) {
             $context->addViolation("password must be composed of at least 4 characters");
         }
     }

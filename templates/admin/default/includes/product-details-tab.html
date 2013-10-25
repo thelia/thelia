@@ -83,7 +83,7 @@
 			                    <select id="tax_rule_field" required="required" name="{$name}" class="form-control">
 			                        <option value="">{intl l="Select a tax tule"}</option>
 			                        {loop name="tax" type="tax-rule" backend_context="1"}
-			                            <option value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}>{$TITLE}</option>
+			                            <option value="{$ID}" {if $ID == $TAX_RULE_ID}selected="selected"{/if}>{$TITLE}</option>
 			                        {/loop}
 			                    </select>
 			                </div>
@@ -115,7 +115,7 @@
 			                      <div class="form-group {if $error}has-error{/if}">
 			                          <div class="checkbox">
 			                              <label>
-			                                  <input type="checkbox" id="use_exchange_rate_box" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+			                                  <input type="checkbox" data-pse-id="{$default_product_sale_element_id}" class="use_exchange_rate_box" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
 			                                  {$label}
 			                              </label>
 			                          </div>
@@ -129,19 +129,21 @@
 			                      <label for="price_without_tax" class="control-label">{$label} : </label>
 
 			                         <div class="input-group">
-			                             <input {if !$show_pricing_fields}readonly{/if} data-price-type="without-tax" data-rel-price="price_with_tax" type="text" id="price_without_tax" required="required" name="{$name}" class="automatic_price_field form-control" value="{$value}" title="{$label}" placeholder="{intl l='Price excl. taxes'}">
+			                             <input {if !$show_pricing_fields}readonly{/if} data-pse-id="{$default_product_sale_element_id}" data-price-type="price-without-tax" data-rel-price="price_with_tax" type="text" id="price_without_tax" required="required" name="{$name}" class="price_field automatic_price_field form-control" value="{$value}" title="{$label}" placeholder="{intl l='Price excl. taxes'}">
 			                             <span class="input-group-addon">{$currency_symbol}</span>
 			                         </div>
 			                  </div>
 			              {/form_field}
 
-		                  <div class="form-group">
-		                      <label for="price_with_tax" class="control-label">{intl l="Product price including taxes"} : </label>
-		                      <div class="input-group">
-		                          <input {if !$show_pricing_fields}readonly{/if} data-price-type="with-tax" data-rel-price="price_without_tax" type="text" id="price_with_tax" name="price_with_tax" class="automatic_price_field form-control" value="" title="{intl l='Product price including taxes'}" placeholder="{intl l='Price incl. taxes'}">
-		                          <span class="input-group-addon">{$currency_symbol}</span>
-		                      </div>
-		                  </div>
+                          {form_field form=$form field='price_with_tax'}
+			                  <div class="form-group">
+			                      <label for="price_with_tax" class="control-label">{intl l="Product price including taxes"} : </label>
+			                      <div class="input-group">
+			                          <input {if !$show_pricing_fields}readonly{/if} data-pse-id="{$default_product_sale_element_id}" data-price-type="price-with-tax" data-rel-price="price_without_tax" type="text" id="price_with_tax" name="{$name}" class="price_field automatic_price_field form-control" value="{$value}" title="{$value}" placeholder="{intl l='Price incl. taxes'}">
+			                          <span class="input-group-addon">{$currency_symbol}</span>
+			                      </div>
+			                  </div>
+                          {/form_field}
 
 			              {module_include location='product_details_pricing_form'}
 			          </div>
@@ -203,19 +205,21 @@
 			                    <label for="sale_price_without_tax" class="control-label">{$label} : </label>
 
 			                    <div class="input-group">
-			                        <input {if !$show_pricing_fields}readonly{/if} data-price-type="without-tax" data-rel-price="sale_price_with_tax" type="text" id="sale_price_without_tax" required="required" name="{$name}" class="automatic_price_field form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
+			                        <input {if !$show_pricing_fields}readonly{/if} data-pse-id="{$default_product_sale_element_id}" data-price-type="sale-price-without-tax" data-rel-price="sale_price_with_tax" type="text" id="sale_price_without_tax" required="required" name="{$name}" class="price_field automatic_price_field form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
 			                        <span class="input-group-addon">{$currency_symbol}</span>
 			                    </div>
 			               </div>
 			            {/form_field}
 
+                        {form_field form=$form field='sale_price_with_tax'}
                         <div class="form-group">
-                            <label for="sale_price_with_tax" class="control-label">{intl l="Sale price including taxes"} : </label>
+                            <label for="sale_price_with_tax" class="control-label">{$label} : </label>
                             <div class="input-group">
-                                <input {if !$show_pricing_fields}readonly{/if} data-price-type="with-tax" data-rel-price="sale_price_without_tax" type="text" id="sale_price_with_tax" name="sale_price_with_tax" class="automatic_price_field form-control" value="" title="{intl l='Sale price including taxes'}" placeholder="{intl l='Sale price incl. taxes'}">
+                                <input {if !$show_pricing_fields}readonly{/if} data-pse-id="{$default_product_sale_element_id}" data-price-type="sale-price-with-tax" data-rel-price="sale_price_without_tax" type="text" id="sale_price_with_tax" name="sale_price_with_tax" class="price_field automatic_price_field form-control" value="{$value}" title="{$label}" placeholder="{intl l='Sale price incl. taxes'}">
                                 <span class="input-group-addon">{$currency_symbol}</span>
                             </div>
                         </div>
+                        {/form_field}
 
 						{form_field form=$form field='onsale'}
 						<div class="form-group {if $error}has-error{/if}">
@@ -253,37 +257,79 @@
 
        {form name="thelia.admin.product_sale_element.update"}
        <form method="POST" action="{url path='/admin/product/combinations/update'}" {form_enctype form=$form}>
+            <div class="row">
+                <div class="col-md-12">
 
-	       <div class="row">
-	           <div class="col-md-12">
+					{include
+					    file = "includes/inner-form-toolbar.html"
+					    hide_submit_buttons = false
+					    show_currencies = true
+					    page_url  = "{url path='/admin/products/update' product_id=$ID}"
+					    close_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
+					}
 
-			        {include
-			            file = "includes/inner-form-toolbar.html"
-			            hide_submit_buttons = false
-			            show_currencies = true
-			            page_url  = "{url path='/admin/products/update' product_id=$ID}"
-			            close_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
-			        }
+					{* Be sure to get the product ID, even if the form could not be validated *}
+					<input type="hidden" name="product_id" value="{$product_id}" />
 
-                    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+					<input type="hidden" name="current_tab" value="details" />
 
-		           <div class="row">
-		               <div class="col-md-4">
-		                   {form_field form=$form field='tax_rule'}
-		                       <div class="form-group {if $error}has-error{/if}">
-		                           <label for="tax_rule_field" class="control-label">{$label} : </label>
-		                           <div class="form-group">
-		                               <select id="tax_rule_field" required="required" name="{$name}" class="form-control">
-		                                   <option value="">{intl l="Select a tax tule"}</option>
-		                                   {loop name="tax" type="tax-rule" backend_context="1"}
-		                                       <option value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}>{$TITLE}</option>
-		                                   {/loop}
-		                               </select>
-		                           </div>
-		                       </div>
-		                   {/form_field}
-		               </div>
-		           </div>
+					{form_hidden_fields form=$form}
+
+					{form_field form=$form field='product_id'}
+					    <input type="hidden" name="{$name}" value="{$value}" />
+					{/form_field}
+
+					{form_field form=$form field='success_url'}
+					    <input type="hidden" name="{$name}" value="{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}" />
+					{/form_field}
+
+	                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                    {loop type="currency" name="get-currency-symbol" id=$edit_currency_id backend_context="1"}
+                        {$currency_symbol = $SYMBOL}
+                        {$current_currency_is_default = $IS_DEFAULT}
+
+                        {form_field form=$form field='currency'}
+                            <input type="hidden" name="{$name}" value="{$ID}" />
+                        {/form_field}
+                    {/loop}
+
+					<div class="row">
+					    <div class="col-md-4">
+					        {form_field form=$form field='tax_rule'}
+					            <div class="form-group {if $error}has-error{/if}">
+					                <label for="tax_rule_field" class="control-label">{$label} : </label>
+					                <div class="form-group">
+					                   <select id="tax_rule_field" required="required" name="{$name}" class="form-control">
+					                        <option value="">{intl l="Select a tax tule"}</option>
+					                        {loop name="tax" type="tax-rule" backend_context="1"}
+					                            <option value="{$ID}" {if $ID == $TAX_RULE_ID}selected="selected"{/if}>{$TITLE}</option>
+					                        {/loop}
+					                    </select>
+					                </div>
+					            </div>
+					        {/form_field}
+					    </div>
+					    <div class="col-md-4">
+                          {form_field form=$form field='use_exchange_rate'}
+                              {if $current_currency_is_default}
+                                 <input type="hidden" name="{$name}" value="0">
+                                 {$show_pricing_fields = true}
+                              {else}
+                                  <div class="form-group {if $error}has-error{/if}">
+                                      <label>&nbsp;</label>
+                                      <div class="checkbox">
+                                          <label>
+                                              <input type="checkbox" class="use_exchange_rate_box" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+                                              {$label}
+                                          </label>
+                                      </div>
+                                  </div>
+                                  {$show_pricing_fields = ($value == 0)}
+                              {/if}
+                          {/form_field}
+					    </div>
+					</div>
 
 	                {module_include location='product_before_combinations'}
 
@@ -294,6 +340,9 @@
 					        {module_include location='product_combinations_list_caption'}
 
 					        {loop type="auth" name="can_create" role="ADMIN" resource="admin.product" access="UPDATE"}
+                            <a class="btn btn-default btn-primary action-btn" title="{intl l='Quickly create combinations using the combination builder'}" href="#combination_generator_dialog" data-toggle="modal">
+                                {intl l='Combination builder'}
+                            </a>
 					        <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new combination'}" href="#combination_creation_dialog" data-toggle="modal">
 					            <span class="glyphicon glyphicon-plus-sign"></span>
 					        </a>
@@ -318,43 +367,91 @@
 					    </thead>
 
 					    <tbody>
-	                        {loop name="product.sales.elements" type="product_sale_elements" product=$product_id currency=$edit_currency_id backend_context="1"}
+	                        {* Get number of PSE defined, assumin the form have the same number of values for each fields *}
+
+	                        {form_field form=$form field='product_sale_element_id' value_key=0}
+	                           {$pse_count = $total_value_count}
+	                        {/form_field}
+
+	                        {for $idx = 0 to $total_value_count-1}
 	                        <tr>
                                 <td colspan="12">
-                                {$ID}: {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$ID backend_context="1"}
-                                    {if $LOOP_COUNT > 1} - {/if}{$ATTRIBUTE_TITLE}
-                                {/loop}
+
+			                    {form_field form=$form field='product_sale_element_id' value_key=$idx}
+			                        <input type="hidden" name="{$name}" value="{$value}" />
+
+                                    {$current_pse_id = $value}
+
+	                                {$current_pse_id}: {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1"}
+	                                    {if $LOOP_COUNT > 1} - {/if}{$ATTRIBUTE_TITLE}
+	                                {/loop}
+                                {/form_field}
                                 </td>
 	                        </tr>
-					        <tr>
 
-                                <td><input class="form-control text-right" type="text" name="quantity[{$ID}]" value="{$REF}" /></td>
-                                <td><input class="form-control text-right" type="text" name="quantity[{$ID}]" value="{$EAN_CODE}" /></td>
-                                <td><input class="form-control text-right" type="text" name="quantity[{$ID}]" value="{$QUANTITY}" /></td>
-								<td><input class="form-control text-right" type="text" name="price_wo_taxes[{$ID}]" value="{format_number number=$PRICE}" /></td>
-								<td><input class="form-control text-right" type="text" name="price_w_taxes[{$ID}]" value="{format_number number=$TAXED_PRICE}" /></td>
-								<td><input class="form-control text-right col-lg-1" type="text" name="weight[{$ID}]" value="{$WEIGHT}" /></td>
+                            <tr>
+                                {form_field form=$form field='reference' value_key=$idx}
+                                <td {if $error}class="has-error"{/if}><input class="form-control" type="text" name="{$name}" value="{$value}" /></td>
+                                {/form_field}
 
-                                <td class="text-center">
-                                    <input class="form-control" type="radio" name="default" value="{$ID}" {if $IS_DEFAULT}checked="checked"{/if}/>
+                                {form_field form=$form field='ean_code' value_key=$idx}
+                                <td {if $error}class="has-error"{/if}><input class="form-control" type="text" name="{$name}" value="{$value}" /></td>
+                                {/form_field}
+
+                                {form_field form=$form field='quantity' value_key=$idx}
+                                <td {if $error}class="has-error"{/if}>
+                                    <input class="form-control text-right" required type="text" name="{$name}" value="{$value}" />
                                 </td>
+                                {/form_field}
 
-								<td class="text-center">
-								    <input class="form-control" type="checkbox" name="on_sale[{$ID}]" value="{$ID}" {if $IS_PROMO}checked="checked"{/if}/>
-								</td>
+                                {form_field form=$form field='price' value_key=$idx}
+                                <td {if $error}class="has-error"{/if}><input {if !$show_pricing_fields}readonly{/if} required data-price-type="price-without-tax" data-rel-price="price_with_tax_{$idx}" id="price_without_tax_{$idx}" class="price_field automatic_price_field form-control text-right" required type="text" name="{$name}" value="{$value}" /></td>
+                                {/form_field}
 
-								<td class="text-center">
-							         <input class="form-control" type="checkbox" name="is_new[{$ID}]" value="{$ID}" {if $IS_NEW}checked="checked"{/if}/>
-								</td>
+                                {form_field form=$form field='price_with_tax' value_key=$idx}
+                                <td {if $error}class="has-error"{/if}><input {if !$show_pricing_fields}readonly{/if} data-price-type="price-with-tax" data-rel-price="price_without_tax_{$idx}" id="price_with_tax_{$idx}" class="price_field automatic_price_field form-control text-right" type="text" name="{$name}" value="{$value}" /></td>
+                                {/form_field}
 
-								<td><input class="form-control text-right" type="text" name="sale_price_wo_taxes[{$ID}]" value="{format_number number=$PROMO_PRICE}" /></td>
-								<td><input class="form-control text-right" type="text" name="sale_price_w_taxes[{$ID}]" value="{format_number number=$TAXED_PROMO_PRICE}" /></td>
+                                {form_field form=$form field='weight' value_key=$idx}
+                                <td {if $error}class="has-error"{/if}><input required class="form-control text-right" required type="text" name="{$name}" value="{$value}" /></td>
+                                {/form_field}
 
-								<td class="actions">
-								    <a class="btn btn-default btn-xs combination-delete" title="{intl l='Delete this combination'}"  href="#combination_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
-								</td>
-					        </tr>
-	                        {/loop}
+
+                                {form_field form=$form field='default_pse'}
+                                <td class="{if $error}has-error {/if}text-center">
+                                    <input class="form-control" type="radio" name="{$name}" value="{$current_pse_id}" {if $value == $current_pse_id}checked="checked"{/if}/>
+                                </td>
+                                {/form_field}
+
+                                {form_field form=$form field='onsale' value_key=$idx}
+                                <td class="{if $error}has-error {/if}text-center">
+                                    <input class="form-control" type="checkbox" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}/>
+                                </td>
+                                {/form_field}
+
+                                {form_field form=$form field='isnew' value_key=$idx}
+                                <td class="{if $error}has-error {/if}text-center">
+                                     <input class="form-control" type="checkbox" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}/>
+                                </td>
+                                {/form_field}
+
+                                {form_field form=$form field='sale_price' value_key=$idx}
+                                <td {if $error}class="has-error"{/if}>
+                                    <input {if !$show_pricing_fields}readonly{/if} required data-price-type="sale-price-without-tax" data-rel-price="sale_price_with_tax_{$idx}" id="sale_price_without_tax_{$idx}" class="price_field automatic_price_field form-control text-right" type="text" name="{$name}" value="{$value}"  />
+                                </td>
+                                {/form_field}
+
+                                {form_field form=$form field='sale_price_with_tax' value_key=$idx}
+                                <td {if $error}class="has-error"{/if}>
+                                    <input {if !$show_pricing_fields}readonly{/if} data-price-type="sale-price-with-tax" data-rel-price="sale_price_without_tax_{$idx}" id="sale_price_with_tax_{$idx}" class="price_field automatic_price_field form-control text-right" type="text" name="{$name}" value="{$value}"  />
+                                </td>
+                                {/form_field}
+
+                                <td class="actions">
+                                    <a class="btn btn-default btn-xs combination-delete" title="{intl l='Delete this combination'}"  href="#combination_delete_dialog" data-id="{$current_pse_id}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                </td>
+                            </tr>
+	                        {/for}
 					    </tbody>
 					</table>
 

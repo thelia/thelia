@@ -70,7 +70,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             $con->beginTransaction();
 
             try {
-                if(null === $module->getFullNamespace()) {
+                if (null === $module->getFullNamespace()) {
                     throw new \LogicException('can not instanciante this module if namespace is null. Maybe the model is not loaded ?');
                 }
 

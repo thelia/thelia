@@ -24,10 +24,8 @@
 namespace Thelia\Form\Lang;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Range;
 use Thelia\Form\BaseForm;
 use Thelia\Core\Translation\Translator;
-
 
 /**
  * Class LangDefaultBehaviorForm

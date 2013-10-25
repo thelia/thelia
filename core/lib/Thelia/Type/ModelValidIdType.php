@@ -78,7 +78,7 @@ class ModelValidIdType extends BaseType
         $queryClass = $this->expectedModelActiveRecordQuery;
 
         $choices = array();
-        foreach($queryClass::create()->find() as $item) {
+        foreach ($queryClass::create()->find() as $item) {
             $choices[$item->getId()] = method_exists($item, "getTitle") ? $item->getTitle() : $item->getId();
         }
 

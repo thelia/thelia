@@ -28,8 +28,11 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 
 use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Model\CustomerQuery;
+use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
@@ -38,8 +41,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Order extends BaseLoop
+class Order extends BaseLoop implements SearchLoopInterface
 {
     public $countable = true;
     public $timestampable = true;
@@ -72,6 +76,59 @@ class Order extends BaseLoop
                 'create-date-reverse'
             )
         );
+    }
+
+    public function getSearchIn()
+    {
+        return array(
+            "ref",
+            "customer_ref",
+            "customer_firstname",
+            "customer_lastname",
+            "customer_email",
+        );
+    }
+
+    /**
+     * @param OrderQuery $search
+     * @param $searchTerm
+     * @param $searchIn
+     * @param $searchCriteria
+     */
+    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
+    {
+
+        $search->_and();
+        foreach ($searchIn as $index => $searchInElement) {
+            if ($index > 0) {
+                $search->_or();
+            }
+            switch ($searchInElement) {
+                case "ref":
+                    $search->filterByRef($searchTerm, $searchCriteria);
+                    break;
+                case "customer_ref":
+                    $search->filterByCustomer(
+                        CustomerQuery::create()->filterByRef($searchTerm, $searchCriteria)->find()
+                    );
+                    break;
+                case "customer_firstname":
+                    $search->filterByOrderAddressRelatedByInvoiceOrderAddressId(
+                        OrderAddressQuery::create()->filterByFirstname($searchTerm, $searchCriteria)->find()
+                    );
+                    break;
+                case "customer_lastname":
+                    $search->filterByOrderAddressRelatedByInvoiceOrderAddressId(
+                        OrderAddressQuery::create()->filterByLastname($searchTerm, $searchCriteria)->find()
+                    );
+                    break;
+                case "customer_email":
+                    $search->filterByCustomer(
+                        CustomerQuery::create()->filterByEmail($searchTerm, $searchCriteria)->find()
+                    );
+                    break;
+            }
+        }
     }
 
     /**

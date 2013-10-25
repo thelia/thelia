@@ -40,7 +40,7 @@ abstract class AbstractSmartyPlugin
      */
     protected function _explode($commaSeparatedValues)
     {
-        if(null === $commaSeparatedValues) {
+        if (null === $commaSeparatedValues) {
             return array();
         }
 

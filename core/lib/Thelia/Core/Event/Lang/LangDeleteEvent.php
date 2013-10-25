@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Lang;
 
-
 /**
  * Class LangDeleteEvent
  * @package Thelia\Core\Event\Lang
@@ -39,7 +38,7 @@ class LangDeleteEvent extends LangEvent
     /**
      * @param int $lang_id
      */
-    function __construct($lang_id)
+    public function __construct($lang_id)
     {
         $this->lang_id = $lang_id;
     }

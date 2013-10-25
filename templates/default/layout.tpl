@@ -24,6 +24,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 <!--[if IE 8 ]><html class="no-js oldie ie8" lang="{lang attr="code"}"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="{lang attr="code"}" class="no-js"> <!--<![endif]-->
 <head>
+
     {* Test if javascript is enabled *}
     <script>(function(H) { H.className=H.className.replace(/\bno-js\b/,'js') } )(document.documentElement);</script>
 
@@ -160,7 +161,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/language"}">{lang attr="title"}</a>
                     <ul class="select dropdown-menu">
                         {loop type="lang" name="lang_available" exclude="{lang attr="id"}"}
-                            <li><a href="?lang={$CODE}">{$TITLE}</a></li>
+                            <li><a href="{url path="{navigate to="current"}" lang={$CODE}}">{$TITLE}</a></li>
                         {/loop}
                     </ul>
                 </div>
@@ -170,7 +171,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/currency"}">{currency attr="code"}</a>
                     <ul class="select dropdown-menu">
                         {loop type="currency" name="currency_available" exclude="{currency attr="id"}" }
-                            <li><a href="?currency={$ISOCODE}">{$SYMBOL} - {$NAME}</a></li>
+                            <li><a href="{url path="{navigate to="current"}" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
                         {/loop}
                     </ul>
                 </div>

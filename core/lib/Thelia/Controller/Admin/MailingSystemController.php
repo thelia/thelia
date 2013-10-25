@@ -38,5 +38,5 @@ class MailingSystemController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::MAILING_SYSTEM, AccessManager::VIEW)) return $response;
         return $this->render("mailing-system");
     }
-    
+
 }

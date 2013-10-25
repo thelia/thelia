@@ -52,14 +52,6 @@ use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
-use Thelia\Model\AttributeAvQuery;
-use Thelia\Model\AttributeCombination;
-use Thelia\Core\Event\Product\ProductSaleElementCreateEvent;
-use Propel\Runtime\Propel;
-use Thelia\Model\Map\ProductTableMap;
-use Thelia\Core\Event\Product\ProductSaleElementDeleteEvent;
-use Thelia\Model\ProductPrice;
-use Thelia\Model\ProductSaleElements;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
 

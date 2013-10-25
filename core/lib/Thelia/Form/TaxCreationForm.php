@@ -43,7 +43,7 @@ class TaxCreationForm extends BaseForm
         $types = TaxEngine::getInstance()->getTaxTypeList();
         $typeList = array();
         $requirementList = array();
-        foreach($types as $type) {
+        foreach ($types as $type) {
             $classPath = "\\Thelia\\TaxEngine\\TaxType\\$type";
             $instance = new $classPath();
             $typeList[$type] = $instance->getTitle();
@@ -65,8 +65,8 @@ class TaxCreationForm extends BaseForm
             ))
         ;
 
-        foreach($requirementList as $type => $requirements) {
-            foreach($requirements as $name => $requirementType) {
+        foreach ($requirementList as $type => $requirements) {
+            foreach ($requirements as $name => $requirementType) {
                 $this->formBuilder
                     ->add($type . ':' . $name, new TheliaType(), array(
                         //"instance" => $requirementType,

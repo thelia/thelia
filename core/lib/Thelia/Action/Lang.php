@@ -34,7 +34,6 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Lang as LangModel;
 
-
 /**
  * Class Lang
  * @package Thelia\Action
@@ -105,7 +104,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
 
     public function langUrl(LangUrlEvent $event)
     {
-        foreach($event->getUrl() as $id => $url){
+        foreach ($event->getUrl() as $id => $url) {
             LangQuery::create()
                 ->filterById($id)
                 ->update(array('Url' => $url));

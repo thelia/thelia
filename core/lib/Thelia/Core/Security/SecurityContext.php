@@ -23,12 +23,9 @@
 
 namespace Thelia\Core\Security;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Model\ProfileQuery;
-use Thelia\Model\ProfileResourceQuery;
 
 /**
  * A simple security manager, in charge of checking user
@@ -147,29 +144,29 @@ class SecurityContext
             return true;
         }
 
-        if( !method_exists($user, 'getPermissions') ) {
+        if ( !method_exists($user, 'getPermissions') ) {
             return false;
         }
 
         $userPermissions = $user->getPermissions();
 
-        if($userPermissions === AdminResources::SUPERADMINISTRATOR) {
+        if ($userPermissions === AdminResources::SUPERADMINISTRATOR) {
             return true;
         }
 
-        foreach($resources as $resource) {
-            if($resource === '') {
+        foreach ($resources as $resource) {
+            if ($resource === '') {
                 continue;
             }
 
             $resource = strtolower($resource);
 
-            if(!array_key_exists($resource, $userPermissions)) {
+            if (!array_key_exists($resource, $userPermissions)) {
                 return false;
             }
 
-            foreach($accesses as $access) {
-                if(!$userPermissions[$resource]->can($access)) {
+            foreach ($accesses as $access) {
+                if (!$userPermissions[$resource]->can($access)) {
                     return false;
                 }
             }

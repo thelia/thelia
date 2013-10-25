@@ -96,6 +96,10 @@ $_SESSION['install']['step'] = $step;
             <label for="site_name">Company name :</label>
             <input id="site_name" class="form-control" type="text" name="company_name" placeholder="" value="" required>
         </div>
+        <div class="form-group">
+            <label for="site_name">website url :</label>
+            <input id="site_name" class="form-control" type="text" name="url_site" placeholder="" value="http://<?php echo $_SERVER['SERVER_NAME']; ?>" required>
+        </div>
         <div class="clearfix">
             <div class="control-btn">
                 <button type="submit" class="pull-right btn btn-default btn-primary">Continue</button>

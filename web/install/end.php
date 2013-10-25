@@ -43,6 +43,10 @@ if($_SESSION['install']['step'] == 5) {
     \Thelia\Model\ConfigQuery::create()
         ->filterByName('company_name')
         ->update(array('Value' => $_POST['company_name']));
+
+    \Thelia\Model\ConfigQuery::create()
+        ->filterByName('url_site')
+        ->update(array('Value' => $_POST['url_site']));
 }
 
 //clean up cache directories

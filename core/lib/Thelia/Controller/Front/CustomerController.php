@@ -51,7 +51,6 @@ class CustomerController extends BaseFrontController
 {
     use \Thelia\Cart\CartTrait;
 
-
     public function newPasswordAction()
     {
         if (! $this->getSecurityContext()->hasCustomerUser()) {
@@ -156,7 +155,6 @@ class CustomerController extends BaseFrontController
         $this->getParserContext()->addForm($customerProfilUpdateForm);
     }
 
-
     public function updatePasswordAction()
     {
         if ($this->getSecurityContext()->hasCustomerUser()) {
@@ -220,14 +218,14 @@ class CustomerController extends BaseFrontController
                     $nlEvent->setFirstname($updatedCustomer->getFirstname());
                     $nlEvent->setLastname($updatedCustomer->getLastname());
 
-                    if(null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterOldEmail)) {
+                    if (null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterOldEmail)) {
                         $nlEvent->setId($newsletter->getId());
                         $this->dispatch(TheliaEvents::NEWSLETTER_UPDATE, $nlEvent);
                     } else {
                         $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $nlEvent);
                     }
                 } else {
-                    if(null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterOldEmail)) {
+                    if (null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterOldEmail)) {
                         $nlEvent = new NewsletterEvent($updatedCustomer->getEmail(), $this->getRequest()->getSession()->getLang()->getLocale());
                         $nlEvent->setId($newsletter->getId());
                         $this->dispatch(TheliaEvents::NEWSLETTER_UNSUBSCRIBE, $nlEvent);

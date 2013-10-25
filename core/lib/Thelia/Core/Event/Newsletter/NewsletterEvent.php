@@ -24,7 +24,6 @@
 namespace Thelia\Core\Event\Newsletter;
 use Thelia\Core\Event\ActionEvent;
 
-
 /**
  * Class NewsletterEvent
  * @package Thelia\Core\Event\Newsletter
@@ -57,7 +56,7 @@ class NewsletterEvent extends ActionEvent
      */
     protected $locale;
 
-    function __construct($email, $locale)
+    public function __construct($email, $locale)
     {
         $this->email = $email;
         $this->locale = $locale;
@@ -158,9 +157,5 @@ class NewsletterEvent extends ActionEvent
     {
         return $this->id;
     }
-
-
-
-
 
 }

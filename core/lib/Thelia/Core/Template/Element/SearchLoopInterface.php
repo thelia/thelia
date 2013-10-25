@@ -20,74 +20,23 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Core\Template\Element;
 
-namespace Thelia\Controller\Admin;
-
-use Thelia\Form\TestForm;
 /**
- * Manages variables
  *
- * @author Franck Allimant <franck@cqfdev.fr>
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
  */
-class TestController extends BaseAdminController
+interface SearchLoopInterface
 {
-    /**
-     * Load a object for modification, and display the edit template.
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
-     */
-    public function updateAction()
-    {
-        // Prepare the data that will hydrate the form
-        $data = array(
-                'title'           => "test title",
-                'test'         => array('a', 'b', 'toto' => 'c')
-        );
-
-        // Setup the object form
-        $changeForm = new TestForm($this->getRequest(), "form", $data);
-
-        // Pass it to the parser
-        $this->getParserContext()->addForm($changeForm);
-
-        return $this->render('test-form');
-    }
+    const MODE_ANY_WORD = 'any_word';
+    const MODE_SENTENCE = 'sentence';
+    const MODE_STRICT_SENTENCE = 'strict_sentence';
 
     /**
-     * Save changes on a modified object, and either go back to the object list, or stay on the edition page.
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return array of available field to search in
      */
-    public function processUpdateAction()
-    {
-        $error_msg = false;
+    public function getSearchIn();
 
-        // Create the form from the request
-        $changeForm = new TestForm($this->getRequest());
-
-        try {
-
-            // Check the form against constraints violations
-            $form = $this->validateForm($changeForm, "POST");
-
-            // Get the form field values
-            $data = $form->getData();
-
-            echo "data=";
-
-            var_dump($data);
-        }
-        catch (FormValidationException $ex) {
-            // Form cannot be validated
-            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
-            // Any other error
-            $error_msg = $ex->getMessage();
-        }
-
-        echo "Error = $error_msg";
-
-        exit;
-    }
+    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria);
 }

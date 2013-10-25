@@ -27,7 +27,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Map\TaxRuleTableMap;
 use Thelia\Model\TaxRuleCountry;
 use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Model\TaxRule as TaxRuleModel;

@@ -33,7 +33,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\ContentTableMap;
-use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
@@ -152,7 +151,8 @@ class Content extends BaseI18nLoop
 
         $visible = $this->getVisible();
 
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
+
 
         $orders  = $this->getOrder();
 
