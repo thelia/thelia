@@ -1,16 +1,5 @@
 {block name="no-return-functions"}{/block}
 <!doctype html>
-<!--
- ______   __  __     ______     __         __     ______
-/\__  _\ /\ \_\ \   /\  ___\   /\ \       /\ \   /\  __ \
-\/_/\ \/ \ \  __ \  \ \  __\   \ \ \____  \ \ \  \ \  __ \
-   \ \_\  \ \_\ \_\  \ \_____\  \ \_____\  \ \_\  \ \_\ \_\
-    \/_/   \/_/\/_/   \/_____/   \/_____/   \/_/   \/_/\/_/
-
-
-Author: Christophe Laffont
-URL: http://www.thelia.net
--->
 {* paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither *}
 <!--[if lt IE 7 ]><html class="no-js oldie ie6" lang="{lang attr="code"}"> <![endif]-->
 <!--[if IE 7 ]><html class="no-js oldie ie7" lang="{lang attr="code"}"> <![endif]-->
