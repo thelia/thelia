@@ -73,7 +73,7 @@ class Format extends AbstractSmartyPlugin
         $date = $this->getParam($params, "date", false);
 
         if ($date === false) {
-            return '';
+            return "";
         }
 
         if (!$date instanceof \DateTime) {
@@ -112,7 +112,7 @@ class Format extends AbstractSmartyPlugin
         $number = $this->getParam($params, "number", false);
 
         if ($number ===  false) {
-            throw new SmartyPluginException("number is a mandatory parameter in format_number function");
+            return "";
         }
 
         if ($number == '') {
