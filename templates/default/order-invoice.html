@@ -139,13 +139,15 @@
                         <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
                         <td class="coupon">
                             {form_field form=$form field='coupon-code'}
-                                <div class="input-group {if $error}has-error{/if}">
-                                    <label class="control-label sr-only" for="code">{intl l='Code :'}</label>
-                                    <input id="coupon" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='Coupon code'}">
-                                    <span class="input-group-btn">
-                                        <button type="submit" class="btn btn-coupon">{intl l="Ok"}</button>
-                                    </span>
-                                    {if $error}{$message}{/if}
+                                <div class="{if $error}has-error{/if}">
+                                    <div class="input-group">
+                                        <label class="control-label sr-only" for="code">{intl l='Code :'}</label>
+                                        <input id="coupon" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='Coupon code'}">
+                                        <span class="input-group-btn">
+                                            <button type="submit" class="btn btn-coupon">{intl l="Ok"}</button>
+                                        </span>
+                                    </div>
+                                    {if $error}<span class="help-block"><i class="icon-remove"></i> {$message}</span>{/if}
                                 </div>
                             {/form_field}
                             <!-- /input-group -->
