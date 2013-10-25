@@ -1,16 +1,5 @@
 {block name="no-return-functions"}{/block}
 <!doctype html>
-<!--
- ______   __  __     ______     __         __     ______
-/\__  _\ /\ \_\ \   /\  ___\   /\ \       /\ \   /\  __ \
-\/_/\ \/ \ \  __ \  \ \  __\   \ \ \____  \ \ \  \ \  __ \
-   \ \_\  \ \_\ \_\  \ \_____\  \ \_____\  \ \_\  \ \_\ \_\
-    \/_/   \/_/\/_/   \/_____/   \/_____/   \/_/   \/_/\/_/
-
-
-Author: Christophe Laffont
-URL: http://www.thelia.net
--->
 {* paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither *}
 <!--[if lt IE 7 ]><html class="no-js oldie ie6" lang="{lang attr="code"}"> <![endif]-->
 <!--[if IE 7 ]><html class="no-js oldie ie7" lang="{lang attr="code"}"> <![endif]-->
@@ -236,7 +225,7 @@ URL: http://www.thelia.net
                                 <li><a href="{url path="/login"}">{intl l="Login"}</a></li>
                                 <li><a href="{url path="/register"}">{intl l="Register"}</a></li>
                                 {/elseloop}
-                                <li><a href="{url path="/Cart"}">{intl l="Cart"}</a></li>
+                                <li><a href="{url path="/cart"}">{intl l="Cart"}</a></li>
                                 <li><a href="{url path="/order/delivery"}">{intl l="Checkout"}</a></li>
                             </ul>
                         </div>
@@ -407,6 +396,9 @@ URL: http://www.thelia.net
 {* HTML5 shim, for IE6-8 support of HTML5 elements *}
 <!--[if lt IE 9]>
 <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+{javascripts file='assets/js/libs/respond.min.js'}
+<script src="{$asset_url}"></script>
+{/javascripts}
 <![endif]-->
 
 </body>
