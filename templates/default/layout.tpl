@@ -236,7 +236,7 @@ URL: http://www.thelia.net
                                 <li><a href="{url path="/login"}">{intl l="Login"}</a></li>
                                 <li><a href="{url path="/register"}">{intl l="Register"}</a></li>
                                 {/elseloop}
-                                <li><a href="{url path="/Cart"}">{intl l="Cart"}</a></li>
+                                <li><a href="{url path="/cart"}">{intl l="Cart"}</a></li>
                                 <li><a href="{url path="/order/delivery"}">{intl l="Checkout"}</a></li>
                             </ul>
                         </div>
