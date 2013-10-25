@@ -1,5 +1,23 @@
 {block name="no-return-functions"}{/block}
 <!doctype html>
+<!--
+ ______   __  __     ______     __         __     ______
+/\__  _\ /\ \_\ \   /\  ___\   /\ \       /\ \   /\  __ \
+\/_/\ \/ \ \  __ \  \ \  __\   \ \ \____  \ \ \  \ \  __ \
+   \ \_\  \ \_\ \_\  \ \_____\  \ \_____\  \ \_\  \ \_\ \_\
+    \/_/   \/_/\/_/   \/_____/   \/_____/   \/_/   \/_/\/_/
+
+
+Copyright (c) OpenStudio
+email : info@thelia.net
+web : http://www.thelia.net
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the
+GNU General Public License : http://www.gnu.org/licenses/
+-->
+
 {* paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither *}
 <!--[if lt IE 7 ]><html class="no-js oldie ie6" lang="{lang attr="code"}"> <![endif]-->
 <!--[if IE 7 ]><html class="no-js oldie ie7" lang="{lang attr="code"}"> <![endif]-->
@@ -17,7 +35,7 @@
     {* Meta Tags *}
     <meta name="description" content="">
     <meta name="generator" content="{intl l='Thelia V2'}">
-    <meta name="robots" content="index,follow">
+    <meta name="robots" content="noindex,nofollow">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     {block name="meta"}{/block}
