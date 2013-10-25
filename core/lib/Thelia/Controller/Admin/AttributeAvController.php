@@ -47,10 +47,7 @@ class AttributeAvController extends AbstractCrudController
             'manual',
             'order',
 
-            AdminResources::ATTRIBUTE_VIEW,
-            AdminResources::ATTRIBUTE_CREATE,
-            AdminResources::ATTRIBUTE_UPDATE,
-            AdminResources::ATTRIBUTE_DELETE,
+            AdminResources::ATTRIBUTE,
 
             TheliaEvents::ATTRIBUTE_AV_CREATE,
             TheliaEvents::ATTRIBUTE_AV_UPDATE,

@@ -47,10 +47,7 @@ class FeatureAvController extends AbstractCrudController
             'manual',
             'order',
 
-            AdminResources::FEATURE_VIEW,
-            AdminResources::FEATURE_CREATE,
-            AdminResources::FEATURE_UPDATE,
-            AdminResources::FEATURE_DELETE,
+            AdminResources::FEATURE,
 
             TheliaEvents::FEATURE_AV_CREATE,
             TheliaEvents::FEATURE_AV_UPDATE,
