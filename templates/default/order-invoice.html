@@ -70,7 +70,6 @@
                     <tbody>
 
                     {loop type="cart" name="cartloop"}
-
                     <tr>
                         <td class="image">
 
@@ -141,7 +140,7 @@
                         <td class="coupon">
                             {form_field form=$form field='coupon-code'}
                                 <div class="input-group {if $error}has-error{/if}">
-                                    <label class="control-label" for="code">{intl l='Code :'}</label>
+                                    <label class="control-label sr-only" for="code">{intl l='Code :'}</label>
                                     <input id="coupon" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='Coupon code'}">
                                     <span class="input-group-btn">
                                         <button type="submit" class="btn btn-coupon">{intl l="Ok"}</button>

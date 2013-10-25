@@ -23,7 +23,7 @@ URL: http://www.thelia.net
     <meta charset="utf-8">
 
     {* Page Title *}
-    <title>{block name="page-title"}{strip}{if $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title} | {/foreach}{/if}{config key="company_name"}{/strip}{/block}</title>
+    <title>{block name="page-title"}{strip}{if $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title} - {/foreach}{/if}{config key="company_name"}{/strip}{/block}</title>
 
     {* Meta Tags *}
     <meta name="description" content="">
@@ -179,15 +179,15 @@ URL: http://www.thelia.net
             <div class="banner banner-col-3">
                 <div class="col">
                     <span class="icon-truck icon-flip-horizontal"></span>
-                    Free shipping <small>Orders over $50</small>
+                    {intl l="Free shipping"} <small>{intl l="Orders over $50"}</small>
                 </div>
                 <div class="col">
                     <span class="icon-credit-card"></span>
-                    Secure payment <small>Multi-payment plateform</small>
+                    {intl l="Secure payment"} <small>{intl l="Multi-payment plateform"}</small>
                 </div>
                 <div class="col">
                     <span class="icon-info"></span>
-                    Need help ? <small>Questions ? See or F.A.Q.</small>
+                    {intl l="Need help ?"} <small>{intl l="Questions ? See or F.A.Q."}</small>
                 </div>
             </div>
         </div>
@@ -198,7 +198,7 @@ URL: http://www.thelia.net
             <div class="blocks block-col-4">
                 <div class="col">
                     <section class="block block-links">
-                        <div class="block-heading"><h3 class="block-title">Latest articles</h3></div>
+                        <div class="block-heading"><h3 class="block-title">{intl l="Latest articles"}</h3></div>
                         <div class="block-content">
                             {ifloop rel="blog.articles"}
                                 <ul>
@@ -328,16 +328,16 @@ URL: http://www.thelia.net
                             <ul>
                                 <li class="contact-address">
                                     <address class="adr" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-                                        <span class="street-address" itemprop="streetAddress">street name of my business</span><br>
+                                        <span class="street-address" itemprop="streetAddress">Street name of my business</span><br>
                                         <span class="postal-code" itemprop="postalCode">75000</span>
-                                        <span class="locality" itemprop="addressLocality">City, <span class="country-name">Country</span></span>
+                                        <span class="locality" itemprop="addressLocality">City, <span class="country-name">France</span></span>
                                     </address>
                                 </li>
                                 <li class="contact-phone">
-                                    <span class="tel" itemprop="telephone">+33 04 44 05 31 00</span>
+                                    <span class="tel" itemprop="telephone">+33 (0)0 00 00 00 00</span>
                                 </li>
                                 <li class="contact-email">
-                                    {mailto address="info@thelia.net" encode="hex" extra='class="email" itemprop="email"'}
+                                    {mailto address="contact@yourdomain.com" encode="hex" extra='class="email" itemprop="email"'}
                                 </li>
                             </ul>
                         </div>
@@ -362,7 +362,7 @@ URL: http://www.thelia.net
                     </ul>
                 </nav>
 
-                <section class="copyright">Copyright &copy; <time datetime="2013-08-01">2013</time> <a href="http://www.thelia.net" rel="external">Thelia</a></section>
+                <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://www.thelia.net" rel="external">Thelia</a></section>
             </div>
         </div>
     </footer><!-- /.footer-info -->

@@ -1120,6 +1120,21 @@ td.product,
     }
 }
 
+.table-cart-mini {
+
+  thead,
+  tbody,
+  tfoot {
+    > tr {
+      > th,
+      > td {
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+
 .table-cart {
 
     thead,
@@ -1130,6 +1145,7 @@ td.product,
             > td {
                 padding: 14px;
                 text-align: center;
+                vertical-align: middle;
                 &.product { text-align: left; }
             }
         }

@@ -31,6 +31,7 @@
             </div>
 
             {form name="thelia.order.delivery"}
+            {assign var="isPost" value="{$smarty.post|count}"}
             <form id="form-cart-delivery" action="{url path="/order/delivery"}" method="post" role="form" {form_enctype form=$form}>
 
                 {form_hidden_fields form=$form}
@@ -42,7 +43,7 @@
                 <div id="delivery-address" class="panel">
                     <div class="panel-heading clearfix">
                         <a href="{url path="/address/create"}" class="btn btn-add-address">{intl l="Add a new address"}</a>
-                        {intl l="Chose your delivery address"}
+                        {intl l="Choose your delivery address"}
                         {if $error}
                             <span class="help-block"><span class="icon-remove"></span> {$message}</span>
                         {/if}
@@ -50,18 +51,20 @@
                     <div class="panel-body">
                         <table class="table table-address" role="presentation" summary="Address Books">
                             <tbody>
-
                             {loop type="address" name="customer.addresses" customer="current"}
-
-
+                            {if $isPost}
+                                {if $value == $ID}
+                                    {assign var="isDeliveryAddressChecked" value="true"}
+                                {/if}
+                            {elseif $DEFAULT}
+                                {assign var="isDeliveryAddressChecked" value="true"}
+                            {/if}
                             <tr>
                                 <th>
                                     <div class="radio">
                                         <label for="delivery-address_{$ID}">
-
-                                                <input type="radio" name="{$name}" value="{$ID}" {if $value == $ID}checked="checked"{/if} id="delivery-address_{$ID}">
-
-                                            {$LABEL}
+                                            <input type="radio" name="{$name}" value="{$ID}"{if isDeliveryAddressChecked } checked="checked"{/if} id="delivery-address_{$ID}">
+                                            {$LABEL|default:"{intl l='Address %nb' nb={$LOOP_COUNT}}"}
                                         </label>
                                     </div>
                                 </th>
@@ -125,12 +128,19 @@
                     <div class="panel-body">
                         {loop type="delivery" name="deliveries" force_return="true"}
                         <div class="radio">
-                            <label for="delivery-method_1">
-                                {form_field form=$form field='delivery-module'}
-                                    <input type="radio" name="{$name}" {if $value == $ID}checked="checked"{/if} value="{$ID}">
-                                {/form_field}
-                                <strong>{$TITLE}</strong> / {currency attr="symbol"} {$POSTAGE}
-                            </label>
+                            {form_field form=$form field='delivery-module'}
+                                {if $isPost}
+                                    {if $value == $ID}
+                                        {assign var="isDeliveryMethodChecked" value="true"}
+                                    {/if}
+                                {elseif $LOOP_COUNT == 1}
+                                    {assign var="isDeliveryMethodChecked" value="true"}
+                                {/if}
+                                <label for="delivery-method_{$ID}">
+                                    <input type="radio" name="{$name}" id="delivery-method_{$ID}"{if $isDeliveryMethodChecked} checked="checked"{/if} value="{$ID}">
+                                    <strong>{$TITLE}</strong> / {currency attr="symbol"} {$POSTAGE}
+                                </label>
+                            {/form_field}
                         </div>
                         {/loop}
                     </div>
