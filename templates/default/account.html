@@ -156,7 +156,7 @@
                                     <td>{$REF}</td>
                                     <td>{format_date date=$CREATE_DATE}</td>
                                     <td>{loop type="currency" name="order.currency" id={$CURRENCY}}{$SYMBOL}{/loop} {format_number number=$TOTAL_TAXED_AMOUNT}</td>
-                                    <td><span class="label-delivered">{$STATUS}</span></td>
+                                    <td><span class="label-delivered">{loop type="order-status" name="order.status" id={$STATUS}}{$TITLE}{/loop}</span></td>
                                     <td><a href="#" class="btn btn-order-details" data-toggle="tooltip" title="{intl l="View order %ref as pdf document" ref={$REF}}"><span class="icon-cloud-download"></span> {intl l="Order details"}</a></td>
                                 </tr>
                                 {/loop}
