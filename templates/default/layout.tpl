@@ -334,10 +334,10 @@ URL: http://www.thelia.net
                                     </address>
                                 </li>
                                 <li class="contact-phone">
-                                    <span class="tel" itemprop="telephone">+33 (0)1 02 03 04 05</span>
+                                    <span class="tel" itemprop="telephone">+33 (0)0 00 00 00 00</span>
                                 </li>
                                 <li class="contact-email">
-                                    {mailto address="info@thelia.net" encode="hex" extra='class="email" itemprop="email"'}
+                                    {mailto address="contact@yourdomain.com" encode="hex" extra='class="email" itemprop="email"'}
                                 </li>
                             </ul>
                         </div>
