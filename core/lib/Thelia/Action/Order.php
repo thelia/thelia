@@ -293,35 +293,37 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function sendOrderEmail(OrderEvent $event)
     {
-        $order = $event->getOrder();
-        $customer = $order->getCustomer();
+        $contact_email = ConfigQuery::read('contact_email');
+        if($contact_email) {
+            $order = $event->getOrder();
+            $customer = $order->getCustomer();
 
-        $parser = $this->container->get("thelia.parser");
+            $parser = $this->container->get("thelia.parser");
 
-        $parser->assign('order_id', $order->getId());
-        $parser->assign('order_ref', $order->getRef());
+            $parser->assign('order_id', $order->getId());
+            $parser->assign('order_ref', $order->getRef());
 
-        $message = MessageQuery::create()
-            ->filterByName('order_confirmation')
-            ->findOne();
+            $message = MessageQuery::create()
+                ->filterByName('order_confirmation')
+                ->findOne();
 
-        $message
-            ->setLocale($order->getLang()->getLocale());
+            $message
+                ->setLocale($order->getLang()->getLocale());
 
-        $subject = $parser->fetch(sprintf("string:%s", $message->getSubject()));
-        $htmlMessage = $parser->fetch(sprintf("string:%s", $message->getHtmlMessage()));
-        $textMessage = $parser->fetch(sprintf("string:%s", $message->getTextMessage()));
+            $subject = $parser->fetch(sprintf("string:%s", $message->getSubject()));
+            $htmlMessage = $parser->fetch(sprintf("string:%s", $message->getHtmlMessage()));
+            $textMessage = $parser->fetch(sprintf("string:%s", $message->getTextMessage()));
 
-        $instance = \Swift_Message::newInstance($subject)
-            ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
-            ->addFrom(ConfigQuery::read('contact_email'), ConfigQuery::read('company_name'))
+            $instance = \Swift_Message::newInstance($subject)
+                ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
+                ->addFrom(ConfigQuery::read('contact_email'), ConfigQuery::read('company_name'))
             ;
-        $instance
-            ->setBody($htmlMessage, 'text/html')
-            ->addPart($textMessage, 'text/plain');
+            $instance
+                ->setBody($htmlMessage, 'text/html')
+                ->addPart($textMessage, 'text/plain');
 
-        $mail = $this->getMailer()->send($instance);
-
+            $mail = $this->getMailer()->send($instance);
+        }
     }
 
     /**
