@@ -214,8 +214,16 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
                 ELSE
                     CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END
                 END';
+
+            $search->withColumn('ROUND(' . $priceToCompareAsSQL . ', 2)', 'real_price');
+            $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price' . $defaultCurrencySuffix . '`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END', 'price');
+            $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price' . $defaultCurrencySuffix . '`.PROMO_PRICE * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END', 'promo_price');
         } else {
             $priceToCompareAsSQL = 'CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END';
+
+            $search->withColumn('ROUND(' . $priceToCompareAsSQL . ', 2)', 'real_price');
+            $search->withColumn('`price`.PRICE', 'price');
+            $search->withColumn('`price`.PROMO_PRICE', 'promo_price');
         }
 
         /* manage translations */
@@ -393,10 +401,6 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
         $search->withColumn('`pse`.QUANTITY', 'quantity');
         $search->withColumn('`pse`.WEIGHT', 'weight');
         $search->withColumn('`pse`.EAN_CODE', 'ean_code');
-
-        $search->withColumn('ROUND(' . $priceToCompareAsSQL . ', 2)', 'real_price');
-        $search->withColumn('`price`.PRICE', 'price');
-        $search->withColumn('`price`.PROMO_PRICE', 'promo_price');
 
         $orders  = $this->getOrder();
 
