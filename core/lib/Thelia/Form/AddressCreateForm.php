@@ -168,7 +168,7 @@ class AddressCreateForm extends BaseForm
                 ))
             // Default address
             ->add("is_default", "checkbox", array(
-                    "label" => Translator::getInstance()->trans("Make this address has my primary address"),
+                    "label" => Translator::getInstance()->trans("Make this address as my primary address"),
                     "label_attr" => array(
                         "for" => "default_address"
                     ),
