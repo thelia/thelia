@@ -328,13 +328,13 @@ URL: http://www.thelia.net
                             <ul>
                                 <li class="contact-address">
                                     <address class="adr" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-                                        <span class="street-address" itemprop="streetAddress">street name of my business</span><br>
+                                        <span class="street-address" itemprop="streetAddress">Street name of my business</span><br>
                                         <span class="postal-code" itemprop="postalCode">75000</span>
-                                        <span class="locality" itemprop="addressLocality">City, <span class="country-name">Country</span></span>
+                                        <span class="locality" itemprop="addressLocality">City, <span class="country-name">France</span></span>
                                     </address>
                                 </li>
                                 <li class="contact-phone">
-                                    <span class="tel" itemprop="telephone">+33 04 44 05 31 00</span>
+                                    <span class="tel" itemprop="telephone">+33 (0)1 02 03 04 05</span>
                                 </li>
                                 <li class="contact-email">
                                     {mailto address="info@thelia.net" encode="hex" extra='class="email" itemprop="email"'}
