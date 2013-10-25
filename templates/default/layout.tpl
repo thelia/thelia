@@ -144,7 +144,7 @@ URL: http://www.thelia.net
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/language"}">{lang attr="title"}</a>
                     <ul class="select dropdown-menu">
                         {loop type="lang" name="lang_available" exclude="{lang attr="id"}"}
-                            <li><a href="?lang={$CODE}">{$TITLE}</a></li>
+                            <li><a href="{url path="{navigate to="current"}" lang={$CODE}}">{$TITLE}</a></li>
                         {/loop}
                     </ul>
                 </div>
@@ -154,7 +154,7 @@ URL: http://www.thelia.net
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/currency"}">{currency attr="code"}</a>
                     <ul class="select dropdown-menu">
                         {loop type="currency" name="currency_available" exclude="{currency attr="id"}" }
-                            <li><a href="?currency={$ISOCODE}">{$SYMBOL} - {$NAME}</a></li>
+                            <li><a href="{url path="{navigate to="current"}" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
                         {/loop}
                     </ul>
                 </div>
