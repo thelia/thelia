@@ -128,8 +128,9 @@ class Category extends BaseI18nLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        if ($this->getVisible() != BooleanOrBothType::ANY)
-            $search->filterByVisible($this->getVisible() ? 1 : 0);
+        $visible = $this->getVisible();
+
+        if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
 
         $product = $this->getProduct();
 
