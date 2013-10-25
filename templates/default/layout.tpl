@@ -6,6 +6,7 @@
 <!--[if IE 8 ]><html class="no-js oldie ie8" lang="{lang attr="code"}"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="{lang attr="code"}" class="no-js"> <!--<![endif]-->
 <head>
+
     {* Test if javascript is enabled *}
     <script>(function(H) { H.className=H.className.replace(/\bno-js\b/,'js') } )(document.documentElement);</script>
 
@@ -20,6 +21,11 @@
     <meta name="robots" content="index,follow">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     {block name="meta"}{/block}
+
+    {* HTML5 shim, for IE6-8 support of HTML5 elements *}
+    <!--[if lt IE 9]>
+        <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
     {* Stylesheets *}
     {stylesheets file='assets/less/styles.less' filters='less,cssembed'}
@@ -395,7 +401,6 @@
 
 {* HTML5 shim, for IE6-8 support of HTML5 elements *}
 <!--[if lt IE 9]>
-<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 {javascripts file='assets/js/libs/respond.min.js'}
 <script src="{$asset_url}"></script>
 {/javascripts}
