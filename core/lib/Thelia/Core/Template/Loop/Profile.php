@@ -33,7 +33,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\ProfileQuery;
 use Thelia\Type;
-use Thelia\Type\BooleanOrBothType;
 
 /**
  *

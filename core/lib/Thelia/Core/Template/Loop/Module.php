@@ -107,7 +107,7 @@ class Module extends BaseI18nLoop
 
         $code = $this->getCode();
 
-        if(null !== $code) {
+        if (null !== $code) {
             $search->filterByCode($code, Criteria::IN);
         }
 

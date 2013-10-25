@@ -24,7 +24,6 @@
 namespace Thelia\Core\Template;
 
 use Thelia\Core\Thelia;
-use Thelia\Model\ConfigQuery;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Form\BaseForm;
 /**

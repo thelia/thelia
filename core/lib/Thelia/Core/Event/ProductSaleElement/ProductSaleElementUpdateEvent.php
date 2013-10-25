@@ -22,9 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\ProductSaleElement;
-use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Model\Product;
-use Thelia\Core\Event\Product\ProductEvent;
 
 class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 {
@@ -217,6 +215,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
     public function setFromDefaultCurrency($from_default_currency)
     {
         $this->from_default_currency = $from_default_currency;
+
         return $this;
     }
 

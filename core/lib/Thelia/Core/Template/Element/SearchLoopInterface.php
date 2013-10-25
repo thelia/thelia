@@ -22,8 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Core\Template\Element;
 
-use Symfony\Component\Validator\ExecutionContextInterface;
-
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>

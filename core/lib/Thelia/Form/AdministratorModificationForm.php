@@ -25,7 +25,6 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
-use Thelia\Core\Translation\Translator;
 use Thelia\Model\AdminQuery;
 
 class AdministratorModificationForm extends AdministratorCreationForm
@@ -90,7 +89,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
             $context->addViolation("password confirmation is not the same as password field");
         }
 
-        if($data["password"] !== '' && strlen($data["password"]) < 4) {
+        if ($data["password"] !== '' && strlen($data["password"]) < 4) {
             $context->addViolation("password must be composed of at least 4 characters");
         }
     }

@@ -23,7 +23,6 @@
 
 namespace Thelia\Controller\Front;
 
-
 /**
  * Class Mail
  * @package Thelia\Controller\Front

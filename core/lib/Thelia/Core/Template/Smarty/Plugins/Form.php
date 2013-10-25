@@ -60,8 +60,8 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
  */
 class Form extends AbstractSmartyPlugin
 {
-    static private $taggedFieldsStack = null;
-    static private $taggedFieldsStackPosition = null;
+    private static $taggedFieldsStack = null;
+    private static $taggedFieldsStackPosition = null;
 
     protected $request;
     protected $parserContext;
@@ -113,8 +113,7 @@ class Form extends AbstractSmartyPlugin
 
             $template->assign("form_error", $instance->hasError() ? true : false);
             $template->assign("form_error_message", $instance->getErrorMessage());
-        }
-        else {
+        } else {
             return $content;
         }
     }
@@ -126,7 +125,6 @@ class Form extends AbstractSmartyPlugin
         $template->assign("value", $fieldValue);
 
         $template->assign("checked", isset($fieldVars['checked']) ? $fieldVars['checked'] : false);
-
 
         //data
         $template->assign("data", $fieldVars['data']);
@@ -161,13 +159,13 @@ class Form extends AbstractSmartyPlugin
         $formFieldType = $formFieldConfig->getType()->getInnerType();
 
         /* access to choices */
-        if($formFieldType instanceof ChoiceType) {
+        if ($formFieldType instanceof ChoiceType) {
             $template->assign("choices", $formFieldView->vars['choices']);
         }
 
         /* access to collections */
-        if($formFieldType instanceof CollectionType) {
-            if( true === $formFieldConfig->getOption('prototype') ) {
+        if ($formFieldType instanceof CollectionType) {
+            if ( true === $formFieldConfig->getOption('prototype') ) {
 
             } else {
                 /* access to choices */
@@ -179,17 +177,16 @@ class Form extends AbstractSmartyPlugin
         }
 
         /* access to thelia type */
-        if($formFieldType instanceof TheliaType) {
+        if ($formFieldType instanceof TheliaType) {
             $template->assign("formType", $formFieldView->vars['type']);
 
-
-            switch($formFieldView->vars['type']) {
+            switch ($formFieldView->vars['type']) {
                 case "choice":
-                    if(!isset($formFieldView->vars['options']['choices']) || !is_array($formFieldView->vars['options']['choices'])) {
+                    if (!isset($formFieldView->vars['options']['choices']) || !is_array($formFieldView->vars['options']['choices'])) {
                         //throw new
                     }
                     $choices = array();
-                    foreach($formFieldView->vars['options']['choices'] as $value => $choice) {
+                    foreach ($formFieldView->vars['options']['choices'] as $value => $choice) {
                         $choices[] = new ChoiceView($value, $value, $choice);
                     }
                     $template->assign("choices", $choices);
@@ -223,32 +220,29 @@ class Form extends AbstractSmartyPlugin
                     $val = $value[$key];
 
                     $this->assignFieldValues($template, $name, $val, $formFieldView->vars, $value_count);
-                }
-                else {
+                } else {
                     throw new \InvalidArgumentException(sprintf("Missing or empty parameter 'value_key' for field '%s'", $formFieldView->vars["name"]));
                 }
-            }
-            else {
+            } else {
                 $this->assignFieldValues($template, $formFieldView->vars["full_name"], $formFieldView->vars["value"], $formFieldView->vars);
             }
 
             $formFieldView->setRendered();
-        }
-        else {
+        } else {
             return $content;
         }
     }
 
     public function renderTaggedFormFields($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-        if(null === $content) {
+        if (null === $content) {
             self::$taggedFieldsStack = $this->getFormFieldsFromTag($params);
             self::$taggedFieldsStackPosition = 0;
         } else {
             self::$taggedFieldsStackPosition++;
         }
 
-        if(isset(self::$taggedFieldsStack[self::$taggedFieldsStackPosition])) {
+        if (isset(self::$taggedFieldsStack[self::$taggedFieldsStackPosition])) {
             $this->assignFieldValues(
                 $template,
                 self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['view']->vars["full_name"],
@@ -268,7 +262,7 @@ class Form extends AbstractSmartyPlugin
             self::$taggedFieldsStackPosition = null;
         }
 
-        if(null !== $content) {
+        if (null !== $content) {
             return $content;
         }
     }
@@ -322,8 +316,7 @@ class Form extends AbstractSmartyPlugin
 
         if ($repeat) {
             $this->assignFieldErrorVars($template, $errors);
-        }
-        else {
+        } else {
             return $content;
         }
     }
@@ -364,8 +357,8 @@ class Form extends AbstractSmartyPlugin
             throw new \InvalidArgumentException("'tag' parameter is missing");
 
         $viewList = array();
-        foreach($instance->getView() as $view) {
-            if(isset($view->vars['attr']['tag']) && $tag == $view->vars['attr']['tag']) {
+        foreach ($instance->getView() as $view) {
+            if (isset($view->vars['attr']['tag']) && $tag == $view->vars['attr']['tag']) {
                 $fieldData = $instance->getForm()->all()[$view->vars['name']];
                 $viewList[] = array(
                     'view' => $view,

@@ -27,7 +27,6 @@ use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\NewsletterForm;
 
-
 /**
  * Class NewsletterController
  * @package Thelia\Controller\Front
@@ -50,15 +49,14 @@ class NewsletterController extends BaseFrontController
                 $this->getRequest()->getSession()->getLang()->getLocale()
             );
 
-            if (null !== $customer = $this->getSecurityContext()->getCustomerUser())
-            {
+            if (null !== $customer = $this->getSecurityContext()->getCustomerUser()) {
                 $event->setFirstname($customer->getFirstname());
                 $event->setLastname($customer->getLastname());
             }
 
             $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $event);
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $error_message = $e->getMessage();
         }
 

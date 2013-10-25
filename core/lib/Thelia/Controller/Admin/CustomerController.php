@@ -25,7 +25,6 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Customer\CustomerAddressEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;

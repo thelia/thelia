@@ -88,11 +88,11 @@ class Customer extends BaseLoop implements SearchLoopInterface
     {
 
         $search->_and();
-        foreach($searchIn as $index => $searchInElement) {
-            if($index > 0) {
+        foreach ($searchIn as $index => $searchInElement) {
+            if ($index > 0) {
                 $search->_or();
             }
-            switch($searchInElement) {
+            switch ($searchInElement) {
                 case "ref":
                     $search->filterByRef($searchTerm, $searchCriteria);
                     break;

@@ -24,7 +24,6 @@
 namespace Thelia\Form\Lang;
 use Thelia\Core\Event\ActionEvent;
 
-
 /**
  * Class LangUrlEvent
  * @package Thelia\Form\Lang

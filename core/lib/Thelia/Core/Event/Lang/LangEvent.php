@@ -25,7 +25,6 @@ namespace Thelia\Core\Event\Lang;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Lang;
 
-
 /**
  * Class LangEvent
  * @package Thelia\Core\Event\Lang
@@ -38,7 +37,7 @@ class LangEvent extends ActionEvent
      */
     protected $lang;
 
-    function __construct(Lang $lang = null)
+    public function __construct(Lang $lang = null)
     {
         $this->lang = $lang;
     }
@@ -69,8 +68,5 @@ class LangEvent extends ActionEvent
     {
         return null !== $this->lang;
     }
-
-
-
 
 }

@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Lang;
 
-
 /**
  * Class LangUpdateEvent
  * @package Thelia\Core\Event\Lang
@@ -39,11 +38,10 @@ class LangUpdateEvent extends LangCreateEvent
     /**
      * @param int $id
      */
-    function __construct($id)
+    public function __construct($id)
     {
         $this->id = $id;
     }
-
 
     /**
      * @param int $id
@@ -64,6 +62,5 @@ class LangUpdateEvent extends LangCreateEvent
     {
         return $this->id;
     }
-
 
 }

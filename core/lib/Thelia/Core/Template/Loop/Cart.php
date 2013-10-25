@@ -16,7 +16,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CountryQuery;
 use Thelia\Type;
-use Thelia\Type\TypeCollection;
 
 class Cart extends BaseLoop
 {
@@ -90,17 +89,17 @@ class Cart extends BaseLoop
 
         $countCartItems = count($cartItems);
 
-        if($limit <= 0 || $limit >= $countCartItems){
+        if ($limit <= 0 || $limit >= $countCartItems) {
             $limit = $countCartItems;
         }
 
         $position = $this->getPosition();
 
-        if(isset($position)){
-            if($position == "first"){
+        if (isset($position)) {
+            if ($position == "first") {
                 $limit = 1;
                 $cartItems = array($cartItems[0]);
-            }else if($position == "last"){
+            } elseif ($position == "last") {
                 $limit = 1;
                 $cartItems = array(end($cartItems));
             }

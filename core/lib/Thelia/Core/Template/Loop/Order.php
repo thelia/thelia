@@ -32,7 +32,6 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\CustomerQuery;
-use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Type\TypeCollection;
@@ -100,11 +99,11 @@ class Order extends BaseLoop implements SearchLoopInterface
     {
 
         $search->_and();
-        foreach($searchIn as $index => $searchInElement) {
-            if($index > 0) {
+        foreach ($searchIn as $index => $searchInElement) {
+            if ($index > 0) {
                 $search->_or();
             }
-            switch($searchInElement) {
+            switch ($searchInElement) {
                 case "ref":
                     $search->filterByRef($searchTerm, $searchCriteria);
                     break;

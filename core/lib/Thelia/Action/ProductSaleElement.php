@@ -25,9 +25,6 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Thelia\Model\ProductQuery;
-use Thelia\Model\Product as ProductModel;
-
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
@@ -49,7 +46,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new product sale element, with or without combination
      *
-     * @param ProductSaleElementCreateEvent $event
+     * @param  ProductSaleElementCreateEvent $event
      * @throws Exception
      */
     public function create(ProductSaleElementCreateEvent $event)
@@ -69,8 +66,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             if ($salesElement == null) {
                 // Create a new default product sale element
                 $salesElement = $event->getProduct()->createDefaultProductSaleElement($con, 0, 0, $event->getCurrencyId(), true);
-            }
-            else {
+            } else {
                 // This (new) one is the default
                 $salesElement->setIsDefault(true)->save($con);
             }
@@ -98,8 +94,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
 
             $con->rollback();
 
@@ -170,8 +165,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                     ->setPromoPrice($event->getSalePrice())
                     ->setPrice($event->getPrice())
                 ;
-            }
-            else {
+            } else {
                 // Do not store the price.
                 $productPrice
                     ->setPromoPrice(0)
@@ -183,8 +177,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
 
             $con->rollback();
 
@@ -214,8 +207,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 if ($product->countSaleElements() <= 0) {
                     // If we just deleted the last PSE, create a default one
                     $product->createDefaultProductSaleElement($con, 0, 0, $event->getCurrencyId(), true);
-                }
-                else if ($pse->getIsDefault()) {
+                } elseif ($pse->getIsDefault()) {
 
                     // If we deleted the default PSE, make the last created one the default
                     $pse = ProductSaleElementsQuery::create()
@@ -229,8 +221,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
                 // Store all the stuff !
                 $con->commit();
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
 
                 $con->rollback();
 

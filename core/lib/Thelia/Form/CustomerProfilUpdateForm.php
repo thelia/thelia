@@ -22,11 +22,8 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Model\CustomerQuery;
-use Thelia\Model\ConfigQuery;
-use Thelia\Core\Translation\Translator;
 
 /**
  * Class CustomerProfilUpdateForm
@@ -68,7 +65,6 @@ class CustomerProfilUpdateForm extends CustomerCreateForm
                 "required" => false
             ));
     }
-
 
     /**
      * @param $value

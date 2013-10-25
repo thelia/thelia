@@ -23,13 +23,6 @@
 
 namespace Thelia\Core\Security;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Security\User\UserInterface;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Model\ProfileQuery;
-use Thelia\Model\ProfileResourceQuery;
-
 /**
  * A simple security manager, in charge of checking user
  *
@@ -49,7 +42,7 @@ class AccessManager
         self::DELETE    =>  false,
     );
 
-    static protected $accessPows = array(
+    protected static $accessPows = array(
         self::VIEW      =>  3,
         self::CREATE    =>  2,
         self::UPDATE    =>  1,
@@ -67,7 +60,7 @@ class AccessManager
 
     public function can($type)
     {
-        if(!array_key_exists($type, $this->accessGranted)) {
+        if (!array_key_exists($type, $this->accessGranted)) {
             return false;
         }
 
@@ -75,7 +68,7 @@ class AccessManager
 
     }
 
-    static public function getMaxAccessValue()
+    public static function getMaxAccessValue()
     {
         return pow(2, current(array_slice( self::$accessPows, -1, 1, true ))) - 1;
     }
@@ -83,8 +76,8 @@ class AccessManager
     public function build($accesses)
     {
         $this->accessValue = 0;
-        foreach($accesses as $access) {
-            if(array_key_exists($access, self::$accessPows)) {
+        foreach ($accesses as $access) {
+            if (array_key_exists($access, self::$accessPows)) {
                 $this->accessValue += pow(2, self::$accessPows[$access]);
             }
         }
@@ -95,9 +88,9 @@ class AccessManager
     protected function fillGrantedAccess()
     {
         $accessValue = $this->accessValue;
-        foreach(self::$accessPows as $type => $value) {
+        foreach (self::$accessPows as $type => $value) {
             $pow = pow(2, $value);
-            if($accessValue >= $pow) {
+            if ($accessValue >= $pow) {
                 $accessValue -= $pow;
                 $this->accessGranted[$type] = true;
             } else {
@@ -105,7 +98,6 @@ class AccessManager
             }
         }
     }
-
 
     public function getAccessValue()
     {

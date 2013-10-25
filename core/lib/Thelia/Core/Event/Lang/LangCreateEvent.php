@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Lang;
 
-
 /**
  * Class LangCreateEvent
  * @package Thelia\Core\Event\Lang
@@ -136,6 +135,5 @@ class LangCreateEvent extends LangEvent
     {
         return $this->title;
     }
-
 
 }

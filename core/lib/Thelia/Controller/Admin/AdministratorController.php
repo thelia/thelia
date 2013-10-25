@@ -23,14 +23,12 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\AdministratorCreationForm;
 use Thelia\Form\AdministratorModificationForm;
 use Thelia\Model\AdminQuery;
-
 
 class AdministratorController extends AbstractCrudController
 {
@@ -157,7 +155,6 @@ class AdministratorController extends AbstractCrudController
     {
         return $object->getId();
     }
-
 
     protected function renderListTemplate($currentOrder)
     {

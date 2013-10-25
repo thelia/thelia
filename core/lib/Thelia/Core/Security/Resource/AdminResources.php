@@ -33,17 +33,17 @@ use Thelia\Core\Security\Exception\ResourceException;
  */
 final class AdminResources
 {
-    static private $selfReflection = null;
+    private static $selfReflection = null;
 
-    static public function retrieve($name)
+    public static function retrieve($name)
     {
         $constantName = strtoupper($name);
 
-        if(null === self::$selfReflection) {
+        if (null === self::$selfReflection) {
             self::$selfReflection = new \ReflectionClass(__CLASS__);
         }
 
-        if(self::$selfReflection->hasConstant($constantName)) {
+        if (self::$selfReflection->hasConstant($constantName)) {
             return self::$selfReflection->getConstant($constantName);
         } else {
             throw new ResourceException(sprintf('Resource `%s` not found', $constantName), ResourceException::RESOURCE_NOT_FOUND);

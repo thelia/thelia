@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Module;
 
-
 /**
  * Class ModuleDeleteEvent
  * @package Thelia\Core\Event\Module
@@ -36,7 +35,7 @@ class ModuleDeleteEvent extends ModuleEvent
      */
     protected $module_id;
 
-    function __construct($module_id)
+    public function __construct($module_id)
     {
         $this->module_id = $module_id;
     }
@@ -56,6 +55,5 @@ class ModuleDeleteEvent extends ModuleEvent
     {
         return $this->module_id;
     }
-
 
 }

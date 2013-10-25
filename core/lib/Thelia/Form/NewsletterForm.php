@@ -30,7 +30,6 @@ use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\NewsletterQuery;
 
-
 /**
  * Class NewsletterForm
  * @package Thelia\Form

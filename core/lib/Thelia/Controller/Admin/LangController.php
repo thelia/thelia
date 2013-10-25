@@ -41,7 +41,6 @@ use Thelia\Form\Lang\LangUrlForm;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 
-
 /**
  * Class LangController
  * @package Thelia\Controller\Admin
@@ -53,7 +52,6 @@ class LangController extends BaseAdminController
     public function defaultAction()
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::VIEW)) return $response;
-
         return $this->renderDefault();
     }
 
@@ -120,7 +118,7 @@ class LangController extends BaseAdminController
             $changedObject = $event->getLang();
             $this->adminLogAppend(sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
             $this->redirectToRoute('/admin/configuration/languages');
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $error_msg = $e->getMessage();
         }
 
@@ -162,7 +160,7 @@ class LangController extends BaseAdminController
             $error = $e->getMessage();
         }
 
-        if($error) {
+        if ($error) {
             return $this->nullResponse(500);
         } else {
             return $this->nullResponse();
@@ -281,7 +279,7 @@ class LangController extends BaseAdminController
             $event = new LangUrlEvent();
             foreach ($data as $key => $value) {
                 $pos= strpos($key, LangUrlForm::LANG_PREFIX);
-                if(false !== strpos($key, LangUrlForm::LANG_PREFIX)) {
+                if (false !== strpos($key, LangUrlForm::LANG_PREFIX)) {
                     $event->addUrl(substr($key,strlen(LangUrlForm::LANG_PREFIX)), $value);
                 }
             }

@@ -28,7 +28,6 @@ use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\TaxCreationForm;
 use Thelia\Form\TaxModificationForm;
-use Thelia\Form\TaxTaxListUpdateForm;
 use Thelia\Model\TaxQuery;
 
 class TaxController extends AbstractCrudController
@@ -177,7 +176,7 @@ class TaxController extends AbstractCrudController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param  TaxEvent  $createEvent the create event
+     * @param  TaxEvent $createEvent the create event
      * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalCreateAction($createEvent)
@@ -200,20 +199,19 @@ class TaxController extends AbstractCrudController
     {
         $type = $formData['type'];
 
-
     }
 
     protected function getRequirements($type, $formData)
     {
         $requirements = array();
-        foreach($formData as $data => $value) {
-            if(!strstr($data, ':')) {
+        foreach ($formData as $data => $value) {
+            if (!strstr($data, ':')) {
                 continue;
             }
 
             $couple = explode(':', $data);
 
-            if(count($couple) != 2 || $couple[0] != $type) {
+            if (count($couple) != 2 || $couple[0] != $type) {
                 continue;
             }
 

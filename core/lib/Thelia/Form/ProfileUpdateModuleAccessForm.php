@@ -26,7 +26,6 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Translation\Translator;
 use Thelia\Model\ProfileQuery;
 use Thelia\Model\ModuleQuery;
 
@@ -57,7 +56,7 @@ class ProfileUpdateModuleAccessForm extends BaseForm
             ))
         ;
 
-        foreach(ModuleQuery::create()->find() as $module) {
+        foreach (ModuleQuery::create()->find() as $module) {
             $this->formBuilder->add(
                 self::MODULE_ACCESS_FIELD_PREFIX . ':' . str_replace(".", ":", $module->getCode()),
                 "choice",

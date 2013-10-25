@@ -47,7 +47,6 @@ class MessageController extends AbstractCrudController
 
             AdminResources::MESSAGE,
 
-
             TheliaEvents::MESSAGE_CREATE,
             TheliaEvents::MESSAGE_UPDATE,
             TheliaEvents::MESSAGE_DELETE,

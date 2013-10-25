@@ -54,7 +54,6 @@ use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Form\ProductSaleElementUpdateForm;
-use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Form\ProductDefaultSaleElementUpdateForm;
 use Thelia\Model\ProductPrice;
@@ -62,8 +61,6 @@ use Thelia\Model\Currency;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Thelia\TaxEngine\Calculator;
 use Thelia\Model\Country;
-use Thelia\Model\CountryQuery;
-use Thelia\Model\TaxRuleQuery;
 use Thelia\Tools\NumberFormat;
 use Thelia\Model\Product;
 use Thelia\Model\CurrencyQuery;
@@ -189,8 +186,8 @@ class ProductController extends AbstractCrudController
         return $event->hasProduct();
     }
 
-    protected function updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency) {
-
+    protected function updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency)
+    {
         // Get price for default currency
         $priceForDefaultCurrency = ProductPriceQuery::create()
         ->filterByCurrency($defaultCurrency)
@@ -206,7 +203,8 @@ class ProductController extends AbstractCrudController
         }
     }
 
-    protected function appendValue(&$array, $key, $value) {
+    protected function appendValue(&$array, $key, $value)
+    {
         if (! isset($array[$key])) $array[$key] = array();
 
         $array[$key][] = $value;
@@ -228,7 +226,7 @@ class ProductController extends AbstractCrudController
             "tax_rule"    => $object->getTaxRuleId()
         );
 
-        foreach($saleElements as $saleElement) {
+        foreach ($saleElements as $saleElement) {
 
             // Get the product price for the current currency
             $productPrice = ProductPriceQuery::create()
@@ -277,8 +275,7 @@ class ProductController extends AbstractCrudController
                     "isdefault"               => $saleElement->getIsDefault() > 0 ? 1 : 0,
                     "ean_code"                => $saleElement->getEanCode()
                 );
-            }
-            else {
+            } else {
 
                 if ($saleElement->getIsDefault()) {
                     $combinationPseData['default_pse']       = $saleElement->getId();
@@ -871,8 +868,7 @@ class ProductController extends AbstractCrudController
 
         try {
             $this->dispatch(TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT, $event);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
@@ -895,8 +891,7 @@ class ProductController extends AbstractCrudController
 
         try {
             $this->dispatch(TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT, $event);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
@@ -907,7 +902,7 @@ class ProductController extends AbstractCrudController
     /**
      * Process a single PSE update, using form data array.
      *
-     * @param array $data the form data
+     * @param  array     $data the form data
      * @throws Exception is someting goes wrong.
      */
     protected function processSingleProductSaleElementUpdate($data)
@@ -969,7 +964,7 @@ class ProductController extends AbstractCrudController
 
                 $count = count($data['product_sale_element_id']);
 
-                for($idx = 0; $idx < $count; $idx++) {
+                for ($idx = 0; $idx < $count; $idx++) {
                     $tmp_data['product_sale_element_id'] = $pse_id = $data['product_sale_element_id'][$idx];
                     $tmp_data['reference']               = $data['reference'][$idx];
                     $tmp_data['price']                   = $data['price'][$idx];
@@ -983,8 +978,7 @@ class ProductController extends AbstractCrudController
 
                     $this->processSingleProductSaleElementUpdate($tmp_data);
                 }
-            }
-            else {
+            } else {
                 // No need to preprocess data
                 $this->processSingleProductSaleElementUpdate($data);
             }
@@ -996,12 +990,10 @@ class ProductController extends AbstractCrudController
 
            // Redirect to the success URL
            $this->redirect($changeForm->getSuccessUrl());
-        }
-        catch (FormValidationException $ex) {
+        } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -1016,7 +1008,8 @@ class ProductController extends AbstractCrudController
     /**
      * Process the change of product's PSE list.
      */
-    public function updateProductSaleElementsAction() {
+    public function updateProductSaleElementsAction()
+    {
         return $this->processProductSaleElementUpdate(
                 new ProductSaleElementUpdateForm($this->getRequest())
         );
@@ -1025,7 +1018,8 @@ class ProductController extends AbstractCrudController
     /**
      * Update default product sale element (not attached to any combination)
      */
-    public function updateProductDefaultSaleElementAction() {
+    public function updateProductDefaultSaleElementAction()
+    {
         return $this->processProductSaleElementUpdate(
                 new ProductDefaultSaleElementUpdateForm($this->getRequest())
         );
@@ -1035,8 +1029,8 @@ class ProductController extends AbstractCrudController
      * Invoked through Ajax; this method calculates the taxed price from the unaxed price, and
      * vice versa.
      */
-    public function priceCaclulator() {
-
+    public function priceCaclulator()
+    {
         $return_price = 0;
 
         $price      = floatval($this->getRequest()->get('price', 0));
@@ -1048,11 +1042,9 @@ class ProductController extends AbstractCrudController
 
             if ($action == 'to_tax') {
                 $return_price = $this->computePrice($price, 'without_tax', $product);
-            }
-            else if ($action == 'from_tax') {
+            } elseif ($action == 'from_tax') {
                 $return_price = $this->computePrice($price, 'with_tax', $product);
-            }
-            else {
+            } else {
                 $return_price = $price;
             }
 
@@ -1069,8 +1061,8 @@ class ProductController extends AbstractCrudController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function loadConvertedPrices() {
-
+    public function loadConvertedPrices()
+    {
         $product_sale_element_id  = intval($this->getRequest()->get('product_sale_element_id', 0));
         $currency_id = intval($this->getRequest()->get('currency_id', 0));
 
@@ -1114,13 +1106,13 @@ class ProductController extends AbstractCrudController
     /**
      * Calculate taxed/untexted price for a product
      *
-     * @param unknown $price
-     * @param unknown $price_type
-     * @param Product $product
+     * @param  unknown  $price
+     * @param  unknown  $price_type
+     * @param  Product  $product
      * @return Ambigous <unknown, number>
      */
-    protected function computePrice($price, $price_type, Product $product, $convert = false) {
-
+    protected function computePrice($price, $price_type, Product $product, $convert = false)
+    {
         $calc = new Calculator();
 
         $calc->load(
@@ -1130,11 +1122,9 @@ class ProductController extends AbstractCrudController
 
         if ($price_type == 'without_tax') {
             $return_price = $calc->getTaxedPrice($price);
-        }
-        else if ($price_type == 'with_tax') {
+        } elseif ($price_type == 'with_tax') {
             $return_price = $calc->getUntaxedPrice($price);
-        }
-        else {
+        } else {
             $return_price = $price;
         }
 

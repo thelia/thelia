@@ -27,7 +27,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Template\Element\Exception\SearchLoopException;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Security\SecurityContext;
@@ -95,7 +94,7 @@ abstract class BaseLoop
             Argument::createBooleanTypeArgument('force_return', false),
         );
 
-        if(true === $this->countable) {
+        if (true === $this->countable) {
             $defaultArgs = array_merge($defaultArgs, array(
                 Argument::createIntTypeArgument('offset', 0),
                 Argument::createIntTypeArgument('page'),
@@ -103,7 +102,7 @@ abstract class BaseLoop
             ));
         }
 
-        if($this instanceof SearchLoopInterface) {
+        if ($this instanceof SearchLoopInterface) {
             $defaultArgs = array_merge($defaultArgs, array(
                 Argument::createAnyTypeArgument('search_term'),
                 new Argument(
@@ -241,13 +240,13 @@ abstract class BaseLoop
      */
     protected function search(ModelCriteria $search, &$pagination = null)
     {
-        if($this instanceof SearchLoopInterface) {
+        if ($this instanceof SearchLoopInterface) {
             $searchTerm = $this->getSearch_term();
             $searchIn = $this->getSearch_in();
             $searchMode = $this->getSearch_mode();
-            if(null !== $searchTerm && null !== $searchIn) {
+            if (null !== $searchTerm && null !== $searchIn) {
 
-                switch($searchMode) {
+                switch ($searchMode) {
                     case SearchLoopInterface::MODE_ANY_WORD:
                         $searchCriteria = Criteria::IN;
                         $searchTerm = explode(' ', $searchTerm);

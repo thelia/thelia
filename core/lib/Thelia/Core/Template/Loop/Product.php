@@ -26,7 +26,6 @@ namespace Thelia\Core\Template\Loop;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseI18nLoop;
-use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -35,7 +34,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Exception\TaxEngineException;
-use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
@@ -148,11 +146,11 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
     {
 
         $search->_and();
-        foreach($searchIn as $index => $searchInElement) {
-            if($index > 0) {
+        foreach ($searchIn as $index => $searchInElement) {
+            if ($index > 0) {
                 $search->_or();
             }
-            switch($searchInElement) {
+            switch ($searchInElement) {
                 case "ref":
                     $search->filterByRef($searchTerm, $searchCriteria);
                     break;
@@ -172,7 +170,7 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
     public function exec(&$pagination)
     {
         $complex = $this->getComplex();
-        if(true === $complex) {
+        if (true === $complex) {
             return $this->execComplex($pagination);
         }
 
@@ -237,7 +235,7 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
 
         $title = $this->getTitle();
 
-        if(!is_null($title)) {
+        if (!is_null($title)) {
             $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
         }
 
@@ -594,7 +592,7 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
 
         $title = $this->getTitle();
 
-        if(!is_null($title)){
+        if (!is_null($title)) {
 
             $search->where(" CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
         }

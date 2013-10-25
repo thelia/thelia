@@ -67,7 +67,6 @@ class CartController extends BaseFrontController
             $request->attributes->set('_view', "includes/mini-cart");
         }
 
-
         if ($message) {
             $cartAdd->setErrorMessage($message);
             $this->getParserContext()->addForm($cartAdd);

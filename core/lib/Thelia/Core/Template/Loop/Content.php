@@ -33,7 +33,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\ContentTableMap;
-use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
