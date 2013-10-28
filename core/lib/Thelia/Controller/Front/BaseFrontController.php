@@ -56,7 +56,7 @@ class BaseFrontController extends BaseController
     public function checkAuth()
     {
         if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirectToRoute('default', array('view'=>'login'));
+            $this->redirectToRoute('customer.login.process');
         }
     }
 
