@@ -158,14 +158,14 @@
                                                                 <td>
                                                                     <address>
                                                                         <strong>{loop name="address.title" type="title" id=$TITLE}{$SHORT}{/loop} {$FIRSTNAME} {$LASTNAME}</strong><br>
-                                                                        {$ADDRESS1}<br>
-                                                                        {$ADDRESS2}<br>
-                                                                        {$ADDRESS3}<br>
+                                                                        {$ADDRESS1}
+                                                                        {if $ADDRESS2}<br />{$ADDRESS2}{/if}
+                                                                        {if $ADDRESS3}<br />{$ADDRESS3}{/if}
                                                                         {if $PHONE}
-                                                                            <abbr title="{intl l="Phone"}">P:</abbr> {$PHONE}<br>
+                                                                            <br> <abbr title="{intl l="Phone"}">P:</abbr>{$PHONE}
                                                                         {/if}
                                                                         {if $CELLPHONE}
-                                                                            <abbr title="{intl l="cell phone"}">P:</abbr> {$CELLPHONE}
+                                                                            <br> <abbr title="{intl l="cell phone"}">P:</abbr>{$CELLPHONE}
                                                                         {/if}
                                                                     </address>
                                                                 </td>
