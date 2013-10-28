@@ -161,6 +161,10 @@
                                                                         {$ADDRESS1}<br>
                                                                         {$ADDRESS2}<br>
                                                                         {$ADDRESS3}<br>
+                                                                        {$ZIPCODE} {$CITY}<br>
+                                                                        {loop name="address.country" type="country" id=$COUNTRY}
+                                                                        {$TITLE}<br>
+                                                                        {/loop}
                                                                         {if $PHONE}
                                                                             <abbr title="{intl l="Phone"}">P:</abbr> {$PHONE}<br>
                                                                         {/if}
