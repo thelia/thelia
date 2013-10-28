@@ -114,6 +114,10 @@
         <default key="_controller">Thelia\Controller\Admin\CustomerController::deleteAction</default>
     </route>
 
+    <route id="admin.customer.create" path="/admin/customer/create">
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::createAction</default>
+    </route>
+
     <!-- end Customer rule management -->
 
     <!-- address management -->

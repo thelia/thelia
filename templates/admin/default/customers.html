@@ -166,6 +166,18 @@
                <input type="hidden" name="{$name}" value="{url path='/admin/customer/update/_ID_'}" />
             {/form_field}
 
+            {form_field form=$form field="password"}
+                <input type="hidden" name="{$name}" value="random" />
+            {/form_field}
+
+            {form_field form=$form field="password_confirm"}
+                <input type="hidden" name="{$name}" value="random" />
+            {/form_field}
+
+            {form_field form=$form field="agreed"}
+                <input type="hidden" name="{$name}" value="on" />
+            {/form_field}
+
             {form_field form=$form field='company'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
