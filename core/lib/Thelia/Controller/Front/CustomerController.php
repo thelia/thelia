@@ -276,7 +276,7 @@ class CustomerController extends BaseFrontController
 
                 // If User is a new customer
                 if ($form->get('account')->getData() == 0 && !$form->get("email")->getErrors()) {
-                    $this->redirectToRoute("default", array("view" => "register","email" => $form->get("email")->getData()));
+                    $this->redirectToRoute("customer.create.process", array("email" => $form->get("email")->getData()));
                 } else {
 
                     try {
