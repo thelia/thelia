@@ -566,6 +566,10 @@ final class TheliaEvents
     const ADMINISTRATOR_UPDATE                    = "action.updateAdministrator";
     const ADMINISTRATOR_DELETE                    = "action.deleteAdministrator";
 
+    // -- Mailing System management ---------------------------------------------
+
+    const MAILING_SYSTEM_UPDATE                    = "action.updateMailingSystem";
+
     // -- Tax Rules management ---------------------------------------------
 
     const TAX_RULE_CREATE          = "action.createTaxRule";

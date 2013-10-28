@@ -148,6 +148,8 @@
         <form name="thelia.admin.administrator.add" class="Thelia\Form\AdministratorCreationForm"/>
         <form name="thelia.admin.administrator.update" class="Thelia\Form\AdministratorModificationForm"/>
 
+        <form name="thelia.admin.mailing-system.update" class="Thelia\Form\MailingSystemModificationForm"/>
+
         <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
         <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>
 

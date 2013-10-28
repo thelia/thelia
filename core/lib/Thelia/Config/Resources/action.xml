@@ -166,6 +166,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.mailing_system" class="Thelia\Action\MailingSystem">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.newsletter" class="Thelia\Action\Newsletter">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
