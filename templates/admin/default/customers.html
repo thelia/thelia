@@ -44,10 +44,6 @@
                                             {intl l="customer ref"}
                                         </th>
 
-                                        <th class="object-title">
-                                            {intl l="company"}
-                                        </th>
-
                                         {module_include location='category_list_header'}
 
                                         <th>
@@ -81,10 +77,6 @@
                                         <tr>
                                             <td><a href="{url path="/admin/customer/update/{$ID}"}">{$REF}</a></td>
 
-                                            <td>
-                                                {$COMPANY}
-                                            </td>
-
                                             <td class="object-title">
                                                 {$FIRSTNAME} {$LASTNAME}
                                             </td>
@@ -98,7 +90,7 @@
                                             <td>
                                                 {$lastOrderCurrency} {$lastOrderAmount}
                                             </td>
-                                            <td>
+                                            <td class="actions">
                                                 <div class="btn-group">
 
                                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.customer" access="UPDATE"}
