@@ -18,12 +18,7 @@
 
             {nocache}
             {ifloop rel="cartloop"}
-            <div class="btn-group checkout-progress">
-                <a href="#" role="button" class="btn btn-step active"><span class="step-nb">1</span> <span class="step-label">{intl l="Your Cart"}</span></a>
-                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">2</span> <span class="step-label">{intl l="Billing and delivery"}</span></a>
-                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">3</span> <span class="step-label">{intl l="Check my order"}</span></a>
-                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">{intl l="Secure payment"}</span></a>
-            </div>
+            {include file="misc/checkout-progress.tpl" step="cart"}
 
             <table class="table table-cart">
                 <colgroup>
