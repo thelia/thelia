@@ -21,71 +21,42 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Mailer;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Event\MailTransporterEvent;
+namespace Thelia\Action;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\MailingSystem\MailingSystemEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ConfigQuery;
 
-
-/**
- * Class MailerFactory
- * @package Thelia\Mailer
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class MailerFactory {
+class MailingSystem extends BaseAction implements EventSubscriberInterface
+{
     /**
-     * @var \Swift_Mailer
+     * @param MailingSystemEvent $event
      */
-    protected $swiftMailer;
-
-    protected $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function update(MailingSystemEvent $event)
     {
-
-        $this->dispatcher = $dispatcher;
-
-        $transporterEvent = new MailTransporterEvent();
-        $this->dispatcher->dispatch(TheliaEvents::MAILTRANSPORTER_CONFIG, $transporterEvent);
-
-        if($transporterEvent->hasTransporter()) {
-            $transporter = $transporterEvent->getTransporter();
+        if($event->getEnabled()) {
+            ConfigQuery::enableSmtp();
         } else {
-            if (ConfigQuery::isSmtpEnable()) {
-                $transporter = $this->configureSmtp();
-            } else {
-                $transporter = \Swift_MailTransport::newInstance();
-            }
+            ConfigQuery::disableSmtp();
         }
-
-        $this->swiftMailer = new \Swift_Mailer($transporter);
+        ConfigQuery::setSmtpHost($event->getHost());
+        ConfigQuery::setSmtpPort($event->getPort());
+        ConfigQuery::setSmtpEncryption($event->getEncryption());
+        ConfigQuery::setSmtpUsername($event->getUsername());
+        ConfigQuery::setSmtpPassword($event->getPassword());
+        ConfigQuery::setSmtpAuthMode($event->getAuthMode());
+        ConfigQuery::setSmtpTimeout($event->getTimeout());
+        ConfigQuery::setSmtpSourceIp($event->getSourceIp());
     }
 
-    private function configureSmtp()
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedEvents()
     {
-        $smtpTransporter = new \Swift_SmtpTransport();
-        $smtpTransporter->setHost(Configquery::getSmtpHost())
-            ->setPort(ConfigQuery::getSmtpPort())
-            ->setEncryption(ConfigQuery::getSmtpEncryption())
-            ->setUsername(ConfigQuery::getSmtpUsername())
-            ->setPassword(ConfigQuery::getSmtpPassword())
-            ->setAuthMode(ConfigQuery::getSmtpAuthMode())
-            ->setTimeout(ConfigQuery::getSmtpTimeout())
-            ->setSourceIp(ConfigQuery::getSmtpSourceIp())
-        ;
-        return $smtpTransporter;
+        return array(
+            TheliaEvents::MAILING_SYSTEM_UPDATE                        => array("update", 128),
+        );
     }
-
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
-    {
-        $this->swiftMailer->send($message, $failedRecipients);
-    }
-
-    public function getSwiftMailer()
-    {
-        return $this->swiftMailer;
-    }
-
-
 }
