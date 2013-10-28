@@ -812,6 +812,18 @@
 
     <!-- end administrator management -->
 
+    <!-- mailing-system management -->
+
+    <route id="admin.configuration.mailing-system.view" path="/admin/configuration/mailingSystem">
+        <default key="_controller">Thelia\Controller\Admin\MailingSystemController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.mailing-system.save" path="/admin/configuration/mailingSystem/save">
+        <default key="_controller">Thelia\Controller\Admin\MailingSystemController::updateAction</default>
+    </route>
+
+    <!-- end mailing-system management -->
+
     <!-- feature and features value management -->
 
     <route id="admin.configuration.features.default" path="/admin/configuration/features">
