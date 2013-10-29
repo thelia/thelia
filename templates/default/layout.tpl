@@ -48,6 +48,12 @@ GNU General Public License : http://www.gnu.org/licenses/
 
     {block name="stylesheet"}{/block}
 
+    {* Favicon *}
+    {images file='assets/img/favicon.ico'}<link rel="shortcut icon" type="image/x-icon" href="{$asset_url}">{/images}
+    {images file='assets/img/favicon.png'}<link rel="icon" type="image/png" href="{$asset_url}" />{/images}
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}
     <!--[if lt IE 9]>
     <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
