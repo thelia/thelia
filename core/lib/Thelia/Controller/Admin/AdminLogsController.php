@@ -24,6 +24,7 @@
 namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Security\AccessManager;
+use Thelia\Model\AdminLogQuery;
 
 class AdminLogsController extends BaseAdminController
 {
@@ -35,5 +36,35 @@ class AdminLogsController extends BaseAdminController
 
         // Render the edition template.
         return $this->render('admin-logs');
+    }
+
+    public function loadLoggerAjaxAction()
+    {
+        $entries = array();
+        foreach( AdminLogQuery::getEntries(
+                     $this->getRequest()->request->get('admins', array()),
+                     null,
+                     null,
+                     array_merge($this->getRequest()->request->get('resources', array()), $this->getRequest()->request->get('modules', array()))
+                 ) as $entry) {
+
+            $entries[] = array(
+                "head" => sprintf(
+                    "[%s][%s][%s:%s]",
+                    date('Y-m-d H:i:s', $entry->getCreatedAt()->getTimestamp()),
+                    $entry->getAdminLogin(),
+                    $entry->getResource(),
+                    $entry->getAction()
+                ),
+                "data" => $entry->getMessage(),
+            );
+        }
+
+        return $this->render(
+            'ajax/logger',
+            array(
+                'entries' => $entries,
+            )
+        );
     }
 }

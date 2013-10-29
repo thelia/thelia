@@ -830,6 +830,10 @@
         <default key="_controller">Thelia\Controller\Admin\AdminLogsController::defaultAction</default>
     </route>
 
+    <route id="admin.configuration.admin-logs.logger" path="/admin/configuration/adminLogs/logger">
+        <default key="_controller">Thelia\Controller\Admin\AdminLogsController::loadLoggerAjaxAction</default>
+    </route>
+
     <!-- end admin logs display -->
 
     <!-- feature and features value management -->

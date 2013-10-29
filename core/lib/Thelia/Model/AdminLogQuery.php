@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\Base\AdminLogQuery as BaseAdminLogQuery;
 
 
@@ -15,6 +16,41 @@ use Thelia\Model\Base\AdminLogQuery as BaseAdminLogQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class AdminLogQuery extends BaseAdminLogQuery {
+class AdminLogQuery extends BaseAdminLogQuery
+{
+    /**
+     * @param null      $login
+     * @param \DateTime $maxDateTime
+     * @param \DateTime $minDateTime
+     * @param null      $resources
+     * @param null      $actions
+     *
+     * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
+     */
+    public static function getEntries($login = null, \DateTime $maxDateTime = null, \DateTime $minDateTime = null, $resources = null, $actions = null)
+    {
+        $search = self::create();
 
+        if(null !== $minDateTime) {
+            $search->filterByCreatedAt($minDateTime->getTimestamp(), Criteria::GREATER_EQUAL);
+        }
+
+        if(null !== $maxDateTime) {
+            $search->filterByCreatedAt($maxDateTime->getTimestamp(), Criteria::LESS_EQUAL);
+        }
+
+        if(null !== $resources) {
+            $search->filterByResource($resources);
+        }
+
+        if(null !== $actions) {
+            $search->filterByAction($actions);
+        }
+
+        if(null !== $login) {
+            $search->filterByAdminLogin($login);
+        }
+
+        return $search->find();
+    }
 } // AdminLogQuery
