@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
@@ -898,8 +898,10 @@
     <column name="admin_login" size="255" type="VARCHAR" />
     <column name="admin_firstname" size="255" type="VARCHAR" />
     <column name="admin_lastname" size="255" type="VARCHAR" />
+    <column name="resource" size="255" type="VARCHAR" />
     <column name="action" size="255" type="VARCHAR" />
-    <column name="request" type="LONGVARCHAR" />
+    <column name="message" type="LONGVARCHAR" />
+    <column name="request" type="CLOB" />
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="content_folder" namespace="Thelia\Model">

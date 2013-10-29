@@ -356,6 +356,7 @@ class CouponController extends BaseAdminController
         );
 
         $this->adminLogAppend(
+            AdminResources::COUPON, AccessManager::UPDATE,
             sprintf(
                 'Coupon %s (ID %s) conditions updated',
                 $couponEvent->getCouponModel()->getTitle(),
@@ -468,6 +469,7 @@ class CouponController extends BaseAdminController
             );
 
             $this->adminLogAppend(
+                AdminResources::COUPON, AccessManager::UPDATE,
                 sprintf(
                     'Coupon %s (ID ) ' . $log,
                     $couponEvent->getTitle(),

@@ -22,7 +22,9 @@ use Thelia\Model\Map\AdminLogTableMap;
  * @method     ChildAdminLogQuery orderByAdminLogin($order = Criteria::ASC) Order by the admin_login column
  * @method     ChildAdminLogQuery orderByAdminFirstname($order = Criteria::ASC) Order by the admin_firstname column
  * @method     ChildAdminLogQuery orderByAdminLastname($order = Criteria::ASC) Order by the admin_lastname column
+ * @method     ChildAdminLogQuery orderByResource($order = Criteria::ASC) Order by the resource column
  * @method     ChildAdminLogQuery orderByAction($order = Criteria::ASC) Order by the action column
+ * @method     ChildAdminLogQuery orderByMessage($order = Criteria::ASC) Order by the message column
  * @method     ChildAdminLogQuery orderByRequest($order = Criteria::ASC) Order by the request column
  * @method     ChildAdminLogQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAdminLogQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -31,7 +33,9 @@ use Thelia\Model\Map\AdminLogTableMap;
  * @method     ChildAdminLogQuery groupByAdminLogin() Group by the admin_login column
  * @method     ChildAdminLogQuery groupByAdminFirstname() Group by the admin_firstname column
  * @method     ChildAdminLogQuery groupByAdminLastname() Group by the admin_lastname column
+ * @method     ChildAdminLogQuery groupByResource() Group by the resource column
  * @method     ChildAdminLogQuery groupByAction() Group by the action column
+ * @method     ChildAdminLogQuery groupByMessage() Group by the message column
  * @method     ChildAdminLogQuery groupByRequest() Group by the request column
  * @method     ChildAdminLogQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAdminLogQuery groupByUpdatedAt() Group by the updated_at column
@@ -47,7 +51,9 @@ use Thelia\Model\Map\AdminLogTableMap;
  * @method     ChildAdminLog findOneByAdminLogin(string $admin_login) Return the first ChildAdminLog filtered by the admin_login column
  * @method     ChildAdminLog findOneByAdminFirstname(string $admin_firstname) Return the first ChildAdminLog filtered by the admin_firstname column
  * @method     ChildAdminLog findOneByAdminLastname(string $admin_lastname) Return the first ChildAdminLog filtered by the admin_lastname column
+ * @method     ChildAdminLog findOneByResource(string $resource) Return the first ChildAdminLog filtered by the resource column
  * @method     ChildAdminLog findOneByAction(string $action) Return the first ChildAdminLog filtered by the action column
+ * @method     ChildAdminLog findOneByMessage(string $message) Return the first ChildAdminLog filtered by the message column
  * @method     ChildAdminLog findOneByRequest(string $request) Return the first ChildAdminLog filtered by the request column
  * @method     ChildAdminLog findOneByCreatedAt(string $created_at) Return the first ChildAdminLog filtered by the created_at column
  * @method     ChildAdminLog findOneByUpdatedAt(string $updated_at) Return the first ChildAdminLog filtered by the updated_at column
@@ -56,7 +62,9 @@ use Thelia\Model\Map\AdminLogTableMap;
  * @method     array findByAdminLogin(string $admin_login) Return ChildAdminLog objects filtered by the admin_login column
  * @method     array findByAdminFirstname(string $admin_firstname) Return ChildAdminLog objects filtered by the admin_firstname column
  * @method     array findByAdminLastname(string $admin_lastname) Return ChildAdminLog objects filtered by the admin_lastname column
+ * @method     array findByResource(string $resource) Return ChildAdminLog objects filtered by the resource column
  * @method     array findByAction(string $action) Return ChildAdminLog objects filtered by the action column
+ * @method     array findByMessage(string $message) Return ChildAdminLog objects filtered by the message column
  * @method     array findByRequest(string $request) Return ChildAdminLog objects filtered by the request column
  * @method     array findByCreatedAt(string $created_at) Return ChildAdminLog objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildAdminLog objects filtered by the updated_at column
@@ -148,7 +156,7 @@ abstract class AdminLogQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, ADMIN_LOGIN, ADMIN_FIRSTNAME, ADMIN_LASTNAME, ACTION, REQUEST, CREATED_AT, UPDATED_AT FROM admin_log WHERE ID = :p0';
+        $sql = 'SELECT ID, ADMIN_LOGIN, ADMIN_FIRSTNAME, ADMIN_LASTNAME, RESOURCE, ACTION, MESSAGE, REQUEST, CREATED_AT, UPDATED_AT FROM admin_log WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -366,6 +374,35 @@ abstract class AdminLogQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the resource column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByResource('fooValue');   // WHERE resource = 'fooValue'
+     * $query->filterByResource('%fooValue%'); // WHERE resource LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $resource The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAdminLogQuery The current query, for fluid interface
+     */
+    public function filterByResource($resource = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($resource)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $resource)) {
+                $resource = str_replace('*', '%', $resource);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(AdminLogTableMap::RESOURCE, $resource, $comparison);
+    }
+
+    /**
      * Filter the query on the action column
      *
      * Example usage:
@@ -392,6 +429,35 @@ abstract class AdminLogQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AdminLogTableMap::ACTION, $action, $comparison);
+    }
+
+    /**
+     * Filter the query on the message column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByMessage('fooValue');   // WHERE message = 'fooValue'
+     * $query->filterByMessage('%fooValue%'); // WHERE message LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $message The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAdminLogQuery The current query, for fluid interface
+     */
+    public function filterByMessage($message = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($message)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $message)) {
+                $message = str_replace('*', '%', $message);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(AdminLogTableMap::MESSAGE, $message, $comparison);
     }
 
     /**

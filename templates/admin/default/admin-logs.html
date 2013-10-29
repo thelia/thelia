@@ -1,0 +1,143 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Thelia Mailing System'}{/block}
+
+{block name="check-resource"}admin.configuration.admin-logs{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+    <div class="admin-logs">
+
+        <div id="wrapper" class="container">
+
+            <ul class="breadcrumb">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                <li><a href="{url path='/admin/configuration/adminLogs'}">{intl l="Admin logs"}</a></li>
+            </ul>
+
+            {module_include location='admin_logs_top'}
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="general-block-decorator">
+
+                        <div class="title title-without-tabs">{intl l="Configuration variables"}</div>
+
+                        {form name="thelia.admin.mailing-system.update"}
+
+                            <form method="POST" action="{url path="/admin/configuration/mailingSystem/save"}" {form_enctype form=$form} >
+
+                                <div class="row inner-toolbar">
+                                    <div class="col-md-12 inner-actions clearfix">
+                                        <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-success pull-right" title="Save">Save <span class="glyphicon glyphicon-ok"></span></button>
+                                    </div>
+                                </div>
+
+                                {form_hidden_fields form=$form}
+
+                                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                {form_field form=$form field='enabled'}
+                                    <div class="form-group">
+                                        <label for="{$label_attr.for}" class="label-control">{intl l="Enable remote SMTP use : "}</label>
+
+                                        <input type="hidden" id="smtp_enabled" name="{$name}" value="{if $form_error}{$value}{else}{if {config key="smtp.enabled"}}1{else}0{/if}{/if}">
+
+                                        <div class="make-switch switch-small" id="enable-smtp" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                            <input type="checkbox" id="{$label_attr.for}" {if $form_error AND $value == 1 OR !$form_error AND {config key="smtp.enabled"} == 1}checked{/if}>
+                                        </div>
+                                    </div>
+                                {/form_field}
+
+                                {form_field form=$form field='host'}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label for="{$label_attr.for}" class="label-control">{intl l="Host :"}</label>
+                                        <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Host"}" value="{if $form_error}{$value}{else}{config key="smtp.host"}{/if}">
+                                    </div>
+                                {/form_field}
+
+                                {form_field form=$form field='port'}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label for="{$label_attr.for}" class="label-control">{intl l="Port :"}</label>
+                                        <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Port"}" value="{if $form_error}{$value}{else}{config key="smtp.port"}{/if}">
+                                    </div>
+                                {/form_field}
+
+                                {form_field form=$form field='encryption'}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label for="{$label_attr.for}" class="label-control">{intl l="Encryption :"}</label>
+                                        <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Encryption"}" value="{if $form_error}{$value}{else}{config key="smtp.encryption"}{/if}">
+                                    </div>
+                                {/form_field}
+
+                                {form_field form=$form field='username'}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label for="{$label_attr.for}" class="label-control">{intl l="Username :"}</label>
+                                        <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Username"}" value="{if $form_error}{$value}{else}{config key="smtp.username"}{/if}">
+                                    </div>
+                                {/form_field}
+
+                                {form_field form=$form field='password'}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label for="{$label_attr.for}" class="label-control">{intl l="Password :"}</label>
+                                        <input type="password" class="form-control" id="{$label_attr.for}" name="{$name}" value="{if $form_error}{$value}{else}{config key="smtp.password"}{/if}">
+                                    </div>
+                                {/form_field}
+
+                                {form_field form=$form field='authmode'}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label for="{$label_attr.for}" class="label-control">{intl l="Auth Mode :"}</label>
+                                        <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Auth Mode"}" value="{if $form_error}{$value}{else}{config key="smtp.authmode"}{/if}">
+                                    </div>
+                                {/form_field}
+
+                                {form_field form=$form field='timeout'}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label for="{$label_attr.for}" class="label-control">{intl l="Timeout :"}</label>
+                                        <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Timeout"}" value="{if $form_error}{$value}{else}{config key="smtp.timeout"}{/if}">
+                                    </div>
+                                {/form_field}
+
+                                {form_field form=$form field='sourceip'}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label for="{$label_attr.for}" class="label-control">{intl l="Source IP :"}</label>
+                                        <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Source IP"}" value="{if $form_error}{$value}{else}{config key="smtp.sourceip"}{/if}">
+                                    </div>
+                                {/form_field}
+
+                                <div class="row inner-toolbar">
+                                    <div class="col-md-12 inner-actions clearfix">
+                                        <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-success pull-right" title="Save">Save <span class="glyphicon glyphicon-ok"></span></button>
+                                    </div>
+                                </div>
+
+                            </form>
+
+                        {/form}
+
+                    </div>
+                </div>
+            </div>
+
+            {module_include location='admin_logs_bottom'}
+
+        </div>
+    </div>
+{/block}
+
+{block name="javascript-initialization"}
+    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    <script type="text/javascript">
+
+        jQuery(function($) {
+            $('#enable-smtp').on('switch-change', function (e, data) {
+                $('#smtp_enabled').val(data.value ? 1 : 0);
+            });
+        });
+
+    </script>
+{/block}

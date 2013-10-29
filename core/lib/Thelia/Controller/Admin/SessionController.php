@@ -50,7 +50,7 @@ class SessionController extends BaseAdminController
 
                 $this->getSecurityContext()->setAdminUser($user);
 
-                $this->adminLogAppend("Successful token authentication");
+                $this->adminLogAppend("admin", "LOGIN", "Successful token authentication");
 
                 // Update the cookie
                 $cookie = $this->createAdminRememberMeCookie($user);
@@ -58,7 +58,7 @@ class SessionController extends BaseAdminController
                 // Render the home page
                 return $this->render("home");
             } catch (TokenAuthenticationException $ex) {
-                $this->adminLogAppend("Token based authentication failed.");
+                $this->adminLogAppend("admin", "LOGIN", "Token based authentication failed.");
 
                 // Clear the cookie
                 $this->clearRememberMeCookie();
@@ -99,7 +99,7 @@ class SessionController extends BaseAdminController
             $this->getSecurityContext()->setAdminUser($user);
 
             // Log authentication success
-            AdminLog::append("Authentication successful", $request, $user);
+            AdminLog::append("admin", "LOGIN", "Authentication successful", $request, $user);
 
             /**
              * FIXME: we have tou find a way to send cookie
@@ -122,13 +122,13 @@ class SessionController extends BaseAdminController
          } catch (AuthenticationException $ex) {
 
              // Log authentication failure
-             AdminLog::append(sprintf("Authentication failure for username '%s'", $authenticator->getUsername()), $request);
+             AdminLog::append("admin", "LOGIN", sprintf("Authentication failure for username '%s'", $authenticator->getUsername()), $request);
 
              $message =  $this->getTranslator()->trans("Login failed. Please check your username and password.");
          } catch (\Exception $ex) {
 
              // Log authentication failure
-             AdminLog::append(sprintf("Undefined error: %s", $ex->getMessage()), $request);
+             AdminLog::append("admin", "LOGIN", sprintf("Undefined error: %s", $ex->getMessage()), $request);
 
              $message = $this->getTranslator()->trans(
                      "Unable to process your request. Please try again (%err).",

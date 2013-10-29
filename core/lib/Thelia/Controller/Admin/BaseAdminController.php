@@ -51,18 +51,20 @@ class BaseAdminController extends BaseController
     /**
      * Helper to append a message to the admin log.
      *
+     * @param string $resource
+     * @param string $action
      * @param string $message
      */
-    public function adminLogAppend($message)
+    public function adminLogAppend($resource, $action, $message)
     {
-        AdminLog::append($message, $this->getRequest(), $this->getSecurityContext()->getAdminUser());
+        AdminLog::append($resource, $action, $message, $this->getRequest(), $this->getSecurityContext()->getAdminUser());
     }
 
     /**
      * This method process the rendering of view called from an admin page
      *
      * @param  unknown  $template
-     * @return Response the reponse which contains the rendered view
+     * @return Response the response which contains the rendered view
      */
     public function processTemplateAction($template)
     {
@@ -131,7 +133,7 @@ class BaseAdminController extends BaseController
          }
 
          // Log the problem
-         $this->adminLogAppend("User is not granted for resources %s with accesses %s", implode(", ", $resources), implode(", ", $accesses));
+         $this->adminLogAppend(implode(",", $resources), implode(",", $accesses), "User is not granted for resources %s with accesses %s", implode(", ", $resources), implode(", ", $accesses));
 
          // Generate the proper response
          $response = new Response();

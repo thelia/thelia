@@ -20,57 +20,20 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Model\AdminLog;
-use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Core\Event\UpdatePositionEvent;
+namespace Thelia\Controller\Admin;
 
-class BaseAction
+use Thelia\Core\Security\AccessManager;
+
+class AdminLogsController extends BaseAdminController
 {
-    /**
-     * @var The container
-     */
-    protected $container;
+    const RESOURCE_CODE = "admin.admin-logs";
 
-    public function __construct(ContainerInterface $container)
+    public function defaultAction()
     {
-        $this->container = $container;
-    }
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, AccessManager::VIEW)) return $response;
 
-    /**
-     * Return the event dispatcher,
-     *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    public function getDispatcher()
-    {
-        return $this->container->get('event_dispatcher');
-    }
-
-    /**
-     * Changes object position, selecting absolute ou relative change.
-     *
-     * @param ModelCriteria       $query
-     * @param UpdatePositionEvent $event
-     *
-     * @return mixed
-     */
-    protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event)
-    {
-        if (null !== $object = $query->findPk($event->getObjectId())) {
-
-            $object->setDispatcher($this->getDispatcher());
-
-            $mode = $event->getMode();
-
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $object->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $object->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $object->movePositionDown();
-        }
+        // Render the edition template.
+        return $this->render('admin-logs');
     }
 }
