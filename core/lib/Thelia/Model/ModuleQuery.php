@@ -16,13 +16,26 @@ use Thelia\Model\Base\ModuleQuery as BaseModuleQuery;
  *
  */
 class ModuleQuery extends BaseModuleQuery {
+
+    protected static $activated = null;
     /**
      * @return array|mixed|\PropelObjectCollection
      */
     public static function getActivated()
     {
-        return self::create()
-            ->filterByActivate(1)
-            ->find();
+        if(null === self::$activated) {
+            self::$activated = self::create()
+                ->filterByActivate(1)
+                ->find();
+        }
+
+        return self::$activated;
     }
+
+    public static function resetActivated()
+    {
+        self::$activated = null;
+    }
+
+
 } // ModuleQuery

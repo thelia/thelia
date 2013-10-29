@@ -124,7 +124,7 @@
                                                             <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
                                                             <select name="{$name}" id="{$label_attr.for}" class="form-control">
                                                                 {loop type="country" name="country1"}
-                                                                    <option value="{$ID}">{$TITLE}</option>
+                                                                    <option value="{$ID}" {if $ID == $COUNTRY}selected{/if}>{$TITLE}</option>
                                                                 {/loop}
                                                             </select>
                                                         </div>
@@ -158,14 +158,18 @@
                                                                 <td>
                                                                     <address>
                                                                         <strong>{loop name="address.title" type="title" id=$TITLE}{$SHORT}{/loop} {$FIRSTNAME} {$LASTNAME}</strong><br>
-                                                                        {$ADDRESS1}<br>
-                                                                        {$ADDRESS2}<br>
-                                                                        {$ADDRESS3}<br>
+                                                                        {$ADDRESS1}
+                                                                        {if $ADDRESS2}<br />{$ADDRESS2}{/if}
+                                                                        {if $ADDRESS3}<br />{$ADDRESS3}{/if}
+                                                                        <br>{$ZIPCODE} {$CITY}
+                                                                        {loop name="address.country" type="country" id=$COUNTRY}
+                                                                            <br>{$TITLE}
+                                                                        {/loop}
                                                                         {if $PHONE}
-                                                                            <abbr title="{intl l="Phone"}">P:</abbr> {$PHONE}<br>
+                                                                            <br> <abbr title="{intl l="Phone"}">P:</abbr>{$PHONE}
                                                                         {/if}
                                                                         {if $CELLPHONE}
-                                                                            <abbr title="{intl l="cell phone"}">P:</abbr> {$CELLPHONE}
+                                                                            <br> <abbr title="{intl l="cell phone"}">P:</abbr>{$CELLPHONE}
                                                                         {/if}
                                                                     </address>
                                                                 </td>

@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -20,44 +20,35 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Command;
+
+namespace Thelia\Tools;
+
 
 /**
- * base class for module commands
- *
- * Class BaseModuleGenerate
- * @package Thelia\Command
+ * Class Password
+ * @package Thelia\Tools
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-abstract class BaseModuleGenerate extends ContainerAwareCommand
+class Password 
 {
-     protected $module;
-     protected $moduleDirectory;
 
-     protected $reservedKeyWords = array(
-         'thelia'
-     );
+    private static function randgen($letter, $length) {
 
-     protected $neededDirectories = array(
-         'Config',
-         'Model',
-         'Loop',
-         'AdminModule'
-     );
+        return substr(str_shuffle($letter), 0, $length);
+    }
 
-     protected function verifyExistingModule()
-     {
-         if (file_exists($this->moduleDirectory)) {
-             throw new \RuntimeException(sprintf("%s module already exists", $this->module));
-         }
-     }
+    /**
+     * generate a Random password with defined length
+     *
+     * @param int $length
+     * @return mixed
+     */
+    public static function generateRandom($length = 8){
 
-     protected function formatModuleName($name)
-     {
-         if (in_array(strtolower($name), $this->reservedKeyWords)) {
-             throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
-         }
+        $letter = "abcdefghijklmnopqrstuvwxyz";
+        $letter .= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        $letter .= "0123456789";
 
-         return ucfirst($name);
-     }
-}
+        return self::randgen($letter, $length);
+    }
+} 
