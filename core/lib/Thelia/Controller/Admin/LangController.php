@@ -116,7 +116,7 @@ class LangController extends BaseAdminController
             }
 
             $changedObject = $event->getLang();
-            $this->adminLogAppend(sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
+            $this->adminLogAppend(AdminResources::LANGUAGE, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
             $this->redirectToRoute('/admin/configuration/languages');
         } catch (\Exception $e) {
             $error_msg = $e->getMessage();
@@ -153,7 +153,7 @@ class LangController extends BaseAdminController
             }
 
             $changedObject = $event->getLang();
-            $this->adminLogAppend(sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
+            $this->adminLogAppend(AdminResources::LANGUAGE, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
 
         } catch (\Exception $e) {
             \Thelia\Log\Tlog::getInstance()->error(sprintf("Error on changing default languages with message : %s", $e->getMessage()));
@@ -189,7 +189,7 @@ class LangController extends BaseAdminController
             }
 
             $createdObject = $createEvent->getLang();
-            $this->adminLogAppend(sprintf("%s %s (ID %s) created", 'Lang', $createdObject->getTitle(), $createdObject->getId()));
+            $this->adminLogAppend(AdminResources::LANGUAGE, AccessManager::CREATE, sprintf("%s %s (ID %s) created", 'Lang', $createdObject->getTitle(), $createdObject->getId()));
 
             $this->redirectToRoute('admin.configuration.languages');
 

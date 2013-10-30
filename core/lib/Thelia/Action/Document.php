@@ -143,18 +143,6 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      */
     public function saveDocument(DocumentCreateOrUpdateEvent $event)
     {
-        $this->adminLogAppend(
-            $this->container->get('thelia.translator')->trans(
-                'Saving documents for %parentName% parent id %parentId% (%parentType%)',
-                array(
-                    '%parentName%' => $event->getParentName(),
-                    '%parentId%' => $event->getParentId(),
-                    '%parentType%' => $event->getDocumentType()
-                ),
-                'document'
-            )
-        );
-
         $fileManager = new FileManager($this->container);
         $model = $event->getModelDocument();
 
@@ -187,18 +175,6 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      */
     public function updateDocument(DocumentCreateOrUpdateEvent $event)
     {
-        $this->adminLogAppend(
-            $this->container->get('thelia.translator')->trans(
-                'Updating documents for %parentName% parent id %parentId% (%parentType%)',
-                array(
-                    '%parentName%' => $event->getParentName(),
-                    '%parentId%' => $event->getParentId(),
-                    '%parentType%' => $event->getDocumentType()
-                ),
-                'image'
-            )
-        );
-
         if (null !== $event->getUploadedFile()) {
             $event->getModelDocument()->setTitle($event->getUploadedFile()->getClientOriginalName());
         }
@@ -231,33 +207,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
     {
         $fileManager = new FileManager($this->container);
 
-        try {
-            $fileManager->deleteFile($event->getDocumentToDelete(), $event->getDocumentType(), FileManager::FILE_TYPE_DOCUMENTS);
-
-            $this->adminLogAppend(
-                $this->container->get('thelia.translator')->trans(
-                    'Deleting document for %id% with parent id %parentId%',
-                    array(
-                        '%id%' => $event->getDocumentToDelete()->getId(),
-                        '%parentId%' => $event->getDocumentToDelete()->getParentId(),
-                    ),
-                    'document'
-                )
-            );
-        } catch (\Exception $e) {
-            $this->adminLogAppend(
-                $this->container->get('thelia.translator')->trans(
-                    'Fail to delete document for %id% with parent id %parentId% (Exception : %e%)',
-                    array(
-                        '%id%' => $event->getDocumentToDelete()->getId(),
-                        '%parentId%' => $event->getDocumentToDelete()->getParentId(),
-                        '%e%' => $e->getMessage()
-                    ),
-                    'document'
-                )
-            );
-            throw $e;
-        }
+        $fileManager->deleteFile($event->getDocumentToDelete(), $event->getDocumentType(), FileManager::FILE_TYPE_DOCUMENTS);
     }
 
     public static function getSubscribedEvents()

@@ -1138,8 +1138,10 @@ CREATE TABLE `admin_log`
     `admin_login` VARCHAR(255),
     `admin_firstname` VARCHAR(255),
     `admin_lastname` VARCHAR(255),
+    `resource` VARCHAR(255),
     `action` VARCHAR(255),
-    `request` TEXT,
+    `message` TEXT,
+    `request` LONGTEXT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)

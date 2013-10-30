@@ -20,57 +20,51 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Model\AdminLog;
-use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Core\Event\UpdatePositionEvent;
+namespace Thelia\Controller\Admin;
 
-class BaseAction
+use Thelia\Core\Security\AccessManager;
+use Thelia\Model\AdminLogQuery;
+
+class AdminLogsController extends BaseAdminController
 {
-    /**
-     * @var The container
-     */
-    protected $container;
+    const RESOURCE_CODE = "admin.admin-logs";
 
-    public function __construct(ContainerInterface $container)
+    public function defaultAction()
     {
-        $this->container = $container;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, AccessManager::VIEW)) return $response;
+
+        // Render the edition template.
+        return $this->render('admin-logs');
     }
 
-    /**
-     * Return the event dispatcher,
-     *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    public function getDispatcher()
+    public function loadLoggerAjaxAction()
     {
-        return $this->container->get('event_dispatcher');
-    }
+        $entries = array();
+        foreach( AdminLogQuery::getEntries(
+                     $this->getRequest()->request->get('admins', array()),
+                     null,
+                     null,
+                     array_merge($this->getRequest()->request->get('resources', array()), $this->getRequest()->request->get('modules', array()))
+                 ) as $entry) {
 
-    /**
-     * Changes object position, selecting absolute ou relative change.
-     *
-     * @param ModelCriteria       $query
-     * @param UpdatePositionEvent $event
-     *
-     * @return mixed
-     */
-    protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event)
-    {
-        if (null !== $object = $query->findPk($event->getObjectId())) {
-
-            $object->setDispatcher($this->getDispatcher());
-
-            $mode = $event->getMode();
-
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $object->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $object->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $object->movePositionDown();
+            $entries[] = array(
+                "head" => sprintf(
+                    "[%s][%s][%s:%s]",
+                    date('Y-m-d H:i:s', $entry->getCreatedAt()->getTimestamp()),
+                    $entry->getAdminLogin(),
+                    $entry->getResource(),
+                    $entry->getAction()
+                ),
+                "data" => $entry->getMessage(),
+            );
         }
+
+        return $this->render(
+            'ajax/logger',
+            array(
+                'entries' => $entries,
+            )
+        );
     }
 }

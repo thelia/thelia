@@ -254,18 +254,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     public function saveImage(ImageCreateOrUpdateEvent $event)
     {
-        $this->adminLogAppend(
-            $this->container->get('thelia.translator')->trans(
-                'Saving images for %parentName% parent id %parentId% (%parentType%)',
-                array(
-                    '%parentName%' => $event->getParentName(),
-                    '%parentId%' => $event->getParentId(),
-                    '%parentType%' => $event->getImageType()
-                ),
-                'image'
-            )
-        );
-
         $fileManager = new FileManager($this->container);
         $model = $event->getModelImage();
 
@@ -297,18 +285,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     public function updateImage(ImageCreateOrUpdateEvent $event)
     {
-        $this->adminLogAppend(
-            $this->container->get('thelia.translator')->trans(
-                'Updating images for %parentName% parent id %parentId% (%parentType%)',
-                array(
-                    '%parentName%' => $event->getParentName(),
-                    '%parentId%' => $event->getParentId(),
-                    '%parentType%' => $event->getImageType()
-                ),
-                'image'
-            )
-        );
-
         $fileManager = new FileManager($this->container);
         // Copy and save file
         if ($event->getUploadedFile()) {
@@ -337,33 +313,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     {
         $fileManager = new FileManager($this->container);
 
-        try {
-            $fileManager->deleteFile($event->getImageToDelete(), $event->getImageType(), FileManager::FILE_TYPE_IMAGES);
-
-            $this->adminLogAppend(
-                $this->container->get('thelia.translator')->trans(
-                    'Deleting image for %id% with parent id %parentId%',
-                    array(
-                        '%id%' => $event->getImageToDelete()->getId(),
-                        '%parentId%' => $event->getImageToDelete()->getParentId(),
-                    ),
-                    'image'
-                )
-            );
-        } catch (\Exception $e) {
-            $this->adminLogAppend(
-                $this->container->get('thelia.translator')->trans(
-                    'Fail to delete image for %id% with parent id %parentId% (Exception : %e%)',
-                    array(
-                        '%id%' => $event->getImageToDelete()->getId(),
-                        '%parentId%' => $event->getImageToDelete()->getParentId(),
-                        '%e%' => $e->getMessage()
-                    ),
-                    'image'
-                )
-            );
-            throw $e;
-        }
+        $fileManager->deleteFile($event->getImageToDelete(), $event->getImageType(), FileManager::FILE_TYPE_IMAGES);
     }
 
     /**

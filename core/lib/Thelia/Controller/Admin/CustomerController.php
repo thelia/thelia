@@ -87,7 +87,7 @@ class CustomerController extends BaseAdminController
 
             $customerUpdated = $event->getCustomer();
 
-            $this->adminLogAppend(sprintf("Customer with Ref %s (ID %d) modified", $customerUpdated->getRef() , $customerUpdated->getId()));
+            $this->adminLogAppend(AdminResources::CUSTOMER, AccessManager::UPDATE, sprintf("Customer with Ref %s (ID %d) modified", $customerUpdated->getRef() , $customerUpdated->getId()));
 
             if ($this->getRequest()->get("save_mode") == "close") {
                 $this->redirectToRoute("admin.customers");
