@@ -70,8 +70,14 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
         // Si on n'est pas en mode debug, activer le cache, avec une lifetime de 15mn, et en vérifiant que les templates sources n'ont pas été modifiés.
-        $this->caching       = Smarty::CACHING_OFF;
-        $this->force_compile = true;
+
+        if($debug) {
+            $this->setCaching(Smarty::CACHING_OFF);
+            $this->setForceCompile(true);
+        } else {
+            $this->setForceCompile(false);
+        }
+
 
         // The default HTTP status
         $this->status = 200;
