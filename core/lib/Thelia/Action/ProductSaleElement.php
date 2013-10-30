@@ -40,6 +40,8 @@ use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Map\AttributeCombinationTableMap;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
+use Propel\Runtime\Connection\ConnectionInterface;
 
 class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 {
@@ -65,7 +67,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             if ($salesElement == null) {
                 // Create a new default product sale element
-                $salesElement = $event->getProduct()->createDefaultProductSaleElement($con, 0, 0, $event->getCurrencyId(), true);
+                $salesElement = $event->getProduct()->createDefaultProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
             } else {
                 // This (new) one is the default
                 $salesElement->setIsDefault(true)->save($con);
@@ -87,7 +89,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                             ->setAttributeAvId($attributeAvId)
                             ->setAttribute($attributeAv->getAttribute())
                             ->setProductSaleElements($salesElement)
-                            ->save();
+                            ->save($con);
                     }
                 }
             }
@@ -206,8 +208,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
                 if ($product->countSaleElements() <= 0) {
                     // If we just deleted the last PSE, create a default one
-                    $product->createDefaultProductSaleElement($con, 0, 0, $event->getCurrencyId(), true);
-                } elseif ($pse->getIsDefault()) {
+                    $product->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
+                }
+                elseif ($pse->getIsDefault()) {
 
                     // If we deleted the default PSE, make the last created one the default
                     $pse = ProductSaleElementsQuery::create()
@@ -231,6 +234,83 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Generate combinations. All existing combinations for the product are deleted.
+     *
+     * @param ProductCombinationGenerationEvent $event
+     */
+    public function generateCombinations(ProductCombinationGenerationEvent $event) {
+
+        $con = Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
+
+        $con->beginTransaction();
+
+        try {
+
+            // Delete all product's productSaleElement
+            ProductSaleElementsQuery::create()->filterByProductId($event->product->getId())->delete();
+
+            $isDefault = true;
+
+            // Create all combinations
+            foreach($event->getCombinations() as $combinationAttributesAvIds) {
+
+                // Create the PSE
+                $saleElement = $event->getProduct()->createProductSaleElement(
+                        $con,
+                        $event->getWeight(),
+                        $event->getPrice(),
+                        $event->getSalePrice(),
+                        $event->getCurrencyId(),
+                        $isDefault,
+                        $event->getOnsale(),
+                        $event->getIsnew(),
+                        $event->getQuantity(),
+                        $event->getEanCode(),
+                        $event->getReference()
+                );
+
+                $isDefault = false;
+
+                $this->createCombination($con, $saleElement, $combinationAttributesAvIds);
+            }
+
+            // Store all the stuff !
+            $con->commit();
+        }
+        catch (\Exception $ex) {
+
+            $con->rollback();
+
+            throw $ex;
+        }
+    }
+
+    /**
+     * Create a combination for a given product sale element
+     *
+     * @param ConnectionInterface $con the Propel connection
+     * @param ProductSaleElement $salesElement the product sale element
+     * @param unknown $combinationAttributes an array oif attributes av IDs
+     */
+    protected function createCombination(ConnectionInterface $con, ProductSaleElements $salesElement, $combinationAttributes)
+    {
+        foreach ($combinationAttributes as $attributeAvId) {
+
+            $attributeAv = AttributeAvQuery::create()->findPk($attributeAvId);
+
+            if ($attributeAv !== null) {
+                $attributeCombination = new AttributeCombination();
+
+                $attributeCombination
+                    ->setAttributeAvId($attributeAvId)
+                    ->setAttribute($attributeAv->getAttribute())
+                    ->setProductSaleElements($salesElement)
+                ->save($con);
+            }
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     public static function getSubscribedEvents()
@@ -239,6 +319,8 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT    => array("create", 128),
             TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT => array("update", 128),
             TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT => array("delete", 128),
+            TheliaEvents::PRODUCT_COMBINATION_GENERATION      => array("generateCombinations", 128),
+
         );
     }
 }

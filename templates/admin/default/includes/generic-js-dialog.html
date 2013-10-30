@@ -30,6 +30,13 @@ $('#{$dialog_id}').on('hidden.bs.modal', function() {
     // Clear error status
     $("#{$dialog_id} .error").removeClass('error');
 
+    $('#{$dialog_id} .form-group').removeClass('has-error')
+
     // Empty field values
     $("#{$dialog_id} input[type=text], #{$dialog_id} select").val('');
+
+    // Uncheck boxes
+    $("#{$dialog_id} input[type=checkbox]").removeAttr('checked');
+
+    {$additionnal_js_code|default:''}
 });

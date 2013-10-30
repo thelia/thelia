@@ -90,6 +90,8 @@
 
         <form name="thelia.admin.product_sale_element.update" class="Thelia\Form\ProductSaleElementUpdateForm"/>
         <form name="thelia.admin.product_default_sale_element.update" class="Thelia\Form\ProductDefaultSaleElementUpdateForm"/>
+        <form name="thelia.admin.product_combination.build" class="Thelia\Form\ProductCombinationGenerationForm"/>
+
 
         <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>
 

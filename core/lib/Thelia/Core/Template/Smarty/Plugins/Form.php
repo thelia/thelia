@@ -199,30 +199,29 @@ class Form extends AbstractSmartyPlugin
     {
         if ($repeat) {
 
-        $formFieldView = $this->getFormFieldView($params);
-        $formFieldConfig = $this->getFormFieldConfig($params);
+            $formFieldView = $this->getFormFieldView($params);
+            $formFieldConfig = $this->getFormFieldConfig($params);
 
-        $this->assignFormTypeValues($template, $formFieldConfig, $formFieldView);
+            $this->assignFormTypeValues($template, $formFieldConfig, $formFieldView);
 
             $value = $formFieldView->vars["value"];
 
-            // We have a collection
-            if (0 < $value_count = count($formFieldView->children)) {
+            $key = $this->getParam($params, 'value_key', null);
 
-                $key = $this->getParam($params, 'value_key', null);
+            // We (may) have a collection
+            if ($key !== null) {
 
-                if ($key !== null) {
-                    // If the field is not found, use an empty value
-                    $val = array_key_exists($key, $value) ? $value[$key] : '';
+                // Force array
+                if (! is_array($value)) $value = array();
 
-                    $name = sprintf("%s[%s]", $formFieldView->vars["full_name"], $key);
+                // If the field is not found, use an empty value
+                $val = array_key_exists($key, $value) ? $value[$key] : '';
 
-                    $val = $value[$key];
+                $name = sprintf("%s[%s]", $formFieldView->vars["full_name"], $key);
 
-                    $this->assignFieldValues($template, $name, $val, $formFieldView->vars, $value_count);
-                } else {
-                    throw new \InvalidArgumentException(sprintf("Missing or empty parameter 'value_key' for field '%s'", $formFieldView->vars["name"]));
-                }
+                $val = $value[$key];
+
+                $this->assignFieldValues($template, $name, $val, $formFieldView->vars, count($formFieldView->children));
             } else {
                 $this->assignFieldValues($template, $formFieldView->vars["full_name"], $formFieldView->vars["value"], $formFieldView->vars);
             }
