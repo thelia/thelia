@@ -43,7 +43,7 @@ class HomeController extends BaseAdminController
     {
         $data = new \stdClass();
 
-        $data->title = "Stats on [...]";
+        $data->title = "Stats on " . $this->getRequest()->request->get('month', date('m')) . "/" . $this->getRequest()->request->get('month', date('Y'));
 
         /* sales */
         $saleSeries = new \stdClass();
