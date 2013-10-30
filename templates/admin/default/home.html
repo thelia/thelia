@@ -274,7 +274,7 @@
 
 			    	var $elem			= $('#jqplot');
 
-		            var url 			= "{url file='/test_to_remove/admin-stats.json'}",
+                    var url 			= "{url path='/admin/home/stats'}",
 		    			series 			= [],
 		    			seriesColors 	= [],
 		    			ticks 			= [],
@@ -318,12 +318,12 @@
     					}
 					};
 
-					// Get datas Json
+					// Get data Json
 					$.getJSON(url)
 		            .done(function(data) {
 
-			    		// Init series datas and colors
-						initJqplotDatas(series, seriesColors, options, data);
+			    		// Init series data and colors
+						initJqplotData(series, seriesColors, options, data);
 
 						// Add days to xaxis
 						for(var i = 1; i < (days+1); i++){
@@ -350,8 +350,8 @@
 				    				series = [];
 				    				seriesColors = [];
 
-				    				// Init series datas and colors
-						    		initJqplotDatas(series, seriesColors, options, data);
+				    				// Init series data and colors
+						    		initJqplotData(series, seriesColors, options, data);
 
 				    				// Restart jqplot
 				    				jqplot.destroy();
@@ -372,15 +372,15 @@
 		            });
 
 
-    				function initJqplotDatas(series, seriesColors, options, json){
+    				function initJqplotData(series, seriesColors, options, json){
     					$('[data-toggle="jqplot-serie"].active').each(function(i){
     						var position = $(this).index() - 1;
-			    			series.push(json.series[position].datas);
+			    			series.push(json.series[position].data);
 			    			seriesColors.push(json.series[position].color);
 			    		});
 
-    					// Number of days to display ( = datas.length in one serie)
-    					days = json.series[0].datas.length;
+    					// Number of days to display ( = data.length in one serie)
+    					days = json.series[0].data.length;
 
 			    		// Graph title
 			    		options.title = json.title;
