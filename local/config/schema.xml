@@ -771,6 +771,9 @@
     <index name="idx_admin_profile_id">
       <index-column name="profile_id" />
     </index>
+    <unique name="login_UNIQUE">
+      <unique-column name="login" />
+    </unique>
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="profile_resource" namespace="Thelia\Model">

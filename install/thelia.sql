@@ -984,6 +984,7 @@ CREATE TABLE `admin`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
+    UNIQUE INDEX `login_UNIQUE` (`login`),
     INDEX `idx_admin_profile_id` (`profile_id`),
     CONSTRAINT `fk_admin_profile_id`
         FOREIGN KEY (`profile_id`)
