@@ -95,10 +95,9 @@ class Administrator extends BaseAction implements EventSubscriberInterface
 
     public function updatePassword(AdministratorUpdatePasswordEvent $event)
     {
-        if (null !== $admin = AdminQuery::create()->filterByLogin($event->getLogin())->findOne()) {
-            $admin->setPassword($event->getPassword())
-                ->save();
-        }
+        $admin = $event->getAdmin();
+        $admin->setPassword($event->getPassword())
+            ->save();
     }
 
     /**

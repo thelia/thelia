@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Event\Administrator;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Admin;
 
 
 /**
@@ -34,18 +35,18 @@ class AdministratorUpdatePasswordEvent extends ActionEvent
 {
 
     /**
-     * @var string administrator login
+     * @var \Thelia\Model\Admin
      */
-    protected $login;
+    protected $admin;
 
     /**
      * @var string new administrator password
      */
     protected $password;
 
-    public function __construct($login)
+    public function __construct(Admin $admin)
     {
-        $this->login = $login;
+        $this->admin = $admin;
     }
 
     /**
@@ -65,20 +66,22 @@ class AdministratorUpdatePasswordEvent extends ActionEvent
     }
 
     /**
-     * @param string $login
+     * @param \Thelia\Model\Admin $admin
      */
-    public function setLogin($login)
+    public function setAdmin(Admin $admin)
     {
-        $this->login = $login;
+        $this->admin = $admin;
     }
 
     /**
-     * @return string
+     * @return \Thelia\Model\Admin
      */
-    public function getLogin()
+    public function getAdmin()
     {
-        return $this->login;
+        return $this->admin;
     }
+
+
 
 
 } 
