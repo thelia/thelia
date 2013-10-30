@@ -28,12 +28,7 @@
                             {elseloop rel="folder_title"}
                                 {intl l="Top level folders"}
                             {/elseloop}
-{*
-                            <td class="object-title">
-                                <a href="{url path='admin/folders' parent=$ID}" title="{intl l='Browse this folder'}">
-                                    {$TITLE}
-                                </a>
-                            </td>*}
+
                             {module_include location='folder_list_caption'}
 
                             {loop type="auth" name="can_create" role="ADMIN" resource="admin.folder" access="CREATE"}

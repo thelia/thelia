@@ -28,3 +28,6 @@ Parameters:
         {/loop}
     </div>
 {/ifloop}
+{elseloop rel="image"}
+<div class="alert alert-info">{intl l='There is no images attached to this %type.' type=$imageType}</div>
+{/elseloop}

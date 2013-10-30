@@ -9,7 +9,7 @@
     <div class="folder edit-folder">
     <div id="wrapper" class="container">
 
-    {include file="includes/folder-breadcrumb.html" editing_category="false" editing_content="true"}
+    {include file="includes/folder-breadcrumb.html" editing_content="true"}
 
     <div class="row">
     {loop name="content_edit" type="content" visible="*" id="{$content_id}" backend_context="1" lang="$edit_language_id"}
@@ -131,7 +131,7 @@
                                 <div class="control-group">
                                     <lablel>&nbsp;</lablel>
                                     <div class="controls">
-                                        <p>{intl l='Colder created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
+                                        <p>{intl l='Folder created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
                                     </div>
                                 </div>
                             </div>
