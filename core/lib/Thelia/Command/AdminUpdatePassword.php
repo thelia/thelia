@@ -21,64 +21,43 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Administrator;
-use Thelia\Core\Event\ActionEvent;
+namespace Thelia\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 
 /**
- * Class AdministratorUpdatePasswordEvent
- * @package Thelia\Core\Event\Administrator
+ * command line for updating admin password
+ *
+ * php Thelia admin:updatePassword
+ *
+ * Class AdminUpdatePassword
+ * @package Thelia\Command
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class AdministratorUpdatePasswordEvent extends ActionEvent
+class AdminUpdatePassword extends ContainerAwareCommand
 {
 
     /**
-     * @var string administrator login
+     * Configures the current command.
      */
-    protected $login;
-
-    /**
-     * @var string new administrator password
-     */
-    protected $password;
-
-    public function __construct($login)
+    protected function configure()
     {
-        $this->login = $login;
+        $this
+            ->setName('admin:updatePassword')
+            ->setDescription('change administrator password')
+            ->setHelp('The <info>admin:updatePassword</info> command allows you to change the password for a given administrator')
+            ->addArgument(
+                'login',
+                InputArgument::REQUIRED,
+                'Login for administrator you want to change the password'
+            )
+            ->addOption(
+                'password',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Desired password. If this option is omitted, a random password is generated and shown in this prompt after'
+            )
+        ;
     }
-
-    /**
-     * @param string $password
-     */
-    public function setPassword($password)
-    {
-        $this->password = $password;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPassword()
-    {
-        return $this->password;
-    }
-
-    /**
-     * @param string $login
-     */
-    public function setLogin($login)
-    {
-        $this->login = $login;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLogin()
-    {
-        return $this->login;
-    }
-
-
 } 
