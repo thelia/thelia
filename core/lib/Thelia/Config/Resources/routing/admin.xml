@@ -9,6 +9,18 @@
         <default key="_controller">Thelia\Controller\Admin\AdminController::indexAction</default>
     </route>
 
+    <!-- home -->
+
+    <route id="admin.home.view" path="/admin/home">
+        <default key="_controller">Thelia\Controller\Admin\HomeController::defaultAction</default>
+    </route>
+
+    <route id="admin.home.stats" path="/admin/home/stats">
+        <default key="_controller">Thelia\Controller\Admin\HomeController::loadStatsAjaxAction</default>
+    </route>
+
+    <!-- end home -->
+
     <!-- Route to the administration login page -->
     <route id="admin.login" path="/admin/login">
         <default key="_controller">Thelia\Controller\Admin\SessionController::showLoginAction</default>

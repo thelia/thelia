@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\OrderQuery as BaseOrderQuery;
@@ -53,5 +54,72 @@ class OrderQuery extends BaseOrderQuery
 
         return $obj;
     }
+
+    public static function getSaleStats($month, $year)
+    {
+        $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+        $stats = array();
+        for($day=1; $day<=$numberOfDay; $day++) {
+            $dayAmount = 0;
+            foreach(self::create()
+                        ->filterByStatusId(array(2,3,4), Criteria::IN)
+                        ->filterByCreatedAt(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
+                        ->filterByCreatedAt(sprintf("%s-%s-%s 23:59:59", $year, $month, $day), Criteria::LESS_EQUAL)
+                        ->find() as $dayOrders) {
+                $dayAmount += $dayOrders->getTotalAmount();
+            }
+            $stats[] = array($day-1, $dayAmount);
+        }
+
+        return $stats;
+    }
+
+    public static function getOrdersStats($month, $year, $status = null)
+    {
+        $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+        $stats = array();
+        for($day=1; $day<=$numberOfDay; $day++) {
+            $dayOrdersQuery = self::create()
+                ->filterByCreatedAt(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
+                ->filterByCreatedAt(sprintf("%s-%s-%s 23:59:59", $year, $month, $day), Criteria::LESS_EQUAL);
+            if(null !== $status) {
+                $dayOrdersQuery->filterByStatusId($status, Criteria::IN);
+            }
+            $dayOrders = $dayOrdersQuery->count();
+            $stats[] = array($day-1, $dayOrders);
+        }
+
+        return $stats;
+    }
+
+    public static function getFirstOrdersStats($month, $year)
+    {
+        $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+        $stats = array();
+        for($day=1; $day<=$numberOfDay; $day++) {
+            $dayOrdersQuery = self::create('matching_order')
+                ->filterByCreatedAt(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
+                ->filterByCreatedAt(sprintf("%s-%s-%s 23:59:59", $year, $month, $day), Criteria::LESS_EQUAL);
+
+            $otherOrderJoin = new Join();
+            $otherOrderJoin->addExplicitCondition(OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', 'matching_order', OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', 'other_order');
+            $otherOrderJoin->setJoinType(Criteria::LEFT_JOIN);
+
+            $dayOrdersQuery->addJoinObject($otherOrderJoin, 'other_order_join')
+                ->addJoinCondition('other_order_join', '`matching_order`.`ID` <>  `other_order`.`ID`')
+                ->addJoinCondition('other_order_join', '`matching_order`.`CREATED_AT` >  `other_order`.`CREATED_AT`');
+
+            $dayOrdersQuery->where('ISNULL(`other_order`.`ID`)');
+
+            $dayOrders = $dayOrdersQuery->count();
+            $stats[] = array($day-1, $dayOrders);
+        }
+
+        return $stats;
+    }
+
 
 } // OrderQuery
