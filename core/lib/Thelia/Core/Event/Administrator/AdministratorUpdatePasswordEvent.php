@@ -81,7 +81,5 @@ class AdministratorUpdatePasswordEvent extends ActionEvent
         return $this->admin;
     }
 
-
-
-
 }
+

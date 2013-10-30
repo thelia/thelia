@@ -97,4 +97,6 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
         ));
 
     }
+
 }
+
