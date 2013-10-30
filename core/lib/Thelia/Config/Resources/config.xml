@@ -182,6 +182,7 @@
         <command class="Thelia\Command\CreateAdminUser"/>
         <command class="Thelia\Command\ReloadDatabaseCommand"/>
         <command class="Thelia\Command\GenerateResources"/>
+        <command class="Thelia\Command\AdminUpdatePasswordCommand"/>
     </commands>
 
     <services>
