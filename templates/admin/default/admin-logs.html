@@ -24,16 +24,46 @@
 
                         <div class="title title-without-tabs">{intl l="Administration logs"}</div>
 
-                        <div class="col-md-12 clearfix">
+                        <div class="row inner-toolbar">
+                            <div class="col-md-12 inner-actions clearfix">
+                                <button type="button" class="btn btn-default btn-success pull-right js-show-logs" title="{intl l='Show logs'}">{intl l='Show logs'} <span class="glyphicon glyphicon-eye-open"></span></button>
+                            </div>
+                        </div>
 
-                            <div class="row inner-toolbar">
-                                <div class="col-md-12 inner-actions clearfix">
-                                    <button type="button" class="btn btn-default btn-success pull-right js-show-logs" title="Show logs">Show logs <span class="glyphicon glyphicon-eye-open"></span></button>
-                                </div>
+                        <div class="col-md-12 clearfix">
+                            <div>
+                                <strong>{intl l='Period'} :</strong>
                             </div>
 
+                            <div class="row">
+                                <div class="col-lg-3 clearfix">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">{intl l='From'}</span>
+                                        <input class="form-control" type="text" id="from_date" readonly="readonly">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default js-show-datepicker" data-datepicker-selector="#from_date" type="button">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 clearfix input-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">{intl l='To'}</span>
+                                        <input class="form-control" type="text" id="to_date" readonly="readonly">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default js-show-datepicker" data-datepicker-selector="#to_date" type="button">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 clearfix">
                             <div>
-                                <strong>Administrators :</strong>
+                                <strong>{intl l='Administrators'} :</strong>
                             </div>
 
                             <div class="row">
@@ -48,12 +78,11 @@
                                 </div>
                             {/loop}
                             </div>
-
                         </div>
 
                         <div class="col-md-12 clearfix">
                             <div>
-                                <strong>Resources :</strong>
+                                <strong>{intl l='Resources'} :</strong>
                             </div>
 
                             <div class="row">
@@ -73,7 +102,7 @@
 
                         <div class="col-md-12 clearfix">
                             <div>
-                                <strong>Modules :</strong>
+                                <strong>{intl l='Modules'} :</strong>
                             </div>
 
                             <div class="row">
@@ -93,7 +122,7 @@
 
                         <div class="row inner-toolbar">
                             <div class="col-md-12 inner-actions clearfix">
-                                <button type="button" class="btn btn-default btn-success pull-right js-show-logs" title="Show logs">Show logs <span class="glyphicon glyphicon-eye-open"></span></button>
+                                <button type="button" class="btn btn-default btn-success pull-right js-show-logs" title="{intl l='Show logs'}">{intl l='Show logs'} <span class="glyphicon glyphicon-eye-open"></span></button>
                             </div>
                         </div>
 
@@ -116,9 +145,43 @@
         <script src="{$asset_url}"></script>
     {/javascripts}
 
+    {javascripts file='assets/js/jquery.ui/jquery.ui.datepicker/jquery.ui.datepicker.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {stylesheets file='assets/js/jquery.ui/jquery.ui.theme.css'}
+        <link rel="stylesheet" href="{$asset_url}">
+    {/stylesheets}
+    {stylesheets file='assets/js/jquery.ui/jquery.ui.datepicker/jquery.ui.datepicker.css'}
+        <link rel="stylesheet" href="{$asset_url}">
+    {/stylesheets}
+
+    {javascripts file="assets/js/jquery/jquery.ui.ui.datepicker/i18n/jquery.ui.datepicker-{lang attr="locale"}.js" catchException="true"}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+
+
     <script type="text/javascript">
 
         jQuery(function($) {
+
+            $('#from_date').datepicker({
+                maxDate: "-1d",
+                showOn: 'manual'
+            });
+            $('#from_date').datepicker( "setDate", "-7d" );
+
+            $('#to_date').datepicker({
+                maxDate: "0",
+                showOn: 'manual'
+            });
+            $('#to_date').datepicker( "setDate", "0" );
+
+            $('.js-show-datepicker').click(function(e){
+                $($(this).data('datepicker-selector')).datepicker('show');
+            });
+
             $('.js-show-logs').click(function(e) {
 
                 $('.js-show-logs').attr('disabled', true);
@@ -139,12 +202,17 @@
                     modules.push($(v).data('id'));
                 })
 
+                var fromDate = new Date( $('#from_date').datepicker( "getDate" ) );
+                var toDate = new Date( $('#to_date').datepicker( "getDate" ) );
+
                 $.post(
                     "{url path='/admin/configuration/adminLogs/logger'}",
                     {
-                        admins:     admins,
-                        resources:  resources,
-                        modules:    modules
+                        fromDate:       $.datepicker.formatDate("yy-mm-dd", fromDate),
+                        toDate:         $.datepicker.formatDate("yy-mm-dd", toDate),
+                        admins:         admins,
+                        resources:      resources,
+                        modules:        modules
                     },
                     function(html) {
                         $('#loading-block').hide();

@@ -41,12 +41,14 @@ class AdminLogsController extends BaseAdminController
     public function loadLoggerAjaxAction()
     {
         $entries = array();
+
         foreach( AdminLogQuery::getEntries(
-                     $this->getRequest()->request->get('admins', array()),
-                     null,
-                     null,
-                     array_merge($this->getRequest()->request->get('resources', array()), $this->getRequest()->request->get('modules', array()))
-                 ) as $entry) {
+                    $this->getRequest()->request->get('admins', array()),
+                    $this->getRequest()->request->get('fromDate', null),
+                    $this->getRequest()->request->get('toDate', null),
+                    array_merge($this->getRequest()->request->get('resources', array()), $this->getRequest()->request->get('modules', array())),
+                    null
+                ) as $entry) {
 
             $entries[] = array(
                 "head" => sprintf(

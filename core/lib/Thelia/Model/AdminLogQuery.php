@@ -20,23 +20,25 @@ class AdminLogQuery extends BaseAdminLogQuery
 {
     /**
      * @param null      $login
-     * @param \DateTime $maxDateTime
-     * @param \DateTime $minDateTime
+     * @param null      $minDate
+     * @param null      $maxDate
      * @param null      $resources
      * @param null      $actions
      *
      * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
      */
-    public static function getEntries($login = null, \DateTime $maxDateTime = null, \DateTime $minDateTime = null, $resources = null, $actions = null)
+    public static function getEntries($login = null, $minDate = null, $maxDate = null, $resources = null, $actions = null)
     {
         $search = self::create();
 
-        if(null !== $minDateTime) {
-            $search->filterByCreatedAt($minDateTime->getTimestamp(), Criteria::GREATER_EQUAL);
+        if(null !== $minDate) {
+            $search->filterByCreatedAt($minDate, Criteria::GREATER_EQUAL);
         }
 
-        if(null !== $maxDateTime) {
-            $search->filterByCreatedAt($maxDateTime->getTimestamp(), Criteria::LESS_EQUAL);
+        if(null !== $maxDate) {
+            $maxDateObject = new \DateTime($maxDate);
+            $maxDateObject->add(new \DateInterval('P1D'));
+            $search->filterByCreatedAt(date('Y-m-d', $maxDateObject->getTimestamp()), Criteria::LESS_THAN);
         }
 
         if(null !== $resources) {
