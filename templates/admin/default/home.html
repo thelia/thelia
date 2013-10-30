@@ -266,133 +266,133 @@
 			<script type="text/javascript" src="{$asset_url}"></script>
 		{/javascripts}
 
-        <script>
+<script>
 
-        	(function($, window, document){
+    jQuery(function($){
 
-			    $(function(){
+        var $elem			= $('#jqplot');
 
-			    	var $elem			= $('#jqplot');
+        var url 			= "{url path='/admin/home/stats'}",
+            series 			= [],
+            seriesColors 	= [],
+            ticks 			= [],
+            days 			= 0,
+            jqplot;
 
-                    var url 			= "{url path='/admin/home/stats'}",
-		    			series 			= [],
-		    			seriesColors 	= [],
-		    			ticks 			= [],
-		    			days 			= 0,
-		    			jqplot;
+        var options = {
+            animate: true,
+            axesDefaults: {
+                tickOptions: { showMark: true, showGridline: true }
+            },
+            axes: {
+                xaxis: {
+                    borderColor: '#ccc',
+                    ticks : ticks,
+                    tickOptions:    { showGridline: false }
+                },
+                yaxis: {
+                    tickOptions: { showGridline: true, showMark: false, showLabel: false, shadow: false }
+                }
+            },
+            seriesDefaults: {
+                lineWidth: 3,
+                shadow : false,
+                markerOptions: { shadow : false, style: 'filledCircle', size: 12 }
+            },
+            grid: {
+                background: '#FFF',
+                shadow : false,
+                borderColor : '#FFF'
+            },
+            highlighter: {
+                show: true,
+                sizeAdjust: 7,
+                tooltipLocation: 'n',
+                tooltipContentEditor: function(str, seriesIndex, pointIndex, plot){
 
-		    		var options = {
-	    				animate: true,
-	    				axesDefaults: {
-	    					tickOptions: { showMark: true, showGridline: true }
-	    				},
-	    				axes: {
-				            xaxis: {
-				                borderColor: '#ccc',
-				                ticks : ticks,
-				                tickOptions:    { showGridline: false }
-				            },
-				            yaxis: {
-								tickOptions: { showGridline: true, showMark: false, showLabel: false, shadow: false }
-							}
-				        },
-						seriesDefaults: {
-							lineWidth: 3,
-							shadow : false,
-							markerOptions: { shadow : false, style: 'filledCircle', size: 12 }
-						},
-						grid: {
-					        background: '#FFF',
-					        shadow : false,
-					        borderColor : '#FFF'
-					    },
-					    highlighter: {
-					    	show: true,
-					        sizeAdjust: 7,
-					        tooltipLocation: 'n',
-					        tooltipContentEditor: function(str, seriesIndex, pointIndex, plot){
+                    // Return axis value : data value
+                    return ticks[pointIndex][1] + ': ' + plot.data[seriesIndex][pointIndex][1];
+                }
+            }
+        };
 
-					        	// Return axis value : data value
-				                return ticks[pointIndex][1] + ': ' + plot.data[seriesIndex][pointIndex][1];
-				            }
-    					}
-					};
-
-					// Get data Json
-					$.getJSON(url)
-		            .done(function(data) {
-
-			    		// Init series data and colors
-						initJqplotData(series, seriesColors, options, data);
-
-						// Add days to xaxis
-						for(var i = 1; i < (days+1); i++){
-			    			ticks.push([i-1, i]);
-			    		}
-
-			    		// Start jqplot
-			    		var elementId = $elem.attr('id');
-			    		jqplot = $.jqplot(elementId, series, options);
-
-			    		$('[data-toggle="jqplot"]').each(function(){
-
-			    			$(this).click(function(){
-
-			    				if($('[data-toggle="jqplot-serie"].active').length > 1 || !$(this).hasClass('active')){
-
-				    				// Active button and jqplot-serie management
-				    				$(this).toggleClass('active');
-
-				    				var id = $(this).data('target');
-				    				$('[data-toggle="jqplot-serie"]#' + id).toggleClass('active');
-
-				    				// Reinit variables
-				    				series = [];
-				    				seriesColors = [];
-
-				    				// Init series data and colors
-						    		initJqplotData(series, seriesColors, options, data);
-
-				    				// Restart jqplot
-				    				jqplot.destroy();
-				    				jqplot = $.jqplot(elementId, series, options);
-			    				}
-
-			    			});
-
-			    		});
-
-						$(window).bind('resize', function(event, ui) {
-	        				jqplot.replot( { resetAxes: true } );
-	    				});
-
-		            })
-		            .fail(function() {
-		                $elem.append('<div class="alert alert-danger">An error occurred while reading from JSON file</div>');
-		            });
+        // Get initial data Json
+        $.getJSON(url)
+        .done(jsonSuccessLoad)
+        .fail(jsonFailLoad);
 
 
-    				function initJqplotData(series, seriesColors, options, json){
-    					$('[data-toggle="jqplot-serie"].active').each(function(i){
-    						var position = $(this).index() - 1;
-			    			series.push(json.series[position].data);
-			    			seriesColors.push(json.series[position].color);
-			    		});
+        function initJqplotData(series, seriesColors, options, json){
+            $('[data-toggle="jqplot-serie"].active').each(function(i){
+                var position = $(this).index() - 1;
+                series.push(json.series[position].data);
+                seriesColors.push(json.series[position].color);
+            });
 
-    					// Number of days to display ( = data.length in one serie)
-    					days = json.series[0].data.length;
+            // Number of days to display ( = data.length in one serie)
+            days = json.series[0].data.length;
 
-			    		// Graph title
-			    		options.title = json.title;
+            // Graph title
+            options.title = json.title;
 
-			    		// Graph series colors
-			    		options.seriesColors = seriesColors;
-    				}
+            // Graph series colors
+            options.seriesColors = seriesColors;
+        }
 
-			    });
+        function jsonFailLoad(data) {
+            $elem.append('<div class="alert alert-danger">An error occurred while reading from JSON file</div>');
+        }
 
-			}(window.jQuery, window, document));
+        function jsonSuccessLoad(data) {
 
-        </script>
+            // Init series data and colors
+            initJqplotData(series, seriesColors, options, data);
+
+            // Add days to xaxis
+            for(var i = 1; i < (days+1); i++){
+                ticks.push([i-1, i]);
+            }
+
+            // Start jqplot
+            var elementId = $elem.attr('id');
+            jqplot = $.jqplot(elementId, series, options);
+
+            $('[data-toggle="jqplot"]').each(function(){
+
+                $(this).click(function(){
+
+                    if($('[data-toggle="jqplot-serie"].active').length > 1 || !$(this).hasClass('active')){
+
+                        // Active button and jqplot-serie management
+                        $(this).toggleClass('active');
+
+                        var id = $(this).data('target');
+                        $('[data-toggle="jqplot-serie"]#' + id).toggleClass('active');
+
+                        // Reinit variables
+                        series = [];
+                        seriesColors = [];
+
+                        // Init series data and colors
+                        initJqplotData(series, seriesColors, options, data);
+
+                        // Restart jqplot
+                        jqplot.destroy();
+                        jqplot = $.jqplot(elementId, series, options);
+                    }
+
+                });
+
+            });
+
+            $(window).bind('resize', function(event, ui) {
+                jqplot.replot( { resetAxes: true } );
+            });
+
+        }
+
+    });
+
+</script>
     {/javascripts}
 {/block}
