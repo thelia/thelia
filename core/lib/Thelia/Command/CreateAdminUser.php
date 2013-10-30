@@ -39,8 +39,8 @@ class CreateAdminUser extends ContainerAwareCommand
     {
         $this
             ->setName("admin:create")
-            ->setDescription("Create a new adminsitration user")
-            ->setHelp("The <info>thelia:create-admin</info> command create a new administration user.")
+            ->setDescription("Create a new administrator user")
+            ->setHelp("The <info>admin:create</info> command create a new administration user.")
             ->addOption(
                 'login_name',
                 null,
