@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -20,44 +20,66 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Command;
+
+namespace Thelia\Core\Event\Administrator;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Admin;
+
 
 /**
- * base class for module commands
- *
- * Class BaseModuleGenerate
- * @package Thelia\Command
+ * Class AdministratorUpdatePasswordEvent
+ * @package Thelia\Core\Event\Administrator
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-abstract class BaseModuleGenerate extends ContainerAwareCommand
+class AdministratorUpdatePasswordEvent extends ActionEvent
 {
-     protected $module;
-     protected $moduleDirectory;
 
-     protected $reservedKeyWords = array(
-         'thelia'
-     );
+    /**
+     * @var \Thelia\Model\Admin
+     */
+    protected $admin;
 
-     protected $neededDirectories = array(
-         'Config',
-         'Model',
-         'Loop',
-         'AdminModule'
-     );
+    /**
+     * @var string new administrator password
+     */
+    protected $password;
 
-     protected function verifyExistingModule()
-     {
-         if (file_exists($this->moduleDirectory)) {
-             throw new \RuntimeException(sprintf("%s module already exists", $this->module));
-         }
-     }
+    public function __construct(Admin $admin)
+    {
+        $this->admin = $admin;
+    }
 
-     protected function formatModuleName($name)
-     {
-         if (in_array(strtolower($name), $this->reservedKeyWords)) {
-             throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
-         }
+    /**
+     * @param string $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
 
-         return ucfirst($name);
-     }
+    /**
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param \Thelia\Model\Admin $admin
+     */
+    public function setAdmin(Admin $admin)
+    {
+        $this->admin = $admin;
+    }
+
+    /**
+     * @return \Thelia\Model\Admin
+     */
+    public function getAdmin()
+    {
+        return $this->admin;
+    }
+
 }
+

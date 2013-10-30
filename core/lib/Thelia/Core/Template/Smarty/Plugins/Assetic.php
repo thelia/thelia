@@ -43,7 +43,17 @@ class Assetic extends AbstractSmartyPlugin
 
     public function blockJavascripts($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-        return $this->assetManager->processSmartyPluginCall('js', $params, $content, $template, $repeat);
+        try {
+            return $this->assetManager->processSmartyPluginCall('js', $params, $content, $template, $repeat);
+        } catch(\Exception $e) {
+            $catchException = $this->getNormalizedParam($params, array('catchException'));
+            if($catchException == "true") {
+                $repeat = false;
+                return null;
+            } else {
+                throw $e;
+            }
+        }
     }
 
     public function blockImages($params, $content, \Smarty_Internal_Template $template, &$repeat)

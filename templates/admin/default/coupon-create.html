@@ -29,10 +29,6 @@
 {/block}
 
 {block name="javascript-initialization"}
-    {javascripts file='assets/bootstrap-datepicker/js/bootstrap-datepicker.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
-
     {javascripts file='assets/js/main.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
@@ -62,10 +58,6 @@
             external_filemanager_path:"{url file='/tinymce/plugins/filemanager/'}'",
             filemanager_title:"{intl l='Files manager'}" ,
             external_plugins: { "filemanager" : "{url file='/tinymce/plugins/filemanager/plugin.min.js'}"}
-        });
-
-        $(function($){
-            {*$('.datepicker').datepicker({ dateFormat: "{$dateFormat}", defaultDate: +60, minDate: "+0m" });*}
         });
     </script>
 

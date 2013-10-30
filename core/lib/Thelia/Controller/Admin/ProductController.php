@@ -933,7 +933,7 @@ class ProductController extends AbstractCrudController
 
         // Log object modification
         if (null !== $changedObject = $event->getProductSaleElement()) {
-            $this->adminLogAppend(sprintf("Product Sale Element (ID %s) for product reference %s modified", $changedObject->getId(), $event->getProduct()->getRef()));
+            $this->adminLogAppend($this->resourceCode, AccessManager::UPDATE, sprintf("Product Sale Element (ID %s) for product reference %s modified", $changedObject->getId(), $event->getProduct()->getRef()));
         }
     }
 

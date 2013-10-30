@@ -25,6 +25,7 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
+use Thelia\Model\ModuleQuery;
 
 class Module extends AbstractSmartyPlugin
 {
@@ -32,13 +33,27 @@ class Module extends AbstractSmartyPlugin
      * Process theliaModule template inclusion function
      *
      * @param  unknown $params
-     * @param  unknown $smarty
+     * @param \Smarty_Internal_Template $template
+     * @internal param \Thelia\Core\Template\Smarty\Plugins\unknown $smarty
+     *
      * @return string
      */
-    public function theliaModule($params, &$smarty)
+    public function theliaModule($params, \Smarty_Internal_Template $template)
     {
-        // TODO
-        return "";
+        $content = null;
+        if (array_key_exists('location', $params)) {
+            $location = $params['location'];
+            $modules = ModuleQuery::getActivated();
+
+            foreach ($modules as $module) {
+
+                $file = THELIA_MODULE_DIR . "/". ucfirst($module->getCode()) . "/ModuleAdmin/".$location.".html";
+                if(file_exists($file)) {
+                    $content .= file_get_contents($file);
+                }
+            }
+        }
+        return $template->fetch(sprintf("string:%s", $content));
     }
 
     /**

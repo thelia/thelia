@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -20,44 +20,53 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Command;
 
-/**
- * base class for module commands
- *
- * Class BaseModuleGenerate
- * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-abstract class BaseModuleGenerate extends ContainerAwareCommand
+namespace Thelia\Controller\Admin;
+
+use Thelia\Core\Security\AccessManager;
+use Thelia\Model\AdminLogQuery;
+
+class AdminLogsController extends BaseAdminController
 {
-     protected $module;
-     protected $moduleDirectory;
+    const RESOURCE_CODE = "admin.admin-logs";
 
-     protected $reservedKeyWords = array(
-         'thelia'
-     );
+    public function defaultAction()
+    {
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, AccessManager::VIEW)) return $response;
 
-     protected $neededDirectories = array(
-         'Config',
-         'Model',
-         'Loop',
-         'AdminModule'
-     );
+        // Render the edition template.
+        return $this->render('admin-logs');
+    }
 
-     protected function verifyExistingModule()
-     {
-         if (file_exists($this->moduleDirectory)) {
-             throw new \RuntimeException(sprintf("%s module already exists", $this->module));
-         }
-     }
+    public function loadLoggerAjaxAction()
+    {
+        $entries = array();
 
-     protected function formatModuleName($name)
-     {
-         if (in_array(strtolower($name), $this->reservedKeyWords)) {
-             throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
-         }
+        foreach( AdminLogQuery::getEntries(
+                    $this->getRequest()->request->get('admins', array()),
+                    $this->getRequest()->request->get('fromDate', null),
+                    $this->getRequest()->request->get('toDate', null),
+                    array_merge($this->getRequest()->request->get('resources', array()), $this->getRequest()->request->get('modules', array())),
+                    null
+                ) as $entry) {
 
-         return ucfirst($name);
-     }
+            $entries[] = array(
+                "head" => sprintf(
+                    "[%s][%s][%s:%s]",
+                    date('Y-m-d H:i:s', $entry->getCreatedAt()->getTimestamp()),
+                    $entry->getAdminLogin(),
+                    $entry->getResource(),
+                    $entry->getAction()
+                ),
+                "data" => $entry->getMessage(),
+            );
+        }
+
+        return $this->render(
+            'ajax/logger',
+            array(
+                'entries' => $entries,
+            )
+        );
+    }
 }

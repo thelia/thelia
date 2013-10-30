@@ -567,6 +567,7 @@ final class TheliaEvents
     const ADMINISTRATOR_CREATE                    = "action.createAdministrator";
     const ADMINISTRATOR_UPDATE                    = "action.updateAdministrator";
     const ADMINISTRATOR_DELETE                    = "action.deleteAdministrator";
+    const ADMINISTRATOR_UPDATEPASSWORD          = 'action.generatePassword';
 
     // -- Mailing System management ---------------------------------------------
 

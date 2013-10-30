@@ -15,6 +15,7 @@
 @import "bootstrap-select.less";
 @import "jqplot.less";
 @import "dropzone.less";
+@import "logger.less";
 
 // -- Base styling ------------------------------------------------------------
 
@@ -293,6 +294,14 @@
   line-height: 30px;
   padding-left: 40px;
   width: auto;
+}
+
+.loading-block{
+  background: url("@{imgDir}/ajax-loader.gif") no-repeat;
+  margin: auto;
+  height: 30px;
+  width: 30px;
+  display: none;
 }
 
 .modal-backdrop .loading {

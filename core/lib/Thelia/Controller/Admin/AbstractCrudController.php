@@ -303,7 +303,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             if (null !== $createdObject = $this->getObjectFromEvent($createEvent)) {
                 // Log object creation
-                $this->adminLogAppend(sprintf("%s %s (ID %s) created", ucfirst($this->objectName), $this->getObjectLabel($createdObject), $this->getObjectId($createdObject)));
+                $this->adminLogAppend($this->resourceCode, AccessManager::CREATE, sprintf("%s %s (ID %s) created", ucfirst($this->objectName), $this->getObjectLabel($createdObject), $this->getObjectId($createdObject)));
             }
 
             $response = $this->performAdditionalCreateAction($createEvent);
@@ -391,7 +391,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Log object modification
             if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
-                $this->adminLogAppend(sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+                $this->adminLogAppend($this->resourceCode, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
             }
 
             $response = $this->performAdditionalUpdateAction($changeEvent);
@@ -530,7 +530,8 @@ abstract class AbstractCrudController extends BaseAdminController
 
         if (null !== $deletedObject = $this->getObjectFromEvent($deleteEvent)) {
             $this->adminLogAppend(
-                    sprintf("%s %s (ID %s) deleted", ucfirst($this->objectName), $this->getObjectLabel($deletedObject), $this->getObjectId($deletedObject)));
+                $this->resourceCode, AccessManager::DELETE,
+                sprintf("%s %s (ID %s) deleted", ucfirst($this->objectName), $this->getObjectLabel($deletedObject), $this->getObjectId($deletedObject)));
         }
 
         $response = $this->performAdditionalDeleteAction($deleteEvent);
