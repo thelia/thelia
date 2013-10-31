@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -20,44 +20,41 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Command;
+
+namespace Thelia\Core\DependencyInjection\Compiler;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+
 
 /**
- * base class for module commands
- *
- * Class BaseModuleGenerate
- * @package Thelia\Command
+ * Class TranslatorPass
+ * @package Thelia\Core\DependencyInjection\Compiler
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-abstract class BaseModuleGenerate extends ContainerAwareCommand
+class TranslatorPass implements CompilerPassInterface
 {
-     protected $module;
-     protected $moduleDirectory;
 
-     protected $reservedKeyWords = array(
-         'thelia'
-     );
+    /**
+     * You can modify the container here before it is dumped to PHP code.
+     *
+     * @param ContainerBuilder $container
+     *
+     * @api
+     */
+    public function process(ContainerBuilder $container)
+    {
+        if (!$container->hasDefinition('thelia.translator')) {
+            return;
+        }
 
-     protected $neededDirectories = array(
-         'Config',
-         'Model',
-         'Loop',
-         'AdminIncludes'
-     );
+        $translator = $container->getDefinition('thelia.translator');
 
-     protected function verifyExistingModule()
-     {
-         if (file_exists($this->moduleDirectory)) {
-             throw new \RuntimeException(sprintf("%s module already exists", $this->module));
-         }
-     }
-
-     protected function formatModuleName($name)
-     {
-         if (in_array(strtolower($name), $this->reservedKeyWords)) {
-             throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
-         }
-
-         return ucfirst($name);
-     }
+        foreach($container->findTaggedServiceIds('translation.loader') as $id => $attributes) {
+            $translator->addMethodCall('addLoader', array($attributes[0]['alias'], new Reference($id)));
+            if (isset($attributes[0]['legacy-alias'])) {
+                $translator->addMethodCall('addLoader', array($attributes[0]['legacy-alias'], new Reference($id)));
+            }
+        }
+    }
 }

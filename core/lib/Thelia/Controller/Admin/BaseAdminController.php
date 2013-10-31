@@ -199,7 +199,7 @@ class BaseAdminController extends BaseController
         $parser = $this->container->get("thelia.parser");
 
         // Define the template thant shoud be used
-        $parser->setTemplate($template ?: ConfigQuery::read('base_admin_template', 'admin/default'));
+        $parser->setTemplate($template ?: ConfigQuery::read('base-admin-template', 'admin/default'));
 
         return $parser;
     }
