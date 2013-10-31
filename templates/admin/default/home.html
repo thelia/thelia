@@ -13,9 +13,9 @@
 				<div class="title title-without-tabs clearfix">
 					{intl l='Dashboard'}
                     <div class="btn-group pull-right">
-						<button type="button" class="btn btn-default js-stats-change-month" data-change="previous"><span class="glyphicon glyphicon-chevron-left"></span></button>
+						<button type="button" class="btn btn-default js-stats-change-month" data-month-offset="-1"><span class="glyphicon glyphicon-chevron-left"></span></button>
 						<button type="button" class="btn btn-default" disabled><span class="glyphicon glyphicon-calendar"></span></button>
-						<button type="button" class="btn btn-default js-stats-change-month" data-change="next"><span class="glyphicon glyphicon-chevron-right"></span></button>
+						<button type="button" class="btn btn-default js-stats-change-month" data-month-offset="+1"><span class="glyphicon glyphicon-chevron-right"></span></button>
 					</div>
 				</div>
 
@@ -264,6 +264,8 @@
 
 jQuery(function($){
 
+    var jQplotDate = new Date();
+    jQplotDate.setDate(1); // Set day to 1 so we can add month without 30/31 days of month troubles.
     var url = "{url path='/admin/home/stats'}";
     var jQplotData; // json data
     var jQPlotInstance; // global instance
@@ -306,13 +308,10 @@ jQuery(function($){
         }
     };
 
+    {literal}
+
     // Get initial data Json
-    $.getJSON(url)
-    .done(function(data) {
-        jQplotData = data;
-        jsonSuccessLoad();
-    })
-    .fail(jsonFailLoad);
+    retrieveJQPlotJson(jQplotDate.getMonth()+1, jQplotDate.getFullYear());
 
     $('[data-toggle="jqplot"]').click(function(){
 
@@ -323,21 +322,26 @@ jQuery(function($){
 
     $('.js-stats-change-month').click(function(e){
         $('.js-stats-change-month').attr('disabled', true);
+        jQplotDate.setMonth(parseInt(jQplotDate.getMonth()) + parseInt($(this).data('month-offset')));
+        retrieveJQPlotJson(jQplotDate.getMonth()+1, jQplotDate.getFullYear(), function(){$('.js-stats-change-month').attr('disabled', false);});
 
-        $('#jqplot');
-
-        {literal}
-        $.getJSON(url, {month: 9, year: 2010})
-        .done(function(data) {
-            jQplotData = data;
-            jsonSuccessLoad();
-        })
-        .fail(jsonFailLoad);
-        {/literal}
     });
 
+    function retrieveJQPlotJson(month, year, callback) {
+        console.log(month, year);
 
-    function initJqplotData(json){
+        $.getJSON(url, {month: month, year: year})
+            .done(function(data) {
+                jQplotData = data;
+                jsonSuccessLoad();
+                if(callback) {
+                    callback();
+                }
+            })
+            .fail(jsonFailLoad);
+    }
+
+    function initJqplotData(json) {
         var series = [];
         var seriesColors = [];
         $('[data-toggle="jqplot"].active').each(function(i){
@@ -390,6 +394,8 @@ jQuery(function($){
         });
 
     }
+
+    {/literal}
 
 });
 
