@@ -27,6 +27,8 @@ use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Tools\URL;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Model\Config;
+use Thelia\Model\ConfigQuery;
 
 /**
  * This class implements variour admin template utilities
@@ -40,6 +42,26 @@ class AdminUtilities extends AbstractSmartyPlugin
     public function __construct(SecurityContext $securityContext)
     {
         $this->securityContext = $securityContext;
+    }
+
+    protected function fetch_snippet($smarty, $templateName, $variablesArray) {
+
+        $data = '';
+
+        $snippet_path = sprintf('%s/%s/%s.html',
+                THELIA_TEMPLATE_DIR,
+                ConfigQuery::read('base-admin-template', 'admin/default'),
+                $templateName
+        );
+
+        if (false !== $snippet_content = file_get_contents($snippet_path)) {
+
+            $smarty->assign($variablesArray);
+
+            $data = $smarty->fetch(sprintf('string:%s', $snippet_content));
+        }
+
+        return $data;
     }
 
     public function generatePositionChangeBlock($params, &$smarty)
@@ -70,15 +92,15 @@ class AdminUtilities extends AbstractSmartyPlugin
         */
 
         if ($permissions == null || $this->securityContext->isGranted("ADMIN", array($resource), array($access))) {
-            return sprintf(
-                '<a href="%s"><i class="glyphicon glyphicon-arrow-up"></i></a><span class="%s" data-id="%s">%s</span><a href="%s"><i class="glyphicon glyphicon-arrow-down"></i></a>',
-                URL::getInstance()->absoluteUrl($path, array('mode' => 'up', $url_parameter => $id)),
-                $in_place_edit_class,
-                $id,
-                $position,
-                URL::getInstance()->absoluteUrl($path, array('mode' => 'down', $url_parameter => $id))
-            );
-        } else {
+
+            return $this->fetch_snippet($smarty, 'includes/admin-utilities-position-block', array(
+                    'admin_utilities_go_up_url'           => URL::getInstance()->absoluteUrl($path, array('mode' => 'up', $url_parameter => $id)),
+                    'admin_utilities_in_place_edit_class' => $in_place_edit_class,
+                    'admin_utilities_object_id'           => $id,
+                    'admin_utilities_current_position'    => $position,
+                    'admin_utilities_go_down_url'         => URL::getInstance()->absoluteUrl($path, array('mode' => 'down', $url_parameter => $id))
+            ));
+         } else {
             return $position;
         }
     }
@@ -111,21 +133,20 @@ class AdminUtilities extends AbstractSmartyPlugin
         $request_parameter_name = $this->getParam($params, 'request_parameter_name', 'order');
 
         if ($current_order == $order) {
-            $icon = 'up';
+            $sort_direction = 'up';
             $order_change = $reverse_order;
         } elseif ($current_order == $reverse_order) {
-            $icon = 'down';
+            $sort_direction = 'down';
             $order_change = $order;
         } else {
             $order_change = $order;
         }
 
-        if (! empty($icon))
-            $output = sprintf('<i class="glyphicon glyphicon-chevron-%s"></i> ', $icon);
-        else
-            $output = '';
-
-        return sprintf('%s<a href="%s">%s</a>', $output, URL::getInstance()->absoluteUrl($path, array($request_parameter_name => $order_change)), $label);
+        return $this->fetch_snippet($smarty, 'includes/admin-utilities-sortable-column-header', array(
+                'admin_utilities_sort_direction' => $sort_direction,
+                'admin_utilities_sorting_url'    => URL::getInstance()->absoluteUrl($path, array($request_parameter_name => $order_change)),
+                'admin_utilities_header_text'    => $label
+        ));
     }
 
     /**
