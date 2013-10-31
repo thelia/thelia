@@ -1,18 +1,28 @@
 <?php
 namespace Thelia\Core\Translation;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 
 class Translator extends BaseTranslator
 {
+    /**
+     * @var \Symfony\Component\DependencyInjection\ContainerInterface
+     */
+    protected $container;
 
     protected static $instance = null;
 
-    public function __construct()
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
     {
+        $this->container = $container;
         // Allow singleton style calls once intanciated.
         // For this to work, the Translator service has to be instanciated very early. This is done manually
         // in TheliaHttpKernel, by calling $this->container->get('thelia.translator');
+        parent::__construct(null);
         self::$instance = $this;
     }
 
@@ -26,6 +36,11 @@ class Translator extends BaseTranslator
     {
         if (self::$instance == null) throw new \RuntimeException("Translator instance is not initialized.");
         return self::$instance;
+    }
+
+    public function getLocale()
+    {
+        return $this->container->get('request')->getSession()->getLang()->getLocale();
     }
 
     /**

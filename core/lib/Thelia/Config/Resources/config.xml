@@ -211,7 +211,7 @@
 		<!--  Translation and internationalisation -->
 
 		<service id="thelia.translator" class="Thelia\Core\Translation\Translator">
-			<argument>null</argument>
+			<argument type="service" id="service_container"/>
 		</service>
 
 		<!-- Security context for front and back office -->
