@@ -32,7 +32,7 @@ echo -e "\n\033[01;34m[INFO] Installing fixtures\033[00m\n"
 php install/faker.php
 
 echo -e "\n\033[01;34m[INFO] Adding admin\033[00m\n"
-php Thelia thelia:create-admin --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2
+php Thelia admin:create --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2
 
 echo -e "\n\033[01;34m[INFO] Clearing caches\033[00m\n"
 php Thelia cache:clear

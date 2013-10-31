@@ -136,9 +136,9 @@ class FileController extends BaseAdminController
                     $this->container->get('thelia.translator')->trans(
                         'Saving images for %parentName% parent id %parentId% (%parentType%)',
                         array(
-                            '%parentName%' => $event->getParentName(),
-                            '%parentId%' => $event->getParentId(),
-                            '%parentType%' => $event->getImageType()
+                            '%parentName%' => $imageCreateOrUpdateEvent->getParentName(),
+                            '%parentId%' => $imageCreateOrUpdateEvent->getParentId(),
+                            '%parentType%' => $imageCreateOrUpdateEvent->getImageType()
                         ),
                         'image'
                     )
@@ -214,9 +214,9 @@ class FileController extends BaseAdminController
                     $this->container->get('thelia.translator')->trans(
                         'Saving documents for %parentName% parent id %parentId% (%parentType%)',
                         array(
-                            '%parentName%' => $event->getParentName(),
-                            '%parentId%' => $event->getParentId(),
-                            '%parentType%' => $event->getDocumentType()
+                            '%parentName%' => $documentCreateOrUpdateEvent->getParentName(),
+                            '%parentId%' => $documentCreateOrUpdateEvent->getParentId(),
+                            '%parentType%' => $documentCreateOrUpdateEvent->getDocumentType()
                         ),
                         'document'
                     )
@@ -549,8 +549,8 @@ class FileController extends BaseAdminController
                 $this->container->get('thelia.translator')->trans(
                     'Deleting image for %id% with parent id %parentId%',
                     array(
-                        '%id%' => $event->getDocumentToDelete()->getId(),
-                        '%parentId%' => $event->getDocumentToDelete()->getParentId(),
+                        '%id%' => $imageDeleteEvent->getImageToDelete()->getId(),
+                        '%parentId%' => $imageDeleteEvent->getImageToDelete()->getParentId(),
                     ),
                     'image'
                 )
@@ -562,8 +562,8 @@ class FileController extends BaseAdminController
                 $this->container->get('thelia.translator')->trans(
                     'Fail to delete image for %id% with parent id %parentId% (Exception : %e%)',
                     array(
-                        '%id%' => $event->getDocumentToDelete()->getId(),
-                        '%parentId%' => $event->getDocumentToDelete()->getParentId(),
+                        '%id%' => $imageDeleteEvent->getImageToDelete()->getId(),
+                        '%parentId%' => $imageDeleteEvent->getImageToDelete()->getParentId(),
                         '%e%' => $e->getMessage()
                     ),
                     'image'
@@ -621,8 +621,8 @@ class FileController extends BaseAdminController
                 $this->container->get('thelia.translator')->trans(
                     'Deleting document for %id% with parent id %parentId%',
                     array(
-                        '%id%' => $event->getDocumentToDelete()->getId(),
-                        '%parentId%' => $event->getDocumentToDelete()->getParentId(),
+                        '%id%' => $documentDeleteEvent->getDocumentToDelete()->getId(),
+                        '%parentId%' => $documentDeleteEvent->getDocumentToDelete()->getParentId(),
                     ),
                     'document'
                 )
@@ -634,8 +634,8 @@ class FileController extends BaseAdminController
                 $this->container->get('thelia.translator')->trans(
                     'Fail to delete document for %id% with parent id %parentId% (Exception : %e%)',
                     array(
-                        '%id%' => $event->getDocumentToDelete()->getId(),
-                        '%parentId%' => $event->getDocumentToDelete()->getParentId(),
+                        '%id%' => $documentDeleteEvent->getDocumentToDelete()->getId(),
+                        '%parentId%' => $documentDeleteEvent->getDocumentToDelete()->getParentId(),
                         '%e%' => $e->getMessage()
                     ),
                     'document'

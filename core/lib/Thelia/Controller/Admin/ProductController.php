@@ -64,6 +64,8 @@ use Thelia\Model\Country;
 use Thelia\Tools\NumberFormat;
 use Thelia\Model\Product;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Form\ProductCombinationGenerationForm;
+use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
 
 /**
  * Manages products
@@ -1023,6 +1025,108 @@ class ProductController extends AbstractCrudController
         return $this->processProductSaleElementUpdate(
                 new ProductDefaultSaleElementUpdateForm($this->getRequest())
         );
+    }
+
+    // Create combinations
+    protected function combine($input, &$output, &$tmp) {
+        $current = array_shift($input);
+
+        if (count($input) > 0) {
+            foreach($current as $element) {
+                $tmp[] = $element;
+                $this->combine($input, $output, $tmp);
+                array_pop($tmp);
+            }
+        } else {
+            foreach($current as $element) {
+                $tmp[] = $element;
+                $output[] = $tmp;
+                array_pop($tmp);
+            }
+        }
+    }
+
+    /**
+     * Build combinations from the combination output builder
+     */
+    public function buildCombinationsAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+
+        $error_msg = false;
+
+        $changeForm = new ProductCombinationGenerationForm($this->getRequest());
+
+        try {
+
+            // Check the form against constraints violations
+            $form = $this->validateForm($changeForm, "POST");
+
+            // Get the form field values
+            $data = $form->getData();
+
+            // Rework attributes_av array, to build an array which contains all combinations,
+            // in the form combination[] = array of combination attributes av IDs
+            //
+            // First, create an array of attributes_av ID in the form $attributes_av_list[$attribute_id] = array of attributes_av ID
+            // from the list of attribute_id:attributes_av ID from the form.
+            $combinations = $attributes_av_list = array();
+
+            foreach($data['attribute_av'] as $item) {
+                list($attribute_id, $attribute_av_id) = explode(':', $item);
+
+                if (! isset($attributes_av_list[$attribute_id]))
+                    $attributes_av_list[$attribute_id] = array();
+
+
+                $attributes_av_list[$attribute_id][] = $attribute_av_id;
+            }
+
+            // Next, recursively combine array
+            $combinations = $tmp = array();
+
+            $this->combine($attributes_av_list, $combinations, $tmp);
+
+            // Create event
+            $event = new ProductCombinationGenerationEvent(
+                    $this->getExistingObject(),
+                    $data['currency'],
+                    $combinations
+            );
+
+            $event
+                ->setReference($data['reference'] == null ? '' : $data['reference'])
+                ->setPrice($data['price'] == null ? 0 : $data['price'])
+                ->setWeight($data['weight'] == null ? 0 : $data['weight'])
+                ->setQuantity($data['quantity'] == null ? 0 : $data['quantity'])
+                ->setSalePrice($data['sale_price'] == null ? 0 : $data['sale_price'])
+                ->setOnsale($data['onsale'] == null ? false : $data['onsale'])
+                ->setIsnew($data['isnew'] == null ? false : $data['isnew'])
+                ->setEanCode($data['ean_code'] == null ? '' : $data['ean_code'])
+            ;
+
+            $this->dispatch(TheliaEvents::PRODUCT_COMBINATION_GENERATION, $event);
+
+            // Log object modification
+            $this->adminLogAppend(sprintf("Combination generation for product reference %s", $event->getProduct()->getRef()));
+
+           // Redirect to the success URL
+           $this->redirect($changeForm->getSuccessUrl());
+
+        } catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext(
+                $this->getTranslator()->trans("Combination builder"), $error_msg, $changeForm, $ex);
+
+        // At this point, the form has errors, and should be redisplayed.
+        return $this->renderEditionTemplate();
     }
 
     /**

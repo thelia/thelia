@@ -90,6 +90,8 @@
 
         <form name="thelia.admin.product_sale_element.update" class="Thelia\Form\ProductSaleElementUpdateForm"/>
         <form name="thelia.admin.product_default_sale_element.update" class="Thelia\Form\ProductDefaultSaleElementUpdateForm"/>
+        <form name="thelia.admin.product_combination.build" class="Thelia\Form\ProductCombinationGenerationForm"/>
+
 
         <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>
 
@@ -182,6 +184,7 @@
         <command class="Thelia\Command\CreateAdminUser"/>
         <command class="Thelia\Command\ReloadDatabaseCommand"/>
         <command class="Thelia\Command\GenerateResources"/>
+        <command class="Thelia\Command\AdminUpdatePasswordCommand"/>
     </commands>
 
     <services>
@@ -208,7 +211,7 @@
 		<!--  Translation and internationalisation -->
 
 		<service id="thelia.translator" class="Thelia\Core\Translation\Translator">
-			<argument type="string" id="en_UK"></argument>
+			<argument>null</argument>
 		</service>
 
 		<!-- Security context for front and back office -->

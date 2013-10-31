@@ -128,14 +128,17 @@ class AttributeAvailability extends BaseI18nLoop
 
         foreach ($attributesAv as $attributeAv) {
             $loopResultRow = new LoopResultRow($loopResult, $attributeAv, $this->versionable, $this->timestampable, $this->countable);
-            $loopResultRow->set("ID", $attributeAv->getId())
-                ->set("IS_TRANSLATED",$attributeAv->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
-                ->set("TITLE",$attributeAv->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $attributeAv->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("POSITION", $attributeAv->getPosition());
+            $loopResultRow
+                ->set("ID"           , $attributeAv->getId())
+                ->set("ATTRIBUTE_ID" , $attributeAv->getAttributeId())
+                ->set("IS_TRANSLATED", $attributeAv->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE"       , $locale)
+                ->set("TITLE"        , $attributeAv->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO"        , $attributeAv->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION"  , $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM" , $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("POSITION"     , $attributeAv->getPosition())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

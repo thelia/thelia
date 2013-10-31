@@ -336,9 +336,16 @@
     }
 }
 
+.existing-document {
+
+    .loading{
+        margin: 0;
+    }
+}
+
 // -- Drag & drop --
 .take{
-    
+
     .draggable{
         border: 2px dashed @gray-light;
         margin-bottom: 10px;
@@ -346,9 +353,9 @@
 
         &:last-child{
             margin-bottom: 0;
-        }       
+        }
     }
-    
+
     .over{
         .drop-message{
             border-color: @brand-primary;
@@ -358,8 +365,8 @@
 
 }
 
-.place{    
-    
+.place{
+
     .over{
         .drop-message{
             border-color: @brand-primary;
@@ -368,10 +375,10 @@
     }
 
     .panel-body{
-        
+
         .draggable, .drag{
             margin: 5px 0;
-            padding: 10px;            
+            padding: 10px;
             border: 1px dashed @gray-light;
         }
 
@@ -390,7 +397,7 @@
 }
 
 .take, .place{
-    
+
     .drop-message{
         width: 50%;
         margin: 10px auto;
@@ -410,4 +417,11 @@
     .ui-draggable-dragging{
         z-index: 100;
     }
+}
+
+// -- File Upoload drop zone ---------------------------------------------------
+
+.dropzone {
+    border: 1px dashed #ddd;
+    padding: 20px;
 }

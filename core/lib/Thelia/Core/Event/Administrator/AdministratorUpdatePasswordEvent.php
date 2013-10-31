@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -21,54 +21,65 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Smarty\Plugins;
+namespace Thelia\Core\Event\Administrator;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Admin;
 
-use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
-use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
-use Thelia\Model\ModuleQuery;
 
-class Module extends AbstractSmartyPlugin
+/**
+ * Class AdministratorUpdatePasswordEvent
+ * @package Thelia\Core\Event\Administrator
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+class AdministratorUpdatePasswordEvent extends ActionEvent
 {
+
     /**
-     * Process theliaModule template inclusion function
-     *
-     * @param  unknown $params
-     * @param \Smarty_Internal_Template $template
-     * @internal param \Thelia\Core\Template\Smarty\Plugins\unknown $smarty
-     *
+     * @var \Thelia\Model\Admin
+     */
+    protected $admin;
+
+    /**
+     * @var string new administrator password
+     */
+    protected $password;
+
+    public function __construct(Admin $admin)
+    {
+        $this->admin = $admin;
+    }
+
+    /**
+     * @param string $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    /**
      * @return string
      */
-    public function theliaModule($params, \Smarty_Internal_Template $template)
+    public function getPassword()
     {
-        $content = null;
-        if (array_key_exists('location', $params)) {
-            $location = $params['location'];
-            $modules = ModuleQuery::getActivated();
-
-            foreach ($modules as $module) {
-
-                $file = THELIA_MODULE_DIR . "/". ucfirst($module->getCode()) . "/ModuleAdmin/".$location.".html";
-                if(file_exists($file)) {
-                    $content .= file_get_contents($file);
-                }
-            }
-        }
-
-        if (! empty($content))
-            return $template->fetch(sprintf("string:%s", $content));
-
-        return "";
+        return $this->password;
     }
 
     /**
-     * Define the various smarty plugins hendled by this class
-     *
-     * @return an array of smarty plugin descriptors
+     * @param \Thelia\Model\Admin $admin
      */
-    public function getPluginDescriptors()
+    public function setAdmin(Admin $admin)
     {
-        return array(
-            new SmartyPluginDescriptor('function', 'module_include', $this, 'theliaModule'),
-        );
+        $this->admin = $admin;
     }
+
+    /**
+     * @return \Thelia\Model\Admin
+     */
+    public function getAdmin()
+    {
+        return $this->admin;
+    }
+
 }
+

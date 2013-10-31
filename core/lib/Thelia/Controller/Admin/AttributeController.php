@@ -157,23 +157,6 @@ class AttributeController extends AbstractCrudController
             'postscriptum' => $object->getPostscriptum()
         );
 
-        // Setup attributes values
-        /*
-         * FIXME : doesn't work. "We get a This form should not contain extra fields." error
-        $attr_av_list = AttributeAvQuery::create()
-                    ->joinWithI18n($this->getCurrentEditionLocale())
-                    ->filterByAttributeId($object->getId())
-                    ->find();
-
-        $attr_array = array();
-
-        foreach ($attr_av_list as $attr_av) {
-            $attr_array[$attr_av->getId()] = $attr_av->getTitle();
-        }
-
-        $data['attribute_values'] = $attr_array;
-        */
-
         // Setup the object form
         return new AttributeModificationForm($this->getRequest(), "form", $data);
     }

@@ -29,6 +29,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Tools\DateTimeFormat;
 
 /**
  *
@@ -90,15 +91,15 @@ class Feed extends BaseLoop
             $author = $item->get_author();
             $description = $item->get_description();
 
-            $date = $item->get_date('d/m/Y');
-
             $loopResultRow = new LoopResultRow($loopResult, null, $this->versionable, $this->timestampable, $this->countable);
 
-            $loopResultRow->set("URL", $item->get_permalink());
-            $loopResultRow->set("TITLE", $item->get_title());
-            $loopResultRow->set("AUTHOR", $item->get_author());
-            $loopResultRow->set("DESCRIPTION", $item->get_description());
-            $loopResultRow->set("DATE", $item->get_date('d/m/Y')); // FIXME - date format should be an intl parameter
+            $loopResultRow
+                ->set("URL"         , $item->get_permalink())
+                ->set("TITLE"       , $item->get_title())
+                ->set("AUTHOR"      , $item->get_author())
+                ->set("DESCRIPTION" , $item->get_description())
+                ->set("DATE"        , $item->get_date('U')) // FIXME - date format should be an intl parameter
+            ;
 
             $loopResult->addRow($loopResultRow);
         }
