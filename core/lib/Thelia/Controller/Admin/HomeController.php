@@ -43,46 +43,46 @@ class HomeController extends BaseAdminController
     {
         $data = new \stdClass();
 
-        $data->title = "Stats on " . $this->getRequest()->request->get('month', date('m')) . "/" . $this->getRequest()->request->get('month', date('Y'));
+        $data->title = "Stats on " . $this->getRequest()->query->get('month', date('m')) . "/" . $this->getRequest()->query->get('year', date('Y'));
 
         /* sales */
         $saleSeries = new \stdClass();
-        $saleSeries->color = $this->getRequest()->request->get('sales_color', '#adadad');
+        $saleSeries->color = $this->getRequest()->query->get('sales_color', '#adadad');
         $saleSeries->data = OrderQuery::getSaleStats(
-            $this->getRequest()->request->get('month', date('m')),
-            $this->getRequest()->request->get('year', date('Y'))
+            $this->getRequest()->query->get('month', date('m')),
+            $this->getRequest()->query->get('year', date('Y'))
         );
 
         /* new customers */
         $newCustomerSeries = new \stdClass();
-        $newCustomerSeries->color = $this->getRequest()->request->get('customers_color', '#f39922');
+        $newCustomerSeries->color = $this->getRequest()->query->get('customers_color', '#f39922');
         $newCustomerSeries->data = CustomerQuery::getNewCustomersStats(
-            $this->getRequest()->request->get('month', date('m')),
-            $this->getRequest()->request->get('year', date('Y'))
+            $this->getRequest()->query->get('month', date('m')),
+            $this->getRequest()->query->get('year', date('Y'))
         );
 
         /* orders */
         $orderSeries = new \stdClass();
-        $orderSeries->color = $this->getRequest()->request->get('orders_color', '#5cb85c');
+        $orderSeries->color = $this->getRequest()->query->get('orders_color', '#5cb85c');
         $orderSeries->data = OrderQuery::getOrdersStats(
-            $this->getRequest()->request->get('month', date('m')),
-            $this->getRequest()->request->get('year', date('Y'))
+            $this->getRequest()->query->get('month', date('m')),
+            $this->getRequest()->query->get('year', date('Y'))
         );
 
         /* first order */
         $firstOrderSeries = new \stdClass();
-        $firstOrderSeries->color = $this->getRequest()->request->get('first_orders_color', '#5bc0de');
+        $firstOrderSeries->color = $this->getRequest()->query->get('first_orders_color', '#5bc0de');
         $firstOrderSeries->data = OrderQuery::getFirstOrdersStats(
-            $this->getRequest()->request->get('month', date('m')),
-            $this->getRequest()->request->get('year', date('Y'))
+            $this->getRequest()->query->get('month', date('m')),
+            $this->getRequest()->query->get('year', date('Y'))
         );
 
         /* cancelled orders */
         $cancelledOrderSeries = new \stdClass();
-        $cancelledOrderSeries->color = $this->getRequest()->request->get('cancelled_orders_color', '#d9534f');
+        $cancelledOrderSeries->color = $this->getRequest()->query->get('cancelled_orders_color', '#d9534f');
         $cancelledOrderSeries->data = OrderQuery::getOrdersStats(
-            $this->getRequest()->request->get('month', date('m')),
-            $this->getRequest()->request->get('year', date('Y')),
+            $this->getRequest()->query->get('month', date('m')),
+            $this->getRequest()->query->get('year', date('Y')),
             array(5)
         );
 
