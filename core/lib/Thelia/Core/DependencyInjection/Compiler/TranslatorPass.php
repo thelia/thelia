@@ -24,6 +24,7 @@
 namespace Thelia\Core\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 
 /**
@@ -49,8 +50,11 @@ class TranslatorPass implements CompilerPassInterface
 
         $translator = $container->getDefinition('thelia.translator');
 
-        foreach($container->findTaggedServiceIds('translator.loader') as $id => $attributes) {
-
+        foreach($container->findTaggedServiceIds('translation.loader') as $id => $attributes) {
+            $translator->addMethodCall('addLoader', array($attributes[0]['alias'], new Reference($id)));
+            if (isset($attributes[0]['legacy-alias'])) {
+                $translator->addMethodCall('addLoader', array($attributes[0]['legacy-alias'], new Reference($id)));
+            }
         }
     }
 }
