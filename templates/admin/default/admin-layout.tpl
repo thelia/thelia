@@ -26,8 +26,6 @@
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 
-    {debugbar_rendercss}
-
     {block name="after-bootstrap-css"}{/block}
 
     {* -- Admin CSS section ------------------------------------------------- *}
@@ -244,11 +242,6 @@
             {/javascripts}
         }
     </script>
-
-
-
-    {debugbar_renderjs}
-    {debugbar_renderresult}
 
 	{block name="after-javascript-include"}{/block}
 

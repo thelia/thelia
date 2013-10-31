@@ -8,6 +8,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('session_config.default', '1', 1, 1, NOW(), NOW()),
 ('verifyStock', '1', 0, 0, NOW(), NOW()),
 ('active-template', 'default', 0, 0, NOW(), NOW()),
+('base-admin-template', 'admin/default', 0, 0, NOW(), NOW()),
 ('default_lang_without_translation', '1', 1, 1, NOW(), NOW()),
 ('rewriting_enable', '0', 0, 0, NOW(), NOW()),
 ('imagine_graphic_driver', 'gd', 0, 0, NOW(), NOW()),
