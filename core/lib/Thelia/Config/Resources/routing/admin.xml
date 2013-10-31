@@ -504,6 +504,16 @@
         <default key="_controller">Thelia\Controller\Admin\ConfigController::deleteAction</default>
     </route>
 
+    <!--  Routes to the SystemLog controller -->
+
+    <route id="admin.configuration.system-logs.default" path="/admin/configuration/system-logs">
+        <default key="_controller">Thelia\Controller\Admin\SystemLogController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.system-logs.save" path="/admin/configuration/system-logs/save">
+        <default key="_controller">Thelia\Controller\Admin\SystemLogController::saveAction</default>
+    </route>
+
     <!-- Routes to the Messages controller -->
 
     <route id="admin.configuration.messages.default" path="/admin/configuration/messages">
