@@ -42,7 +42,7 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
          'Config',
          'Model',
          'Loop',
-         'AdminModule'
+         'AdminIncludes'
      );
 
      protected function verifyExistingModule()
