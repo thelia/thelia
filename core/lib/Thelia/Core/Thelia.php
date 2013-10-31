@@ -35,6 +35,7 @@ namespace Thelia\Core;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -110,9 +111,15 @@ class Thelia extends Kernel
     {
 
         $loader = new XmlFileLoader($container, new FileLocator(THELIA_ROOT . "/core/lib/Thelia/Config/Resources"));
-        $loader->load("config.xml");
-        $loader->load("routing.xml");
-        $loader->load("action.xml");
+        $finder = Finder::create()
+            ->name('*.xml')
+            ->depth(0)
+            ->in(THELIA_ROOT . "/core/lib/Thelia/Config/Resources");
+
+        foreach($finder as $file) {
+            $loader->load($file->getBaseName());
+        }
+
         if (defined("THELIA_INSTALL_MODE") === false) {
             $modules = \Thelia\Model\ModuleQuery::getActivated();
 
