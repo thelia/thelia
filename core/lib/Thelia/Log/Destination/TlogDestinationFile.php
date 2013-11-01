@@ -37,32 +37,52 @@ class TlogDestinationFile extends AbstractTlogDestination
     const VAR_MODE = "tlog_destinationfile_mode";
     const VALEUR_MODE_DEFAULT = "A";
 
+    const VAR_MAX_FILE_SIZE_KB = "tlog_destinationfile_max_file_size";
+    const MAX_FILE_SIZE_KB_DEFAULT = 1024; // 1 Mb
+
     protected $path_defaut = false;
     protected $fh = false;
 
     public function __construct()
     {
-            $this->path_defaut = THELIA_ROOT . "log" . DS . self::TLOG_DEFAULT_NAME;
-            parent::__construct();
+        $this->path_defaut = THELIA_ROOT . "log" . DS . self::TLOG_DEFAULT_NAME;
+        parent::__construct();
     }
 
     public function configure()
     {
         $file_path = $this->getConfig(self::VAR_PATH_FILE);
-        $mode = strtolower($this->getConfig(self::VAR_MODE)) == 'a' ? 'a' : 'w';
+        $mode = strtolower($this->getConfig(self::VAR_MODE, self::VALEUR_MODE_DEFAULT)) == 'a' ? 'a' : 'w';
 
         if (! empty($file_path)) {
             if (! is_file($file_path)) {
-                    $dir = dirname($file_path);
-                    if (! is_dir($dir)) {
-                            mkdir($dir, 0777, true);
-                    }
+                $dir = dirname($file_path);
+                if (! is_dir($dir)) {
+                    mkdir($dir, 0777, true);
+                }
 
-                    touch($file_path);
-                    chmod($file_path, 0777);
+                touch($file_path);
+                chmod($file_path, 0666);
             }
 
             if ($this->fh) @fclose($this->fh);
+
+            if (filesize($file_path) > 1024 * $this->getConfig(self::VAR_MAX_FILE_SIZE_KB, self::MAX_FILE_SIZE_KB_DEFAULT)) {
+
+                $idx = 1;
+
+                do {
+                    $file_path_bk = "$file_path.$idx";
+
+                    $idx++;
+
+                } while (file_exists($file_path_bk));
+
+                rename($file_path, $file_path_bk);
+
+                touch($file_path);
+                chmod($file_path, 0666);
+            }
 
             $this->fh = fopen($file_path, $mode);
         }
@@ -93,6 +113,13 @@ class TlogDestinationFile extends AbstractTlogDestination
                 'File opening mode (A or E)',
                 'Enter E to empty this file for each request, or A to always append logs. Consider resetting the file from time to time',
                 self::VALEUR_MODE_DEFAULT,
+                TlogDestinationConfig::TYPE_TEXTFIELD
+            ),
+            new TlogDestinationConfig(
+                self::VAR_MAX_FILE_SIZE_KB,
+                'Maximum log file size, in Kb',
+                'When this size if exeeded, a backup copy of the file is made, and a new log file is opened. As the file size check is performed only at the beginning of a request, the file size may be bigger thant this limit. Note: 1 Mb = 1024 Kb',
+                self::MAX_FILE_SIZE_KB_DEFAULT,
                 TlogDestinationConfig::TYPE_TEXTFIELD
             )
         );

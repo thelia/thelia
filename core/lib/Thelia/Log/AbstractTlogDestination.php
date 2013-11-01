@@ -60,7 +60,7 @@ abstract class AbstractTlogDestination
     }
 
     //Récupère la valeur affectée à une configuration de la destination
-    public function getConfig($name)
+    public function getConfig($name, $default = false)
     {
         foreach ($this->_configs as $config) {
             if ($config->getName() == $name) {
@@ -68,7 +68,7 @@ abstract class AbstractTlogDestination
             }
         }
 
-        return false;
+        return $default;
     }
 
     public function getConfigs()
