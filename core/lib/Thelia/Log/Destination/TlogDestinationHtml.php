@@ -24,6 +24,7 @@
 namespace Thelia\Log\Destination;
 
 use Thelia\Log\AbstractTlogDestination;
+use Thelia\Log\TlogDestinationConfig;
 
 class TlogDestinationHtml extends AbstractTlogDestination
 {
@@ -46,12 +47,12 @@ class TlogDestinationHtml extends AbstractTlogDestination
 
     public function getTitle()
     {
-        return "Affichage direct dans la page, en HTML";
+        return "Direct HTML display";
     }
 
     public function getDescription()
     {
-            return "Permet d'afficher les logs directement dans la page resultat, avec une mise en forme HTML.";
+            return "Display logs in HTML format, on top of generated pages.";
     }
 
     public function getConfigs()
@@ -59,8 +60,8 @@ class TlogDestinationHtml extends AbstractTlogDestination
         return array(
             new TlogDestinationConfig(
                 self::VAR_STYLE,
-                "Style d'affichage direct dans la page",
-                "Vous pouvez aussi laisser ce champ vide, et créer un style \"tlog-trace\" dans votre feuille de style.",
+                "CSS of each log line",
+                "You may also leave this field empty, and define a \"tlog-trace\" style in your CSS.",
                 self::VALEUR_STYLE_DEFAUT,
                 TlogDestinationConfig::TYPE_TEXTAREA
             )
@@ -71,6 +72,6 @@ class TlogDestinationHtml extends AbstractTlogDestination
     {
         $block = sprintf('<pre class="tlog-trace" style="%s">%s</pre>', $this->style, htmlspecialchars(implode("\n", $this->_logs)));
 
-        $this->InsertAfterBody($res, $block);
+        $this->insertAfterBody($res, $block);
     }
 }

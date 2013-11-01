@@ -25,6 +25,7 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints;
 use Thelia\Model\ConfigQuery;
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Core\Translation\Translator;
 
 class ConfigCreationForm extends BaseForm
 {
@@ -41,7 +42,7 @@ class ConfigCreationForm extends BaseForm
         $this->formBuilder
             ->add("name", "text", array(
                 "constraints" => $name_constraints,
-                "label" => "Name *",
+                "label" => Translator::getInstance()->trans('Name *'),
                 "label_attr" => array(
                     "for" => "name"
                 )
@@ -50,7 +51,7 @@ class ConfigCreationForm extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "Purpose *",
+                "label" => Translator::getInstance()->trans('Purpose *'),
                 "label_attr" => array(
                     "for" => "purpose"
                 )
@@ -61,14 +62,14 @@ class ConfigCreationForm extends BaseForm
                 )
             ))
             ->add("value", "text", array(
-                "label" => "Value *",
+                "label" => Translator::getInstance()->trans('Value *'),
                 "label_attr" => array(
                     "for" => "value"
                 )
             ))
             ->add("hidden", "hidden", array())
             ->add("secured", "hidden", array(
-                "label" => "Prevent variable modification or deletion, except for super-admin"
+                "label" => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin')
             ))
         ;
     }
@@ -83,7 +84,7 @@ class ConfigCreationForm extends BaseForm
         $config = ConfigQuery::create()->findOneByName($value);
 
         if ($config) {
-            $context->addViolation(sprintf("A variable with name \"%s\" already exists.", $value));
+            $context->addViolation(Translator::getInstance()->trans('A variable with name "%name" already exists.', array('%name' => $value)));
         }
     }
 

@@ -253,7 +253,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Render the object list, ensuring the sort order is set.
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     protected function renderList()
     {
@@ -263,7 +263,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * The default action is displaying the list.
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     public function defaultAction()
     {
@@ -274,7 +274,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Create a new object
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     public function createAction()
     {
@@ -335,7 +335,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Load a object for modification, and display the edit template.
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     public function updateAction()
     {
@@ -361,7 +361,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Save changes on a modified object, and either go back to the object list, or stay on the edition page.
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     public function processUpdateAction()
     {
@@ -516,7 +516,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Delete an object
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     public function deleteAction()
     {

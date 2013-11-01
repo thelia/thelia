@@ -24,6 +24,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Thelia\Core\Translation\Translator;
 
 class MessageModificationForm extends BaseForm
 {
@@ -33,37 +34,37 @@ class MessageModificationForm extends BaseForm
             ->add("id"           , "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
             ->add("name"         , "text"  , array(
                 "constraints" => array(new NotBlank()),
-                "label" => "Name *",
+                "label" => Translator::getInstance()->trans('Name *'),
                 "label_attr" => array(
                     "for" => "name"
                 )
             ))
             ->add("secured"      , "text"  , array(
-                "label" => "Prevent mailing template modification or deletion, except for super-admin"
+                "label" => Translator::getInstance()->trans('Prevent mailing template modification or deletion, except for super-admin')
             ))
             ->add("locale"       , "text"  , array())
             ->add("title"        , "text"  , array(
                 "constraints" => array(new NotBlank()),
-                "label" => "Title *",
+                "label" => Translator::getInstance()->trans('Title *'),
                 "label_attr" => array(
                     "for" => "title"
                 )
             ))
             ->add("subject"      , "text"  , array(
                 "constraints" => array(new NotBlank()),
-                "label" => "Message subject *",
+                "label" => Translator::getInstance()->trans('Message subject *'),
                 "label_attr" => array(
                     "for" => "subject"
                 )
             ))
             ->add("html_message" , "text"  , array(
-                "label" => "HTML Message",
+                "label" => Translator::getInstance()->trans('HTML Message'),
                 "label_attr" => array(
                     "for" => "html_message"
                 )
             ))
             ->add("text_message" , "text"  , array(
-                "label" => "Text Message",
+                "label" => Translator::getInstance()->trans('Text Message'),
                 "label_attr" => array(
                     "for" => "text_message"
                 )

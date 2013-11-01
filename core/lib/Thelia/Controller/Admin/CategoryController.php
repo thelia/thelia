@@ -23,7 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -320,7 +320,7 @@ class CategoryController extends AbstractCrudController
     /**
      * Add category pictures
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     public function addRelatedPictureAction()
     {

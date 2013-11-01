@@ -55,7 +55,7 @@ class ShippingZoneController extends BaseAdminController
     }
 
     /**
-     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
     public function addArea()
     {

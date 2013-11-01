@@ -20,35 +20,29 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Core\HttpFoundation;
 
-namespace Thelia\Log\Destination;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
+use Thelia\Log\Tlog;
 
-use Thelia\Log\AbstractTlogDestination;
-
-class TlogDestinationText extends AbstractTlogDestination
+/**
+ * extends Thelia\Core\HttpFoundation\Response for adding some helpers
+ *
+ * Class Response
+ * @package Thelia\Core\HttpFoundation
+ * @author Franck Allimant <franck@cqfdev.fr>
+ */
+class Response extends BaseResponse
 {
-    public function __construct()
-    {
-            parent::__construct();
-    }
+    /**
+     * Allow Tlog to write log stuff in the fina content.
+     *
+     * @see \Thelia\Core\HttpFoundation\Response::sendContent()
+     */
+    public function sendContent() {
 
-    public function getTitle()
-    {
-            return "Direct text display";
-    }
+        Tlog::getInstance()->write($this->content);
 
-    public function getDescription()
-    {
-            return "Display logs in raw text format, on top of generated pages.";
-    }
-
-    public function add($texte)
-    {
-            echo trim($texte)."\n";
-    }
-
-    public function write(&$res)
-    {
-                    // Rien
+        parent::sendContent();
     }
 }

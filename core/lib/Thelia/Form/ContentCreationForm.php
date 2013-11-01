@@ -34,7 +34,7 @@ class ContentCreationForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "Content title *",
+                "label" => Translator::getInstance()->trans('Content title *'),
                 "label_attr" => array(
                     "for" => "title"
                 )

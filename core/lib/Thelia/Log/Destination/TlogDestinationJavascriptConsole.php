@@ -1,11 +1,11 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia	                                                            		 */
 /*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
-/*      web : http://www.thelia.net                                                  */
+/*      Copyright (c) OpenStudio		                                             */
+/*		email : thelia@openstudio.fr		        	                          	 */
+/*      web : http://www.openstudio.fr						   						 */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
 /*      it under the terms of the GNU General Public License as published by         */
@@ -17,7 +17,7 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*	    along with this program.  If not, see <http://www.gnu.org/licenses/>.		 */
 /*                                                                                   */
 /*************************************************************************************/
 
@@ -25,30 +25,27 @@ namespace Thelia\Log\Destination;
 
 use Thelia\Log\AbstractTlogDestination;
 
-class TlogDestinationText extends AbstractTlogDestination
-{
-    public function __construct()
-    {
-            parent::__construct();
-    }
+class TlogDestinationJavascriptConsole extends AbstractTlogDestination {
 
-    public function getTitle()
-    {
-            return "Direct text display";
-    }
+	public function getTitle() {
+		return "Browser's Javascript console";
+	}
 
-    public function getDescription()
-    {
-            return "Display logs in raw text format, on top of generated pages.";
-    }
+	public function getDescription() {
+		return "The Thelia logs are displayed in your browser's Javascript console.";
+	}
 
-    public function add($texte)
-    {
-            echo trim($texte)."\n";
-    }
+    public function write(&$res) {
 
-    public function write(&$res)
-    {
-                    // Rien
-    }
+		$content = '<script>try {'."\n";
+
+		foreach($this->_logs as $line) {
+			$content .= "console.log('".str_replace("'", "\\'", str_replace(array("\r\n", "\r", "\n"), '\\n', $line))."');\n";
+		}
+
+		$content .= '} catch(ex) { alert("Les logs Thelia ne peuvent être affichés dans la console javascript:" + ex); }</script>'."\n";
+
+		if (preg_match("|</body>|i", $res))
+			$res = preg_replace("|</body>|i", "$content</html>", $res);
+   }
 }

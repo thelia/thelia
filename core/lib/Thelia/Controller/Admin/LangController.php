@@ -117,7 +117,7 @@ class LangController extends BaseAdminController
 
             $changedObject = $event->getLang();
             $this->adminLogAppend(AdminResources::LANGUAGE, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
-            $this->redirectToRoute('/admin/configuration/languages');
+            $this->redirectToRoute('admin.configuration.languages');
         } catch (\Exception $e) {
             $error_msg = $e->getMessage();
         }

@@ -25,6 +25,7 @@ namespace Thelia\Log\Destination;
 
 use Thelia\Log\AbstractTlogDestination;
 use Thelia\Log\TlogDestinationConfig;
+use Thelia\Core\Translation\Translator;
 
 class TlogDestinationFile extends AbstractTlogDestination
 {
@@ -41,7 +42,7 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     public function __construct()
     {
-            $this->path_defaut = THELIA_ROOT . "log/" . self::TLOG_DEFAULT_NAME;
+            $this->path_defaut = THELIA_ROOT . "log" . DS . self::TLOG_DEFAULT_NAME;
             parent::__construct();
     }
 
@@ -69,12 +70,12 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     public function getTitle()
     {
-            return "Text File";
+            return Translator::getInstance()->trans('Text File');
     }
 
     public function getDescription()
     {
-            return "Store logs into text file";
+            return Translator::getInstance()->trans('Store logs into text file');
     }
 
     public function getConfigs()
@@ -82,15 +83,15 @@ class TlogDestinationFile extends AbstractTlogDestination
         return array(
             new TlogDestinationConfig(
                 self::VAR_PATH_FILE,
-                "Chemin du fichier",
-                "Attention, vous devez indiquer un chemin absolu.<br />Le répertoire de base de votre Thelia est ".dirname(getcwd()),
+                'Absolute file path',
+                'You should enter an abolute file path. The base directory of your Thelia installation is '.THELIA_ROOT,
                 $this->path_defaut,
                 TlogDestinationConfig::TYPE_TEXTFIELD
             ),
             new TlogDestinationConfig(
                 self::VAR_MODE,
-                "Mode d'ouverture (A ou E)",
-                "Indiquez E pour ré-initialiser le fichier à chaque requête, A pour ne jamais réinitialiser le fichier. Pensez à le vider de temps en temps !",
+                'File opening mode (A or E)',
+                'Enter E to empty this file for each request, or A to always append logs. Consider resetting the file from time to time',
                 self::VALEUR_MODE_DEFAULT,
                 TlogDestinationConfig::TYPE_TEXTFIELD
             )

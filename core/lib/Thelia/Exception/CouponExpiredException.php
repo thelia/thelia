@@ -46,7 +46,7 @@ class CouponExpiredException extends \Exception
     public function __construct($couponCode)
     {
         $message = 'Expired Coupon ' . $couponCode . 'attempt';
-        Tlog::getInstance()->addInfo($message);
+        Tlog::getInstance()->addWarning($message);
 
         parent::__construct($message);
     }

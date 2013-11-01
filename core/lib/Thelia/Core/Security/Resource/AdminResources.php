@@ -97,4 +97,6 @@ final class AdminResources
     const TAX = "admin.configuration.tax";
 
     const TEMPLATE = "admin.configuration.template";
+
+    const SYSTEM_LOG = "admin.configuration.system-log";
 }

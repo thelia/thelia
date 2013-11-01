@@ -32,7 +32,7 @@ class ConfigQuery extends BaseConfigQuery {
         return self::$cache[$search];
     }
 
-    public static function write($configName, $value, $secured, $hidden)
+    public static function write($configName, $value, $secured = null, $hidden = null)
     {
         $config = self::create()->findOneByName($configName);
 
@@ -41,8 +41,9 @@ class ConfigQuery extends BaseConfigQuery {
             $config->setName($configName);
         }
 
-        $config->setSecured($secured ? 1 : 0);
-        $config->setHidden($hidden ? 1 : 0);
+        if ($secured !== null) $config->setSecured($secured ? 1 : 0);
+        if ($hidden !== null) $config->setHidden($hidden ? 1 : 0);
+
         $config->setValue($value);
         $config->save();
 

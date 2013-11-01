@@ -238,13 +238,13 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
     public function ConfigDataAccess($params, $smarty)
     {
-        if (false === array_key_exists("key", $params)) {
-            return null;
-        }
+        $key = $this->getParam($params, 'key', false);
 
-        $key = $params['key'];
+        if ($key === false) return null;
 
-        return ConfigQuery::read($key);
+        $default = $this->getParam($params, 'default', '');
+
+        return ConfigQuery::read($key, $default);
     }
 
     /**

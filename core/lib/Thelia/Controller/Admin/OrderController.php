@@ -23,7 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;

@@ -23,60 +23,64 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-use Thelia\Model\MessageQuery;
+use Thelia\Model\ConfigQuery;
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Log\Tlog;
 use Thelia\Core\Translation\Translator;
 
-class MessageCreationForm extends BaseForm
+class SystemLogConfigurationForm extends BaseForm
 {
-    protected function buildForm($change_mode = false)
+    protected function buildForm()
     {
-        $name_constraints = array(new Constraints\NotBlank());
-
-        if (!$change_mode) {
-            $name_constraints[] = new Constraints\Callback(array(
-                "methods" => array(array($this, "checkDuplicateName"))
-            ));
-        }
-
         $this->formBuilder
-            ->add("name", "text", array(
-                "constraints" => $name_constraints,
-                "label" => Translator::getInstance()->trans('Name *'),
-                "label_attr" => array(
-                    "for" => "name"
-                )
-            ))
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new Constraints\NotBlank()
+            ->add("level", "choice", array(
+                'choices' => array(
+                    Tlog::MUET      => Translator::getInstance()->trans("Disabled"),
+                    Tlog::DEBUG     => Translator::getInstance()->trans("Debug"),
+                    Tlog::INFO      => Translator::getInstance()->trans("Information"),
+                    Tlog::NOTICE    => Translator::getInstance()->trans("Notices"),
+                    Tlog::WARNING   => Translator::getInstance()->trans("Warnings"),
+                    Tlog::ERROR     => Translator::getInstance()->trans("Errors"),
+                    Tlog::CRITICAL  => Translator::getInstance()->trans("Critical"),
+                    Tlog::ALERT     => Translator::getInstance()->trans("Alerts"),
+                    Tlog::EMERGENCY => Translator::getInstance()->trans("Emergency"),
                 ),
-                "label" => Translator::getInstance()->trans('Purpose *'),
+
+                "label" => Translator::getInstance()->trans('Log level *'),
                 "label_attr" => array(
-                    "for" => "purpose"
+                    "for" => "level_field"
                 )
             ))
-            ->add("locale", "hidden", array(
-                "constraints" => array(
-                    new Constraints\NotBlank()
+            ->add("format", "text", array(
+                "label" => Translator::getInstance()->trans('Log format *'),
+                "label_attr" => array(
+                    "for" => "format_field"
                 )
             ))
-            ->add("secured", "hidden", array())
-        ;
+            ->add("show_redirections", "integer", array(
+                    "constraints" => array(new Constraints\NotBlank()),
+                    "label" => Translator::getInstance()->trans('Show redirections *'),
+                    "label_attr" => array(
+                            "for" => "show_redirections_field"
+                    )
+            ))
+            ->add("files", "text", array(
+                    "label" => Translator::getInstance()->trans('Activate logs only for these files'),
+                    "label_attr" => array(
+                            "for" => "files_field"
+                    )
+            ))
+            ->add("ip_addresses", "text", array(
+                    "label" => Translator::getInstance()->trans('Activate logs only for these IP Addresses'),
+                    "label_attr" => array(
+                            "for" => "files_field"
+                    )
+            ))
+            ;
     }
 
     public function getName()
     {
-        return "thelia_message_creation";
+        return "thelia_system_log_configuration";
     }
-
-    public function checkDuplicateName($value, ExecutionContextInterface $context)
-    {
-        $message = MessageQuery::create()->findOneByName($value);
-
-        if ($message) {
-            $context->addViolation(Translator::getInstance()->trans('A message with name "%name" already exists.', array('%name' => $value)));
-        }
-    }
-
 }
