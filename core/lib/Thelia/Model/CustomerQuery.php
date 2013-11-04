@@ -23,7 +23,7 @@ class CustomerQuery extends BaseCustomerQuery {
         return self::create()->findOneByEmail($email);
     }
 
-    public static function getNewCustomersStats($month, $year)
+    public static function getMonthlyNewCustomersStats($month, $year)
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 

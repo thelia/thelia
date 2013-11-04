@@ -50,11 +50,12 @@ class Order extends BaseOrder
     /**
      * calculate the total amount
      *
-     * @param int $tax
+     * @param int  $tax
+     * @param bool $includePostage
      *
-     * @return int|string|Base\double
+     * @return float|int|string
      */
-    public function getTotalAmount(&$tax = 0)
+    public function getTotalAmount(&$tax = 0, $includePostage = true)
     {
         $amount = 0;
         $tax = 0;
@@ -76,7 +77,13 @@ class Order extends BaseOrder
             $tax += round($taxAmount->getVirtualColumn('total_tax'), 2) * $orderProduct->getQuantity();
         }
 
-        return $amount + $tax + $this->getPostage(); // @todo : manage discount
+        $total = $amount + $tax;
+
+        if(false !== $includePostage) {
+            $total += $this->getPostage();
+        }
+
+        return $total; // @todo : manage discount
     }
 
     /**
