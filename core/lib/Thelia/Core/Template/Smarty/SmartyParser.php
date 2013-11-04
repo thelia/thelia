@@ -7,7 +7,7 @@ use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use \Smarty;
 
-use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
 
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
@@ -70,8 +70,14 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
         // Si on n'est pas en mode debug, activer le cache, avec une lifetime de 15mn, et en vérifiant que les templates sources n'ont pas été modifiés.
-        $this->caching       = Smarty::CACHING_OFF;
-        $this->force_compile = true;
+
+        if($debug) {
+            $this->setCaching(Smarty::CACHING_OFF);
+            $this->setForceCompile(true);
+        } else {
+            $this->setForceCompile(false);
+        }
+
 
         // The default HTTP status
         $this->status = 200;
@@ -149,7 +155,7 @@ class SmartyParser extends Smarty implements ParserInterface
      *
      * set $content with the body of the response or the Response object directly
      *
-     * @param string|Symfony\Component\HttpFoundation\Response $content
+     * @param string|Thelia\Core\HttpFoundation\Response $content
      */
     public function setContent($content)
     {

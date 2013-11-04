@@ -34,12 +34,12 @@ class TlogDestinationText extends AbstractTlogDestination
 
     public function getTitle()
     {
-            return "Affichage direct dans la page, en texte brut";
+            return "Direct text display";
     }
 
     public function getDescription()
     {
-            return "Permet d'afficher les logs directement dans la page resultat, au format texte brut.";
+            return "Display logs in raw text format, on top of generated pages.";
     }
 
     public function add($texte)

@@ -29,3 +29,6 @@ Parameters:
         {/loop}
     </table>
 {/ifloop}
+{elseloop rel="document"}
+<div class="alert alert-info">{intl l='There is no documents attached to this %type.' type=$documentType}</div>
+{/elseloop}

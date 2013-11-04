@@ -26,8 +26,6 @@
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 
-    {debugbar_rendercss}
-
     {block name="after-bootstrap-css"}{/block}
 
     {* -- Admin CSS section ------------------------------------------------- *}
@@ -39,6 +37,14 @@
     {* Modules css are included here *}
 
     {module_include location='head_css'}
+
+    {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    {javascripts file='assets/js/libs/respond.min.js'}
+    <script src="{$asset_url}"></script>
+    {/javascripts}
+    <![endif]-->
 </head>
 
 <body>
@@ -236,11 +242,6 @@
             {/javascripts}
         }
     </script>
-
-
-
-    {debugbar_renderjs}
-    {debugbar_renderresult}
 
 	{block name="after-javascript-include"}{/block}
 

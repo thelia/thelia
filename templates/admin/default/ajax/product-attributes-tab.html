@@ -25,7 +25,7 @@
 			                <div class="input-group">
 			                    <select required="required" name="template_id" id="template_id" class="form-control">
 			                        <option value="0">{intl l='Do not use a product template'}</option>
-			                        {loop name="product_template_select" type="template"}
+			                        {loop name="product_template_select" type="product-template"}
 			                            <option value="{$ID}" {if $TEMPLATE == $ID}selected="selected"{/if}>{$NAME}</option>
 			                        {/loop}
 			                    </select>

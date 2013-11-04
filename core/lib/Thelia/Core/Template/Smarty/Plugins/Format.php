@@ -73,7 +73,17 @@ class Format extends AbstractSmartyPlugin
         $date = $this->getParam($params, "date", false);
 
         if ($date === false) {
-            return "";
+
+            // Check if we have a timestamp
+            $timestamp = $this->getParam($params, "timestamp", false);
+
+            if ($timestamp === false) {
+                // No timestamp => error
+                throw new SmartyPluginException("Either date or timestamp is a mandatory parameter in format_date function");
+            } else {
+                $date = new \DateTime();
+                $date->setTimestamp($timestamp);
+            }
         }
 
         if (!($date instanceof \DateTime)) {
@@ -87,7 +97,6 @@ class Format extends AbstractSmartyPlugin
         }
 
         return $date->format($format);
-
     }
 
     /**

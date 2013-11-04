@@ -58,7 +58,7 @@ class CustomerProfilUpdateForm extends CustomerCreateForm
 
             // Add Newsletter
             ->add("newsletter", "checkbox", array(
-                "label" => "I would like to receive the newsletter our the latest news.",
+                "label" => Translator::getInstance()->trans('I would like to receive the newsletter or the latest news.'),
                 "label_attr" => array(
                     "for" => "newsletter"
                 ),

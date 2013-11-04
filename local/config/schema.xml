@@ -319,7 +319,7 @@
   <table name="config" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="name" required="true" size="255" type="VARCHAR" />
-    <column name="value" required="true" size="255" type="VARCHAR" />
+    <column name="value" required="true" type="LONGVARCHAR" />
     <column defaultValue="1" name="secured" required="true" type="TINYINT" />
     <column defaultValue="1" name="hidden" required="true" type="TINYINT" />
     <column name="title" size="255" type="VARCHAR" />
@@ -771,6 +771,9 @@
     <index name="idx_admin_profile_id">
       <index-column name="profile_id" />
     </index>
+    <unique name="login_UNIQUE">
+      <unique-column name="login" />
+    </unique>
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="profile_resource" namespace="Thelia\Model">
@@ -898,8 +901,10 @@
     <column name="admin_login" size="255" type="VARCHAR" />
     <column name="admin_firstname" size="255" type="VARCHAR" />
     <column name="admin_lastname" size="255" type="VARCHAR" />
+    <column name="resource" size="255" type="VARCHAR" />
     <column name="action" size="255" type="VARCHAR" />
-    <column name="request" type="LONGVARCHAR" />
+    <column name="message" type="LONGVARCHAR" />
+    <column name="request" type="CLOB" />
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="content_folder" namespace="Thelia\Model">

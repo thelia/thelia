@@ -81,7 +81,7 @@ class AdministratorCreationForm extends BaseForm
                         array($this, "verifyPasswordField")
                     )))
                 ),
-                "label" => "Password confirmation",
+                "label" => Translator::getInstance()->trans('Password confirmation'),
                 "label_attr" => array(
                     "for" => "password_confirmation"
                 ),
@@ -94,7 +94,7 @@ class AdministratorCreationForm extends BaseForm
                     "constraints" => array(
                         new Constraints\NotBlank(),
                     ),
-                    "label" => "Profile",
+                    "label" => Translator::getInstance()->trans('Profile'),
                     "label_attr" => array(
                         "for" => "profile"
                     ),

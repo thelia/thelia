@@ -25,7 +25,7 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
 use Thelia\Core\Event\Document\DocumentDeleteEvent;
@@ -130,6 +130,20 @@ class FileController extends BaseAdminController
                     $imageCreateOrUpdateEvent
                 );
 
+                $this->adminLogAppend(
+                    AdminResources::retrieve($parentType),
+                    AccessManager::UPDATE,
+                    $this->container->get('thelia.translator')->trans(
+                        'Saving images for %parentName% parent id %parentId% (%parentType%)',
+                        array(
+                            '%parentName%' => $imageCreateOrUpdateEvent->getParentName(),
+                            '%parentId%' => $imageCreateOrUpdateEvent->getParentId(),
+                            '%parentType%' => $imageCreateOrUpdateEvent->getImageType()
+                        ),
+                        'image'
+                    )
+                );
+
                 return new ResponseRest(array('status' => true, 'message' => ''));
             }
         }
@@ -192,6 +206,20 @@ class FileController extends BaseAdminController
                 $this->dispatch(
                     TheliaEvents::DOCUMENT_SAVE,
                     $documentCreateOrUpdateEvent
+                );
+
+                $this->adminLogAppend(
+                    AdminResources::retrieve($parentType),
+                    AccessManager::UPDATE,
+                    $this->container->get('thelia.translator')->trans(
+                        'Saving documents for %parentName% parent id %parentId% (%parentType%)',
+                        array(
+                            '%parentName%' => $documentCreateOrUpdateEvent->getParentName(),
+                            '%parentId%' => $documentCreateOrUpdateEvent->getParentId(),
+                            '%parentType%' => $documentCreateOrUpdateEvent->getDocumentType()
+                        ),
+                        'document'
+                    )
                 );
 
                 return new ResponseRest(array('status' => true, 'message' => ''));
@@ -368,7 +396,7 @@ class FileController extends BaseAdminController
 
             $imageUpdated = $event->getModelImage();
 
-            $this->adminLogAppend(sprintf('Image with Ref %s (ID %d) modified', $imageUpdated->getTitle(), $imageUpdated->getId()));
+            $this->adminLogAppend(AdminResources::retrieve($parentType), AccessManager::UPDATE, sprintf('Image with Ref %s (ID %d) modified', $imageUpdated->getTitle(), $imageUpdated->getId()));
 
             if ($this->getRequest()->get('save_mode') == 'close') {
                 $this->redirectToRoute('admin.images');
@@ -445,7 +473,7 @@ class FileController extends BaseAdminController
 
             $documentUpdated = $event->getModelDocument();
 
-            $this->adminLogAppend(sprintf('Document with Ref %s (ID %d) modified', $documentUpdated->getTitle(), $documentUpdated->getId()));
+            $this->adminLogAppend(AdminResources::retrieve($parentType), AccessManager::UPDATE, sprintf('Document with Ref %s (ID %d) modified', $documentUpdated->getTitle(), $documentUpdated->getId()));
 
             if ($this->getRequest()->get('save_mode') == 'close') {
                 $this->redirectToRoute('admin.documents');
@@ -509,10 +537,39 @@ class FileController extends BaseAdminController
         );
 
         // Dispatch Event to the Action
-        $this->dispatch(
-            TheliaEvents::IMAGE_DELETE,
-            $imageDeleteEvent
-        );
+        try {
+            $this->dispatch(
+                TheliaEvents::IMAGE_DELETE,
+                $imageDeleteEvent
+            );
+
+            $this->adminLogAppend(
+                AdminResources::retrieve($parentType),
+                AccessManager::UPDATE,
+                $this->container->get('thelia.translator')->trans(
+                    'Deleting image for %id% with parent id %parentId%',
+                    array(
+                        '%id%' => $imageDeleteEvent->getImageToDelete()->getId(),
+                        '%parentId%' => $imageDeleteEvent->getImageToDelete()->getParentId(),
+                    ),
+                    'image'
+                )
+            );
+        } catch (\Exception $e) {
+            $this->adminLogAppend(
+                AdminResources::retrieve($parentType),
+                AccessManager::UPDATE,
+                $this->container->get('thelia.translator')->trans(
+                    'Fail to delete image for %id% with parent id %parentId% (Exception : %e%)',
+                    array(
+                        '%id%' => $imageDeleteEvent->getImageToDelete()->getId(),
+                        '%parentId%' => $imageDeleteEvent->getImageToDelete()->getParentId(),
+                        '%e%' => $e->getMessage()
+                    ),
+                    'image'
+                )
+            );
+        }
 
         $message = $this->getTranslator()
             ->trans(
@@ -552,10 +609,39 @@ class FileController extends BaseAdminController
         );
 
         // Dispatch Event to the Action
-        $this->dispatch(
-            TheliaEvents::DOCUMENT_DELETE,
-            $documentDeleteEvent
-        );
+        try {
+            $this->dispatch(
+                TheliaEvents::DOCUMENT_DELETE,
+                $documentDeleteEvent
+            );
+
+            $this->adminLogAppend(
+                AdminResources::retrieve($parentType),
+                AccessManager::UPDATE,
+                $this->container->get('thelia.translator')->trans(
+                    'Deleting document for %id% with parent id %parentId%',
+                    array(
+                        '%id%' => $documentDeleteEvent->getDocumentToDelete()->getId(),
+                        '%parentId%' => $documentDeleteEvent->getDocumentToDelete()->getParentId(),
+                    ),
+                    'document'
+                )
+            );
+        } catch (\Exception $e) {
+            $this->adminLogAppend(
+                AdminResources::retrieve($parentType),
+                AccessManager::UPDATE,
+                $this->container->get('thelia.translator')->trans(
+                    'Fail to delete document for %id% with parent id %parentId% (Exception : %e%)',
+                    array(
+                        '%id%' => $documentDeleteEvent->getDocumentToDelete()->getId(),
+                        '%parentId%' => $documentDeleteEvent->getDocumentToDelete()->getParentId(),
+                        '%e%' => $e->getMessage()
+                    ),
+                    'document'
+                )
+            );
+        }
 
         $message = $this->getTranslator()
             ->trans(

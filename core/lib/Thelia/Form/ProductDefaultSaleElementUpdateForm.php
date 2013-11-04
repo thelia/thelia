@@ -29,8 +29,6 @@ use Thelia\Core\Translation\Translator;
 
 class ProductDefaultSaleElementUpdateForm extends ProductSaleElementUpdateForm
 {
-    use StandardDescriptionFieldsTrait;
-
     protected function buildForm()
     {
         $this->formBuilder
@@ -77,7 +75,7 @@ class ProductDefaultSaleElementUpdateForm extends ProductSaleElementUpdateForm
                 "label_attr" => array("for" => "quantity_field")
         ))
         ->add("sale_price", "number", array(
-                "label"      => Translator::getInstance()->trans("Sale price without taxes"),
+                "label"      => Translator::getInstance()->trans("Sale price excluding taxes"),
                 "label_attr" => array("for" => "price_with_tax_field")
         ))
         ->add("sale_price_with_tax", "number", array(

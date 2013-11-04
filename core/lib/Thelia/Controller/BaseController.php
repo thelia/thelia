@@ -22,7 +22,7 @@
 /*************************************************************************************/
 namespace Thelia\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -58,7 +58,7 @@ class BaseController extends ContainerAware
     /**
      * Return an empty response (after an ajax request, for example)
      * @param  int                                        $status
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function nullResponse($status = 200)
     {

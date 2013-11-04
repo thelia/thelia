@@ -285,6 +285,8 @@ final class TheliaEvents
     const PRODUCT_DELETE_PRODUCT_SALE_ELEMENT = "action.deleteProductSaleElement";
     const PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT = "action.updateProductSaleElement";
 
+    const PRODUCT_COMBINATION_GENERATION = "action.productCombineationGeneration";
+
     const PRODUCT_SET_TEMPLATE = "action.productSetTemplate";
 
     const PRODUCT_ADD_ACCESSORY             = "action.productAddProductAccessory";
@@ -565,6 +567,11 @@ final class TheliaEvents
     const ADMINISTRATOR_CREATE                    = "action.createAdministrator";
     const ADMINISTRATOR_UPDATE                    = "action.updateAdministrator";
     const ADMINISTRATOR_DELETE                    = "action.deleteAdministrator";
+    const ADMINISTRATOR_UPDATEPASSWORD          = 'action.generatePassword';
+
+    // -- Mailing System management ---------------------------------------------
+
+    const MAILING_SYSTEM_UPDATE                    = "action.updateMailingSystem";
 
     // -- Tax Rules management ---------------------------------------------
 

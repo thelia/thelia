@@ -29,10 +29,12 @@ use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Form\CustomerCreateForm;
 use Thelia\Form\CustomerUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
 use Thelia\Core\Translation\Translator;
+use Thelia\Tools\Password;
 
 /**
  * Class CustomerController
@@ -59,7 +61,7 @@ class CustomerController extends BaseAdminController
      * update customer action
      *
      * @param $customer_id
-     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
     public function updateAction($customer_id)
     {
@@ -85,7 +87,7 @@ class CustomerController extends BaseAdminController
 
             $customerUpdated = $event->getCustomer();
 
-            $this->adminLogAppend(sprintf("Customer with Ref %s (ID %d) modified", $customerUpdated->getRef() , $customerUpdated->getId()));
+            $this->adminLogAppend(AdminResources::CUSTOMER, AccessManager::UPDATE, sprintf("Customer with Ref %s (ID %d) modified", $customerUpdated->getRef() , $customerUpdated->getId()));
 
             if ($this->getRequest()->get("save_mode") == "close") {
                 $this->redirectToRoute("admin.customers");
@@ -102,7 +104,7 @@ class CustomerController extends BaseAdminController
         }
 
         if ($message !== false) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("Error during customer login process : %s.", $message));
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("Error during customer update process : %s.", $message));
 
             $customerUpdateForm->setErrorMessage($message);
 
@@ -115,6 +117,56 @@ class CustomerController extends BaseAdminController
         return $this->render("customer-edit", array(
             "customer_id" => $customer_id
         ));
+    }
+
+    public function createAction()
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, AccessManager::CREATE)) return $response;
+
+        $message = null;
+
+        $customerCreateForm = new CustomerCreateForm($this->getRequest());
+
+        try {
+
+            $form = $this->validateForm($customerCreateForm);
+
+            $data = $form->getData();
+            $data["password"] = Password::generateRandom();
+
+            $event = $this->createEventInstance($form->getData());
+
+
+
+            $this->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $event);
+
+            $successUrl = $customerCreateForm->getSuccessUrl();
+
+            $successUrl = str_replace('_ID_', $event->getCustomer()->getId(), $successUrl);
+
+            $this->redirect($successUrl);
+
+
+        }catch (FormValidationException $e) {
+            $message = sprintf("Please check your input: %s", $e->getMessage());
+        } catch (PropelException $e) {
+            $message = $e->getMessage();
+        } catch (\Exception $e) {
+            $message = sprintf("Sorry, an error occured: %s", $e->getMessage()." ".$e->getFile());
+        }
+
+        if ($message !== false) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("Error during customer creation process : %s.", $message));
+
+            $customerCreateForm->setErrorMessage($message);
+
+            $this->getParserContext()
+                ->addForm($customerCreateForm)
+                ->setGeneralError($message)
+            ;
+        }
+
+        return $this->render("customers", array("display_customer" => 20));
     }
 
     public function deleteAction()

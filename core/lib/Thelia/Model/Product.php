@@ -167,7 +167,7 @@ class Product extends BaseProduct
             $this->setTaxRuleId($taxRuleId);
 
             // Create the default product sale element of this product
-            $sale_elements = $this->createDefaultProductSaleElement($con, $baseWeight, $basePrice, $priceCurrencyId, true);
+            $sale_elements = $this->createProductSaleElement($con, $baseWeight, $basePrice, $basePrice, $priceCurrencyId, true);
 
             // Store all the stuff !
             $con->commit();
@@ -185,19 +185,20 @@ class Product extends BaseProduct
     /**
      * Create a basic product sale element attached to this product.
      */
-    public function createDefaultProductSaleElement(ConnectionInterface $con, $weight, $basePrice, $currencyId, $isDefault) {
+    public function createProductSaleElement(ConnectionInterface $con, $weight, $basePrice, $salePrice, $currencyId, $isDefault, $isPromo = false, $isNew = false, $quantity = 0, $eanCode = '', $ref = false) {
 
         // Create an empty product sale element
         $sale_elements = new ProductSaleElements();
 
         $sale_elements
             ->setProduct($this)
-            ->setRef($this->getRef())
-            ->setPromo(0)
-            ->setNewness(0)
+            ->setRef($ref == false ? $this->getRef() : $ref)
+            ->setPromo($isPromo)
+            ->setNewness($isNew)
             ->setWeight($weight)
             ->setIsDefault($isDefault)
-            ->setEanCode('')
+            ->setEanCode($eanCode)
+            ->setQuantity($quantity)
             ->save($con)
         ;
 
@@ -206,7 +207,7 @@ class Product extends BaseProduct
 
         $product_price
             ->setProductSaleElements($sale_elements)
-            ->setPromoPrice($basePrice)
+            ->setPromoPrice($salePrice)
             ->setPrice($basePrice)
             ->setCurrencyId($currencyId)
             ->save($con)

@@ -181,7 +181,7 @@ class ConfigController extends AbstractCrudController
     /**
      * Change values modified directly from the variable list
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     public function changeValuesAction()
     {

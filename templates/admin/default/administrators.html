@@ -62,13 +62,20 @@
                                     </td>
                                     <td>
                                         <div class="btn-group">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.administrator" access="UPDATE"}
+                                            {* if admin is current admin :
+                                                - can UPDATE anyway
+                                                - cannot delete himself
+                                            *}
+                                            {if $ID == {admin attr="id"}}
                                                 <a class="btn btn-default btn-xs js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
-
-                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.administrator" access="DELETE"}
-                                                <a class="btn btn-default btn-xs js-delete-administrator" title="{intl l='Delete this administrator'}" href="#administrator_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                            {/loop}
+                                            {else}
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.administrator" access="UPDATE"}
+                                                    <a class="btn btn-default btn-xs js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
+                                                {/loop}
+                                                {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.administrator" access="DELETE"}
+                                                    <a class="btn btn-default btn-xs js-delete-administrator" title="{intl l='Delete this administrator'}" href="#administrator_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                                {/loop}
+                                            {/if}
                                         </div>
                                     </td>
                                 </tr>

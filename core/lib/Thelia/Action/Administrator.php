@@ -25,6 +25,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
+use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Admin as AdminModel;
 use Thelia\Model\AdminQuery;
@@ -92,15 +93,23 @@ class Administrator extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function updatePassword(AdministratorUpdatePasswordEvent $event)
+    {
+        $admin = $event->getAdmin();
+        $admin->setPassword($event->getPassword())
+            ->save();
+    }
+
     /**
      * {@inheritDoc}
      */
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::ADMINISTRATOR_CREATE                        => array("create", 128),
-            TheliaEvents::ADMINISTRATOR_UPDATE                        => array("update", 128),
-            TheliaEvents::ADMINISTRATOR_DELETE                        => array("delete", 128),
+            TheliaEvents::ADMINISTRATOR_CREATE                        => array('create', 128),
+            TheliaEvents::ADMINISTRATOR_UPDATE                        => array('update', 128),
+            TheliaEvents::ADMINISTRATOR_DELETE                        => array('delete', 128),
+            TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD              => array('updatePassword', 128)
         );
     }
 }

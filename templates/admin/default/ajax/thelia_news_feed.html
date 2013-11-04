@@ -7,7 +7,7 @@
 			<div class="panel-heading">
 				<h3 class="panel-title">
 					<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse-{$LOOP_COUNT}">
-						{$TITLE|strip_tags nofilter} - {$DATE}
+						{$TITLE|strip_tags nofilter} - {format_date timestamp=$DATE output='date'}
 					</a>
 				</h3>
 			</div>
@@ -20,7 +20,7 @@
 					<a href="{$URL}" target="_blank" class="btn btn-defaut btn-primary"><span class="glyphicon glyphicon-book"></span> {intl l='Lire la suite'}</a>
 				</div>
 			</div>
-		</div>	
+		</div>
 
 	{/loop}
 </div>

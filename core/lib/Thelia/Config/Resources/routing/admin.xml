@@ -9,6 +9,18 @@
         <default key="_controller">Thelia\Controller\Admin\AdminController::indexAction</default>
     </route>
 
+    <!-- home -->
+
+    <route id="admin.home.view" path="/admin/home">
+        <default key="_controller">Thelia\Controller\Admin\HomeController::defaultAction</default>
+    </route>
+
+    <route id="admin.home.stats" path="/admin/home/stats">
+        <default key="_controller">Thelia\Controller\Admin\HomeController::loadStatsAjaxAction</default>
+    </route>
+
+    <!-- end home -->
+
     <!-- Route to the administration login page -->
     <route id="admin.login" path="/admin/login">
         <default key="_controller">Thelia\Controller\Admin\SessionController::showLoginAction</default>
@@ -112,6 +124,10 @@
 
     <route id="admin.customer.delete" path="/admin/customer/delete">
         <default key="_controller">Thelia\Controller\Admin\CustomerController::deleteAction</default>
+    </route>
+
+    <route id="admin.customer.create" path="/admin/customer/create">
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::createAction</default>
     </route>
 
     <!-- end Customer rule management -->
@@ -368,6 +384,10 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::updateProductSaleElementsAction</default>
     </route>
 
+    <route id="admin.product.combination.build" path="/admin/product/combination/build">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::buildCombinationsAction</default>
+    </route>
+
     <route id="admin.product.combination.defaut-price.update" path="/admin/product/default-price/update">
         <default key="_controller">Thelia\Controller\Admin\ProductController::updateProductDefaultSaleElementAction</default>
     </route>
@@ -494,6 +514,16 @@
 
     <route id="admin.configuration.variables.delete" path="/admin/configuration/variables/delete">
         <default key="_controller">Thelia\Controller\Admin\ConfigController::deleteAction</default>
+    </route>
+
+    <!--  Routes to the SystemLog controller -->
+
+    <route id="admin.configuration.system-logs.default" path="/admin/configuration/system-logs">
+        <default key="_controller">Thelia\Controller\Admin\SystemLogController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.system-logs.save" path="/admin/configuration/system-logs/save">
+        <default key="_controller">Thelia\Controller\Admin\SystemLogController::saveAction</default>
     </route>
 
     <!-- Routes to the Messages controller -->
@@ -811,6 +841,30 @@
     </route>
 
     <!-- end administrator management -->
+
+    <!-- mailing-system management -->
+
+    <route id="admin.configuration.mailing-system.view" path="/admin/configuration/mailingSystem">
+        <default key="_controller">Thelia\Controller\Admin\MailingSystemController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.mailing-system.save" path="/admin/configuration/mailingSystem/save">
+        <default key="_controller">Thelia\Controller\Admin\MailingSystemController::updateAction</default>
+    </route>
+
+    <!-- end mailing-system management -->
+
+    <!-- admin logs display -->
+
+    <route id="admin.configuration.admin-logs.view" path="/admin/configuration/adminLogs">
+        <default key="_controller">Thelia\Controller\Admin\AdminLogsController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.admin-logs.logger" path="/admin/configuration/adminLogs/logger">
+        <default key="_controller">Thelia\Controller\Admin\AdminLogsController::loadLoggerAjaxAction</default>
+    </route>
+
+    <!-- end admin logs display -->
 
     <!-- feature and features value management -->
 

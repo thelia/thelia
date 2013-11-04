@@ -43,12 +43,12 @@ class ProductCreationForm extends BaseForm
         $this->formBuilder
             ->add("ref", "text", array(
                 "constraints" => $ref_constraints,
-                "label"       => "Product reference *",
+                "label"       => Translator::getInstance()->trans('Product reference *'),
                 "label_attr"  => array("for" => "ref")
             ))
             ->add("title", "text", array(
                 "constraints" => array(new NotBlank()),
-                "label" => "Product title *",
+                "label" => Translator::getInstance()->trans('Product title *'),
                 "label_attr" => array("for" => "title")
             ))
             ->add("default_category", "integer", array(

@@ -344,6 +344,21 @@ $(function() {
         }
     }
 
+    // -- Combination builder stuff --------------------------------------------
+
+    $('#open_combination_builder').click(function(ev) {
+        if (! confirm("{intl l='Existing combinations will be deleted. Do you want to continue ?'}'")) {
+        	ev.preventDefault();
+        	ev.stopPropagation();
+        }
+    });
+
+    {include
+        file      = "includes/generic-js-dialog.html"
+        dialog_id = "combination_builder_dialog"
+        form_name = "thelia.admin.product_combination.build"
+    }
+
     // Automatic update of price fields: any change in the taxed (resp. untaxed) price
     // will update the untaxed (resp. taxed) one
     $('.automatic_price_field').typeWatch({
@@ -352,6 +367,47 @@ $(function() {
     	callback     : function () {
     		update_price($(this).val(), $(this).data('price-type'), $(this).data('rel-price'));
     	}
+    });
+
+    // Count generated combinations in real time
+    function countGeneratedCombinations() {
+
+        var total = 0;
+
+    	var counter = {};
+
+    	var list = $('.attribute_av_value:checked');
+
+    	if (list.length > 0) {
+    		console.log("ok !");
+
+	    	list.each(function() {
+	    		var attr_id = $(this).data('attribute-id');
+
+	    		console.log("att="+attr_id);
+
+	    		if (undefined != counter[attr_id])
+	    			counter[attr_id]++;
+	    		else
+	    			counter[attr_id] = 1;
+	    	});
+
+	    	console.log(counter);
+
+	    	total = 1;
+
+	    	for(var count in counter) {
+	    		total *= counter[count];
+	    	}
+    	}
+
+    	return total;
+    }
+
+    $('.attribute_av_value').change(function(ev) {
+    	var total = countGeneratedCombinations();
+
+    	$('#number_of_generated_combinations').text(total);
     });
 });
 </script>

@@ -42,7 +42,7 @@
 
 						<ul class="nav nav-tabs" id="tabbed-menu">
                             <li {if $current_tab == 'general'}class="active"{/if}><a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
-                            <li {if $current_tab == 'details'}class="active"{/if}><a href="#details" data-toggle="tab">{intl l="Details"}</a></li>
+                            <li {if $current_tab == 'associations'}class="active"{/if}><a href="#associations" data-toggle="tab">{intl l="Associations"}</a></li>
                             <li {if $current_tab == 'images'}class="active"{/if}><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
                             <li {if $current_tab == 'documents'}class="active"{/if}><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
                             <li {if $current_tab == 'modules'}class="active"{/if}><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
@@ -141,7 +141,7 @@
 			                    </div>
 		                    </div>
 
-		                    <div class="tab-pane fade {if $current_tab == 'details'}active in{/if}" id="details">
+		                    <div class="tab-pane fade {if $current_tab == 'associations'}active in{/if}" id="associations">
 		                        <div class="form-container">
 									<div class="form-group">
 									    <form action="{url path='/admin/categories/related-content/add'}" id="related_content_form">
@@ -153,10 +153,10 @@
 									        }
 
                                             <p class="title title-without-tabs">{intl l='Related content'}</p>
-                                            <p>{intl l='You can attach here some content to this product'}</p>
+                                            <p>{intl l='You can attach here some content to this category'}</p>
 
 									        <input type="hidden" name="category_id" value="{$category_id}" />
-									        <input type="hidden" name="current_tab" value="details" />
+									        <input type="hidden" name="current_tab" value="associations" />
 
 									        {ifloop rel="folders"}
 									        <div class="row">
@@ -283,7 +283,7 @@
     <input type="hidden" name="content_id" id="content_delete_id" value="" />
     <input type="hidden" name="folder_id" id="folder_delete_id" value="" />
 
-    <input type="hidden" name="current_tab" value="details" />
+    <input type="hidden" name="current_tab" value="associations" />
 {/capture}
 
 {include

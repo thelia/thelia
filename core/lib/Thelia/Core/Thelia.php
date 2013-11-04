@@ -35,6 +35,7 @@ namespace Thelia\Core;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -46,6 +47,7 @@ use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
 use Thelia\Core\TheliaContainerBuilder;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
+use Thelia\Model\ConfigQuery;
 use Symfony\Component\Config\FileLocator;
 
 use Propel\Runtime\Propel;
@@ -67,7 +69,7 @@ class Thelia extends Kernel
 
     protected function initPropel()
     {
-        if (file_exists(THELIA_ROOT . '/local/config/database.yml') === false) {
+        if (file_exists(THELIA_CONF_DIR . 'database.yml') === false) {
             return ;
         }
 
@@ -94,7 +96,7 @@ class Thelia extends Kernel
     {
         parent::boot();
 
-        if (file_exists(THELIA_ROOT . '/local/config/database.yml') === true) {
+        if (file_exists(THELIA_CONF_DIR . 'database.yml') === true) {
             $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
         }
 
@@ -110,12 +112,19 @@ class Thelia extends Kernel
     {
 
         $loader = new XmlFileLoader($container, new FileLocator(THELIA_ROOT . "/core/lib/Thelia/Config/Resources"));
-        $loader->load("config.xml");
-        $loader->load("routing.xml");
-        $loader->load("action.xml");
+        $finder = Finder::create()
+            ->name('*.xml')
+            ->depth(0)
+            ->in(THELIA_ROOT . "/core/lib/Thelia/Config/Resources");
+
+        foreach($finder as $file) {
+            $loader->load($file->getBaseName());
+        }
+
         if (defined("THELIA_INSTALL_MODE") === false) {
             $modules = \Thelia\Model\ModuleQuery::getActivated();
-
+            $translator = $container->getDefinition('thelia.translator');
+            $dirs = array();
             foreach ($modules as $module) {
 
                 try {
@@ -131,8 +140,39 @@ class Thelia extends Kernel
 
                     $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/Config"));
                     $loader->load("config.xml");
+
+                    if (is_dir($dir = THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/I18n")) {
+                        $dirs[] = $dir;
+                    }
                 } catch (\InvalidArgumentException $e) {
                     // FIXME: process module configuration exception
+                }
+            }
+
+            //Load translation from templates
+            //core translation
+            $dirs[] = THELIA_ROOT . "/core/lib/Thelia/Config/I18n";
+
+            //admin template
+            if(is_dir($dir = THELIA_TEMPLATE_DIR . '/admin/default/I18n')) {
+                $dirs[] = $dir;
+            }
+
+            //front template
+            $template = ConfigQuery::getActiveTemplate();
+            if(is_dir($dir = THELIA_TEMPLATE_DIR . $template . "/I18n")) {
+                $dirs[] = $dir;
+            }
+
+            if ($dirs) {
+                $finder = Finder::create()
+                    ->files()
+                    ->depth(0)
+                    ->in($dirs);
+
+                foreach ($finder as $file) {
+                    list($locale, $format) = explode('.', $file->getBaseName(), 2);
+                    $translator->addMethodCall('addResource', array($format, (string) $file, $locale));
                 }
             }
         }

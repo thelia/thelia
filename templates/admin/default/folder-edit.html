@@ -9,7 +9,7 @@
 <div class="folder edit-folder">
 	<div id="wrapper" class="container">
 
-        {include file="includes/folder-breadcrumb.html" editing_category="true" }
+        {include file="includes/folder-breadcrumb.html" }
 
         <div class="row">
             {loop name="folder_edit" type="folder" visible="*" id="{$folder_id}" backend_context="1" lang="$edit_language_id"}
@@ -182,7 +182,7 @@
 									                        </span>
 									                    </div>
 
-									                    <span class="help-block">{intl l='Select a content and click (+) to add it to this category'}</span>
+									                    <span class="help-block">{intl l='Select a content and click (+) to add it to this folder'}</span>
 									                </div>
 									            </div>
 

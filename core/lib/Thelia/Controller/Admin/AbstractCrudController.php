@@ -253,7 +253,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Render the object list, ensuring the sort order is set.
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     protected function renderList()
     {
@@ -263,7 +263,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * The default action is displaying the list.
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     public function defaultAction()
     {
@@ -274,7 +274,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Create a new object
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     public function createAction()
     {
@@ -303,7 +303,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             if (null !== $createdObject = $this->getObjectFromEvent($createEvent)) {
                 // Log object creation
-                $this->adminLogAppend(sprintf("%s %s (ID %s) created", ucfirst($this->objectName), $this->getObjectLabel($createdObject), $this->getObjectId($createdObject)));
+                $this->adminLogAppend($this->resourceCode, AccessManager::CREATE, sprintf("%s %s (ID %s) created", ucfirst($this->objectName), $this->getObjectLabel($createdObject), $this->getObjectId($createdObject)));
             }
 
             $response = $this->performAdditionalCreateAction($createEvent);
@@ -335,7 +335,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Load a object for modification, and display the edit template.
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     public function updateAction()
     {
@@ -361,7 +361,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Save changes on a modified object, and either go back to the object list, or stay on the edition page.
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     public function processUpdateAction()
     {
@@ -391,7 +391,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Log object modification
             if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
-                $this->adminLogAppend(sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+                $this->adminLogAppend($this->resourceCode, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
             }
 
             $response = $this->performAdditionalUpdateAction($changeEvent);
@@ -516,7 +516,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Delete an object
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     public function deleteAction()
     {
@@ -530,7 +530,8 @@ abstract class AbstractCrudController extends BaseAdminController
 
         if (null !== $deletedObject = $this->getObjectFromEvent($deleteEvent)) {
             $this->adminLogAppend(
-                    sprintf("%s %s (ID %s) deleted", ucfirst($this->objectName), $this->getObjectLabel($deletedObject), $this->getObjectId($deletedObject)));
+                $this->resourceCode, AccessManager::DELETE,
+                sprintf("%s %s (ID %s) deleted", ucfirst($this->objectName), $this->getObjectLabel($deletedObject), $this->getObjectId($deletedObject)));
         }
 
         $response = $this->performAdditionalDeleteAction($deleteEvent);

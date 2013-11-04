@@ -35,13 +35,14 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
      protected $moduleDirectory;
 
      protected $reservedKeyWords = array(
-         "thelia"
+         'thelia'
      );
 
      protected $neededDirectories = array(
-         "Config",
-         "Model",
-         "Loop"
+         'Config',
+         'Model',
+         'Loop',
+         'AdminIncludes'
      );
 
      protected function verifyExistingModule()

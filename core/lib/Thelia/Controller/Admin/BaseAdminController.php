@@ -26,7 +26,7 @@ use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Thelia\Controller\BaseController;
-use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Model\ConfigQuery;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -51,18 +51,20 @@ class BaseAdminController extends BaseController
     /**
      * Helper to append a message to the admin log.
      *
+     * @param string $resource
+     * @param string $action
      * @param string $message
      */
-    public function adminLogAppend($message)
+    public function adminLogAppend($resource, $action, $message)
     {
-        AdminLog::append($message, $this->getRequest(), $this->getSecurityContext()->getAdminUser());
+        AdminLog::append($resource, $action, $message, $this->getRequest(), $this->getSecurityContext()->getAdminUser());
     }
 
     /**
      * This method process the rendering of view called from an admin page
      *
      * @param  unknown  $template
-     * @return Response the reponse which contains the rendered view
+     * @return Response the response which contains the rendered view
      */
     public function processTemplateAction($template)
     {
@@ -83,7 +85,7 @@ class BaseAdminController extends BaseController
     /**
      * Return a 404 error
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function pageNotFound()
     {
@@ -95,7 +97,7 @@ class BaseAdminController extends BaseController
      *
      * @param mixed $message a message string, or an exception instance
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function errorPage($message, $status = 500)
     {
@@ -131,7 +133,7 @@ class BaseAdminController extends BaseController
          }
 
          // Log the problem
-         $this->adminLogAppend("User is not granted for resources %s with accesses %s", implode(", ", $resources), implode(", ", $accesses));
+         $this->adminLogAppend(implode(",", $resources), implode(",", $accesses), "User is not granted for resources %s with accesses %s", implode(", ", $resources), implode(", ", $accesses));
 
          // Generate the proper response
          $response = new Response();
@@ -197,7 +199,7 @@ class BaseAdminController extends BaseController
         $parser = $this->container->get("thelia.parser");
 
         // Define the template thant shoud be used
-        $parser->setTemplate($template ?: ConfigQuery::read('base_admin_template', 'admin/default'));
+        $parser->setTemplate($template ?: ConfigQuery::read('base-admin-template', 'admin/default'));
 
         return $parser;
     }
@@ -371,7 +373,7 @@ class BaseAdminController extends BaseController
      * @param $templateName the complete template name, with extension
      * @param  array                                      $args   the template arguments
      * @param  int                                        $status http code status
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function render($templateName, $args = array(), $status = 200)
     {
@@ -385,7 +387,7 @@ class BaseAdminController extends BaseController
      * @param array $args        the template arguments
      * @param null  $templateDir
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function renderRaw($templateName, $args = array(), $templateDir = null)
     {

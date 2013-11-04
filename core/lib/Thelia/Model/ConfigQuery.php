@@ -32,6 +32,24 @@ class ConfigQuery extends BaseConfigQuery {
         return self::$cache[$search];
     }
 
+    public static function write($configName, $value, $secured = null, $hidden = null)
+    {
+        $config = self::create()->findOneByName($configName);
+
+        if(null == $config) {
+            $config = new Config();
+            $config->setName($configName);
+        }
+
+        if ($secured !== null) $config->setSecured($secured ? 1 : 0);
+        if ($hidden !== null) $config->setHidden($hidden ? 1 : 0);
+
+        $config->setValue($value);
+        $config->save();
+
+        self::$cache[$configName] = $value;
+    }
+
     public static function resetCache($key = null)
     {
         if($key) {
@@ -74,4 +92,101 @@ class ConfigQuery extends BaseConfigQuery {
     {
         return self::read('use_tax_free_amounts', 'default') == 1;
     }
+
+    /* smtp config */
+    public static function isSmtpEnable()
+    {
+        return self::read('smtp.enabled') == 1;
+    }
+
+    public static function getSmtpHost()
+    {
+        return self::read('smtp.host', 'localhost');
+    }
+
+    public static function getSmtpPort()
+    {
+        return self::read('smtp.port');
+    }
+
+    public static function getSmtpEncryption()
+    {
+        return self::read('smtp.encryption');
+    }
+
+    public static function getSmtpUsername()
+    {
+        return self::read('smtp.username');
+    }
+
+    public static function getSmtpPassword()
+    {
+        return self::read('smtp.authmode');
+    }
+
+    public static function getSmtpAuthMode()
+    {
+        return self::read('smtp.host');
+    }
+
+    public static function getSmtpTimeout()
+    {
+        return self::read('smtp.timeout', 30);
+    }
+
+    public static function getSmtpSourceIp()
+    {
+        return self::read('smtp.sourceip');
+    }
+
+    public static function enableSmtp()
+    {
+        self::write('smtp.enabled', 1, 1, 1);
+    }
+
+    public static function disableSmtp()
+    {
+        self::write('smtp.enabled', 0, 1, 1);
+    }
+
+    public static function setSmtpHost($value)
+    {
+        return self::write('smtp.host', $value, 1, 1);
+    }
+
+    public static function setSmtpPort($value)
+    {
+        return self::write('smtp.port', $value, 1, 1);
+    }
+
+    public static function setSmtpEncryption($value)
+    {
+        return self::write('smtp.encryption', $value, 1, 1);
+    }
+
+    public static function setSmtpUsername($value)
+    {
+        return self::write('smtp.username', $value, 1, 1);
+    }
+
+    public static function setSmtpPassword($value)
+    {
+        return self::write('smtp.password', $value, 1, 1);
+    }
+
+    public static function setSmtpAuthMode($value)
+    {
+        return self::write('smtp.authmode', $value, 1, 1);
+    }
+
+    public static function setSmtpTimeout($value)
+    {
+        return self::write('smtp.timeout', $value, 1, 1);
+    }
+
+    public static function setSmtpSourceIp($value)
+    {
+        return self::write('smtp.sourceip', $value, 1, 1);
+    }
+    /* end smtp config */
 } // ConfigQuery

@@ -155,6 +155,7 @@ class FormatTest extends \PHPUnit_Framework_TestCase
      * test formatDate without mandatory parameters
      *
      * @covers ::formatDate
+     * @expectedException Thelia\Core\Template\Smarty\Exception\SmartyPluginException
      */
     public function testFormatDateWithoutDate()
     {

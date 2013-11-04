@@ -4,7 +4,7 @@ $(function($){
 
     Dropzone.autoDiscover = false;
 
-    
+
 
     // Remove image on click
     $.documentUploadManager.initDocumentDropZone = function() {
@@ -14,7 +14,7 @@ $(function($){
             dictDefaultMessage : $('.btn-browse').html(),
             uploadMultiple: false,
             maxFilesize: 8
-        });    
+        });
 
         var totalFiles      = 0,
             completedFiles  = 0;
@@ -40,8 +40,8 @@ $(function($){
             $.documentUploadManager.updateDocumentListAjax();
             $.documentUploadManager.onClickDeleteDocument();
         });
-        
-              
+
+
 
     };
 
