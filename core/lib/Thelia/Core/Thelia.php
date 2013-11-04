@@ -69,7 +69,7 @@ class Thelia extends Kernel
 
     protected function initPropel()
     {
-        if (file_exists(THELIA_ROOT . '/local/config/database.yml') === false) {
+        if (file_exists(THELIA_CONF_DIR . 'database.yml') === false) {
             return ;
         }
 
@@ -96,7 +96,7 @@ class Thelia extends Kernel
     {
         parent::boot();
 
-        if (file_exists(THELIA_ROOT . '/local/config/database.yml') === true) {
+        if (file_exists(THELIA_CONF_DIR . 'database.yml') === true) {
             $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
         }
 

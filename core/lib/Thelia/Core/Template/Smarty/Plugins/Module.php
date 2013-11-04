@@ -41,14 +41,16 @@ class Module extends AbstractSmartyPlugin
     public function theliaModule($params, \Smarty_Internal_Template $template)
     {
         $content = null;
-        if (array_key_exists('location', $params)) {
-            $location = $params['location'];
+
+        if (false !== $location = $this->getParam($params, 'location', false)) {
+
             $modules = ModuleQuery::getActivated();
 
             foreach ($modules as $module) {
 
-                $file = THELIA_MODULE_DIR . "/". ucfirst($module->getCode()) . "/AdminIncludes/".$location.".html";
-                if(file_exists($file)) {
+                $file = sprintf("%s/%s/AdminIncludes/%s.html", THELIA_MODULE_DIR, ucfirst($module->getCode()), $location);
+
+                if (file_exists($file)) {
                     $content .= file_get_contents($file);
                 }
             }

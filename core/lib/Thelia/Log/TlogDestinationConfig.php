@@ -22,7 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Log;
-
 use Thelia\Model\Config;
 use Thelia\Model\ConfigQuery;
 
@@ -32,12 +31,12 @@ class TlogDestinationConfig
     const TYPE_TEXTAREA = 1;
     const TYPE_TEXTFIELD = 2;
 
-    public $name;
-    public $title;
-    public $label;
-    public $default;
-    public $type;
-    public $value;
+    protected $name;
+    protected $title;
+    protected $label;
+    protected $default;
+    protected $type;
+    protected $value;
 
     public function __construct($name, $title, $label, $default, $type)
     {
@@ -45,22 +44,67 @@ class TlogDestinationConfig
         $this->title = $title;
         $this->label = $label;
         $this->default = $default;
-        $this->type = $type;
-
-        $this->load();
+        $this->type= $type;
+        $this->value = ConfigQuery::read($this->name, $this->default);
     }
 
-    public function load()
+    public function getName()
     {
-        if (null === $config = ConfigQuery::create()->findOneByName($this->name)) {
-            $config = new Config();
-            $config->setName($this->name);
-            $config->setValue($this->default);
-            $config->setHidden(1);
-            $config->setSecured(1);
-            $config->save();
-        }
+        return $this->name;
+    }
 
-        $this->value = $config->getValue();
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    public function setLabel($label)
+    {
+        $this->label = $label;
+    }
+
+    public function getDefault()
+    {
+        return $this->default;
+    }
+
+    public function setDefault($default)
+    {
+        $this->default = $default;
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    public function setValue($value)
+    {
+        $this->value = $value;
     }
 }

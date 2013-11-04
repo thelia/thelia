@@ -61,7 +61,7 @@ class CustomerController extends BaseAdminController
      * update customer action
      *
      * @param $customer_id
-     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
     public function updateAction($customer_id)
     {

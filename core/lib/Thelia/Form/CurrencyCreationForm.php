@@ -26,6 +26,7 @@ use Symfony\Component\Validator\Constraints;
 use Thelia\Model\CurrencyQuery;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
 
 class CurrencyCreationForm extends BaseForm
 {
@@ -44,7 +45,7 @@ class CurrencyCreationForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "Name *",
+                "label" => Translator::getInstance()->trans('Name *'),
                 "label_attr" => array(
                     "for" => "name"
                 ))
@@ -58,7 +59,7 @@ class CurrencyCreationForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "Symbol *",
+                "label" => Translator::getInstance()->trans('Symbol *'),
                 "label_attr" => array(
                     "for" => "symbol"
                 ))
@@ -67,7 +68,7 @@ class CurrencyCreationForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "Rate from &euro; *",
+                "label" => Translator::getInstance()->trans('Rate from &euro; *'),
                 "label_attr" => array(
                     "for" => "rate"
                 ))
@@ -76,7 +77,7 @@ class CurrencyCreationForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "ISO 4217 code *",
+                "label" => Translator::getInstance()->trans('ISO 4217 code *'),
                 "label_attr" => array(
                     "for" => "iso_4217_code"
                 ))
@@ -94,7 +95,7 @@ class CurrencyCreationForm extends BaseForm
         $currency = CurrencyQuery::create()->findOneByCode($value);
 
         if ($currency) {
-            $context->addViolation(sprintf("A currency with code \"%s\" already exists.", $value));
+            $context->addViolation(Translator::getInstance()->trans('A currency with code "%name" already exists.', array('%name' => $value)));
         }
     }
 

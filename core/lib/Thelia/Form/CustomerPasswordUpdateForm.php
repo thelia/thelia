@@ -70,7 +70,7 @@ class CustomerPasswordUpdateForm extends BaseForm
                         array($this, "verifyPasswordField")
                     )))
                 ),
-                "label" => "Password confirmation",
+                "label" => Translator::getInstance()->trans('Password confirmation'),
                 "label_attr" => array(
                     "for" => "password_confirmation"
                 )
