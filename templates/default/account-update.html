@@ -8,7 +8,7 @@
     {$breadcrumbs = [['title' => {intl l="Account"}, 'url'=>{url path="/account"}]]}
     {$breadcrumbs = [
     ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
-    ['title' => {intl l="Update Profil"}, 'url'=>{url path="/account/update"}]
+    ['title' => {intl l="Update Profile"}, 'url'=>{url path="/account/update"}]
     ]}
 {/block}
 
@@ -17,9 +17,9 @@
 
         <article class="col-main" role="main" aria-labelledby="main-label">
 
-            <h1 id="main-label" class="page-header">{intl l="Update Profil"}</h1>
+            <h1 id="main-label" class="page-header">{intl l="Update Profile"}</h1>
 
-            {form name="thelia.front.customer.profil.update"}
+            {form name="thelia.front.customer.profile.update"}
                 {assign var="isPost" value="{$smarty.post|count}"}
             <form id="form-register" class="form-horizontal" action="{url path="/account/update"}" method="post" role="form">
                 {form_field form=$form field='success_url'}

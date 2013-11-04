@@ -245,7 +245,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                 </div>
                 <div class="col">
                     <section class="block block-default">
-                        <div class="block-heading"><h3 class="block-title">{intl l="Usefull links"}</h3></div>
+                        <div class="block-heading"><h3 class="block-title">{intl l="Useful links"}</h3></div>
                         <div class="block-content">
                             <ul>
                                 {loop name="footer_links" type="content" folder="2"}

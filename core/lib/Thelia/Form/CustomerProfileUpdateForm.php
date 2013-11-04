@@ -26,11 +26,11 @@ use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Model\CustomerQuery;
 
 /**
- * Class CustomerProfilUpdateForm
+ * Class CustomerProfileUpdateForm
  * @package Thelia\Form
  * @author Christophe Laffont <claffont@openstudio.fr>
  */
-class CustomerProfilUpdateForm extends CustomerCreateForm
+class CustomerProfileUpdateForm extends CustomerCreateForm
 {
 
     protected function buildForm()
