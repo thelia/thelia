@@ -26,7 +26,7 @@ use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Thelia\Controller\BaseController;
-use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Model\ConfigQuery;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -85,7 +85,7 @@ class BaseAdminController extends BaseController
     /**
      * Return a 404 error
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function pageNotFound()
     {
@@ -97,7 +97,7 @@ class BaseAdminController extends BaseController
      *
      * @param mixed $message a message string, or an exception instance
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function errorPage($message, $status = 500)
     {
@@ -373,7 +373,7 @@ class BaseAdminController extends BaseController
      * @param $templateName the complete template name, with extension
      * @param  array                                      $args   the template arguments
      * @param  int                                        $status http code status
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function render($templateName, $args = array(), $status = 200)
     {
@@ -387,7 +387,7 @@ class BaseAdminController extends BaseController
      * @param array $args        the template arguments
      * @param null  $templateDir
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function renderRaw($templateName, $args = array(), $templateDir = null)
     {

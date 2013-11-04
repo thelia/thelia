@@ -69,7 +69,7 @@ class Thelia extends Kernel
 
     protected function initPropel()
     {
-        if (file_exists(THELIA_ROOT . '/local/config/database.yml') === false) {
+        if (file_exists(THELIA_CONF_DIR . 'database.yml') === false) {
             return ;
         }
 
@@ -96,7 +96,7 @@ class Thelia extends Kernel
     {
         parent::boot();
 
-        if (file_exists(THELIA_ROOT . '/local/config/database.yml') === true) {
+        if (file_exists(THELIA_CONF_DIR . 'database.yml') === true) {
             $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
         }
 
@@ -150,6 +150,9 @@ class Thelia extends Kernel
             }
 
             //Load translation from templates
+            //core translation
+            $dirs[] = THELIA_ROOT . "/core/lib/Thelia/Config/I18n";
+
             //admin template
             if(is_dir($dir = THELIA_TEMPLATE_DIR . '/admin/default/I18n')) {
                 $dirs[] = $dir;

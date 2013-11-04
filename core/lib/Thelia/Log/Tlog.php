@@ -24,6 +24,7 @@ namespace Thelia\Log;
 
 use Thelia\Model\ConfigQuery;
 use Psr\Log\LoggerInterface;
+use Thelia\Core\Translation\Translator;
 
 /**
  *
@@ -69,7 +70,7 @@ class Tlog Implements LoggerInterface
     // default values
     const DEFAULT_LEVEL     	= self::DEBUG;
     const DEFAUT_DESTINATIONS   = "Thelia\Log\Destination\TlogDestinationFile";
-    const DEFAUT_PREFIXE 	= "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: ";
+    const DEFAUT_PREFIXE 	= "#INDEX: #LEVEL [#FILE:#FUNCTION()] {#LINE} #DATE #HOUR: ";
     const DEFAUT_FILES 		= "*";
     const DEFAUT_IP 		= "";
     const DEFAUT_SHOW_REDIRECT  = 0;
@@ -95,7 +96,7 @@ class Tlog Implements LoggerInterface
 
     private $linecount = 0;
 
-    protected static $done = false;
+    protected $done = false;
 
     // directories where are the Destinations Files
     public $dir_destinations = array();
@@ -132,8 +133,8 @@ class Tlog Implements LoggerInterface
         $this->setLevel(ConfigQuery::read(self::VAR_LEVEL, self::DEFAULT_LEVEL));
 
         $this->dir_destinations = array(
-                __DIR__.'/Destination'
-                //, __DIR__.'/../client/tlog/destinations'
+                __DIR__.DS.'Destination',
+                THELIA_LOCAL_DIR.'tlog'.DS.'destinations'
         );
 
         $this->setPrefix(ConfigQuery::read(self::VAR_PREFIXE, self::DEFAUT_PREFIXE));
@@ -160,8 +161,18 @@ class Tlog Implements LoggerInterface
             $this->destinations = array();
 
             $classes_destinations = explode(';', $destinations);
+
             $this->loadDestinations($this->destinations, $classes_destinations);
         }
+    }
+
+    /**
+     * Return the directories where destinations classes should be searched.
+     *
+     * @return array of directories
+     */
+    public function getDestinationsDirectories() {
+        return $this->dir_destinations;
     }
 
     /**
@@ -489,16 +500,6 @@ class Tlog Implements LoggerInterface
         $this->out($this->levels[$level], $message, $context);
     }
 
-
-
-    // Mode back office
-    public static function SetBackOfficeMode($booleen)
-    {
-            foreach (Tlog::getInstance()->destinations as $dest) {
-                    $dest->SetBackOfficeMode($booleen);
-            }
-    }
-
     /**
      *
      * final end method. Write log for each destination handler
@@ -508,7 +509,7 @@ class Tlog Implements LoggerInterface
      */
     public function write(&$res)
     {
-            self::$done = true;
+            $this->done = true;
 
             // Muet ? On ne fait rien
             if ($this->level == self::MUET) return;
@@ -524,7 +525,7 @@ class Tlog Implements LoggerInterface
     public function writeOnExit()
     {
         // Si les infos de debug n'ont pas été ecrites, le faire maintenant
-        if (self::$done === false) {
+        if ($this->done === false) {
 
                 $res = "";
 
@@ -539,12 +540,12 @@ class Tlog Implements LoggerInterface
         if ($this->level != self::MUET && $this->show_redirect) {
                 echo "
 <html>
-<head><title>Redirection...</title></head>
+<head><title>".Translator::getInstance()->trans('Redirecting ...')."</title></head>
 <body>
-<a href=\"$url\">Redirection vers $url</a>
+<a href=\"$url\">".Translator::getInstance()->trans('Redirecting to %url', array('%url' => $url))."</a>
 </body>
 </html>
-        ";
+";
 
                 return true;
         } else {
@@ -670,7 +671,7 @@ class Tlog Implements LoggerInterface
             $line = $origine['line'];
 
             $prefixe = str_replace(
-                array("#NUM", "#NIVEAU", "#FICHIER", "#FONCTION", "#LIGNE", "#DATE", "#HEURE"),
+                array("#INDEX", "#LEVEL", "#FILE", "#FUNCTION", "#LINE", "#DATE", "#HOUR"),
                 array(1+$this->linecount, $level, $file, $function, $line, date("Y-m-d"), date("G:i:s")),
                 $this->prefixe
             );

@@ -58,7 +58,7 @@ class CouponController extends BaseAdminController
     /**
      * Manage Coupons list display
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     public function browseAction()
     {
@@ -90,7 +90,7 @@ class CouponController extends BaseAdminController
      *
      * @param int $couponId Coupon Id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     public function readAction($couponId)
     {
@@ -117,7 +117,7 @@ class CouponController extends BaseAdminController
     /**
      * Manage Coupons creation display
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     public function createAction()
     {
@@ -165,7 +165,7 @@ class CouponController extends BaseAdminController
      *
      * @param int $couponId Coupon id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     public function updateAction($couponId)
     {
@@ -270,7 +270,7 @@ class CouponController extends BaseAdminController
      *
      * @param string $conditionId Condition service id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     public function getConditionInputAction($conditionId)
     {
@@ -300,7 +300,7 @@ class CouponController extends BaseAdminController
      *
      * @param int $couponId Coupon id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     public function updateConditionsAction($couponId)
     {

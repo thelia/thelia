@@ -64,7 +64,7 @@ class ContentController extends AbstractCrudController
     /**
      * controller adding content to additional folder
      *
-     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
     public function addAdditionalFolderAction()
     {
@@ -92,7 +92,7 @@ class ContentController extends AbstractCrudController
     /**
      * controller removing additional folder to a content
      *
-     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
     public function removeAdditionalFolderAction()
     {

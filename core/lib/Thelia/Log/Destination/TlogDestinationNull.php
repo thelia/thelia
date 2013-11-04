@@ -29,12 +29,12 @@ class TlogDestinationNull extends AbstractTlogDestination
 {
     public function getTitle()
     {
-            return "Trou noir";
+            return "Black hole";
     }
 
     public function getDescription()
     {
-            return "Cette destination ne provoque aucune sortie";
+            return "This destinations consumes the logs but don't display them";
     }
 
     public function add($string)

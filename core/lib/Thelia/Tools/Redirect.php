@@ -24,14 +24,17 @@
 namespace Thelia\Tools;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Log\Tlog;
 
 class Redirect
 {
     public static function exec($url, $status = 302)
     {
-        $response = new RedirectResponse($url, $status);
+        if (false == Tlog::getInstance()->showRedirect($url)) {
+            $response = new RedirectResponse($url, $status);
 
-        $response->send();
+            $response->send();
+        }
 
         exit;
     }

@@ -24,6 +24,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Thelia\Core\Translation\Translator;
 
 class ConfigModificationForm extends BaseForm
 {
@@ -43,20 +44,20 @@ class ConfigModificationForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "Name",
+                "label" => Translator::getInstance()->trans('Name'),
                 "label_attr" => array(
                     "for" => "name"
                 )
             ))
             ->add("value", "text", array(
-                "label" => "Value",
+                "label" => Translator::getInstance()->trans('Value'),
                 "label_attr" => array(
                     "for" => "value"
                 )
             ))
             ->add("hidden", "hidden", array())
             ->add("secured", "hidden", array(
-                "label" => "Prevent variable modification or deletion, except for super-admin"
+                "label" => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin')
             ))
          ;
 

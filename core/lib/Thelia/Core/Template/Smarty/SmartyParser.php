@@ -7,7 +7,7 @@ use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use \Smarty;
 
-use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
 
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
@@ -155,7 +155,7 @@ class SmartyParser extends Smarty implements ParserInterface
      *
      * set $content with the body of the response or the Response object directly
      *
-     * @param string|Symfony\Component\HttpFoundation\Response $content
+     * @param string|Thelia\Core\HttpFoundation\Response $content
      */
     public function setContent($content)
     {

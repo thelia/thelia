@@ -60,13 +60,12 @@ class TheliaBundle extends Bundle
         $container->addScope(new Scope('request'));
 
         $container
+            ->addCompilerPass(new TranslatorPass())
             ->addCompilerPass(new RegisterListenersPass())
             ->addCompilerPass(new RegisterParserPluginPass())
             ->addCompilerPass(new RegisterRouterPass())
             ->addCompilerPass(new RegisterCouponPass())
             ->addCompilerPass(new RegisterCouponConditionPass())
-            ->addCompilerPass(new TranslatorPass())
-
         ;
     }
 }
