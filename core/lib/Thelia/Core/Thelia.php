@@ -150,6 +150,9 @@ class Thelia extends Kernel
             }
 
             //Load translation from templates
+            //core translation
+            $dirs[] = THELIA_ROOT . "/core/lib/Thelia/Config/I18n";
+
             //admin template
             if(is_dir($dir = THELIA_TEMPLATE_DIR . '/admin/default/I18n')) {
                 $dirs[] = $dir;
