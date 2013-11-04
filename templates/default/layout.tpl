@@ -206,7 +206,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                 </div>
                 <div class="col">
                     <span class="icon-credit-card"></span>
-                    {intl l="Secure payment"} <small>{intl l="Multi-payment plateform"}</small>
+                    {intl l="Secure payment"} <small>{intl l="Multi-payment platform"}</small>
                 </div>
                 <div class="col">
                     <span class="icon-info"></span>

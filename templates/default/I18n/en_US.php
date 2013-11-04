@@ -28,7 +28,7 @@ return array (
   'Free shipping' => 'Free shipping',
   'Orders over $50' => 'Orders over $50',
   'Secure payment' => 'Secure payment',
-  'Multi-payment plateform' => 'Multi-payment plateform',
+  'Multi-payment platform' => 'Multi-payment platform',
   'Need help ?' => 'Need help ?',
   'Questions ? See or F.A.Q.' => 'Questions ? See or F.A.Q.',
   'Latest articles' => 'Latest articles',
