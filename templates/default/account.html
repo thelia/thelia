@@ -49,11 +49,11 @@
                                     </address>
                                 </li>
                                 <li>
-                                    {if $CELLPHONE != ""}
-                                        <span class="tel">{$CELLPHONE}</span>
-                                    {/if}
                                     {if $PHONE != ""}
                                         <span class="tel">{$PHONE}</span>
+                                    {/if}
+                                    {if $CELLPHONE != ""}
+                                        <span class="mobile">{$CELLPHONE}</span>
                                     {/if}
                                     <span class="email">{mailto address="{$EMAIL}" encode="hex"}</span>
                                 </li>

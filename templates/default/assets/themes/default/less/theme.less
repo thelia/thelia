@@ -1045,6 +1045,7 @@ td.product,
     .fn { font-size: 16px;  font-weight: 600; }
 
     .list-info {
+        .mobile,
         .tel,
         .email {
             &:before {
@@ -1054,7 +1055,8 @@ td.product,
                 vertical-align: middle;
             }
         }
-        .tel:before { .icon(@mobile-phone); font-size: 30px;  }
+        .mobile:before { .icon(@mobile-phone); font-size: 30px;  }
+        .tel:before { .icon(@phone); font-size: 22px;  }
         .email:before { .icon(@envelope); font-size: 18px; }
     }
     .group-btn {
