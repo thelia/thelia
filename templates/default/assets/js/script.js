@@ -195,7 +195,7 @@
         });
 
         // Apply validation
-        $('#form-contact, #form-register').validate({
+        $('#form-contact, #form-register, #form-address').validate({
             highlight: function(element) {
                 $(element).closest('.form-group').addClass('has-error');
             },
@@ -203,14 +203,14 @@
                 $(element).closest('.form-group').removeClass('has-error');
             },
             errorElement: 'span',
-            errorClass: 'help-block',
+            errorClass: 'help-block'/*,
             errorPlacement: function(error, element) {
                 if(element.parent('.input-group').length || element.prop('type') === 'checkbox' || element.prop('type') === 'radio'){
                     error.prepend('<i class="icon-remove"></i> ').insertAfter(element.parent());
                 }else{
                     error.prepend('<i class="icon-remove"></i> ').insertAfter(element);
                 }
-            }
+            }*/
         });
 
 
