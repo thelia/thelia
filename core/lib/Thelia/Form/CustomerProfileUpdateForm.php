@@ -23,6 +23,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\CustomerQuery;
 
 /**
@@ -81,6 +82,6 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
 
     public function getName()
     {
-        return "thelia_customer_profil_update";
+        return "thelia_customer_profile_update";
     }
 }
