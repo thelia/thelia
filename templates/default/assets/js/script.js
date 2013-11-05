@@ -1,7 +1,20 @@
 /* JQUERY PREVENT CONFLICT */
 (function($) {
 
-    /*	------------------------------------------------------------------
+/*	------------------------------------------------------------------
+    callback Function -------------------------------------------------- */
+    var confirmCallback = {
+        'address.delete': function($elm){
+            $.post($elm.attr('href'), function(data){
+                if(data.success)
+                    $elm.closest('tr').remove();
+                else
+                    bootbox.alert(data.message);
+            });
+        }
+    }
+
+/*	------------------------------------------------------------------
      onLoad Function -------------------------------------------------- */
     $(document).ready(function(){
 
@@ -49,19 +62,25 @@
 
         // Confirm Dialog
         $(document).on('click.confirm', '[data-confirm]', function (e) {
-            var $this   = $(this),
-                href    = $this.attr('href'),
-                title   = $this.attr('data-confirm') != '' ? $this.attr('data-confirm') : 'Are you sure?';
+            var $this       = $(this),
+                href        = $this.attr('href'),
+                callback    = $this.attr('data-confirm-callback'),
+                title       = $this.attr('data-confirm') != '' ? $this.attr('data-confirm') : 'Are you sure?';
 
-                bootbox.confirm(title, function(confirm) {
+            bootbox.confirm(title, function(confirm) {
                     if(confirm){
-                        if(href){
-                            window.location.href = href;
+                        //Check if callback and if it's a function
+                        if (callback && $.isFunction(confirmCallback[callback])) {
+                            confirmCallback[callback]($this);
                         } else {
-                            // If forms
-                            var $form = $this.closest("form");
-                            if($form.size() > 0){
-                                $form.submit();
+                            if(href){
+                                window.location.href = href;
+                            } else {
+                                // If forms
+                                var $form = $this.closest("form");
+                                if($form.size() > 0){
+                                    $form.submit();
+                                }
                             }
                         }
                     }
