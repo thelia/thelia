@@ -152,7 +152,7 @@ return array (
   'Select Country' => '',
   'Create' => '',
   'Related' => '',
-
+/*
   'The page cannot be found' => '',
   'What\'s your name?' => '',
   'So I can get back to you.' => '',
@@ -190,5 +190,23 @@ return array (
   'Your current password does not match.' => '',
   'Password confirmation is not the same as password field.' => '',
   'I would like to receive the newsletter or the latest news.' => '',
+*/
+  'Placeholder firstname' => '',
+  'Placeholder lastname' => '',
+  'Placeholder email' => '',
+  'Placeholder phone' => '',
+  'Placeholder cellphone' => '',
+  'Placeholder company' => '',
+  'Placeholder address1' => '',
+  'Placeholder address2' => '',
+  'Placeholder city' => '',
+  'Placeholder zipcode' => '',
+  'Placeholder address label' => '',
+  'Placeholder contact name' => '',
+  'Placeholder contact email' => '',
+  'Placeholder contact subject' => '',
+  'Placeholder contact message' => '',
+
+
 )
 ;

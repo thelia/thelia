@@ -152,6 +152,7 @@ return array (
   'Select Country' => 'Select Country',
   'Create' => 'Create',
   'Related' => 'Related',
+/*
   'The page cannot be found' => 'The page cannot be found',
   'What\'s your name?' => 'What\'s your name?',
   'So I can get back to you.' => 'So I can get back to you.',
@@ -189,5 +190,21 @@ return array (
   'Your current password does not match.' => 'Your current password does not match.',
   'Password confirmation is not the same as password field.' => 'Password confirmation is not the same as password field.',
   'I would like to receive the newsletter or the latest news.' => 'I would like to receive the newsletter or the latest news.',
+*/
+  'Placeholder firstname' => 'John',
+  'Placeholder lastname' => 'Doe',
+  'Placeholder email' => 'johndoe@domain.com',
+  'Placeholder phone' => '',
+  'Placeholder cellphone' => '',
+  'Placeholder company' => 'Google',
+  'Placeholder address1' => '76 Ninth Avenue',
+  'Placeholder address2' => '',
+  'Placeholder city' => 'New York',
+  'Placeholder zipcode' => 'NY 10011',
+  'Placeholder address label' => 'Home, Work office, other',
+  'Placeholder contact name' => 'What\'s your name?',
+  'Placeholder contact email' => 'So I can get back to you.',
+  'Placeholder contact subject' => 'The subject of your message.',
+  'Placeholder contact message' => 'And your message...',
 )
 ;
