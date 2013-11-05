@@ -48,10 +48,10 @@
         });
 
         // Confirm Dialog
-        $(document).on('click.confirm', '[data-toggle="confirm"]', function (e) {
+        $(document).on('click.confirm', '[data-confirm]', function (e) {
             var $this   = $(this),
                 href    = $this.attr('href'),
-                title   = $this.attr('data-confirm-title') ? $this.attr('data-confirm-title') : 'Are you sure?';
+                title   = $this.attr('data-confirm') != '' ? $this.attr('data-confirm') : 'Are you sure?';
 
                 bootbox.confirm(title, function(confirm) {
                     if(confirm){

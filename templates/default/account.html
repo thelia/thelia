@@ -33,7 +33,7 @@
                     <div id="account-info" class="panel-collapse collapse in">
                         {loop type="customer" name="customer.info"}
                         <div class="panel-body">
-                            <p class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$FIRSTNAME} {$LASTNAME}</p>
+                            <p class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$FIRSTNAME|ucwords} {$LASTNAME|upper}</p>
                             {loop type="address" name="address.default" default="true"}
                             <ul class="list-info">
                                 <li>
@@ -87,7 +87,7 @@
                                     <td>
                                         <ul class="list-address">
                                             <li>
-                                                <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$FIRSTNAME} {$LASTNAME}</span>
+                                                <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$FIRSTNAME|ucwords} {$LASTNAME|upper}</span>
                                                 {if $COMPANY}
                                                     <span class="org">{$COMPANY}</span>
                                                 {/if}
@@ -119,7 +119,7 @@
                                         <div class="group-btn">
                                             <a href="{url path="/address/update/{$ID}"}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
                                             {if $DEFAULT != 1}
-                                                <a href="{url path="/address/delete/{$ID}"}" class="btn btn-remove-address" data-toggle="confirm" data-confirm-title="{intl l="Do you really want to delete this address ?"}" title="{intl l="Remove this address"}" ><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
+                                                <a href="{url path="/address/delete/{$ID}"}" class="btn btn-remove-address" data-confirm="{intl l="Do you really want to delete this address ?"}" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
                                             {/if}
                                         </div>
                                     </td>
