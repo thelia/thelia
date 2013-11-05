@@ -1,6 +1,7 @@
 {extends file="layout.tpl"}
 
-{block name="no-return-functions"}
+{* Security *}
+{block name="no-return-functions" prepend}
     {check_auth context="front" role="CUSTOMER" login_tpl="login"}
 {/block}
 
@@ -20,7 +21,7 @@
 
     <article class="col-main" role="main" aria-labelledby="main-label">
 
-    <h1 id="main-label" class="page-header">{intl l="Create New Address"}</h1>
+    <h1 id="main-label" class="page-header">{intl l="Address Update"}</h1>
     {form name="thelia.front.address.update"}
         {loop name="customer.update" type="address" customer="current" id="{$address_id}"}
         <form id="form-address" class="form-horizontal" action="{url path="/address/update/{$address_id}"}" method="post" role="form">

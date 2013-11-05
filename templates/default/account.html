@@ -1,5 +1,6 @@
 {extends file="layout.tpl"}
 
+{* Security *}
 {block name="no-return-functions" prepend}
     {check_auth context="front" role="CUSTOMER" login_tpl="login"}
 {/block}
@@ -7,7 +8,7 @@
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = [
-    ['title' => {intl l="Account"}, 'url'=>{url path="/account"}]
+        ['title' => {intl l="Account"}, 'url'=>{url path="/account"}]
     ]}
 {/block}
 

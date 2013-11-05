@@ -1,14 +1,18 @@
 {extends file="layout.tpl"}
 
+{* Security *}
+{block name="no-return-functions" prepend}
+    {check_auth context="front" role="CUSTOMER" login_tpl="login"}
+{/block}
+
 {* Body Class *}
 {block name="body-class"}page-account-update{/block}
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
-    {$breadcrumbs = [['title' => {intl l="Account"}, 'url'=>{url path="/account"}]]}
     {$breadcrumbs = [
-    ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
-    ['title' => {intl l="Update Profile"}, 'url'=>{url path="/account/update"}]
+        ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
+        ['title' => {intl l="Update Profile"}, 'url'=>{url path="/account/update"}]
     ]}
 {/block}
 
