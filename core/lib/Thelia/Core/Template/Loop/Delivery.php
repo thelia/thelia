@@ -22,7 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -33,6 +32,7 @@ use Thelia\Module\BaseModule;
  * Class Delivery
  * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Etienne Roudeix <eroudeix@gmail.com>
  */
 class Delivery extends BaseSpecificModule
 {
@@ -48,14 +48,8 @@ class Delivery extends BaseSpecificModule
         return $collection;
     }
 
-    public function exec(&$pagination)
+    public function parseResults(LoopResult $loopResult)
     {
-        $search = parent::exec($pagination);
-        /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
-
-        $search->filterByType(BaseModule::DELIVERY_MODULE_TYPE, Criteria::EQUAL);
-
         $countryId = $this->getCountry();
         if (null !== $countryId) {
             $country = CountryQuery::create()->findPk($countryId);
@@ -66,13 +60,8 @@ class Delivery extends BaseSpecificModule
             $country = CountryQuery::create()->findOneByByDefault(1);
         }
 
-        /* perform search */
-        $deliveryModules = $this->search($search, $pagination);
-
-        $loopResult = new LoopResult($deliveryModules);
-
-        foreach ($deliveryModules as $deliveryModule) {
-            $loopResultRow = new LoopResultRow($loopResult, $deliveryModule, $this->versionable, $this->timestampable, $this->countable);
+        foreach ($loopResult->getResultDataCollection() as $deliveryModule) {
+            $loopResultRow = new LoopResultRow($deliveryModule);
 
             $moduleReflection = new \ReflectionClass($deliveryModule->getFullNamespace());
             if ($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
@@ -96,5 +85,10 @@ class Delivery extends BaseSpecificModule
         }
 
         return $loopResult;
+    }
+
+    protected function getModuleType()
+    {
+        return BaseModule::DELIVERY_MODULE_TYPE;
     }
 }

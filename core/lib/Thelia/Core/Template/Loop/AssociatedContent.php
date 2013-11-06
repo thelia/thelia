@@ -46,6 +46,9 @@ use Thelia\Type;
  */
 class AssociatedContent extends Content
 {
+    protected $contentId;
+    protected $contentPosition;
+    
     /**
      * @return ArgumentCollection
      */
@@ -68,16 +71,8 @@ class AssociatedContent extends Content
         return $argumentCollection;
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return LoopResult
-     * @throws \InvalidArgumentException
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
-        //
-
         $product = $this->getProduct();
         $category = $this->getCategory();
 
@@ -136,16 +131,15 @@ class AssociatedContent extends Content
 
         $associatedContentIdList = array(0);
 
-        $contentIdList = array(0);
-        $contentPosition = $contentId = array();
+        $this->contentPosition = $this->contentId = array();
 
         foreach ($associatedContents as $associatedContent) {
 
             $associatedContentId = $associatedContent->getContentId();
 
             array_push($associatedContentIdList, $associatedContentId);
-            $contentPosition[$associatedContentId] = $associatedContent->getPosition();
-            $contentId[$associatedContentId] = $associatedContent->getId();
+            $this->contentPosition[$associatedContentId] = $associatedContent->getPosition();
+            $this->contentId[$associatedContentId] = $associatedContent->getId();
         }
 
         $receivedIdList = $this->getId();
@@ -157,18 +151,23 @@ class AssociatedContent extends Content
             $this->args->get('id')->setValue( implode(',', array_intersect($receivedIdList, $associatedContentIdList)) );
         }
 
-        $loopResult = parent::exec($pagination);
+        return parent::buildModelCriteria();
+    }
 
-        foreach ($loopResult as $loopResultRow) {
+    public function parseResults(LoopResult $results)
+    {
+        $results = parent::parseResults($results);
+
+        foreach ($results as $loopResultRow) {
 
             $relatedContentId = $loopResultRow->get('ID');
 
             $loopResultRow
-            ->set("ID"      , $contentId[$relatedContentId])
-            ->set("POSITION", $contentPosition[$relatedContentId])
+                ->set("ID"      , $this->contentId[$relatedContentId])
+                ->set("POSITION", $this->contentPosition[$relatedContentId])
             ;
         }
 
-        return $loopResult;
+        return $results;
     }
 }

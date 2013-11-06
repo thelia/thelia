@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -41,9 +42,9 @@ use Thelia\Model\Base\OrderProductQuery;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class OrderProduct extends BaseLoop
+class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -55,13 +56,7 @@ class OrderProduct extends BaseLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     * @throws \InvalidArgumentException
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = OrderProductQuery::create();
 
@@ -76,44 +71,47 @@ class OrderProduct extends BaseLoop
 
         $search->orderById(Criteria::ASC);
 
-        $products = $this->search($search, $pagination);
+        return $search;
+        
+    }
 
-        $loopResult = new LoopResult($products);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $orderProduct) {
+            $loopResultRow = new LoopResultRow($orderProduct);
 
-        foreach ($products as $product) {
-            $loopResultRow = new LoopResultRow($loopResult, $product, $this->versionable, $this->timestampable, $this->countable);
+            $price = $orderProduct->getPrice();
+            $taxedPrice = $price + round($orderProduct->getVirtualColumn('TOTAL_TAX'), 2);
+            $promoPrice = $orderProduct->getPromoPrice();
+            $taxedPromoPrice = $promoPrice + round($orderProduct->getVirtualColumn('TOTAL_PROMO_TAX'), 2);
 
-            $price = $product->getPrice();
-            $taxedPrice = $price + round($product->getVirtualColumn('TOTAL_TAX'), 2);
-            $promoPrice = $product->getPromoPrice();
-            $taxedPromoPrice = $promoPrice + round($product->getVirtualColumn('TOTAL_PROMO_TAX'), 2);
-
-            $loopResultRow->set("ID", $product->getId())
-                ->set("REF", $product->getProductRef())
-                ->set("PRODUCT_SALE_ELEMENTS_REF", $product->getProductSaleElementsRef())
-                ->set("WAS_NEW", $product->getWasNew() === 1 ? 1 : 0)
-                ->set("WAS_IN_PROMO", $product->getWasInPromo() === 1 ? 1 : 0)
-                ->set("WEIGHT", $product->getWeight())
-                ->set("TITLE", $product->getTitle())
-                ->set("CHAPO", $product->getChapo())
-                ->set("DESCRIPTION", $product->getDescription())
-                ->set("POSTSCRIPTUM", $product->getPostscriptum())
-                ->set("QUANTITY", $product->getQuantity())
+            $loopResultRow->set("ID", $orderProduct->getId())
+                ->set("REF", $orderProduct->getProductRef())
+                ->set("PRODUCT_SALE_ELEMENTS_REF", $orderProduct->getProductSaleElementsRef())
+                ->set("WAS_NEW", $orderProduct->getWasNew() === 1 ? 1 : 0)
+                ->set("WAS_IN_PROMO", $orderProduct->getWasInPromo() === 1 ? 1 : 0)
+                ->set("WEIGHT", $orderProduct->getWeight())
+                ->set("TITLE", $orderProduct->getTitle())
+                ->set("CHAPO", $orderProduct->getChapo())
+                ->set("DESCRIPTION", $orderProduct->getDescription())
+                ->set("POSTSCRIPTUM", $orderProduct->getPostscriptum())
+                ->set("QUANTITY", $orderProduct->getQuantity())
                 ->set("PRICE", $price)
                 ->set("PRICE_TAX", $taxedPrice - $price)
                 ->set("TAXED_PRICE", $taxedPrice)
                 ->set("PROMO_PRICE", $promoPrice)
                 ->set("PROMO_PRICE_TAX", $taxedPromoPrice - $promoPrice)
                 ->set("TAXED_PROMO_PRICE", $taxedPromoPrice)
-                ->set("TAX_RULE_TITLE", $product->getTaxRuleTitle())
-                ->set("TAX_RULE_DESCRIPTION", $product->getTaxRuledescription())
-                ->set("PARENT", $product->getParent())
-                ->set("EAN_CODE", $product->getEanCode())
+                ->set("TAX_RULE_TITLE", $orderProduct->getTaxRuleTitle())
+                ->set("TAX_RULE_DESCRIPTION", $orderProduct->getTaxRuledescription())
+                ->set("PARENT", $orderProduct->getParent())
+                ->set("EAN_CODE", $orderProduct->getEanCode())
             ;
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
+
     }
 }

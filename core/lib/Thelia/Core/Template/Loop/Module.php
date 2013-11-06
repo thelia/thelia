@@ -29,6 +29,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -46,9 +47,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Module extends BaseI18nLoop
+class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -79,17 +80,12 @@ class Module extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = ModuleQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -131,16 +127,17 @@ class Module extends BaseI18nLoop
 
         $search->orderByPosition();
 
-        /* perform search */
-        $modules = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($modules);
+    }
 
-        foreach ($modules as $module) {
-            $loopResultRow = new LoopResultRow($loopResult, $module, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $module) {
+            $loopResultRow = new LoopResultRow($module);
             $loopResultRow->set("ID", $module->getId())
                 ->set("IS_TRANSLATED",$module->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("TITLE",$module->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $module->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $module->getVirtualColumn('i18n_DESCRIPTION'))
@@ -151,7 +148,7 @@ class Module extends BaseI18nLoop
                 ->set("CLASS", $module->getFullNamespace())
                 ->set("POSITION", $module->getPosition());
 
-            if (null !== $profile) {
+            if (null !== $this->getProfile()) {
                 $accessValue = $module->getVirtualColumn('access');
                 $manager = new AccessManager($accessValue);
 
@@ -165,5 +162,6 @@ class Module extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

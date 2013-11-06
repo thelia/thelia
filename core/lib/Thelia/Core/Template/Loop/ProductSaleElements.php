@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -49,9 +50,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class ProductSaleElements extends BaseLoop
+class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -77,13 +78,7 @@ class ProductSaleElements extends BaseLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     * @throws \InvalidArgumentException
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = ProductSaleElementsQuery::create();
 
@@ -144,14 +139,16 @@ class ProductSaleElements extends BaseLoop
 
         $search->groupById();
 
-        $PSEValues = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($PSEValues);
+    }
 
+    public function parseResults(LoopResult $loopResult)
+    {
         $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
 
-        foreach ($PSEValues as $PSEValue) {
-            $loopResultRow = new LoopResultRow($loopResult, $PSEValue, $this->versionable, $this->timestampable, $this->countable);
+        foreach ($loopResult->getResultDataCollection() as $PSEValue) {
+            $loopResultRow = new LoopResultRow($PSEValue);
 
             $price = $PSEValue->getPrice();
             try {
@@ -189,5 +186,6 @@ class ProductSaleElements extends BaseLoop
         }
 
         return $loopResult;
+
     }
 }

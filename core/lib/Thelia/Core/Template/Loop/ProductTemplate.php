@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -42,9 +43,9 @@ use Thelia\Model\Base\TemplateQuery;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class ProductTemplate extends BaseI18nLoop
+class ProductTemplate extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -57,12 +58,7 @@ class ProductTemplate extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = TemplateQuery::create();
 
@@ -71,7 +67,7 @@ class ProductTemplate extends BaseI18nLoop
         $lang = $this->getLang();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search, $columns = array('NAME'));
+        $this->configureI18nProcessing($search, $columns = array('NAME'));
 
         $id = $this->getId();
 
@@ -85,18 +81,19 @@ class ProductTemplate extends BaseI18nLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        /* perform search */
-        $templates = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($templates);
+    }
 
-        foreach ($templates as $template) {
-            $loopResultRow = new LoopResultRow($loopResult, $template, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $template) {
+            $loopResultRow = new LoopResultRow($template);
 
             $loopResultRow
                 ->set("ID", $template->getId())
                 ->set("IS_TRANSLATED" , $template->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"        , $locale)
+                ->set("LOCALE"        , $this->locale)
                 ->set("NAME"          , $template->getVirtualColumn('i18n_NAME'))
             ;
 
@@ -104,5 +101,6 @@ class ProductTemplate extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

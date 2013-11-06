@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -47,10 +48,10 @@ use Thelia\Type\BooleanOrBothType;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Content extends BaseI18nLoop
+class Content extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
-    public $versionable = true;
+    protected $timestampable = true;
+    protected $versionable = true;
 
     /**
      * @return ArgumentCollection
@@ -77,19 +78,13 @@ class Content extends BaseI18nLoop
         );
     }
 
-   /**
-     * @param $pagination
-     *
-     * @return LoopResult
-     * @throws \InvalidArgumentException
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
 
         $search = ContentQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -205,26 +200,25 @@ class Content extends BaseI18nLoop
             );
         }
 
-        /* perform search */
-        $search->groupBy(ContentTableMap::ID);
+        return $search;
 
-        $contents = $this->search($search, $pagination);
+    }
 
-        $loopResult = new LoopResult($contents);
-
-        foreach ($contents as $content) {
-            $loopResultRow = new LoopResultRow($loopResult, $content, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $content) {
+            $loopResultRow = new LoopResultRow($content);
 
             $loopResultRow->set("ID", $content->getId())
                 ->set("IS_TRANSLATED",$content->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("TITLE",$content->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $content->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $content->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $content->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $content->getPosition())
                 ->set("DEFAULT_FOLDER", $content->getDefaultFolderId())
-                ->set("URL", $content->getUrl($locale))
+                ->set("URL", $content->getUrl($this->locale))
                 ->set("VISIBLE", $content->getVisible())
             ;
 
@@ -232,6 +226,7 @@ class Content extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 
 }

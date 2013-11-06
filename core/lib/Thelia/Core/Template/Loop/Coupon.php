@@ -31,6 +31,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Coupon\Type\CouponInterface;
@@ -49,7 +50,7 @@ use Thelia\Type;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class Coupon extends BaseI18nLoop
+class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     /**
      * Define all args used in your loop
@@ -64,19 +65,12 @@ class Coupon extends BaseI18nLoop
         );
     }
 
-    /**
-     * Execute Loop
-     *
-     * @param PropelModelPager $pagination Pagination manager
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = CouponQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search, array('TITLE', 'DESCRIPTION', 'SHORT_DESCRIPTION'));
+        $this->configureI18nProcessing($search, array('TITLE', 'DESCRIPTION', 'SHORT_DESCRIPTION'));
 
         $id = $this->getId();
         $isEnabled = $this->getIsEnabled();
@@ -89,10 +83,11 @@ class Coupon extends BaseI18nLoop
             $search->filterByIsEnabled($isEnabled ? true : false);
         }
 
-        // Perform search
-        $coupons = $this->search($search, $pagination);
+        return $search;
+    }
 
-        $loopResult = new LoopResult();
+    public function parseResults(LoopResult $loopResult)
+    {
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->container->get('thelia.condition.factory');
 
@@ -102,8 +97,8 @@ class Coupon extends BaseI18nLoop
         $lang = $request->getSession()->getLang();
 
         /** @var MCoupon $coupon */
-        foreach ($coupons as $coupon) {
-            $loopResultRow = new LoopResultRow();
+        foreach ($loopResult->getResultDataCollection() as $coupon) {
+            $loopResultRow = new LoopResultRow($coupon);
             $conditions = $conditionFactory->unserializeConditionCollection(
                 $coupon->getSerializedConditions()
             );
@@ -136,7 +131,7 @@ class Coupon extends BaseI18nLoop
             }
             $loopResultRow->set("ID", $coupon->getId())
                 ->set("IS_TRANSLATED", $coupon->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $locale)
+                ->set("LOCALE", $this->locale)
                 ->set("CODE", $coupon->getCode())
                 ->set("TITLE", $coupon->getVirtualColumn('i18n_TITLE'))
                 ->set("SHORT_DESCRIPTION", $coupon->getVirtualColumn('i18n_SHORT_DESCRIPTION'))

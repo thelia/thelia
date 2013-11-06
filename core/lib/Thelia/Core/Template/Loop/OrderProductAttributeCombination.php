@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -43,9 +44,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class OrderProductAttributeCombination extends BaseI18nLoop
+class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -64,12 +65,7 @@ class OrderProductAttributeCombination extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = OrderProductAttributeCombinationQuery::create();
 
@@ -90,28 +86,30 @@ class OrderProductAttributeCombination extends BaseI18nLoop
             }
         }
 
-        $attributeCombinations = $this->search($search, $pagination);
+        return $search;
+        
+    }
 
-        $loopResult = new LoopResult($attributeCombinations);
-
-        foreach ($attributeCombinations as $attributeCombination) {
-            $loopResultRow = new LoopResultRow($loopResult, $attributeCombination, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $orderAttributeCombination) {
+            $loopResultRow = new LoopResultRow($orderAttributeCombination);
 
             $loopResultRow
-                ->set("LOCALE",$locale)
-                ->set("ATTRIBUTE_TITLE", $attributeCombination->getAttributeTitle())
-                ->set("ATTRIBUTE_CHAPO", $attributeCombination->getAttributeChapo())
-                ->set("ATTRIBUTE_DESCRIPTION", $attributeCombination->getAttributeDescription())
-                ->set("ATTRIBUTE_POSTSCRIPTUM", $attributeCombination->getAttributePostscriptum())
-                ->set("ATTRIBUTE_AVAILABILITY_TITLE", $attributeCombination->getAttributeAvTitle())
-                ->set("ATTRIBUTE_AVAILABILITY_CHAPO", $attributeCombination->getAttributeAvChapo())
-                ->set("ATTRIBUTE_AVAILABILITY_DESCRIPTION", $attributeCombination->getAttributeAvDescription())
-                ->set("ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM", $attributeCombination->getAttributeAvPostscriptum())
+                ->set("ATTRIBUTE_TITLE", $orderAttributeCombination->getAttributeTitle())
+                ->set("ATTRIBUTE_CHAPO", $orderAttributeCombination->getAttributeChapo())
+                ->set("ATTRIBUTE_DESCRIPTION", $orderAttributeCombination->getAttributeDescription())
+                ->set("ATTRIBUTE_POSTSCRIPTUM", $orderAttributeCombination->getAttributePostscriptum())
+                ->set("ATTRIBUTE_AVAILABILITY_TITLE", $orderAttributeCombination->getAttributeAvTitle())
+                ->set("ATTRIBUTE_AVAILABILITY_CHAPO", $orderAttributeCombination->getAttributeAvChapo())
+                ->set("ATTRIBUTE_AVAILABILITY_DESCRIPTION", $orderAttributeCombination->getAttributeAvDescription())
+                ->set("ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM", $orderAttributeCombination->getAttributeAvPostscriptum())
             ;
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
+
     }
 }

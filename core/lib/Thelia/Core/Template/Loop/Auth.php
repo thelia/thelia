@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -40,7 +41,7 @@ use Thelia\Type\TypeCollection;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Auth extends BaseLoop
+class Auth extends BaseLoop implements ArraySearchLoopInterface
 {
     public function getArgDefinitions()
     {
@@ -69,18 +70,16 @@ class Auth extends BaseLoop
          );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildArray()
+    {
+        return array();
+    }
+
+    public function parseResults(LoopResult $loopResult)
     {
         $roles = $this->getRole();
         $resource = $this->getResource();
         $access = $this->getAccess();
-
-        $loopResult = new LoopResult();
 
         try {
             if (true === $this->securityContext->isGranted($roles, $resource === null ? array() : $resource, $access === null ? array() : $access)) {

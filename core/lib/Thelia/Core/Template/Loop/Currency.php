@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -44,9 +45,9 @@ use Thelia\Type\EnumListType;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Currency extends BaseI18nLoop
+class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -76,17 +77,12 @@ class Currency extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = CurrencyQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search, array('NAME'));
+        $this->configureI18nProcessing($search, array('NAME'));
 
         $id = $this->getId();
 
@@ -162,17 +158,18 @@ class Currency extends BaseI18nLoop
         }
 
         /* perform search */
-        $currencies = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($currencies);
+    }
 
-        foreach ($currencies as $currency) {
-
-            $loopResultRow = new LoopResultRow($loopResult, $currency, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $currency) {
+            $loopResultRow = new LoopResultRow($currency);
             $loopResultRow
                 ->set("ID"            , $currency->getId())
                 ->set("IS_TRANSLATED" , $currency->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"        , $locale)
+                ->set("LOCALE"        , $this->locale)
                 ->set("NAME"          , $currency->getVirtualColumn('i18n_NAME'))
                 ->set("ISOCODE"       , $currency->getCode())
                 ->set("SYMBOL"        , $currency->getSymbol())
@@ -185,5 +182,6 @@ class Currency extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -43,9 +44,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Profile extends BaseI18nLoop
+class Profile extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -57,17 +58,12 @@ class Profile extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = ProfileQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -77,16 +73,17 @@ class Profile extends BaseI18nLoop
 
         $search->orderById(Criteria::ASC);
 
-        /* perform search */
-        $profiles = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($profiles);
+    }
 
-        foreach ($profiles as $profile) {
-            $loopResultRow = new LoopResultRow($loopResult, $profile, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $profile) {
+            $loopResultRow = new LoopResultRow($profile);
             $loopResultRow->set("ID", $profile->getId())
                 ->set("IS_TRANSLATED",$profile->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("CODE",$profile->getCode())
                 ->set("TITLE",$profile->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $profile->getVirtualColumn('i18n_CHAPO'))

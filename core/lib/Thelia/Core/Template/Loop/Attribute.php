@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -47,9 +48,11 @@ use Thelia\Model\Map\AttributeTemplateTableMap;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Attribute extends BaseI18nLoop
+class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $useAttributePosistion;
+
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -72,12 +75,7 @@ class Attribute extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = AttributeQuery::create();
 
@@ -86,7 +84,7 @@ class Attribute extends BaseI18nLoop
         $lang = $this->getLang();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -104,7 +102,7 @@ class Attribute extends BaseI18nLoop
         $template = $this->getTemplate();
         $exclude_template = $this->getExcludeTemplate();
 
-        $use_attribute_pos = true;
+        $this->useAttributePosistion = true;
 
         if (null !== $product) {
             // Find all template assigned to the products.
@@ -132,7 +130,7 @@ class Attribute extends BaseI18nLoop
                 ->filterByTemplate(TemplateQuery::create()->findById($template), Criteria::IN)
             ;
 
-            $use_attribute_pos = false;
+            $this->useAttributePosistion = false;
         } elseif (null !== $exclude_template) {
 
             // Join with attribute_template table to get position
@@ -144,7 +142,7 @@ class Attribute extends BaseI18nLoop
                 ->filterById($exclude_attributes, Criteria::NOT_IN)
             ;
 
-            $use_attribute_pos = false;
+            $this->useAttributePosistion = false;
         }
 
         $orders  = $this->getOrder();
@@ -164,13 +162,13 @@ class Attribute extends BaseI18nLoop
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
-                    if ($use_attribute_pos)
+                    if ($this->useAttributePosistion)
                         $search->orderByPosition(Criteria::ASC);
                      else
                         $search->addAscendingOrderByColumn(AttributeTemplateTableMap::POSITION);
                     break;
                 case "manual_reverse":
-                    if ($use_attribute_pos)
+                    if ($this->useAttributePosistion)
                         $search->orderByPosition(Criteria::DESC);
                      else
                         $search->addDescendingOrderByColumn(AttributeTemplateTableMap::POSITION);
@@ -178,26 +176,28 @@ class Attribute extends BaseI18nLoop
             }
         }
 
-        /* perform search */
-        $attributes = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($attributes);
+    }
 
-        foreach ($attributes as $attribute) {
-            $loopResultRow = new LoopResultRow($loopResult, $attribute, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $attribute) {
+            $loopResultRow = new LoopResultRow($attribute);
             $loopResultRow->set("ID", $attribute->getId())
                 ->set("IS_TRANSLATED",$attribute->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("TITLE",$attribute->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $attribute->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $attribute->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $attribute->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("POSITION", $use_attribute_pos ? $attribute->getPosition() : $attribute->getVirtualColumn('position'))
+                ->set("POSITION", $this->useAttributePosistion ? $attribute->getPosition() : $attribute->getVirtualColumn('position'))
             ;
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
+
     }
 }

@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -44,9 +45,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Address extends BaseLoop
+class Address extends BaseLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -80,12 +81,7 @@ class Address extends BaseLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = AddressQuery::create();
 
@@ -100,7 +96,7 @@ class Address extends BaseLoop
         if ($customer === 'current') {
             $currentCustomer = $this->securityContext->getCustomerUser();
             if ($currentCustomer === null) {
-                return new LoopResult();
+                return null;
             } else {
                 $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
             }
@@ -122,12 +118,14 @@ class Address extends BaseLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $addresses = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($addresses);
+    }
 
-        foreach ($addresses as $address) {
-            $loopResultRow = new LoopResultRow($loopResult, $address, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $address) {
+            $loopResultRow = new LoopResultRow($address);
             $loopResultRow
                 ->set("ID", $address->getId())
                 ->set("LABEL", $address->getLabel())

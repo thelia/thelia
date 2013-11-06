@@ -22,9 +22,9 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Module\BaseModule;
 
 /**
@@ -32,7 +32,7 @@ use Thelia\Module\BaseModule;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@gmail.com>
  */
-class Payment extends BaseSpecificModule
+class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
 {
 
     public function getArgDefinitions()
@@ -42,21 +42,10 @@ class Payment extends BaseSpecificModule
         return $collection;
     }
 
-    public function exec(&$pagination)
+    public function parseResults(LoopResult $loopResult)
     {
-        $search = parent::exec($pagination);
-        /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
-
-        $search->filterByType(BaseModule::PAYMENT_MODULE_TYPE, Criteria::EQUAL);
-
-        /* perform search */
-        $paymentModules = $this->search($search, $pagination);
-
-        $loopResult = new LoopResult($paymentModules);
-
-        foreach ($paymentModules as $paymentModule) {
-            $loopResultRow = new LoopResultRow($loopResult, $paymentModule, $this->versionable, $this->timestampable, $this->countable);
+        foreach ($loopResult->getResultDataCollection() as $paymentModule) {
+            $loopResultRow = new LoopResultRow($paymentModule);
 
             $moduleReflection = new \ReflectionClass($paymentModule->getFullNamespace());
             if ($moduleReflection->isSubclassOf("Thelia\Module\PaymentModuleInterface") === false) {
@@ -79,5 +68,10 @@ class Payment extends BaseSpecificModule
         }
 
         return $loopResult;
+    }
+
+    protected function getModuleType()
+    {
+        return BaseModule::PAYMENT_MODULE_TYPE;
     }
 }
