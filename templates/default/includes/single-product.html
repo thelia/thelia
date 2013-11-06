@@ -19,6 +19,9 @@
             {loop name="product_thumbnail" type="image" product=$ID width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
                 <img itemprop="image" src="{$IMAGE_URL}" alt="{$productTitle}">
             {/loop}
+            {elseloop rel="product_thumbnail"}
+                {images file='../assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="{$productTitle}">{/images}
+            {/elseloop}
             <span class="mask"></span>
         </a>
 
