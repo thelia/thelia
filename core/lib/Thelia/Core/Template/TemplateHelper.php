@@ -171,7 +171,7 @@ class TemplateHelper
 
                             $matches = array();
 
-                            if (preg_match_all('/'.$prefix.'((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)\1/', $content, $matches)) {
+                            if (preg_match_all('/'.$prefix.'((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)\1/ms', $content, $matches)) {
 
                                 Tlog::getInstance()->debug("Strings found: ", $matches[2]);
 
