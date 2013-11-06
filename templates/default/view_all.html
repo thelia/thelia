@@ -22,8 +22,8 @@
     <article class="col-main  {$smarty.get.mode|default:"grid"}"  role="main" aria-labelledby="main-label">
 
         <h1 id="main-label" class="page-header">{if $product_type == "new"}{intl l="Latest products"}{elseif $product_type == "offers"}{intl l="Product Offers"}{/if}</h1>
-
-        {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order amount={count type="product" promo="{$product_type == "offers"}" new="{$product_type == "new"}"}}
+        {assign var="amount" value="{count type="product" promo="{$product_type == "offers"}" new="{$product_type == "new"}"}"}
+        {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order  amount={$amount}}
         <div id="category-products">
             <div class="products-content">
                 {ifloop rel="product_list"}
@@ -39,7 +39,7 @@
             </div>
         </div><!-- /#category-products -->
         {ifloop rel="product_list"}
-            {include file="includes/toolbar.html" toolbar="bottom"}
+            {include file="includes/toolbar.html" toolbar="bottom" amount={$amount}}
         {/ifloop}
     </article>
 
