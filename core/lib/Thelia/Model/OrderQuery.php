@@ -55,7 +55,7 @@ class OrderQuery extends BaseOrderQuery
         return $obj;
     }
 
-    public static function getSaleStats($month, $year)
+    public static function getMonthlySaleStats($month, $year)
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
@@ -75,7 +75,7 @@ class OrderQuery extends BaseOrderQuery
         return $stats;
     }
 
-    public static function getOrdersStats($month, $year, $status = null)
+    public static function getMonthlyOrdersStats($month, $year, $status = null)
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
@@ -121,5 +121,42 @@ class OrderQuery extends BaseOrderQuery
         return $stats;
     }
 
+    /**
+     * @param \DateTime $startDate
+     * @param \DateTime $endDate
+     * @param           $includeShipping
+     *
+     * @return int
+     */
+    public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping)
+    {
+        $amount = 0;
+        foreach(self::create()
+                    ->filterByStatusId(array(2,3,4), Criteria::IN)
+                    ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
+                    ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
+                    ->find() as $order) {
+            $tax = 0;
+            $amount += $order->getTotalAmount($tax, $includeShipping);
+        }
+
+        return $amount;
+    }
+
+    /**
+     * @param \DateTime $startDate
+     * @param \DateTime $endDate
+     * @param           $status
+     *
+     * @return int
+     */
+    public static function getOrderStats(\DateTime $startDate, \DateTime $endDate, $status = array(1,2,3,4))
+    {
+        return self::create()
+            ->filterByStatusId($status, Criteria::IN)
+            ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
+            ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
+            ->count();
+    }
 
 } // OrderQuery

@@ -16,10 +16,12 @@ define('DS'                  , DIRECTORY_SEPARATOR);
 $loader = require __DIR__ . "/vendor/autoload.php";
 
 if (!file_exists(THELIA_ROOT . '/local/config/database.yml') && !defined('THELIA_INSTALL_MODE')) {
-    $request = \Thelia\Core\HttpFoundation\Request::createFromGlobals();
-    header('location: '.$request->getSchemeAndHttpHost() . '/install');
-    exit;
+    $sapi = php_sapi_name();
+    if (substr($sapi, 0, 3) == 'cli') {
+        define('THELIA_INSTALL_MODE', true);
+    } else {
+        $request = \Thelia\Core\HttpFoundation\Request::createFromGlobals();
+        header('location: '.$request->getSchemeAndHttpHost() . '/install');
+        exit;
+    }
 }
-/*else {
-    define('THELIA_INSTALL_MODE',true);
-}*/

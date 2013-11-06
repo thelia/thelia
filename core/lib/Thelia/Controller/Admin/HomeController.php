@@ -48,7 +48,7 @@ class HomeController extends BaseAdminController
         /* sales */
         $saleSeries = new \stdClass();
         $saleSeries->color = $this->getRequest()->query->get('sales_color', '#adadad');
-        $saleSeries->data = OrderQuery::getSaleStats(
+        $saleSeries->data = OrderQuery::getMonthlySaleStats(
             $this->getRequest()->query->get('month', date('m')),
             $this->getRequest()->query->get('year', date('Y'))
         );
@@ -56,7 +56,7 @@ class HomeController extends BaseAdminController
         /* new customers */
         $newCustomerSeries = new \stdClass();
         $newCustomerSeries->color = $this->getRequest()->query->get('customers_color', '#f39922');
-        $newCustomerSeries->data = CustomerQuery::getNewCustomersStats(
+        $newCustomerSeries->data = CustomerQuery::getMonthlyNewCustomersStats(
             $this->getRequest()->query->get('month', date('m')),
             $this->getRequest()->query->get('year', date('Y'))
         );
@@ -64,7 +64,7 @@ class HomeController extends BaseAdminController
         /* orders */
         $orderSeries = new \stdClass();
         $orderSeries->color = $this->getRequest()->query->get('orders_color', '#5cb85c');
-        $orderSeries->data = OrderQuery::getOrdersStats(
+        $orderSeries->data = OrderQuery::getMonthlyOrdersStats(
             $this->getRequest()->query->get('month', date('m')),
             $this->getRequest()->query->get('year', date('Y'))
         );
@@ -80,7 +80,7 @@ class HomeController extends BaseAdminController
         /* cancelled orders */
         $cancelledOrderSeries = new \stdClass();
         $cancelledOrderSeries->color = $this->getRequest()->query->get('cancelled_orders_color', '#d9534f');
-        $cancelledOrderSeries->data = OrderQuery::getOrdersStats(
+        $cancelledOrderSeries->data = OrderQuery::getMonthlyOrdersStats(
             $this->getRequest()->query->get('month', date('m')),
             $this->getRequest()->query->get('year', date('Y')),
             array(5)
