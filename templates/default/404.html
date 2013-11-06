@@ -12,31 +12,11 @@
 
 {block name="main-content"}
 <div class="main">
-    <article id="cart" class="col-main" role="main" aria-labelledby="main-label">
-
-        <h1 id="main-label" class="page_404">
+    <article class="col-main" role="main" aria-labelledby="main-label">
+        <h1 id="main-label">
             404
             <span>{intl l="The page cannot be found"}</span>
         </h1>
-
-
-
-        {ifloop rel="product_upsell"}
-            <aside id="products-upsell" role="complementary" aria-labelledby="products-upsell-label">
-                <div class="products-heading">
-                    <h3 id="products-upsell-label">{intl l="Upsell Products"}</h3>
-                </div>
-
-                <div class="products-content">
-                    <ul class="products-grid product-col-5 hover-effect">
-                        {loop name="product_upsell" type="product" promo="yes" limit="5"}
-                            {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="218" height="146"}
-                        {/loop}
-
-                    </ul>
-                </div>
-            </aside><!-- #products-upsell -->
-        {/ifloop}
-
-    </div>
+    </article>
+</div>
 {/block}

@@ -60,7 +60,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     }
 
-    public function updateProfil(CustomerCreateOrUpdateEvent $event)
+    public function updateProfile(CustomerCreateOrUpdateEvent $event)
     {
 
         $customer = $event->getCustomer();
@@ -166,7 +166,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::CUSTOMER_CREATEACCOUNT    => array('create', 128),
             TheliaEvents::CUSTOMER_UPDATEACCOUNT    => array('modify', 128),
-            TheliaEvents::CUSTOMER_UPDATEPROFIL     => array('updateProfil', 128),
+            TheliaEvents::CUSTOMER_UPDATEPROFILE     => array('updateProfile', 128),
             TheliaEvents::CUSTOMER_LOGOUT           => array('logout', 128),
             TheliaEvents::CUSTOMER_LOGIN            => array('login', 128),
             TheliaEvents::CUSTOMER_DELETEACCOUNT    => array('delete', 128),
