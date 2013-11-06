@@ -33,9 +33,9 @@
                     </xs:annotation>
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element type="xs:string" name="name"/>
+                            <xs:element type="xs:string" name="name" minOccurs="1" maxOccurs="1"/>
                             <xs:element type="xs:string" name="company" minOccurs="0" maxOccurs="1"/>
-                            <xs:element type="xs:string" name="email"/>
+                            <xs:element type="xs:string" name="email" minOccurs="1" maxOccurs="1"/>
                             <xs:element type="xs:anyURI" name="website" minOccurs="0" maxOccurs="1"/>
                         </xs:sequence>
                     </xs:complexType>
@@ -52,13 +52,13 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
-                <xs:element name="prerequis" minOccurs="0" maxOccurs="1">
+                <xs:element name="required" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Les plugins qui doivent déjà être présents</xs:documentation>
                     </xs:annotation>
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="plugin" maxOccurs="unbounded" minOccurs="0">
+                            <xs:element name="module" maxOccurs="unbounded" minOccurs="0">
                                 <xs:complexType>
                                     <xs:simpleContent>
                                         <xs:extension base="xs:string">
