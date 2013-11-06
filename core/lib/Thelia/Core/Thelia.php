@@ -123,8 +123,10 @@ class Thelia extends Kernel
 
         if (defined("THELIA_INSTALL_MODE") === false) {
             $modules = \Thelia\Model\ModuleQuery::getActivated();
-            $translator = $container->getDefinition('thelia.translator');
-            $dirs = array();
+
+            $translationDirs = array();
+            $templateDirs = array();
+            $parser = $container->getDefinition('thelia.parser');
             foreach ($modules as $module) {
 
                 try {
@@ -138,43 +140,57 @@ class Thelia extends Kernel
                         $defintion
                     );
 
-                    $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/Config"));
+                    $code = ucfirst($module->getCode());
+
+                    $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . "/" . $code . "/Config"));
                     $loader->load("config.xml");
 
-                    if (is_dir($dir = THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/I18n")) {
-                        $dirs[] = $dir;
+                    if (is_dir($dir = THELIA_MODULE_DIR . "/" . $code . "/I18n")) {
+                        $translationDirs[] = $dir;
+                    }
+
+                    if (is_dir($dir = THELIA_MODULE_DIR . "/" . $code . "/templates")) {
+                        //$templateDirs[$code] = $dir;
+                        $parser->addMethodCall('addTemplateDir', array($dir, $code));
                     }
                 } catch (\InvalidArgumentException $e) {
-                    // FIXME: process module configuration exception
+                    // TODO: process module configuration exception
                 }
             }
 
             //Load translation from templates
             //core translation
-            $dirs[] = THELIA_ROOT . "/core/lib/Thelia/Config/I18n";
+            $translationDirs[] = THELIA_ROOT . "/core/lib/Thelia/Config/I18n";
 
             //admin template
             if(is_dir($dir = THELIA_TEMPLATE_DIR . '/admin/default/I18n')) {
-                $dirs[] = $dir;
+                $translationDirs[] = $dir;
             }
 
             //front template
             $template = ConfigQuery::getActiveTemplate();
             if(is_dir($dir = THELIA_TEMPLATE_DIR . $template . "/I18n")) {
-                $dirs[] = $dir;
+                $translationDirs[] = $dir;
             }
 
-            if ($dirs) {
-                $finder = Finder::create()
-                    ->files()
-                    ->depth(0)
-                    ->in($dirs);
-
-                foreach ($finder as $file) {
-                    list($locale, $format) = explode('.', $file->getBaseName(), 2);
-                    $translator->addMethodCall('addResource', array($format, (string) $file, $locale));
-                }
+            if ($translationDirs) {
+                $this->loadTranslation($container, $translationDirs);
             }
+        }
+    }
+
+    private function loadTranslation(ContainerBuilder $container, array $dirs)
+    {
+        $translator = $container->getDefinition('thelia.translator');
+
+        $finder = Finder::create()
+            ->files()
+            ->depth(0)
+            ->in($dirs);
+
+        foreach ($finder as $file) {
+            list($locale, $format) = explode('.', $file->getBaseName(), 2);
+            $translator->addMethodCall('addResource', array($format, (string) $file, $locale));
         }
     }
 

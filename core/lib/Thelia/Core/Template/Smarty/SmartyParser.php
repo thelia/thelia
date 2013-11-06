@@ -37,13 +37,12 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param Request                  $request
      * @param EventDispatcherInterface $dispatcher
      * @param ParserContext            $parserContext
-     * @param bool                     $template
      * @param string                   $env
      * @param bool                     $debug
      */
     public function __construct(
             Request $request, EventDispatcherInterface $dispatcher, ParserContext $parserContext,
-            $template = false, $env = "prod", $debug = false)
+            $env = "prod", $debug = false)
     {
         parent::__construct();
 
@@ -62,7 +61,7 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
 
-        $this->setTemplate($template ?: ConfigQuery::read('active-template', 'default'));
+        //$this->setTemplate($template ?: ConfigQuery::read('active-template', 'default'));
 
         $this->debugging = $debug;
 
