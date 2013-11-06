@@ -1,7 +1,7 @@
 <div class="toolbar toolbar-{$toolbar}" role="toolbar">
     {if $toolbar == "top" }
     <div class="sorter-container">
-        {*<span class="amount">9 {intl l="Item(s)"}</span>*}
+        <span class="amount">{if ($amount > 1)}{intl l="%nb Items" nb="{$amount}"}{else}{intl l="%nb Item" nb="{$amount}"}{/if}</span>
 
             <span class="limiter">
                 <label for="limit-top">{intl l="Show"}</label>

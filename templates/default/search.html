@@ -20,14 +20,13 @@
     <article class="col-main  {$smarty.get.mode|default:"grid"}"  role="main" aria-labelledby="main-label">
 
         <h1 id="main-label" class="page-header">{intl l="Search Result for"} <small>{$smarty.get.q}</small></h1>
-        {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order}
+        {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order amount={count type="product" title="{$smarty.get.q}"}}
         <div id="category-products">
             <div class="products-content">
                 {ifloop rel="product_list"}
                     <ul class="product-col-3">
                         {loop type="product" name="product_list" title="{$smarty.get.q}"  limit=$limit page=$product_page order=$product_order}
                             {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="369" height="247"}
-                            {assign "products_count" $LOOP_TOTAL}
                         {/loop}
                     </ul>
                 {/ifloop}

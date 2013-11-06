@@ -156,6 +156,10 @@ return array (
   'List' => '',
   'Next' => '',
   'Previous' => '',
+  '%nb Items' => '',
+  '%nb Item' => '',
+  'Latest products' => '',
+  'Product Offers' => '',
 /*
   'The page cannot be found' => '',
   'What\'s your name?' => '',

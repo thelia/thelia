@@ -156,6 +156,10 @@ return array (
     'List' => 'Liste',
     'Next' => 'Suivant',
     'Previous' => 'Précédent',
+    '%nb Items' => '%nb produits',
+    '%nb Item' => '%nb produit',
+    'Latest products' => 'Derniers produits',
+    'Product Offers' => 'Produits en promotion',
 
     /*
       'The page cannot be found' => '',

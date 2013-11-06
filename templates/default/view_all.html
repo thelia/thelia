@@ -13,43 +13,34 @@
 {block name="main-content"}
     <div class="main">
 
+    {* Parameters *}
     {$limit={$smarty.get.limit|default:8}}
     {$product_page={$smarty.get.page|default:1}}
-    {$product_order={$smarty.get.order|default:'alpha'}}
+    {$product_order={$smarty.get.order|default:'new'}}
+    {$product_type={$smarty.get.type|default:'new'}}
 
-<article class="col-main  {$smarty.get.mode|default:"grid"}"  role="main" aria-labelledby="main-label">
+    <article class="col-main  {$smarty.get.mode|default:"grid"}"  role="main" aria-labelledby="main-label">
 
-    {if $smarty.get.type == "new"}
-        <h1 id="main-label" class="page-header">{intl l="View all"} {$smarty.get.type} {intl l="products"}</h1>
-        {else}
-        <h1 id="main-label" class="page-header">{intl l="View all"} {intl l="offers"}</h1>
-    {/if}
-    {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order}
-    <div id="category-products">
-        <div class="products-content">
-            {ifloop rel="product_list"}
-                <ul class="product-col-3">
-                    {if $smarty.get.type == "new"}
-                        {loop type="product" name="product_list" limit=$limit page=$product_page order=$product_order}
+        <h1 id="main-label" class="page-header">{if $product_type == "new"}{intl l="Latest products"}{elseif $product_type == "offers"}{intl l="Product Offers"}{/if}</h1>
+
+        {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order amount={count type="product" promo="{$product_type == "offers"}" new="{$product_type == "new"}"}}
+        <div id="category-products">
+            <div class="products-content">
+                {ifloop rel="product_list"}
+                    <ul class="product-col-3">
+                        {loop type="product" promo="{$product_type == "offers"}" new="{$product_type == "new"}" name="product_list" limit=$limit page=$product_page order=$product_order}
                             {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="700" height="320"}
                         {/loop}
-                        {else}
-                        {loop type="product" name="product_list"  promo="yes" limit=$limit page=$product_page order=$product_order}
-                            {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="700" height="320"}
-                        {/loop}
-                    {/if}
-
-
-                </ul>
-            {/ifloop}
-            {elseloop  rel="product_list"}
-                <h2 class="text-center">{intl l="No results found"} </h2>
-            {/elseloop}
-        </div>
-    </div><!-- /#category-products -->
-    {ifloop rel="product_list"}
-        {include file="includes/toolbar.html" toolbar="bottom"}
-    {/ifloop}
+                    </ul>
+                {/ifloop}
+                {elseloop  rel="product_list"}
+                    <h2 class="text-center">{intl l="No results found"} </h2>
+                {/elseloop}
+            </div>
+        </div><!-- /#category-products -->
+        {ifloop rel="product_list"}
+            {include file="includes/toolbar.html" toolbar="bottom"}
+        {/ifloop}
     </article>
 
 </div><!-- /.layout -->
