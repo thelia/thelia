@@ -230,7 +230,7 @@ return array (
     'Total including discount' => 'Total avec remise',
     'Postage' => 'Frais de livraison',
     'Total' => 'Total',
-    'Payment information' = 'Informations de paiement',
+    'Payment information' => 'Informations de paiement',
     'Payment module' => 'Module de paiement',
     'Transaction reference' => 'Référence de la transaction',
     'Delivery module' => 'Module de livraison',
