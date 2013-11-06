@@ -202,7 +202,7 @@
 
 	{elseloop rel="top-bar-auth"}
 	    <div class="brandbar brandbar-wide container">
-	        <a class="navbar-brand" href="{url path='/admin'}">{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}</a>
+	        <a class="navbar-brand" href="{url path='/admin'}">{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, the open source e-commerce solution'}" />{/images}</a>
 	    </div>
 	{/elseloop}
 
