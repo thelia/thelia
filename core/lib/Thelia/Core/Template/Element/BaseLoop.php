@@ -410,6 +410,11 @@ abstract class BaseLoop
         }
     }
 
+    /**
+     * @param LoopResult $loopResult
+     *
+     * @return LoopResult
+     */
     abstract public function parseResults(LoopResult $loopResult);
 
     /**

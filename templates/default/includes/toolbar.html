@@ -30,8 +30,8 @@
             <span class="view-mode">
                 <span class="view-mode-label">{intl l="View as"}:</span>
                 <span class="view-mode-btn">
-                    <a href="{url path="{navigate to="current"}" mode='grid'}" data-toggle="view" role="button" class="btn btn-grid"><i class="icon-grid"></i></a>
-                    <a href="{url path="{navigate to="current"}" mode="list"}" data-toggle="view" role="button" class="btn btn-list "><i class="icon-list"></i></a>
+                    <a href="{url path="{navigate to="current"}" mode="grid"}" data-toggle="view" role="button" title="{intl l="Grid"}" rel="nofollow" class="btn btn-grid"><i class="icon-grid"></i></a>
+                    <a href="{url path="{navigate to="current"}" mode="list"}" data-toggle="view" role="button" title="{intl l="List"}" rel="nofollow" class="btn btn-list"><i class="icon-list"></i></a>
                 </span>
             </span><!-- /.view-mode -->
 
@@ -42,9 +42,9 @@
         <ul class="pagination">
 
             {if $product_page > 1}
-                <li><a href="{url path={navigate to="current"} page={$product_page-1} }" class="prev"><i class="icon-prev"></i></a></li>
+                <li><a href="{url path={navigate to="current"} page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="icon-prev"></i></a></li>
             {else}
-                <li><a href="#" class="prev"><i class="icon-prev"></i></a></li>
+                <li><a href="#" title="{intl l="Previous"}" class="prev"><i class="icon-prev"></i></a></li>
             {/if}
             {pageloop rel="product_list"}
             {if $PAGE != $CURRENT}
@@ -54,9 +54,9 @@
             {/if}
             {if $PAGE == $LAST}
                 {if $CURRENT < $LAST}
-                    <li><a href="{url path={navigate to="current"} page={$CURRENT+1} }" class="next"><i class="icon-next"></i></a></li>
+                    <li><a href="{url path={navigate to="current"} page={$CURRENT+1} }"  title="{intl l="Next"}" class="next"><i class="icon-next"></i></a></li>
                 {else}
-                    <li><a href="#" class="next"><i class="icon-next"></i></a></li>
+                    <li><a href="#" title="{intl l="Next"}" class="next"><i class="icon-next"></i></a></li>
                 {/if}
 
             {/if}
