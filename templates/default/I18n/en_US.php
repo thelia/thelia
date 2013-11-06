@@ -152,6 +152,10 @@ return array (
   'Select Country' => 'Select Country',
   'Create' => 'Create',
   'Related' => 'Related',
+  'Grid' => 'Grid',
+  'List' => 'List',
+  'Next' => 'Next',
+  'Previous' => 'Previous',
 /*
   'The page cannot be found' => 'The page cannot be found',
   'What\'s your name?' => 'What\'s your name?',
