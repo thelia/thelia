@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -42,9 +43,9 @@ use Thelia\Model\OrderAddressQuery;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class OrderAddress extends BaseLoop
+class OrderAddress extends BaseLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -56,12 +57,7 @@ class OrderAddress extends BaseLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = OrderAddressQuery::create();
 
@@ -69,12 +65,14 @@ class OrderAddress extends BaseLoop
 
         $search->filterById($id, Criteria::IN);
 
-        $orderAddresses = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($orderAddresses);
+    }
 
-        foreach ($orderAddresses as $orderAddress) {
-            $loopResultRow = new LoopResultRow($loopResult, $orderAddress, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $orderAddress) {
+            $loopResultRow = new LoopResultRow($orderAddress);
             $loopResultRow
                 ->set("ID", $orderAddress->getId())
                 ->set("TITLE", $orderAddress->getCustomerTitleId())
@@ -94,5 +92,6 @@ class OrderAddress extends BaseLoop
         }
 
         return $loopResult;
+
     }
 }

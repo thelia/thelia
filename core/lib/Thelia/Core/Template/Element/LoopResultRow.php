@@ -30,28 +30,12 @@ class LoopResultRow
     protected $substitution = array();
 
     public $model = null;
-    public $loopResult;
 
-    public $versionable = false;
-    public $timestampable = false;
-    public $countable = false;
-
-    public function __construct($loopResult = null, $model = null, $versionable = false, $timestampable = false, $countable = true)
+    public function __construct($model = null)
     {
         if ($model instanceof ActiveRecordInterface) {
             $this->model = $model;
-
-            $this->versionable = $versionable;
-            $this->timestampable = $timestampable;
         }
-
-        if ($loopResult instanceof LoopResult) {
-            $this->loopResult = $loopResult;
-
-            $this->countable = $countable;
-        }
-
-        $this->assignDefaultOutputs();
     }
 
     public function set($key, $value)
@@ -74,40 +58,5 @@ class LoopResultRow
     public function getVars()
     {
         return array_keys($this->substitution);
-    }
-
-    protected function getTimestampOutputs()
-    {
-        return array(
-            array('CREATE_DATE', 'getCreatedAt'),
-            array('UPDATE_DATE', 'getUpdatedAt'),
-        );
-    }
-
-    protected function getVersionOutputs()
-    {
-        return array(
-            array('VERSION', 'getVersion'),
-            array('VERSION_DATE', 'getVersionCreatedAt'),
-            array('VERSION_AUTHOR', 'getVersionCreatedBy'),
-        );
-    }
-
-    protected function assignDefaultOutputs()
-    {
-        if (true === $this->versionable) {
-            foreach ($this->getVersionOutputs() as $output) {
-                $this->set($output[0], $this->model->$output[1]());
-            }
-        }
-        if (true === $this->timestampable) {
-            foreach ($this->getTimestampOutputs() as $output) {
-                $this->set($output[0], $this->model->$output[1]());
-            }
-        }
-        if (true === $this->countable) {
-            $this->set('LOOP_COUNT', 1 + $this->loopResult->getCount());
-            $this->set('LOOP_TOTAL', $this->loopResult->getModelCollectionCount());
-        }
     }
 }

@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 
 use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -43,11 +44,11 @@ use Thelia\Type;
  * @author Franck Allimant <franck@cqfdev.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Order extends BaseLoop implements SearchLoopInterface
+class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
-    public $countable = true;
-    public $timestampable = true;
-    public $versionable = false;
+    protected  $countable = true;
+    protected $timestampable = true;
+    protected $versionable = false;
 
     public function getArgDefinitions()
     {
@@ -131,12 +132,7 @@ class Order extends BaseLoop implements SearchLoopInterface
         }
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = OrderQuery::create();
 
@@ -151,7 +147,7 @@ class Order extends BaseLoop implements SearchLoopInterface
         if ($customer === 'current') {
             $currentCustomer = $this->securityContext->getCustomerUser();
             if ($currentCustomer === null) {
-                return new LoopResult();
+                return null;
             } else {
                 $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
             }
@@ -178,14 +174,16 @@ class Order extends BaseLoop implements SearchLoopInterface
             }
         }
 
-        $orders = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($orders);
+    }
 
-        foreach ($orders as $order) {
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $order) {
             $tax = 0;
             $amount = $order->getTotalAmount($tax);
-            $loopResultRow = new LoopResultRow($loopResult, $order, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow = new LoopResultRow($order);
             $loopResultRow
                 ->set("ID", $order->getId())
                 ->set("REF", $order->getRef())
@@ -213,5 +211,6 @@ class Order extends BaseLoop implements SearchLoopInterface
         }
 
         return $loopResult;
+
     }
 }

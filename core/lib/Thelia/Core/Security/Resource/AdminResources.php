@@ -99,4 +99,6 @@ final class AdminResources
     const TEMPLATE = "admin.configuration.template";
 
     const SYSTEM_LOG = "admin.configuration.system-log";
+
+    const TRANSLATIONS = "admin.configuration.translations";
 }

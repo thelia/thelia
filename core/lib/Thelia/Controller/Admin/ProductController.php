@@ -66,6 +66,7 @@ use Thelia\Model\Product;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Form\ProductCombinationGenerationForm;
 use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
+use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 
 /**
  * Manages products

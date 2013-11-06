@@ -48,7 +48,7 @@ class Module extends AbstractSmartyPlugin
 
             foreach ($modules as $module) {
 
-                $file = sprintf("%s/%s/AdminIncludes/%s.html", THELIA_MODULE_DIR, ucfirst($module->getCode()), $location);
+                $file = sprintf("%s/%s/AdminIncludes/%s.html", THELIA_MODULE_DIR, $module->getBaseDir(), $location);
 
                 if (file_exists($file)) {
                     $content .= file_get_contents($file);

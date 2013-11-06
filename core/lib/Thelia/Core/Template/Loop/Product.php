@@ -29,6 +29,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -52,10 +53,10 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Product extends BaseI18nLoop implements SearchLoopInterface
+class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
-    public $timestampable = true;
-    public $versionable = true;
+    protected $timestampable = true;
+    protected $versionable = true;
 
     /**
      * @return ArgumentCollection
@@ -161,17 +162,11 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
         }
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     * @throws \InvalidArgumentException
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $complex = $this->getComplex();
         if (true === $complex) {
-            return $this->execComplex($pagination);
+            return $this->buildComplex();
         }
 
         $currencyId = $this->getCurrency();
@@ -227,7 +222,7 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
         }
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -459,16 +454,21 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
             }
         }
 
-        /* perform search */
-        $products = $this->search($search, $pagination);
+        return $search;
+    }
 
-        $loopResult = new LoopResult($products);
+    public function parseResults(LoopResult $loopResult)
+    {
+        $complex = $this->getComplex();
+        if (true === $complex) {
+            return $this->parseComplex($loopResult);
+        }
 
         $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
 
-        foreach ($products as $product) {
+        foreach ($loopResult->getResultDataCollection() as $product) {
 
-            $loopResultRow = new LoopResultRow($loopResult, $product, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow = new LoopResultRow($product);
 
             $price = $product->getVirtualColumn('price');
             try {
@@ -512,12 +512,12 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
                 ->set("ID"                      , $product->getId())
                 ->set("REF"                     , $product->getRef())
                 ->set("IS_TRANSLATED"           , $product->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"                  , $locale)
+                ->set("LOCALE"                  , $this->locale)
                 ->set("TITLE"                   , $product->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO"                   , $product->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION"             , $product->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM"            , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL"                     , $product->getUrl($locale))
+                ->set("URL"                     , $product->getUrl($this->locale))
                 ->set("BEST_PRICE"              , $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
                 ->set("BEST_PRICE_TAX"          , $taxedPrice - $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
                 ->set("BEST_TAXED_PRICE"        , $product->getVirtualColumn('is_promo') ? $taxedPromoPrice : $taxedPrice)
@@ -551,13 +551,7 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
         return $loopResult;
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     * @throws \InvalidArgumentException
-     */
-    public function execComplex(&$pagination)
+    public function buildComplex()
     {
         $currencyId = $this->getCurrency();
         if (null !== $currencyId) {
@@ -575,7 +569,7 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
         $search = ProductQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $attributeNonStrictMatch = $this->getAttribute_non_strict_match();
         $isPSELeftJoinList = array();
@@ -978,16 +972,18 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
             }
         }
 
-        /* perform search */
-        $products = $this->search($search, $pagination);
+        return $search;
+    }
 
-        $loopResult = new LoopResult($products);
+    public function parseComplex(LoopResult $results)
+    {
+        $loopResult = new LoopResult($results);
 
         $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
 
-        foreach ($products as $product) {
+        foreach ($loopResult->getResultDataCollection() as $product) {
 
-            $loopResultRow = new LoopResultRow($loopResult, $product, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow = new LoopResultRow($product);
 
             $price = $product->getRealLowestPrice();
 
@@ -1023,12 +1019,12 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
                 ->set("ID"               , $product->getId())
                 ->set("REF"              , $product->getRef())
                 ->set("IS_TRANSLATED"    , $product->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"           , $locale)
+                ->set("LOCALE"           , $this->locale)
                 ->set("TITLE"            , $product->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO"            , $product->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION"      , $product->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM"     , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL"              , $product->getUrl($locale))
+                ->set("URL"              , $product->getUrl($this->locale))
                 ->set("BEST_PRICE"       , $price)
                 ->set("BEST_PRICE_TAX"   , $taxedPrice - $price)
                 ->set("BEST_TAXED_PRICE" , $taxedPrice)

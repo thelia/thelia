@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -45,9 +46,9 @@ use Thelia\Model\TaxQuery;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Tax extends BaseI18nLoop
+class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -70,17 +71,12 @@ class Tax extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = TaxQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search, array('TITLE', 'DESCRIPTION'));
+        $this->configureI18nProcessing($search, array('TITLE', 'DESCRIPTION'));
 
         $id = $this->getId();
 
@@ -142,21 +138,21 @@ class Tax extends BaseI18nLoop
             }
         }
 
-        /* perform search */
-        $taxes = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($taxes);
+    }
 
-        foreach ($taxes as $tax) {
-
-            $loopResultRow = new LoopResultRow($loopResult, $tax, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $tax) {
+            $loopResultRow = new LoopResultRow($tax);
 
             $loopResultRow
                 ->set("ID"                      , $tax->getId())
                 ->set("TYPE"                    , $tax->getType())
                 ->set("REQUIREMENTS"            , $tax->getRequirements())
                 ->set("IS_TRANSLATED"           , $tax->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"                  , $locale)
+                ->set("LOCALE"                  , $this->locale)
                 ->set("TITLE"                   , $tax->getVirtualColumn('i18n_TITLE'))
                 ->set("DESCRIPTION"             , $tax->getVirtualColumn('i18n_DESCRIPTION'))
             ;
@@ -165,5 +161,6 @@ class Tax extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

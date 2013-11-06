@@ -1040,6 +1040,16 @@
         <default key="_controller">Thelia\Controller\Admin\LangController::deactivateDomainAction</default>
     </route>
 
+    <!-- translations management -->
+
+    <route id="admin.configuration.translations" path="/admin/configuration/translations">
+        <default key="_controller">Thelia\Controller\Admin\TranslationsController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.translations.update" path="/admin/configuration/translations/update">
+        <default key="_controller">Thelia\Controller\Admin\TranslationsController::updateAction</default>
+    </route>
+
     <!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">

@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -43,10 +44,10 @@ use Thelia\Type\BooleanOrBothType;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Folder extends BaseI18nLoop
+class Folder extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
-    public $versionable = true;
+    protected $timestampable = true;
+    protected $versionable = true;
 
     /**
      * @return ArgumentCollection
@@ -71,17 +72,12 @@ class Folder extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = FolderQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -148,33 +144,28 @@ class Folder extends BaseI18nLoop
             }
         }
 
-        /* perform search */
-        $folders = $this->search($search, $pagination);
-
         /* @todo */
         $notEmpty  = $this->getNot_empty();
 
-        $loopResult = new LoopResult($folders);
+        return $search;
 
-        foreach ($folders as $folder) {
+    }
 
-            /*
-             * no cause pagination lost :
-             * if ($notEmpty && $folder->countAllProducts() == 0) continue;
-             */
-
-            $loopResultRow = new LoopResultRow($loopResult, $folder, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $folder) {
+            $loopResultRow = new LoopResultRow($folder);
 
             $loopResultRow
                 ->set("ID", $folder->getId())
                 ->set("IS_TRANSLATED",$folder->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("TITLE",$folder->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $folder->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("PARENT", $folder->getParent())
-                ->set("URL", $folder->getUrl($locale))
+                ->set("URL", $folder->getUrl($this->locale))
                 ->set("CHILD_COUNT", $folder->countChild())
                 ->set("CONTENT_COUNT", $folder->countAllContents())
                 ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
@@ -185,5 +176,6 @@ class Folder extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

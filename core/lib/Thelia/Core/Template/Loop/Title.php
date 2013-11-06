@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -42,9 +43,9 @@ use Thelia\Model\CustomerTitleQuery;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Title extends BaseI18nLoop
+class Title extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -56,17 +57,12 @@ class Title extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = CustomerTitleQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search, array('SHORT', 'LONG'));
+        $this->configureI18nProcessing($search, array('SHORT', 'LONG'));
 
         $id = $this->getId();
 
@@ -76,16 +72,17 @@ class Title extends BaseI18nLoop
 
         $search->orderByPosition();
 
-        /* perform search */
-        $titles = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($titles);
+    }
 
-        foreach ($titles as $title) {
-            $loopResultRow = new LoopResultRow($loopResult, $title, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $title) {
+            $loopResultRow = new LoopResultRow($title);
             $loopResultRow->set("ID", $title->getId())
                 ->set("IS_TRANSLATED",$title->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("DEFAULT", $title->getByDefault())
                 ->set("SHORT", $title->getVirtualColumn('i18n_SHORT'))
                 ->set("LONG", $title->getVirtualColumn('i18n_LONG'))
@@ -95,5 +92,6 @@ class Title extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

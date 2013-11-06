@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\LangQuery;
@@ -43,9 +44,9 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Lang extends BaseLoop
+class Lang extends BaseLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -59,12 +60,7 @@ class Lang extends BaseLoop
         );
      }
 
-    /**
-     * @param $pagination (ignored)
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $id      = $this->getId();
         $exclude = $this->getExclude();
@@ -84,13 +80,14 @@ class Lang extends BaseLoop
 
         $search->orderByPosition(Criteria::ASC);
 
-        $results = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($results);
+    }
 
-        foreach ($results as $result) {
-
-            $loopResultRow = new LoopResultRow($loopResult, $result, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $result) {
+            $loopResultRow = new LoopResultRow($result);
 
             $loopResultRow
                 ->set("ID", $result->getId())
@@ -108,5 +105,6 @@ class Lang extends BaseLoop
         }
 
         return $loopResult;
+
     }
 }

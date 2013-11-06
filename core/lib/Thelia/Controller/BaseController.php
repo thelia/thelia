@@ -311,6 +311,11 @@ class BaseController extends ContainerAware
     }
 
     /**
+     *
+     * return an instance of SmartyParser
+     *
+     * Caution : maybe there is still not default template defined.
+     *
      * @return ParserInterface instance parser
      */
     protected function getParser()

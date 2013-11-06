@@ -50,7 +50,6 @@
             <argument type="service" id="request" />
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="thelia.parser.context"/>
-            <argument >false</argument> <!-- Template name, or false  -->
             <argument >%kernel.environment%</argument>
             <argument >%kernel.debug%</argument>
         </service>

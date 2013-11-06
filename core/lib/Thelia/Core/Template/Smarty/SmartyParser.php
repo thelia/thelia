@@ -14,6 +14,7 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Model\ConfigQuery;
+use Thelia\Core\Template\TemplateHelper;
 
 /**
  *
@@ -37,13 +38,12 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param Request                  $request
      * @param EventDispatcherInterface $dispatcher
      * @param ParserContext            $parserContext
-     * @param bool                     $template
      * @param string                   $env
      * @param bool                     $debug
      */
     public function __construct(
             Request $request, EventDispatcherInterface $dispatcher, ParserContext $parserContext,
-            $template = false, $env = "prod", $debug = false)
+            $env = "prod", $debug = false)
     {
         parent::__construct();
 
@@ -62,7 +62,6 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
 
-        $this->setTemplate($template ?: ConfigQuery::read('active-template', 'default'));
 
         $this->debugging = $debug;
 
@@ -77,6 +76,8 @@ class SmartyParser extends Smarty implements ParserInterface
         } else {
             $this->setForceCompile(false);
         }
+
+        //$this->enableSecurity();
 
 
         // The default HTTP status
@@ -104,7 +105,7 @@ class SmartyParser extends Smarty implements ParserInterface
     {
         $this->template = $template_path_from_template_base;
 
-        $this->setTemplateDir(THELIA_TEMPLATE_DIR.$this->template);
+        $this->addTemplateDir(THELIA_TEMPLATE_DIR.$this->template, 0);
 
         $config_dir = THELIA_TEMPLATE_DIR.$this->template.'/configs';
 
@@ -125,6 +126,9 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function render($realTemplateName, array $parameters = array())
     {
+        if(false === $this->templateExists($realTemplateName)) {
+            throw new ResourceNotFoundException();
+        }
         // Assign the parserContext variables
         foreach ($this->parserContext as $var => $value) {
             $this->assign($var, $value);
@@ -132,23 +136,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
         $this->assign($parameters);
 
-        return $this->fetch($realTemplateName);
-    }
-
-    /**
-     *
-     * This method must return a Symfony\Component\HttpFoudation\Response instance or the content of the response
-     *
-     */
-    public function getContent()
-    {
-        try {
-            $templateFile = $this->getTemplateFilePath();
-        } catch (\RuntimeException $e) {
-            return new Response($this->render(\Thelia\Model\ConfigQuery::getPageNotFoundView()), "404");
-        }
-
-        return $this->render($templateFile);
+        return $this->fetch(sprintf("file:%s", $realTemplateName));
     }
 
     /**
@@ -209,26 +197,4 @@ class SmartyParser extends Smarty implements ParserInterface
         }
     }
 
-    protected function getTemplateFilePath()
-    {
-         $file = $this->request->attributes->get('_view');
-         $fileName = THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/" . $file;
-
-        $pathFileName = realpath(dirname(THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/" . $file));
-        $templateDir = realpath(THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/");
-
-        if (strpos($pathFileName, $templateDir) !== 0) {
-            throw new ResourceNotFoundException(sprintf("this view does not exists"));
-        }
-
-        if (!file_exists($fileName)) {
-            $fileName .= ".html";
-
-            if (!file_exists($fileName)) {
-                throw new ResourceNotFoundException(sprintf("file not found in %s template", $this->template));
-            }
-        }
-
-        return $fileName;
-    }
 }

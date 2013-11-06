@@ -29,6 +29,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -44,9 +45,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Resource extends BaseI18nLoop
+class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -64,17 +65,12 @@ class Resource extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = ResourceQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $profile = $this->getProfile();
 
@@ -92,16 +88,17 @@ class Resource extends BaseI18nLoop
 
         $search->orderById(Criteria::ASC);
 
-        /* perform search */
-        $resources = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($resources);
+    }
 
-        foreach ($resources as $resource) {
-            $loopResultRow = new LoopResultRow($loopResult, $resource, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $resource) {
+            $loopResultRow = new LoopResultRow($resource);
             $loopResultRow->set("ID", $resource->getId())
                 ->set("IS_TRANSLATED",$resource->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("CODE",$resource->getCode())
                 ->set("TITLE",$resource->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $resource->getVirtualColumn('i18n_CHAPO'))
@@ -109,7 +106,7 @@ class Resource extends BaseI18nLoop
                 ->set("POSTSCRIPTUM", $resource->getVirtualColumn('i18n_POSTSCRIPTUM'))
             ;
 
-            if (null !== $profile) {
+            if (null !== $this->getProfile()) {
                 $accessValue = $resource->getVirtualColumn('access');
                 $manager = new AccessManager($accessValue);
 
@@ -123,5 +120,6 @@ class Resource extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

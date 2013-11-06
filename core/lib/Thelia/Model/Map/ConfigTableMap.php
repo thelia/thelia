@@ -166,7 +166,7 @@ class ConfigTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('NAME', 'Name', 'VARCHAR', true, 255, null);
-        $this->addColumn('VALUE', 'Value', 'VARCHAR', true, 255, null);
+        $this->addColumn('VALUE', 'Value', 'LONGVARCHAR', true, null, null);
         $this->addColumn('SECURED', 'Secured', 'TINYINT', true, null, 1);
         $this->addColumn('HIDDEN', 'Hidden', 'TINYINT', true, null, 1);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
