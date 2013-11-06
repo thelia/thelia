@@ -14,18 +14,32 @@
                     <figure class="item active">
                         {images file='assets/img/carousel/slider1.png'}<img src="{$asset_url}" alt="img1">{/images}
                     </figure>
- {*                   <figure class="item">
+                    <figure class="item">
                         {images file='assets/img/carousel/slider2.png'}<img src="{$asset_url}" alt="img2">{/images}
                     </figure>
                     <figure class="item">
                         {images file='assets/img/carousel/slider3.png'}<img src="{$asset_url}" alt="img3">{/images}
-                    </figure>*}
+                    </figure>
                 </div>
             </div>
-{*            <a class="left carousel-control" href="#carousel" data-slide="prev"><span class="icon-prev"></span></a>
-            <a class="right carousel-control" href="#carousel" data-slide="next"><span class="icon-next"></span></a>*}
+            <a class="left carousel-control" href="#carousel" data-slide="prev"><span class="icon-prev"></span></a>
+            <a class="right carousel-control" href="#carousel" data-slide="next"><span class="icon-next"></span></a>
         </div>
     </section><!-- #carousel -->
+
+    {if {count type="product"} eq 0}
+    <div class="jumbotron">
+        <h1>Welcome</h1>
+        <p>
+            It's really quick to add a product.
+            <ol>
+                <li>Check <strong>NEW</strong> under the details tab if you want to see your product in the latest product section.</li>
+                <li>Check <strong>SALE</strong> under the details tab if you want to see your product in the offer product section.</li>
+            </ol>
+        </p>
+        <p><a href="{url path="/admin/catalog"}" class="btn btn-jumbotron btn-lg" role="button">Add my first product</a></p>
+    </div>
+    {/if}
 
 
     <section id="products-new">
@@ -92,11 +106,12 @@
                     </article><!-- /product -->
                 </li>
                 {/loop}
-
+                {elseloop rel="product_new"}{include file="demo/product-new.html"}{/elseloop}
             </ul>
         </div>
     </section><!-- #products-new -->
 
+    {ifloop rel="product_promo"}
     <section id="products-offer">
         <div class="products-heading">
             <h2>{intl l="Offers"} <a href="{url path="/view_all" type="offers"}" class="btn-all">{intl l="+ View All"}</a></h2>
@@ -107,8 +122,8 @@
                 {loop name="product_promo" type="product" limit="5" promo="yes"}
                     {include file="includes/single-product.html" product_id=$ID hasBtn=false hasDescription=false width="218" height="146"}
                 {/loop}
-
             </ul>
         </div>
     </section><!-- #products-offer -->
+    {/ifloop}
 {/block}
