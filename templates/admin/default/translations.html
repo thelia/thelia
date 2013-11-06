@@ -34,6 +34,8 @@
 	                                    close_url = {url path='/admin/configuration'}
 	                                }
 
+                                    <input type="hidden" name="edit_language_id" value="{$edit_language_id}" />
+
 	                                <div class="row">
 	                                    <div class="col-md-4">
 			                                <div class="form-group">
@@ -94,7 +96,7 @@
 	                                            <div class="form-group">
 	                                                <label class="control-label" for="item_id">{intl l='Select the PDF template you want to translate'}</label>
 
-	                                                <select id="pdf_template" required="required" name="item_id" class="submit-on-change form-control">
+	                                                <select id="item_id" required="required" name="item_id" class="submit-on-change form-control">
 	                                                    <option value="">{intl l='Please select the PDF template to translate'}</option>
 	                                                    {loop type="template" name="translate-pdf-template" template-type="pdf" backend_context=1}
 	                                                        <option value="{$NAME}" {if $item_id == $NAME}selected="selected"{/if}>{$NAME}</option>
@@ -123,7 +125,9 @@
 
                                 {foreach $all_strings as $hash => $info}
 
-                                    {if $view_missing_traductions_only != 1 || ! isset($translated_strings[$info.chaine]) || $translated_strings[$info.chaine]== ''}
+                                    {$not_translated = empty($info.translation)}
+
+                                    {if $view_missing_traductions_only != 1 || $not_translated }
 
                                         {* Create a liste of files names *}
 
@@ -172,15 +176,17 @@
 	                                            <span id="{$hash}">{$info.chaine}</span>
 
 												{if $info.dollar}
-												    <span class="label label-warning">{intl l='Warning'}</span>
-												    {intl l='This string contains a Smarty variable, and cannot not be translated properly'}
+												    <div>
+												        <span class="label label-warning">{intl l='Warning'}</span>
+												        {intl l='Il seems that this string contains a Smarty variable ($). If \'s the case, it cannot be transleted properly.'}
+												    </div>
 												{/if}
 		                                    </td>
 
-	                                        <td class="col-md-6">
-	                                            <div class="input-group">
+	                                        <td class="col-md-6" >
+	                                            <div class="input-group {if $not_translated}has-error{/if}">
 												    <span class="input-group-addon"><a href="#" data-hash="{$hash}" class="copy-translation" title="{intl l='Copy source text in input field'}"><span class="glyphicon glyphicon-chevron-right"></span></a></span>
-												    <input type="text" class="translation_field form-control" name="{$hash}" value="{$translated_strings[$info.chaine]}" />
+												    <input type="text" class="translation_field form-control" name="{$hash}" value="{$info.translation}" />
 												</div>
 	                                        </td>
 	                                    </tr>
@@ -208,6 +214,10 @@
 
         var translation_changed = false;
 
+        $('#item_to_translate').change(function() {
+        	$('#item_id').val('');
+        });
+
         $('.submit-on-change').change(function() {
             $('#translation_form').submit();
         });
@@ -232,6 +242,16 @@
 
             	ev.preventDefault();
             }
+        });
+
+        // Intercept language changes, to reload string when changing language
+        $('.language-change-button').click(function(ev) {
+
+        	$('input[name=edit_language_id]').val($(this).data('language-id'));
+
+        	$('#translation_form').submit();
+
+        	ev.preventDefault();
         });
     });
 </script>

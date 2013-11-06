@@ -54,9 +54,11 @@ class TranslationsController extends BaseAdminController
 
         $item_id = $this->getRequest()->get('item_id', '');
 
-        $all_strings = $translated_strings = array();
+        $all_strings = array();
 
         $template = $directory = $i18n_directory = false;
+
+        $mode = 'template';
 
         if (! empty($item_id)) {
 
@@ -66,7 +68,14 @@ class TranslationsController extends BaseAdminController
                     if (null !== $module = ModuleQuery::create()->findPk($item_id)) {
                         $directory = THELIA_MODULE_DIR . $module->getBaseDir();
                         $i18n_directory = THELIA_TEMPLATE_DIR . $template->getI18nPath();
+                        $mode = 'php';
                     }
+                    break;
+
+                case 'co' :
+                    $directory = THELIA_ROOT . 'core/lib/Thelia';
+                    $i18n_directory = THELIA_ROOT . 'core/lib/Thelia/Config/I18n';
+                    $mode = 'php';
                 break;
 
                 case 'fo' :
@@ -90,7 +99,7 @@ class TranslationsController extends BaseAdminController
             if ($directory) {
 
                 // Load strings
-                $this->walkDir($directory, $all_strings);
+                $this->walkDir($directory, $mode, $all_strings);
 
                 // Load translated strings
                 if ($i18n_directory) {
@@ -103,7 +112,6 @@ class TranslationsController extends BaseAdminController
                 'item_to_translate'             => $item_to_translate,
                 'item_id'                       => $item_id,
                 'all_strings'                   => $all_strings,
-                'translated_strings'            => $translated_strings,
                 'view_missing_traductions_only' => $this->getRequest()->get('view_missing_traductions_only', 0)
         ));
     }
@@ -136,7 +144,18 @@ class TranslationsController extends BaseAdminController
         return $path;
     }
 
-    protected function walkDir($directory, &$strings) {
+    protected function walkDir($directory, $mode, &$strings) {
+
+        if ($mode == 'php') {
+            $prefix = '\-\>[\s]*trans[\s]*\(';
+
+            $allowed_exts = array('php');
+        } else {
+            $prefix = '\{intl[\s]l=';
+
+            $allowed_exts = array('html', 'tpl', 'xml');
+        }
+
         try {
             //echo "walking in $directory<br />";
 
@@ -144,13 +163,13 @@ class TranslationsController extends BaseAdminController
 
                 if ($fileInfo->isDot()) continue;
 
-                if ($fileInfo->isDir()) $this->walkDir($fileInfo->getPathName(), $strings);
+                if ($fileInfo->isDir()) $this->walkDir($fileInfo->getPathName(), $mode, $strings);
 
                 if ($fileInfo->isFile()) {
 
                     $ext = $fileInfo->getExtension();
 
-                    if ($ext == 'html' || $ext == 'tpl' || $ext == 'xml') {
+                    if (in_array($ext, $allowed_exts)) {
 
                         if ($content = file_get_contents($fileInfo->getPathName())) {
 
@@ -160,7 +179,7 @@ class TranslationsController extends BaseAdminController
 
                             $matches = array();
 
-                            if (preg_match_all('/{intl[\s]l=((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)\1/', $content, $matches)) {
+                            if (preg_match_all('/'.$prefix.'((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)\1/', $content, $matches)) {
 
                                 // print_r($matches[2]);
 
@@ -179,7 +198,9 @@ class TranslationsController extends BaseAdminController
                                         $strings[$hash] = array(
                                                 'files'   => array($short_path),
                                                 'chaine'  => $match,
-                                                'dollar'  => strstr($match, '$') !== false);
+                                                'translation' => $this->getTranslator()->trans($match, array(), 'messages', $this->getCurrentEditionLocale(), false),
+                                                'dollar'  => strstr($match, '$') !== false
+                                    );
                                 }
                             }
                         }
@@ -190,5 +211,4 @@ class TranslationsController extends BaseAdminController
             echo $ex;
         }
     }
-
 }
