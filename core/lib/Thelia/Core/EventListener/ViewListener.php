@@ -33,6 +33,7 @@ use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpKernel\Exception\NotFountHttpException;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateHelper;
 use Thelia\Exception\OrderException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\Redirect;
@@ -77,7 +78,7 @@ class ViewListener implements EventSubscriberInterface
     {
 
         $parser = $this->container->get('thelia.parser');
-        $parser->setTemplate(ConfigQuery::getActiveTemplate());
+        $parser->setTemplate(TemplateHelper::getInstance()->getActiveFrontTemplate()->getPath());
         $request = $this->container->get('request');
 
         try {
