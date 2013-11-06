@@ -14,6 +14,7 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Model\ConfigQuery;
+use Thelia\Core\Template\TemplateHelper;
 
 /**
  *
@@ -62,7 +63,7 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
 
-        $this->setTemplate($template ?: ConfigQuery::read('active-template', 'default'));
+        $this->setTemplate($template ?: TemplateHelper::getInstance()->getActiveFrontTemplate()->getPath());
 
         $this->debugging = $debug;
 

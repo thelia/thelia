@@ -29,6 +29,7 @@ use Thelia\Tools\URL;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\Config;
 use Thelia\Model\ConfigQuery;
+use Thelia\Core\Template\TemplateHelper;
 
 /**
  * This class implements variour admin template utilities
@@ -50,7 +51,7 @@ class AdminUtilities extends AbstractSmartyPlugin
 
         $snippet_path = sprintf('%s/%s/%s.html',
                 THELIA_TEMPLATE_DIR,
-                ConfigQuery::read('base-admin-template', 'admin/default'),
+                TemplateHelper::getInstance()->getActiveAdminTemplate()->getPath(),
                 $templateName
         );
 

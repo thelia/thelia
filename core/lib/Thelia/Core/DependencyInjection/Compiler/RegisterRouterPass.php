@@ -67,26 +67,26 @@ class RegisterRouterPass implements CompilerPassInterface
             $modules = \Thelia\Model\ModuleQuery::getActivated();
 
             foreach ($modules as $module) {
-                $moduleCode = ucfirst($module->getCode());
-                if (file_exists(THELIA_MODULE_DIR . "/" . $moduleCode . "/Config/routing.xml")) {
+                $moduleBaseDir = $module->getBaseDir();
+                if (file_exists(THELIA_MODULE_DIR . "/" . $moduleBaseDir . "/Config/routing.xml")) {
                     $definition = new Definition(
                         $container->getParameter("router.class"),
                         array(
                             new Reference("router.module.xmlLoader"),
-                            ucfirst($module->getCode()) . "/Config/routing.xml",
+                            $moduleBaseDir . "/Config/routing.xml",
                             array(
                                 "cache_dir" => $container->getParameter("kernel.cache_dir"),
                                 "debug" => $container->getParameter("kernel.debug"),
-                                "matcher_cache_class" => $container::camelize("ProjectUrlMatcher".$moduleCode),
-                                "generator_cache_class" => $container::camelize("ProjectUrlGenerator".$moduleCode),
+                                "matcher_cache_class" => $container::camelize("ProjectUrlMatcher".$moduleBaseDir),
+                                "generator_cache_class" => $container::camelize("ProjectUrlGenerator".$moduleBaseDir),
                             ),
                             new Reference("request.context")
                         )
                     );
 
-                    $container->setDefinition("router.".$moduleCode, $definition);
+                    $container->setDefinition("router.".$moduleBaseDir, $definition);
 
-                    $chainRouter->addMethodCall("add", array(new Reference("router.".$moduleCode), 150));
+                    $chainRouter->addMethodCall("add", array(new Reference("router.".$moduleBaseDir), 150));
                 }
             }
         }

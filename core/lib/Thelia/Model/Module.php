@@ -11,4 +11,25 @@ class Module extends BaseModule {
     {
         ModuleQuery::resetActivated();
     }
+
+    /**
+     * @return the module's base directory path, relative to THELIA_MODULE_DIR
+     */
+    public function getBaseDir() {
+        return ucfirst($this->getCode());
+    }
+
+    /**
+     * @return the module's config directory path, relative to THELIA_MODULE_DIR
+     */
+    public function getConfigPath() {
+        return $this->getBaseDir() . DS . "Config";
+    }
+
+    /**
+     * @return the module's i18N directory path, relative to THELIA_MODULE_DIR
+     */
+    public function getI18nPath() {
+        return $this->getBaseDir() . DS . "I18n";
+    }
 }

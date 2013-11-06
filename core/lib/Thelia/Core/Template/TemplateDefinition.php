@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -21,56 +21,82 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Smarty\Plugins;
+namespace Thelia\Core\Template;
+use Thelia\Model\ConfigQuery;
 
-use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
-use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
-use Thelia\Model\ModuleQuery;
-
-class Module extends AbstractSmartyPlugin
+class TemplateDefinition
 {
-    /**
-     * Process theliaModule template inclusion function
-     *
-     * @param  unknown $params
-     * @param \Smarty_Internal_Template $template
-     * @internal param \Thelia\Core\Template\Smarty\Plugins\unknown $smarty
-     *
-     * @return string
-     */
-    public function theliaModule($params, \Smarty_Internal_Template $template)
-    {
-        $content = null;
+    const FRONT_OFFICE = 1;
+    const BACK_OFFICE = 2;
+    const PDF = 3;
 
-        if (false !== $location = $this->getParam($params, 'location', false)) {
-
-            $modules = ModuleQuery::getActivated();
-
-            foreach ($modules as $module) {
-
-                $file = sprintf("%s/%s/AdminIncludes/%s.html", THELIA_MODULE_DIR, $module->getBaseDir(), $location);
-
-                if (file_exists($file)) {
-                    $content .= file_get_contents($file);
-                }
-            }
-        }
-
-        if (! empty($content))
-            return $template->fetch(sprintf("string:%s", $content));
-
-        return "";
-    }
+    const BACK_OFFICE_SUBDIR = 'admin/';
+    const PDF_SUBDIR = 'pdf/';
 
     /**
-     * Define the various smarty plugins hendled by this class
-     *
-     * @return an array of smarty plugin descriptors
+     * @var the template directory name (e.g. 'default')
      */
-    public function getPluginDescriptors()
+    protected $name;
+
+    /**
+     * @var the template directory full path
+     */
+    protected $path;
+
+    /**
+     * @var the template type (front, back, pdf)
+     */
+    protected $type;
+
+
+    public function __construct($name, $type)
     {
-        return array(
-            new SmartyPluginDescriptor('function', 'module_include', $this, 'theliaModule'),
-        );
+        $this->name = $name;
+        $this->type = $type;
+
+        if ($type == self::BACK_OFFICE)
+            $this->path = self::BACK_OFFICE_SUBDIR . $name;
+        else if ($type == self::PDF)
+            $this->path = self::PDF_SUBDIR . $name;
+        else
+            $this->path = $name;
     }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getI18nPath() {
+        return $this->getPath() . DS . 'I18n';
+    }
+
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    public function setPath($path)
+    {
+        $this->path = $path;
+        return $this;
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
+        return $this;
+    }
+
 }

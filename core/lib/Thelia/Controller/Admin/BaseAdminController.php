@@ -43,6 +43,7 @@ use Symfony\Component\Routing\Router;
 use Thelia\Model\Admin;
 use Thelia\Core\Security\Token\CookieTokenProvider;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Core\Template\TemplateHelper;
 
 class BaseAdminController extends BaseController
 {
@@ -199,7 +200,7 @@ class BaseAdminController extends BaseController
         $parser = $this->container->get("thelia.parser");
 
         // Define the template thant shoud be used
-        $parser->setTemplate($template ?: ConfigQuery::read('base-admin-template', 'admin/default'));
+        $parser->setTemplate($template ?: TemplateHelper::getInstance()->getActiveAdminTemplate()->getPath());
 
         return $parser;
     }

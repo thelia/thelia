@@ -49,6 +49,7 @@
         <loop class="Thelia\Core\Template\Loop\Message" name="message"/>
         <loop class="Thelia\Core\Template\Loop\Delivery" name="delivery"/>
         <loop class="Thelia\Core\Template\Loop\ProductTemplate" name="product-template"/> <!--  This is product templates ;-) -->
+        <loop class="Thelia\Core\Template\Loop\Template" name="template"/>
         <loop class="Thelia\Core\Template\Loop\Tax" name="tax"/>
         <loop class="Thelia\Core\Template\Loop\TaxRule" name="tax-rule"/>
         <loop class="Thelia\Core\Template\Loop\TaxRuleCountry" name="tax-rule-country"/>

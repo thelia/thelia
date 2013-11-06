@@ -52,6 +52,7 @@ use Symfony\Component\Config\FileLocator;
 
 use Propel\Runtime\Propel;
 use Propel\Runtime\Connection\ConnectionManagerSingle;
+use Thelia\Core\Template\TemplateHelper;
 
 class Thelia extends Kernel
 {
@@ -138,10 +139,10 @@ class Thelia extends Kernel
                         $defintion
                     );
 
-                    $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/Config"));
+                    $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . $module->getConfigPath()));
                     $loader->load("config.xml");
 
-                    if (is_dir($dir = THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/I18n")) {
+                    if (is_dir($dir = THELIA_MODULE_DIR . $module->getI18nPath())) {
                         $dirs[] = $dir;
                     }
                 } catch (\InvalidArgumentException $e) {
@@ -149,18 +150,22 @@ class Thelia extends Kernel
                 }
             }
 
-            //Load translation from templates
+            // Load translation from templates
             //core translation
-            $dirs[] = THELIA_ROOT . "/core/lib/Thelia/Config/I18n";
+            $dirs[] = THELIA_ROOT . "core/lib/Thelia/Config/I18n";
 
-            //admin template
-            if(is_dir($dir = THELIA_TEMPLATE_DIR . '/admin/default/I18n')) {
+            // admin template
+            if (is_dir($dir = THELIA_TEMPLATE_DIR . TemplateHelper::getInstance()->getActiveAdminTemplate()->getI18nPath())) {
                 $dirs[] = $dir;
             }
 
-            //front template
-            $template = ConfigQuery::getActiveTemplate();
-            if(is_dir($dir = THELIA_TEMPLATE_DIR . $template . "/I18n")) {
+            // front template
+            if (is_dir($dir = THELIA_TEMPLATE_DIR . TemplateHelper::getInstance()->getActiveFrontTemplate()->getI18nPath())) {
+                $dirs[] = $dir;
+            }
+
+            // PDF template
+            if (is_dir($dir = THELIA_TEMPLATE_DIR . TemplateHelper::getInstance()->getActivePdfTemplate()->getI18nPath())) {
                 $dirs[] = $dir;
             }
 

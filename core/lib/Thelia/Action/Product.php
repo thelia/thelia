@@ -54,6 +54,8 @@ use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
+use Thelia\Model\Map\ProductTableMap;
+use Propel\Runtime\Propel;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
@@ -257,21 +259,37 @@ class Product extends BaseAction implements EventSubscriberInterface
 
     public function setProductTemplate(ProductSetTemplateEvent $event)
     {
-        $product = $event->getProduct();
 
-        // Delete all product feature relations
-        FeatureProductQuery::create()->filterByProduct($product)->delete();
+        $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
-        // Delete all product attributes sale elements
-        ProductSaleElementsQuery::create()->filterByProduct($product)->delete();
+        $con->beginTransaction();
 
-        // Update the product template
-        $template_id = $event->getTemplateId();
+        try {
 
-        // Set it to null if it's zero.
-        if ($template_id <= 0) $template_id = NULL;
+            $product = $event->getProduct();
 
-        $product->setTemplateId($template_id)->save();
+            // Delete all product feature relations
+            FeatureProductQuery::create()->filterByProduct($product)->delete($con);
+
+            // Delete all product attributes sale elements
+            ProductSaleElementsQuery::create()->filterByProduct($product)->delete($con);
+
+            // Update the product template
+            $template_id = $event->getTemplateId();
+
+            // Set it to null if it's zero.
+            if ($template_id <= 0) $template_id = NULL;
+
+            $product->setTemplateId($template_id)->save($con);
+
+            // Store all the stuff !
+            $con->commit();
+        } catch (\Exception $ex) {
+
+            $con->rollback();
+
+            throw $ex;
+        }
     }
 
     /**

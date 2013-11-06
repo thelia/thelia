@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -31,29 +32,39 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Base\TemplateQuery;
+use Thelia\Model\ModuleQuery;
+
+use Thelia\Module\BaseModule;
+use Thelia\Type;
+use Thelia\Core\Template\TemplateHelper;
+use Thelia\Core\Template\TemplateDefinition;
 
 /**
  *
- * Template loop
+ * Template loop, to get available back-office or front-office templates.
  *
- *
- * Class Template
  * @package Thelia\Core\Template\Loop
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
  */
 class Template extends BaseI18nLoop
 {
-    public $timestampable = true;
-
     /**
      * @return ArgumentCollection
      */
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('exclude')
+            new Argument(
+                'template_type',
+                new Type\TypeCollection(
+                    new Type\EnumListType(array(
+                        'front-office',
+                        'back-office',
+                        'pdf'
+                    ))
+                )
+            )
         );
     }
 
@@ -64,40 +75,27 @@ class Template extends BaseI18nLoop
      */
     public function exec(&$pagination)
     {
-        $search = TemplateQuery::create();
+        $type = $this->getArg(template_type);
 
-        $backendContext = $this->getBackend_context();
+        if ($type == 'front-office')
+            $templateType = TemplateDefinition::FRONT_OFFICE;
+        else if ($type == 'back-office')
+            $templateType = TemplateDefinition::BACK_OFFICE;
+        else if ($type == 'pdf')
+            $templateType = TemplateDefinition::PDF;
 
-        $lang = $this->getLang();
+        $templates = TemplateHelper::getInstance()->getList($templateType);
 
-        /* manage translations */
-        $locale = $this->configureI18nProcessing($search, $columns = array('NAME'));
-
-        $id = $this->getId();
-
-        if (null !== $id) {
-            $search->filterById($id, Criteria::IN);
-        }
-
-        $exclude = $this->getExclude();
-
-        if (null !== $exclude) {
-            $search->filterById($exclude, Criteria::NOT_IN);
-        }
-
-        /* perform search */
-        $templates = $this->search($search, $pagination);
-
-        $loopResult = new LoopResult($templates);
+        $loopResult = new LoopResult();
 
         foreach ($templates as $template) {
-            $loopResultRow = new LoopResultRow($loopResult, $template, $this->versionable, $this->timestampable, $this->countable);
+
+            $loopResultRow = new LoopResultRow($loopResult);
 
             $loopResultRow
-                ->set("ID", $template->getId())
-                ->set("IS_TRANSLATED" , $template->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"        , $locale)
-                ->set("NAME"          , $template->getVirtualColumn('i18n_NAME'))
+                ->set("NAME"          , $template->getName())
+                ->set("RELATIVE_PATH" , $template->getPath())
+                ->set("ABSOLUTE_PATH" , THELIA_TEMPLATE_DIR . $template->getPath())
             ;
 
             $loopResult->addRow($loopResultRow);

@@ -8,7 +8,8 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('session_config.default', '1', 1, 1, NOW(), NOW()),
 ('verifyStock', '1', 0, 0, NOW(), NOW()),
 ('active-template', 'default', 0, 0, NOW(), NOW()),
-('base-admin-template', 'admin/default', 0, 0, NOW(), NOW()),
+('active-admin-template', 'default', 0, 0, NOW(), NOW()),
+('active-pdf-template', 'default', 0, 0, NOW(), NOW()),
 ('default_lang_without_translation', '1', 1, 1, NOW(), NOW()),
 ('rewriting_enable', '0', 0, 0, NOW(), NOW()),
 ('imagine_graphic_driver', 'gd', 0, 0, NOW(), NOW()),
@@ -33,6 +34,8 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('contact_email','', 0, 0, NOW(), NOW()),
 ('url_site','', 0, 0, NOW(), NOW()),
 ('one_domain_foreach_lang','0', 1, 1, NOW(), NOW()),
+('pdf_invoice_file', 'invoice', 0, 0, NOW(), NOW()),
+('pdf_delivery_file', 'delivery', 0, 0, NOW(), NOW()),
 ('thelia_version','2.0.0-beta1', 1, 1, NOW(), NOW()),
 ('thelia_major_version','2', 1, 1, NOW(), NOW()),
 ('thelia_minus_version','0', 1, 1, NOW(), NOW()),
@@ -1207,7 +1210,7 @@ generated with command : php Thelia thelia:generate-resources --output sql
  */
 INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (1, 'admin.address', NOW(), NOW()),
-(2, 'admin.configuration.admin', NOW(), NOW()),
+(2, 'admin.configuration.administrator', NOW(), NOW()),
 (3, 'admin.configuration.area', NOW(), NOW()),
 (4, 'admin.configuration.attribute', NOW(), NOW()),
 (5, 'admin.category', NOW(), NOW()),
@@ -1228,7 +1231,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (20, 'admin.configuration.profile', NOW(), NOW()),
 (21, 'admin.configuration.shipping-zone', NOW(), NOW()),
 (22, 'admin.configuration.tax', NOW(), NOW()),
-(23, 'admin.configuration.template', NOW(), NOW());
+(23, 'admin.configuration.template', NOW(), NOW()),
+(24, 'admin.configuration.system-log', NOW(), NOW());
 
 /**
 generated with command : php Thelia thelia:generate-resources --output sql-i18n
@@ -1236,8 +1240,8 @@ generated with command : php Thelia thelia:generate-resources --output sql-i18n
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (1, 'en_US', 'Address'),
 (1, 'fr_FR', 'Address'),
-(2, 'en_US', 'Configuration / Admin'),
-(2, 'fr_FR', 'Configuration / Admin'),
+(2, 'en_US', 'Configuration / Administrator'),
+(2, 'fr_FR', 'Configuration / Administrator'),
 (3, 'en_US', 'Configuration / Area'),
 (3, 'fr_FR', 'Configuration / Area'),
 (4, 'en_US', 'Configuration / Attribute'),
@@ -1279,7 +1283,9 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (22, 'en_US', 'Configuration / Tax'),
 (22, 'fr_FR', 'Configuration / Tax'),
 (23, 'en_US', 'Configuration / Template'),
-(23, 'fr_FR', 'Configuration / Template');
+(23, 'fr_FR', 'Configuration / Template'),
+(24, 'en_US', 'Configuration / System Log'),
+(24, 'fr_FR', 'Configuration / Logs système');
 
 
 INSERT INTO `message` (`id`, `name`, `secured`, `created_at`, `updated_at`, `version`, `version_created_at`, `version_created_by`) VALUES

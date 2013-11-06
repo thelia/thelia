@@ -36,6 +36,7 @@ use Thelia\Model\Base\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Tools\URL;
+use Thelia\Core\Template\TemplateHelper;
 
 /**
  * Class OrderController
@@ -218,7 +219,7 @@ class OrderController extends BaseAdminController
             array(
                 'order_id' => $order_id
             ),
-            ConfigQuery::read('pdf_template', 'pdf')
+            TemplateHelper::getInstance()->getActivePdfTemplate()->getPath()
         );
 
         $order = OrderQuery::create()->findPk($order_id);
