@@ -30,6 +30,8 @@ namespace Thelia\Core\Template\Element;
 interface PropelSearchLoopInterface
 {
     /**
+     * this method returns a Propel ModelCriteria
+     *
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      */
     public function buildModelCriteria();
