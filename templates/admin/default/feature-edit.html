@@ -16,7 +16,7 @@
     			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                 <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
                 <li><a href="{url path='/admin/configuration/features'}">{intl l="Features"}</a></li>
-                <li>{intl l='Editing feature "%name"' name="{$TITLE}"}</li>
+                <li>{intl l='Editing feature "%name"' name=$TITLE}</li>
             </ul>
 
     		<div class="row">
@@ -24,7 +24,7 @@
     				<div class="row">
 
     					<div class="col-md-12 title title-without-tabs">
-    					   {intl l="Edit feature $TITLE"}
+    					   {intl l='Edit feature "%name"' name=$TITLE}
     					</div>
 
                         <div class="col-md-12">
@@ -186,7 +186,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="alert alert-error">
-                        {intl l="Sorry, feature ID=$feature_id was not found."}
+                        {intl l="Sorry, feature ID=%id was not found." id=$feature_id}
                     </div>
                 </div>
             </div>
@@ -218,7 +218,7 @@
 
         {form_field form=$form field='title'}
             <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
                 {loop type="lang" name="current-edit-lang" id="$edit_language_id"}
                     <div class="input-group">
@@ -226,7 +226,7 @@
                         <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.gif"}" alt="{intl l=$TITLE}" /></span>
                     </div>
 
-                    <div class="help-block">{intl l="Enter here the value in the current edit language ($TITLE)"}</div>
+                    <div class="help-block">{intl l="Enter here the value in the current edit language (%language_name)" language_name=$TITLE}</div>
 
                     {form_field form=$form field='locale'}
                         <input type="hidden" name="{$name}" value="{$LOCALE}" />

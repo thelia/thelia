@@ -14,7 +14,7 @@
                 <ul class="breadcrumb">
         			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                     <li><a href="{url path="{$redirectUrl}"}">{intl l="Image"}</a></li>
-                    <li>{intl l='Editing image "%name"' name="{$TITLE}"}</li>
+                    <li>{intl l='Editing image "%name"' name=$TITLE}</li>
                 </ul>
 
         		<div class="row">
@@ -22,7 +22,7 @@
         				<div class="row">
 
         					<div class="col-md-12 title title-without-tabs">
-        					   {intl l="Edit image $TITLE"}
+        					   {intl l='Edit image "%name"' name=$TITLE}
         					</div>
 
                             <div class="form-container">
@@ -47,7 +47,7 @@
         					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
                                             <p class="title title-without-tabs">{intl l="Image informations"}</p>
-                                            
+
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
@@ -63,29 +63,29 @@
                                                 <div class="col-md-6">
                                                     {form_field form=$form field='file'}
                                                         <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                            <input type="file" id="{$label_attr.for}" name="{$name}" class="form-control" value="" title="{intl l="{$label}"}" placeholder="{intl l='File'}">
+                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                                                            <input type="file" id="{$label_attr.for}" name="{$name}" class="form-control" value="" title="{$label}" placeholder="{intl l='File'}">
                                                         </div>
                                                     {/form_field}
 
                                                     {form_field form=$form field='title'}
                                                         <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$TITLE}" title="{intl l="{$label}"}" placeholder="{intl l='Title'}">
+                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$TITLE}" title="{$label}" placeholder="{intl l='Title'}">
                                                         </div>
                                                     {/form_field}
 
                                                     {form_field form=$form field='chapo'}
                                                         <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="{$label}"}" placeholder="{intl l='Chapo'}">{$CHAPO}</textarea>
+                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{$label}" placeholder="{intl l='Chapo'}">{$CHAPO}</textarea>
                                                         </div>
                                                     {/form_field}
 
                                                     {form_field form=$form field='postscriptum'}
                                                         <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="{$label}"}" placeholder="{intl l='Post Scriptum'}">{$POSTSCRIPTUM}</textarea>
+                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{$label}" placeholder="{intl l='Post Scriptum'}">{$POSTSCRIPTUM}</textarea>
                                                         </div>
                                                     {/form_field}
                                                 </div>
@@ -94,8 +94,8 @@
                                                 <div class="col-md-12">
                                                     {form_field form=$form field='description'}
                                                         <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control wysiwyg" title="{intl l="{$label}"}" placeholder="{intl l='Description'}">{$DESCRIPTION}</textarea>
+                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control wysiwyg" title="{$label}" placeholder="{intl l='Description'}">{$DESCRIPTION}</textarea>
                                                         </div>
                                                     {/form_field}
                                                 </div>
@@ -130,7 +130,7 @@
                             </div>
                         </div>
                         <div class="alert alert-error">
-                            {intl l="Sorry, image ID=$imageId was not found."}
+                            {intl l="Sorry, image ID=%id was not found." id=$imageId}
                         </div>
                     </div>
                 </div>
@@ -144,7 +144,7 @@
     {javascripts file='assets/js/main.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
-    
+
     <script src="{url file='/tinymce/tinymce.min.js'}"></script>
     <script>
         tinymce.init({

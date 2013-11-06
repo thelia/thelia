@@ -43,11 +43,11 @@ Parameters:
 
     <div class="col-md-6 inner-actions">
          {if $hide_submit_buttons != true}
-            <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-success" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>
-            <button type="submit" name="save_mode" value="close" class="btn btn-default btn-info" title="{intl l='Save and close'}">{intl l='Save and close'} <span class="glyphicon glyphicon-remove"></span></button>
+            <button type="submit" name="save_mode" value="stay" class="form-submit-button btn btn-default btn-success" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>
+            <button type="submit" name="save_mode" value="close" class="form-submit-button btn btn-default btn-info" title="{intl l='Save and close'}">{intl l='Save and close'} <span class="glyphicon glyphicon-remove"></span></button>
          {/if}
          {if ! empty($close_url)}
-            <a href="{$close_url}" class="btn btn-default">{intl l='Close'} <span class="glyphicon glyphicon-remove"></span></a>
+            <a href="{$close_url}" class="page-close-button btn btn-default">{intl l='Close'} <span class="glyphicon glyphicon-remove"></span></a>
          {/if}
     </div>
 </div>

@@ -53,7 +53,7 @@
 		                                </div>
 
 	                                    {if $item_to_translate == 'mo'}
-		                                    <div class="col-md-4">
+		                                    <div class="col-md-4 item-id-selector">
 		                                        <div class="form-group">
 		                                            <label class="control-label" for="item_id">{intl l='Select the module you want to translate'}</label>
 
@@ -66,7 +66,7 @@
 					                            </div>
 		                                    </div>
 	                                    {else if $item_to_translate == 'fo'}
-	                                        <div class="col-md-4">
+	                                        <div class="col-md-4 item-id-selector">
 	                                            <div class="form-group">
 	                                                <label class="control-label" for="item_id">{intl l='Select the front-office template you want to translate'}</label>
 
@@ -79,7 +79,7 @@
 	                                            </div>
 	                                        </div>
 	                                    {else if $item_to_translate == 'bo'}
-	                                        <div class="col-md-4">
+	                                        <div class="col-md-4 item-id-selector">
 	                                            <div class="form-group">
 	                                                <label class="control-label" for="item_id">{intl l='Select the back-office template you want to translate'}</label>
 
@@ -92,7 +92,7 @@
 	                                            </div>
 	                                        </div>
 	                                    {else if $item_to_translate == 'pf'}
-	                                        <div class="col-md-4">
+	                                        <div class="col-md-4 item-id-selector">
 	                                            <div class="form-group">
 	                                                <label class="control-label" for="item_id">{intl l='Select the PDF template you want to translate'}</label>
 
@@ -111,7 +111,7 @@
 			                                <div class="form-group">
 			                                    <label class="control-label">&nbsp;</label>
 			                                    <label class="checkbox control-label">
-			                                       <input type="checkbox" name="view_missing_traductions_only" value="1" {if $view_missing_traductions_only}checked="checked"{/if}> {intl l='View only missing translations'}
+			                                       <input class="submit-on-change" type="checkbox" name="view_missing_traductions_only" value="1" {if $view_missing_traductions_only}checked="checked"{/if}> {intl l='View only missing translations'}
 			                                    </label>
 			                                </div>
 	                                    </div>
@@ -121,9 +121,13 @@
                                 {* -- STRINGS TO TRANSLATE --------------------------------------------- *}
 
                                 {$currfile = false}
-                                {$untranslated = 0}
+                                {$close_last_panel = false}
 
-                                {foreach $all_strings as $hash => $info}
+                                {$idx = 0}
+
+                                {foreach $all_strings as $info}
+
+                                    <input type="hidden" id="text_{$idx}" name="text[]" value="{$info.text}" />
 
                                     {$not_translated = empty($info.translation)}
 
@@ -151,8 +155,8 @@
 
                                             {if $currfile !== false}
                                                 {* Close current panel *}
-                                                </tbody></table>
-                                            </div>
+                                                </tbody></table></div>
+                                                {$close_last_panel = false}
                                             {/if}
 
                                             {$currfile = $file_names}
@@ -169,33 +173,69 @@
 
 											    <table class="table table-condensed table-hover">
 											        <tbody>
+											        {$close_last_panel = true}
                                         {/if}
 
 	                                    <tr>
 	                                        <td class="col-md-6">
-	                                            <span id="{$hash}">{$info.chaine}</span>
+	                                            {$info.text}
+
 
 												{if $info.dollar}
 												    <div>
 												        <span class="label label-warning">{intl l='Warning'}</span>
-												        {intl l='Il seems that this string contains a Smarty variable ($). If \'s the case, it cannot be transleted properly.'}
+												        {intl l='Il seems that this string contains a Smarty variable (&#36;). If \'s the case, it cannot be transleted properly.'}
 												    </div>
 												{/if}
 		                                    </td>
 
 	                                        <td class="col-md-6" >
 	                                            <div class="input-group {if $not_translated}has-error{/if}">
-												    <span class="input-group-addon"><a href="#" data-hash="{$hash}" class="copy-translation" title="{intl l='Copy source text in input field'}"><span class="glyphicon glyphicon-chevron-right"></span></a></span>
-												    <input type="text" class="translation_field form-control" name="{$hash}" value="{$info.translation}" />
+												    <span class="input-group-addon"><a href="#" data-text-num="{$idx}" class="copy-translation" title="{intl l='Copy source text in input field'}"><span class="glyphicon glyphicon-chevron-right"></span></a></span>
+												    <input type="text" id="translation_{$idx}" class="translation_field form-control" name="translation[]" value="{$info.translation}" />
 												</div>
 	                                        </td>
 	                                    </tr>
+
+	                                {else}
+
+	                                   {* Text is not displayed, put it in a hidden field *}
+	                                   <input type="hidden" id="translation_{$idx}" name="translation[]" value="{$info.translation}" />
+
                                     {/if}
 
+                                    {$idx = $idx + 1}
                                 {/foreach}
-                                        </tbody>
-                                    </table>
-                                </div> {* panel *}
+
+                                {if isset($all_strings) }
+
+                                    {if empty($all_strings) }
+                                        <div class="alert alert-info">
+                                            {intl l='<strong>Did not found any text to translate</strong>. It\'s probably normal. If not, please be sure to use Smarty\'s "intl" function in templates, or the Translator::trans() method in PHP files.'}
+                                        </div>
+                                    {else if $view_missing_traductions_only == 1 && $currfile == false }
+		                                <div class="alert alert-success">
+		                                    {intl l='<strong>Congratulations</strong>, all text is now translated !'}
+		                                </div>
+		                            {/if}
+
+		                            {if $close_last_panel}
+	                                    {* close the last panel *}
+	                                    </tbody></table></div>
+	                                {/if}
+	                            {/if}
+
+	                            {if $max_input_vars_warning}
+	                            <div class="alert alert-danger">
+	                               {intl l='<strong>Cannot translate all fields.</strong> According to your PHP configuration, forms cannot contains more than
+	                                        %current_max_input_vars input fields, but at least %required_max_input_vars are required. Please change the value of max_input_vars in your PHP configuration
+	                                        of change the translation file by hand.'
+
+	                                current_max_input_vars=$current_max_input_vars
+	                                required_max_input_vars=$required_max_input_vars
+	                                }
+	                            </div>
+	                            {/if}
 
 							</form>
 						</div>
@@ -215,7 +255,8 @@
         var translation_changed = false;
 
         $('#item_to_translate').change(function() {
-        	$('#item_id').val('');
+        	$('#item-id').val('');
+        	$('.item-id-selector').hide();
         });
 
         $('.submit-on-change').change(function() {
@@ -225,9 +266,9 @@
         $('input.translation_field').change(function() { translation_changed = true; });
 
         $('.copy-translation').click(function(ev) {
-        	var hash = $(this).data('hash');
+        	var num = $(this).data('text-num');
 
-        	$('input[name='+hash+']').val($('#'+hash).html());
+        	$('#translation_' + num).val($('#text_' + num).val());
 
         	translation_changed = true;
 
@@ -242,6 +283,12 @@
 
             	ev.preventDefault();
             }
+        });
+
+     // Intercept language changes, to reload string when changing language
+        $('.form-submit-button').click(function(ev) {
+            // For a submit throught the save buttons, do not show the change warning.
+            translation_changed = false;
         });
 
         // Intercept language changes, to reload string when changing language

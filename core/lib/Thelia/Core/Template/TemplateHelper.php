@@ -24,9 +24,14 @@
 namespace Thelia\Core\Template;
 
 use Thelia\Model\ConfigQuery;
+use Thelia\Log\Tlog;
+use Thelia\Core\Translation\Translator;
 
 class TemplateHelper
 {
+    const WALK_MODE_PHP = 'php';
+    const WALK_MODE_TEMPLATE = 'tpl';
+
     /**
      * This is a singleton
 
@@ -92,5 +97,157 @@ class TemplateHelper
         }
 
         return $list;
+    }
+
+
+    protected function normalize_path($path)
+    {
+        $path = str_replace(
+            str_replace('\\', '/', THELIA_ROOT),
+            '',
+            str_replace('\\', '/', realpath($path))
+        );
+
+        return ltrim($path, '/');
+    }
+
+    /**
+     * Récursively examine files in a directory tree, and extract translatable strings.
+     *
+     * Returns an array of translatable strings, each item having with the following structure:
+     * 'files' an arfray of file names in which the string appears,
+     * 'text' the translatable text
+     * 'translation' => the text translation, or an empty string if none available.
+     * 'dollar'  => true if the translatable text contains a $
+     *
+     * @param string $directory the path to the directory to examine
+     * @param string $walkMode type of file scanning: WALK_MODE_PHP or WALK_MODE_TEMPLATE
+     * @param Thelia\Core\Translation\Translator $translator the current translator
+     * @param string $currentLocale the current locale
+     * @param array $strings the liste of strings
+     * @throws \InvalidArgumentException if $walkMode contains an invalid value
+     * @return number the total number of translatable texts
+     */
+    public function walkDir($directory, $walkMode, Translator $translator, $currentLocale, &$strings) {
+
+        $num_files = 0;
+
+        if ($walkMode == self::WALK_MODE_PHP) {
+            $prefix = '\-\>[\s]*trans[\s]*\(';
+
+            $allowed_exts = array('php');
+        } else if ($walkMode == self::WALK_MODE_TEMPLATE) {
+            $prefix = '\{intl[\s]l=';
+
+            $allowed_exts = array('html', 'tpl', 'xml');
+        }
+        else {
+            throw new \InvalidArgumentException(
+                    Translator::getInstance()->trans('Invalid value for walkMode parameter: %value', array('%value' => $walkMode))
+            );
+        }
+
+        try {
+
+            Tlog::getInstance()->debug("Walking in $directory, in mode $walkMode");
+
+            foreach (new \DirectoryIterator($directory) as $fileInfo) {
+
+                if ($fileInfo->isDot()) continue;
+
+                if ($fileInfo->isDir()) $num_files += $this->walkDir($fileInfo->getPathName(), $walkMode, $translator, $currentLocale, $strings);
+
+                if ($fileInfo->isFile()) {
+
+                    $ext = $fileInfo->getExtension();
+
+                    if (in_array($ext, $allowed_exts)) {
+
+                        if ($content = file_get_contents($fileInfo->getPathName())) {
+
+                            $short_path = $this->normalize_path($fileInfo->getPathName());
+
+                            Tlog::getInstance()->debug("Examining file $short_path\n");
+
+                            $matches = array();
+
+                            if (preg_match_all('/'.$prefix.'((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)\1/', $content, $matches)) {
+
+                                Tlog::getInstance()->debug("Strings found: ", $matches[2]);
+
+                                foreach($matches[2] as $match) {
+
+                                    $hash = md5($match);
+
+                                    if (isset($strings[$hash]))
+                                    {
+                                        if (! in_array($short_path, $strings[$hash]['files']))
+                                        {
+                                            $strings[$hash]['files'][] = $short_path;
+                                        }
+                                    }
+                                    else
+                                        $num_files++;
+
+                                    // remove \'
+                                    $match = str_replace("\\'", "'", $match);
+
+                                    $strings[$hash] = array(
+                                            'files'   => array($short_path),
+                                            'text'  => $match,
+                                            'translation' => $translator->trans($match, array(), 'messages', $currentLocale, false),
+                                            'dollar'  => strstr($match, '$') !== false
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return $num_files;
+
+        } catch (\UnexpectedValueException $ex) {
+            echo $ex;
+        }
+    }
+
+
+    public function write_translation($file, $texts, $translations)
+    {
+        if ($fp = @fopen($file, 'w')) {
+
+            fwrite($fp, '<' . "?php\n\n");
+            fwrite($fp, "return array(\n");
+
+            $idx = 0;
+
+            foreach($texts as $text)
+            {
+                // Write only defined (not empty) translations
+                if (! empty($translations[$idx])) {
+                    $text = str_replace("'", "\'", $text);
+
+                    $translation = str_replace("'", "\'", $translations[$idx]);
+
+                    fwrite($fp, sprintf("\t'%s' => '%s',\n", $text, $translation));
+                }
+
+                $idx++;
+            }
+
+            fwrite($fp, ");\n");
+
+            @fclose($fh);
+        }
+        else
+        {
+            throw new \RuntimeException(
+                    $this->getTranslator()->trans(
+                            "Failed to open translation file %file. Please be sure that this file is writable by your Web server",
+                            array('%file' => $file)
+                    )
+            );
+        }
     }
 }
