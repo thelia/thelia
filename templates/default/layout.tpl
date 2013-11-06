@@ -48,6 +48,12 @@ GNU General Public License : http://www.gnu.org/licenses/
 
     {block name="stylesheet"}{/block}
 
+    {* Favicon *}
+    {images file='assets/img/favicon.ico'}<link rel="shortcut icon" type="image/x-icon" href="{$asset_url}">{/images}
+    {images file='assets/img/favicon.png'}<link rel="icon" type="image/png" href="{$asset_url}" />{/images}
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}
     <!--[if lt IE 9]>
     <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -200,7 +206,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                 </div>
                 <div class="col">
                     <span class="icon-credit-card"></span>
-                    {intl l="Secure payment"} <small>{intl l="Multi-payment plateform"}</small>
+                    {intl l="Secure payment"} <small>{intl l="Multi-payment platform"}</small>
                 </div>
                 <div class="col">
                     <span class="icon-info"></span>
@@ -239,7 +245,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                 </div>
                 <div class="col">
                     <section class="block block-default">
-                        <div class="block-heading"><h3 class="block-title">{intl l="Usefull links"}</h3></div>
+                        <div class="block-heading"><h3 class="block-title">{intl l="Useful links"}</h3></div>
                         <div class="block-content">
                             <ul>
                                 {loop name="footer_links" type="content" folder="2"}
