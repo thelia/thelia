@@ -152,6 +152,11 @@ return array (
     'Select Country' => 'Choisissez un pays',
     'Create' => 'Créer',
     'Related' => 'Liés', // voir le contexte pour l'accord
+    'Grid' => 'Grille',
+    'List' => 'Liste',
+    'Next' => 'Suivant',
+    'Previous' => 'Précédent',
+
     /*
       'The page cannot be found' => '',
       'What\'s your name?' => '',
