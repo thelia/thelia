@@ -54,6 +54,13 @@ class ProductTest extends BaseLoopTestor
     public function testSearchById()
     {
         $product = ProductQuery::create()->orderById(Criteria::ASC)->findOne();
+        if(null === $product) {
+            $product = new \Thelia\Model\Product();
+            $product->setDefaultCategory(0);
+            $product->setVisible(1);
+            $product->setTitle('foo');
+            $product->save();
+        }
 
         $this->baseTestSearchById($product->getId());
     }

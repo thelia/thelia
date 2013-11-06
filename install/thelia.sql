@@ -416,7 +416,7 @@ CREATE TABLE `config`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL,
-    `value` VARCHAR(255) NOT NULL,
+    `value` TEXT NOT NULL,
     `secured` TINYINT DEFAULT 1 NOT NULL,
     `hidden` TINYINT DEFAULT 1 NOT NULL,
     `created_at` DATETIME,
