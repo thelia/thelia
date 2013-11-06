@@ -47,43 +47,39 @@
 								<tbody>
 									<tr>
 										<th>{intl l="Customers"}</th>
-		                                <td>1</td>
+		                                <td>
+                                            {count type="customer" current="false" backend_context="1"}
+		                                </td>
 									</tr>
 									<tr>
 										<th>{intl l="Categories"}</th>
-		                                <td>8</td>
+		                                <td>
+                                            {count type="category" visible="*" backend_context="1"}
+		                                </td>
 									</tr>
 									<tr>
 										<th>{intl l="Products"}</th>
-		                                <td>43</td>
+		                                <td>
+                                            {count type="product" visible="*" backend_context="1"}
+		                                </td>
 									</tr>
 									<tr>
 										<th>{intl l="Online products"}</th>
-		                                <td>43</td>
+		                                <td>
+                                            {count type="product" visible="true" backend_context="1"}
+		                                </td>
 									</tr>
 									<tr>
 										<th>{intl l="Offline products"}</th>
-		                                <td>0</td>
+		                                <td>
+                                            {count type="product" visible="false" backend_context="1"}
+		                                </td>
 									</tr>
 									<tr>
 										<th>{intl l="Orders"}</th>
-		                                <td>1</td>
-									</tr>
-									<tr>
-										<th>{intl l="Pending orders"}</th>
-		                                <td>1</td>
-									</tr>
-									<tr>
-										<th>{intl l="In process orderst"}</th>
-		                                <td>0</td>
-									</tr>
-									<tr>
-										<th>{intl l="Shipped orders"}</th>
-		                                <td>0</td>
-									</tr>
-									<tr>
-										<th>{intl l="Canceled orders"}</th>
-		                                <td>0</td>
+		                                <td>
+                                            {count type="order" status="*" backend_context="1"}
+		                                </td>
 									</tr>
 					            </tbody>
 					        </table>
@@ -108,31 +104,35 @@
 		                                <tbody>
                                             <tr>
                                                 <th>{intl l="Overall sales"}</th>
-                                                <td>2500.00 €</td>
+                                                <td>{stats key="sales" startDate="today" endDate="today"} €</td>
                                             </tr>
                                             <tr>
                                                 <th>{intl l="Sales excluding shipping"}</th>
-                                                <td>2000.00 €</td>
+                                                <td>
+                                                    {$salesNoShipping = {stats key="sales" startDate="today" endDate="today" includeShipping="false"}}
+                                                    {$salesNoShipping} €
+                                                </td>
                                             </tr>
 		                                    <tr>
 		                                        <th>{intl l="Yesterday sales"}</th>
-		                                        <td>1700.00 €</td>
+		                                        <td>{stats key="sales" startDate="yesterday" endDate="yesterday"} €</td>
 		                                    </tr>
 		                                    <tr>
-		                                        <th>{intl l="Waiting orders"}</th>
-		                                        <td>4</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="In process orders"}</th>
-		                                        <td>52</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="Canceled orders"}</th>
-		                                        <td>3</td>
+		                                        <th>{intl l="Orders"}</th>
+		                                        <td>
+                                                    {$orderCount =  {stats key="orders" startDate="today" endDate="today"}}
+                                                    {$orderCount}
+                                                </td>
 		                                    </tr>
 		                                    <tr>
 		                                        <th>{intl l="Average cart"}</th>
-		                                        <td>25.00 €</td>
+		                                        <td>
+                                                    {if $orderCount == 0}
+                                                        0 €
+                                                    {else}
+                                                        {($salesNoShipping/$orderCount)|round:"2"} €
+		                                            {/if}
+                                                </td>
 		                                    </tr>
 		                           		</tbody>
 		                        	</table>
@@ -144,31 +144,35 @@
 		                                <tbody>
                                             <tr>
                                                 <th>{intl l="Overall sales"}</th>
-                                                <td>2500.00 €</td>
+                                                <td>{stats key="sales" startDate="this_month" endDate="this_month"} €</td>
                                             </tr>
                                             <tr>
                                                 <th>{intl l="Sales excluding shipping"}</th>
-                                                <td>2000.00 €</td>
+                                                <td>
+                                                    {$salesNoShipping = {stats key="sales" startDate="this_month" endDate="this_month" includeShipping="false"}}
+                                                    {$salesNoShipping} €
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>{intl l="Previous month sales"}</th>
-                                                <td>1700.00 €</td>
+                                                <td>{stats key="sales" startDate="last_month" endDate="last_month"} €</td>
                                             </tr>
                                             <tr>
-                                                <th>{intl l="Waiting orders"}</th>
-                                                <td>4</td>
-                                            </tr>
-                                            <tr>
-                                                <th>{intl l="In process orders"}</th>
-                                                <td>52</td>
-                                            </tr>
-                                            <tr>
-                                                <th>{intl l="Canceled orders"}</th>
-                                                <td>3</td>
+                                                <th>{intl l="Orders"}</th>
+                                                <td>
+                                                    {$orderCount =  {stats key="orders" startDate="this_month" endDate="this_month"}}
+                                                    {$orderCount}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>{intl l="Average cart"}</th>
-                                                <td>25.00 €</td>
+                                                <td>
+                                                    {if $orderCount == 0}
+                                                        0 €
+                                                    {else}
+                                                        {($salesNoShipping/$orderCount)|round:"2"} €
+                                                    {/if}
+                                                </td>
                                             </tr>
 		                           		</tbody>
 		                        	</table>
@@ -180,31 +184,35 @@
 		                                <tbody>
                                             <tr>
                                                 <th>{intl l="Overall sales"}</th>
-                                                <td>2500.00 €</td>
+                                                <td>{stats key="sales" startDate="this_year" endDate="this_year"} €</td>
                                             </tr>
                                             <tr>
                                                 <th>{intl l="Sales excluding shipping"}</th>
-                                                <td>2000.00 €</td>
+                                                <td>
+                                                    {$salesNoShipping = {stats key="sales" startDate="this_year" endDate="this_year" includeShipping="false"}}
+                                                    {$salesNoShipping} €
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>{intl l="Previous year sales"}</th>
-                                                <td>1700.00 €</td>
+                                                <td>{stats key="sales" startDate="last_year" endDate="last_year"} €</td>
                                             </tr>
                                             <tr>
-                                                <th>{intl l="Waiting orders"}</th>
-                                                <td>4</td>
-                                            </tr>
-                                            <tr>
-                                                <th>{intl l="In process orders"}</th>
-                                                <td>52</td>
-                                            </tr>
-                                            <tr>
-                                                <th>{intl l="Canceled orders"}</th>
-                                                <td>3</td>
+                                                <th>{intl l="Orders"}</th>
+                                                <td>
+                                                    {$orderCount =  {stats key="orders" startDate="this_year" endDate="this_year"}}
+                                                    {$orderCount}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>{intl l="Average cart"}</th>
-                                                <td>25.00 €</td>
+                                                <td>
+                                                    {if $orderCount == 0}
+                                                        0 €
+                                                    {else}
+                                                        {($salesNoShipping/$orderCount)|round:"2"} €
+                                                    {/if}
+                                                </td>
                                             </tr>
 		                           		</tbody>
 		                            </table>
