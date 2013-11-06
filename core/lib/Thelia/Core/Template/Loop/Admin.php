@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -43,9 +44,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Admin extends BaseLoop
+class Admin extends BaseLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -58,12 +59,7 @@ class Admin extends BaseLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = AdminQuery::create();
 
@@ -81,13 +77,14 @@ class Admin extends BaseLoop
 
         $search->orderByFirstname(Criteria::ASC);
 
-        /* perform search */
-        $admins = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($admins);
+    }
 
-        foreach ($admins as $admin) {
-            $loopResultRow = new LoopResultRow($loopResult, $admin, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $admin) {
+            $loopResultRow = new LoopResultRow($admin);
             $loopResultRow->set("ID", $admin->getId())
                 ->set("PROFILE",$admin->getProfileId())
                 ->set("FIRSTNAME",$admin->getFirstname())
@@ -99,5 +96,6 @@ class Admin extends BaseLoop
         }
 
         return $loopResult;
+
     }
 }

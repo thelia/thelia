@@ -27,6 +27,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Template\Element\Exception\LoopException;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Security\SecurityContext;
@@ -62,9 +63,9 @@ abstract class BaseLoop
 
     protected $args;
 
-    public $countable = true;
-    public $timestampable = false;
-    public $versionable = false;
+    protected $countable = true;
+    protected $timestampable = false;
+    protected $versionable = false;
 
     /**
      * Create a new Loop
@@ -73,6 +74,8 @@ abstract class BaseLoop
      */
     public function __construct(ContainerInterface $container)
     {
+        $this->checkInterface();
+
         $this->container = $container;
 
         $this->request = $container->get('request');
@@ -240,6 +243,9 @@ abstract class BaseLoop
      */
     protected function search(ModelCriteria $search, &$pagination = null)
     {
+        if (false === $this->countable) {
+            return $search->find();
+        }
         if ($this instanceof SearchLoopInterface) {
             $searchTerm = $this->getSearch_term();
             $searchIn = $this->getSearch_in();
@@ -268,6 +274,29 @@ abstract class BaseLoop
             return $this->searchWithPagination($search, $pagination);
         } else {
             return $this->searchWithOffset($search);
+        }
+    }
+
+
+    protected function searchArray(array $search, &$pagination = null)
+    {
+        if (false === $this->countable) {
+            return $search;
+        }
+        if ($this->getArgValue('page') !== null) {
+
+            $nbPage = ceil(count($search)/$this->getArgValue('limit'));
+            if($this->getArgValue('page') > $nbPage || $this->getArgValue('page') <= 0) {
+                return array();
+            }
+
+            $firstItem = ($this->getArgValue('page')-1) * $this->getArgValue('limit') + 1;
+
+            return array_slice($search, $firstItem, $firstItem + $this->getArgValue('limit'), false);
+
+        } else {
+            return array_slice($search, $this->getArgValue('offset'), $this->getArgValue('limit'), false);
+
         }
     }
 
@@ -304,18 +333,84 @@ abstract class BaseLoop
     }
 
     /**
-     *
-     * this function have to be implement in your own loop class.
-     *
-     * All loops parameters can be accessible via getter.
-     *
-     * for example, ref parameter is accessible through getRef method
-     *
      * @param $pagination
-     *
      * @return LoopResult
      */
-    abstract public function exec(&$pagination);
+    public function exec(&$pagination)
+    {
+        if($this instanceof PropelSearchLoopInterface) {
+            $searchModelCriteria = $this->buildModelCriteria();
+            if(null === $searchModelCriteria) {
+                $results = array();
+            } else {
+                $results = $this->search(
+                    $searchModelCriteria,
+                    $pagination
+                );
+            }
+        } elseif ($this instanceof ArraySearchLoopInterface) {
+            $searchArray = $this->buildArray();
+            if(null === $searchArray) {
+                $results = array();
+            } else {
+                $results = $this->searchArray(
+                    $searchArray,
+                    $pagination
+                );
+            }
+        }
+
+        $loopResult = new LoopResult($results);
+
+        if(true === $this->countable) {
+            $loopResult->setCountable();
+        }
+        if(true === $this->timestampable) {
+            $loopResult->setTimestamped();
+        }
+        if(true === $this->versionable) {
+            $loopResult->setVersioned();
+        }
+
+        return $this->parseResults($loopResult);
+    }
+
+    protected function checkInterface()
+    {
+        /* Must implement either :
+         *  - PropelSearchLoopInterface
+         *  - ArraySearchLoopInterface
+        */
+        $searchInterface = false;
+        if($this instanceof PropelSearchLoopInterface) {
+            if(true === $searchInterface) {
+                throw new LoopException('Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`', LoopException::MULTIPLE_SEARCH_INTERFACE);
+            }
+            $searchInterface = true;
+        }
+        if($this instanceof ArraySearchLoopInterface) {
+            if(true === $searchInterface) {
+                throw new LoopException('Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`', LoopException::MULTIPLE_SEARCH_INTERFACE);
+            }
+            $searchInterface = true;
+        }
+
+        if(false === $searchInterface) {
+            throw new LoopException('Loop must implements one of the following interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`', LoopException::SEARCH_INTERFACE_NOT_FOUND);
+        }
+
+        /* Only PropelSearch allows timestamp and version */
+        if(!$this instanceof PropelSearchLoopInterface) {
+            if(true === $this->timestampable) {
+                throw new LoopException("Loop must implements 'PropelSearchLoopInterface' to be timestampable", LoopException::NOT_TIMESTAMPED);
+            }
+            if(true === $this->versionable) {
+                throw new LoopException("Loop must implements 'PropelSearchLoopInterface' to be versionable", LoopException::NOT_VERSIONED);
+            }
+        }
+    }
+
+    abstract public function parseResults(LoopResult $loopResult);
 
     /**
      *

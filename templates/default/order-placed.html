@@ -1,5 +1,10 @@
 {extends file="layout.tpl"}
 
+{* Security *}
+{block name="no-return-functions" prepend}
+    {check_auth context="front" role="CUSTOMER" login_tpl="login"}
+{/block}
+
 {* Body Class *}
 {block name="body-class"}page-order-payment{/block}
 
@@ -18,18 +23,13 @@
 
             <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
 
-            <div class="btn-group checkout-progress">
-                <a href="cart.php" role="button" class="btn btn-step disabled"><span class="step-nb">1</span> <span class="step-label">{intl l="Your Cart"}</span></a>
-                <a href="cart-step2.php" role="button" class="btn btn-step disabled"><span class="step-nb">2</span> <span class="step-label">{intl l="Billing and delivery"}</span></a>
-                <a href="cart-step3.php" role="button" class="btn btn-step disabled"><span class="step-nb">3</span> <span class="step-label">{intl l="Check my order"}</span></a>
-                <a href="cart-step4.php" role="button" class="btn btn-step active"><span class="step-nb">4</span> <span class="step-label">{intl l="Secure payment"}</span></a>
-            </div>
+            {include file="misc/checkout-progress.tpl" step="last"}
 
             {loop type="order" name="placed-order" id=$placed_order_id}
 
             <div id="payment-success" class="panel">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{intl l="You chose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
+                    <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
                 </div>
                 <div class="panel-body">
                     <h3>{intl l="Thank you for the trust you place in us."}</h3>

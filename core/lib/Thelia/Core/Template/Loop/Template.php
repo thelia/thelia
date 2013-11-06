@@ -29,6 +29,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -38,6 +39,8 @@ use Thelia\Module\BaseModule;
 use Thelia\Type;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 
 /**
  *
@@ -47,9 +50,9 @@ use Thelia\Core\Template\TemplateDefinition;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Template extends BaseI18nLoop
+class Template extends BaseLoop implements ArraySearchLoopInterface
 {
-    /**
+   /**
      * @return ArgumentCollection
      */
     protected function getArgDefinitions()
@@ -68,13 +71,7 @@ class Template extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
-    {
+    public function buildArray() {
         $type = $this->getArg(template_type);
 
         if ($type == 'front-office')
@@ -84,13 +81,14 @@ class Template extends BaseI18nLoop
         else if ($type == 'pdf')
             $templateType = TemplateDefinition::PDF;
 
-        $templates = TemplateHelper::getInstance()->getList($templateType);
+        return TemplateHelper::getInstance()->getList($templateType);
+    }
 
-        $loopResult = new LoopResult();
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $template) {
 
-        foreach ($templates as $template) {
-
-            $loopResultRow = new LoopResultRow($loopResult);
+            $loopResultRow = new LoopResultRow($template);
 
             $loopResultRow
                 ->set("NAME"          , $template->getName())

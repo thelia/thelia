@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -35,9 +36,8 @@ use Thelia\Type\BooleanOrBothType;
  * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderPath extends BaseI18nLoop
+class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
 {
-
     /**
      *
      * define all args used in your loop
@@ -80,26 +80,14 @@ class FolderPath extends BaseI18nLoop
         );
     }
 
-    /**
-     *
-     * this function have to be implement in your own loop class.
-     *
-     * All loops parameters can be accessible via getter.
-     *
-     * for example, ref parameter is accessible through getRef method
-     *
-     * @param $pagination
-     *
-     * @return mixed
-     */
-    public function exec(&$pagination)
+    public function buildArray()
     {
         $id = $this->getFolder();
         $visible = $this->getVisible();
 
         $search = FolderQuery::create();
 
-        $locale = $this->configureI18nProcessing($search, array('TITLE'));
+        $this->configureI18nProcessing($search, array('TITLE'));
 
         $search->filterById($id);
         if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
@@ -113,16 +101,12 @@ class FolderPath extends BaseI18nLoop
 
             if ($folder != null) {
 
-                $loopResultRow = new LoopResultRow();
-
-                $loopResultRow
-                    ->set("TITLE",$folder->getVirtualColumn('i18n_TITLE'))
-                    ->set("URL", $folder->getUrl($locale))
-                    ->set("ID", $folder->getId())
-                    ->set("LOCALE",$locale)
-                ;
-
-                $results[] = $loopResultRow;
+                $results[] = array(
+                    "ID" => $result->getId(),
+                    "TITLE" => $result->getVirtualColumn('i18n_TITLE'),
+                    "URL" => $result->getUrl($this->locale),
+                    "LOCALE" => $this->locale,
+                );
 
                 $parent = $folder->getParent();
 
@@ -146,13 +130,19 @@ class FolderPath extends BaseI18nLoop
         } while ($folder != null && $parent > 0);
 
         // Reverse list and build the final result
-        $results = array_reverse($results);
+        return array_reverse($results);
+    }
 
-        $loopResult = new LoopResult();
-
-        foreach($results as $result) $loopResult->addRow($result);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach($loopResult->getResultDataCollection() as $result) {
+            $loopResultRow = new LoopResultRow($result);
+            foreach($result as $output => $outputValue) {
+                $loopResultRow->set($output, $outputValue);
+            }
+            $loopResult->addRow($loopResultRow);
+        }
 
         return $loopResult;
     }
-
 }

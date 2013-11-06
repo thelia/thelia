@@ -1,6 +1,7 @@
 {extends file="layout.tpl"}
 
-{block name="no-return-functions"}
+{* Security *}
+{block name="no-return-functions" prepend}
     {check_auth context="front" role="CUSTOMER" login_tpl="login"}
     {check_cart_not_empty}
     {check_valid_delivery}
@@ -24,12 +25,7 @@
 
             <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
 
-            <div class="btn-group checkout-progress">
-                <a href="{url path="/cart"}" role="button" class="btn btn-step"><span class="step-nb">1</span> <span class="step-label"> <span>{intl l="Your Cart"}</span></a>
-                <a href="{url path="/order/delivery"}" role="button" class="btn btn-step"><span class="step-nb">2</span> <span class="step-label">{intl l="Billing and delivery"}</span></a>
-                <a href="#" role="button" class="btn btn-step active"><span class="step-nb">3</span> <span class="step-label">{intl l="Check my order"}</span></a>
-                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">{intl l="Secure payment"}</span></a>
-            </div>
+            {include file="misc/checkout-progress.tpl"  step="invoice"}
 
             {form name="thelia.order.coupon"}
 
@@ -59,10 +55,10 @@
                         </th>
                         <th class="qty">
                             <span class="hidden-xs">{intl l="Quantity"}</span>
-                            <span class="visible-xs">{intl l="Quantity"}</span>
+                            <span class="visible-xs">{intl l="Qty"}</span>
                         </th>
                         <th class="subprice">
-                            <span class="hidden-xs">{intl l="Total"} <abbr title="{intl l="Tax Inclusive"}">{intl l="TTC"}</abbr></span>
+                            <span class="hidden-xs">{intl l="Total"}</span>
                             <span class="visible-xs">{intl l="Total"}</span>
                         </th>
                     </tr>
@@ -197,7 +193,7 @@
                     {form_field form=$form field='invoice-address'}
 
                     <div class="panel">
-                        <div class="panel-heading">{intl l="Billing addres"}s</div>
+                        <div class="panel-heading">{intl l="Billing address"}s</div>
 
                         {if $error}
                             <span class="help-block"><span class="icon-remove"></span> {$message}</span>

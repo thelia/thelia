@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Loop;
 use Thelia\Core\Template\Element\BaseI18nLoop;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -41,9 +42,12 @@ use Thelia\Log\Tlog;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Document extends BaseI18nLoop
+class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $objectType;
+    protected $objectId;
+
+    protected $timestampable = true;
 
     /**
      * @var array Possible document sources
@@ -195,18 +199,15 @@ class Document extends BaseI18nLoop
         return $search;
     }
 
-    /**
-     * @param unknown $pagination
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         // Select the proper query to use, and get the object type
-        $object_type = $object_id = null;
+        $this->objectType = $this->objectId = null;
 
-        $search = $this->getSearchQuery($object_type, $object_id);
+        $search = $this->getSearchQuery($this->objectType, $this->objectId);
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -221,14 +222,13 @@ class Document extends BaseI18nLoop
         // Create document processing event
         $event = new DocumentEvent($this->request);
 
-        // echo "sql=".$search->toString();
+        return $search;
 
-        $results = $this->search($search, $pagination);
+    }
 
-        $loopResult = new LoopResult($results);
-
-        foreach ($results as $result) {
-
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $result) {
             // Create document processing event
             $event = new DocumentEvent($this->request);
 
@@ -236,22 +236,22 @@ class Document extends BaseI18nLoop
             $source_filepath = sprintf("%s%s/%s/%s",
                 THELIA_ROOT,
                 ConfigQuery::read('documents_library_path', 'local/media/documents'),
-                $object_type,
+                $this->objectType,
                 $result->getFile()
-             );
+            );
 
             $event->setSourceFilepath($source_filepath);
-            $event->setCacheSubdirectory($object_type);
+            $event->setCacheSubdirectory($this->objectType);
 
             try {
                 // Dispatch document processing event
                 $this->dispatcher->dispatch(TheliaEvents::DOCUMENT_PROCESS, $event);
 
-                $loopResultRow = new LoopResultRow($loopResult, $result, $this->versionable, $this->timestampable, $this->countable);
+                $loopResultRow = new LoopResultRow($result);
 
                 $loopResultRow
                     ->set("ID"                    , $result->getId())
-                    ->set("LOCALE"                , $locale)
+                    ->set("LOCALE"                , $this->locale)
                     ->set("DOCUMENT_URL"          , $event->getFileUrl())
                     ->set("DOCUMENT_PATH"         , $event->getDocumentPath())
                     ->set("ORIGINAL_DOCUMENT_PATH", $source_filepath)
@@ -260,8 +260,8 @@ class Document extends BaseI18nLoop
                     ->set("DESCRIPTION"           , $result->getVirtualColumn('i18n_DESCRIPTION'))
                     ->set("POSTSCRIPTUM"          , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
                     ->set("POSITION"              , $result->getPosition())
-                    ->set("OBJECT_TYPE"           , $object_type)
-                    ->set("OBJECT_ID"             , $object_id)
+                    ->set("OBJECT_TYPE"           , $this->objectType)
+                    ->set("OBJECT_ID"             , $this->objectId)
                 ;
 
                 $loopResult->addRow($loopResultRow);
@@ -272,5 +272,6 @@ class Document extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

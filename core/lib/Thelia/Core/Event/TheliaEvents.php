@@ -72,9 +72,9 @@ final class TheliaEvents
     const CUSTOMER_UPDATEACCOUNT = "action.updateCustomer";
 
     /**
-     * sent on customer account update profil
+     * sent on customer account update profile
      */
-    const CUSTOMER_UPDATEPROFIL = "action.updateProfilCustomer";
+    const CUSTOMER_UPDATEPROFILE = "action.updateProfileCustomer";
 
     /**
      * sent on customer removal

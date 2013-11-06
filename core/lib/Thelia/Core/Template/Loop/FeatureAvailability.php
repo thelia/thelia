@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -43,9 +44,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class FeatureAvailability extends BaseI18nLoop
+class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -66,17 +67,12 @@ class FeatureAvailability extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = FeatureAvQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -115,16 +111,17 @@ class FeatureAvailability extends BaseI18nLoop
             }
         }
 
-        /* perform search */
-        $featuresAv = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($featuresAv);
+    }
 
-        foreach ($featuresAv as $featureAv) {
-            $loopResultRow = new LoopResultRow($loopResult, $featureAv, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $featureAv) {
+            $loopResultRow = new LoopResultRow($featureAv);
             $loopResultRow->set("ID", $featureAv->getId())
                 ->set("IS_TRANSLATED",$featureAv->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("TITLE",$featureAv->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $featureAv->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $featureAv->getVirtualColumn('i18n_DESCRIPTION'))
@@ -135,5 +132,6 @@ class FeatureAvailability extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

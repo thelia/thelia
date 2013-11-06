@@ -9,7 +9,7 @@
         <form name="thelia.front.customer.login" class="Thelia\Form\CustomerLogin"/>
         <form name="thelia.front.customer.lostpassword" class="Thelia\Form\CustomerLostPasswordForm"/>
         <form name="thelia.front.customer.create" class="Thelia\Form\CustomerCreateForm"/>
-        <form name="thelia.front.customer.profil.update" class="Thelia\Form\CustomerProfilUpdateForm"/>
+        <form name="thelia.front.customer.profile.update" class="Thelia\Form\CustomerProfileUpdateForm"/>
         <form name="thelia.front.customer.password.update" class="Thelia\Form\CustomerPasswordUpdateForm"/>
         <form name="thelia.front.address.create" class="Thelia\Form\AddressCreateForm"/>
         <form name="thelia.front.address.update" class="Thelia\Form\AddressUpdateForm"/>

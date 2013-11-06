@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -42,9 +43,9 @@ use Thelia\Model\OrderStatusQuery;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class OrderStatus extends BaseI18nLoop
+class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -56,17 +57,12 @@ class OrderStatus extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = OrderStatusQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -74,16 +70,17 @@ class OrderStatus extends BaseI18nLoop
             $search->filterById($id, Criteria::IN);
         }
 
-        /* perform search */
-        $orderStatusList = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($orderStatusList);
+    }
 
-        foreach ($orderStatusList as $orderStatus) {
-            $loopResultRow = new LoopResultRow($loopResult, $orderStatus, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $orderStatus) {
+            $loopResultRow = new LoopResultRow($orderStatus);
             $loopResultRow->set("ID", $orderStatus->getId())
                 ->set("IS_TRANSLATED",$orderStatus->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("CODE", $orderStatus->getCode())
                 ->set("TITLE", $orderStatus->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $orderStatus->getVirtualColumn('i18n_CHAPO'))
@@ -95,5 +92,6 @@ class OrderStatus extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

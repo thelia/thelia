@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -21,42 +21,26 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Element;
+namespace Thelia\Core\Template\Element\Exception;
 
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-
-class LoopResultRow
+class LoopException extends \RuntimeException
 {
-    protected $substitution = array();
+    const UNKNOWN_EXCEPTION = 0;
 
-    public $model = null;
+    const NOT_TIMESTAMPED = 100;
+    const NOT_VERSIONED = 101;
 
-    public function __construct($model = null)
+    const MULTIPLE_SEARCH_INTERFACE = 400;
+    const SEARCH_INTERFACE_NOT_FOUND = 404;
+
+    public function __construct($message, $code = null, $arguments = array(), $previous = null)
     {
-        if ($model instanceof ActiveRecordInterface) {
-            $this->model = $model;
+        if (is_array($arguments)) {
+            $this->arguments = $arguments;
         }
-    }
-
-    public function set($key, $value)
-    {
-        $this->substitution[$key] = $value === null ? '' : $value;
-
-        return $this;
-    }
-
-    public function get($key)
-    {
-        return $this->substitution[$key];
-    }
-
-    public function getVarVal()
-    {
-        return $this->substitution;
-    }
-
-    public function getVars()
-    {
-        return array_keys($this->substitution);
+        if ($code === null) {
+            $code = self::UNKNOWN_EXCEPTION;
+        }
+        parent::__construct($message, $code, $previous);
     }
 }

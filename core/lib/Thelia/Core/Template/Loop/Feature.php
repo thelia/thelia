@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -50,9 +51,11 @@ use Thelia\Model\Map\FeatureTemplateTableMap;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Feature extends BaseI18nLoop
+class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $useFeaturePosition;
+
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -77,17 +80,12 @@ class Feature extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = FeatureQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -109,7 +107,7 @@ class Feature extends BaseI18nLoop
         $template = $this->getTemplate();
         $exclude_template = $this->getExcludeTemplate();
 
-        $use_feature_pos = true;
+        $this->useFeaturePosition = true;
 
         if (null !== $product) {
             // Find all template assigned to the products.
@@ -137,7 +135,7 @@ class Feature extends BaseI18nLoop
                 ->filterByTemplate(TemplateQuery::create()->findById($template), Criteria::IN)
             ;
 
-            $use_feature_pos = false;
+            $this->useFeaturePosition = false;
         }
 
         if (null !== $exclude_template) {
@@ -149,7 +147,7 @@ class Feature extends BaseI18nLoop
                 ->filterById($exclude_features, Criteria::NOT_IN)
             ;
 
-            $use_feature_pos = false;
+            $this->useFeaturePosition = false;
         }
 
         $title = $this->getTitle();
@@ -186,13 +184,13 @@ class Feature extends BaseI18nLoop
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
-                    if ($use_feature_pos)
+                    if ($this->useFeaturePosition)
                         $search->orderByPosition(Criteria::ASC);
                      else
                         $search->addAscendingOrderByColumn(FeatureTemplateTableMap::POSITION);
                     break;
                 case "manual_reverse":
-                    if ($use_feature_pos)
+                    if ($this->useFeaturePosition)
                         $search->orderByPosition(Criteria::DESC);
                      else
                         $search->addDescendingOrderByColumn(FeatureTemplateTableMap::POSITION);
@@ -201,26 +199,28 @@ class Feature extends BaseI18nLoop
 
         }
 
-        /* perform search */
-        $features = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($features);
+    }
 
-        foreach ($features as $feature) {
-            $loopResultRow = new LoopResultRow($loopResult, $feature, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $feature) {
+            $loopResultRow = new LoopResultRow($feature);
             $loopResultRow->set("ID", $feature->getId())
                 ->set("IS_TRANSLATED",$feature->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("TITLE",$feature->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $feature->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $feature->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $feature->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("POSITION", $use_feature_pos ? $feature->getPosition() : $feature->getVirtualColumn('position'))
+                ->set("POSITION", $this->useFeaturePosition ? $feature->getPosition() : $feature->getVirtualColumn('position'))
             ;
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
+
     }
 }

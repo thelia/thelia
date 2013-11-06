@@ -156,17 +156,51 @@ class AddressController extends BaseFrontController
     public function deleteAction($address_id)
     {
         $this->checkAuth();
+        $error_message = false;
 
         $customer = $this->getSecurityContext()->getCustomerUser();
         $address = AddressQuery::create()->findPk($address_id);
 
         if (!$address || $customer->getId() != $address->getCustomerId()) {
-            $this->redirectToRoute('default');
+            // If Ajax Request
+            if ($this->getRequest()->isXmlHttpRequest()) {
+                return $this->jsonResponse(json_encode(array(
+                                "success" => false,
+                                "message" => "Error during address deletion process"
+                            )));
+            } else {
+                $this->redirectToRoute('default');
+            }
         }
 
-        $this->dispatch(TheliaEvents::ADDRESS_DELETE, new AddressEvent($address));
+        try {
+            $this->dispatch(TheliaEvents::ADDRESS_DELETE, new AddressEvent($address));
+        } catch (\Exception $e) {
+            $error_message = $e->getMessage();
+        }
 
-        $this->redirectToRoute('default', array('view'=>'account'));
+        \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during address deletion : %s', $error_message));
+
+
+        // If Ajax Request
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            if ($error_message) {
+                $response = $this->jsonResponse(json_encode(array(
+                            "success" => false,
+                            "message" => $error_message
+                        )));
+            } else {
+                $response = $this->jsonResponse(json_encode(array(
+                            "success" => true,
+                            "message" => ""
+                        )));;
+            }
+
+            return $response;
+
+        } else {
+            $this->redirectToRoute('default', array('view'=>'account'));
+        }
     }
 
     protected function createAddressEvent($form)

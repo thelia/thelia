@@ -111,6 +111,7 @@
 
     <route id="cart.update.quantity" path="/cart/update">
         <default key="_controller">Thelia\Controller\Front\CartController::changeItem</default>
+        <default key="_controller">Thelia\Controller\Front\CartController::changeItem</default>
         <default key="_view">cart</default>
     </route>
     <!-- end cart routes -->

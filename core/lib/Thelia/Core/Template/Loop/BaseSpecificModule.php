@@ -24,6 +24,8 @@
 namespace Thelia\Core\Template\Loop;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ModuleQuery;
@@ -32,9 +34,9 @@ use Thelia\Model\ModuleQuery;
  * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class BaseSpecificModule extends BaseI18nLoop
+abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      *
@@ -76,19 +78,7 @@ class BaseSpecificModule extends BaseI18nLoop
         );
     }
 
-    /**
-     *
-     * this function have to be implement in your own loop class.
-     *
-     * All loops parameters can be accesible via getter.
-     *
-     * for example, ref parameter is accessible through getRef method
-     *
-     * @param $pagination
-     *
-     * @return \Thelia\Model\ModuleQuery
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = ModuleQuery::create();
 
@@ -102,7 +92,12 @@ class BaseSpecificModule extends BaseI18nLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
+        $this->configureI18nProcessing($search);
+
+        $search->filterByType($this->getModuleType(), Criteria::EQUAL);
+
         return $search;
     }
 
+    abstract protected function getModuleType();
 }

@@ -73,11 +73,8 @@ class Address extends BaseAction implements EventSubscriberInterface
         $con = Propel::getWriteConnection(AddressTableMap::DATABASE_NAME);
         $con->beginTransaction();
         try {
-            if ($addressModel->isNew()) {
-                $addressModel->setLabel($event->getLabel());
-            }
-
             $addressModel
+                ->setLabel($event->getLabel())
                 ->setTitleId($event->getTitle())
                 ->setFirstname($event->getFirstname())
                 ->setLastname($event->getLastname())

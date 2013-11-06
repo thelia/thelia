@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -45,9 +46,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Customer extends BaseLoop implements SearchLoopInterface
+class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -109,12 +110,7 @@ class Customer extends BaseLoop implements SearchLoopInterface
         }
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = CustomerQuery::create();
 
@@ -123,7 +119,7 @@ class Customer extends BaseLoop implements SearchLoopInterface
         if ($current === true) {
             $currentCustomer = $this->securityContext->getCustomerUser();
             if ($currentCustomer === null) {
-                return new LoopResult();
+                return null;
             } else {
                 $search->filterById($currentCustomer->getId(), Criteria::EQUAL);
             }
@@ -155,12 +151,14 @@ class Customer extends BaseLoop implements SearchLoopInterface
             $search->filterBySponsor($sponsor, Criteria::EQUAL);
         }
 
-        $customers = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($customers);
+    }
 
-        foreach ($customers as $customer) {
-            $loopResultRow = new LoopResultRow($loopResult, $customer, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $customer) {
+            $loopResultRow = new LoopResultRow($customer);
             $loopResultRow->set("ID", $customer->getId());
             $loopResultRow->set("REF", $customer->getRef());
             $loopResultRow->set("TITLE", $customer->getTitleId());
@@ -175,5 +173,6 @@ class Customer extends BaseLoop implements SearchLoopInterface
         }
 
         return $loopResult;
+
     }
 }

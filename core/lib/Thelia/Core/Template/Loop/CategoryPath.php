@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -54,7 +55,7 @@ use Thelia\Type\BooleanOrBothType;
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class CategoryPath extends BaseI18nLoop
+class CategoryPath extends BaseI18nLoop  implements ArraySearchLoopInterface
 {
     /**
      * @return ArgumentCollection
@@ -69,19 +70,14 @@ class CategoryPath extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination (ignored)
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildArray()
     {
         $id = $this->getCategory();
         $visible = $this->getVisible();
 
         $search = CategoryQuery::create();
 
-        $locale = $this->configureI18nProcessing($search, array('TITLE'));
+        $this->configureI18nProcessing($search, array('TITLE'));
 
         $search->filterById($id);
         if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
@@ -95,16 +91,12 @@ class CategoryPath extends BaseI18nLoop
 
             if ($category != null) {
 
-                $loopResultRow = new LoopResultRow();
-
-                $loopResultRow
-                    ->set("TITLE",$category->getVirtualColumn('i18n_TITLE'))
-                    ->set("URL", $category->getUrl($locale))
-                    ->set("ID", $category->getId())
-                    ->set("LOCALE",$locale)
-                ;
-
-                $results[] = $loopResultRow;
+                $results[] = array(
+                    "ID" => $category->getId(),
+                    "TITLE" => $category->getVirtualColumn('i18n_TITLE'),
+                    "URL" => $category->getUrl($this->locale),
+                    "LOCALE" => $this->locale,
+                );
 
                 $parent = $category->getParent();
 
@@ -128,11 +120,18 @@ class CategoryPath extends BaseI18nLoop
         } while ($category != null && $parent > 0);
 
         // Reverse list and build the final result
-        $results = array_reverse($results);
+        return array_reverse($results);
+    }
 
-        $loopResult = new LoopResult();
-
-        foreach($results as $result) $loopResult->addRow($result);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach($loopResult->getResultDataCollection() as $result) {
+            $loopResultRow = new LoopResultRow($result);
+            foreach($result as $output => $outputValue) {
+                $loopResultRow->set($output, $outputValue);
+            }
+            $loopResult->addRow($loopResultRow);
+        }
 
         return $loopResult;
     }
