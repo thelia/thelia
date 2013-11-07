@@ -55,16 +55,7 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
             ->remove("password")
             ->remove("password_confirm")
             // Remove Terms & conditions
-            ->remove("agreed")
-
-            // Add Newsletter
-            ->add("newsletter", "checkbox", array(
-                "label" => Translator::getInstance()->trans('I would like to receive the newsletter or the latest news.'),
-                "label_attr" => array(
-                    "for" => "newsletter"
-                ),
-                "required" => false
-            ));
+            ->remove("agreed");
     }
 
     /**

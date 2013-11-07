@@ -104,6 +104,24 @@ class CustomerController extends BaseFrontController
 
                 $this->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $customerCreateEvent);
 
+                $newCustomer = $customerCreateEvent->getCustomer();
+
+                // Newsletter
+                if (true === $form->get('newsletter')->getData()) {
+                    $newsletterEmail = $newCustomer->getEmail();
+                    $nlEvent = new NewsletterEvent($newsletterEmail, $this->getRequest()->getSession()->getLang()->getLocale());
+                    $nlEvent->setFirstname($newCustomer->getFirstname());
+                    $nlEvent->setLastname($newCustomer->getLastname());
+
+                    // Security : Check if this new Email address already exist
+                    if (null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterEmail)) {
+                        $nlEvent->setId($newsletter->getId());
+                        $this->dispatch(TheliaEvents::NEWSLETTER_UPDATE, $nlEvent);
+                    } else {
+                        $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $nlEvent);
+                    }
+                }
+
                 $this->processLogin($customerCreateEvent->getCustomer());
 
                 $cart = $this->getCart($this->getRequest());
