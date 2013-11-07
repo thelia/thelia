@@ -79,7 +79,7 @@ return array (
     'Address Line 2' => 'Adresse suite',
     'Additional address' => 'Adresse complémentaire',
     'Address Line 3' => 'Adresse suite',
-    'Zip code' => 'Code posta',
+    'Zip code' => 'Code postal',
     'City' => 'Ville',
     'Country' => 'Pays',
     'Email Address' => 'Adresse e-mail',

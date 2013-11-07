@@ -103,18 +103,18 @@
                         <td class="unitprice">
                             {if $IS_PROMO == 1}
                                 {assign "real_price" $PROMO_TAXED_PRICE}
-                                <div class="special-price"><span class="price">{currency attr="symbol"} {$PROMO_TAXED_PRICE}</span></div>
-                                <small class="old-price">{intl l="instead of"} <span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></small>
+                                <div class="special-price"><span class="price">{$PROMO_TAXED_PRICE} {currency attr="symbol"}</span></div>
+                                <small class="old-price">{intl l="instead of"} <span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></small>
                             {else}
                                 {assign "real_price" $TAXED_PRICE}
-                                <div class="special-price"><span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></div>
+                                <div class="special-price"><span class="price">{$TAXED_PRICE} {currency attr="symbol"} </span></div>
                             {/if}
                         </td>
                         <td class="qty">
                             <span class="price">{$QUANTITY}</span>
                         </td>
                         <td class="subprice">
-                            <span class="price">{currency attr="symbol"} {$real_price * $QUANTITY}</span>
+                            <span class="price">{$real_price * $QUANTITY} {currency attr="symbol"}</span>
                         </td>
                     </tr>
 
@@ -127,7 +127,7 @@
                         <th class="shipping">{intl l="Shipping Tax"}</th>
                         <td class="shipping">
                             <div class="shipping-price">
-                                <span class="price">{currency attr="symbol"} {order attr="postage"}</span>
+                                <span class="price">{order attr="postage"} {currency attr="symbol"}</span>
                             </div>
                         </td>
                     </tr>
@@ -153,7 +153,7 @@
                         <th class="total">{intl l="Total"}</th>
                         <td class="total">
                             <div class="total-price">
-                                <span class="price">{currency attr="symbol"} {{cart attr="total_taxed_price"} + {order attr="postage"}}</span>
+                                <span class="price">{{cart attr="total_taxed_price"} + {order attr="postage"}} {currency attr="symbol"}</span>
                             </div>
                         </td>
                     </tr>

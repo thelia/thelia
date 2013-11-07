@@ -89,11 +89,11 @@
                         <td class="unitprice">
                             {if $IS_PROMO == 1}
                                 {assign "real_price" $PROMO_TAXED_PRICE}
-                                <div class="special-price"><span class="price">{currency attr="symbol"} {$PROMO_TAXED_PRICE}</span></div>
-                                <small class="old-price">{intl l="instead of"} <span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></small>
+                                <div class="special-price"><span class="price">{$PROMO_TAXED_PRICE} {currency attr="symbol"}</span></div>
+                                <small class="old-price">{intl l="instead of"} <span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></small>
                             {else}
                                 {assign "real_price" $TAXED_PRICE}
-                                <div class="special-price"><span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></div>
+                                <div class="special-price"><span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></div>
                             {/if}
                         </td>
                         <td class="qty">
@@ -109,7 +109,7 @@
                             </div>
                         </td>
                         <td class="subprice">
-                            <span class="price">{currency attr="symbol"} {$real_price * $QUANTITY}</span>
+                            <span class="price">{$real_price * $QUANTITY} {currency attr="symbol"}</span>
                         </td>
                     </tr>
 
@@ -121,7 +121,7 @@
                     <th class="total">{intl l="Total"}</th>
                     <td class="total">
                         <div class="total-price">
-                            <span class="price">{currency attr="symbol"} {cart attr="total_taxed_price"}</span>
+                            <span class="price">{cart attr="total_taxed_price"} {currency attr="symbol"}</span>
                         </div>
                     </td>
                 </tr>
