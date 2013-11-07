@@ -62,7 +62,7 @@ class TemplateHelper
 
     public function getActiveFrontTemplate() {
         return new TemplateDefinition(
-                ConfigQuery::read('active-admin-template', 'default'),
+                ConfigQuery::read('active-front-template', 'default'),
                 TemplateDefinition::FRONT_OFFICE
         );
     }
