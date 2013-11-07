@@ -23,6 +23,9 @@
 namespace Thelia\Controller\Front;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Core\Event\PdfEvent;
+use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Template\TemplateHelper;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -34,6 +37,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Base\OrderQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;
@@ -241,5 +245,49 @@ class OrderController extends BaseFrontController
         $session->setOrder($order);
 
         return $order;
+    }
+
+    public function generateInvoicePdf($order_id)
+    {
+        return $this->generatePdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
+    }
+
+    public function generateDeliveryPdf($order_id)
+    {
+        return $this->generatePdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
+    }
+
+    protected function generatePdf($order_id, $fileName)
+    {
+        /* check customer */
+        $this->checkAuth();
+
+        $html = $this->renderRaw(
+            $fileName,
+            array(
+                'order_id' => $order_id
+            ),
+            TemplateHelper::getInstance()->getActivePdfTemplate()->getPath()
+        );
+
+        $order = OrderQuery::create()->findPk($order_id);
+
+        try {
+            $pdfEvent = new PdfEvent($html);
+
+            $this->dispatch(TheliaEvents::GENERATE_PDF, $pdfEvent);
+
+            if ($pdfEvent->hasPdf()) {
+                return Response::create($pdfEvent->getPdf(), 200,
+                    array(
+                        'Content-type' => "application/pdf",
+                        'Content-Disposition' => sprintf('Attachment;filename=%s.pdf', $order->getRef()),
+                    ));
+            }
+
+        } catch (\Exception $e) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during generating invoice pdf for order id : %d with message "%s"', $order_id, $e->getMessage()));
+
+        }
     }
 }

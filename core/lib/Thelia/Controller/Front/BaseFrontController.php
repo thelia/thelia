@@ -24,6 +24,7 @@ namespace Thelia\Controller\Front;
 
 use Symfony\Component\Routing\Router;
 use Thelia\Controller\BaseController;
+use Thelia\Core\Template\TemplateHelper;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
@@ -88,12 +89,65 @@ class BaseFrontController extends BaseController
     /**
      * @return ParserInterface instance parser
      */
-    protected function getParser()
+    protected function getParser($template = null)
     {
         $parser = $this->container->get("thelia.parser");
 
-        $parser->setTemplate(ConfigQuery::getActiveTemplate());
+        // Define the template that should be used
+        $parser->setTemplate($template ?: TemplateHelper::getInstance()->getActiveFrontTemplate()->getPath());
 
         return $parser;
+    }
+
+    /**
+     * Render the given template, and returns the result as an Http Response.
+     *
+     * @param $templateName the complete template name, with extension
+     * @param  array                                      $args   the template arguments
+     * @param  int                                        $status http code status
+     * @return \Thelia\Core\HttpFoundation\Response
+     */
+    protected function render($templateName, $args = array(), $status = 200)
+    {
+        return Response::create($this->renderRaw($templateName, $args), $status);
+    }
+
+    /**
+     * Render the given template, and returns the result as a string.
+     *
+     * @param $templateName the complete template name, with extension
+     * @param array $args        the template arguments
+     * @param null  $templateDir
+     *
+     * @return \Thelia\Core\HttpFoundation\Response
+     */
+    protected function renderRaw($templateName, $args = array(), $templateDir = null)
+    {
+
+        // Add the template standard extension
+        $templateName .= '.html';
+
+        $session = $this->getSession();
+
+        // Prepare common template variables
+        $args = array_merge($args, array(
+                'locale'               => $session->getLang()->getLocale(),
+                'lang_code'            => $session->getLang()->getCode(),
+                'lang_id'              => $session->getLang()->getId(),
+                'current_url'          => $this->getRequest()->getUri()
+            ));
+
+        // Render the template.
+        try {
+            $data = $this->getParser($templateDir)->render($templateName, $args);
+
+            return $data;
+        } catch (AuthenticationException $ex) {
+            // User is not authenticated, and templates requires authentication -> redirect to login page
+            Redirect::exec(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
+        } catch (AuthorizationException $ex) {
+            // User is not allowed to perform the required action. Return the error page instead of the requested page.
+            return $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."), 403);
+        }
     }
 }
