@@ -95,7 +95,7 @@ class SmartyParser extends Smarty implements ParserInterface
     public static function theliaEscape($content, $smarty)
     {
         if (is_scalar($content)) {
-            return htmlspecialchars($content ,ENT_QUOTES, Smarty::$_CHARSET);
+            return htmlspecialchars($content, ENT_QUOTES, Smarty::$_CHARSET);
         } else {
             return $content;
         }

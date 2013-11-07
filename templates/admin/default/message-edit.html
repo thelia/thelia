@@ -16,7 +16,7 @@
 			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
             <li><a href="{url path='/admin/configuration/messages'}">{intl l="Mailing templates"}</a></li>
-            <li>{intl l='Editing mailing template "%name"' name="{$NAME}"}</li>
+            <li>{intl l='Editing mailing template "%name"' name=$NAME}</li>
         </ul>
 
 		<div class="row">
@@ -24,7 +24,7 @@
 				<div class="row">
 
 					<div class="col-md-12 title title-without-tabs">
-					   {intl l="Edit mailing template $NAME"}
+					   {intl l='Edit mailing template "%name"' name=$NAME}
 					</div>
 
                     <div class="form-container">
@@ -55,7 +55,7 @@
 
 								{form_field form=$form field='name'}
 								<div class="form-group {if $error}has-error{/if}">
-									<label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+									<label for="{$label_attr.for}" class="control-label">{$label} : </label>
 									<input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Variable name'}" placeholder="{intl l='Variable name'}" class="form-control">
 								</div>
 					            {/form_field}
@@ -64,21 +64,21 @@
 		                        <div class="checkbox {if $error}has-error{/if}">
 		                            <label>
 		                                <input type="checkbox" name="{$name}" value="1" {if $value == 1}checked="checked"{/if}>
-		                                {intl l="{$label}"}
+		                                {$label}
 									</label>
 		                        </div>
 		                        {/form_field}
 
 								{form_field form=$form field='title'}
 								<div class="form-group {if $error}has-error{/if}">
-								    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+								    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 									<input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{$value}">
 								</div>
 								{/form_field}
 
                                 {form_field form=$form field='subject'}
                                 <div class="form-group {if $error}has-error{/if}">
-                                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 									<input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Subject'}" placeholder="{intl l='Subject'}" class="form-control" value="{$value}">
 								</div>
                                 {/form_field}
@@ -86,7 +86,7 @@
 								{form_field form=$form field='html_message'}
 								<div class="form-group {if $error}has-error{/if}">
 								    <label for="{$label_attr.for}" class="control-label">
-								    	{intl l="{$label}"} :
+								    	{$label} :
 								      <span class="label-help-block">{intl l="The mailing template in HTML format."}</span>
 								    </label>
 								    <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control">{$value}</textarea>
@@ -96,7 +96,7 @@
                                 {form_field form=$form field='text_message'}
                                 <div class="form-group {if $error}has-error{/if}">
                                     <label for="{$label_attr.for}" class="control-label">
-                                    	{intl l="{$label}"} :
+                                    	{$label} :
                                       <span class="label-help-block">{intl l="The mailing template in text-only format."}</span>
                                     </label>
                                     <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control">{$value}</textarea>
@@ -121,7 +121,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="alert alert-error">
-                    {intl l="Sorry, message ID=$message_id was not found."}
+                    {intl l="Sorry, message ID=%id was not found." id=$message_id}
                 </div>
             </div>
         </div>

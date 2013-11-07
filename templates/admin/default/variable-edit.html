@@ -61,14 +61,14 @@
 
 									{form_field form=$form field='name'}
 						            <div class="form-group {if $error}has-error{/if}">
-    									<label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+    									<label for="{$label_attr.for}" class="control-label">{$label} : </label>
 					                    <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Variable name'}" placeholder="{intl l='Variable name'}" class="form-control">
 						            </div>
 						            {/form_field}
 
 									{form_field form=$form field='value'}
 						            <div class="form-group {if $error}has-error{/if}">
-    									<label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+    									<label for="{$label_attr.for}" class="control-label">{$label} : </label>
 						                <input type="text" id="{$label_attr.for}" name="{$name}" value="{$value}" title="{intl l='Variable value'}" placeholder="{intl l='Variable value'}" class="form-control">
 						            </div>
 						            {/form_field}
@@ -77,7 +77,7 @@
 			                        <div class="checkbox {if $error}has-error{/if}">
 										<label>
 	                                        <input type="checkbox" name="{$name}" value="1" {if $value == 1}checked="checked"{/if}>
-	                                        {intl l="{$label}"}
+	                                        {$label}
 										</label>
 			                        </div>
 			                        {/form_field}
@@ -106,7 +106,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="alert alert-error">
-                    {intl l="Sorry, variable ID=$variable_id was not found."}
+                    {intl l="Sorry, variable ID=%id was not found." id=$variable_id}
                 </div>
             </div>
         </div>

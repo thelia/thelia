@@ -32,6 +32,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Tools\URL;
 /**
  * Class LangController
  * @package Thelia\Controller\Admin
@@ -41,7 +42,6 @@ class TranslationsController extends BaseAdminController
 {
     protected function renderTemplate()
     {
-
         // Find modules
         $modules = ModuleQuery::create()->joinI18n($this->getCurrentEditionLocale())->orderByPosition()->find();
 
@@ -58,24 +58,33 @@ class TranslationsController extends BaseAdminController
 
         $template = $directory = $i18n_directory = false;
 
-        $mode = 'template';
+        $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
 
-        if (! empty($item_id)) {
+        $templateArguments = array(
+                'item_to_translate'             => $item_to_translate,
+                'item_id'                       => $item_id,
+                'view_missing_traductions_only' => $this->getRequest()->get('view_missing_traductions_only', 0),
+                'max_input_vars_warning'        => false,
+        );
+
+        // Find the i18n directory, and the directory to examine.
+
+        if (! empty($item_id) || $item_to_translate == 'co') {
 
             switch($item_to_translate) {
 
                 case 'mo' :
                     if (null !== $module = ModuleQuery::create()->findPk($item_id)) {
                         $directory = THELIA_MODULE_DIR . $module->getBaseDir();
-                        $i18n_directory = THELIA_TEMPLATE_DIR . $template->getI18nPath();
-                        $mode = 'php';
+                        $i18n_directory = THELIA_TEMPLATE_DIR . $module->getI18nPath();
+                        $walkMode = TemplateHelper::WALK_MODE_PHP;
                     }
                     break;
 
                 case 'co' :
                     $directory = THELIA_ROOT . 'core/lib/Thelia';
                     $i18n_directory = THELIA_ROOT . 'core/lib/Thelia/Config/I18n';
-                    $mode = 'php';
+                    $walkMode = TemplateHelper::WALK_MODE_PHP;
                 break;
 
                 case 'fo' :
@@ -96,24 +105,58 @@ class TranslationsController extends BaseAdminController
                 $i18n_directory = THELIA_TEMPLATE_DIR . $template->getI18nPath();
             }
 
+            // Load strings to translate
             if ($directory) {
 
-                // Load strings
-                $this->walkDir($directory, $mode, $all_strings);
-
-                // Load translated strings
+                // Save the string set, if the form was submitted
                 if ($i18n_directory) {
-                    $locale = $this->getCurrentEditionLocale();
+
+                    $save_mode = $this->getRequest()->get('save_mode', false);
+
+                    if ($save_mode !== false) {
+
+                        $texts = $this->getRequest()->get('text', array());
+
+                        if (! empty($texts)) {
+
+                            $file = sprintf("%s/%s.php", $i18n_directory, $this->getCurrentEditionLocale());
+
+                            $translations = $this->getRequest()->get('translation', array());
+
+                            TemplateHelper::getInstance()->write_translation($file, $texts, $translations);
+
+                            if ($save_mode == 'stay')
+                                $this->redirectToRoute("admin.configuration.translations", $templateArguments);
+                            else
+                                $this->redirect(URL::getInstance()->adminViewUrl('configuration'));
+                        }
+                    }
+                }
+
+                // Load strings
+                $stringsCount = TemplateHelper::getInstance()->walkDir(
+                        $directory,
+                        $walkMode,
+                        $this->getTranslator(),
+                        $this->getCurrentEditionLocale(),
+                        $all_strings
+                );
+
+                // Estimate number of fields, and compare to php ini max_input_vars
+                $stringsCount = $stringsCount * 2 + 6;
+
+                if ($stringsCount > ini_get('max_input_vars')) {
+                   $templateArguments['max_input_vars_warning']  = true;
+                   $templateArguments['required_max_input_vars'] = $stringsCount;
+                   $templateArguments['current_max_input_vars']  = ini_get('max_input_vars');
+                }
+                else {
+                    $templateArguments['all_strings'] = $all_strings;
                 }
             }
         }
 
-        return $this->render('translations', array(
-                'item_to_translate'             => $item_to_translate,
-                'item_id'                       => $item_id,
-                'all_strings'                   => $all_strings,
-                'view_missing_traductions_only' => $this->getRequest()->get('view_missing_traductions_only', 0)
-        ));
+        return $this->render('translations', $templateArguments);
     }
 
     public function defaultAction()
@@ -128,87 +171,5 @@ class TranslationsController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
 
         return $this->renderTemplate();
-    }
-
-    protected function normalize_path($path)
-    {
-        $path =
-        str_replace(
-                str_replace('\\', '/', THELIA_ROOT),
-                '',
-                str_replace('\\', '/', realpath($path))
-        );
-
-        if ($path[0] == '/') $path = substr($path, 1);
-
-        return $path;
-    }
-
-    protected function walkDir($directory, $mode, &$strings) {
-
-        if ($mode == 'php') {
-            $prefix = '\-\>[\s]*trans[\s]*\(';
-
-            $allowed_exts = array('php');
-        } else {
-            $prefix = '\{intl[\s]l=';
-
-            $allowed_exts = array('html', 'tpl', 'xml');
-        }
-
-        try {
-            //echo "walking in $directory<br />";
-
-            foreach (new \DirectoryIterator($directory) as $fileInfo) {
-
-                if ($fileInfo->isDot()) continue;
-
-                if ($fileInfo->isDir()) $this->walkDir($fileInfo->getPathName(), $mode, $strings);
-
-                if ($fileInfo->isFile()) {
-
-                    $ext = $fileInfo->getExtension();
-
-                    if (in_array($ext, $allowed_exts)) {
-
-                        if ($content = file_get_contents($fileInfo->getPathName())) {
-
-                            $short_path = $this->normalize_path($fileInfo->getPathName());
-
-                            // echo "   examining $short_path\n";
-
-                            $matches = array();
-
-                            if (preg_match_all('/'.$prefix.'((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)\1/', $content, $matches)) {
-
-                                // print_r($matches[2]);
-
-                                foreach($matches[2] as $match) {
-
-                                    $hash = md5($match);
-
-                                    if (isset($strings[$hash]))
-                                    {
-                                        if (! in_array($short_path, $strings[$hash]['files']))
-                                        {
-                                            $strings[$hash]['files'][] = $short_path;
-                                        }
-                                    }
-                                    else
-                                        $strings[$hash] = array(
-                                                'files'   => array($short_path),
-                                                'chaine'  => $match,
-                                                'translation' => $this->getTranslator()->trans($match, array(), 'messages', $this->getCurrentEditionLocale(), false),
-                                                'dollar'  => strstr($match, '$') !== false
-                                    );
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (\UnexpectedValueException $ex) {
-            echo $ex;
-        }
     }
 }

@@ -1,26 +1,36 @@
 <?php
-/*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
-/*************************************************************************************/
 
 return array(
-
+	'Combination builder' => 'Combination builder',
+	'Title' => 'Title',
+	'City' => 'City',
+	'Zip code' => 'Zip code',
+	'Country' => 'Country',
+	'Phone' => 'Phone',
+	'Login' => 'Login',
+	'Password' => 'Password',
+	'Profile' => 'Profile',
+	'Postage' => 'Postage',
+	'Add to all product templates' => 'Add to all product templates',
+	'Quantity' => 'Quantity',
+	'Name' => 'Name',
+	'Value' => 'Value',
+	'Subject' => 'Subject',
+	'Company' => 'Company',
+	'Description' => 'Description',
+	'Language name' => 'Language name',
+	'ISO 639 Code' => 'ISO 639 Code',
+	'If a translation is missing or incomplete :' => 'If a translation is missing or incomplete :',
+	'Host' => 'Host',
+	'Port' => 'Port',
+	'Encryption' => 'Encryption',
+	'Username' => 'Username',
+	'Timeout' => 'Timeout',
+	'Source IP' => 'Source IP',
+	'Email address' => 'Email address',
+	'Firstname' => 'Firstname',
+	'Lastname' => 'Lastname',
+	'Additional address' => 'Additional address',
+	'Reference' => 'Reference',
+	'EAN Code' => 'EAN Code',
 );

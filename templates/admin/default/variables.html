@@ -163,21 +163,21 @@
 
 		    {form_field form=$form field='name'}
 		    <div class="form-group {if $error}has-error{/if}">
-		        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+		        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 		        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Variable name'}" placeholder="{intl l='Variable name'}" class="form-control">
 		    </div>
 		    {/form_field}
 
 		    {form_field form=$form field='value'}
 		    <div class="form-group {if $error}has-error{/if}">
-		        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+		        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 		        <input type="text" id="{$label_attr.for}" name="{$name}" value="{$value}" title="{intl l='Variable value'}" placeholder="{intl l='Variable value'}" class="form-control">
 		    </div>
 		    {/form_field}
 
 		    {form_field form=$form field='title'}
 		    <div class="form-group {if $error}has-error{/if}">
-		        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+		        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
 		        {loop type="lang" name="default-lang" default_only="1"}
 

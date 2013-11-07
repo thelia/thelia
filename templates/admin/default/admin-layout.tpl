@@ -202,7 +202,7 @@
 
 	{elseloop rel="top-bar-auth"}
 	    <div class="brandbar brandbar-wide container">
-	        <a class="navbar-brand" href="{url path='/admin'}">{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}</a>
+	        <a class="navbar-brand" href="{url path='/admin'}">{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, the open source e-commerce solution'}" />{/images}</a>
 	    </div>
 	{/elseloop}
 
@@ -218,9 +218,9 @@
     <footer class="footer">
         <div class="container">
             <p>{intl l='&copy; Thelia 2013'}
-            - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Édité par OpenStudio'}</a>
-            - <a href="http://forum.thelia.net/" target="_blank">{intl l='Forum Thelia'}</a>
-            - <a href="http://contrib.thelia.net/" target="_blank">{intl l='Contributions Thelia'}</a>
+            - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
+            - <a href="http://forum.thelia.net/" target="_blank">{intl l='Thelia support forum'}</a>
+            - <a href="http://contrib.thelia.net/" target="_blank">{intl l='Thelia contributions'}</a>
             </p>
 
             {module_include location='in_footer'}

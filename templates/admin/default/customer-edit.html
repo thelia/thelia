@@ -51,7 +51,7 @@
 
                                                 {form_field form=$form field='title'}
                                                     <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
                                                         <select name="{$name}" id="{$label_attr.for}" class="form-control">
                                                             {loop type="title" name="title1" backend_context="1"}
@@ -63,15 +63,15 @@
 
                                                 {form_field form=$form field='firstname'}
                                                     <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$FIRSTNAME}" title="{intl l="{$label}"}" placeholder="{intl l='Firstname'}">
+                                                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$FIRSTNAME}" title="{$label}" placeholder="{intl l='Firstname'}">
                                                     </div>
                                                 {/form_field}
 
                                                 {form_field form=$form field='lastname'}
                                                     <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$LASTNAME}" title="{intl l="{$label}"}" placeholder="{intl l='Lastname'}">
+                                                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$LASTNAME}" title="{$label}" placeholder="{intl l='Lastname'}">
                                                     </div>
                                                 {/form_field}
 
@@ -81,47 +81,47 @@
 
                                                     {form_field form=$form field='company'}
                                                         <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$COMPANY}" title="{intl l="{$label}"}" placeholder="{intl l='Company'}">
+                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$COMPANY}" title="{$label}" placeholder="{intl l='Company'}">
                                                         </div>
                                                     {/form_field}
 
                                                     {form_field form=$form field='address1'}
                                                         <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$ADDRESS1}" title="{intl l="{$label}"}" placeholder="{intl l='Address'}">
+                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$ADDRESS1}" title="{$label}" placeholder="{intl l='Address'}">
                                                         </div>
                                                     {/form_field}
 
                                                     {form_field form=$form field='address2'}
                                                         <div class="form-group">
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$ADDRESS2}" title="{intl l="{$label}"}" placeholder="{intl l='Additional address'}">
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$ADDRESS2}" title="{$label}" placeholder="{intl l='Additional address'}">
                                                         </div>
                                                     {/form_field}
 
                                                     {form_field form=$form field='address3'}
                                                         <div class="form-group">
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$ADDRESS3}" title="{intl l="{$label}"}" placeholder="{intl l='Additional address'}">
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$ADDRESS3}" title="{$label}" placeholder="{intl l='Additional address'}">
                                                         </div>
                                                     {/form_field}
 
                                                     {form_field form=$form field='zipcode'}
                                                         <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$ZIPCODE}" title="{intl l="{$label}"}" placeholder="{intl l='Zip code'}">
+                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$ZIPCODE}" title="{$label}" placeholder="{intl l='Zip code'}">
                                                         </div>
                                                     {/form_field}
 
                                                     {form_field form=$form field='city'}
                                                         <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$CITY}" title="{intl l="{$label}"}" placeholder="{intl l='City'}">
+                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$CITY}" title="{$label}" placeholder="{intl l='City'}">
                                                         </div>
                                                     {/form_field}
 
                                                     {form_field form=$form field='country'}
                                                         <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                                                             <select name="{$name}" id="{$label_attr.for}" class="form-control">
                                                                 {loop type="country" name="country1"}
                                                                     <option value="{$ID}" {if $ID == $COUNTRY}selected{/if}>{$TITLE}</option>
@@ -253,7 +253,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="alert alert-error">
-                            {intl l="Sorry, customer ID=$customer_id was not found."}
+                            {intl l="Sorry, customer ID=%id was not found." id=$customer_id}
                         </div>
                     </div>
                 </div>
@@ -277,21 +277,21 @@
             {/form_field}
             {form_field form=$form field='label'}
                 <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Label'}">
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Label'}">
                 </div>
             {/form_field}
 
             {form_field form=$form field='company'}
                 <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Company'}">
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Company'}">
                 </div>
             {/form_field}
 
             {form_field form=$form field='title'}
                 <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
                     <select name="{$name}" id="{$label_attr.for}" class="form-control" required>
                         {loop type="title" name="title1"}
@@ -303,54 +303,54 @@
 
             {form_field form=$form field='firstname'}
                 <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Firstname'}" required>
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Firstname'}" required>
                 </div>
             {/form_field}
 
             {form_field form=$form field='lastname'}
                 <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Lastname'}" required>
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Lastname'}" required>
                 </div>
             {/form_field}
 
             {form_field form=$form field='address1'}
                 <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Address'}" required>
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Address'}" required>
                 </div>
 
                 <div class="form-group">
                     {form_field form=$form field='address2'}
-                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Additional address'}">
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
                     {/form_field}
                 </div>
 
                 <div class="form-group">
                     {form_field form=$form field='address3'}
-                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Additional address'}">
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
                     {/form_field}
                 </div>
             {/form_field}
 
             {form_field form=$form field='zipcode'}
                 <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Zip code'}" required>
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Zip code'}" required>
                 </div>
             {/form_field}
 
             {form_field form=$form field='city'}
                 <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='City'}" required>
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='City'}" required>
                 </div>
             {/form_field}
 
             {form_field form=$form field='country'}
                 <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <select name="{$name}" id="{$label_attr.for}" class="form-control" required>
                         {loop type="country" name="country1"}
                             <option value="{$ID}">{$TITLE}</option>
