@@ -36,8 +36,9 @@ use Thelia\Exception\ModuleException;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleImage;
 use Thelia\Model\ModuleQuery;
+use Thelia\Core\HttpFoundation\Request;
 
-abstract class BaseModule extends ContainerAware
+class BaseModule extends ContainerAware implements BaseModuleInterface
 {
     const CLASSIC_MODULE_TYPE = 1;
     const DELIVERY_MODULE_TYPE = 2;
@@ -48,10 +49,8 @@ abstract class BaseModule extends ContainerAware
 
     protected $reflected;
 
-    public function __construct()
-    {
-
-    }
+    protected $dispatcher = null;
+    protected $request = null;
 
     public function activate($moduleModel = null)
     {
@@ -102,7 +101,7 @@ abstract class BaseModule extends ContainerAware
 
     public function hasContainer()
     {
-        return null === $this->container;
+        return null !== $this->container;
     }
 
     public function getContainer()
@@ -113,6 +112,41 @@ abstract class BaseModule extends ContainerAware
 
         return $this->container;
     }
+
+
+    public function hasRequest() {
+        return null !== $this->request;
+    }
+
+    public function setRequest(Request $request) {
+        $this->request = $request;
+    }
+
+    public function getRequest() {
+        if ($this->hasRequest() === false) {
+            throw new \RuntimeException("Sorry, the request is not available in this context");
+        }
+
+        return $this->request;
+    }
+
+
+    public function hasDispatcher() {
+        return null !== $this->dispatcher;
+    }
+
+    public function setDispatcher(EventDispatcherInterface $dispatcher) {
+        $this->dispatcher = $dispatcher;
+    }
+
+    public function getDispatcher() {
+        if ($this->hasDispatcher() === false) {
+            throw new \RuntimeException("Sorry, the dispatcher is not available in this context");
+        }
+
+        return $this->dispatcher;
+    }
+
 
     public function setTitle(Module $module, $titles)
     {
@@ -226,6 +260,7 @@ abstract class BaseModule extends ContainerAware
 
     public function install(ConnectionInterface $con = null)
     {
+        // Implement this method to do something useful.
     }
 
     public function preActivation(ConnectionInterface $con = null)
@@ -235,7 +270,7 @@ abstract class BaseModule extends ContainerAware
 
     public function postActivation(ConnectionInterface $con = null)
     {
-
+        // Implement this method to do something useful.
     }
 
     public function preDeactivation(ConnectionInterface $con = null)
@@ -245,12 +280,11 @@ abstract class BaseModule extends ContainerAware
 
     public function postDeactivation(ConnectionInterface $con = null)
     {
-
+        // Implement this method to do something useful.
     }
 
-    public function destroy(ConnectionInterface $con = null)
+    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
     {
-
+        // Implement this method to do something useful.
     }
-
 }
