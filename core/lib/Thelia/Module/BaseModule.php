@@ -27,6 +27,8 @@ namespace Thelia\Module;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\Map\ModuleImageTableMap;
@@ -36,7 +38,7 @@ use Thelia\Exception\ModuleException;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleImage;
 use Thelia\Model\ModuleQuery;
-use Thelia\Core\HttpFoundation\Request;
+
 
 class BaseModule extends ContainerAware implements BaseModuleInterface
 {
