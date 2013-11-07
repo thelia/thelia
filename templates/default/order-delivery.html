@@ -134,7 +134,7 @@
                                 {/if}
                                 <label for="delivery-method_{$ID}">
                                     <input type="radio" name="{$name}" id="delivery-method_{$ID}"{if $isDeliveryMethodChecked} checked="checked"{/if} value="{$ID}">
-                                    <strong>{$TITLE}</strong> / {currency attr="symbol"} {$POSTAGE}
+                                    <strong>{$TITLE}</strong> / {$POSTAGE} {currency attr="symbol"}
                                 </label>
                             {/form_field}
                         </div>
