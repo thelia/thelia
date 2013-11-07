@@ -156,6 +156,10 @@ return array (
     'List' => 'Liste',
     'Next' => 'Suivant',
     'Previous' => 'Précédent',
+    '%nb Items' => '%nb produits',
+    '%nb Item' => '%nb produit',
+    'Latest products' => 'Derniers produits',
+    'Product Offers' => 'Produits en promotion',
 
     /*
       'The page cannot be found' => '',
@@ -196,6 +200,17 @@ return array (
       'Password confirmation is not the same as password field.' => '',
       'I would like to receive the newsletter or the latest news.' => '',
     */
+    // Product Empty
+    'Product Empty Title' => 'Bonjour',
+    'Product Empty Message' => 'C\'est très simple d\'ajouter un produit dans l\'adminsitration.
+        <ol>
+            <li>N\'oubliez pas de sélectionner <strong>NEW</strong> dans l\'onglet Details afin de voir votre produit dans la section des nouveautés.</li>
+            <li>N\'oubliez pas de sélectionner <strong>SALE</strong> dans l\'onglet Details afin de voir votre produit dans la section des promotions.</li>
+        </ol>',
+    'Product Empty Button' => 'Ajouter mon premier produit',
+    'Demo product title' => 'Example de titre',
+    'Demo product description' => 'Example de description de produit',
+    // Placeholder
     'Placeholder firstname' => 'Prénom',
     'Placeholder lastname' => 'Nom de famille',
     'Placeholder email' => 'Adresse e-mail',

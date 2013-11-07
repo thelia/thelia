@@ -1,5 +1,7 @@
 <li class="item">
     {assign var="hasSubmit" value = false}
+    {assign var="productTitle" value="{$TITLE}"}
+
     <article itemscope itemtype="http://schema.org/Product">
         <!-- Use the meta tag to specify content that is not visible on the page in any way -->
         {loop name="brand.feature" type="feature" product=$ID title="brand"}
@@ -15,14 +17,16 @@
 
         <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
             {loop name="product_thumbnail" type="image" product=$ID width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
-                <img itemprop="image" src="{$IMAGE_URL}" alt="Product #{$LOOP_COUNT}">
+                <img itemprop="image" src="{$IMAGE_URL}" alt="{$productTitle}">
             {/loop}
-
+            {elseloop rel="product_thumbnail"}
+                {images file='../assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="{$productTitle}">{/images}
+            {/elseloop}
             <span class="mask"></span>
         </a>
 
         <div class="product-info">
-            <h3 class="name"><a href="{$URL}"><span itemprop="name">{$TITLE}</span></a></h3>
+            <h3 class="name"><a href="{$URL}"><span itemprop="name">{$productTitle}</span></a></h3>
             {if $hasDescription}
             <div class="description" itemprop="description">
                 <p>{$DESCRIPTION}</p>
