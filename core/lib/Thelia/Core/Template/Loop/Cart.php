@@ -13,6 +13,7 @@ use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CountryQuery;
 use Thelia\Type;
@@ -41,7 +42,15 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
      */
     protected function getArgDefinitions()
     {
-        return new ArgumentCollection();
+        return new ArgumentCollection(
+            new Argument(
+                'order',
+                new Type\TypeCollection(
+                    new Type\EnumListType(array('reverse'))
+                ),
+                'reverse'
+            )
+        );
     }
 
     public function buildArray()
@@ -52,7 +61,19 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             return array();
         }
 
-        return iterator_to_array($cart->getCartItems());
+        $returnArray = iterator_to_array($cart->getCartItems());
+
+        $orders  = $this->getOrder();
+
+        foreach ($orders as $order) {
+            switch ($order) {
+                case "reverse":
+                    $returnArray = array_reverse($returnArray, false);
+                    break;
+            }
+        }
+
+        return $returnArray;
     }
 
     public function parseResults(LoopResult $loopResult)
