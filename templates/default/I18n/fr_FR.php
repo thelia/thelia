@@ -148,7 +148,7 @@ return array(
     'Rating' => 'Avis',
     'Ref.' => '',
     'Register!' => 'S\'inscrire !',
-    'Register' => 'Se connecter',
+    'Register' => 'S\'inscrire',
     'Regular Price:' => 'Prix :',
     'Related' => 'Liés', // voir le contexte pour l'accord
     'Remove this address' => 'Supprimer cette adresse',
@@ -165,7 +165,7 @@ return array(
     'Send' => 'Envoyer',
     'Shipping Tax' => 'Frais de livraison',
     'Show' => 'Voir',
-    'Sign In' => 'S\'inscrire',
+    'Sign In' => 'Se connecter',
     'Sign up to receive our latest news.' => 'Inscrivez-vous pour recevoir nos actualités.',
     'Skip to content' => 'Aller au contenu',
     'Sort By' => 'Trier par',
