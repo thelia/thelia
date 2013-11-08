@@ -50,11 +50,11 @@
                                 <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"><span class="glyphicon glyphicon-book"></span></a>
                             {/loop*}
 
-                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.modules" access="UPDATE"}
+                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.module" access="UPDATE"}
                                 <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
                             {/loop}
 
-                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.modules" access="DELETE"}
+                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.module" access="DELETE"}
                                 <a class="btn btn-default btn-xs module-delete-action" title="{intl l='Delete this module'}" href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                             {/loop}
                         </div>

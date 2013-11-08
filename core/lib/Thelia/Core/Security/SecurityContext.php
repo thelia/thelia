@@ -177,14 +177,18 @@ class SecurityContext
                 continue;
             }
 
+            if(!array_key_exists('module', $userPermissions)) {
+                return false;
+            }
+
             $module = strtolower($module);
 
-            if (!array_key_exists($module, $userPermissions)) {
+            if (!array_key_exists($module, $userPermissions['module'])) {
                 return false;
             }
 
             foreach ($accesses as $access) {
-                if (!$userPermissions[$module]->can($access)) {
+                if (!$userPermissions['module'][$module]->can($access)) {
                     return false;
                 }
             }
