@@ -925,16 +925,25 @@
 
     <!-- Modules rule management -->
 
-    <route id="admin.module" path="/admin/configuration/modules">
+    <route id="admin.module" path="/admin/modules">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::indexAction</default>
     </route>
 
-    <route id="admin.module.toggle-activation" path="/admin/configuration/modules/toggle-activation/{module_id}">
+    <route id="admin.module.update" path="/admin/module/update/{module_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::updateAction</default>
+        <requirement key="module_id">\d+</requirement>
+    </route>
+
+    <route id="admin.module.save" path="/admin/module/save">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.module.toggle-activation" path="/admin/modules/toggle-activation/{module_id}">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::toggleActivationAction</default>
         <requirement key="module_id">\d+</requirement>
     </route>
 
-    <route id="admin.module.delete" path="/admin/configuration/modules/delete">
+    <route id="admin.module.delete" path="/admin/modules/delete">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::deleteAction</default>
     </route>
 

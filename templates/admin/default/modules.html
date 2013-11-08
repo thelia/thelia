@@ -2,7 +2,7 @@
 
 {block name="page-title"}{intl l='Modules'}{/block}
 
-{block name="check-resource"}admin.configuration.module{/block}
+{block name="check-resource"}admin.module{/block}
 {block name="check-access"}view{/block}
 
 {block name="main-content"}
@@ -53,7 +53,7 @@
     dialog_title    = {intl l="Delete a module"}
     dialog_message  = {intl l="Do you really want to delete this module ?"}
 
-    form_action         = {url path='/admin/configuration/modules/delete'}
+    form_action         = {url path='/admin/modules/delete'}
     form_content        = {$smarty.capture.delete_module_dialog nofilter}
 }
 
@@ -81,8 +81,8 @@
     {/javascripts}
 
     <script>
-        $(document).ready(function(){
-           var url_management = "{url path="/admin/configuration/modules/toggle-activation/"}";
+        $(document).ready(function() {
+           var url_management = "{url path="/admin/modules/toggle-activation/"}";
            $(".module-activation").on("switch-change", function(e, data){
                $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
                $.ajax({

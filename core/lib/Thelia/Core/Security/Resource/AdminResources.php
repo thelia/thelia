@@ -84,7 +84,7 @@ final class AdminResources
 
     const MESSAGE = "admin.configuration.message";
 
-    const MODULE = "admin.configuration.module";
+    const MODULE = "admin.module";
 
     const ORDER = "admin.order";
 

@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -21,32 +21,55 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace FakeCB\Tests;
+namespace Thelia\Form;
 
-use FakeCB\FakeCB;
-use Thelia\Tests\Module\BaseModuleTestor;
+use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Model\ModuleQuery;
 
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
-class FakeCBTest extends BaseModuleTestor
+class ModuleModificationForm extends BaseForm
 {
-    public function getTestedClassName()
+    use StandardDescriptionFieldsTrait;
+
+    protected function buildForm()
     {
-        return 'FakeCB\FakeCB';
+        $this->addStandardDescFields();
+
+        $this->formBuilder
+            ->add("id", "hidden", array(
+                "required" => true,
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                    new Constraints\Callback(
+                        array(
+                            "methods" => array(
+                                array($this, "verifyModuleId"),
+                            ),
+                        )
+                    ),
+                ),
+                "attr" => array(
+                    "id" => "module_update_id",
+                ),
+            ))
+        ;
     }
 
-    public function getTestedInstance()
+    /**
+     * @return string the name of you form. This name must be unique
+     */
+    public function getName()
     {
-        return new FakeCB();
+        return "thelia_admin_module_modification";
     }
 
-    public function testInstall()
+    public function verifyModuleId($value, ExecutionContextInterface $context)
     {
-        //$fakeCB = new FakeCB();
+        $module = ModuleQuery::create()
+            ->findPk($value);
 
-        //$fakeCB->install();
+        if (null === $module) {
+            $context->addViolation("Module ID not found");
+        }
     }
 }
