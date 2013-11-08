@@ -194,7 +194,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 <main class="main-container" role="main">
     <div class="container">
         {block name="breadcrumb"}{include file="misc/breadcrumb.tpl"}{/block}
-        {block name="main-content"}{/block}
+        <div id="content">{block name="main-content"}{/block}</div>
     </div><!-- /.container -->
 </main><!-- /.main-container -->
 
@@ -275,7 +275,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                             <p>{intl l="Follow us introduction"}</p>
                             <ul role="presentation">
                                 <li>
-                                    <a href="http://facebook.com" class="facebook" data-toggle="tooltip" data-placement="top" title="{intl l="Facebook"}" target="_blank">
+                                    <a href="http://facebook.com" rel="nofollow" class="facebook" data-toggle="tooltip" data-placement="top" title="{intl l="Facebook"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-facebook icon-light"></span>
@@ -284,7 +284,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://twitter.com" class="twitter" data-toggle="tooltip" data-placement="top" title="{intl l="Twitter"}" target="_blank">
+                                    <a href="https://twitter.com" rel="nofollow" class="twitter" data-toggle="tooltip" data-placement="top" title="{intl l="Twitter"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-twitter icon-light"></span>
@@ -293,7 +293,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://instagram.com" class="instagram" data-toggle="tooltip" data-placement="top" title="{intl l="Instagram"}" target="_blank">
+                                    <a href="http://instagram.com" rel="nofollow" class="instagram" data-toggle="tooltip" data-placement="top" title="{intl l="Instagram"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-instagram icon-light"></span>
@@ -302,7 +302,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://google.com" class="google-plus" data-toggle="tooltip" data-placement="top" title="{intl l="Google+"}" target="_blank">
+                                    <a href="http://www.google.com" rel="nofollow" class="google-plus" data-toggle="tooltip" data-placement="top" title="{intl l="Google+"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-google-plus icon-light"></span>
@@ -311,7 +311,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://youtube.com" class="youtube" data-toggle="tooltip" data-placement="top" title="{intl l="Youtube"}" target="_blank">
+                                    <a href="http://www.youtube.com" rel="nofollow" class="youtube" data-toggle="tooltip" data-placement="top" title="{intl l="Youtube"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-youtube icon-light"></span>
@@ -320,7 +320,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#rss" class="rss" data-toggle="tooltip" data-placement="top" title="{intl l="RSS"}" target="_blank">
+                                    <a href="#rss" class="rss" rel="nofollow" data-toggle="tooltip" data-placement="top" title="{intl l="RSS"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-rss icon-light"></span>
@@ -335,14 +335,14 @@ GNU General Public License : http://www.gnu.org/licenses/
                     <section class="block block-newsletter">
                         <div class="block-heading"><h3 class="block-title">{intl l="Newsletter"}</h3></div>
                         <div class="block-content">
-                            <p id="newletter-describe">{intl l="Sign up to receive our latest news."}</p>
+                            <p id="newsletter-describe">{intl l="Sign up to receive our latest news."}</p>
                             {form name="thelia.front.newsletter"}
                             <form id="form-newsletter-mini" action="{url path="/newsletter"}" method="post">
                                 {form_hidden_fields form=$form}
                                 {form_field form=$form field="email"}
                                 <div class="form-group">
                                     <label for="{$label_attr.for}-mini">{intl l="Email address"}</label>
-                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" placeholder="{intl l="Your email address"}" aria-describedby="newletter-describe" {if $required} aria-required="true" required{/if} autocomplete="off">
+                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" placeholder="{intl l="Your email address"}" aria-describedby="newsletter-describe" {if $required} aria-required="true" required{/if} autocomplete="off">
                                 </div>
                                 {/form_field}
                                 <button type="submit" class="btn btn-subscribe">{intl l="Subscribe"}</button>
@@ -394,7 +394,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     </ul>
                 </nav>
 
-                <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://www.thelia.net" rel="external">Thelia</a></section>
+                <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
             </div>
         </div>
     </footer><!-- /.footer-info -->
