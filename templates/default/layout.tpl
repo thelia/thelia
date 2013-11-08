@@ -57,8 +57,6 @@ GNU General Public License : http://www.gnu.org/licenses/
     {images file='assets/img/favicon.ico'}<link rel="shortcut icon" type="image/x-icon" href="{$asset_url}">{/images}
     {images file='assets/img/favicon.png'}<link rel="icon" type="image/png" href="{$asset_url}" />{/images}
 
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}
     <!--[if lt IE 9]>
     <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -109,13 +107,13 @@ GNU General Public License : http://www.gnu.org/licenses/
                                 {form_hidden_fields form=$form}
                                 {form_field form=$form field="email"}
                                 <div class="form-group group-email">
-                                    <label for="{$label_attr.for}-mini">Email address</label>
+                                    <label for="{$label_attr.for}-mini">{intl l="Email address"}</label>
                                     <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" aria-required="true" required>
                                 </div>
                                 {/form_field}
                                 {form_field form=$form field="password"}
                                 <div class="form-group group-password">
-                                    <label for="{$label_attr.for}-mini">Password</label>
+                                    <label for="{$label_attr.for}-mini">{intl l="Password"}</label>
                                     <input type="password" name="{$name}" id="{$label_attr.for}-mini" class="form-control" aria-required="true" required>
                                 </div>
                                 {/form_field}
@@ -274,54 +272,60 @@ GNU General Public License : http://www.gnu.org/licenses/
                     <section class="block block-social">
                         <div class="block-heading"><h3 class="block-title">{intl l="Follow us"}</h3></div>
                         <div class="block-content">
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+                            <p>{intl l="Follow us introduction"}</p>
                             <ul role="presentation">
                                 <li>
-                                    <a href="http://facebook.com" class="facebook" data-toggle="tooltip" data-placement="top" title="facebook" target="_blank">
+                                    <a href="http://facebook.com" class="facebook" data-toggle="tooltip" data-placement="top" title="{intl l="Facebook"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-facebook icon-light"></span>
                                         </span>
+                                        <span class="visible-print">{intl l="Facebook"}</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://twitter.com" class="twitter" data-toggle="tooltip" data-placement="top" title="twitter" target="_blank">
+                                    <a href="http://twitter.com" class="twitter" data-toggle="tooltip" data-placement="top" title="{intl l="Twitter"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-twitter icon-light"></span>
                                         </span>
+                                        <span class="visible-print">{intl l="Twitter"}</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://instagram.com" class="instagram" data-toggle="tooltip" data-placement="top" title="instagram" target="_blank">
+                                    <a href="http://instagram.com" class="instagram" data-toggle="tooltip" data-placement="top" title="{intl l="Instagram"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-instagram icon-light"></span>
                                         </span>
+                                        <span class="visible-print">{intl l="Instagram"}</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://google.com" class="google-plus" data-toggle="tooltip" data-placement="top" title="google+" target="_blank">
+                                    <a href="http://google.com" class="google-plus" data-toggle="tooltip" data-placement="top" title="{intl l="Google+"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-google-plus icon-light"></span>
                                         </span>
+                                        <span class="visible-print">{intl l="Google+"}</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://youtube.com" class="youtube" data-toggle="tooltip" data-placement="top" title="youtube" target="_blank">
+                                    <a href="http://youtube.com" class="youtube" data-toggle="tooltip" data-placement="top" title="{intl l="Youtube"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-youtube icon-light"></span>
                                         </span>
+                                        <span class="visible-print">{intl l="Youtube"}</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#rss" class="rss" data-toggle="tooltip" data-placement="top" title="rss" target="_blank">
+                                    <a href="#rss" class="rss" data-toggle="tooltip" data-placement="top" title="{intl l="RSS"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-rss icon-light"></span>
                                         </span>
+                                        <span class="visible-print">{intl l="RSS"}</span>
                                     </a>
                                 </li>
                             </ul>
