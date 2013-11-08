@@ -1,6 +1,6 @@
 {extends file="admin-layout.tpl"}
 
-{block name="page-title"}{intl l='Taxes rules'}{/block}
+{block name="page-title"}{intl l='Back-office users'}{/block}
 
 {block name="check-resource"}admin.configuration.administrator{/block}
 {block name="check-access"}view{/block}
@@ -9,12 +9,12 @@
 <div>
 
     <div id="wrapper" class="container">
-        
+
         <div class="clearfix">
             <ul class="breadcrumb">
                 <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                 <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
-                <li><a href="{url path='/admin/configuration/administrators'}">{intl l="Administrators"}</a></li>
+                <li><a href="{url path='/admin/configuration/administrators'}">{intl l="Back-office users"}</a></li>
             </ul>
         </div>
 
@@ -37,8 +37,8 @@
                             <thead>
                                 <tr>
                                     <th>{intl l="Login"}</th>
-                                    <th>{intl l="FirstName"}</th>
-                                    <th>{intl l="LastName"}</th>
+                                    <th>{intl l="First Name"}</th>
+                                    <th>{intl l="Last Name"}</th>
                                     <th>{intl l="Profile"}</th>
                                     <th class="col-md-1">{intl l="Actions"}</th>
                                 </tr>
@@ -82,7 +82,7 @@
 
                                 {/loop}
 
-                            </tbody>                            
+                            </tbody>
                         </table>
                     </div>
                 </div>

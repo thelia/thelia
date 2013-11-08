@@ -27,9 +27,9 @@
                         </div>
                         <noscript>
                             {if $ACTIVE}
-                                <a title="{intl l="Deactivate %title module" title=$TITLE}" href="{url path="/admin/configuration/modules/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
+                                <a title="{intl l="Deactivate %title module" title=$TITLE}" href="{url path="/admin/modules/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
                             {else}
-                                <a title="{intl l="activate %title module" title=$TITLE}" href="{url path="/admin/configuration/modules/toggle-activation/{$ID}"}">{intl l="activation"}</a>
+                                <a title="{intl l="activate %title module" title=$TITLE}" href="{url path="/admin/modules/toggle-activation/{$ID}"}">{intl l="activation"}</a>
                             {/if}
                         </noscript>
                     </td>
@@ -48,7 +48,7 @@
                             {/loop}
 
                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.modules" access="DELETE"}
-                                <a class="btn btn-default btn-xs module-delete-action" title="{intl l='Delete this module'}"  href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                <a class="btn btn-default btn-xs module-delete-action" title="{intl l='Delete this module'}" href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                             {/loop}
                         </div>
                     </td>

@@ -122,6 +122,8 @@
         <form name="thelia.lang.url" class="Thelia\Form\Lang\LangUrlForm"/>
 
         <form name="thelia.system-logs.configuration" class="Thelia\Form\SystemLogConfigurationForm"/>
+
+        <form name="thelia.admin.module.modification" class="Thelia\Form\ModuleModificationForm"/>
     </forms>
 
 </config>
