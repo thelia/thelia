@@ -370,9 +370,4 @@ class BaseController extends ContainerAware
     {
         return $this->container->get("thelia.parser");
     }
-
-    protected function render($inline)
-    {
-        return $this->getParser()->fetch(sprintf("string:%s", $inline));
-    }
 }
