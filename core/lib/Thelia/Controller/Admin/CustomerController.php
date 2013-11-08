@@ -45,13 +45,13 @@ class CustomerController extends BaseAdminController
 {
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, array(), AccessManager::VIEW)) return $response;
         return $this->render("customers", array("display_customer" => 20));
     }
 
     public function viewAction($customer_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, array(), AccessManager::VIEW)) return $response;
         return $this->render("customer-edit", array(
             "customer_id" => $customer_id
         ));
@@ -65,7 +65,7 @@ class CustomerController extends BaseAdminController
      */
     public function updateAction($customer_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, array(), AccessManager::UPDATE)) return $response;
 
         $message = false;
 
@@ -121,7 +121,7 @@ class CustomerController extends BaseAdminController
 
     public function createAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, AccessManager::CREATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, array(), AccessManager::CREATE)) return $response;
 
         $message = null;
 
@@ -171,7 +171,7 @@ class CustomerController extends BaseAdminController
 
     public function deleteAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, AccessManager::DELETE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, array(), AccessManager::DELETE)) return $response;
 
         $message = null;
 

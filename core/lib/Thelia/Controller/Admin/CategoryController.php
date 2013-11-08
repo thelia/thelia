@@ -215,7 +215,7 @@ class CategoryController extends AbstractCrudController
     public function setToggleVisibilityAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $event = new CategoryToggleVisibilityEvent($this->getExistingObject());
 
@@ -295,7 +295,7 @@ class CategoryController extends AbstractCrudController
     public function addRelatedContentAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $content_id = intval($this->getRequest()->get('content_id'));
 
@@ -325,7 +325,7 @@ class CategoryController extends AbstractCrudController
     public function addRelatedPictureAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -353,7 +353,7 @@ class CategoryController extends AbstractCrudController
     public function deleteRelatedContentAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $content_id = intval($this->getRequest()->get('content_id'));
 

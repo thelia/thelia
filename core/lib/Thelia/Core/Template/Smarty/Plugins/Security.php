@@ -55,9 +55,10 @@ class Security extends AbstractSmartyPlugin
     {
         $roles = $this->_explode($this->getParam($params, 'role'));
         $resources = $this->_explode($this->getParam($params, 'resource'));
+        $modules = $this->_explode($this->getParam($params, 'module'));
         $accesses = $this->_explode($this->getParam($params, 'access'));
 
-        if (! $this->securityContext->isGranted($roles, $resources, $accesses)) {
+        if (! $this->securityContext->isGranted($roles, $resources, $modules, $accesses)) {
 
             $ex = new AuthenticationException(
                 sprintf("User not granted for roles '%s', to access resources '%s' with %s in context '%s'.",

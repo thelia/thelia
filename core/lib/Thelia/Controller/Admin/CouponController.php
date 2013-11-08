@@ -62,7 +62,7 @@ class CouponController extends BaseAdminController
      */
     public function browseAction()
     {
-        $this->checkAuth(AdminResources::COUPON, AccessManager::VIEW);
+        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
 
         $args['urlReadCoupon'] = $this->getRoute(
             'admin.coupon.read',
@@ -94,7 +94,7 @@ class CouponController extends BaseAdminController
      */
     public function readAction($couponId)
     {
-        $this->checkAuth(AdminResources::COUPON, AccessManager::VIEW);
+        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
 
         // Database request repeated in the loop but cached
         $search = CouponQuery::create();
@@ -122,7 +122,7 @@ class CouponController extends BaseAdminController
     public function createAction()
     {
         // Check current user authorization
-        $response = $this->checkAuth(AdminResources::COUPON, AccessManager::CREATE);
+        $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::CREATE);
         if ($response !==  null) {
             return $response;
         }
@@ -170,7 +170,7 @@ class CouponController extends BaseAdminController
     public function updateAction($couponId)
     {
         // Check current user authorization
-        $response = $this->checkAuth(AdminResources::COUPON, AccessManager::UPDATE);
+        $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::UPDATE);
         if ($response !==  null) {
             return $response;
         }
@@ -274,7 +274,7 @@ class CouponController extends BaseAdminController
      */
     public function getConditionInputAction($conditionId)
     {
-        $this->checkAuth(AdminResources::COUPON, AccessManager::VIEW);
+        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
 
         $this->checkXmlHttpRequest();
 
@@ -304,7 +304,7 @@ class CouponController extends BaseAdminController
      */
     public function updateConditionsAction($couponId)
     {
-        $this->checkAuth(AdminResources::COUPON, AccessManager::VIEW);
+        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
 
         $this->checkXmlHttpRequest();
 

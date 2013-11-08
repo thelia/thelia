@@ -69,6 +69,7 @@ class AdminUtilities extends AbstractSmartyPlugin
     {
         // The required permissions
         $resource = $this->getParam($params, 'resource');
+        $module = $this->getParam($params, 'module');
         $access = $this->getParam($params, 'access');
 
         // The base position change path
@@ -92,7 +93,12 @@ class AdminUtilities extends AbstractSmartyPlugin
         <a href="{url path='/admin/configuration/currencies/positionDown' currency_id=$ID}"><i class="icon-arrow-down"></i></a>
         */
 
-        if ($permissions == null || $this->securityContext->isGranted("ADMIN", array($resource), array($access))) {
+        if ($permissions == null || $this->securityContext->isGranted(
+                "ADMIN",
+                $resource === null ? array() : array($resource),
+                $module === null ? array() : array($module),
+                array($access))
+        ) {
 
             return $this->fetch_snippet($smarty, 'includes/admin-utilities-position-block', array(
                     'admin_utilities_go_up_url'           => URL::getInstance()->absoluteUrl($path, array('mode' => 'up', $url_parameter => $id)),

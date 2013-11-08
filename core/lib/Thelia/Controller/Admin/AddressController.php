@@ -59,7 +59,7 @@ class AddressController extends AbstractCrudController
 
     public function useAddressAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $address_id = $this->getRequest()->request->get('address_id');
 

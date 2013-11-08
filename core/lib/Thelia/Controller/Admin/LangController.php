@@ -51,7 +51,7 @@ class LangController extends BaseAdminController
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::VIEW)) return $response;
         return $this->renderDefault();
     }
 
@@ -72,7 +72,7 @@ class LangController extends BaseAdminController
 
     public function updateAction($lang_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
 
         $this->checkXmlHttpRequest();
 
@@ -96,7 +96,7 @@ class LangController extends BaseAdminController
 
     public function processUpdateAction($lang_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
 
@@ -138,7 +138,7 @@ class LangController extends BaseAdminController
 
     public function toggleDefaultAction($lang_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
 
         $this->checkXmlHttpRequest();
         $error = false;
@@ -169,7 +169,7 @@ class LangController extends BaseAdminController
 
     public function addAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::CREATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::CREATE)) return $response;
 
         $createForm = new LangCreateForm($this->getRequest());
 
@@ -211,7 +211,7 @@ class LangController extends BaseAdminController
 
     public function deleteAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::DELETE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::DELETE)) return $response;
 
         $error_msg = false;
 
@@ -235,7 +235,7 @@ class LangController extends BaseAdminController
 
     public function defaultBehaviorAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
 
@@ -267,7 +267,7 @@ class LangController extends BaseAdminController
 
     public function domainAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
         $langUrlForm = new LangUrlForm($this->getRequest());
@@ -314,7 +314,7 @@ class LangController extends BaseAdminController
 
     private function domainActivation($activate)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
 

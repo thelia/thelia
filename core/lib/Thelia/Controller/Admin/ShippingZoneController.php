@@ -42,13 +42,13 @@ class ShippingZoneController extends BaseAdminController
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::VIEW)) return $response;
         return $this->render("shipping-zones", array("display_shipping_zone" => 20));
     }
 
     public function updateAction($shipping_zones_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::VIEW)) return $response;
         return $this->render("shipping-zones-edit", array(
             "shipping_zones_id" => $shipping_zones_id
         ));
@@ -59,7 +59,7 @@ class ShippingZoneController extends BaseAdminController
      */
     public function addArea()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::UPDATE)) return $response;
 
         $shippingAreaForm = new ShippingZoneAddArea($this->getRequest());
         $error_msg = null;
@@ -94,7 +94,7 @@ class ShippingZoneController extends BaseAdminController
 
     public function removeArea()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::UPDATE)) return $response;
 
         $shippingAreaForm = new ShippingZoneRemoveArea($this->getRequest());
         $error_msg = null;
