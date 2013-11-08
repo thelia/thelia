@@ -20,7 +20,7 @@
                             <div class="control-input">
                                 <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" maxlength="255" {if $required} aria-required="true" required{/if} autofocus>
                                 {if $error}
-                                    <span class="help-block"><span class="icon-remove"></span> {$message}</span>
+                                    <span class="help-block">{$message}</span>
                                 {elseif !$error && $value != ""}
                                     <span class="help-block"><span class="icon-ok"></span> {intl l="Thanks for signing up! We'll keep you posted whenever we have any new updates."}</span>
                                 {/if}
