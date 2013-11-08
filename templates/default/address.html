@@ -23,7 +23,7 @@
 
         <h1 id="main-label" class="page-header">{intl l="Create New Address"}</h1>
         {form name="thelia.front.address.create"}
-        <form id="form-address" class="form-horizontal" action="{url path="/address/create"}" method="post" role="form">
+        <form id="form-address" class="form-horizontal" action="{url path="/address/create"}" method="post">
             {form_field form=$form field='success_url'}
                 <input type="hidden" name="{$name}" value="{url path="/account"}" />
             {/form_field}

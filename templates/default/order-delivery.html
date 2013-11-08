@@ -28,7 +28,7 @@
 
             {form name="thelia.order.delivery"}
             {assign var="isPost" value="{$smarty.post|count}"}
-            <form id="form-cart-delivery" action="{url path="/order/delivery"}" method="post" role="form" {form_enctype form=$form}>
+            <form id="form-cart-delivery" action="{url path="/order/delivery"}" method="post" {form_enctype form=$form}>
 
                 {form_hidden_fields form=$form}
 

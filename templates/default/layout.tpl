@@ -34,12 +34,13 @@ GNU General Public License : http://www.gnu.org/licenses/
     <title>{block name="page-title"}{strip}{if $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title} - {/foreach}{/if}{config key="company_name"}{/strip}{/block}</title>
 
     {* Meta Tags *}
-    <meta name="description" content="">
     <meta name="generator" content="{intl l='Thelia V2'}">
-    <meta name="robots" content="noindex,nofollow">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    {block name="meta"}{/block}
+    {block name="meta"}
+        <meta name="description" content="">
+        <meta name="robots" content="noindex,nofollow">
+    {/block}
 
     {* Stylesheets *}
     {stylesheets file='assets/less/styles.less' filters='less,cssembed'}
@@ -100,7 +101,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                         <a href="{url path="/login"}" class="login">{intl l="Log In!"}</a>
                         <div class="dropdown-menu">
                             {form name="thelia.front.customer.login"}
-                            <form id="form-login-mini" action="{url path="/login"}" method="post" role="form" {form_enctype form=$form}>
+                            <form id="form-login-mini" action="{url path="/login"}" method="post" {form_enctype form=$form}>
                                 {form_hidden_fields form=$form}
                                 {form_field form=$form field="email"}
                                 <div class="form-group group-email">
@@ -328,7 +329,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                         <div class="block-content">
                             <p id="newletter-describe">{intl l="Sign up to receive our latest news."}</p>
                             {form name="thelia.front.newsletter"}
-                            <form id="form-newsletter-mini" action="{url path="/newsletter"}" method="post" role="form">
+                            <form id="form-newsletter-mini" action="{url path="/newsletter"}" method="post">
                                 {form_hidden_fields form=$form}
                                 {form_field form=$form field="email"}
                                 <div class="form-group">
