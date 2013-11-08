@@ -24,10 +24,13 @@ namespace Thelia\Controller\Front;
 
 use Symfony\Component\Routing\Router;
 use Thelia\Controller\BaseController;
+use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
+use Thelia\Tools\Redirect;
 use Thelia\Tools\URL;
 
 class BaseFrontController extends BaseController
@@ -119,7 +122,7 @@ class BaseFrontController extends BaseController
      * @param array $args        the template arguments
      * @param null  $templateDir
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return string
      */
     protected function renderRaw($templateName, $args = array(), $templateDir = null)
     {
@@ -138,16 +141,10 @@ class BaseFrontController extends BaseController
             ));
 
         // Render the template.
-        try {
-            $data = $this->getParser($templateDir)->render($templateName, $args);
 
-            return $data;
-        } catch (AuthenticationException $ex) {
-            // User is not authenticated, and templates requires authentication -> redirect to login page
-            Redirect::exec(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
-        } catch (AuthorizationException $ex) {
-            // User is not allowed to perform the required action. Return the error page instead of the requested page.
-            return $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."), 403);
-        }
+        $data = $this->getParser($templateDir)->render($templateName, $args);
+
+        return $data;
+
     }
 }

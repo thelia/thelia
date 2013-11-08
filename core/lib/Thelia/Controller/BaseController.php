@@ -56,7 +56,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
-class BaseController extends ContainerAware
+abstract class BaseController extends ContainerAware
 {
 
     /**
@@ -359,15 +359,28 @@ class BaseController extends ContainerAware
     }
 
     /**
-     *
-     * return an instance of SmartyParser
-     *
-     * Caution : maybe there is still not default template defined.
-     *
-     * @return ParserInterface instance parser
+     * @return a ParserInterface instance parser
      */
-    protected function getParser()
-    {
-        return $this->container->get("thelia.parser");
-    }
+    abstract protected function getParser($template = null);
+
+    /**
+     * Render the given template, and returns the result as an Http Response.
+     *
+     * @param $templateName the complete template name, with extension
+     * @param  array                                      $args   the template arguments
+     * @param  int                                        $status http code status
+     * @return \Thelia\Core\HttpFoundation\Response
+     */
+    abstract protected function render($templateName, $args = array(), $status = 200);
+
+    /**
+     * Render the given template, and returns the result as a string.
+     *
+     * @param $templateName the complete template name, with extension
+     * @param array $args        the template arguments
+     * @param null  $templateDir
+     *
+     * @return string
+     */
+    abstract protected function renderRaw($templateName, $args = array(), $templateDir = null);
 }
