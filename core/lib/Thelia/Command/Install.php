@@ -180,8 +180,8 @@ class Install extends ContainerAwareCommand
     {
         $fs = new Filesystem();
 
-        $sampleConfigFile = THELIA_ROOT . "/local/config/database.yml.sample";
-        $configFile = THELIA_ROOT . "/local/config/database.yml";
+        $sampleConfigFile = THELIA_CONF_DIR . "database.yml.sample";
+        $configFile = THELIA_CONF_DIR . "database.yml";
 
         $fs->copy($sampleConfigFile, $configFile, true);
 
