@@ -157,10 +157,6 @@
     </route>
     <!-- end order management process -->
 
-    <route id="mail.test" path="/mail/test">
-        <default key="_controller">Thelia\Controller\Front\Mail::test</default>
-    </route>
-
     <!-- contact management -->
     <route id="contact.send" path="/contact" methods="post">
         <default key="_controller">Thelia\Controller\Front\ContactController::sendAction</default>
