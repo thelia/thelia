@@ -202,48 +202,28 @@ class OrderController extends BaseAdminController
 
     public function generateInvoicePdf($order_id)
     {
-        return $this->generatePdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::UPDATE)) return $response;
+
+        return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
     }
 
     public function generateDeliveryPdf($order_id)
     {
-        return $this->generatePdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
-    }
-
-    protected function generatePdf($order_id, $fileName)
-    {
         if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::UPDATE)) return $response;
 
-        $html = $this->renderRaw(
-            $fileName,
-            array(
+        return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
+    }
+
+    private function generateBackOfficeOrderPdf($order_id, $fileName)
+    {
+        if(null === $response = $this->generateOrderPdf($order_id, $fileName)){
+            $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", array(
                 'order_id' => $order_id
-            ),
-            TemplateHelper::getInstance()->getActivePdfTemplate()->getPath()
-        );
-
-        $order = OrderQuery::create()->findPk($order_id);
-
-        try {
-            $pdfEvent = new PdfEvent($html);
-
-            $this->dispatch(TheliaEvents::GENERATE_PDF, $pdfEvent);
-
-            if ($pdfEvent->hasPdf()) {
-                return Response::create($pdfEvent->getPdf(), 200,
-                    array(
-                        'Content-type' => "application/pdf",
-                        'Content-Disposition' => sprintf('Attachment;filename=%s.pdf', $order->getRef()),
-                    ));
-            }
-
-        } catch (\Exception $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during generating invoice pdf for order id : %d with message "%s"', $order_id, $e->getMessage()));
-
+            ))));
         }
 
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", array(
-            'order_id' => $order_id
-        ))));
+        return $response;
     }
+
+
 }
