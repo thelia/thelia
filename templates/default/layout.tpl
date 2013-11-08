@@ -165,7 +165,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     </form>
                 </div>
 
-                <div class="language-switch" aria-labelledby="language-label">
+                <div class="language-switch" aria-labelledby="language-label" role="form">
                     <span id="language-label" class="dropdown-label">{intl l="Language:"}</span>
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/language"}">{lang attr="title"}</a>
                     <ul class="select dropdown-menu">
@@ -175,7 +175,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     </ul>
                 </div>
 
-                <div class="currency-switch" aria-labelledby="currency-label">
+                <div class="currency-switch" aria-labelledby="currency-label" role="form">
                     <span id="currency-label" class="dropdown-label">{intl l="Currency:"}</span>
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/currency"}">{currency attr="code"}</a>
                     <ul class="select dropdown-menu">
