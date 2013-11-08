@@ -18,11 +18,11 @@
 
                     {if $IS_PROMO == 1}
                         {assign "real_price" $PROMO_TAXED_PRICE}
-                        <div class="special-price"><span class="price">{currency attr="symbol"} {$PROMO_TAXED_PRICE}</span></div>
-                        <small class="old-price"> <span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></small>
+                        <div class="special-price"><span class="price">{$PROMO_TAXED_PRICE} {currency attr="symbol"}</span></div>
+                        <small class="old-price"> <span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></small>
                     {else}
                         {assign "real_price" $TAXED_PRICE}
-                        <div class="special-price"><span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></div>
+                        <div class="special-price"><span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></div>
                     {/if}
 
                 </td>
@@ -30,7 +30,7 @@
         </table>
     {/loop}
 
-    <a href="{url path="/cart"}" role="button" class="btn btn_add_to_cart pull-right"><span>{intl l="View cart"}</span></a>
+    <a href="{url path="/cart"}" role="button" class="btn btn_add_to_cart pull-right"><span>{intl l="View Cart"}</span></a>
     <button type="button" class="btn btn-checkout pull-right" data-dismiss="modal"><span>{intl l="Continue Shopping"}</span></button>
 </div>
 

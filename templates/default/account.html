@@ -26,7 +26,7 @@
                     <div class="panel-heading">
                         <h4 class="panel-title">
                             <a class="accordion-toggle" data-toggle="collapse" data-parent="#account" href="#account-info">
-                                {intl l="Personal Information"}
+                                {intl l="Personal Informations"}
                             </a>
                         </h4>
                     </div>
@@ -144,7 +144,7 @@
                             <table class="table table-orders" summary="{intl l="List of orders"}">
                                 <thead>
                                 <tr>
-                                    <th>{intl l="Order Number"}</th>
+                                    <th>{intl l="Order number"}</th>
                                     <th>{intl l="Date"}</th>
                                     <th>{intl l="Amount"}</th>
                                     <th>{intl l="Status"}</th>
@@ -156,7 +156,7 @@
                                 <tr>
                                     <td>{$REF}</td>
                                     <td>{format_date date=$CREATE_DATE}</td>
-                                    <td>{loop type="currency" name="order.currency" id={$CURRENCY}}{$SYMBOL}{/loop} {format_number number=$TOTAL_TAXED_AMOUNT}</td>
+                                    <td>{format_number number=$TOTAL_TAXED_AMOUNT} {loop type="currency" name="order.currency" id={$CURRENCY}}{$SYMBOL}{/loop}</td>
                                     <td><span class="label-delivered">{loop type="order-status" name="order.status" id={$STATUS}}{$TITLE}{/loop}</span></td>
                                     <td><a href="#" class="btn btn-order-details" data-toggle="tooltip" title="{intl l="View order %ref as pdf document" ref={$REF}}"><span class="icon-cloud-download"></span> {intl l="Order details"}</a></td>
                                 </tr>

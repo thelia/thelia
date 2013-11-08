@@ -42,7 +42,7 @@
                         <dt>{intl l="Date"} : </dt>
                         <dd>{format_date date=$CREATE_DATE output="date"}</dd>
                         <dt>{intl l="Total"} : </dt>
-                        <dd>{loop type="currency" name="order-currency" id=$CURRENCY}{$SYMBOL}{/loop} {$TOTAL_TAXED_AMOUNT}</dd>
+                        <dd>{$TOTAL_TAXED_AMOUNT} {loop type="currency" name="order-currency" id=$CURRENCY}{$SYMBOL}{/loop}</dd>
                     </dl>
                 </div>
             </div>

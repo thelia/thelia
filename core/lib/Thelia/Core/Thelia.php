@@ -75,7 +75,7 @@ class Thelia extends Kernel
         }
 
         $definePropel = new DefinePropel(new DatabaseConfiguration(),
-            Yaml::parse(THELIA_ROOT . '/local/config/database.yml'));
+            Yaml::parse(THELIA_CONF_DIR . 'database.yml'));
         $serviceContainer = Propel::getServiceContainer();
         $serviceContainer->setAdapterClass('thelia', 'mysql');
         $manager = new ConnectionManagerSingle();

@@ -33,12 +33,15 @@
             {/loop}
 
             <section id="product-gallery">
+                {ifloop rel="image.main"}
                 <figure class="product-image">
                     {loop type="image" name="image.main" product="{$ID}" width="560" height="445" resize_mode="borders" limit="1"}
                         <img src="{$IMAGE_URL}" alt="{$TITLE}" class="img-responsive" itemprop="image" data-toggle="magnify">
                     {/loop}
                 </figure>
+                {/ifloop}
 
+                {ifloop rel="image.carousel"}
                 <div id="product-thumbnails" class="slide" style="position:relative;">
                     <div class="carousel-inner">
                         <div class="item active">
@@ -76,16 +79,17 @@
                         <a class="right carousel-control" href="#product-thumbnails" data-slide="next"><i class="icon-next"></i></a>
                     {/ifloop}
                 </div>
+                {/ifloop}
             </section>
 
             <section id="product-details">
                 <div class="product-info">
                     <h1 class="name"><span itemprop="name">{$TITLE}</span></h1>
-                    <span itemprop="sku" class="sku">{intl l='Ref.'}: {$REF}</span>
+                    {if $REF}<span itemprop="sku" class="sku">{intl l='Ref.'}: {$REF}</span>{/if}
 
-                    <div class="short-description">
+                    {if $POSTSCRIPTUM}<div class="short-description">
                         <p>{$POSTSCRIPTUM}</p>
-                    </div>
+                    </div>{/if}
                 </div>
 
                 {loop name="stock_meta" type="product_sale_elements" product="$ID"}
@@ -110,8 +114,7 @@
                     <div class="availability">
                         <span class="availibity-label">{intl l="Availability"}: </span>
                         <span itemprop="availability" href="{$current_stock_href}" class="{$current_stock_class}" id="stockInformations">
-                            <span class="in">{intl l='In stock'}</span><span class="out">{intl l='Out of stock'}</span>
-
+                            <span class="in">{intl l='In Stock'}</span><span class="out">{intl l='Out of Stock'}</span>
                         </span>
                     </div>
 
@@ -142,9 +145,7 @@
                         <input type="hidden" name="{$name}" value="1">
                     {/form_field}
 
-
                     {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
-
 
                     {form_field form=$form field="product"}
                         <input id="{$label_attr.for}" type="hidden" name="{$name}" value="{$ID}" {$attr} >
@@ -172,12 +173,12 @@
                         {form_field form=$form field='quantity'}
                         <div class="form-group group-qty {if $error}has-error{elseif $value != "" && !$error}has-success{/if}">
                             <label for="{$label_attr.for}">{$label}</label>
-                                <input type="number" name="{$name}" id="{$label_attr.for}" class="form-control" value="{$value|default:1}" min="1" required>
-                                {if $error }
-                                    <span class="help-block"><i class="icon-remove"></i> {$message}</span>
-                                {elseif $value != "" && !$error}
-                                    <span class="help-block"><i class="icon-ok"></i></span>
-                                {/if}
+                            <input type="number" name="{$name}" id="{$label_attr.for}" class="form-control" value="{$value|default:1}" min="1" required>
+                            {if $error }
+                                <span class="help-block">{$message}</span>
+                            {elseif $value != "" && !$error}
+                                <span class="help-block"><i class="icon-ok"></i></span>
+                            {/if}
                         </div>
                         {/form_field}
 
@@ -189,29 +190,38 @@
                 {/form}
             </section>
 
-            <section id="product-tabs">
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
-                    <li role="presentation"><a id="tab2" href="#additional" data-toggle="tab" role="tab">{intl l="Additional Info"}</a></li>
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane active in" id="description" itemprop="description" role="tabpanel" aria-labelledby="tab1">
-                        <p>{$DESCRIPTION}</p>
-                    </div>
-                    <div class="tab-pane" id="additional" role="tabpanel" aria-labelledby="tab2">
-                        {ifloop rel="feature_value_info"}
-                        <ul>
+            {strip}
+            {capture "additional"}
+                {ifloop rel="feature_value_info"}
+                    <ul>
                         {loop name="feature_info" type="feature" product="{$ID}"}
                             <li>
                                 <strong>{$TITLE}</strong> :
                                 {loop name="feature_value_info" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
-                                    {$TITLE}
+                                {$TITLE}
                                 {/loop}
                             </li>
                         {/loop}
-                        </ul>
-                        {/ifloop}
+                    </ul>
+                {/ifloop}
+            {/capture}
+            {/strip}
+
+            <section id="product-tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
+                    {if $smarty.capture.additional ne ""}<li role="presentation"><a id="tab2" href="#additional" data-toggle="tab" role="tab">{intl l="Additional Info"}</a></li>{/if}
+
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active in" id="description" itemprop="description" role="tabpanel" aria-labelledby="tab1">
+                        <p>{$DESCRIPTION|default:'N/A'}</p>
                     </div>
+                    {if $smarty.capture.additional ne ""}
+                    <div class="tab-pane" id="additional" role="tabpanel" aria-labelledby="tab2">
+                        {$smarty.capture.additional}
+                    </div>
+                    {/if}
                 </div>
             </section>
         </article><!-- /product -->

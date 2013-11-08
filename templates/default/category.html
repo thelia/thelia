@@ -19,7 +19,8 @@
         {$product_order={$smarty.get.order|default:'alpha'}}
         <article class="col-main {$smarty.get.mode|default:"grid"}" role="main">
             {ifloop rel="product_list"}
-                {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order}
+                {assign var="amount" value="{count type="product" category={category attr="id"}}"}
+                {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order amount={$amount}}
                 <div id="category-products">
                     <div class="products-content">
                         <ul class="product-col-4">
@@ -29,7 +30,7 @@
                         </ul>
                     </div>
                 </div><!-- /#category-products -->
-                {include file="includes/toolbar.html" toolbar="bottom"}
+                {include file="includes/toolbar.html" toolbar="bottom" amount={$amount}}
             {/ifloop}
             {elseloop rel="product_list"}
                 <div class="address-warning">

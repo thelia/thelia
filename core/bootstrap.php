@@ -15,7 +15,7 @@ define('DS'                  , DIRECTORY_SEPARATOR);
 
 $loader = require __DIR__ . "/vendor/autoload.php";
 
-if (!file_exists(THELIA_ROOT . '/local/config/database.yml') && !defined('THELIA_INSTALL_MODE')) {
+if (!file_exists(THELIA_CONF_DIR . 'database.yml') && !defined('THELIA_INSTALL_MODE')) {
     $sapi = php_sapi_name();
     if (substr($sapi, 0, 3) == 'cli') {
         define('THELIA_INSTALL_MODE', true);

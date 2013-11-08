@@ -7,7 +7,7 @@ INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`date_format`,`time_format
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 ('session_config.default', '1', 1, 1, NOW(), NOW()),
 ('verifyStock', '1', 0, 0, NOW(), NOW()),
-('active-template', 'default', 0, 0, NOW(), NOW()),
+('active-front-template', 'default', 0, 0, NOW(), NOW()),
 ('active-admin-template', 'default', 0, 0, NOW(), NOW()),
 ('active-pdf-template', 'default', 0, 0, NOW(), NOW()),
 ('default_lang_without_translation', '1', 1, 1, NOW(), NOW()),

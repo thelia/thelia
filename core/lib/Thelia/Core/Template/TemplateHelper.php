@@ -62,7 +62,7 @@ class TemplateHelper
 
     public function getActiveFrontTemplate() {
         return new TemplateDefinition(
-                ConfigQuery::read('active-admin-template', 'default'),
+                ConfigQuery::read('active-front-template', 'default'),
                 TemplateDefinition::FRONT_OFFICE
         );
     }
@@ -130,7 +130,7 @@ class TemplateHelper
      */
     public function walkDir($directory, $walkMode, Translator $translator, $currentLocale, &$strings) {
 
-        $num_files = 0;
+        $num_texts = 0;
 
         if ($walkMode == self::WALK_MODE_PHP) {
             $prefix = '\-\>[\s]*trans[\s]*\(';
@@ -155,7 +155,7 @@ class TemplateHelper
 
                 if ($fileInfo->isDot()) continue;
 
-                if ($fileInfo->isDir()) $num_files += $this->walkDir($fileInfo->getPathName(), $walkMode, $translator, $currentLocale, $strings);
+                if ($fileInfo->isDir()) $num_texts += $this->walkDir($fileInfo->getPathName(), $walkMode, $translator, $currentLocale, $strings);
 
                 if ($fileInfo->isFile()) {
 
@@ -186,18 +186,19 @@ class TemplateHelper
                                             $strings[$hash]['files'][] = $short_path;
                                         }
                                     }
-                                    else
-                                        $num_files++;
+                                    else {
+                                        $num_texts++;
 
-                                    // remove \'
-                                    $match = str_replace("\\'", "'", $match);
+                                        // remove \'
+                                        $match = str_replace("\\'", "'", $match);
 
-                                    $strings[$hash] = array(
-                                            'files'   => array($short_path),
-                                            'text'  => $match,
-                                            'translation' => $translator->trans($match, array(), 'messages', $currentLocale, false),
-                                            'dollar'  => strstr($match, '$') !== false
-                                    );
+                                        $strings[$hash] = array(
+                                                'files'   => array($short_path),
+                                                'text'  => $match,
+                                                'translation' => $translator->trans($match, array(), 'messages', $currentLocale, false),
+                                                'dollar'  => strstr($match, '$') !== false
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -205,7 +206,7 @@ class TemplateHelper
                 }
             }
 
-            return $num_files;
+            return $num_texts;
 
         } catch (\UnexpectedValueException $ex) {
             echo $ex;
