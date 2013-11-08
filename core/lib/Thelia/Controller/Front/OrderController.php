@@ -71,7 +71,6 @@ class OrderController extends BaseFrontController
             $deliveryModule = ModuleQuery::create()->findPk($deliveryModuleId);
 
             /* check that the delivery address belongs to the current customer */
-            $deliveryAddress = AddressQuery::create()->findPk($deliveryAddressId);
             if ($deliveryAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
                 throw new \Exception("Delivery address does not belong to the current customer");
             }
