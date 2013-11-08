@@ -249,15 +249,15 @@ class OrderController extends BaseFrontController
 
     public function generateInvoicePdf($order_id)
     {
-        return $this->generatePdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
+        return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
     }
 
     public function generateDeliveryPdf($order_id)
     {
-        return $this->generatePdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
+        return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
     }
 
-    protected function generatePdf($order_id, $fileName)
+    protected function generateOrderPdf($order_id, $fileName)
     {
         /* check customer */
         $this->checkAuth();

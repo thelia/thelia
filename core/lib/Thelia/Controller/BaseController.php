@@ -22,6 +22,8 @@
 /*************************************************************************************/
 namespace Thelia\Controller;
 
+use Thelia\Core\Event\PdfEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
@@ -31,7 +33,9 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\OrderQuery;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Template\ParserContext;
@@ -71,6 +75,21 @@ class BaseController extends ContainerAware
     protected function jsonResponse($json_data, $status = 200)
     {
         return new Response($json_data, $status, array('content-type' => 'application/json'));
+    }
+
+    /**
+     * @param $pdf
+     * @param $fileName
+     * @param $status
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function pdfResponse($pdf, $fileName, $status = 200)
+    {
+        return Response::create($pdf, $status,
+            array(
+                'Content-type' => "application/pdf",
+                'Content-Disposition' => sprintf('Attachment;filename=%s.pdf', $fileName),
+            ));
     }
 
     /**
@@ -205,6 +224,37 @@ class BaseController extends ContainerAware
         } else {
             throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
         }
+    }
+
+    protected function generateOrderPdf($order_id, $fileName)
+    {
+
+
+        $html = $this->renderRaw(
+            $fileName,
+            array(
+                'order_id' => $order_id
+            ),
+            TemplateHelper::getInstance()->getActivePdfTemplate()->getPath()
+        );
+
+        $order = OrderQuery::create()->findPk($order_id);
+
+        try {
+            $pdfEvent = new PdfEvent($html);
+
+            $this->dispatch(TheliaEvents::GENERATE_PDF, $pdfEvent);
+
+            if ($pdfEvent->hasPdf()) {
+                return $this->pdfResponse($pdfEvent->getPdf(), $order->getRef());
+            }
+
+        } catch (\Exception $e) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during generating invoice pdf for order id : %d with message "%s"', $order_id, $e->getMessage()));
+
+        }
+
+
     }
 
     /**
