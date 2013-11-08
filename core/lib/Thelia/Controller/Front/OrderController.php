@@ -249,45 +249,17 @@ class OrderController extends BaseFrontController
 
     public function generateInvoicePdf($order_id)
     {
+        /* check customer */
+        $this->checkAuth();
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
     }
 
     public function generateDeliveryPdf($order_id)
     {
+        /* check customer */
+        $this->checkAuth();
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
     }
 
-    protected function generateOrderPdf($order_id, $fileName)
-    {
-        /* check customer */
-        $this->checkAuth();
 
-        $html = $this->renderRaw(
-            $fileName,
-            array(
-                'order_id' => $order_id
-            ),
-            TemplateHelper::getInstance()->getActivePdfTemplate()->getPath()
-        );
-
-        $order = OrderQuery::create()->findPk($order_id);
-
-        try {
-            $pdfEvent = new PdfEvent($html);
-
-            $this->dispatch(TheliaEvents::GENERATE_PDF, $pdfEvent);
-
-            if ($pdfEvent->hasPdf()) {
-                return Response::create($pdfEvent->getPdf(), 200,
-                    array(
-                        'Content-type' => "application/pdf",
-                        'Content-Disposition' => sprintf('Attachment;filename=%s.pdf', $order->getRef()),
-                    ));
-            }
-
-        } catch (\Exception $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during generating invoice pdf for order id : %d with message "%s"', $order_id, $e->getMessage()));
-
-        }
-    }
 }

@@ -228,8 +228,6 @@ class BaseController extends ContainerAware
 
     protected function generateOrderPdf($order_id, $fileName)
     {
-
-
         $html = $this->renderRaw(
             $fileName,
             array(
