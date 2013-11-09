@@ -22,7 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Assets;
-
 use Assetic\AssetManager;
 use Assetic\FilterManager;
 use Assetic\Filter;
@@ -59,7 +58,7 @@ class AsseticHelper
         $am = new AssetManager();
         $fm = new FilterManager();
 
-        if (! empty($filters)) {
+        if (!empty($filters)) {
             $filter_list = explode(',', $filters);
 
             foreach ($filter_list as $filter_name) {
@@ -67,36 +66,37 @@ class AsseticHelper
                 $filter_name = trim($filter_name);
 
                 switch ($filter_name) {
-                    case 'less' :
-                        $fm->set('less', new Filter\LessphpFilter());
-                        break;
+                case 'less':
+                    $fm->set('less', new Filter\LessphpFilter());
+                    break;
 
-                    case 'sass' :
-                        $fm->set('sass', new Filter\Sass\SassFilter());
-                        break;
+                case 'sass':
+                    $fm->set('sass', new Filter\Sass\SassFilter());
+                    break;
 
-                    case 'cssembed' :
-                        $fm->set('cssembed', new Filter\PhpCssEmbedFilter());
-                        break;
+                case 'cssembed':
+                    $fm->set('cssembed', new Filter\PhpCssEmbedFilter());
+                    break;
 
-                    case 'cssrewrite':
-                        $fm->set('cssrewrite', new Filter\CssRewriteFilter());
-                        break;
+                case 'cssrewrite':
+                    $fm->set('cssrewrite', new Filter\CssRewriteFilter());
+                    break;
 
-                    case 'cssimport':
-                        $fm->set('cssimport', new Filter\CssImportFilter());
-                        break;
+                case 'cssimport':
+                    $fm->set('cssimport', new Filter\CssImportFilter());
+                    break;
 
-                    case 'compass':
-                        $fm->set('compass', new Filter\CompassFilter());
-                        break;
+                case 'compass':
+                    $fm->set('compass', new Filter\CompassFilter());
+                    break;
 
-                    default :
-                        throw new \InvalidArgumentException("Unsupported Assetic filter: '$filter_name'");
-                        break;
+                default:
+                    throw new \InvalidArgumentException("Unsupported Assetic filter: '$filter_name'");
+                    break;
                 }
             }
-        } else {
+        }
+        else {
             $filter_list = array();
         }
 
@@ -106,7 +106,7 @@ class AsseticHelper
         $factory->setAssetManager($am);
         $factory->setFilterManager($fm);
 
-        $factory->setDefaultOutput('*'.(! empty($asset_type) ? '.' : '').$asset_type);
+        $factory->setDefaultOutput('*' . (!empty($asset_type) ? '.' : '') . $asset_type);
 
         $factory->setDebug($debug);
 
@@ -129,7 +129,7 @@ class AsseticHelper
         //
         //     before generating 3bc974a-ad3ef47.css, delete 3bc974a-* files.
         //
-        if ($dev_mode == true || ! file_exists($target_file)) {
+        if ($dev_mode == true || !file_exists($target_file)) {
 
             if (ConfigQuery::read('process_assets', true)) {
 
@@ -144,7 +144,8 @@ class AsseticHelper
                 foreach ($filter_list as $filter) {
                     if ('?' != $filter[0]) {
                         $asset->ensureFilter($fm->get($filter));
-                    } elseif (!$debug) {
+                    }
+                    elseif (!$debug) {
                         $asset->ensureFilter($fm->get(substr($filter, 1)));
                     }
                 }
@@ -155,6 +156,67 @@ class AsseticHelper
             }
         }
 
-        return rtrim($output_url, '/').'/'.$asset_target_path;
+        return rtrim($output_url, '/') . '/' . $asset_target_path;
+    }
+
+    // Create a hash of the current assets directory
+    public function getStamp($directory)
+    {
+
+        $stamp = '';
+
+        foreach (new \DirectoryIterator($directory) as $fileInfo) {
+
+            if ($fileInfo->isDot()) continue;
+
+            if ($fileInfo->isDir()) {
+                $stamp .= $this->getStamp($fileInfo->getPathName());
+            }
+
+            if ($fileInfo->isFile()) {
+                $stamp .= $fileInfo->getMTime();
+            }
+        }
+
+        return $stamp;
+    }
+
+    public function copyAssets($from_directory, $to_directory)
+    {
+
+        echo "copy $from_directory to $to_directory\n";
+
+        $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($from_directory, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($iterator as $item) {
+            if ($item->isDir()) {
+                $dest_dir = $to_directory . DIRECTORY_SEPARATOR . $iterator->getSubPathName();
+
+                if (!is_dir($dest_dir)) {
+                    if (file_exists($dest_dir)) {
+                        @unlink($dest_dir);
+                    }
+
+                    if (!mkdir($dest_dir, 0777, true)) {
+                        throw new \RuntimeException(
+                                "Failed to create directory  $dest_dir. Please check that your web server has the proper access rights");
+                    }
+                }
+            }
+            else {
+                $dest_file = $to_directory . DIRECTORY_SEPARATOR . $iterator->getSubPathName();
+
+                if (file_exists($dest_file)) {
+                    @unlink($dest_file);
+                }
+
+                if (!copy($item, $dest_file)) {
+                    throw new \RuntimeException(
+                            "Failed to copy  $source_file to $dest_file. Please check that your web server has the proper access rights");
+                }
+            }
+        }
     }
 }

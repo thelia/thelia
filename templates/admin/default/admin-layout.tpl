@@ -22,7 +22,7 @@
 
     {block name="before-bootstrap-css"}{/block}
 
-	{stylesheets file='assets/less/*' filters='less,cssembed'}
+	{stylesheets file='assets/less/main.less' filters='less,cssembed'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 

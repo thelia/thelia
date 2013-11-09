@@ -83,9 +83,10 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     public function delete(CustomerEvent $event)
     {
-        $customer = $event->getCustomer();
+        if (null !== $customer = $event->getCustomer()) {
 
-        $customer->delete();
+            $customer->delete();
+        }
     }
 
     private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event)

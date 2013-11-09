@@ -36,6 +36,9 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\CustomerQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use Thelia\Model\OrderQuery;
+use Thelia\Model\Map\OrderAddressTableMap;
+use Thelia\Model\Map\OrderTableMap;
 
 /**
  *
@@ -65,7 +68,22 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                 )
             ),
             Argument::createBooleanTypeArgument('reseller'),
-            Argument::createIntTypeArgument('sponsor')
+            Argument::createIntTypeArgument('sponsor'),
+            new Argument(
+                    'order',
+                    new TypeCollection(
+                            new Type\EnumListType(array(
+                                    'id', 'id_reverse',
+                                    'reference', 'reference_reverse',
+                                    'firstname', 'firstname_reverse',
+                                    'lastname', 'lastname_reverse',
+                                    'last_order', 'last_order_reverse',
+                                    'order_amount', 'order_amount_reverse',
+                                    'registration_date', 'registration_date_reverse'
+                            ))
+                    ),
+                    'lastname'
+            )
         );
     }
 
@@ -151,6 +169,49 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             $search->filterBySponsor($sponsor, Criteria::EQUAL);
         }
 
+        $orders  = $this->getOrder();
+
+        foreach ($orders as $order) {
+            switch ($order) {
+                case 'id':
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case 'id_reverse':
+                    $search->orderById(Criteria::DESC);
+                    break;
+
+                case 'reference':
+                    $search->orderByRef(Criteria::ASC);
+                    break;
+                case 'reference_reverse':
+                    $search->orderByRef(Criteria::DESC);
+                    break;
+
+                case 'lastname':
+                    $search->orderByLastname(Criteria::ASC);
+                    break;
+                case 'lastname_reverse':
+                    $search->orderByLastname(Criteria::DESC);
+                    break;
+
+                case 'firstname':
+                    $search->orderByFirstname(Criteria::ASC);
+                    break;
+                case 'firstname_reverse':
+                    $search->orderByFirstname(Criteria::DESC);
+                    break;
+
+                case 'registration_date':
+                    $search->orderByCreatedAt(Criteria::ASC);
+                    break;
+                case 'registration_date_reverse':
+                    $search->orderByCreatedAt(Criteria::DESC);
+                    break;
+
+
+            }
+        }
+
         return $search;
 
     }
@@ -158,16 +219,24 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
     public function parseResults(LoopResult $loopResult)
     {
         foreach ($loopResult->getResultDataCollection() as $customer) {
+
             $loopResultRow = new LoopResultRow($customer);
-            $loopResultRow->set("ID", $customer->getId());
-            $loopResultRow->set("REF", $customer->getRef());
-            $loopResultRow->set("TITLE", $customer->getTitleId());
-            $loopResultRow->set("FIRSTNAME", $customer->getFirstname());
-            $loopResultRow->set("LASTNAME", $customer->getLastname());
-            $loopResultRow->set("EMAIL", $customer->getEmail());
-            $loopResultRow->set("RESELLER", $customer->getReseller());
-            $loopResultRow->set("SPONSOR", $customer->getSponsor());
-            $loopResultRow->set("DISCOUNT", $customer->getDiscount());
+
+            $loopResultRow
+                ->set("ID"        , $customer->getId())
+                ->set("REF"       , $customer->getRef())
+                ->set("TITLE"     , $customer->getTitleId())
+                ->set("FIRSTNAME" , $customer->getFirstname())
+                ->set("LASTNAME"  , $customer->getLastname())
+                ->set("EMAIL"     , $customer->getEmail())
+                ->set("RESELLER"  , $customer->getReseller())
+                ->set("SPONSOR"   , $customer->getSponsor())
+                ->set("DISCOUNT"  , $customer->getDiscount())
+
+                ->set("LAST_ORDER_DATE"     , $lastOrder != null ? $lastOrder->getCreatedAt() : '')
+                ->set("LAST_ORDER_AMOUNT"   , $lastOrder != null ? $lastOrder->getCreatedAt() : '')
+                ->set("LAST_ORDER_CURRENCY" , $lastOrder != null ? $lastOrder->getCreatedAt() : '')
+            ;
 
             $loopResult->addRow($loopResultRow);
         }
