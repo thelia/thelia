@@ -107,17 +107,19 @@ class CustomerController extends AbstractCrudController
                 'lastname'  => $object->getLastname(),
                 'email'     => $object->getEmail(),
                 'title'     => $object->getTitleId(),
-
-                'company'   => $address->getCompany(),
-                'address1'  => $address->getAddress1(),
-                'address2'  => $address->getAddress2(),
-                'address3'  => $address->getAddress3(),
-                'phone'     => $address->getPhone(),
-                'cellphone' => $address->getCellphone(),
-                'zipcode'   => $address->getZipcode(),
-                'city'      => $address->getCity(),
-                'country'   => $address->getCountryId(),
         );
+
+        if ($address !== null) {
+                $data['company']   = $address->getCompany();
+                $data['address1']  = $address->getAddress1();
+                $data['address2']  = $address->getAddress2();
+                $data['address3']  = $address->getAddress3();
+                $data['phone']     = $address->getPhone();
+                $data['cellphone'] = $address->getCellphone();
+                $data['zipcode']   = $address->getZipcode();
+                $data['city']      = $address->getCity();
+                $data['country']   = $address->getCountryId();
+        }
 
         // A loop is used in the template
         return new CustomerUpdateForm($this->getRequest(), 'form', $data);
