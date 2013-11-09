@@ -221,7 +221,7 @@ class ProfileController extends AbstractCrudController
 
     public function updateAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $object = $this->getExistingObject();
 
@@ -306,7 +306,7 @@ class ProfileController extends AbstractCrudController
     public function processUpdateResourceAccess()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
 
@@ -355,7 +355,7 @@ class ProfileController extends AbstractCrudController
     public function processUpdateModuleAccess()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
 

@@ -4,8 +4,11 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\Module as BaseModule;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
 
-class Module extends BaseModule {
+class Module extends BaseModule
+{
+    use ModelEventDispatcherTrait;
 
     public function postSave(ConnectionInterface $con = null)
     {

@@ -27,6 +27,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
+use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Map\ModuleTableMap;
@@ -99,6 +100,28 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param ModuleEvent $event
+     */
+    public function update(ModuleEvent $event)
+    {
+        if (null !== $module = ModuleQuery::create()->findPk($event->getId())) {
+
+            $module
+                ->setDispatcher($this->getDispatcher())
+                ->setLocale($event->getLocale())
+                ->setTitle($event->getTitle())
+                ->setChapo($event->getChapo())
+                ->setDescription($event->getDescription())
+                ->setPostscriptum($event->getPostscriptum())
+            ;
+
+            $module->save();
+
+            $event->setModule($module);
+        }
+    }
+
     protected function cacheClear()
     {
         $cacheEvent = new CacheEvent($this->container->getParameter('kernel.cache_dir'));
@@ -130,7 +153,8 @@ class Module extends BaseAction implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleActivation', 128),
-            TheliaEvents::MODULE_DELETE => array('delete', 128)
+            TheliaEvents::MODULE_DELETE => array('delete', 128),
+            TheliaEvents::MODULE_UPDATE => array('update', 128),
         );
     }
 }

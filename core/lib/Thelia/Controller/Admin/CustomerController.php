@@ -47,6 +47,7 @@ class CustomerController extends AbstractCrudController
 {
     public function __construct()
     {
+
         parent::__construct(
                 'customer',
                 'lastname',

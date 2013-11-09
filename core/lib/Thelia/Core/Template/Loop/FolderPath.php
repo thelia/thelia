@@ -102,9 +102,9 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
             if ($folder != null) {
 
                 $results[] = array(
-                    "ID" => $result->getId(),
-                    "TITLE" => $result->getVirtualColumn('i18n_TITLE'),
-                    "URL" => $result->getUrl($this->locale),
+                    "ID" => $folder->getId(),
+                    "TITLE" => $folder->getVirtualColumn('i18n_TITLE'),
+                    "URL" => $folder->getUrl($this->locale),
                     "LOCALE" => $this->locale,
                 );
 
