@@ -1,22 +1,23 @@
 /* JQUERY PREVENT CONFLICT */
-(function($) {
+(function ($) {
 
-/*	------------------------------------------------------------------
+/*  ------------------------------------------------------------------
     callback Function -------------------------------------------------- */
     var confirmCallback = {
-        'address.delete': function($elm){
-            $.post($elm.attr('href'), function(data){
-                if(data.success)
+        'address.delete': function ($elm) {
+            $.post($elm.attr('href'), function (data) {
+                if (data.success) {
                     $elm.closest('tr').remove();
-                else
+                } else {
                     bootbox.alert(data.message);
+                }
             });
         }
-    }
+    };
 
-/*	------------------------------------------------------------------
+/*  ------------------------------------------------------------------
      onLoad Function -------------------------------------------------- */
-    $(document).ready(function(){
+    $(document).ready(function () {
 
         // Loader
         var $loader = $('<div class="loader"></div>');
@@ -24,32 +25,29 @@
 
         // Display loader if we do ajax call
         $(document)
-            .ajaxStart(function() { $loader.show(); })
-            .ajaxStop(function(){ $loader.hide(); });
+            .ajaxStart(function () { $loader.show(); })
+            .ajaxStop(function () { $loader.hide(); });
 
         // Main Navigation Hover
         $('.nav-main')
-            .on('click.subnav', '[data-toggle=dropdown]', function(event){
-                if($(this).parent().hasClass('open') && $(this).is(event.target))
-                    return false;
+            .on('click.subnav', '[data-toggle=dropdown]', function (event) {
+                if ($(this).parent().hasClass('open') && $(this).is(event.target)) { return false; }
             })
-            .on('mouseenter.subnav', '.dropdown', function(event){
-                if($(this).hasClass('open'))
-                    return;
+            .on('mouseenter.subnav', '.dropdown', function () {
+                if ($(this).hasClass('open')) { return; }
 
                 $(this).addClass('open');
             })
-            .on('mouseleave.subnav', '.dropdown', function(){
+            .on('mouseleave.subnav', '.dropdown', function () {
                 var $this = $(this);
 
-                if(!$this.hasClass('open'))
-                    return;
+                if (!$this.hasClass('open')) { return; }
 
                 //This will check if an input child has focus. If no then remove class open
-                if ($this.find(":input:focus").length == 0){
+                if ($this.find(":input:focus").length === 0) {
                     $this.removeClass('open');
                 } else {
-                    $this.find(":input:focus").one('blur', function(){
+                    $this.find(":input:focus").one('blur', function () {
                         $this.trigger('mouseleave.subnav');
                     });
                 }
@@ -61,56 +59,55 @@
         });
 
         // Confirm Dialog
-        $(document).on('click.confirm', '[data-confirm]', function (e) {
+        $(document).on('click.confirm', '[data-confirm]', function () {
             var $this       = $(this),
                 href        = $this.attr('href'),
                 callback    = $this.attr('data-confirm-callback'),
-                title       = $this.attr('data-confirm') != '' ? $this.attr('data-confirm') : 'Are you sure?';
+                title       = $this.attr('data-confirm') !== '' ? $this.attr('data-confirm') : 'Are you sure?';
 
-            bootbox.confirm(title, function(confirm) {
-                    if(confirm){
-                        //Check if callback and if it's a function
-                        if (callback && $.isFunction(confirmCallback[callback])) {
-                            confirmCallback[callback]($this);
+            bootbox.confirm(title, function (confirm) {
+                if (confirm) {
+                    //Check if callback and if it's a function
+                    if (callback && $.isFunction(confirmCallback[callback])) {
+                        confirmCallback[callback]($this);
+                    } else {
+                        if (href) {
+                            window.location.href = href;
                         } else {
-                            if(href){
-                                window.location.href = href;
-                            } else {
-                                // If forms
-                                var $form = $this.closest("form");
-                                if($form.size() > 0){
-                                    $form.submit();
-                                }
+                            // If forms
+                            var $form = $this.closest("form");
+                            if ($form.size() > 0) {
+                                $form.submit();
                             }
                         }
                     }
-                });
+                }
+            });
 
             return false;
         });
 
         // Toolbar
-        var $category_products = $('#category-products');
-        if($category_products.size() > 0){
+        var $category_products = $ ('#category-products');
+        if ($category_products.size() > 0) {
             var $parent = $category_products.parent();
 
-            $parent.on('click.view-mode', '[data-toggle=view]', function(){
-                if( ($(this).hasClass('btn-grid') && $parent.hasClass('grid')) || ($(this).hasClass('btn-list') && $parent.hasClass('list')))
-                    return;
+            $parent.on('click.view-mode', '[data-toggle=view]', function () {
+                if (($(this).hasClass('btn-grid') && $parent.hasClass('grid')) || ($(this).hasClass('btn-list') && $parent.hasClass('list'))) { return; }
 
                 // Add loader effect
                 $loader.show();
-                setTimeout(function(){ $parent.toggleClass('grid').toggleClass('list'); $loader.hide(); }, 400);
+                setTimeout(function () { $parent.toggleClass('grid').toggleClass('list'); $loader.hide(); }, 400);
 
                 return false;
             });
-        }
+        };
 
         // Login
         var $form_login = $('#form-login');
-        if($form_login.size() > 0) {
-            $form_login.on('change.account', ':radio', function(){
-                if($(this).val() === '0')
+        if ($form_login.size() > 0) {
+            $form_login.on('change.account', ':radio', function () {
+                if ($(this).val() === '0')
                     $('#password', $form_login).val('').prop('disabled', true); // Disabled (new customer)
                 else
                     $('#password', $form_login).prop('disabled', false); // Enabled
@@ -119,19 +116,19 @@
 
         // Mini Newsletter Subscription
         var $form_newsletter = $('#form-newsletter-mini');
-        if($form_newsletter.size() > 0) {
-            $form_newsletter.on('submit.newsletter', function(){
+        if ($form_newsletter.size() > 0) {
+            $form_newsletter.on('submit.newsletter', function () {
 
                 $.ajax({
                     url: $(this).attr('action'),
                     type: $(this).attr('method'),
                     data: $(this).serialize(),
                     dataType: 'json',
-                    success: function(json) {
+                    success: function (json) {
                         var $msg = '';
-                        if(json.success){
+                        if (json.success) {
                             $msg = json.message;
-                        }else{
+                        } else {
                             $msg = json.message;
                         }
                         bootbox.alert($msg);
@@ -153,14 +150,14 @@
          content: function() {
          return $('#form-forgotpassword').html();
          }
-         }).on('click.btn-forgot', function(){
+         }).on('click.btn-forgot', function () {
 
-         $('.btn-forgot').click(function(){
+         $('.btn-forgot').click(function () {
          alert('click form');
          return false;
          });
 
-         $('.btn-close').click(function(){
+         $('.btn-close').click(function () {
          $forgot_password.popover('hide');
          });
 
@@ -170,11 +167,11 @@
          */
 
         //.Form Filters
-        $('#form-filters').each(function(){
+        $('#form-filters').each(function () {
             var $form = $(this);
 
             $form
-                .on('change.filter', ':checkbox', function(){
+                .on('change.filter', ':checkbox', function () {
                     $loader.show();
                     $form.submit();
                 })
@@ -182,19 +179,18 @@
         });
 
         // Product details Thumbnails
-        $('#product-gallery').each(function(){
+        $('#product-gallery').each(function () {
             var $item = $('.item', this),
                 $thumbnails = $('.thumbnail', this),
                 $image = $('.product-image > img', this);
 
             // Show Carousel control if needed
-            if($item.size() > 1){
+            if ($item.size() > 1) {
                 $('#product-thumbnails', this).carousel({interval: false}).find('.carousel-control').show();
             }
 
-            $(this).on('click.thumbnails', '.thumbnail', function(){
-                if($(this).hasClass('active'))
-                    return false;
+            $(this).on('click.thumbnails', '.thumbnail', function () {
+                if ($(this).hasClass('active')) { return false; }
 
                 $image.attr('src',$(this).attr('href'));
                 $thumbnails.removeClass('active');
@@ -205,9 +201,9 @@
         });
 
         // Payment Method
-        $('#payment-method').each(function(){
+        $('#payment-method').each(function () {
             var $label = $('label', this);
-            $label.on('change', ':radio', function(){
+            $label.on('change', ':radio', function ()  {
                 $label.removeClass('active');
                 $label.filter('[for="' + $(this).attr('id') + '"]').addClass('active');
             }).filter(':has(:checked)').addClass('active');
@@ -215,21 +211,14 @@
 
         // Apply validation
         $('#form-contact, #form-register, #form-address').validate({
-            highlight: function(element) {
+            highlight: function (element) {
                 $(element).closest('.form-group').addClass('has-error');
             },
-            unhighlight: function(element) {
+            unhighlight: function (element) {
                 $(element).closest('.form-group').removeClass('has-error');
             },
             errorElement: 'span',
-            errorClass: 'help-block'/*,
-            errorPlacement: function(error, element) {
-                if(element.parent('.input-group').length || element.prop('type') === 'checkbox' || element.prop('type') === 'radio'){
-                    error.prepend('<i class="icon-remove"></i> ').insertAfter(element.parent());
-                }else{
-                    error.prepend('<i class="icon-remove"></i> ').insertAfter(element);
-                }
-            }*/
+            errorClass: 'help-block'
         });
 
 
@@ -240,7 +229,7 @@
 
             var $btnAddToCart   = $(".btn_add_to_cart", $("#form-product-details"));
 
-            var $productMeta    = $("#stockInformations");
+            var $productMeta    = $("#stock-information");
 
             var $inStock        = $(".in",$productMeta);
             var $outOfStock     = $(".out",$productMeta);
@@ -253,14 +242,14 @@
             // Switch Quantity in product page
             $("select", $(".product-options")).change(function(){
                 $select_quantity        = $(this).find(":selected").attr("data-quantity");
-                var $old_price              = $(this).find(":selected").attr("data-old-price");
+                var $old_price          = $(this).find(":selected").attr("data-old-price");
 
-                var $best_price             = $(this).find(":selected").attr("data-price");
+                var $best_price         = $(this).find(":selected").attr("data-price");
 
                 $quantityInput.attr("max", $select_quantity);
 
                 // Show Out Of Stock OR In Stock
-                if($select_quantity == 0){
+                if ($select_quantity == 0) {
                     $btnAddToCart.attr("disabled", true);
 
                     $productMeta.removeClass("in-stock");
@@ -271,7 +260,7 @@
                     $outOfStock.show();
                     $inStock.hide();
 
-                }else{
+                } else {
                     $btnAddToCart.attr("disabled", false);
 
                     $productMeta.removeClass("out-of-stock");
@@ -283,38 +272,38 @@
                     $outOfStock.hide();
                 }
 
-                if(parseInt($quantityInput.val()) > parseInt($select_quantity)){
+                if (parseInt($quantityInput.val()) > parseInt($select_quantity)) {
                     $quantityInput.val($select_quantity);
                 }
 
-                if($old_price_container.size() > 0 ){
+                if ($old_price_container.size() > 0) {
                     $(".price", $old_price_container).html($old_price);
                     $(".price", $(".special-price")).html($best_price);
-                }else{
+                } else {
                     $(".price", $(".regular-price")).html($best_price);
                 }
 
             }).change();
 
-            $quantityInput.focusout(function() {
+            $quantityInput.focusout(function () {
                 $quantityInput.attr("max", $select_quantity);
-                if(parseInt($quantityInput.val()) > parseInt($select_quantity)){
+                if (parseInt($quantityInput.val()) > parseInt($select_quantity)) {
                     $quantityInput.val($select_quantity);
                 }
             });
         }
 
-        $(".form-product").submit(function(){
+        $(".form-product").submit(function () {
             var url_action      = $(this).attr("action");
             var $cartContainer  = $(".cart-container");
 
-            $.ajax({type:"POST", data: $(this).serialize(), url:url_action,
+            $.ajax({type: "POST", data: $(this).serialize(), url: url_action,
                     success: function(data){
 
                         $cartContainer.html($(data).html());
 
                         $.ajax({url:"ajax/addCartMessage",
-                            success: function(data){
+                            success: function (data) {
                                 bootbox.dialog({
                                     message : data,
                                     buttons : {}
@@ -322,7 +311,7 @@
                             }
                         });
                 },
-                error: function(){
+                error: function () {
                     console.log('Error.');
                 }
             });
@@ -330,11 +319,11 @@
         return false;
         });
 
-        $('#limit-top').change(function(e){
+        $('#limit-top').change(function (e) {
             window.location = $(this).val()
         });
 
-        $('#sortby-top').change(function(e){
+        $('#sortby-top').change(function (e) {
             window.location = $(this).val()
         });
 

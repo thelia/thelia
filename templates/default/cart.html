@@ -98,13 +98,16 @@
                         </td>
                         <td class="qty">
                             <div class="form-group group-qty">
-                                <form action="{url path="/cart/update"}" method="post" role="form">
+                                <form action="{url path="/cart/update"}" class="form-inline" method="post">
                                     <input type="hidden" name="cart_item" value="{$ITEM_ID}">
-                                    <select name="quantity" class="form-control" onchange="jQuery(this).parent('form').submit();">
-                                        {for $will=1 to $STOCK}
-                                            <option {if $QUANTITY == $will}selected="selected"{/if}>{$will}</option>
-                                        {/for}
-                                    </select>
+                                    <div class="form-group">
+                                        <select name="quantity" class="form-control" onchange="jQuery(this).parent('form').submit();">
+                                            {for $will=1 to $STOCK}
+                                                <option {if $QUANTITY == $will}selected="selected"{/if}>{$will}</option>
+                                            {/for}
+                                        </select>
+                                    </div>
+                                    <button type="submit" title="{intl l="Update Quantity"}" class="btn btn-cart-update">{intl l="+"}</button>
                                 </form>
                             </div>
                         </td>

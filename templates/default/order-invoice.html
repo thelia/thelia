@@ -29,7 +29,7 @@
 
             {form name="thelia.order.coupon"}
 
-            <form id="form-coupon" action="{url path="/order/coupon"}" method="post" role="form" {form_enctype form=$form}>
+            <form id="form-coupon" action="{url path="/order/coupon"}" method="post" {form_enctype form=$form}>
 
                 {form_hidden_fields form=$form}
 
@@ -162,8 +162,8 @@
                 </form>
             {/form}
             {form name="thelia.order.payment"}
-
-            <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" role="form" {form_enctype form=$form}>
+            {assign var="isPost" value="{$smarty.post|count}"}
+            <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" {form_enctype form=$form}>
 
                 {form_hidden_fields form=$form}
 
@@ -191,7 +191,6 @@
                     </div>
 
                     {form_field form=$form field='invoice-address'}
-
                     <div class="panel">
                         <div class="panel-heading">{intl l="Billing address"}s</div>
 
@@ -201,65 +200,19 @@
 
                         <div class="panel-body">
 
-                            <table class="col-md-12">
-
-                        {if !$error && $value}
-                            {assign defaultParam '*'}
-                        {else}
-                            {assign defaultParam 'true'}
-                        {/if}
-                        {if !$error && $value}
-                            {assign idParam $value}
-                        {else}
-                            {assign idParam '*'}
-                        {/if}
-                        {loop type="address" name="invoice-address" default=$defaultParam id=$idParam}
-
-                            <tr>
-                                <td>
-                                    <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
-                                    <span class="org">{$COMPANY}</span>
-                                    <address class="adr">
-                                        <span class="street-address">{$ADDRESS1}</span><br>
-                                        {if $ADDRESS2 != ""}
-                                            <span class="street-address">{$ADDRESS2}</span><br>
-                                        {/if}
-                                        {if $ADDRESS3 != ""}
-                                            <span class="street-address">{$ADDRESS3}</span><br>
-                                        {/if}
-                                        <span class="postal-code">{$ZIPCODE}</span>
-                                        <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
-                                    </address>
-                                </td>
-                                <td>
-                                    <input class="js-invoice-address-selector {if !$error}hidden{/if}" type="radio" name="{$name}" value="{$ID}" {if $value == $ID OR !$error}checked="checked"{/if}>
-                                </td>
-                            </tr>
-
-                            {if !$error}
-                            <tr class="js-change-invoice-address">
-                                <td colspan="2">
-                                    <a href="#" class="btn btn-change-address">{intl l="Change address"}</a>
-                                </td>
-                            </tr>
+                        {loop type="address" name="invoice-address"}
+                            {assign var="isInvoiceAddressChecked" value="0"}
+                            {if $isPost}
+                                {if $value == $ID}
+                                    {assign var="isInvoiceAddressChecked" value="1"}
+                                {/if}
+                            {elseif $DEFAULT}
+                                {assign var="isInvoiceAddressChecked" value="1"}
                             {/if}
 
-                        {/loop}
-
-                        {if !$error && $value}
-                            {assign defaultParam '*'}
-                        {else}
-                            {assign defaultParam 'false'}
-                        {/if}
-                        {if !$error && $value}
-                            {assign excludeParam $value}
-                        {else}
-                            {assign excludeParam 'none'}
-                        {/if}
-                        {loop type="address" name="invoice-address" default=$defaultParam exclude=$excludeParam}
-
-                            <tr class="js-other-invoice-address {if !$error}hidden{/if}">
-                                <td>
+                            <div class="radio">
+                                <label for="invoice-address_{$ID}">
+                                    <input type="radio" name="{$name}" id="invoice-address_{$ID}" value="{$ID}"{if $isInvoiceAddressChecked} checked="checked"{/if}>
                                     <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
                                     <span class="org">{$COMPANY}</span>
                                     <address class="adr">
@@ -273,15 +226,11 @@
                                         <span class="postal-code">{$ZIPCODE}</span>
                                         <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
                                     </address>
-                                </td>
-                                <td>
-                                    <input class="js-invoice-address-selector {if !$error}hidden{/if}" type="radio" name="{$name}" value="{$ID}" {if $value == $ID}checked="checked"{/if}>
-                                </td>
-                            </tr>
-
+                                </label>
+                            </div>
                         {/loop}
 
-                            </table>
+                            <a href="#" class="btn btn-change-address hidden">{intl l="Change address"}</a>
 
                         </div>
 
@@ -342,15 +291,21 @@
 
 {block name="javascript-initialization"}
 <script type="text/javascript">
-jQuery(function($order) {
-    $order('.js-change-invoice-address').on('click', 'a', function(e) {
-        e.preventDefault();
+jQuery(function($) {
+    $('#cart-address').each(function(){
+        var $radio = $('.radio', this),
+            $btn = $('.btn-change-address');
 
-        $order('.js-other-invoice-address').removeClass('hidden');
-        $order('.js-invoice-address-selector').removeClass('hidden');
+        // Hide other invoice address
+        $radio.filter( function(){ return !$(this).find(':radio').is(':checked'); }).hide();
+        $btn
+            .removeClass('hidden')
+            .bind('click.btn-change-address', function(){
+                $radio.show();
+                $(this).hide();
 
-        $order('#js-invoice-address-default-selector').unbind().remove();
-        $order('.js-change-invoice-address').unbind().remove();
+                return false;
+            });
     });
 });
 </script>

@@ -58,6 +58,11 @@
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">account-password</default>
     </route>
+
+    <route id="customer.order.pdf.delivery" path="/account/order/pdf/delivery/{order_id}">
+        <default key="_controller">Thelia\Controller\Front\OrderController::generateDeliveryPdf</default>
+        <requirement key="order_id">\d+</requirement>
+    </route>
     <!-- end customer routes -->
 
     <!-- customer address routes -->
@@ -151,10 +156,6 @@
         <default key="_view">order-placed</default>
     </route>
     <!-- end order management process -->
-
-    <route id="mail.test" path="/mail/test">
-        <default key="_controller">Thelia\Controller\Front\Mail::test</default>
-    </route>
 
     <!-- contact management -->
     <route id="contact.send" path="/contact" methods="post">

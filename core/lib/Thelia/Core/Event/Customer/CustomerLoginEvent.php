@@ -26,17 +26,7 @@ namespace Thelia\Core\Event\Customer;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Customer;
 
-class CustomerLoginEvent extends ActionEvent
+class CustomerLoginEvent extends CustomerEvent
 {
-    protected $customer;
-
-    public function __construct(Customer $customer)
-    {
-        $this->customer = $customer;
-    }
-
-    public function getCustomer()
-    {
-        return $this->customer;
-    }
+    // Nothing specific :)
 }

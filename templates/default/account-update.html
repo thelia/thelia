@@ -24,7 +24,7 @@
             <h1 id="main-label" class="page-header">{intl l="Update Profile"}</h1>
 
             {form name="thelia.front.customer.profile.update"}
-            <form id="form-register" class="form-horizontal" action="{url path="/account/update"}" method="post" role="form">
+            <form id="form-register" class="form-horizontal" action="{url path="/account/update"}" method="post">
                 {form_field form=$form field='success_url'}
                     <input type="hidden" name="{$name}" value="{url path="/account"}" />
                 {/form_field}
@@ -35,7 +35,7 @@
 
                 <fieldset id="register-info" class="panel">
                     <div class="panel-heading">
-                        {intl l="Personal Informations"}
+                        {intl l="Personal Information"}
                     </div>
 
                     <div class="panel-body">

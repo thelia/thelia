@@ -15,7 +15,7 @@
 
             <h1 id="main-label" class="page-header">{intl l="Create New Account"}</h1>
             {form name="thelia.front.customer.create"}
-            <form id="form-register" class="form-horizontal" action="{url path="/register"}" method="post" role="form">
+            <form id="form-register" class="form-horizontal" action="{url path="/register"}" method="post">
                 {form_field form=$form field='success_url'}
                     <input type="hidden" name="{$name}" value="{url path="/account"}" /> {* the url the user is redirected to on registration success *}
                 {/form_field}
@@ -27,7 +27,7 @@
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
                 <fieldset id="register-info" class="panel">
                     <div class="panel-heading">
-                        1. {intl l="Personal Informations"}
+                        1. {intl l="Personal Information"}
                     </div>
 
                     <div class="panel-body">
@@ -116,7 +116,7 @@
 
                 <fieldset id="register-delivery" class="panel">
                     <div class="panel-heading">
-                        2. {intl l="Delivery Informations"}
+                        2. {intl l="Delivery Information"}
                     </div>
 
                     <div class="panel-body">

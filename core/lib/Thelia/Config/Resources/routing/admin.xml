@@ -109,18 +109,16 @@
     <!-- Customer rule management -->
 
     <route id="admin.customers" path="/admin/customers">
-        <default key="_controller">Thelia\Controller\Admin\CustomerController::indexAction</default>
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::defaultAction</default>
     </route>
 
-    <route id="admin.customer.update.view" path="/admin/customer/update/{customer_id}" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\CustomerController::viewAction</default>
-        <requirement key="customer_id">\d+</requirement>
-    </route>
-
-    <route id="admin.customer.update.process" path="/admin/customer/update/{customer_id}" methods="post">
+    <route id="admin.customer.update.view" path="/admin/customer/update">
         <default key="_controller">Thelia\Controller\Admin\CustomerController::updateAction</default>
-        <requirement key="customer_id">\d+</requirement>
     </route>
+
+    <route id="admin.customer.update.process" path="/admin/customer/save">
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::processUpdateAction</default>
+     </route>
 
     <route id="admin.customer.delete" path="/admin/customer/delete">
         <default key="_controller">Thelia\Controller\Admin\CustomerController::deleteAction</default>
@@ -146,14 +144,12 @@
         <default key="_controller">Thelia\Controller\Admin\AddressController::createAction</default>
     </route>
 
-    <route id="admin.address.update.view" path="/admin/address/update/{address_id}">
+    <route id="admin.address.update.view" path="/admin/address/update">
         <default key="_controller">Thelia\Controller\Admin\AddressController::updateAction</default>
-        <requirement key="address_id">\d+</requirement>
     </route>
 
-    <route id="admin.address.save" path="/admin/address/save/{address_id}">
+    <route id="admin.address.save" path="/admin/address/save">
         <default key="_controller">Thelia\Controller\Admin\AddressController::processUpdateAction</default>
-        <requirement key="address_id">\d+</requirement>
     </route>
 
     <!-- end address management -->

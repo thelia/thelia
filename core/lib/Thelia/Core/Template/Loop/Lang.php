@@ -33,6 +33,8 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\LangQuery;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Type\TypeCollection;
+use Thelia\Type;
 
 /**
  * Language loop, to get a list of available languages
@@ -56,7 +58,14 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntTypeArgument('id', null),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createBooleanTypeArgument('default_only', false)
+            Argument::createBooleanTypeArgument('default_only', false),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse', 'position', 'position_reverse'))
+                ),
+                'position'
+            )
         );
      }
 
@@ -79,6 +88,30 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
         }
 
         $search->orderByPosition(Criteria::ASC);
+        $orders  = $this->getOrder();
+
+        foreach ($orders as $order) {
+            switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
+                case "alpha":
+                    $search->orderByTitle(Criteria::ASC);
+                    break;
+                case "alpha_reverse":
+                    $search->orderByTitle(Criteria::DESC);
+                    break;
+                case "position":
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "position_reverse":
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+            }
+        }
 
         return $search;
 
