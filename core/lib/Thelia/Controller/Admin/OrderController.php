@@ -202,14 +202,14 @@ class OrderController extends BaseAdminController
 
     public function generateInvoicePdf($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
 
         return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
     }
 
     public function generateDeliveryPdf($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
 
         return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
     }
