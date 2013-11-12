@@ -229,7 +229,7 @@
 
             var $btnAddToCart   = $(".btn_add_to_cart", $("#form-product-details"));
 
-            var $productMeta    = $("#stockInformations");
+            var $productMeta    = $("#stock-information");
 
             var $inStock        = $(".in",$productMeta);
             var $outOfStock     = $(".out",$productMeta);
