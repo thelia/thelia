@@ -98,7 +98,7 @@
                         </td>
                         <td class="qty">
                             <div class="form-group group-qty">
-                                <form action="{url path="/cart/update"}" method="post" role="form">
+                                <form action="{url path="/cart/update"}" method="post">
                                     <input type="hidden" name="cart_item" value="{$ITEM_ID}">
                                     <select name="quantity" class="form-control" onchange="jQuery(this).parent('form').submit();">
                                         {for $will=1 to $STOCK}

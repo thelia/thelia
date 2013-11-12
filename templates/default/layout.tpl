@@ -1,6 +1,10 @@
 {* Declare assets directory, relative to template base directory *}
 {declare_assets directory='assets'}
 {block name="no-return-functions"}{/block}
+{assign var="company_name" value="{config key="company_name"}"}
+{if not $company_name}
+    {assign var="company_name" value="{intl l='Thelia V2'}"}
+{/if}
 <!doctype html>
 <!--
  ______   __  __     ______     __         __     ______
@@ -33,15 +37,16 @@ GNU General Public License : http://www.gnu.org/licenses/
     <meta charset="utf-8">
 
     {* Page Title *}
-    <title>{block name="page-title"}{strip}{if $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title} - {/foreach}{/if}{config key="company_name"}{/strip}{/block}</title>
+    <title>{block name="page-title"}{strip}{if $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title} - {/foreach}{/if}{$company_name}{/strip}{/block}</title>
 
     {* Meta Tags *}
-    <meta name="description" content="">
     <meta name="generator" content="{intl l='Thelia V2'}">
-    <meta name="robots" content="noindex,nofollow">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    {block name="meta"}{/block}
+    {block name="meta"}
+        <meta name="description" content="{$company_name}">
+        <meta name="robots" content="noindex,nofollow">
+    {/block}
 
     {* Stylesheets *}
     {stylesheets file='assets/less/styles.less' filters='less'}
@@ -54,14 +59,10 @@ GNU General Public License : http://www.gnu.org/licenses/
     {images file='assets/img/favicon.ico'}<link rel="shortcut icon" type="image/x-icon" href="{$asset_url}">{/images}
     {images file='assets/img/favicon.png'}<link rel="icon" type="image/png" href="{$asset_url}" />{/images}
 
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}
     <!--[if lt IE 9]>
-    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    {javascripts file='assets/js/libs/respond.min.js'}
-    <script src="{$asset_url}"></script>
-    {/javascripts}
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
 </head>
 
@@ -85,7 +86,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{navigate to="index"}">{config key="company_name"}</a>
+                <a class="navbar-brand" href="{navigate to="index"}">{$company_name}</a>
             </div>
 
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
@@ -102,18 +103,18 @@ GNU General Public License : http://www.gnu.org/licenses/
                         <a href="{url path="/login"}" class="login">{intl l="Log In!"}</a>
                         <div class="dropdown-menu">
                             {form name="thelia.front.customer.login"}
-                            <form id="form-login-mini" action="{url path="/login"}" method="post" role="form" {form_enctype form=$form}>
+                            <form id="form-login-mini" action="{url path="/login"}" method="post" {form_enctype form=$form}>
                                 {form_hidden_fields form=$form}
                                 {form_field form=$form field="email"}
                                 <div class="form-group group-email">
-                                    <label for="{$label_attr.for}-mini">Email address</label>
-                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" aria-required="true" required>
+                                    <label for="{$label_attr.for}-mini">{intl l="Email address"}</label>
+                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" aria-required="true" required>
                                 </div>
                                 {/form_field}
                                 {form_field form=$form field="password"}
                                 <div class="form-group group-password">
-                                    <label for="{$label_attr.for}-mini">Password</label>
-                                    <input type="password" name="{$name}" id="{$label_attr.for}-mini" class="form-control" aria-required="true" required>
+                                    <label for="{$label_attr.for}-mini">{intl l="Password"}</label>
+                                    <input type="password" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" aria-required="true" required>
                                 </div>
                                 {/form_field}
                                 {form_field form=$form field="account"}
@@ -145,8 +146,8 @@ GNU General Public License : http://www.gnu.org/licenses/
     <header class="container" role="banner">
         <div class="header">
             <h1 class="logo">
-                <a href="{navigate to="index"}" title="{config key="company_name"}">
-                    {images file='assets/img/logo.gif'}<img src="{$asset_url}" alt="{config key="company_name"}">{/images}
+                <a href="{navigate to="index"}" title="{$company_name}">
+                    {images file='assets/img/logo.gif'}<img src="{$asset_url}" alt="{$company_name}">{/images}
                 </a>
             </h1>
 
@@ -164,7 +165,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     </form>
                 </div>
 
-                <div class="language-switch" aria-labelledby="language-label">
+                <div class="language-switch" aria-labelledby="language-label" role="form">
                     <span id="language-label" class="dropdown-label">{intl l="Language:"}</span>
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/language"}">{lang attr="title"}</a>
                     <ul class="select dropdown-menu">
@@ -174,7 +175,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     </ul>
                 </div>
 
-                <div class="currency-switch" aria-labelledby="currency-label">
+                <div class="currency-switch" aria-labelledby="currency-label" role="form">
                     <span id="currency-label" class="dropdown-label">{intl l="Currency:"}</span>
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/currency"}">{currency attr="code"}</a>
                     <ul class="select dropdown-menu">
@@ -193,7 +194,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 <main class="main-container" role="main">
     <div class="container">
         {block name="breadcrumb"}{include file="misc/breadcrumb.tpl"}{/block}
-        {block name="main-content"}{/block}
+        <div id="content">{block name="main-content"}{/block}</div>
     </div><!-- /.container -->
 </main><!-- /.main-container -->
 
@@ -271,54 +272,60 @@ GNU General Public License : http://www.gnu.org/licenses/
                     <section class="block block-social">
                         <div class="block-heading"><h3 class="block-title">{intl l="Follow us"}</h3></div>
                         <div class="block-content">
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+                            <p>{intl l="Follow us introduction"}</p>
                             <ul role="presentation">
                                 <li>
-                                    <a href="http://facebook.com" class="facebook" data-toggle="tooltip" data-placement="top" title="facebook" target="_blank">
+                                    <a href="http://facebook.com" rel="nofollow" class="facebook" data-toggle="tooltip" data-placement="top" title="{intl l="Facebook"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-facebook icon-light"></span>
                                         </span>
+                                        <span class="visible-print">{intl l="Facebook"}</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://twitter.com" class="twitter" data-toggle="tooltip" data-placement="top" title="twitter" target="_blank">
+                                    <a href="https://twitter.com" rel="nofollow" class="twitter" data-toggle="tooltip" data-placement="top" title="{intl l="Twitter"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-twitter icon-light"></span>
                                         </span>
+                                        <span class="visible-print">{intl l="Twitter"}</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://instagram.com" class="instagram" data-toggle="tooltip" data-placement="top" title="instagram" target="_blank">
+                                    <a href="http://instagram.com" rel="nofollow" class="instagram" data-toggle="tooltip" data-placement="top" title="{intl l="Instagram"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-instagram icon-light"></span>
                                         </span>
+                                        <span class="visible-print">{intl l="Instagram"}</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://google.com" class="google-plus" data-toggle="tooltip" data-placement="top" title="google+" target="_blank">
+                                    <a href="http://www.google.com" rel="nofollow" class="google-plus" data-toggle="tooltip" data-placement="top" title="{intl l="Google+"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-google-plus icon-light"></span>
                                         </span>
+                                        <span class="visible-print">{intl l="Google+"}</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://youtube.com" class="youtube" data-toggle="tooltip" data-placement="top" title="youtube" target="_blank">
+                                    <a href="http://www.youtube.com" rel="nofollow" class="youtube" data-toggle="tooltip" data-placement="top" title="{intl l="Youtube"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-youtube icon-light"></span>
                                         </span>
+                                        <span class="visible-print">{intl l="Youtube"}</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#rss" class="rss" data-toggle="tooltip" data-placement="top" title="rss" target="_blank">
+                                    <a href="#rss" class="rss" rel="nofollow" data-toggle="tooltip" data-placement="top" title="{intl l="RSS"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-rss icon-light"></span>
                                         </span>
+                                        <span class="visible-print">{intl l="RSS"}</span>
                                     </a>
                                 </li>
                             </ul>
@@ -328,14 +335,14 @@ GNU General Public License : http://www.gnu.org/licenses/
                     <section class="block block-newsletter">
                         <div class="block-heading"><h3 class="block-title">{intl l="Newsletter"}</h3></div>
                         <div class="block-content">
-                            <p id="newletter-describe">{intl l="Sign up to receive our latest news."}</p>
+                            <p id="newsletter-describe">{intl l="Sign up to receive our latest news."}</p>
                             {form name="thelia.front.newsletter"}
-                            <form id="form-newsletter-mini" action="{url path="/newsletter"}" method="post" role="form">
+                            <form id="form-newsletter-mini" action="{url path="/newsletter"}" method="post">
                                 {form_hidden_fields form=$form}
                                 {form_field form=$form field="email"}
                                 <div class="form-group">
                                     <label for="{$label_attr.for}-mini">{intl l="Email address"}</label>
-                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" placeholder="{intl l="Your email address"}" aria-describedby="newletter-describe" {if $required} aria-required="true" required{/if} autocomplete="off">
+                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" placeholder="{intl l="Your email address"}" aria-describedby="newsletter-describe" {if $required} aria-required="true" required{/if} autocomplete="off">
                                 </div>
                                 {/form_field}
                                 <button type="submit" class="btn btn-subscribe">{intl l="Subscribe"}</button>
@@ -349,7 +356,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     <section class="block block-contact" itemscope itemtype="http://schema.org/Organization">
                         <div class="block-heading"><h3 class="block-title">{intl l="Contact Us"}</h3></div>
                         <div class="block-content">
-                            <meta itemprop="name" content="{config key="company_name"}">
+                            <meta itemprop="name" content="{$company_name}">
                             <ul>
                                 <li class="contact-address">
                                     <address class="adr" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
@@ -387,7 +394,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     </ul>
                 </nav>
 
-                <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://www.thelia.net" rel="external">Thelia</a></section>
+                <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
             </div>
         </div>
     </footer><!-- /.footer-info -->
