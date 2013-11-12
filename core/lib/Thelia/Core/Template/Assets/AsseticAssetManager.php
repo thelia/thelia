@@ -40,13 +40,13 @@ use Symfony\Component\Filesystem\Exception\IOException;
  */
 class AsseticAssetManager implements AssetManagerInterface
 {
-    protected $developmentMode;
+    protected $debugMode;
 
     protected $source_file_extensions = array('less', 'js', 'coffee', 'html', 'tpl', 'htm', 'xml');
 
-    public function __construct($developmentMode)
+    public function __construct($debugMode)
     {
-        $this->developmentMode = $developmentMode;
+        $this->debugMode = $debugMode;
     }
 
     /**
@@ -336,7 +336,7 @@ class AsseticAssetManager implements AssetManagerInterface
         Tlog::getInstance()->addDebug("Asset destination name: ", $asset_destination_path);
 
         // We generate an asset only if it does not exists, or if the asset processing is forced in development mode
-        if (! file_exists($asset_destination_path) || ($this->developmentMode && ConfigQuery::read('process_assets', true)) ) {
+        if (! file_exists($asset_destination_path) || ($this->debugMode && ConfigQuery::read('process_assets', true)) ) {
 
             $writer = new AssetWriter($output_directory);
 
