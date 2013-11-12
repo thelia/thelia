@@ -42,6 +42,5 @@ php Thelia module:activate Colissimo
 
 echo -e "\n\033[01;34m[INFO] Activating Payment Module(s)\033[00m\n"
 php Thelia module:activate Cheque
-php Thelia module:activate FakeCB
 
 echo -e "\n\033[00;32m[SUCCESS] Reset done\033[00m\n"

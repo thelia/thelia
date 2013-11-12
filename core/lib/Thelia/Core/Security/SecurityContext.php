@@ -123,7 +123,7 @@ class SecurityContext
     *
     * @return Boolean
     */
-    final public function isGranted(array $roles, array $resources, array $accesses)
+    final public function isGranted(array $roles, array $resources, array $modules, array $accesses)
     {
         // Find a user which matches the required roles.
         $user = $this->getCustomerUser();
@@ -140,7 +140,7 @@ class SecurityContext
             return false;
         }
 
-        if (empty($resources) || empty($accesses)) {
+        if ((empty($resources) && empty($modules)) || empty($accesses)) {
             return true;
         }
 
@@ -167,6 +167,28 @@ class SecurityContext
 
             foreach ($accesses as $access) {
                 if (!$userPermissions[$resource]->can($access)) {
+                    return false;
+                }
+            }
+        }
+
+        foreach ($modules as $module) {
+            if ($module === '') {
+                continue;
+            }
+
+            if(!array_key_exists('module', $userPermissions)) {
+                return false;
+            }
+
+            $module = strtolower($module);
+
+            if (!array_key_exists($module, $userPermissions['module'])) {
+                return false;
+            }
+
+            foreach ($accesses as $access) {
+                if (!$userPermissions['module'][$module]->can($access)) {
                     return false;
                 }
             }

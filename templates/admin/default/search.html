@@ -9,7 +9,7 @@
 <div class="modules">
 
     <div id="wrapper" class="container">
-        
+
         <div class="clearfix">
             <ul class="breadcrumb pull-left">
                 <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
@@ -68,7 +68,7 @@
                                 {/loop}
 
                                 <tr>
-                                    <td><a href="{url path="/admin/customer/update/{$ID}"}">{$REF}</a></td>
+                                    <td><a href="{url path='/admin/customer/update' customer_id=$ID}">{$REF}</a></td>
 
                                     <td>
                                         {$COMPANY}
@@ -91,7 +91,7 @@
                                         <div class="btn-group">
 
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.customer" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this customer'}" href="{url path="/admin/customer/update/{$ID}" }"><i class="glyphicon glyphicon-edit"></i></a>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this customer'}" href="{url path='/admin/customer/update' customer_id=$ID }"><i class="glyphicon glyphicon-edit"></i></a>
                                             {/loop}
                                             {loop type="auth" name="can_send_mail" role="ADMIN" resource="admin.customer" access="VIEW"}
                                                 <a class="btn btn-default btn-xs" title="{intl l="Send a mail to this customer"}" href="mailto:{$EMAIL}"><span class="glyphicon glyphicon-envelope"></span></a>
@@ -148,7 +148,7 @@
                                     <td><a href="{url path="/admin/order/update/$ID"}">{$REF}</a></td>
                                     <td>{format_date date=$CREATE_DATE}</td>
                                     <td>{$orderInvoiceCompany}</td>
-                                    <td><a href="{url path="/admin/customer/update/$CUSTOMER"}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
+                                    <td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
                                     <td>{$TOTAL_TAXED_AMOUNT}</td>
                                     <td><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
 

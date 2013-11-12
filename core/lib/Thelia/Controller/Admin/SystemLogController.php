@@ -86,7 +86,7 @@ class SystemLogController extends BaseAdminController
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, array(), AccessManager::VIEW)) return $response;
 
         /*
         const VAR_LEVEL 		= "tlog_level";
@@ -121,7 +121,7 @@ class SystemLogController extends BaseAdminController
 
     public function saveAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
 

@@ -28,11 +28,21 @@ use Thelia\Core\Event\ActionEvent;
 
 class CustomerEvent extends ActionEvent
 {
-    public $customer;
+    public $customer = null;
 
-    public function __construct(Customer $customer)
+    public function __construct(Customer $customer = null)
     {
         $this->customer = $customer;
+    }
+
+    /**
+     * @param Customer $customer
+     */
+    public function setCustomer(Customer $customer)
+    {
+        $this->customer = $customer;
+
+        return $this;
     }
 
     /**
@@ -41,6 +51,14 @@ class CustomerEvent extends ActionEvent
     public function getCustomer()
     {
         return $this->customer;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasCustomer()
+    {
+        return $this->customer != null;
     }
 
 }

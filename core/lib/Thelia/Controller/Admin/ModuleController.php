@@ -180,7 +180,7 @@ class ModuleController extends AbstractCrudController
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::VIEW)) return $response;
 
         $moduleManagement = new ModuleManagement();
         $moduleManagement->updateModules();
@@ -190,7 +190,7 @@ class ModuleController extends AbstractCrudController
 
     public function toggleActivationAction($module_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::UPDATE)) return $response;
         $message = null;
         try {
             $event = new ModuleToggleActivationEvent($module_id);
@@ -222,7 +222,7 @@ class ModuleController extends AbstractCrudController
 
     public function deleteAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, AccessManager::DELETE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::DELETE)) return $response;
 
         $message = null;
         try {

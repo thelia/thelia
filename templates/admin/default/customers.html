@@ -7,9 +7,6 @@
 {block name="check-access"}view{/block}
 
 {block name="main-content"}
-    {assign var=customer_page value={$smarty.get.page|default:1}}
-
-
     <div class="customer">
         <div id="wrapper" class="container">
 
@@ -41,27 +38,83 @@
                                     <thead>
                                     <tr>
                                         <th class="object-title">
-                                            {intl l="customer ref"}
+                                            {admin_sortable_header
+                                                current_order=$customer_order
+                                                order='reference'
+                                                reverse_order='reference_reverse'
+                                                path={url path='/admin/customers'}
+                                                request_parameter_name='customer_order'
+                                                label="{intl l='Reference'}"
+                                            }
                                         </th>
 
-                                        {module_include location='category_list_header'}
+                                        {module_include location='customer_list_header'}
 
-                                        <th>
-                                            {intl l="firstname & lastname"}
+                                        <th class="object-title">
+                                            {admin_sortable_header
+                                                current_order=$customer_order
+                                                order='lastname'
+                                                reverse_order='lastname_reverse'
+                                                path={url path='/admin/customers'}
+                                                request_parameter_name='customer_order'
+                                                label="{intl l='Last name'}"
+                                            }
                                         </th>
 
-                                        <th>
-                                            {intl l="last order"}
+                                        <th class="object-title">
+                                            {admin_sortable_header
+                                                current_order=$customer_order
+                                                order='firstname'
+                                                reverse_order='firstname_reverse'
+                                                path={url path='/admin/customers'}
+                                                request_parameter_name='customer_order'
+                                                label="{intl l='First name'}"
+                                            }
                                         </th>
 
-                                        <th>{intl l='order amount'}</th>
+                                        <th class="object-title">
+                                            {admin_sortable_header
+                                                current_order=$customer_order
+                                                order='registration_date'
+                                                reverse_order='registration_date_reverse'
+                                                path={url path='/admin/customers'}
+                                                request_parameter_name='customer_order'
+                                                label="{intl l='Registration date'}"
+                                            }
+                                        </th>
 
+                                        <th class="object-title">{intl l='Date of last order'}</th>
+                                        <th class="object-title">{intl l='Last order amount'}</th>
+
+{* TODO
+                                        <th class="object-title">
+                                            {admin_sortable_header
+                                                current_order=$customer_order
+                                                order='last_order'
+                                                reverse_order='last_order_reverse'
+                                                path={url path='/admin/customers'}
+                                                request_parameter_name='customer_order'
+                                                label="{intl l='Date of last order'}"
+                                            }
+                                        </th>
+
+                                        <th class="object-title">
+                                            {admin_sortable_header
+                                                current_order=$customer_order
+                                                order='order_amount'
+                                                reverse_order='order_amount_reverse'
+                                                path={url path='/admin/customers'}
+                                                request_parameter_name='customer_order'
+                                                label="{intl l='Last order amount'}"
+                                            }
+                                        </th>
+*}
                                         <th class="actions">{intl l='Actions'}</th>
                                     </tr>
                                     </thead>
 
                                     <tbody>
-                                    {loop name="customer_list" type="customer" current="false" visible="*" backend_context="1" page={$customer_page} limit={$display_customer}}
+                                    {loop name="customer_list" type="customer" current="false" visible="*" order=$customer_order backend_context="1" page=$page limit=$display_customer}
                                         {assign "lastOrderDate" ''}
                                         {assign "lastOrderAmount" ''}
                                         {assign "lastOrderCurrency" ''}
@@ -75,13 +128,22 @@
                                         {/loop}
 
                                         <tr>
-                                            <td><a href="{url path="/admin/customer/update/{$ID}"}">{$REF}</a></td>
+                                            <td><a href="{url path="/admin/customer/update" customer_id=$ID page=$page}">{$REF}</a></td>
 
                                             <td class="object-title">
-                                                {$FIRSTNAME} {$LASTNAME}
+                                               {$LASTNAME}
                                             </td>
 
+                                            <td class="object-title">
+                                                {$FIRSTNAME}
+                                            </td>
+
+
                                             {module_include location='customer_list_row'}
+
+                                            <td>
+                                                {format_date date=$CREATE_DATE}
+                                            </td>
 
                                             <td>
                                                 {$lastOrderDate}
@@ -94,7 +156,7 @@
                                                 <div class="btn-group">
 
                                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.customer" access="UPDATE"}
-                                                        <a class="btn btn-default btn-xs" title="{intl l='Edit this customer'}" href="{url path="/admin/customer/update/{$ID}" }"><i class="glyphicon glyphicon-edit"></i></a>
+                                                        <a class="btn btn-default btn-xs" title="{intl l='Edit this customer'}" href="{url path='/admin/customer/update' customer_id=$ID page=$page}"><i class="glyphicon glyphicon-edit"></i></a>
                                                     {/loop}
                                                     {loop type="auth" name="can_send_mail" role="ADMIN" resource="admin.customer" access="VIEW"}
                                                         <a class="btn btn-default btn-xs" title="{intl l="Send a mail to this customer"}" href="mailto:{$EMAIL}"><span class="glyphicon glyphicon-envelope"></span></a>
@@ -111,10 +173,10 @@
                                     <tfoot>
                                         <tr>
                                             <td colspan="6">
-                                                
+
                                                 <div class="text-center">
                                                     <ul class="pagination pagination-centered">
-                                                        {if $customer_page != 1}
+                                                        {if $page != 1}
                                                             <li><a href="{url path="/admin/customers" page="1"}">&laquo;</a></li>
                                                         {else}
                                                             <li class="disabled"><a href="#">&laquo;</a></li>
@@ -137,7 +199,7 @@
                                                         {/if}
                                                     </ul>
                                                 </div>
-                                                
+
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -163,7 +225,7 @@
 
             {form_field form=$form field='success_url'}
                {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
-               <input type="hidden" name="{$name}" value="{url path='/admin/customer/update/_ID_'}" />
+               <input type="hidden" name="{$name}" value="{url path='/admin/customer/update' customer_id='_ID_'}" />
             {/form_field}
 
             {form_field form=$form field="password"}
@@ -283,7 +345,7 @@
     {* Delete confirmation dialog *}
 
     {capture "delete_customer_dialog"}
-        <input type="hidden" name="customer_page" value="{$customer_page}">
+        <input type="hidden" name="page" value="{$page}">
         <input type="hidden" name="customer_id" id="delete_customer_id">
     {/capture}
 

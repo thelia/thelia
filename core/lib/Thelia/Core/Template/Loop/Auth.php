@@ -61,6 +61,12 @@ class Auth extends BaseLoop implements ArraySearchLoopInterface
                 )
             ),
             new Argument(
+                'module',
+                new TypeCollection(
+                    new AlphaNumStringListType()
+                )
+            ),
+            new Argument(
                 'access',
                 new TypeCollection(
                     new EnumListType(array(AccessManager::VIEW, AccessManager::CREATE, AccessManager::UPDATE, AccessManager::DELETE))
@@ -79,10 +85,20 @@ class Auth extends BaseLoop implements ArraySearchLoopInterface
     {
         $roles = $this->getRole();
         $resource = $this->getResource();
+        $module = $this->getModule();
         $access = $this->getAccess();
 
+        if(null !== $module) {
+            $in = true;
+        }
+
         try {
-            if (true === $this->securityContext->isGranted($roles, $resource === null ? array() : $resource, $access === null ? array() : $access)) {
+            if (true === $this->securityContext->isGranted(
+                    $roles,
+                    $resource === null ? array() : $resource,
+                    $module === null ? array() : $module,
+                    $access === null ? array() : $access)
+            ) {
 
                 // Create an empty row: loop is no longer empty :)
                 $loopResult->addRow(new LoopResultRow());

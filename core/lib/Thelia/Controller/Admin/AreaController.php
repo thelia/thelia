@@ -231,7 +231,7 @@ class AreaController extends AbstractCrudController
     public function addCountry()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $areaCountryForm = new AreaCountryForm($this->getRequest());
         $error_msg = null;
@@ -273,7 +273,7 @@ class AreaController extends AbstractCrudController
     public function removeCountry()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
         $request = $this->getRequest();
         $removeCountryEvent = new AreaRemoveCountryEvent($request->request->get('areai_id', 0), $request->request->get('country_id', 0));
 
@@ -284,7 +284,7 @@ class AreaController extends AbstractCrudController
 
     public function updatePostageAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $areaUpdateForm = new AreaPostageForm($this->getRequest());
         $error_msg = null;

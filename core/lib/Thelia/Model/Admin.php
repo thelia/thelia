@@ -35,15 +35,24 @@ class Admin extends BaseAdmin implements UserInterface
             return AdminResources::SUPERADMINISTRATOR;
         }
 
-        $userPermissionsQuery = ProfileResourceQuery::create()
+        $userResourcePermissionsQuery = ProfileResourceQuery::create()
             ->joinResource("resource", Criteria::LEFT_JOIN)
             ->withColumn('resource.code', 'code')
             ->filterByProfileId($profileId)
             ->find();
 
+        $userModulePermissionsQuery = ProfileModuleQuery::create()
+            ->joinModule("module", Criteria::LEFT_JOIN)
+            ->withColumn('module.code', 'code')
+            ->filterByProfileId($profileId)
+            ->find();
+
         $userPermissions = array();
-        foreach($userPermissionsQuery as $userPermission) {
-            $userPermissions[$userPermission->getVirtualColumn('code')] = new AccessManager($userPermission->getAccess());
+        foreach($userResourcePermissionsQuery as $userResourcePermission) {
+            $userPermissions[$userResourcePermission->getVirtualColumn('code')] = new AccessManager($userResourcePermission->getAccess());
+        }
+        foreach($userModulePermissionsQuery as $userModulePermission) {
+            $userPermissions['module'][strtolower($userModulePermission->getVirtualColumn('code'))] = new AccessManager($userModulePermission->getAccess());
         }
 
         return $userPermissions;

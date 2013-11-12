@@ -4,23 +4,21 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
-
-
-
-
-
-
     <services>
 
         <!--  URL maganement -->
 
-
+        <!--  The assets manager -->
+        <service id="assetic.asset.manager" class="Thelia\Core\Template\Assets\AsseticAssetManager" >
+            <argument>%kernel.environment%</argument>
+        </service>
 
         <!-- Smarty parser plugins -->
 
-        <service id="smarty.plugin.assetic" class="Thelia\Core\Template\Smarty\Plugins\Assetic" >
+        <service id="smarty.plugin.assets" class="Thelia\Core\Template\Smarty\Plugins\Assets" >
             <tag name="thelia.parser.register_plugin"/>
-            <argument>%kernel.environment%</argument>
+
+            <argument type="service" id="assetic.asset.manager" />
         </service>
 
         <service id="smarty.plugin.theliasyntax" class="Thelia\Core\Template\Smarty\Plugins\TheliaSyntax" >
