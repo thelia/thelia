@@ -59,10 +59,8 @@ GNU General Public License : http://www.gnu.org/licenses/
 
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}
     <!--[if lt IE 9]>
-    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    {javascripts file='assets/js/libs/respond.min.js'}
-    <script src="{$asset_url}"></script>
-    {/javascripts}
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
 </head>
 
@@ -108,13 +106,13 @@ GNU General Public License : http://www.gnu.org/licenses/
                                 {form_field form=$form field="email"}
                                 <div class="form-group group-email">
                                     <label for="{$label_attr.for}-mini">{intl l="Email address"}</label>
-                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" aria-required="true" required>
+                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" aria-required="true" required>
                                 </div>
                                 {/form_field}
                                 {form_field form=$form field="password"}
                                 <div class="form-group group-password">
                                     <label for="{$label_attr.for}-mini">{intl l="Password"}</label>
-                                    <input type="password" name="{$name}" id="{$label_attr.for}-mini" class="form-control" aria-required="true" required>
+                                    <input type="password" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" aria-required="true" required>
                                 </div>
                                 {/form_field}
                                 {form_field form=$form field="account"}
@@ -342,7 +340,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                 {form_field form=$form field="email"}
                                 <div class="form-group">
                                     <label for="{$label_attr.for}-mini">{intl l="Email address"}</label>
-                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" placeholder="{intl l="Your email address"}" aria-describedby="newsletter-describe" {if $required} aria-required="true" required{/if} autocomplete="off">
+                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" placeholder="{intl l="Your email address"}" aria-describedby="newsletter-describe" {if $required} aria-required="true" required{/if} autocomplete="off">
                                 </div>
                                 {/form_field}
                                 <button type="submit" class="btn btn-subscribe">{intl l="Subscribe"}</button>
