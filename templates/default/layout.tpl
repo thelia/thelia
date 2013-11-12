@@ -1,3 +1,5 @@
+{* Declare assets directory, relative to template base directory *}
+{declare_assets directory='assets'}
 {block name="no-return-functions"}{/block}
 <!doctype html>
 <!--
@@ -42,7 +44,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     {block name="meta"}{/block}
 
     {* Stylesheets *}
-    {stylesheets file='assets/less/styles.less' filters='less,cssembed'}
+    {stylesheets file='assets/less/styles.less' filters='less'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 

@@ -39,7 +39,7 @@ class SmartyAssetsManager
     /**
      * Creates a new SmartyAssetsManager instance
      *
-     * @param string  $web_root                  the disk path to the web root
+     * @param string  $web_root                  the disk path to the web root (with final /)
      * @param string  $path_relative_to_web_root the path (relative to web root) where the assets will be generated
      * @param boolean $developmentMode           true / false. If true, assets are not cached, and always generated.
      */
@@ -51,6 +51,22 @@ class SmartyAssetsManager
         $this->developmentMode = $developmentMode;
 
         $this->assetic_manager = new AsseticHelper();
+    }
+
+    public function prepareAssets($assets_directory, \Smarty_Internal_Template $template) {
+
+        $tpl_dir = dirname($template->source->filepath);
+
+        $asset_dir_absolute_path = realpath($tpl_dir . DS . $assets_directory);
+
+        if ($asset_dir_absolute_path === false) throw new \Exception("Failed to get real path of '".$tpl_dir . DS . $assets_directory."'");
+
+        $modified = $this->assetic_manager->prepareAssets(
+                $asset_dir_absolute_path,
+                $this->web_root . $this->path_relative_to_web_root
+        );
+
+
     }
 
     public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template)
@@ -66,14 +82,24 @@ class SmartyAssetsManager
             $tpl_dir = dirname($tpl_path);
 
             // Create absolute dir path
-            $asset_dir  = realpath($tpl_dir.'/'.dirname($file));
+            $asset_dir  = realpath($tpl_dir) . DS . dirname($file);
             $asset_file = basename($file);
 
             if ($asset_dir === false) throw new \Exception("Failed to get real path of '".$tpl_dir.'/'.dirname($file)."'");
-
+/*
             $url = $this->assetic_manager->asseticize(
                     $asset_dir.'/'.$asset_file,
-                    $this->web_root."/".$this->path_relative_to_web_root,
+                    $this->web_root . DS . $this->path_relative_to_web_root,
+                    URL::getInstance()->absoluteUrl($this->path_relative_to_web_root, null, URL::PATH_TO_FILE),// PATH only
+                    $assetType,
+                    $filters,
+                    $debug,
+                    $this->developmentMode
+             );
+*/
+            $url = $this->assetic_manager->asseticize(
+                    $asset_dir . DS . $asset_file,
+                    $this->web_root . $this->path_relative_to_web_root,
                     URL::getInstance()->absoluteUrl($this->path_relative_to_web_root, null, URL::PATH_TO_FILE /* path only */),
                     $assetType,
                     $filters,
