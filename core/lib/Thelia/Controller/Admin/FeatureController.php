@@ -235,7 +235,7 @@ class FeatureController extends AbstractCrudController
     protected function addRemoveFromAllTemplates($eventType)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         try {
             if (null !== $object = $this->getExistingObject()) {

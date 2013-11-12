@@ -185,7 +185,7 @@ class CurrencyController extends AbstractCrudController
     public function updateRatesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         try {
             $this->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES);
@@ -203,7 +203,7 @@ class CurrencyController extends AbstractCrudController
     public function setDefaultAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $changeEvent = new CurrencyUpdateEvent($this->getRequest()->get('currency_id', 0));
 

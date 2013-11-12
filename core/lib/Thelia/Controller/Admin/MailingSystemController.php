@@ -36,7 +36,7 @@ class MailingSystemController extends BaseAdminController
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
 
         // Hydrate the form abd pass it to the parser
         $data = array(
@@ -64,7 +64,7 @@ class MailingSystemController extends BaseAdminController
     public function updateAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
 

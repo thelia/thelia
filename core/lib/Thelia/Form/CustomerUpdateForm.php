@@ -82,6 +82,21 @@ class CustomerUpdateForm extends BaseForm
                     "for" => "lastname"
                 )
             ))
+            ->add("email", "email", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Email address"),
+                "label_attr" => array(
+                    "for" => "email"
+                )
+            ))
+            ->add("password", "text", array(
+                "label" => Translator::getInstance()->trans("Password"),
+                "label_attr" => array(
+                    "for" => "email"
+                )
+            ))
             ->add("address1", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
@@ -89,7 +104,7 @@ class CustomerUpdateForm extends BaseForm
                 "label_attr" => array(
                     "for" => "address"
                 ),
-                "label" => Translator::getInstance()->trans("Street Address")
+                "label" => Translator::getInstance()->trans("Street Address ")
             ))
             ->add("address2", "text", array(
                 "label" => Translator::getInstance()->trans("Address Line 2"),

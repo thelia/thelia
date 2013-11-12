@@ -4,8 +4,11 @@
     {check_auth role="ADMIN" resource="{block name="check-resource"}{/block}" access="{block name="check-access"}{/block}" login_tpl="/admin/login"}
 {/block}
 
-{* -- Define some stuff for Smarty ----------------------------------------- *}
+{* -- Define some stuff for Smarty ------------------------------------------ *}
 {config_load file='variables.conf'}
+
+{* -- Declare assets directory, relative to template base directory --------- *}
+{declare_assets directory='assets'}
 
 <!DOCTYPE html>
 <html lang="{$lang_code}">
@@ -22,7 +25,7 @@
 
     {block name="before-bootstrap-css"}{/block}
 
-	{stylesheets file='assets/less/*' filters='less,cssembed'}
+	{stylesheets file='assets/less/main.less' filters='less'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 

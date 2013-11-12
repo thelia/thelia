@@ -186,7 +186,7 @@ class ConfigController extends AbstractCrudController
     public function changeValuesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $variables = $this->getRequest()->get('variable', array());
 

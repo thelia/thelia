@@ -47,7 +47,7 @@ class OrderController extends BaseAdminController
 {
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::VIEW)) return $response;
         return $this->render("orders", array("display_order" => 20));
     }
 
@@ -60,7 +60,7 @@ class OrderController extends BaseAdminController
 
     public function updateStatus($order_id = null)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
 
         $message = null;
 
@@ -111,7 +111,7 @@ class OrderController extends BaseAdminController
 
     public function updateDeliveryRef($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
 
         $message = null;
 
@@ -146,7 +146,7 @@ class OrderController extends BaseAdminController
 
     public function updateAddress($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
 
         $message = null;
 
@@ -202,14 +202,14 @@ class OrderController extends BaseAdminController
 
     public function generateInvoicePdf($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
 
         return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
     }
 
     public function generateDeliveryPdf($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
 
         return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
     }

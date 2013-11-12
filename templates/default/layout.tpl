@@ -1,3 +1,5 @@
+{* Declare assets directory, relative to template base directory *}
+{declare_assets directory='assets'}
 {block name="no-return-functions"}{/block}
 {assign var="company_name" value="{config key="company_name"}"}
 {if not $company_name}
@@ -47,7 +49,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     {/block}
 
     {* Stylesheets *}
-    {stylesheets file='assets/less/styles.less' filters='less,cssembed'}
+    {stylesheets file='assets/less/styles.less' filters='less'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 

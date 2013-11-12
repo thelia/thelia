@@ -27,18 +27,29 @@ use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
 use Thelia\Model\ConfigQuery;
+use Thelia\Core\Template\Assets\AssetManagerInterface;
 
-class Assetic extends AbstractSmartyPlugin
+class Assets extends AbstractSmartyPlugin
 {
     public $assetManager;
 
-    public function __construct($developmentMode)
+    public function __construct(AssetManagerInterface $assetsManager)
     {
-        $web_root  = THELIA_WEB_DIR;
+        $asset_dir_from_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
 
-        $asset_dir_from_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets/');
+        $this->assetManager = new SmartyAssetsManager($assetsManager, THELIA_WEB_DIR, $asset_dir_from_web_root);
+    }
 
-        $this->assetManager = new SmartyAssetsManager($web_root, $asset_dir_from_web_root, $developmentMode == 'dev');
+    public function declareAssets($params, \Smarty_Internal_Template $template)
+    {
+        if (false !== $asset_dir = $this->getParam($params, 'directory', false)) {
+
+            $this->assetManager->prepareAssets($asset_dir, $template);
+
+            return '';
+        }
+
+        throw new \InvalidArgumentException('declare_assets: parameter "directory" is required');
     }
 
     public function blockJavascripts($params, $content, \Smarty_Internal_Template $template, &$repeat)
@@ -79,10 +90,11 @@ class Assetic extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor('block'   , 'stylesheets', $this, 'blockStylesheets'),
-            new SmartyPluginDescriptor('block'   , 'javascripts', $this, 'blockJavascripts'),
-            new SmartyPluginDescriptor('block'   , 'images'     , $this, 'blockImages'),
-            new SmartyPluginDescriptor('function', 'image'      , $this, 'functionImage')
+            new SmartyPluginDescriptor('block'   , 'stylesheets'    , $this, 'blockStylesheets'),
+            new SmartyPluginDescriptor('block'   , 'javascripts'    , $this, 'blockJavascripts'),
+            new SmartyPluginDescriptor('block'   , 'images'         , $this, 'blockImages'),
+            new SmartyPluginDescriptor('function', 'image'          , $this, 'functionImage'),
+            new SmartyPluginDescriptor('function', 'declare_assets' , $this, 'declareAssets')
         );
     }
 }
