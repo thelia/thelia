@@ -27,16 +27,17 @@ use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
 use Thelia\Model\ConfigQuery;
+use Thelia\Core\Template\Assets\AssetManagerInterface;
 
-class Assetic extends AbstractSmartyPlugin
+class Assets extends AbstractSmartyPlugin
 {
     public $assetManager;
 
-    public function __construct($developmentMode)
+    public function __construct(AssetManagerInterface $assetsManager)
     {
         $asset_dir_from_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
 
-        $this->assetManager = new SmartyAssetsManager(THELIA_WEB_DIR, $asset_dir_from_web_root, $developmentMode == 'dev');
+        $this->assetManager = new SmartyAssetsManager($assetsManager, THELIA_WEB_DIR, $asset_dir_from_web_root);
     }
 
     public function declareAssets($params, \Smarty_Internal_Template $template)

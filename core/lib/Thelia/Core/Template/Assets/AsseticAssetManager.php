@@ -38,9 +38,16 @@ use Symfony\Component\Filesystem\Exception\IOException;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class AsseticHelper
+class AsseticAssetManager implements AssetManagerInterface
 {
+    protected $developmentMode;
+
     protected $source_file_extensions = array('less', 'js', 'coffee', 'html', 'tpl', 'htm', 'xml');
+
+    public function __construct($developmentMode)
+    {
+        $this->developmentMode = $developmentMode;
+    }
 
     /**
      * Create a stamp form the modification time of the content of the given directory and all of its subdirectories
@@ -175,7 +182,7 @@ class AsseticHelper
 
             $fs = new Filesystem();
 
-            //FIXME: lock the stuff ?
+            // FIXME: locking or not locking ?
 /*
             $lock_file = "$web_assets_directory_base/assets-".md5($source_assets_directory)."-generation-lock.txt";
 
@@ -286,11 +293,10 @@ class AsseticHelper
      * @param  array                     $filters     a list of filters, as defined below (see switch($filter_name) ...)
      *
      * @param  boolean                   $debug       true / false
-     * @param  boolean                   $dev_mode    true / false. If true, assets are not cached and always compiled.
      * @throws \InvalidArgumentException if an invalid filter name is found
      * @return string                    The URL to the generated asset file.
      */
-    public function asseticize($asset_path, $web_assets_directory_base, $output_url, $asset_type, $filters, $debug, $dev_mode = false)
+    public function processAsset($asset_path, $web_assets_directory_base, $output_url, $asset_type, $filters, $debug)
     {
         $asset_name = basename($asset_path);
         $input_directory = realpath(dirname($asset_path));
@@ -330,7 +336,7 @@ class AsseticHelper
         Tlog::getInstance()->addDebug("Asset destination name: ", $asset_destination_path);
 
         // We generate an asset only if it does not exists, or if the asset processing is forced in development mode
-        if (! file_exists($asset_destination_path) || ($dev_mode && ConfigQuery::read('process_assets', true)) ) {
+        if (! file_exists($asset_destination_path) || ($this->developmentMode && ConfigQuery::read('process_assets', true)) ) {
 
             $writer = new AssetWriter($output_directory);
 
