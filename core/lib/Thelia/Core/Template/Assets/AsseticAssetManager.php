@@ -89,7 +89,7 @@ class AsseticAssetManager implements AssetManagerInterface
      */
     protected function copyAssets(Filesystem $fs, $from_directory, $to_directory)
     {
-        Tlog::getInstance()->addDebug("Copying assets from ", $from_directory, " to ", $to_directory);
+        Tlog::getInstance()->addDebug("Copying assets from $from_directory to $to_directory");
 
         $iterator = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($from_directory, \RecursiveDirectoryIterator::SKIP_DOTS),
@@ -333,7 +333,7 @@ class AsseticAssetManager implements AssetManagerInterface
         // This is the final name of the generated asset
         $asset_destination_path = $output_directory . DS . $asset_target_filename;
 
-        Tlog::getInstance()->addDebug("Asset destination name: ", $asset_destination_path);
+        Tlog::getInstance()->addDebug("Asset destination full path: $asset_destination_path");
 
         // We generate an asset only if it does not exists, or if the asset processing is forced in development mode
         if (! file_exists($asset_destination_path) || ($this->developmentMode && ConfigQuery::read('process_assets', true)) ) {
