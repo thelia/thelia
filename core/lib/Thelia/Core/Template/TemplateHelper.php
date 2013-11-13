@@ -78,7 +78,7 @@ class TemplateHelper
             $baseDir = THELIA_TEMPLATE_DIR.TemplateDefinition::PDF_SUBDIR;
         }
         else {
-            $baseDir = THELIA_TEMPLATE_DIR;
+            $baseDir = THELIA_TEMPLATE_DIR.TemplateDefinition::FRONT_OFFICE_SUBDIR;
 
             $exclude = array(TemplateDefinition::BACK_OFFICE_SUBDIR, TemplateDefinition::PDF_SUBDIR);
         }
