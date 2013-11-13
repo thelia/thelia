@@ -22,7 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template;
-use Thelia\Model\ConfigQuery;
 
 class TemplateDefinition
 {
@@ -30,7 +29,8 @@ class TemplateDefinition
     const BACK_OFFICE = 2;
     const PDF = 3;
 
-    const BACK_OFFICE_SUBDIR = 'admin/';
+    const FRONT_OFFICE_SUBDIR = 'frontOffice/';
+    const BACK_OFFICE_SUBDIR = 'backOffice/';
     const PDF_SUBDIR = 'pdf/';
 
     /**
@@ -58,6 +58,8 @@ class TemplateDefinition
             $this->path = self::BACK_OFFICE_SUBDIR . $name;
         else if ($type == self::PDF)
             $this->path = self::PDF_SUBDIR . $name;
+        else if ($type == self::FRONT_OFFICE)
+            $this->path = self::FRONT_OFFICE_SUBDIR . $name;
         else
             $this->path = $name;
     }
