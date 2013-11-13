@@ -63,6 +63,14 @@ class CheckPermission extends BaseInstall
         'upload_max_filesize' => 2097152
     );
 
+    protected $extensions = array(
+        'curl',
+        'gd',
+        'intl',
+        'mcrypt',
+        'pdo_mysql',
+    );
+
     protected $validationMessages = array();
 
     /** @var bool If permissions are OK */
@@ -103,6 +111,14 @@ class CheckPermission extends BaseInstall
             );
         }
 
+        foreach ($this->extensions as $extension) {
+            $this->validationMessages[$extension] = array(
+                'text' => '',
+                'hint' => $this->getI18nExtensionHint(),
+                'status' => true,
+            );
+        }
+
         parent::__construct($verifyInstall);
     }
 
@@ -136,6 +152,15 @@ class CheckPermission extends BaseInstall
                 $this->isValid = false;
                 $this->validationMessages[$key]['status'] = false;
                 $this->validationMessages[$key]['text'] = $this->getI18nConfigText($key, $this->formatBytes($value), ini_get($key), false);;
+            }
+        }
+
+        foreach ($this->extensions as $extension) {
+            $this->validationMessages[$extension]['text'] = $this->getI18nExtensionText($extension, true);
+            if (false === extension_loaded($extension)) {
+                $this->isValid = false;
+                $this->validationMessages[$extension]['status'] = false;
+                $this->validationMessages[$extension]['text'] = $this->getI18nExtensionText($extension, false);
             }
         }
 
@@ -176,7 +201,6 @@ class CheckPermission extends BaseInstall
     }
 
 
-
     /**
      * Get Translated text about the directory state
      *
@@ -198,14 +222,26 @@ class CheckPermission extends BaseInstall
                 $sentence,
                 array(
                     '%directory%' => $directory
-                ),
-                'install-wizard'
+                )
             );
         } else {
             $translatedText = sprintf('Your directory %s needs to be writable', $directory);
         }
 
         return $translatedText;
+    }
+
+    protected function getI18nExtensionText($extension, $isValid)
+    {
+        if ($isValid) {
+            $sentence = '%extension% is loaded';
+        } else {
+            $sentence = '%extension% is not loaded';
+        }
+
+        return $this->translator->trans($sentence, array(
+            '%extension' => $extension
+        ));
     }
 
     /**
@@ -266,6 +302,11 @@ class CheckPermission extends BaseInstall
         return $translatedText;
     }
 
+    protected function getI18nExtensionHint()
+    {
+        return $this->translator->trans('This extension must be installed and loaded');
+    }
+
     /**
      * Get Translated hint about the config requirement issue
      *
@@ -275,9 +316,7 @@ class CheckPermission extends BaseInstall
     {
         $sentence = 'Modifying this value on your server php.ini file with admin rights could help';
         $translatedText = $this->translator->trans(
-            $sentence,
-            array(),
-            'install-wizard'
+            $sentence
         );
 
         return $translatedText;
@@ -306,8 +345,7 @@ class CheckPermission extends BaseInstall
                 array(
                     '%expectedValue%' => $expectedValue,
                     '%currentValue%' => $currentValue,
-                ),
-                'install-wizard'
+                )
             );
         } else {
             $translatedText = sprintf('Thelia needs at least PHP %s (%s currently)', $expectedValue, $currentValue);
@@ -326,8 +364,7 @@ class CheckPermission extends BaseInstall
         $sentence = 'Upgrading your version of PHP with admin rights could help';
         $translatedText = $this->translator->trans(
             $sentence,
-            array(),
-            'install-wizard'
+            array()
         );
 
         return $translatedText;
