@@ -10,7 +10,7 @@
 
         <!--  The assets manager -->
         <service id="assetic.asset.manager" class="Thelia\Core\Template\Assets\AsseticAssetManager" >
-            <argument>%kernel.environment%</argument>
+            <argument>%kernel.debug%</argument>
         </service>
 
         <!-- Smarty parser plugins -->

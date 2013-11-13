@@ -45,10 +45,6 @@ class TranslationsController extends BaseAdminController
         // Find modules
         $modules = ModuleQuery::create()->joinI18n($this->getCurrentEditionLocale())->orderByPosition()->find();
 
-        TemplateHelper::getInstance()->getList(TemplateDefinition::BACK_OFFICE);
-        TemplateHelper::getInstance()->getList(TemplateDefinition::PDF);
-        TemplateHelper::getInstance()->getList(TemplateDefinition::FRONT_OFFICE);
-
         // Get related strings, if all input data are here
         $item_to_translate = $this->getRequest()->get('item_to_translate');
 
