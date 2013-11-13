@@ -234,13 +234,13 @@ class CheckPermission extends BaseInstall
     protected function getI18nExtensionText($extension, $isValid)
     {
         if ($isValid) {
-            $sentence = '%extension% is loaded';
+            $sentence = '%extension% php extension is loaded';
         } else {
-            $sentence = '%extension% is not loaded';
+            $sentence = '%extension% php extension is not loaded';
         }
 
         return $this->translator->trans($sentence, array(
-            '%extension' => $extension
+            '%extension%' => $extension
         ));
     }
 
