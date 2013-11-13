@@ -13,6 +13,7 @@ use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Template\TemplateHelper;
 
@@ -23,12 +24,14 @@ use Thelia\Core\Template\TemplateHelper;
  */
 class SmartyParser extends Smarty implements ParserInterface
 {
-
     public $plugins = array();
 
     protected $request;
     protected $dispatcher;
     protected $parserContext;
+
+    protected $backOfficeTemplateDirectories = array();
+    protected $frontOfficeTemplateDirectories = array();
 
     protected $template = "";
 
@@ -101,15 +104,59 @@ class SmartyParser extends Smarty implements ParserInterface
         }
     }
 
-    public function setTemplate($template_path_from_template_base)
+    public function addBackOfficeTemplateDirectory($templateName, $templateDirectory, $key)
     {
-        $this->template = $template_path_from_template_base;
+        $this->backOfficeTemplateDirectories[$templateName][$key] = $templateDirectory;
+    }
 
-        $this->addTemplateDir(THELIA_TEMPLATE_DIR.$this->template, 0);
+    public function addFrontOfficeTemplateDirectory($templateName, $templateDirectory, $key)
+    {
+        $this->frontOfficeTemplateDirectories[$templateName][$key] = $templateDirectory;
+    }
 
-        $config_dir = THELIA_TEMPLATE_DIR.$this->template.'/configs';
+    /**
+     * @param TemplateDefinition $templateDefinition
+     */
+    public function setTemplate(TemplateDefinition $templateDefinition)
+    {
+        $this->template = $templateDefinition->getPath();
 
-        $this->setConfigDir($config_dir);
+        /* init template directories */
+        $this->setTemplateDir(array());
+
+        /* add main template directory */
+        $this->addTemplateDir(THELIA_TEMPLATE_DIR . $this->template, 0);
+
+        /* define config directory */
+        $configDirectory = THELIA_TEMPLATE_DIR . $this->template . '/configs';
+        $this->setConfigDir($configDirectory);
+
+        /* add modules template directories */
+        switch($templateDefinition->getType()) {
+            case TemplateDefinition::FRONT_OFFICE:
+                /* do not pass array directly to addTemplateDir since we cant control on keys */
+                if(isset($this->frontOfficeTemplateDirectories[$templateDefinition->getName()])) {
+                    foreach($this->frontOfficeTemplateDirectories[$templateDefinition->getName()] as $key => $directory) {
+                        $this->addTemplateDir($directory, $key);
+                    }
+                }
+                break;
+
+            case TemplateDefinition::BACK_OFFICE:
+                /* do not pass array directly to addTemplateDir since we cant control on keys */
+                if(isset($this->backOfficeTemplateDirectories[$templateDefinition->getName()])) {
+                    foreach($this->backOfficeTemplateDirectories[$templateDefinition->getName()] as $key => $directory) {
+                        $this->addTemplateDir($directory, $key);
+                    }
+                }
+                break;
+
+            case TemplateDefinition::PDF:
+                break;
+
+            default:
+                break;
+        }
     }
 
     public function getTemplate()

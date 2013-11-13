@@ -78,7 +78,7 @@ class ViewListener implements EventSubscriberInterface
     {
 
         $parser = $this->container->get('thelia.parser');
-        $parser->setTemplate(TemplateHelper::getInstance()->getActiveFrontTemplate()->getPath());
+        $parser->setTemplate(TemplateHelper::getInstance()->getActiveFrontTemplate());
         $request = $this->container->get('request');
 
         try {

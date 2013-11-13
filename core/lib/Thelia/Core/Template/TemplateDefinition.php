@@ -54,14 +54,20 @@ class TemplateDefinition
         $this->name = $name;
         $this->type = $type;
 
-        if ($type == self::BACK_OFFICE)
-            $this->path = self::BACK_OFFICE_SUBDIR . $name;
-        else if ($type == self::PDF)
-            $this->path = self::PDF_SUBDIR . $name;
-        else if ($type == self::FRONT_OFFICE)
-            $this->path = self::FRONT_OFFICE_SUBDIR . $name;
-        else
-            $this->path = $name;
+        switch($type) {
+            case TemplateDefinition::FRONT_OFFICE:
+                $this->path = self::FRONT_OFFICE_SUBDIR . $name;
+                break;
+            case TemplateDefinition::BACK_OFFICE:
+                $this->path = self::BACK_OFFICE_SUBDIR . $name;
+                break;
+            case TemplateDefinition::PDF:
+                $this->path = self::PDF_SUBDIR . $name;
+                break;
+            default:
+                $this->path = $name;
+                break;
+        }
     }
 
     public function getName()
