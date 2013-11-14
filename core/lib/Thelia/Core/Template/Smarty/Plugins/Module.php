@@ -44,9 +44,15 @@ class Module extends AbstractSmartyPlugin
 
         if (false !== $location = $this->getParam($params, 'location', false)) {
 
+            $moduleLimit = $this->getParam($params, 'module', null);
+
             $modules = ModuleQuery::getActivated();
 
             foreach ($modules as $module) {
+
+                if(null !== $moduleLimit && $moduleLimit != $module->getCode()) {
+                    continue;
+                }
 
                 $file = sprintf("%s/%s/AdminIncludes/%s.html", THELIA_MODULE_DIR, $module->getBaseDir(), $location);
 
