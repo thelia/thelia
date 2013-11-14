@@ -35,7 +35,8 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
     protected $dispatcher;
 
     protected $prices = array(
-        "1" => array( // area 1 : France
+        // area 1 : France
+        "1" => array(
             "slices" => array( // max_weight => price
                 '0.25'    => 5.23,
                 '0.5'     => 5.8,
@@ -50,7 +51,89 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
                 '30'      => 26.93,
             ),
         ),
-        "6" => array( // area 10 : France OM1
+        /*
+         * area 2 : A Zone
+         * Union Européenne et Suisse
+        */
+        "2" => array(
+            "slices" => array( // max_weight => price
+                '1'       => 15.34,
+                '2'       => 16.96,
+                '3'       => 20.47,
+                '4'       => 23.99,
+                '5'       => 27.50,
+                '6'       => 31.02,
+                '7'       => 34.53,
+                '8'       => 38.05,
+                '9'       => 41.56,
+                '10'      => 45.08,
+                '15'      => 51.92,
+                '20'      => 58.76,
+                '25'      => 65.60,
+                '30'      => 72.44,
+            ),
+        ),
+        /*
+         * area 3 : B Zone
+         * Pays de l’Europe de l’Est (hors Union Européenne), Norvège, Maghreb
+        */
+        "3" => array(
+            "slices" => array( // max_weight => price
+                '1'       => 18.81,
+                '2'       => 20.62,
+                '3'       => 24.94,
+                '4'       => 29.26,
+                '5'       => 33.58,
+                '6'       => 37.91,
+                '7'       => 42.23,
+                '8'       => 46.55,
+                '9'       => 50.87,
+                '10'      => 55.20,
+                '15'      => 65.08,
+                '20'      => 74.96,
+            ),
+        ),
+        /*
+         * area 4 : C Zone
+         * Pays d’Afrique hors Maghreb, Canada, Etats-Unis, Proche et Moyen Orient
+        */
+        "4" => array(
+            "slices" => array( // max_weight => price
+                '1'       => 22.04,
+                '2'       => 29.55,
+                '3'       => 38.86,
+                '4'       => 48.17,
+                '5'       => 57.48,
+                '6'       => 66.79,
+                '7'       => 76.10,
+                '8'       => 85.41,
+                '9'       => 94.72,
+                '10'      => 104.03,
+                '15'      => 126.92,
+                '20'      => 149.82,
+            ),
+        ),
+        /*
+         * area 5 : D Zone
+         * Autres destinations
+        */
+        "5" => array(
+            "slices" => array( // max_weight => price
+                '1'       => 25.08,
+                '2'       => 37.72,
+                '3'       => 50.26,
+                '4'       => 62.80,
+                '5'       => 75.34,
+                '6'       => 87.88,
+                '7'       => 100.42,
+                '8'       => 112.96,
+                '9'       => 125.50,
+                '10'      => 138.04,
+                '15'      => 162.74,
+                '20'      => 187.44,
+            ),
+        ),
+        "6" => array( // area 6 : France OM1
             "slices" => array( // max_weight => price
                 '0.5'     => 8.27,
                 '1'       => 12.49,
@@ -69,7 +152,7 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
                 '30'      => 144.73,
             ),
         ),
-        "7" => array( // area 10 : France OM2
+        "7" => array( // area 7 : France OM2
             "slices" => array( // max_weight => price
                 '0.5'     => 9.88,
                 '1'       => 14.92,

@@ -227,7 +227,7 @@ INSERT INTO `country` (`id`, `area_id`, `isocode`, `isoalpha2`, `isoalpha3`, `by
 (125, 4, '562', 'NE', 'NER', 0, 0, NOW(), NOW()),
 (126, 4, '566', 'NG', 'NGA', 0, 0, NOW(), NOW()),
 (127, NULL, '570', 'NU', 'NIU', 0, 0, NOW(), NOW()),
-(128, 2, '578', 'NO', 'NOR', 0, 0, NOW(), NOW()),
+(128, 3, '578', 'NO', 'NOR', 0, 0, NOW(), NOW()),
 (129, 5, '554', 'NZ', 'NZL', 0, 0, NOW(), NOW()),
 (130, 4, '512', 'OM', 'OMN', 0, 0, NOW(), NOW()),
 (131, 4, '800', 'UG', 'UGA', 0, 0, NOW(), NOW()),
