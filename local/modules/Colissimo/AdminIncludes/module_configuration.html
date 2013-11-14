@@ -7,14 +7,16 @@
 
         <div class="alert alert-danger">
             <p>{intl l="Prices are not dynamically editable yet."}</p>
-            <p>{intl l="Prices below can be edited in Colissmo module code."}</p>
+            <p>{intl l="Prices below can be edited in local/modules/Colissimo/Config/prices.json file."}</p>
         </div>
 
         <div class="general-block-decorator">
+
+            {loop type="area" name="list area" backend_context=true}
             <div class="table-responsive">
                 <table class="table table-striped table-condensed table-left-aligned">
                     <caption class="clearfix">
-                        {intl l="Collismo prices"}
+                        {intl l="Area : "}{$NAME}
                         {loop type="auth" name="can_create" role="ADMIN" module="colissimo" access="CREATE"}
                             <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new price slice'}" href="#price_slice_create_dialog" data-toggle="modal">
                                 <span class="glyphicon glyphicon-plus"></span>
@@ -29,10 +31,10 @@
                     </tr>
                     </thead>
                     <tbody>
-
+                        {loop type="colissimo" name="colissimo" area=$ID}
                         <tr>
-                            <td></td>
-                            <td></td>
+                            <td>{$MAX_WEIGHT}</td>
+                            <td>{$PRICE}</td>
                             <td>
                                 <div class="btn-group">
                                     {loop type="auth" name="can_change" role="ADMIN" module="colissimo" access="UPDATE"}
@@ -41,10 +43,12 @@
                                 </div>
                             </td>
                         </tr>
-
+                        {/loop}
                     </tbody>
                 </table>
             </div>
+            {/loop}
+
         </div>
 
     </div>
@@ -70,7 +74,7 @@
 
     dialog_id    = "price_slice_delete_dialog"
     dialog_title = {intl l="Delete a price slice"}
-    dialog_body  = "Not available yet."
+    dialog_message  = "Not available yet."
 
     dialog_ok_label     = {intl l="Delete"}
     dialog_cancel_label = {intl l="Cancel"}

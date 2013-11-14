@@ -39,7 +39,7 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
 
     const JSON_PRICE_RESOURCE = "prices.json";
 
-    public function getPrices()
+    public static function getPrices()
     {
         if(null === self::$prices) {
             self::$prices = json_decode(file_get_contents(sprintf('%s/Config/%s', __DIR__, self::JSON_PRICE_RESOURCE)), true);
@@ -55,9 +55,9 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
      * @return mixed
      * @throws \Thelia\Exception\OrderException
      */
-    public function getPostageAmount($areaId, $weight)
+    public static function getPostageAmount($areaId, $weight)
     {
-        $prices = $this->getPrices();
+        $prices = self::getPrices();
 
         /* check if Colissimo delivers the asked area */
         if(!isset($prices[$areaId]) || !isset($prices[$areaId]["slices"])) {
@@ -119,7 +119,7 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
     {
         $cartWeight = $this->getContainer()->get('request')->getSession()->getCart()->getWeight();
 
-        $postage = $this->getPostageAmount(
+        $postage = self::getPostageAmount(
             $country->getAreaId(),
             $cartWeight
         );
