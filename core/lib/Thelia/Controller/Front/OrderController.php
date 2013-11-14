@@ -84,8 +84,7 @@ class OrderController extends BaseFrontController
             }
 
             /* get postage amount */
-            $moduleReflection = new \ReflectionClass($deliveryModule->getFullNamespace());
-            $moduleInstance = $moduleReflection->newInstance();
+            $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
             $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
 
             $orderEvent = $this->getOrderEvent();

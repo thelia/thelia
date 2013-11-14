@@ -424,7 +424,7 @@ try {
             $stock->setQuantity($faker->randomNumber(1,50));
             $stock->setPromo($faker->randomNumber(0,1));
             $stock->setNewness($faker->randomNumber(0,1));
-            $stock->setWeight($faker->randomFloat(2, 100,10000));
+            $stock->setWeight($faker->randomFloat(2, 1, 5));
             $stock->setIsDefault($i == 0);
             $stock->setEanCode(substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 13));
             $stock->save();

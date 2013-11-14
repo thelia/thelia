@@ -112,4 +112,18 @@ class Cart extends BaseCart
 
         return $total;
     }
+
+    public function getWeight()
+    {
+        $weight = 0;
+
+        foreach($this->getCartItems() as $cartItem) {
+            $itemWeight = $cartItem->getProductSaleElements()->getWeight();
+            $itemWeight *= $cartItem->getQuantity();
+
+            $weight += $itemWeight;
+        }
+
+        return $weight;
+    }
 }

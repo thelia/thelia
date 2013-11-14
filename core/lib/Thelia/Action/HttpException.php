@@ -56,7 +56,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         $parser = $this->container->get("thelia.parser");
 
         // Define the template thant shoud be used
-        $parser->setTemplate(TemplateHelper::getInstance()->getActiveFrontTemplate()->getPath());
+        $parser->setTemplate(TemplateHelper::getInstance()->getActiveFrontTemplate());
 
         //$event->getRequest()->attributes->set('_view', ConfigQuery::getPageNotFoundView());
 

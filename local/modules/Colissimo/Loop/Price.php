@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -21,62 +21,68 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Smarty\Plugins;
+namespace Colissimo\Loop;
 
-use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
-use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
-use Thelia\Model\ModuleQuery;
+use Colissimo\Colissimo;
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
+use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
 
-class Module extends AbstractSmartyPlugin
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Core\Template\Loop\Argument\Argument;
+
+/**
+ *
+ * Price loop
+ *
+ *
+ * Class Price
+ * @package Colissimo\Loop
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ */
+class Price extends BaseLoop implements ArraySearchLoopInterface
 {
+    /* set countable to false since we need to preserve keys */
+    protected $countable = false;
+
     /**
-     * Process theliaModule template inclusion function
-     *
-     * @param  unknown $params
-     * @param \Smarty_Internal_Template $template
-     * @internal param \Thelia\Core\Template\Smarty\Plugins\unknown $smarty
-     *
-     * @return string
+     * @return ArgumentCollection
      */
-    public function theliaModule($params, \Smarty_Internal_Template $template)
+    protected function getArgDefinitions()
     {
-        $content = null;
-
-        if (false !== $location = $this->getParam($params, 'location', false)) {
-
-            $moduleLimit = $this->getParam($params, 'module', null);
-
-            $modules = ModuleQuery::getActivated();
-
-            foreach ($modules as $module) {
-
-                if(null !== $moduleLimit && $moduleLimit != $module->getCode()) {
-                    continue;
-                }
-
-                $file = sprintf("%s/%s/AdminIncludes/%s.html", THELIA_MODULE_DIR, $module->getBaseDir(), $location);
-
-                if (file_exists($file)) {
-                    $content .= file_get_contents($file);
-                }
-            }
-        }
-
-        if (! empty($content))
-            return $template->fetch(sprintf("string:%s", $content));
-
-        return "";
+        return new ArgumentCollection(
+            Argument::createIntTypeArgument('area', null, true)
+        );
     }
 
-    /**
-     * Define the various smarty plugins hendled by this class
-     *
-     * @return an array of smarty plugin descriptors
-     */
-    public function getPluginDescriptors()
+    public function buildArray()
     {
-        return array(
-            new SmartyPluginDescriptor('function', 'module_include', $this, 'theliaModule'),
-        );
+        $area = $this->getArea();
+
+        $prices = Colissimo::getPrices();
+
+        if(!isset($prices[$area]) || !isset($prices[$area]["slices"])) {
+            return array();
+        }
+
+        $areaPrices = $prices[$area]["slices"];
+        ksort($areaPrices);
+
+        return $areaPrices;
+    }
+
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $maxWeight => $price) {
+            $loopResultRow = new LoopResultRow();
+            $loopResultRow->set("MAX_WEIGHT", $maxWeight)
+                ->set("PRICE", $price);
+
+            $loopResult->addRow($loopResultRow);
+        }
+
+        return $loopResult;
+
     }
 }
