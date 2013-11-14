@@ -34,6 +34,62 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
     protected $request;
     protected $dispatcher;
 
+    protected $prices = array(
+        "1" => array( // area 1 : France
+            "slices" => array( // max_weight => price
+                '0.25'    => 5.23,
+                '0.5'     => 5.8,
+                '0.75'    => 6.56,
+                '1'       => 7.13,
+                '2'       => 8.08,
+                '3'       => 9.22,
+                '5'       => 11.31,
+                '7'       => 13.40,
+                '10'      => 16.53,
+                '15'      => 19.14,
+                '30'      => 26.93,
+            ),
+        ),
+        "6" => array( // area 10 : France OM1
+            "slices" => array( // max_weight => price
+                '0.5'     => 8.27,
+                '1'       => 12.49,
+                '2'       => 17.05,
+                '3'       => 21.61,
+                '4'       => 26.17,
+                '5'       => 30.73,
+                '6'       => 35.29,
+                '7'       => 39.85,
+                '8'       => 44.41,
+                '9'       => 48.97,
+                '10'      => 53.53,
+                '15'      => 76.33,
+                '20'      => 99.13,
+                '25'      => 121.93,
+                '30'      => 144.73,
+            ),
+        ),
+        "7" => array( // area 10 : France OM2
+            "slices" => array( // max_weight => price
+                '0.5'     => 9.88,
+                '1'       => 14.92,
+                '2'       => 26.32,
+                '3'       => 37.72,
+                '4'       => 49.12,
+                '5'       => 60.52,
+                '6'       => 71.92,
+                '7'       => 83.32,
+                '8'       => 94.72,
+                '9'       => 106.12,
+                '10'      => 117.52,
+                '15'      => 174.52,
+                '20'      => 231.52,
+                '25'      => 288.52,
+                '30'      => 345.52,
+            ),
+        ),
+    );
+
     public function setRequest(Request $request)
     {
         $this->request = $request;

@@ -43,7 +43,7 @@
 
 
                             {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
-                                <a class="btn btn-primary btn-xs" title="{intl l='Configure this module'}" href="{url path="/admin/module/update/$CODE"}">{intl l="Configure"}</a>
+                                <a class="btn btn-primary btn-xs" title="{intl l='Configure this module'}" href="{url path="/admin/module/$CODE"}">{intl l="Configure"}</a>
                             {/loop}
 
                             {*loop type="auth" name="can_change" role="ADMIN" resource="admin.modules" access="VIEW"}
