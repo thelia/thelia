@@ -62,7 +62,11 @@ class ProductTest extends BaseLoopTestor
             $product->save();
         }
 
-        $this->baseTestSearchById($product->getId());
+        $otherParameters = array(
+            "visible" => "*",
+        );
+
+        $this->baseTestSearchById($product->getId(), $otherParameters);
     }
 
     public function testSearchLimit()

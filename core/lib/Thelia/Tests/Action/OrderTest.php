@@ -24,6 +24,7 @@
 namespace Thelia\Tests\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -249,6 +250,10 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         if (null === $paymentModule) {
             throw new \Exception('No Payment Module fixture found');
         }
+
+        /* define payment module in container */
+        $paymentModuleClass = $paymentModule->getFullNamespace();
+        $this->container->set(sprintf('module.%s', $paymentModule->getCode()), new $paymentModuleClass());
 
         $this->orderEvent->getOrder()->chosenDeliveryAddress = $validDeliveryAddress->getId();
         $this->orderEvent->getOrder()->chosenInvoiceAddress = $validInvoiceAddress->getId();

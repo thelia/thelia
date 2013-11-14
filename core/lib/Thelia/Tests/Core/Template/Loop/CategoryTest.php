@@ -61,7 +61,11 @@ class CategoryTest extends BaseLoopTestor
             $category->save();
         }
 
-        $this->baseTestSearchById($category->getId());
+        $otherParameters = array(
+            "visible" => "*",
+        );
+
+        $this->baseTestSearchById($category->getId(), $otherParameters);
     }
 
     public function testSearchLimit()
