@@ -25,8 +25,10 @@ namespace Thelia\Core\Template\Loop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Exception\OrderException;
 use Thelia\Model\CountryQuery;
 use Thelia\Module\BaseModule;
+use Thelia\Module\DeliveryModuleInterface;
 
 /**
  * Class Delivery
@@ -63,14 +65,24 @@ class Delivery extends BaseSpecificModule
         foreach ($loopResult->getResultDataCollection() as $deliveryModule) {
             $loopResultRow = new LoopResultRow($deliveryModule);
 
-            $moduleReflection = new \ReflectionClass($deliveryModule->getFullNamespace());
-            if ($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
+            $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
+
+            if (false === $moduleInstance instanceof DeliveryModuleInterface) {
                 throw new \RuntimeException(sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $deliveryModule->getCode()));
             }
-            $moduleInstance = $moduleReflection->newInstance();
 
-            $moduleInstance->setRequest($this->request);
-            $moduleInstance->setDispatcher($this->dispatcher);
+            try {
+                $postage = $moduleInstance->getPostage($country);
+            } catch(OrderException $e) {
+                switch($e->getCode()) {
+                    case OrderException::DELIVERY_MODULE_UNAVAILABLE:
+                        /* do not show this delivery module */
+                        continue(2);
+                        break;
+                    default:
+                        throw $e;
+                }
+            }
 
             $loopResultRow
                 ->set('ID', $deliveryModule->getId())
@@ -78,7 +90,7 @@ class Delivery extends BaseSpecificModule
                 ->set('CHAPO', $deliveryModule->getVirtualColumn('i18n_CHAPO'))
                 ->set('DESCRIPTION', $deliveryModule->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set('POSTSCRIPTUM', $deliveryModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set('POSTAGE', $moduleInstance->getPostage($country))
+                ->set('POSTAGE', $postage)
             ;
 
             $loopResult->addRow($loopResultRow);

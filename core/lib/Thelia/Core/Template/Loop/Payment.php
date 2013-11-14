@@ -26,6 +26,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Module\BaseModule;
+use Thelia\Module\PaymentModuleInterface;
 
 /**
  * Class Payment
@@ -47,14 +48,11 @@ class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $paymentModule) {
             $loopResultRow = new LoopResultRow($paymentModule);
 
-            $moduleReflection = new \ReflectionClass($paymentModule->getFullNamespace());
-            if ($moduleReflection->isSubclassOf("Thelia\Module\PaymentModuleInterface") === false) {
+            $moduleInstance = $this->container->get(sprintf('module.%s', $paymentModule->getCode()));
+
+            if (false === $moduleInstance instanceof PaymentModuleInterface) {
                 throw new \RuntimeException(sprintf("payment module %s is not a Thelia\Module\PaymentModuleInterface", $paymentModule->getCode()));
             }
-            $moduleInstance = $moduleReflection->newInstance();
-
-            $moduleInstance->setRequest($this->request);
-            $moduleInstance->setDispatcher($this->dispatcher);
 
             $loopResultRow
                 ->set('ID', $paymentModule->getId())

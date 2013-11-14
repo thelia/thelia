@@ -279,12 +279,13 @@ class Order extends BaseAction implements EventSubscriberInterface
         $this->getDispatcher()->dispatch(TheliaEvents::CART_CLEAR, new CartEvent($this->getCart($this->getRequest())));
 
         /* call pay method */
-        $paymentModuleReflection = new \ReflectionClass($paymentModule->getFullNamespace());
+        /*$paymentModuleReflection = new \ReflectionClass($paymentModule->getFullNamespace());
         $paymentModuleInstance = $paymentModuleReflection->newInstance();
 
         $paymentModuleInstance->setRequest($this->getRequest());
-        $paymentModuleInstance->setDispatcher($this->getDispatcher());
+        $paymentModuleInstance->setDispatcher($this->getDispatcher());*/
 
+        $paymentModuleInstance = $this->container->get(sprintf('module.%s', $paymentModule->getCode()));
         $paymentModuleInstance->pay($placedOrder);
     }
 

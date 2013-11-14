@@ -35,6 +35,7 @@ namespace Thelia\Core;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -134,7 +135,7 @@ class Thelia extends Kernel
 
                     $defintion = new Definition();
                     $defintion->setClass($module->getFullNamespace());
-                    $defintion->addMethodCall("setContainer", array('service_container'));
+                    $defintion->addMethodCall("setContainer", array(new Reference('service_container')));
 
                     $container->setDefinition(
                         "module.".$module->getCode(),
