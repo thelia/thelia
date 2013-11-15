@@ -21,71 +21,53 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Front;
-
-use Thelia\Core\Event\Newsletter\NewsletterEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Form\NewsletterForm;
+namespace Front\Controller;
+use Thelia\Controller\Front\BaseFrontController;
+use Thelia\Form\ContactForm;
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Model\ConfigQuery;
 
 /**
- * Class NewsletterController
+ * Class ContactController
  * @package Thelia\Controller\Front
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class NewsletterController extends BaseFrontController
+class ContactController extends BaseFrontController
 {
-
-    public function subscribeAction()
+    /**
+     * send contact message
+     */
+    public function sendAction()
     {
         $error_message = false;
-        $newsletterForm = new NewsletterForm($this->getRequest());
+        $contactForm = new ContactForm($this->getRequest());
 
         try {
+            $form = $this->validateForm($contactForm);
 
-            $form = $this->validateForm($newsletterForm);
+            $message = \Swift_Message::newInstance($form->get('subject')->getData())
+                ->addFrom($form->get('email')->getData(), $form->get('name')->getData())
+                ->addTo(ConfigQuery::read('contact_email'), ConfigQuery::read('company_name'))
+                ->setBody($form->get('message')->getData())
+            ;
 
-            $event = new NewsletterEvent(
-                $form->get('email')->getData(),
-                $this->getRequest()->getSession()->getLang()->getLocale()
-            );
+            $this->getMailer()->send($message);
 
-            if (null !== $customer = $this->getSecurityContext()->getCustomerUser()) {
-                $event->setFirstname($customer->getFirstname());
-                $event->setLastname($customer->getLastname());
-            }
-
-            $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $event);
-
-        } catch (\Exception $e) {
+        } catch (FormValidationException $e) {
             $error_message = $e->getMessage();
         }
 
-        \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during newsletter subscription : %s', $error_message));
+        if ($error_message !== false) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during sending contact mail : %s', $error_message));
 
-        // If Ajax Request
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            if ($error_message) {
-                $response = $this->jsonResponse(json_encode(array(
-                            "success" => false,
-                            "message" => $error_message
-                        )));
-            } else {
-                $response = $this->jsonResponse(json_encode(array(
-                            "success" => true,
-                            "message" => "Thanks for signing up! We'll keep you posted whenever we have any new updates."
-                        )));;
-            }
-
-            return $response;
-
-        } else {
-            $newsletterForm->setErrorMessage($error_message);
+            $contactForm->setErrorMessage($error_message);
 
             $this->getParserContext()
-                ->addForm($newsletterForm)
+                ->addForm($contactForm)
                 ->setGeneralError($error_message)
             ;
+        } else {
+            $this->redirectToRoute('contact.success');
         }
-
     }
 }
