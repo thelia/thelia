@@ -41,10 +41,11 @@
 
 
 
-
-                            {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
-                                <a class="btn btn-primary btn-xs" title="{intl l='Configure this module'}" href="{url path="/admin/module/$CODE"}">{intl l="Configure"}</a>
-                            {/loop}
+                            {if $CONFIGURABLE == 1}
+                                {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
+                                    <a class="btn btn-primary btn-xs" title="{intl l='Configure this module'}" href="{url path="/admin/module/$CODE"}">{intl l="Configure"}</a>
+                                {/loop}
+                            {/if}
 
                             {*loop type="auth" name="can_change" role="ADMIN" resource="admin.modules" access="VIEW"}
                                 <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"><span class="glyphicon glyphicon-book"></span></a>
