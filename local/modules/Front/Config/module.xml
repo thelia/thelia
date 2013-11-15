@@ -16,5 +16,5 @@
     </author>
     <type>classic</type>
     <thelia>2.0.0</thelia>
-    <stability>dev</stability>
+    <stability>alpha</stability>
 </module>
