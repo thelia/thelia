@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -149,13 +150,19 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("POSITION", $module->getPosition());
 
             $hasConfigurationInterface = false;
-            $routerId = "router." . $module->getBaseDir();
+
             /* first test if module defines it's own config route */
+            $routerId = "router." . $module->getBaseDir();
             if($this->container->has($routerId)) {
-                if($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
-                    $hasConfigurationInterface = true;
+                try {
+                    if($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
+                        $hasConfigurationInterface = true;
+                    }
+                } catch(ResourceNotFoundException $e) {
+                    /* $hasConfigurationInterface stays false */
                 }
             }
+
             /* if not ; test if it uses admin inclusion : module_configuration.html */
             if(false === $hasConfigurationInterface) {
                 if(file_exists( sprintf("%s/%s/AdminIncludes/%s.html", THELIA_MODULE_DIR, $module->getBaseDir(), "module_configuration"))) {
