@@ -169,7 +169,7 @@ class Thelia extends Kernel
                                     'addFrontOfficeTemplateDirectory',
                                     array(
                                         $moduleFrontOfficeTemplateContent->getFilename(),
-                                        $frontOfficeModuleTemplateDirectory,
+                                        $moduleFrontOfficeTemplateContent->getPathName(),
                                         $code,
                                     )
                                 );
@@ -194,7 +194,7 @@ class Thelia extends Kernel
                                     'addBackOfficeTemplateDirectory',
                                     array(
                                         $moduleBackOfficeTemplateContent->getFilename(),
-                                        $backOfficeModuleTemplateDirectory,
+                                        $moduleBackOfficeTemplateContent->getPathName(),
                                         $code,
                                     )
                                 );
