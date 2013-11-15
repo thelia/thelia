@@ -148,6 +148,23 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("CLASS", $module->getFullNamespace())
                 ->set("POSITION", $module->getPosition());
 
+            $hasConfigurationInterface = false;
+            $routerId = "router." . $module->getBaseDir();
+            /* first test if module defines it's own config route */
+            if($this->container->has($routerId)) {
+                if($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
+                    $hasConfigurationInterface = true;
+                }
+            }
+            /* if not ; test if it uses admin inclusion : module_configuration.html */
+            if(false === $hasConfigurationInterface) {
+                if(file_exists( sprintf("%s/%s/AdminIncludes/%s.html", THELIA_MODULE_DIR, $module->getBaseDir(), "module_configuration"))) {
+                    $hasConfigurationInterface = true;
+                }
+            }
+
+            $loopResultRow->set("CONFIGURABLE", $hasConfigurationInterface ? 1 : 0);
+
             if (null !== $this->getProfile()) {
                 $accessValue = $module->getVirtualColumn('access');
                 $manager = new AccessManager($accessValue);
