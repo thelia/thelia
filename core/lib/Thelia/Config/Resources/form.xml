@@ -16,9 +16,6 @@
         <form name="thelia.front.contact" class="Thelia\Form\ContactForm"/>
         <form name="thelia.front.newsletter" class="Thelia\Form\NewsletterForm"/>
 
-        <!--  Forms for Admin -->
-        <form name="thelia.install.step3" class="Thelia\Form\InstallStep3Form"/>
-
         <form name="thelia.admin.login" class="Thelia\Form\AdminLogin"/>
 
         <form name="thelia.admin.customer.create" class="Thelia\Form\CustomerCreateForm"/>
