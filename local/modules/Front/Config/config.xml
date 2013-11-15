@@ -10,9 +10,17 @@
         -->
     </forms>
 
-    <!--
-    <services>
 
+    <services>
+        <service id="router.front" class="%router.class%">
+            <argument type="service" id="router.module.xmlLoader"/>
+            <argument>Front/Config/front.xml</argument>
+            <argument type="collection">
+                <argument key="cache_dir">%kernel.cache_dir%</argument>
+                <argument key="debug">%kernel.debug%</argument>
+            </argument>
+            <argument type="service" id="request.context"/>
+            <tag name="router.register" priority="128"/>
+        </service>
     </services>
-    -->
 </config>
