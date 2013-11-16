@@ -29,6 +29,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -49,9 +50,11 @@ use Thelia\Model\TaxRuleCountryQuery;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class TaxRuleCountry extends BaseI18nLoop
+class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $taxCountForOriginCountry;
+
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -71,12 +74,7 @@ class TaxRuleCountry extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = TaxRuleCountryQuery::create();
 
@@ -86,9 +84,9 @@ class TaxRuleCountry extends BaseI18nLoop
         $taxRule = $this->getTax_rule();
 
         if ($ask === 'countries') {
-            $taxCountForOriginCountry = TaxRuleCountryQuery::create()->filterByCountryId($country)->count();
+            $this->taxCountForOriginCountry = TaxRuleCountryQuery::create()->filterByCountryId($country)->count();
 
-            if ($taxCountForOriginCountry > 0) {
+            if ($this->taxCountForOriginCountry > 0) {
                 $search->groupByCountryId();
 
                 $originalCountryJoin = new Join();
@@ -101,7 +99,7 @@ class TaxRuleCountry extends BaseI18nLoop
                 $search->addJoinObject($originalCountryJoin, 's_to_o');
                 $search->where('`origin`.`COUNTRY_ID`' . Criteria::EQUAL . '?', $country, \PDO::PARAM_INT);
 
-                $search->having('COUNT(*)=?', $taxCountForOriginCountry, \PDO::PARAM_INT);
+                $search->having('COUNT(*)=?', $this->taxCountForOriginCountry, \PDO::PARAM_INT);
 
                 $search->filterByTaxRuleId($taxRule);
 
@@ -142,17 +140,17 @@ class TaxRuleCountry extends BaseI18nLoop
             $search->orderByPosition(Criteria::ASC);
         }
 
-        /* perform search */
-        $taxRuleCountries = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($taxRuleCountries);
+    }
 
-        foreach ($taxRuleCountries as $taxRuleCountry) {
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $taxRuleCountry) {
+            $loopResultRow = new LoopResultRow($taxRuleCountry);
 
-            $loopResultRow = new LoopResultRow($loopResult, $taxRuleCountry, $this->versionable, $this->timestampable, $this->countable);
-
-            if ($ask === 'countries') {
-                if ($taxCountForOriginCountry > 0) {
+            if ($this->getAsk() === 'countries') {
+                if ($this->taxCountForOriginCountry > 0) {
                     $loopResultRow
                         ->set("COUNTRY"             , $taxRuleCountry->getCountryId())
                         ->set("COUNTRY_TITLE"               , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_TITLE'))
@@ -167,7 +165,7 @@ class TaxRuleCountry extends BaseI18nLoop
                         ->set("COUNTRY_DESCRIPTION"         , $taxRuleCountry->getVirtualColumn('i18n_DESCRIPTION'))
                         ->set("COUNTRY_POSTSCRIPTUM"         , $taxRuleCountry->getVirtualColumn('i18n_POSTSCRIPTUM'));
                 }
-            } elseif ($ask === 'taxes') {
+            } elseif ($this->getAsk() === 'taxes') {
                 $loopResultRow
                     ->set("TAX_RULE"            , $taxRuleCountry->getTaxRuleId())
                     ->set("COUNTRY"             , $taxRuleCountry->getCountryId())
@@ -182,5 +180,6 @@ class TaxRuleCountry extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

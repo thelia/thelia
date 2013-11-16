@@ -180,8 +180,8 @@ class Install extends ContainerAwareCommand
     {
         $fs = new Filesystem();
 
-        $sampleConfigFile = THELIA_ROOT . "/local/config/database.yml.sample";
-        $configFile = THELIA_ROOT . "/local/config/database.yml";
+        $sampleConfigFile = THELIA_CONF_DIR . "database.yml.sample";
+        $configFile = THELIA_CONF_DIR . "database.yml";
 
         $fs->copy($sampleConfigFile, $configFile, true);
 
@@ -257,7 +257,7 @@ class Install extends ContainerAwareCommand
             function ($answer) {
                 $answer = trim($answer);
                 if (is_null($answer)) {
-                    throw new \RuntimeException("You must specify database host");
+                    throw new \RuntimeException("You must specify a database host");
                 }
 
                 return $answer;
@@ -266,12 +266,12 @@ class Install extends ContainerAwareCommand
 
         $connectionInfo["dbName"] = $dialog->askAndValidate(
             $output,
-            $this->decorateInfo("Database Name (if database does not exists, Thelia will try to create it) : "),
+            $this->decorateInfo("Database name (if database does not exist, Thelia will try to create it) : "),
             function ($answer) {
                 $answer = trim($answer);
 
                 if (is_null($answer)) {
-                    throw new \RuntimeException("You must specify database name");
+                    throw new \RuntimeException("You must specify a database name");
                 }
 
                 return $answer;
@@ -280,12 +280,12 @@ class Install extends ContainerAwareCommand
 
         $connectionInfo["username"] = $dialog->askAndValidate(
             $output,
-            $this->decorateInfo("Databse username : "),
+            $this->decorateInfo("Database username : "),
             function ($answer) {
                 $answer = trim($answer);
 
                 if (is_null($answer)) {
-                    throw new \RuntimeException("You must sprcify database username");
+                    throw new \RuntimeException("You must specify a database username");
                 }
 
                 return $answer;

@@ -32,7 +32,7 @@ class AdminLogsController extends BaseAdminController
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
 
         // Render the edition template.
         return $this->render('admin-logs');

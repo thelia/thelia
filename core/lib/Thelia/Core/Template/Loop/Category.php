@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -61,10 +62,10 @@ use Thelia\Model\ProductQuery;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Category extends BaseI18nLoop
+class Category extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
-    public $versionable = true;
+    protected $timestampable = true;
+    protected $versionable = true;
 
     /**
      * @return ArgumentCollection
@@ -90,17 +91,12 @@ class Category extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = CategoryQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -184,16 +180,16 @@ class Category extends BaseI18nLoop
             }
         }
 
-        /* perform search */
-        $categories = $this->search($search, $pagination);
-
         /* @todo */
         $notEmpty  = $this->getNot_empty();
 
-        $loopResult = new LoopResult($categories);
+        return $search;
 
-        foreach ($categories as $category) {
+    }
 
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $category) {
             // Find previous and next category
             $previous = CategoryQuery::create()
                 ->filterByParent($category->getParent())
@@ -214,18 +210,18 @@ class Category extends BaseI18nLoop
              * if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
              */
 
-            $loopResultRow = new LoopResultRow($loopResult, $category, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow = new LoopResultRow($category);
 
             $loopResultRow
                 ->set("ID", $category->getId())
                 ->set("IS_TRANSLATED",$category->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("TITLE", $category->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $category->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("PARENT", $category->getParent())
-                ->set("URL", $category->getUrl($locale))
+                ->set("URL", $category->getUrl($this->locale))
                 ->set("PRODUCT_COUNT", $category->countAllProducts())
                 ->set("CHILD_COUNT", $category->countChild())
                 ->set("VISIBLE", $category->getVisible() ? "1" : "0")
@@ -236,11 +232,12 @@ class Category extends BaseI18nLoop
 
                 ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
                 ->set("NEXT"    , $next != null ? $next->getId() : -1)
-                ;
+            ;
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
+
     }
 }

@@ -43,6 +43,7 @@ use Symfony\Component\Routing\Router;
 use Thelia\Model\Admin;
 use Thelia\Core\Security\Token\CookieTokenProvider;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Core\Template\TemplateHelper;
 
 class BaseAdminController extends BaseController
 {
@@ -117,17 +118,18 @@ class BaseAdminController extends BaseController
      * Check current admin user authorisations. An ADMIN role is assumed.
      *
      * @param mixed $resources a single resource or an array of resources.
+     * @param mixed $modules   a single module or an array of modules.
      * @param mixed $accesses  a single access or an array of accesses.
      *
      * @return mixed null if authorization is granted, or a Response object which contains the error page otherwise
-     *
      */
-    protected function checkAuth($resources, $accesses)
+    protected function checkAuth($resources, $modules, $accesses)
     {
         $resources = is_array($resources) ? $resources : array($resources);
+        $modules = is_array($modules) ? $modules : array($modules);
         $accesses = is_array($accesses) ? $accesses : array($accesses);
 
-         if ($this->getSecurityContext()->isGranted(array("ADMIN"), $resources, $accesses)) {
+         if ($this->getSecurityContext()->isGranted(array("ADMIN"), $resources, $modules, $accesses)) {
              // Okay !
              return null;
          }
@@ -198,8 +200,8 @@ class BaseAdminController extends BaseController
     {
         $parser = $this->container->get("thelia.parser");
 
-        // Define the template thant shoud be used
-        $parser->setTemplate($template ?: ConfigQuery::read('base-admin-template', 'admin/default'));
+        // Define the template that should be used
+        $parser->setTemplate($template ?: TemplateHelper::getInstance()->getActiveAdminTemplate());
 
         return $parser;
     }

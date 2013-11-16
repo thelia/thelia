@@ -24,8 +24,13 @@ namespace Thelia\Controller\Front;
 
 use Symfony\Component\Routing\Router;
 use Thelia\Controller\BaseController;
+use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Security\Exception\AuthenticationException;
+use Thelia\Core\Template\TemplateHelper;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
+use Thelia\Tools\Redirect;
 use Thelia\Tools\URL;
 
 class BaseFrontController extends BaseController
@@ -56,7 +61,7 @@ class BaseFrontController extends BaseController
     public function checkAuth()
     {
         if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirectToRoute('default', array('view'=>'login'));
+            $this->redirectToRoute('customer.login.process');
         }
     }
 
@@ -82,5 +87,64 @@ class BaseFrontController extends BaseController
         if (null === $order || null === $order->chosenInvoiceAddress || null === $order->getPaymentModuleId() || null === AddressQuery::create()->findPk($order->chosenInvoiceAddress) || null === ModuleQuery::create()->findPk($order->getPaymentModuleId())) {
             $this->redirectToRoute("order.invoice");
         }
+    }
+
+    /**
+     * @return ParserInterface instance parser
+     */
+    protected function getParser($template = null)
+    {
+        $parser = $this->container->get("thelia.parser");
+
+        // Define the template that should be used
+        $parser->setTemplate($template ?: TemplateHelper::getInstance()->getActiveFrontTemplate());
+
+        return $parser;
+    }
+
+    /**
+     * Render the given template, and returns the result as an Http Response.
+     *
+     * @param $templateName the complete template name, with extension
+     * @param  array                                      $args   the template arguments
+     * @param  int                                        $status http code status
+     * @return \Thelia\Core\HttpFoundation\Response
+     */
+    protected function render($templateName, $args = array(), $status = 200)
+    {
+        return Response::create($this->renderRaw($templateName, $args), $status);
+    }
+
+    /**
+     * Render the given template, and returns the result as a string.
+     *
+     * @param $templateName the complete template name, with extension
+     * @param array $args        the template arguments
+     * @param null  $templateDir
+     *
+     * @return string
+     */
+    protected function renderRaw($templateName, $args = array(), $templateDir = null)
+    {
+
+        // Add the template standard extension
+        $templateName .= '.html';
+
+        $session = $this->getSession();
+
+        // Prepare common template variables
+        $args = array_merge($args, array(
+                'locale'               => $session->getLang()->getLocale(),
+                'lang_code'            => $session->getLang()->getCode(),
+                'lang_id'              => $session->getLang()->getId(),
+                'current_url'          => $this->getRequest()->getUri()
+            ));
+
+        // Render the template.
+
+        $data = $this->getParser($templateDir)->render($templateName, $args);
+
+        return $data;
+
     }
 }

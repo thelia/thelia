@@ -28,10 +28,13 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\LangQuery;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Type\TypeCollection;
+use Thelia\Type;
 
 /**
  * Language loop, to get a list of available languages
@@ -43,9 +46,9 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Lang extends BaseLoop
+class Lang extends BaseLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -55,16 +58,18 @@ class Lang extends BaseLoop
         return new ArgumentCollection(
             Argument::createIntTypeArgument('id', null),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createBooleanTypeArgument('default_only', false)
+            Argument::createBooleanTypeArgument('default_only', false),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse', 'position', 'position_reverse'))
+                ),
+                'position'
+            )
         );
      }
 
-    /**
-     * @param $pagination (ignored)
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $id      = $this->getId();
         $exclude = $this->getExclude();
@@ -83,14 +88,39 @@ class Lang extends BaseLoop
         }
 
         $search->orderByPosition(Criteria::ASC);
+        $orders  = $this->getOrder();
 
-        $results = $this->search($search, $pagination);
+        foreach ($orders as $order) {
+            switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
+                case "alpha":
+                    $search->orderByTitle(Criteria::ASC);
+                    break;
+                case "alpha_reverse":
+                    $search->orderByTitle(Criteria::DESC);
+                    break;
+                case "position":
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "position_reverse":
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+            }
+        }
 
-        $loopResult = new LoopResult($results);
+        return $search;
 
-        foreach ($results as $result) {
+    }
 
-            $loopResultRow = new LoopResultRow($loopResult, $result, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $result) {
+            $loopResultRow = new LoopResultRow($result);
 
             $loopResultRow
                 ->set("ID", $result->getId())
@@ -108,5 +138,6 @@ class Lang extends BaseLoop
         }
 
         return $loopResult;
+
     }
 }

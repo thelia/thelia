@@ -23,13 +23,13 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Tools\DateTimeFormat;
 
 /**
  *
@@ -37,7 +37,7 @@ use Thelia\Tools\DateTimeFormat;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Feed extends BaseLoop
+class Feed extends BaseLoop  implements ArraySearchLoopInterface
 {
     public function getArgDefinitions()
     {
@@ -47,12 +47,7 @@ class Feed extends BaseLoop
         );
     }
 
-    /**
-     *
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildArray()
     {
         $cachedir = THELIA_ROOT . 'cache/feeds';
 
@@ -72,26 +67,15 @@ class Feed extends BaseLoop
 
         $items = $feed->get_items();
 
-        $limit = min(count($items), $this->getLimit());
+        return $items;
 
-        $indexes = array();
-        for ($idx = 0; $idx < $limit; $idx++) {
-            $indexes[] = $idx;
-        }
+    }
 
-        $loopResult = new LoopResult($indexes);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $item) {
 
-        foreach ($indexes as $idx) {
-
-            $item = $items[$idx];
-
-            $link = $item->get_permalink();
-
-            $title = $item->get_title();
-            $author = $item->get_author();
-            $description = $item->get_description();
-
-            $loopResultRow = new LoopResultRow($loopResult, null, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow = new LoopResultRow();
 
             $loopResultRow
                 ->set("URL"         , $item->get_permalink())

@@ -42,7 +42,7 @@ class AddressController extends AbstractCrudController
     public function __construct()
     {
         parent::__construct(
-            'address',
+            'registration_date',
             null,
             null,
 
@@ -50,16 +50,13 @@ class AddressController extends AbstractCrudController
 
             TheliaEvents::ADDRESS_CREATE,
             TheliaEvents::ADDRESS_UPDATE,
-            TheliaEvents::ADDRESS_DELETE,
-            null,
-            null
-
+            TheliaEvents::ADDRESS_DELETE
         );
     }
 
     public function useAddressAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $address_id = $this->getRequest()->request->get('address_id');
 
@@ -79,7 +76,7 @@ class AddressController extends AbstractCrudController
             \Thelia\Log\Tlog::getInstance()->error(sprintf("error during address setting as default with message %s", $e->getMessage()));
         }
 
-        $this->redirectToRoute('admin.customer.update.view', array(), array('customer_id' => $address->getCustomerId()));
+        $this->redirectToEditionTemplate();
     }
 
     /**
@@ -99,13 +96,14 @@ class AddressController extends AbstractCrudController
     }
 
     /**
-     * Hydrate the update form for this object, before passing it to the update template
+     * Fills in the form data array
      *
-     * @param \Thelia\Model\Address $object
+     * @param unknown $object
+     * @return multitype:NULL
      */
-    protected function hydrateObjectForm($object)
+    protected function createFormDataArray($object)
     {
-        $data = array(
+        return array(
             "label" => $object->getLabel(),
             "title" => $object->getTitleId(),
             "firstname" => $object->getFirstname(),
@@ -120,8 +118,16 @@ class AddressController extends AbstractCrudController
             "phone" => $object->getPhone(),
             "company" => $object->getCompany()
         );
+    }
 
-        return new AddressUpdateForm($this->getRequest(), "form", $data);
+    /**
+     * Hydrate the update form for this object, before passing it to the update template
+     *
+     * @param \Thelia\Model\Address $object
+     */
+    protected function hydrateObjectForm($object)
+    {
+        return new AddressUpdateForm($this->getRequest(), "form", $this->createFormDataArray($object));
     }
 
     /**
@@ -240,7 +246,8 @@ class AddressController extends AbstractCrudController
      */
     protected function renderListTemplate($currentOrder)
     {
-        // TODO: Implement renderListTemplate() method.
+        // We render here the customer edit template.
+        return $this->renderEditionTemplate();
     }
 
     /**
@@ -248,9 +255,10 @@ class AddressController extends AbstractCrudController
      */
     protected function renderEditionTemplate()
     {
-        return $this->render('ajax/address-update-modal', array(
-            "address_id" => $this->getRequest()->get('address_id'),
-            "customer_id" => $this->getExistingObject()->getCustomerId()
+        return $this->render('customer-edit', array(
+            "address_id"  => $this->getRequest()->get('address_id'),
+            "page"        => $this->getRequest()->get('page'),
+            "customer_id" => $this->getCustomerId()
         ));
     }
 
@@ -259,8 +267,11 @@ class AddressController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        $address = $this->getExistingObject();
-        $this->redirectToRoute('admin.customer.update.view', array(), array('customer_id' => $address->getCustomerId()));
+        // We display here the custromer edition template
+        $this->redirectToRoute('admin.customer.update.view', array(
+            "page"        => $this->getRequest()->get('page'),
+            "customer_id" => $this->getCustomerId()
+        ));
     }
 
     /**
@@ -279,8 +290,7 @@ class AddressController extends AbstractCrudController
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
-        $address = $deleteEvent->getAddress();
-        $this->redirectToRoute('admin.customer.update.view', array(), array('customer_id' => $address->getCustomerId()));
+        $this->redirectToEditionTemplate();
     }
 
     /**
@@ -297,5 +307,12 @@ class AddressController extends AbstractCrudController
     protected function performAdditionalUpdateAction($event)
     {
         $this->redirectToEditionTemplate();
+    }
+
+    protected function getCustomerId() {
+        if (null !== $address = $this->getExistingObject())
+            return $address->getCustomerId();
+        else
+            return $this->getRequest()->get('customer_id', 0);
     }
 }

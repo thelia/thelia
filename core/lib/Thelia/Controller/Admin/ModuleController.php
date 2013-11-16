@@ -23,12 +23,15 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Security\Resource\AdminResources;
 
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Form\ModuleModificationForm;
+use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
 
 /**
@@ -36,28 +39,176 @@ use Thelia\Module\ModuleManagement;
  * @package Thelia\Controller\Admin
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ModuleController extends BaseAdminController
+class ModuleController extends AbstractCrudController
 {
+    public function __construct()
+    {
+        parent::__construct(
+            'module',
+            null,
+            null,
+
+            AdminResources::MODULE,
+
+            null,
+            TheliaEvents::MODULE_UPDATE,
+            null
+        );
+    }
+
+    protected function getCreationForm()
+    {
+        return null;
+    }
+
+    protected function getUpdateForm()
+    {
+        return new ModuleModificationForm($this->getRequest());
+    }
+
+    protected function getCreationEvent($formData)
+    {
+        return null;
+    }
+
+    protected function getUpdateEvent($formData)
+    {
+        $event = new ModuleEvent();
+
+        $event->setLocale($formData['locale']);
+        $event->setId($formData['id']);
+        $event->setTitle($formData['title']);
+        $event->setChapo($formData['chapo']);
+        $event->setDescription($formData['description']);
+        $event->setPostscriptum($formData['postscriptum']);
+
+        return $event;
+    }
+
+    protected function getDeleteEvent()
+    {
+        return null;
+    }
+
+    protected function eventContainsObject($event)
+    {
+        return $event->hasModule();
+    }
+
+    protected function hydrateObjectForm($object)
+    {
+        $object->setLocale($this->getCurrentEditionLocale());
+        $data = array(
+            'id'           => $object->getId(),
+            'locale'       => $object->getLocale(),
+            'title'        => $object->getTitle(),
+            'chapo'        => $object->getChapo(),
+            'description'  => $object->getDescription(),
+            'postscriptum' => $object->getPostscriptum(),
+        );
+
+        // Setup the object form
+        return new ModuleModificationForm($this->getRequest(), "form", $data);
+    }
+
+    protected function getObjectFromEvent($event)
+    {
+        return $event->hasModule() ? $event->getModule() : null;
+    }
+
+    protected function getExistingObject()
+    {
+        return ModuleQuery::create()
+            ->joinWithI18n($this->getCurrentEditionLocale())
+            ->findOneById($this->getRequest()->get('module_id'));
+    }
+
+
+    protected function getObjectLabel($object)
+    {
+        return $object->getTitle();
+    }
+
+    protected function getObjectId($object)
+    {
+        return $object->getId();
+    }
+
+    protected function getViewArguments()
+    {
+        return array();
+    }
+
+    protected function getRouteArguments($module_id = null)
+    {
+        return array(
+            'module_id' => $module_id === null ? $this->getRequest()->get('module_id') : $module_id,
+        );
+    }
+
+    protected function renderListTemplate($currentOrder)
+    {
+        // We always return to the feature edition form
+        return $this->render(
+            'modules',
+            array()
+        );
+    }
+
+    protected function renderEditionTemplate()
+    {
+        // We always return to the feature edition form
+        return $this->render('module-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
+    }
+
+    protected function redirectToEditionTemplate($request = null, $country = null)
+    {
+        // We always return to the module edition form
+        $this->redirectToRoute(
+            "admin.module.update",
+            $this->getViewArguments(),
+            $this->getRouteArguments()
+        );
+    }
+
+    protected function redirectToListTemplate()
+    {
+        $this->redirectToRoute(
+            "admin.module"
+        );
+    }
+
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::VIEW)) return $response;
 
-        $modulemanagement = new ModuleManagement();
-        $modulemanagement->updateModules();
+        $moduleManagement = new ModuleManagement();
+        $moduleManagement->updateModules();
 
         return $this->render("modules");
     }
 
-    public function updateAction($module_id)
+    public function configureAction($module_code)
     {
-        return $this->render("module-edit", array(
-            "module_id" => $module_id
-        ));
+        $module = ModuleQuery::create()->findOneByCode($module_code);
+
+        if(null === $module) {
+            throw new \InvalidArgumentException(sprintf("Module `%s` does not exists", $module_code));
+        }
+
+        if (null !== $response = $this->checkAuth(array(), $module_code, AccessManager::VIEW)) return $response;
+
+        return $this->render(
+            "module-configure",
+            array(
+                "module_code" => $module_code,
+            )
+        );
     }
 
     public function toggleActivationAction($module_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::UPDATE)) return $response;
         $message = null;
         try {
             $event = new ModuleToggleActivationEvent($module_id);
@@ -89,7 +240,7 @@ class ModuleController extends BaseAdminController
 
     public function deleteAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, AccessManager::DELETE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::DELETE)) return $response;
 
         $message = null;
         try {

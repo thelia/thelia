@@ -33,7 +33,7 @@ use Thelia\Form\CustomerCreateForm;
 use Thelia\Form\CustomerLogin;
 use Thelia\Form\CustomerLostPasswordForm;
 use Thelia\Form\CustomerPasswordUpdateForm;
-use Thelia\Form\CustomerProfilUpdateForm;
+use Thelia\Form\CustomerProfileUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
 use Thelia\Core\Event\TheliaEvents;
@@ -104,6 +104,24 @@ class CustomerController extends BaseFrontController
 
                 $this->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $customerCreateEvent);
 
+                $newCustomer = $customerCreateEvent->getCustomer();
+
+                // Newsletter
+                if (true === $form->get('newsletter')->getData()) {
+                    $newsletterEmail = $newCustomer->getEmail();
+                    $nlEvent = new NewsletterEvent($newsletterEmail, $this->getRequest()->getSession()->getLang()->getLocale());
+                    $nlEvent->setFirstname($newCustomer->getFirstname());
+                    $nlEvent->setLastname($newCustomer->getLastname());
+
+                    // Security : Check if this new Email address already exist
+                    if (null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterEmail)) {
+                        $nlEvent->setId($newsletter->getId());
+                        $this->dispatch(TheliaEvents::NEWSLETTER_UPDATE, $nlEvent);
+                    } else {
+                        $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $nlEvent);
+                    }
+                }
+
                 $this->processLogin($customerCreateEvent->getCustomer());
 
                 $cart = $this->getCart($this->getRequest());
@@ -149,10 +167,10 @@ class CustomerController extends BaseFrontController
             'newsletter'   => null !== NewsletterQuery::create()->findOneByEmail($customer->getEmail()),
         );
 
-        $customerProfilUpdateForm = new CustomerProfilUpdateForm($this->getRequest(), 'form', $data);
+        $customerProfileUpdateForm = new CustomerProfileUpdateForm($this->getRequest(), 'form', $data);
 
         // Pass it to the parser
-        $this->getParserContext()->addForm($customerProfilUpdateForm);
+        $this->getParserContext()->addForm($customerProfileUpdateForm);
     }
 
     public function updatePasswordAction()
@@ -169,7 +187,7 @@ class CustomerController extends BaseFrontController
 
                 $customerChangeEvent = $this->createEventInstance($form->getData());
                 $customerChangeEvent->setCustomer($customer);
-                $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFIL, $customerChangeEvent);
+                $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
 
                 $this->redirectSuccess($customerPasswordUpdateForm);
 
@@ -198,17 +216,17 @@ class CustomerController extends BaseFrontController
 
             $message = false;
 
-            $customerProfilUpdateForm = new CustomerProfilUpdateForm($this->getRequest());
+            $customerProfileUpdateForm = new CustomerProfileUpdateForm($this->getRequest());
 
             try {
                 $customer = $this->getSecurityContext()->getCustomerUser();
                 $newsletterOldEmail = $customer->getEmail();
 
-                $form = $this->validateForm($customerProfilUpdateForm, "post");
+                $form = $this->validateForm($customerProfileUpdateForm, "post");
 
                 $customerChangeEvent = $this->createEventInstance($form->getData());
                 $customerChangeEvent->setCustomer($customer);
-                $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFIL, $customerChangeEvent);
+                $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
 
                 $updatedCustomer = $customerChangeEvent->getCustomer();
 
@@ -234,7 +252,7 @@ class CustomerController extends BaseFrontController
 
                 $this->processLogin($updatedCustomer);
 
-                $this->redirectSuccess($customerProfilUpdateForm);
+                $this->redirectSuccess($customerProfileUpdateForm);
 
             } catch (FormValidationException $e) {
                 $message = sprintf("Please check your input: %s", $e->getMessage());
@@ -245,10 +263,10 @@ class CustomerController extends BaseFrontController
             if ($message !== false) {
                 Tlog::getInstance()->error(sprintf("Error during customer modification process : %s.", $message));
 
-                $customerProfilUpdateForm->setErrorMessage($message);
+                $customerProfileUpdateForm->setErrorMessage($message);
 
                 $this->getParserContext()
-                    ->addForm($customerProfilUpdateForm)
+                    ->addForm($customerProfileUpdateForm)
                     ->setGeneralError($message)
                 ;
             }
@@ -276,7 +294,7 @@ class CustomerController extends BaseFrontController
 
                 // If User is a new customer
                 if ($form->get('account')->getData() == 0 && !$form->get("email")->getErrors()) {
-                    $this->redirectToRoute("default", array("view" => "register","email" => $form->get("email")->getData()));
+                    $this->redirectToRoute("customer.create.process", array("email" => $form->get("email")->getData()));
                 } else {
 
                     try {

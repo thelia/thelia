@@ -23,14 +23,21 @@
 
 namespace Thelia\Module;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 interface BaseModuleInterface
 {
-    public function setRequest(Request $request);
-    public function getRequest();
+    public function install(ConnectionInterface $con = null);
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher);
-    public function getDispatcher();
+    public function preActivation(ConnectionInterface $con = null);
+
+    public function postActivation(ConnectionInterface $con = null);
+
+    public function preDeactivation(ConnectionInterface $con = null);
+
+    public function postDeactivation(ConnectionInterface $con = null);
+
+    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false);
 }

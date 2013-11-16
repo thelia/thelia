@@ -40,7 +40,11 @@ class Translator extends BaseTranslator
 
     public function getLocale()
     {
-        return $this->container->get('request')->getSession()->getLang()->getLocale();
+        if($this->container->isScopeActive('request') && $this->container->has('request')) {
+            return $this->container->get('request')->getSession()->getLang()->getLocale();
+        }
+
+        return $this->locale;
     }
 
     /**
@@ -48,7 +52,7 @@ class Translator extends BaseTranslator
      *
      * @api
      */
-    public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
+    public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null, $return_default_if_not_available = true)
     {
         if (null === $locale) {
             $locale = $this->getLocale();
@@ -60,7 +64,9 @@ class Translator extends BaseTranslator
 
         if ($this->catalogues[$locale]->has((string) $id, $domain))
             return parent::trans($id, $parameters, $domain, $locale);
-        else
+        else if ($return_default_if_not_available)
             return strtr($id, $parameters);
+        else
+            return '';
     }
 }

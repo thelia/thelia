@@ -89,6 +89,14 @@ class CustomerCreateForm extends AddressCreateForm
                     "for" => "password_confirmation"
                 )
             ))
+            // Add Newsletter
+            ->add("newsletter", "checkbox", array(
+                "label" => Translator::getInstance()->trans('I would like to receive the newsletter or the latest news.'),
+                "label_attr" => array(
+                    "for" => "newsletter"
+                ),
+                "required" => false
+            ))
             // Add terms & conditions
             ->add("agreed", "checkbox", array(
                 "constraints" => array(

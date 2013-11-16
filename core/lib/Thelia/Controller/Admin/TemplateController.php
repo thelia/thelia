@@ -211,7 +211,7 @@ class TemplateController extends AbstractCrudController
     public function addAttributeAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) return $response;
 
         $attribute_id = intval($this->getRequest()->get('attribute_id'));
 
@@ -235,7 +235,7 @@ class TemplateController extends AbstractCrudController
     public function deleteAttributeAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) return $response;
 
         $event = new TemplateDeleteAttributeEvent(
                 $this->getExistingObject(),
@@ -270,7 +270,7 @@ class TemplateController extends AbstractCrudController
     public function addFeatureAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) return $response;
 
         $feature_id = intval($this->getRequest()->get('feature_id'));
 
@@ -294,7 +294,7 @@ class TemplateController extends AbstractCrudController
     public function deleteFeatureAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) return $response;
 
         $event = new TemplateDeleteFeatureEvent(
                 $this->getExistingObject(),

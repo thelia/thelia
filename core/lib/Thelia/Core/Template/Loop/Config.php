@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
@@ -48,9 +49,9 @@ use Thelia\Type\EnumListType;
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Config extends BaseI18nLoop
+class Config extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -80,20 +81,16 @@ class Config extends BaseI18nLoop
         );
      }
 
-    /**
-     * @param $pagination (ignored)
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $id      = $this->getId();
         $name    = $this->getVariable();
         $secured = $this->getSecured();
+        $exclude = $this->getExclude();
 
         $search = ConfigQuery::create();
 
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         if (! is_null($id))
             $search->filterById($id);
@@ -145,20 +142,21 @@ class Config extends BaseI18nLoop
              }
         }
 
-        $results = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($results);
+    }
 
-        foreach ($results as $result) {
-
-            $loopResultRow = new LoopResultRow($loopResult, $result, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $result) {
+            $loopResultRow = new LoopResultRow($result);
 
             $loopResultRow
                 ->set("ID"           , $result->getId())
                 ->set("NAME"         , $result->getName())
                 ->set("VALUE"        , $result->getValue())
                 ->set("IS_TRANSLATED", $result->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"       , $locale)
+                ->set("LOCALE"       , $this->locale)
                 ->set("TITLE"        , $result->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO"        , $result->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION"  , $result->getVirtualColumn('i18n_DESCRIPTION'))
@@ -171,5 +169,6 @@ class Config extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

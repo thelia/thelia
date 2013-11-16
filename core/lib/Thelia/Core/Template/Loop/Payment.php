@@ -22,17 +22,18 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Module\BaseModule;
+use Thelia\Module\PaymentModuleInterface;
 
 /**
  * Class Payment
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@gmail.com>
  */
-class Payment extends BaseSpecificModule
+class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
 {
 
     public function getArgDefinitions()
@@ -42,30 +43,16 @@ class Payment extends BaseSpecificModule
         return $collection;
     }
 
-    public function exec(&$pagination)
+    public function parseResults(LoopResult $loopResult)
     {
-        $search = parent::exec($pagination);
-        /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        foreach ($loopResult->getResultDataCollection() as $paymentModule) {
+            $loopResultRow = new LoopResultRow($paymentModule);
 
-        $search->filterByType(BaseModule::PAYMENT_MODULE_TYPE, Criteria::EQUAL);
+            $moduleInstance = $this->container->get(sprintf('module.%s', $paymentModule->getCode()));
 
-        /* perform search */
-        $paymentModules = $this->search($search, $pagination);
-
-        $loopResult = new LoopResult($paymentModules);
-
-        foreach ($paymentModules as $paymentModule) {
-            $loopResultRow = new LoopResultRow($loopResult, $paymentModule, $this->versionable, $this->timestampable, $this->countable);
-
-            $moduleReflection = new \ReflectionClass($paymentModule->getFullNamespace());
-            if ($moduleReflection->isSubclassOf("Thelia\Module\PaymentModuleInterface") === false) {
+            if (false === $moduleInstance instanceof PaymentModuleInterface) {
                 throw new \RuntimeException(sprintf("payment module %s is not a Thelia\Module\PaymentModuleInterface", $paymentModule->getCode()));
             }
-            $moduleInstance = $moduleReflection->newInstance();
-
-            $moduleInstance->setRequest($this->request);
-            $moduleInstance->setDispatcher($this->dispatcher);
 
             $loopResultRow
                 ->set('ID', $paymentModule->getId())
@@ -79,5 +66,10 @@ class Payment extends BaseSpecificModule
         }
 
         return $loopResult;
+    }
+
+    protected function getModuleType()
+    {
+        return BaseModule::PAYMENT_MODULE_TYPE;
     }
 }

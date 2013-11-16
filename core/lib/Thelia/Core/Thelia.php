@@ -35,6 +35,7 @@ namespace Thelia\Core;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -45,6 +46,7 @@ use Thelia\Core\Bundle;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\TheliaContainerBuilder;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Model\ConfigQuery;
@@ -52,6 +54,7 @@ use Symfony\Component\Config\FileLocator;
 
 use Propel\Runtime\Propel;
 use Propel\Runtime\Connection\ConnectionManagerSingle;
+use Thelia\Core\Template\TemplateHelper;
 
 class Thelia extends Kernel
 {
@@ -74,7 +77,7 @@ class Thelia extends Kernel
         }
 
         $definePropel = new DefinePropel(new DatabaseConfiguration(),
-            Yaml::parse(THELIA_ROOT . '/local/config/database.yml'));
+            Yaml::parse(THELIA_CONF_DIR . 'database.yml'));
         $serviceContainer = Propel::getServiceContainer();
         $serviceContainer->setAdapterClass('thelia', 'mysql');
         $manager = new ConnectionManagerSingle();
@@ -123,55 +126,123 @@ class Thelia extends Kernel
 
         if (defined("THELIA_INSTALL_MODE") === false) {
             $modules = \Thelia\Model\ModuleQuery::getActivated();
-            $translator = $container->getDefinition('thelia.translator');
-            $dirs = array();
+
+            $translationDirs = array();
+            $parser = $container->getDefinition('thelia.parser');
             foreach ($modules as $module) {
 
                 try {
 
                     $defintion = new Definition();
                     $defintion->setClass($module->getFullNamespace());
-                    $defintion->addMethodCall("setContainer", array('service_container'));
+                    $defintion->addMethodCall("setContainer", array(new Reference('service_container')));
 
                     $container->setDefinition(
                         "module.".$module->getCode(),
                         $defintion
                     );
 
-                    $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/Config"));
+
+                    $code = ucfirst($module->getCode());
+
+                    $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . "/" . $code . "/Config"));
                     $loader->load("config.xml");
 
-                    if (is_dir($dir = THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/I18n")) {
-                        $dirs[] = $dir;
+                    if (is_dir($dir = THELIA_MODULE_DIR . "/" . $code . "/I18n")) {
+                        $translationDirs[] = $dir;
+                    }
+
+                    /* is there a front-office template directory ? */
+                    $frontOfficeModuleTemplateDirectory = sprintf("%s%s%stemplates%s%s", THELIA_MODULE_DIR, $code, DS, DS, TemplateDefinition::FRONT_OFFICE_SUBDIR);
+                    if (is_dir($frontOfficeModuleTemplateDirectory)) {
+                        try {
+                            $moduleFrontOfficeTemplateBrowser = new \DirectoryIterator($frontOfficeModuleTemplateDirectory);
+                        } catch (\UnexpectedValueException $e) {
+                            throw $e;
+                        }
+
+                        /* browse the directory */
+                        foreach ($moduleFrontOfficeTemplateBrowser as $moduleFrontOfficeTemplateContent) {
+                            /* is it a directory which is not . or .. ? */
+                            if ($moduleFrontOfficeTemplateContent->isDir() && !$moduleFrontOfficeTemplateContent->isDot()) {
+                                $parser->addMethodCall(
+                                    'addFrontOfficeTemplateDirectory',
+                                    array(
+                                        $moduleFrontOfficeTemplateContent->getFilename(),
+                                        $moduleFrontOfficeTemplateContent->getPathName(),
+                                        $code,
+                                    )
+                                );
+                            }
+                        }
+                    }
+
+                    /* is there a back-office template directory ? */
+                    $backOfficeModuleTemplateDirectory = sprintf("%s%s%stemplates%s%s", THELIA_MODULE_DIR, $code, DS, DS, TemplateDefinition::BACK_OFFICE_SUBDIR);
+                    if (is_dir($backOfficeModuleTemplateDirectory)) {
+                        try {
+                            $moduleBackOfficeTemplateBrowser = new \DirectoryIterator($backOfficeModuleTemplateDirectory);
+                        } catch (\UnexpectedValueException $e) {
+                            throw $e;
+                        }
+
+                        /* browse the directory */
+                        foreach ($moduleBackOfficeTemplateBrowser as $moduleBackOfficeTemplateContent) {
+                            /* is it a directory which is not . or .. ? */
+                            if ($moduleBackOfficeTemplateContent->isDir() && !$moduleBackOfficeTemplateContent->isDot()) {
+                                $parser->addMethodCall(
+                                    'addBackOfficeTemplateDirectory',
+                                    array(
+                                        $moduleBackOfficeTemplateContent->getFilename(),
+                                        $moduleBackOfficeTemplateContent->getPathName(),
+                                        $code,
+                                    )
+                                );
+                            }
+                        }
                     }
                 } catch (\InvalidArgumentException $e) {
-                    // FIXME: process module configuration exception
+                    // TODO: process module configuration exception
                 }
             }
 
-            //Load translation from templates
-            //admin template
-            if(is_dir($dir = THELIA_TEMPLATE_DIR . '/admin/default/I18n')) {
-                $dirs[] = $dir;
+            // Load translation from templates
+            //core translation
+            $translationDirs[] = THELIA_ROOT . "core/lib/Thelia/Config/I18n";
+
+            // admin template
+            if (is_dir($dir = THELIA_TEMPLATE_DIR . TemplateHelper::getInstance()->getActiveAdminTemplate()->getI18nPath())) {
+                $translationDirs[] = $dir;
             }
 
-            //front template
-            $template = ConfigQuery::getActiveTemplate();
-            if(is_dir($dir = THELIA_TEMPLATE_DIR . $template . "/I18n")) {
-                $dirs[] = $dir;
+            // front template
+            if (is_dir($dir = THELIA_TEMPLATE_DIR . TemplateHelper::getInstance()->getActiveFrontTemplate()->getI18nPath())) {
+                $translationDirs[] = $dir;
             }
 
-            if ($dirs) {
-                $finder = Finder::create()
-                    ->files()
-                    ->depth(0)
-                    ->in($dirs);
-
-                foreach ($finder as $file) {
-                    list($locale, $format) = explode('.', $file->getBaseName(), 2);
-                    $translator->addMethodCall('addResource', array($format, (string) $file, $locale));
-                }
+            // PDF template
+            if (is_dir($dir = THELIA_TEMPLATE_DIR . TemplateHelper::getInstance()->getActivePdfTemplate()->getI18nPath())) {
+                $translationDirs[] = $dir;
             }
+
+            if ($translationDirs) {
+                $this->loadTranslation($container, $translationDirs);
+            }
+        }
+    }
+
+    private function loadTranslation(ContainerBuilder $container, array $dirs)
+    {
+        $translator = $container->getDefinition('thelia.translator');
+
+        $finder = Finder::create()
+            ->files()
+            ->depth(0)
+            ->in($dirs);
+
+        foreach ($finder as $file) {
+            list($locale, $format) = explode('.', $file->getBaseName(), 2);
+            $translator->addMethodCall('addResource', array($format, (string) $file, $locale));
         }
     }
 

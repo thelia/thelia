@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -45,9 +46,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class FeatureValue extends BaseI18nLoop
+class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -70,17 +71,12 @@ class FeatureValue extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = FeatureProductQuery::create();
 
          // manage featureAv translations
-        $locale = $this->configureI18nProcessing(
+        $this->configureI18nProcessing(
             $search,
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             FeatureAvTableMap::TABLE_NAME,
@@ -127,13 +123,14 @@ class FeatureValue extends BaseI18nLoop
             }
         }
 
-        $featureValues = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($featureValues);
+    }
 
-        foreach ($featureValues as $featureValue) {
-
-            $loopResultRow = new LoopResultRow($loopResult, $featureValue, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $featureValue) {
+            $loopResultRow = new LoopResultRow($featureValue);
 
             $loopResultRow
                 ->set("ID"               , $featureValue->getId())
@@ -144,7 +141,7 @@ class FeatureValue extends BaseI18nLoop
                 ->set("IS_FREE_TEXT"     , is_null($featureValue->getFeatureAvId()) ? 1 : 0)
                 ->set("IS_FEATURE_AV"    , is_null($featureValue->getFeatureAvId()) ? 0 : 1)
 
-                ->set("LOCALE"           , $locale)
+                ->set("LOCALE"           , $this->locale)
                 ->set("TITLE"            , $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
                 ->set("CHAPO"            , $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
                 ->set("DESCRIPTION"      , $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
@@ -157,5 +154,6 @@ class FeatureValue extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

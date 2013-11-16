@@ -219,7 +219,7 @@ class TaxRuleController extends AbstractCrudController
 
     public function updateAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $object = $this->getExistingObject();
 
@@ -237,7 +237,7 @@ class TaxRuleController extends AbstractCrudController
 
     public function setDefaultAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $setDefaultEvent = new TaxRuleEvent();
 
@@ -255,7 +255,7 @@ class TaxRuleController extends AbstractCrudController
     public function processUpdateTaxesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
 

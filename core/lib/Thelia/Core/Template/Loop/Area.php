@@ -26,6 +26,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\AreaQuery;
@@ -35,9 +36,9 @@ use Thelia\Model\AreaQuery;
  * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Area extends BaseLoop
+class Area extends BaseLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      *
@@ -80,19 +81,7 @@ class Area extends BaseLoop
         );
     }
 
-    /**
-     *
-     * this function have to be implement in your own loop class.
-     *
-     * All loops parameters can be accessible via getter.
-     *
-     * for example, ref parameter is accessible through getRef method
-     *
-     * @param $pagination
-     *
-     * @return mixed
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $id = $this->getId();
 
@@ -117,14 +106,14 @@ class Area extends BaseLoop
                 ->where('`without_zone`.delivery_module_id '.Criteria::ISNULL);
         }
 
-        //echo $search->toString(); exit;
+        return $search;
 
-        $areas = $this->search($search, $pagination);
+    }
 
-        $loopResult = new LoopResult($areas);
-
-        foreach ($areas as $area) {
-            $loopResultRow = new LoopResultRow($loopResult, $area, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $area) {
+            $loopResultRow = new LoopResultRow($area);
 
             $loopResultRow
                 ->set('ID', $area->getId())
@@ -136,6 +125,7 @@ class Area extends BaseLoop
         }
 
         return $loopResult;
+
     }
 
 }

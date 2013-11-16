@@ -267,7 +267,7 @@ abstract class AbstractCrudController extends BaseAdminController
      */
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::VIEW)) return $response;
         return $this->renderList();
     }
 
@@ -279,7 +279,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function createAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::CREATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::CREATE)) return $response;
 
         $error_msg = false;
 
@@ -340,7 +340,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function updateAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         // Load the object
         $object = $this->getExistingObject();
@@ -366,7 +366,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function processUpdateAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
 
@@ -431,7 +431,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function updatePositionAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         try {
             $mode = $this->getRequest()->get('mode', null);
@@ -465,7 +465,7 @@ abstract class AbstractCrudController extends BaseAdminController
     protected function genericUpdatePositionAction($object, $eventName, $doFinalRedirect = true)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         if ($object != null) {
 
@@ -499,7 +499,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function setToggleVisibilityAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $changeEvent = $this->createToggleVisibilityEvent($this->getRequest());
 
@@ -521,7 +521,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function deleteAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::DELETE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::DELETE)) return $response;
 
         // Get the currency id, and dispatch the delet request
         $deleteEvent = $this->getDeleteEvent();

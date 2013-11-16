@@ -23,6 +23,9 @@
 namespace Thelia\Controller\Front;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Core\Event\PdfEvent;
+use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Template\TemplateHelper;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -34,6 +37,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Base\OrderQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;
@@ -67,7 +71,6 @@ class OrderController extends BaseFrontController
             $deliveryModule = ModuleQuery::create()->findPk($deliveryModuleId);
 
             /* check that the delivery address belongs to the current customer */
-            $deliveryAddress = AddressQuery::create()->findPk($deliveryAddressId);
             if ($deliveryAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
                 throw new \Exception("Delivery address does not belong to the current customer");
             }
@@ -81,8 +84,7 @@ class OrderController extends BaseFrontController
             }
 
             /* get postage amount */
-            $moduleReflection = new \ReflectionClass($deliveryModule->getFullNamespace());
-            $moduleInstance = $moduleReflection->newInstance();
+            $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
             $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
 
             $orderEvent = $this->getOrderEvent();
@@ -242,4 +244,20 @@ class OrderController extends BaseFrontController
 
         return $order;
     }
+
+    public function generateInvoicePdf($order_id)
+    {
+        /* check customer */
+        $this->checkAuth();
+        return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
+    }
+
+    public function generateDeliveryPdf($order_id)
+    {
+        /* check customer */
+        $this->checkAuth();
+        return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
+    }
+
+
 }

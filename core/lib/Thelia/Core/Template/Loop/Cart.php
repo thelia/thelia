@@ -9,6 +9,7 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -17,7 +18,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CountryQuery;
 use Thelia\Type;
 
-class Cart extends BaseLoop
+class Cart extends BaseLoop implements ArraySearchLoopInterface
 {
     use \Thelia\Cart\CartTrait;
     /**
@@ -42,79 +43,48 @@ class Cart extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('limit'),
-            Argument::createAnyTypeArgument('position')
+            new Argument(
+                'order',
+                new Type\TypeCollection(
+                    new Type\EnumListType(array('reverse'))
+                ),
+                'reverse'
+            )
         );
     }
 
-    /**
-     *
-     * this function have to be implement in your own loop class.
-     *
-     * All your parameters are defined in defineArgs() and can be accessible like a class property.
-     *
-     * example :
-     *
-     * public function defineArgs()
-     * {
-     *  return array (
-     *      "ref",
-     *      "id" => "optional",
-     *      "stock" => array(
-     *          "optional",
-     *          "default" => 10
-     *          )
-     *  );
-     * }
-     *
-     * you can retrieve ref value using $this->ref
-     *
-     * @param $pagination
-     *
-     * @return mixed
-     */
-    public function exec(&$pagination)
+    public function buildArray()
     {
-
         $cart = $this->getCart($this->request);
 
-        $cartItems = $cart->getCartItems();
-        $result = new LoopResult($cartItems);
-
-        if ($cart === null) {
-            return $result;
+        if(null === $cart) {
+            return array();
         }
 
-        $limit = $this->getLimit();
+        $returnArray = iterator_to_array($cart->getCartItems());
 
-        $countCartItems = count($cartItems);
+        $orders  = $this->getOrder();
 
-        if ($limit <= 0 || $limit >= $countCartItems) {
-            $limit = $countCartItems;
-        }
-
-        $position = $this->getPosition();
-
-        if (isset($position)) {
-            if ($position == "first") {
-                $limit = 1;
-                $cartItems = array($cartItems[0]);
-            } elseif ($position == "last") {
-                $limit = 1;
-                $cartItems = array(end($cartItems));
+        foreach ($orders as $order) {
+            switch ($order) {
+                case "reverse":
+                    $returnArray = array_reverse($returnArray, false);
+                    break;
             }
-
-            // @TODO : if the position is a number
         }
 
+        return $returnArray;
+    }
+
+    public function parseResults(LoopResult $loopResult)
+    {
         $taxCountry = CountryQuery::create()->findPk(64); // @TODO : make it magic;
 
-        for ($i=0; $i<$limit; $i ++) {
-            $cartItem = $cartItems[$i];
+        foreach($loopResult->getResultDataCollection() as $cartItem) {
             $product = $cartItem->getProduct();
             $productSaleElement = $cartItem->getProductSaleElements();
 
-            $loopResultRow = new LoopResultRow($result, $cartItem, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow = new LoopResultRow();
 
             $loopResultRow->set("ITEM_ID", $cartItem->getId());
             $loopResultRow->set("TITLE", $product->getTitle());
@@ -130,10 +100,11 @@ class Cart extends BaseLoop
                 ->set("PROMO_TAXED_PRICE", $cartItem->getTaxedPromoPrice($taxCountry))
                 ->set("IS_PROMO", $cartItem->getPromo() === 1 ? 1 : 0);
             $loopResultRow->set("PRODUCT_SALE_ELEMENTS_ID", $productSaleElement->getId());
-            $result->addRow($loopResultRow);
+
+            $loopResult->addRow($loopResultRow);
         }
 
-        return $result;
+        return $loopResult;
     }
 
     /**

@@ -1,0 +1,358 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Back-office users'}{/block}
+
+{block name="check-resource"}admin.configuration.administrator{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+<div>
+
+    <div id="wrapper" class="container">
+
+        <div class="clearfix">
+            <ul class="breadcrumb">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                <li><a href="{url path='/admin/configuration/administrators'}">{intl l="Back-office users"}</a></li>
+            </ul>
+        </div>
+
+        {module_include location='administrators_top'}
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <caption class="clearfix">
+                                {intl l="Taxes"}
+                                {loop type="auth" name="can_create" role="ADMIN" resource="admin.administrator" access="CREATE"}
+                                    <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new administrator'}" href="#administrator_create_dialog" data-toggle="modal">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </a>
+                                {/loop}
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th>{intl l="Login"}</th>
+                                    <th>{intl l="First Name"}</th>
+                                    <th>{intl l="Last Name"}</th>
+                                    <th>{intl l="Profile"}</th>
+                                    <th class="col-md-1">{intl l="Actions"}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                {loop type="admin" name="administrators" backend_context="1"}
+
+                                <tr>
+                                    <td data-field-class="js-login">{$LOGIN}</td>
+                                    <td data-field-class="js-firstname">{$FIRSTNAME}</td>
+                                    <td data-field-class="js-lastname">{$LASTNAME}</td>
+                                    <td data-field-class="js-profile" data-value="{$PROFILE}">
+                                        {if $PROFILE}
+                                            {loop type="profile" name="admin-profile" id=$PROFILE}
+                                                {$TITLE}
+                                            {/loop}
+                                        {else}
+                                            {intl l='Superadministrator'}
+                                        {/if}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            {* if admin is current admin :
+                                                - can UPDATE anyway
+                                                - cannot delete himself
+                                            *}
+                                            {if $ID == {admin attr="id"}}
+                                                <a class="btn btn-default btn-xs js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
+                                            {else}
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.administrator" access="UPDATE"}
+                                                    <a class="btn btn-default btn-xs js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
+                                                {/loop}
+                                                {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.administrator" access="DELETE"}
+                                                    <a class="btn btn-default btn-xs js-delete-administrator" title="{intl l='Delete this administrator'}" href="#administrator_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                                {/loop}
+                                            {/if}
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                {/loop}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        {module_include location='administrators_bottom'}
+
+    </div>
+</div>
+
+{* -- Add administrator confirmation dialog ----------------------------------- *}
+{form name="thelia.admin.administrator.add"}
+
+{if $form_error_message}
+    {$administratorCreateError = true}
+{else}
+    {$administratorCreateError = false}
+{/if}
+
+{* Capture the dialog body, to pass it to the generic dialog *}
+{capture "administrator_create_dialog"}
+
+    {form_hidden_fields form=$form}
+
+    {form_field form=$form field='login'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Login'}" placeholder="{intl l='Login'}" class="form-control" value="{if $form_error}{$value}{/if}">
+        </div>
+    {/form_field}
+
+    {form_field form=$form field='firstname'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='FirstName'}" placeholder="{intl l='FirstName'}" class="form-control" value="{if $form_error}{$value}{/if}">
+        </div>
+    {/form_field}
+
+    {form_field form=$form field='lastname'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='LastName'}" placeholder="{intl l='LastName'}" class="form-control" value="{if $form_error}{$value}{/if}">
+        </div>
+    {/form_field}
+
+    {form_field form=$form field='password_confirm'}
+    {$passwordError = $error}
+    {/form_field}
+
+    {form_field form=$form field='password'}
+        <div class="form-group {if $passwordError}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <input type="password" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Password'}" class="form-control">
+        </div>
+    {/form_field}
+
+    {form_field form=$form field='password_confirm'}
+        <div class="form-group {if $passwordError}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <input type="password" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Password'}" class="form-control">
+        </div>
+    {/form_field}
+
+    {form_field form=$form field='profile'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+
+            <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker">
+                {foreach $choices as $choice}
+                    {if $choice->value == 0}
+                        <option value="0">{intl l='Superadministrator'}</option>
+                    {else}
+                        {loop name='profile' type="profile" id=$choice->value}
+                            <option value="{$ID}">{$TITLE}</option>
+                        {/loop}
+                    {/if}
+                {/foreach}
+            </select>
+
+        </div>
+    {/form_field}
+
+{/capture}
+
+    {include
+        file = "includes/generic-create-dialog.html"
+
+        dialog_id    = "administrator_create_dialog"
+        dialog_title = {intl l="Create a new administrator"}
+        dialog_body  = {$smarty.capture.administrator_create_dialog nofilter}
+
+        dialog_ok_label     = {intl l="Create"}
+        dialog_cancel_label = {intl l="Cancel"}
+
+        form_action        = {url path="/admin/configuration/administrators/add"}
+        form_enctype       = {form_enctype form=$form}
+        form_error_message = $form_error_message
+    }
+
+{/form}
+
+{* -- Update administrator confirmation dialog ----------------------------------- *}
+{form name="thelia.admin.administrator.update"}
+
+{if $form_error_message}
+    {$administratorUpdateError = true}
+{else}
+    {$administratorUpdateError = false}
+{/if}
+
+{* Capture the dialog body, to pass it to the generic dialog *}
+{capture "administrator_update_dialog"}
+
+    {form_hidden_fields form=$form}
+
+    {form_field form=$form field='login'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Login'}" placeholder="{intl l='Login'}" class="form-control js-login" value="{if $form_error}{$value}{/if}">
+        </div>
+    {/form_field}
+
+    {form_field form=$form field='firstname'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='FirstName'}" placeholder="{intl l='FirstName'}" class="form-control js-firstname" value="{if $form_error}{$value}{/if}">
+        </div>
+    {/form_field}
+
+    {form_field form=$form field='lastname'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='LastName'}" placeholder="{intl l='LastName'}" class="form-control js-lastname" value="{if $form_error}{$value}{/if}">
+        </div>
+    {/form_field}
+
+    {form_field form=$form field='password_confirm'}
+        {$passwordError = $error}
+    {/form_field}
+
+    {form_field form=$form field='password'}
+        <div class="form-group {if $passwordError}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <input type="password" id="{$label_attr.for}" name="{$name}" title="{intl l='Password'}" placeholder="{intl l='Leave empty to keep current password'}" class="form-control">
+        </div>
+    {/form_field}
+
+    {form_field form=$form field='password_confirm'}
+        <div class="form-group {if $passwordError}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <input type="password" id="{$label_attr.for}" name="{$name}" title="{intl l='Password'}" placeholder="{intl l='Leave empty to keep current password'}" class="form-control">
+        </div>
+    {/form_field}
+
+    {form_field form=$form field='profile'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+
+            <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker" class="js-profile">
+                {foreach $choices as $choice}
+                    {if $choice->value == 0}
+                        <option value="0">{intl l='Superadministrator'}</option>
+                    {else}
+                        {loop name='profile' type="profile" id=$choice->value}
+                            <option value="{$ID}">{$TITLE}</option>
+                        {/loop}
+                    {/if}
+                {/foreach}
+            </select>
+
+        </div>
+    {/form_field}
+
+{/capture}
+
+    {include
+        file = "includes/generic-create-dialog.html"
+
+        dialog_id    = "administrator_update_dialog"
+        dialog_title = {intl l="Update a new administrator"}
+        dialog_body  = {$smarty.capture.administrator_update_dialog nofilter}
+
+        dialog_ok_label     = {intl l="Update"}
+        dialog_cancel_label = {intl l="Cancel"}
+
+        form_action        = {url path="/admin/configuration/administrators/save"}
+        form_enctype       = {form_enctype form=$form}
+        form_error_message = $form_error_message
+    }
+
+{/form}
+
+{* -- Delete administrator confirmation dialog ----------------------------------- *}
+
+{capture "administrator_delete_dialog"}
+    <input type="hidden" name="administrator_id" id="administrator_delete_id" value="" />
+
+    {module_include location='administrator_delete_form'}
+
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "administrator_delete_dialog"
+    dialog_title    = {intl l="Delete administrator"}
+    dialog_message  = {intl l="Do you really want to delete this administrator ?"}
+
+    form_action         = {url path='/admin/configuration/administrators/delete'}
+    form_content        = {$smarty.capture.administrator_delete_dialog nofilter}
+}
+
+{include
+    file = "includes/generic-warning-dialog.html"
+
+    dialog_id       = "administrator_cannot_delete_dialog"
+    dialog_title    = {intl l="You can't delete this administrator"}
+    dialog_body     = {intl l="They are some administrator which are linked to this administrator. Please edit/remove them before deleting this administrator."}
+}
+
+{/block}
+
+{block name="javascript-initialization"}
+
+{javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
+    <script src='{$asset_url}'></script>
+{/javascripts}
+
+{javascripts file='assets/js/main.js'}
+    <script src='{$asset_url}'></script>
+{/javascripts}
+
+<script type="text/javascript">
+jQuery(function($) {
+
+{if $administratorCreateError == true}
+    $('#administrator_create_dialog').modal();
+{/if}
+
+{if $administratorUpdateError == true}
+    $('#administrator_update_dialog').modal();
+{/if}
+
+    $(".js-delete-administrator").click(function(e){
+        $('#administrator_delete_id').val($(this).data('id'))
+    });
+
+    $(".js-update-administrator").click(function(e){
+        $('#administrator_update_id').val($(this).data('id'))
+
+        $(this).parents('tr').find('td').each(function(k, v) {
+            if(!$(v).data('field-class')) {
+                return true;
+            }
+            if($(v).data('value')) {
+                var fieldValue = $(v).data('value');
+            } else {
+                var fieldValue = $(v).text();
+            }
+
+            $('.' + $(v).data('field-class')).val(fieldValue);
+            if($('.' + $(v).data('field-class')).is('select')) {
+                $('.' + $(v).data('field-class')).selectpicker('refresh');
+            }
+        });
+    });
+})
+</script>
+
+{/block}

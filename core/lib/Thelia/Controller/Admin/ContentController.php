@@ -69,7 +69,7 @@ class ContentController extends AbstractCrudController
     public function addAdditionalFolderAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $folder_id = intval($this->getRequest()->request->get('additional_folder_id'));
 
@@ -97,7 +97,7 @@ class ContentController extends AbstractCrudController
     public function removeAdditionalFolderAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $folder_id = intval($this->getRequest()->request->get('additional_folder_id'));
 

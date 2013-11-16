@@ -84,7 +84,7 @@ final class AdminResources
 
     const MESSAGE = "admin.configuration.message";
 
-    const MODULE = "admin.configuration.module";
+    const MODULE = "admin.module";
 
     const ORDER = "admin.order";
 
@@ -99,4 +99,6 @@ final class AdminResources
     const TEMPLATE = "admin.configuration.template";
 
     const SYSTEM_LOG = "admin.configuration.system-log";
+
+    const TRANSLATIONS = "admin.configuration.translations";
 }

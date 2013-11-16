@@ -1,0 +1,87 @@
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="alert alert-info">
+            <p>{intl l="Colissimo Module allows to send your products all around the world with La Poste."}</p>
+        </div>
+
+        <div class="alert alert-danger">
+            <p>{intl l="Prices are not dynamically editable yet."}</p>
+            <p>{intl l="Prices below can be edited in local/modules/Colissimo/Config/prices.json file."}</p>
+        </div>
+
+        <div class="general-block-decorator">
+
+            {loop type="area" name="list area" backend_context=true}
+            <div class="table-responsive">
+                <table class="table table-striped table-condensed table-left-aligned">
+                    <caption class="clearfix">
+                        {intl l="Area : "}{$NAME}
+                        {loop type="auth" name="can_create" role="ADMIN" module="colissimo" access="CREATE"}
+                            <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new price slice'}" href="#price_slice_create_dialog" data-toggle="modal">
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </a>
+                        {/loop}
+                    </caption>
+                    <thead>
+                    <tr>
+                        <th class="col-md-3">{intl l="Weight lower than ... (kg)"}</th>
+                        <th class="col-md-5">{intl l="Price (€)"}</th>
+                        <th class="col-md-1">{intl l="Actions"}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {loop type="colissimo" name="colissimo" area=$ID}
+                        <tr>
+                            <td>{$MAX_WEIGHT}</td>
+                            <td>{$PRICE}</td>
+                            <td>
+                                <div class="btn-group">
+                                    {loop type="auth" name="can_change" role="ADMIN" module="colissimo" access="UPDATE"}
+                                        <a class="btn btn-default btn-xs" title="{intl l='Delete this price slice'}" href="#price_slice_delete_dialog" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                    {/loop}
+                                </div>
+                            </td>
+                        </tr>
+                        {/loop}
+                    </tbody>
+                </table>
+            </div>
+            {/loop}
+
+        </div>
+
+    </div>
+</div>
+
+{* -- Add price slice confirmation dialog ----------------------------------- *}
+
+{include
+    file = "includes/generic-create-dialog.html"
+
+    dialog_id    = "price_slice_create_dialog"
+    dialog_title = {intl l="Create a price slice"}
+    dialog_body  = "Not available yet."
+
+    dialog_ok_label     = {intl l="Create"}
+    dialog_cancel_label = {intl l="Cancel"}
+}
+
+{* -- Delete price slice confirmation dialog ----------------------------------- *}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id    = "price_slice_delete_dialog"
+    dialog_title = {intl l="Delete a price slice"}
+    dialog_message  = "Not available yet."
+
+    dialog_ok_label     = {intl l="Delete"}
+    dialog_cancel_label = {intl l="Cancel"}
+}
+
+<script type="text/javascript">
+    jQuery(function($) {
+
+    })
+</script>

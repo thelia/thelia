@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -40,7 +41,7 @@ use Thelia\Type\TypeCollection;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Auth extends BaseLoop
+class Auth extends BaseLoop implements ArraySearchLoopInterface
 {
     public function getArgDefinitions()
     {
@@ -60,6 +61,12 @@ class Auth extends BaseLoop
                 )
             ),
             new Argument(
+                'module',
+                new TypeCollection(
+                    new AlphaNumStringListType()
+                )
+            ),
+            new Argument(
                 'access',
                 new TypeCollection(
                     new EnumListType(array(AccessManager::VIEW, AccessManager::CREATE, AccessManager::UPDATE, AccessManager::DELETE))
@@ -69,21 +76,29 @@ class Auth extends BaseLoop
          );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildArray()
+    {
+        return array();
+    }
+
+    public function parseResults(LoopResult $loopResult)
     {
         $roles = $this->getRole();
         $resource = $this->getResource();
+        $module = $this->getModule();
         $access = $this->getAccess();
 
-        $loopResult = new LoopResult();
+        if(null !== $module) {
+            $in = true;
+        }
 
         try {
-            if (true === $this->securityContext->isGranted($roles, $resource === null ? array() : $resource, $access === null ? array() : $access)) {
+            if (true === $this->securityContext->isGranted(
+                    $roles,
+                    $resource === null ? array() : $resource,
+                    $module === null ? array() : $module,
+                    $access === null ? array() : $access)
+            ) {
 
                 // Create an empty row: loop is no longer empty :)
                 $loopResult->addRow(new LoopResultRow());

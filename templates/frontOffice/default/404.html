@@ -1,0 +1,22 @@
+{extends file="layout.tpl"}
+
+{* Body Class *}
+{block name="body-class"}page-404{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+    ['title' => {intl l="404"}, 'url'=>{url path="/404"}]
+    ]}
+{/block}
+
+{block name="main-content"}
+<div class="main">
+    <article class="col-main" role="main" aria-labelledby="main-label">
+        <h1 id="main-label">
+            404
+            <span>{intl l="The page cannot be found"}</span>
+        </h1>
+    </article>
+</div>
+{/block}

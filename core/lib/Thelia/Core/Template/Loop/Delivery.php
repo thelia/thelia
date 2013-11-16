@@ -22,17 +22,19 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Exception\OrderException;
 use Thelia\Model\CountryQuery;
 use Thelia\Module\BaseModule;
+use Thelia\Module\DeliveryModuleInterface;
 
 /**
  * Class Delivery
  * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Etienne Roudeix <eroudeix@gmail.com>
  */
 class Delivery extends BaseSpecificModule
 {
@@ -48,14 +50,8 @@ class Delivery extends BaseSpecificModule
         return $collection;
     }
 
-    public function exec(&$pagination)
+    public function parseResults(LoopResult $loopResult)
     {
-        $search = parent::exec($pagination);
-        /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
-
-        $search->filterByType(BaseModule::DELIVERY_MODULE_TYPE, Criteria::EQUAL);
-
         $countryId = $this->getCountry();
         if (null !== $countryId) {
             $country = CountryQuery::create()->findPk($countryId);
@@ -66,22 +62,27 @@ class Delivery extends BaseSpecificModule
             $country = CountryQuery::create()->findOneByByDefault(1);
         }
 
-        /* perform search */
-        $deliveryModules = $this->search($search, $pagination);
+        foreach ($loopResult->getResultDataCollection() as $deliveryModule) {
+            $loopResultRow = new LoopResultRow($deliveryModule);
 
-        $loopResult = new LoopResult($deliveryModules);
+            $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
 
-        foreach ($deliveryModules as $deliveryModule) {
-            $loopResultRow = new LoopResultRow($loopResult, $deliveryModule, $this->versionable, $this->timestampable, $this->countable);
-
-            $moduleReflection = new \ReflectionClass($deliveryModule->getFullNamespace());
-            if ($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
+            if (false === $moduleInstance instanceof DeliveryModuleInterface) {
                 throw new \RuntimeException(sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $deliveryModule->getCode()));
             }
-            $moduleInstance = $moduleReflection->newInstance();
 
-            $moduleInstance->setRequest($this->request);
-            $moduleInstance->setDispatcher($this->dispatcher);
+            try {
+                $postage = $moduleInstance->getPostage($country);
+            } catch(OrderException $e) {
+                switch($e->getCode()) {
+                    case OrderException::DELIVERY_MODULE_UNAVAILABLE:
+                        /* do not show this delivery module */
+                        continue(2);
+                        break;
+                    default:
+                        throw $e;
+                }
+            }
 
             $loopResultRow
                 ->set('ID', $deliveryModule->getId())
@@ -89,12 +90,17 @@ class Delivery extends BaseSpecificModule
                 ->set('CHAPO', $deliveryModule->getVirtualColumn('i18n_CHAPO'))
                 ->set('DESCRIPTION', $deliveryModule->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set('POSTSCRIPTUM', $deliveryModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set('POSTAGE', $moduleInstance->getPostage($country))
+                ->set('POSTAGE', $postage)
             ;
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
+    }
+
+    protected function getModuleType()
+    {
+        return BaseModule::DELIVERY_MODULE_TYPE;
     }
 }
