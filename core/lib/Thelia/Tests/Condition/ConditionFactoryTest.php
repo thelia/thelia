@@ -388,6 +388,66 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test condition serialization if collection is empty
+     *
+     * @covers Thelia\Condition\ConditionFactory::serializeConditionCollection
+     */
+    public function testSerializeConditionCollectionEmpty()
+    {
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+             ->disableOriginalConstructor()
+             ->getMock();
+
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubFacade->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+        $stubFacade->expects($this->any())
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
+
+        $currencies = CurrencyQuery::create();
+        $currencies = $currencies->find();
+        $stubFacade->expects($this->any())
+            ->method('getAvailableCurrencies')
+            ->will($this->returnValue($currencies));
+
+        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->returnValue(new MatchForEveryoneManager($stubFacade)));
+
+        $stubContainer->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
+
+        $stubFacade->expects($this->any())
+            ->method('getContainer')
+            ->will($this->returnValue($stubContainer));
+
+
+        $conditions = new ConditionCollection();
+
+        $conditionFactory = new ConditionFactory($stubContainer);
+
+
+        $conditionNone = new MatchForEveryoneManager($stubFacade);
+        $expectedCollection = new ConditionCollection();
+        $expectedCollection->add($conditionNone);
+
+        $expected = $conditionFactory->serializeConditionCollection($expectedCollection);
+        $actual = $conditionFactory->serializeConditionCollection($conditions);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */

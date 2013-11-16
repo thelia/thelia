@@ -124,7 +124,7 @@ class MatchForTotalAmountManager extends ConditionManagerAbstract
         $this->isPriceValid($priceValue);
 
 
-        $this->IsCurrencyValid($currencyValue);
+        $this->isCurrencyValid($currencyValue);
 
 
         $this->operators = array(
@@ -160,12 +160,12 @@ class MatchForTotalAmountManager extends ConditionManagerAbstract
         }
 
         $condition1 = $this->conditionValidator->variableOpComparison(
-            $this->adapter->getCartTotalPrice(),
+            $this->facade->getCartTotalPrice(),
             $this->operators[self::INPUT1],
             $this->values[self::INPUT1]
         );
         $condition2 = $this->conditionValidator->variableOpComparison(
-            $this->adapter->getCheckoutCurrency(),
+            $this->facade->getCheckoutCurrency(),
             $this->operators[self::INPUT2],
             $this->values[self::INPUT2]
         );

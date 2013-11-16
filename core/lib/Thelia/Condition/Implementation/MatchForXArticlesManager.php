@@ -124,7 +124,7 @@ class MatchForXArticlesManager extends ConditionManagerAbstract
     public function isMatching()
     {
         $condition1 = $this->conditionValidator->variableOpComparison(
-            $this->adapter->getNbArticlesInCart(),
+            $this->facade->getNbArticlesInCart(),
             $this->operators[self::INPUT1],
             $this->values[self::INPUT1]
         );

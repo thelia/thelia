@@ -24,10 +24,13 @@
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\ConditionEvaluator;
+use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Operators;
+use Thelia\Coupon\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
 use Thelia\Model\Currency;
+use Thelia\Model\CurrencyQuery;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -597,6 +600,73 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         $expected = false;
         $actual =$isValid;
         $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check unknown currency
+     *
+     * @covers Thelia\Condition\ConditionManagerAbstract::isCurrencyValid
+     * @expectedException \Thelia\Exception\InvalidConditionValueException
+     *
+     */
+    public function testUnknownCurrency()
+    {
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubFacade->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+        $stubFacade->expects($this->any())
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
+
+        $currencies = CurrencyQuery::create();
+        $currencies = $currencies->find();
+        $stubFacade->expects($this->any())
+            ->method('getAvailableCurrencies')
+            ->will($this->returnValue($currencies));
+
+
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $operators = array(
+            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmountManager::INPUT1 => 400.00,
+            MatchForTotalAmountManager::INPUT2 => 'UNK');
+        $condition1->setValidatorsFromForm($operators, $values);
+
+
+        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->returnValue($condition1));
+
+        $stubContainer->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
+
+        $stubFacade->expects($this->any())
+            ->method('getContainer')
+            ->will($this->returnValue($stubContainer));
+
+        $conditionFactory = new ConditionFactory($stubContainer);
+
+        $collection = new ConditionCollection();
+        $collection->add($condition1);
+
+        $serialized = $conditionFactory->serializeConditionCollection($collection);
+        $unserialized = $conditionFactory->unserializeConditionCollection($serialized);
     }
 
     /**
