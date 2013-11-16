@@ -52,7 +52,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    public function generateAdapterStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR')
+    public function generateFacadeStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR', $i18nOutput = '')
     {
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
@@ -69,6 +69,17 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
+
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubTranslator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnValue($i18nOutput));
+
+        $stubFacade->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
 
         $currency1 = new Currency();
         $currency1->setCode('EUR');
@@ -89,7 +100,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidBackOfficeInputOperator()
     {
-        $stubFacade = $this->generateAdapterStub(399, 'EUR');
+        $stubFacade = $this->generateFacadeStub(399, 'EUR');
 
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForEveryoneManager($stubFacade);
@@ -112,7 +123,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsMatching()
     {
-        $stubFacade = $this->generateAdapterStub(399, 'EUR');
+        $stubFacade = $this->generateFacadeStub(399, 'EUR');
 
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForEveryoneManager($stubFacade);
@@ -122,6 +133,67 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
         $expected = true;
         $actual = $isValid;
         $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check getName i18n
+     *
+     * @covers Thelia\Condition\Implementation\MatchForEveryoneManager::getName
+     *
+     */
+    public function testGetName()
+    {
+        $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Everybody can use it (no condition)');
+
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForEveryoneManager($stubFacade);
+
+        $actual = $condition1->getName();
+        $expected = 'Everybody can use it (no condition)';
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check tooltip i18n
+     *
+     * @covers Thelia\Condition\Implementation\MatchForEveryoneManager::getToolTip
+     *
+     */
+    public function testGetToolTip()
+    {
+        $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Will return always true');
+
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForEveryoneManager($stubFacade);
+
+        $actual = $condition1->getToolTip();
+        $expected = 'Will return always true';
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check validator
+     *
+     * @covers Thelia\Condition\Implementation\MatchForEveryoneManager::generateInputs
+     *
+     */
+    public function testGetValidator()
+    {
+        $stubFacade = $this->generateFacadeStub(399, 'EUR');
+
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForEveryoneManager($stubFacade);
+
+        $actual = $condition1->getValidators();
+
+        $validators = array();
+        $validators['inputs'] = array();
+        $validators['setOperators'] = array();
+        $validators['setValues'] = array();
+        $expected = $validators;
+
+        $this->assertEquals($expected, $actual);
+
     }
 
 }
