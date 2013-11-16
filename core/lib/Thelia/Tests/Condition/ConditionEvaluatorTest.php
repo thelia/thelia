@@ -51,328 +51,11 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    public function testTestSuccess1Rules()
-    {
-        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var FacadeInterface $stubFacade */
-        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubFacade->expects($this->any())
-            ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
-        $stubFacade->expects($this->any())
-            ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
-
-        $currencies = CurrencyQuery::create();
-        $currencies = $currencies->find();
-        $stubFacade->expects($this->any())
-            ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
-
-        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubMatchForTotalAmountManager = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForTotalAmountManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $stubMatchForTotalAmountManager->expects($this->any())
-            ->method('isMatching')
-            ->will($this->returnValue(true));
-
-        $stubContainer->expects($this->any())
-            ->method('get')
-            ->will($this->returnValue($stubMatchForTotalAmountManager));
-
-        $stubContainer->expects($this->any())
-            ->method('has')
-            ->will($this->returnValue(true));
-
-        $stubFacade->expects($this->any())
-            ->method('getContainer')
-            ->will($this->returnValue($stubContainer));
-        $stubFacade->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubFacade->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(401.00));
-
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
-        $operators = array(
-            MatchForTotalAmountManager::INPUT1 => '>',
-            MatchForTotalAmountManager::INPUT2 => '=='
-        );
-        $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
-        $condition1->setValidatorsFromForm($operators, $values);
-
-        $conditions = new ConditionCollection();
-        $conditions->add($condition1);
-
-        $conditionEvaluator = new ConditionEvaluator();
-        $isValid = $conditionEvaluator->isMatching($conditions);
-
-        $expected = true;
-        $actual =$isValid;
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testTestFail1Rules()
-    {
-        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var FacadeInterface $stubFacade */
-        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubFacade->expects($this->any())
-            ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
-        $stubFacade->expects($this->any())
-            ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
-
-        $currencies = CurrencyQuery::create();
-        $currencies = $currencies->find();
-        $stubFacade->expects($this->any())
-            ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
-
-        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubMatchForTotalAmountManager = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForTotalAmountManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $stubMatchForTotalAmountManager->expects($this->any())
-            ->method('isMatching')
-            ->will($this->returnValue(true));
-
-        $stubContainer->expects($this->any())
-            ->method('get')
-            ->will($this->returnValue($stubMatchForTotalAmountManager));
-
-        $stubContainer->expects($this->any())
-            ->method('has')
-            ->will($this->returnValue(true));
-
-        $stubFacade->expects($this->any())
-            ->method('getContainer')
-            ->will($this->returnValue($stubContainer));
-        $stubFacade->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubFacade->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(400.00));
-
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
-        $operators = array(
-            MatchForTotalAmountManager::INPUT1 => '>',
-            MatchForTotalAmountManager::INPUT2 => '=='
-        );
-        $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
-        $condition1->setValidatorsFromForm($operators, $values);
-
-        $conditions = new ConditionCollection();
-        $conditions->add($condition1);
-
-        $conditionEvaluator = new ConditionEvaluator();
-        $isValid = $conditionEvaluator->isMatching($conditions);
-
-        $expected = false;
-        $actual =$isValid;
-        $this->assertEquals($expected, $actual, 'Conditions evaluator always think Customer is matching conditions');
-    }
-
-    public function testTestSuccess2Rules()
-    {
-        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var FacadeInterface $stubFacade */
-        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubFacade->expects($this->any())
-            ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
-        $stubFacade->expects($this->any())
-            ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
-
-        $currencies = CurrencyQuery::create();
-        $currencies = $currencies->find();
-        $stubFacade->expects($this->any())
-            ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
-
-        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubMatchForTotalAmountManager = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForTotalAmountManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $stubMatchForTotalAmountManager->expects($this->any())
-            ->method('isMatching')
-            ->will($this->returnValue(true));
-
-        $stubContainer->expects($this->any())
-            ->method('get')
-            ->will($this->returnValue($stubMatchForTotalAmountManager));
-
-        $stubContainer->expects($this->any())
-            ->method('has')
-            ->will($this->returnValue(true));
-
-        $stubFacade->expects($this->any())
-            ->method('getContainer')
-            ->will($this->returnValue($stubContainer));
-        $stubFacade->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubFacade->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(401.00));
-        $stubFacade->expects($this->any())
-            ->method('getNbArticlesInCart')
-            ->will($this->returnValue(5));
-
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
-        $operators = array(
-            MatchForTotalAmountManager::INPUT1 => '>',
-            MatchForTotalAmountManager::INPUT2 => '=='
-        );
-        $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
-        $condition1->setValidatorsFromForm($operators, $values);
-
-        $condition2 = new MatchForXArticlesManager($stubFacade);
-        $operators = array(
-            MatchForXArticlesManager::INPUT1 => '>'
-        );
-        $values = array(
-            MatchForXArticlesManager::INPUT1 => 4
-        );
-        $condition2->setValidatorsFromForm($operators, $values);
-
-        $conditions = new ConditionCollection();
-        $conditions->add($condition1);
-        $conditions->add($condition2);
-
-        $conditionEvaluator = new ConditionEvaluator();
-        $isValid = $conditionEvaluator->isMatching($conditions);
-
-        $expected = true;
-        $actual =$isValid;
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testTestFail2Rules()
-    {
-        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var FacadeInterface $stubFacade */
-        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubFacade->expects($this->any())
-            ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
-        $stubFacade->expects($this->any())
-            ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
-
-        $currencies = CurrencyQuery::create();
-        $currencies = $currencies->find();
-        $stubFacade->expects($this->any())
-            ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
-
-        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubMatchForTotalAmountManager = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForTotalAmountManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $stubMatchForTotalAmountManager->expects($this->any())
-            ->method('isMatching')
-            ->will($this->returnValue(true));
-
-        $stubContainer->expects($this->any())
-            ->method('get')
-            ->will($this->returnValue($stubMatchForTotalAmountManager));
-
-        $stubContainer->expects($this->any())
-            ->method('has')
-            ->will($this->returnValue(true));
-
-        $stubFacade->expects($this->any())
-            ->method('getContainer')
-            ->will($this->returnValue($stubContainer));
-        $stubFacade->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubFacade->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(400.00));
-        $stubFacade->expects($this->any())
-            ->method('getNbArticlesInCart')
-            ->will($this->returnValue(5));
-
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
-        $operators = array(
-            MatchForTotalAmountManager::INPUT1 => '>',
-            MatchForTotalAmountManager::INPUT2 => '=='
-        );
-        $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
-        $condition1->setValidatorsFromForm($operators, $values);
-
-        $condition2 = new MatchForXArticlesManager($stubFacade);
-        $operators = array(
-            MatchForXArticlesManager::INPUT1 => '>'
-        );
-        $values = array(
-            MatchForXArticlesManager::INPUT1 => 4
-        );
-        $condition2->setValidatorsFromForm($operators, $values);
-
-        $conditions = new ConditionCollection();
-        $conditions->add($condition1);
-        $conditions->add($condition2);
-
-        $conditionEvaluator = new ConditionEvaluator();
-        $isValid = $conditionEvaluator->isMatching($conditions);
-
-        $expected = false;
-        $actual =$isValid;
-        $this->assertEquals($expected, $actual, 'Conditions evaluator always think Customer is matching conditions');
-    }
-
+    /**
+     * Test vatiable comparison
+     *
+     * @covers Thelia\Condition\ConditionEvaluator::variableOpComparison
+     */
     public function testVariableOpComparisonSuccess()
     {
         $conditionEvaluator = new ConditionEvaluator();
@@ -409,6 +92,11 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * Test vatiable comparison
+     *
+     * @covers Thelia\Condition\ConditionEvaluator::variableOpComparison
+     */
     public function testVariableOpComparisonFail()
     {
         $conditionEvaluator = new ConditionEvaluator();
@@ -440,7 +128,10 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test vatiable comparison
+     *
      * @expectedException \Exception
+     * @covers Thelia\Condition\ConditionEvaluator::variableOpComparison
      */
     public function testVariableOpComparisonException()
     {
@@ -448,6 +139,68 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
         $expected = true;
         $actual = $conditionEvaluator->variableOpComparison(1, 'bad', 1);
         $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Test condition collection matching
+     *
+     * @covers Thelia\Condition\ConditionEvaluator::isMatching
+     */
+    public function testIsMatchingTrue()
+    {
+        $stubConditionTrue1 = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticlesManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubConditionTrue1->expects($this->any())
+            ->method('isMatching')
+            ->will($this->returnValue(true));
+
+        $stubConditionTrue2 = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticlesManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubConditionTrue2->expects($this->any())
+            ->method('isMatching')
+            ->will($this->returnValue(true));
+
+        $collection = new ConditionCollection();
+        $collection->add($stubConditionTrue1);
+        $collection->add($stubConditionTrue2);
+
+        $conitionEvaluator = new ConditionEvaluator();
+        $actual = $conitionEvaluator->isMatching($collection);
+
+        $this->assertTrue($actual);
+    }
+
+    /**
+     * Test condition collection matching
+     *
+     * @covers Thelia\Condition\ConditionEvaluator::isMatching
+     */
+    public function testIsMatchingFalse()
+    {
+        $stubConditionTrue = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticlesManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubConditionTrue->expects($this->any())
+            ->method('isMatching')
+            ->will($this->returnValue(true));
+
+        $stubConditionFalse = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticlesManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubConditionFalse->expects($this->any())
+            ->method('isMatching')
+            ->will($this->returnValue(false));
+
+        $collection = new ConditionCollection();
+        $collection->add($stubConditionTrue);
+        $collection->add($stubConditionFalse);
+
+        $conitionEvaluator = new ConditionEvaluator();
+        $actual = $conitionEvaluator->isMatching($collection);
+
+        $this->assertFalse($actual);
     }
 
     /**
