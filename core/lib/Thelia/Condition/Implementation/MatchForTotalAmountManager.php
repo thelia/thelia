@@ -155,10 +155,6 @@ class MatchForTotalAmountManager extends ConditionManagerAbstract
             $this->availableOperators[self::INPUT2]
         );
 
-        if (!$isOperator1Legit || !$isOperator2Legit) {
-            return false;
-        }
-
         $condition1 = $this->conditionValidator->variableOpComparison(
             $this->facade->getCartTotalPrice(),
             $this->operators[self::INPUT1],

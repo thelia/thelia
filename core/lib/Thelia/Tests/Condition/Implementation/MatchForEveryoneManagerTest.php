@@ -197,4 +197,25 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * Check validator
+     *
+     * @covers Thelia\Condition\Implementation\setValidatorsFromForm::generateInputs
+     *
+     */
+    public function testSetValidator()
+    {
+        $stubFacade = $this->generateFacadeStub(399, 'EUR');
+
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForEveryoneManager($stubFacade);
+
+        $actual = $condition1->setValidatorsFromForm(array(), array());
+
+        $expected = $condition1;
+
+        $this->assertEquals($expected, $actual);
+
+    }
+
 }
