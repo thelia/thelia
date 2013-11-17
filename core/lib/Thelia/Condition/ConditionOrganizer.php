@@ -21,20 +21,20 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Condition;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Manage how Coupons could interact with a Checkout
+ * Manage how Condition could interact with each others
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RuleOrganizer implements RuleOrganizerInterface
+class ConditionOrganizer implements ConditionOrganizerInterface
 {
     /**
      * Organize ConditionManagerInterface

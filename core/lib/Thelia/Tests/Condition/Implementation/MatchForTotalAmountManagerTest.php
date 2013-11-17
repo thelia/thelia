@@ -26,7 +26,7 @@ namespace Thelia\Condition\Implementation;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Operators;
-use Thelia\Coupon\ConditionCollection;
+use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
 use Thelia\Model\Currency;

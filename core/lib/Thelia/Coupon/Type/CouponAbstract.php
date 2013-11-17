@@ -27,8 +27,8 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Coupon\ConditionCollection;
-use Thelia\Coupon\RuleOrganizerInterface;
+use Thelia\Condition\ConditionCollection;
+use Thelia\Condition\ConditionOrganizerInterface;
 use Thelia\Exception\InvalidConditionException;
 
 /**
@@ -50,7 +50,7 @@ abstract class CouponAbstract implements CouponInterface
     /** @var Translator Service Translator */
     protected $translator = null;
 
-    /** @var RuleOrganizerInterface  */
+    /** @var ConditionOrganizerInterface  */
     protected $organizer = null;
 
     /** @var ConditionCollection Array of ConditionManagerInterface */
@@ -116,7 +116,7 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Set Condition Organizer
      *
-     * @param RuleOrganizerInterface $organizer Manage Condition groups (&& and ||)
+     * @param ConditionOrganizerInterface $organizer Manage Condition groups (&& and ||)
      *
      * @return $this
      */

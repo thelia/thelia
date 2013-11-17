@@ -25,9 +25,7 @@ namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
-use Thelia\Coupon\FacadeInterface;
-use Thelia\Coupon\ConditionCollection;
-use Thelia\Model\CurrencyQuery;
+use Thelia\Condition\ConditionCollection;
 
 /**
  * Created by JetBrains PhpStorm.

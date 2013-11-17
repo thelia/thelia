@@ -25,7 +25,7 @@ namespace Thelia\Condition;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\Operators;
-use Thelia\Coupon\ConditionCollection;
+use Thelia\Condition\ConditionCollection;
 
 
 /**

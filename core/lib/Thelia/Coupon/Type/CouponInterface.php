@@ -23,7 +23,7 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Coupon\ConditionCollection;
+use Thelia\Condition\ConditionCollection;
 
 /**
  * Created by JetBrains PhpStorm.
