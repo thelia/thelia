@@ -176,7 +176,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
      * Check validator
      *
      * @covers Thelia\Condition\Implementation\MatchForEveryoneManager::generateInputs
-     *
+     * @covers Thelia\Condition\Implementation\MatchForEveryoneManager::setValidatorsFromForm
      */
     public function testGetValidator()
     {
@@ -184,38 +184,19 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
 
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForEveryoneManager($stubFacade);
-
-        $actual = $condition1->getValidators();
+        $actual1 = $condition1->setValidatorsFromForm(array(), array());
+        $expected1 = $condition1;
+        $actual2 = $condition1->getValidators();
 
         $validators = array();
         $validators['inputs'] = array();
         $validators['setOperators'] = array();
         $validators['setValues'] = array();
-        $expected = $validators;
+        $expected2 = $validators;
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected1, $actual1);
+        $this->assertEquals($expected2, $actual2);
 
-    }
-
-    /**
-     * Check validator
-     *
-     * @covers Thelia\Condition\Implementation\setValidatorsFromForm::generateInputs
-     *
-     */
-    public function testSetValidator()
-    {
-        $stubFacade = $this->generateFacadeStub(399, 'EUR');
-
-        /** @var FacadeInterface $stubFacade */
-        $condition1 = new MatchForEveryoneManager($stubFacade);
-
-        $actual = $condition1->setValidatorsFromForm(array(), array());
-
-        $expected = $condition1;
-
-        $this->assertEquals($expected, $actual);
 
     }
-
 }
