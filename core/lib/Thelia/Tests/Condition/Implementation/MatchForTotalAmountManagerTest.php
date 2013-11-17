@@ -804,6 +804,168 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Generate adapter stub
+     *
+     * @param int    $cartTotalPrice   Cart total price
+     * @param string $checkoutCurrency Checkout currency
+     * @param string $i18nOutput       Output from each translation
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    public function generateFacadeStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR', $i18nOutput = '')
+    {
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubFacade->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue($cartTotalPrice));
+
+        $stubFacade->expects($this->any())
+            ->method('getCheckoutCurrency')
+            ->will($this->returnValue($checkoutCurrency));
+
+        $stubFacade->expects($this->any())
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
+
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubTranslator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnValue($i18nOutput));
+
+        $stubFacade->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+
+        $currency1 = new Currency();
+        $currency1->setCode('EUR');
+        $currency2 = new Currency();
+        $currency2->setCode('USD');
+        $stubFacade->expects($this->any())
+            ->method('getAvailableCurrencies')
+            ->will($this->returnValue(array($currency1, $currency2)));
+
+        return $stubFacade;
+    }
+
+    /**
+     * Check getName i18n
+     *
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::getName
+     *
+     */
+    public function testGetName()
+    {
+        $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Cart total amount');
+
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
+
+        $actual = $condition1->getName();
+        $expected = 'Cart total amount';
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check tooltip i18n
+     *
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::getToolTip
+     *
+     */
+    public function testGetToolTip()
+    {
+        $stubFacade = $this->generateFacadeStub(399, 'EUR', 'If cart total amount is <strong>%operator%</strong> %amount% %currency%');
+
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $operators = array(
+            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmountManager::INPUT1 => 400.00,
+            MatchForTotalAmountManager::INPUT2 => 'EUR');
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $actual = $condition1->getToolTip();
+        $expected = 'If cart total amount is <strong>%operator%</strong> %amount% %currency%';
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check validator
+     *
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::generateInputs
+     *
+     */
+    public function testGetValidator()
+    {
+        $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Price');
+
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $operators = array(
+            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmountManager::INPUT1 => 400.00,
+            MatchForTotalAmountManager::INPUT2 => 'EUR');
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $actual = $condition1->getValidators();
+
+        $validators = array(
+            'inputs' => array(
+                MatchForTotalAmountManager::INPUT1 => array(
+                    'title' => 'Price',
+                    'availableOperators' => array(
+                        '<' => 'Price',
+                        '<=' => 'Price',
+                        '==' => 'Price',
+                        '>=' => 'Price',
+                        '>' => 'Price'
+                    ),
+                    'availableValues' => '',
+                    'type' => 'text',
+                    'class' => 'form-control',
+                    'value' => '',
+                    'selectedOperator' => ''
+                ),
+                MatchForTotalAmountManager::INPUT2 => array(
+                    'title' => 'Price',
+                    'availableOperators' => array('==' => 'Price'),
+                    'availableValues' => array(
+                        'EUR' => 'â‚¬',
+                        'USD' => '$',
+                        'GBP' => 'Â£',
+                    ),
+                    'type' => 'select',
+                    'class' => 'form-control',
+                    'value' => '',
+                    'selectedOperator' => Operators::EQUAL
+                )
+            ),
+            'setOperators' => array(
+                'price' => '==',
+                'currency' => '=='
+            ),
+            'setValues' => array(
+                'price' => 400,
+                'currency' => 'EUR'
+            )
+        );
+        $expected = $validators;
+
+        $this->assertEquals($expected, $actual);
+
+    }
+
+    /**
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */

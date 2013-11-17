@@ -631,6 +631,142 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Generate adapter stub
+     *
+     * @param int    $cartTotalPrice   Cart total price
+     * @param string $checkoutCurrency Checkout currency
+     * @param string $i18nOutput       Output from each translation
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    public function generateFacadeStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR', $i18nOutput = '')
+    {
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubFacade->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue($cartTotalPrice));
+
+        $stubFacade->expects($this->any())
+            ->method('getCheckoutCurrency')
+            ->will($this->returnValue($checkoutCurrency));
+
+        $stubFacade->expects($this->any())
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
+
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubTranslator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnValue($i18nOutput));
+
+        $stubFacade->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+
+        return $stubFacade;
+    }
+
+    /**
+     * Check getName i18n
+     *
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::getName
+     *
+     */
+    public function testGetName()
+    {
+        $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Number of articles in cart');
+
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForXArticlesManager($stubFacade);
+
+        $actual = $condition1->getName();
+        $expected = 'Number of articles in cart';
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check tooltip i18n
+     *
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::getToolTip
+     *
+     */
+    public function testGetToolTip()
+    {
+        $stubFacade = $this->generateFacadeStub(399, 'EUR', 'If cart products quantity is <strong>superior to</strong> 4');
+
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $operators = array(
+            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
+        );
+        $values = array(
+            MatchForXArticlesManager::INPUT1 => 4
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $actual = $condition1->getToolTip();
+        $expected = 'If cart products quantity is <strong>superior to</strong> 4';
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check validator
+     *
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::generateInputs
+     *
+     */
+    public function testGetValidator()
+    {
+        $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Price');
+
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $operators = array(
+            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
+        );
+        $values = array(
+            MatchForXArticlesManager::INPUT1 => 4
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $actual = $condition1->getValidators();
+
+        $validators = array(
+            'inputs' => array(
+                MatchForXArticlesManager::INPUT1 => array(
+                    'title' => 'Price',
+                    'availableOperators' => array(
+                        '<' => 'Price',
+                        '<=' => 'Price',
+                        '==' => 'Price',
+                        '>=' => 'Price',
+                        '>' => 'Price'
+                    ),
+                    'type' => 'text',
+                    'class' => 'form-control',
+                    'value' => '',
+                    'selectedOperator' => ''
+                )
+            ),
+            'setOperators' => array(
+                'quantity' => '>'
+            ),
+            'setValues' => array(
+                'quantity' => 4
+            )
+        );
+        $expected = $validators;
+
+        $this->assertEquals($expected, $actual);
+
+    }
+
+    /**
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */

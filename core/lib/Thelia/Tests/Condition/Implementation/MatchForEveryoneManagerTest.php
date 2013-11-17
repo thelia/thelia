@@ -49,6 +49,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
+     * @param string $i18nOutput       Output from each translation
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
