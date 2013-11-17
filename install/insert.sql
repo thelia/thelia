@@ -66,7 +66,7 @@ INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
 (1, 'en_US', 'M', 'Mister'),
 (2, 'fr_FR', 'Mme', 'Madame'),
 (2, 'en_US', 'Mrs', 'Misses'),
-(3, 'fr_FR', 'Mlle', 'Madamemoiselle'),
+(3, 'fr_FR', 'Mlle', 'Mademoiselle'),
 (3, 'en_US', 'Miss', 'Miss');
 
 INSERT INTO `currency` (`id`, `code`, `symbol`, `rate`, `position`, `by_default`, `created_at`, `updated_at`)
