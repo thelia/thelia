@@ -20,9 +20,10 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Controller\Front;
+namespace Front\Controller;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\TemplateHelper;
