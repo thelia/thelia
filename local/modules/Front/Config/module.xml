@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+    <fullnamespace>Front\Front</fullnamespace>
+    <descriptive locale="en_US">
+        <title>front integration</title>
+        <description></description>
+    </descriptive>
+    <descriptive locale="fr_FR">
+        <title>front office module</title>
+        <description></description>
+    </descriptive>
+    <version>0.1</version>
+    <author>
+        <name>Thelia team</name>
+        <email>info@thelia.net</email>
+    </author>
+    <type>classic</type>
+    <thelia>2.0.0</thelia>
+    <stability>alpha</stability>
+</module>

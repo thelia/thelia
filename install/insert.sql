@@ -47,13 +47,16 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
 (1, 'TheliaDebugBar', 1, 1, 1, 'TheliaDebugBar\\TheliaDebugBar', NOW(), NOW()),
 (2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', NOW(), NOW()),
-(3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', NOW(), NOW());
+(3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', NOW(), NOW()),
+(4, 'Front', 1, 1, 2, 'Front\\Front', NOW(), NOW());
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 ('1',  'en_US',  'Debug bar', NULL,  NULL,  NULL),
 ('1',  'fr_FR',  'Debug bar', NULL,  NULL,  NULL),
 ('2',  'en_US',  '72h delivery', NULL,  NULL,  NULL),
-('2',  'fr_FR',  'Livraison par colissimo en 72h', NULL,  NULL,  NULL);
+('2',  'fr_FR',  'Livraison par colissimo en 72h', NULL,  NULL,  NULL),
+('4',  'en_US',  'Front office integration', NULL,  NULL,  NULL),
+('4',  'fr_FR',  'Module Front office', NULL,  NULL,  NULL);
 
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
@@ -66,7 +69,7 @@ INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
 (1, 'en_US', 'M', 'Mister'),
 (2, 'fr_FR', 'Mme', 'Madame'),
 (2, 'en_US', 'Mrs', 'Misses'),
-(3, 'fr_FR', 'Mlle', 'Madamemoiselle'),
+(3, 'fr_FR', 'Mlle', 'Mademoiselle'),
 (3, 'en_US', 'Miss', 'Miss');
 
 INSERT INTO `currency` (`id`, `code`, `symbol`, `rate`, `position`, `by_default`, `created_at`, `updated_at`)

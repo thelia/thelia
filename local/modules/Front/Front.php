@@ -21,52 +21,15 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Front;
-use Thelia\Form\ContactForm;
-use Thelia\Form\Exception\FormValidationException;
-use Thelia\Model\ConfigQuery;
+namespace Front;
 
-/**
- * Class ContactController
- * @package Thelia\Controller\Front
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class ContactController extends BaseFrontController
+use Thelia\Module\BaseModule;
+
+class Front extends BaseModule
 {
     /**
-     * send contact message
+     * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
+     * Like install and destroy
      */
-    public function sendAction()
-    {
-        $error_message = false;
-        $contactForm = new ContactForm($this->getRequest());
 
-        try {
-            $form = $this->validateForm($contactForm);
-
-            $message = \Swift_Message::newInstance($form->get('subject')->getData())
-                ->addFrom($form->get('email')->getData(), $form->get('name')->getData())
-                ->addTo(ConfigQuery::read('contact_email'), ConfigQuery::read('company_name'))
-                ->setBody($form->get('message')->getData())
-            ;
-
-            $this->getMailer()->send($message);
-
-        } catch (FormValidationException $e) {
-            $error_message = $e->getMessage();
-        }
-
-        if ($error_message !== false) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during sending contact mail : %s', $error_message));
-
-            $contactForm->setErrorMessage($error_message);
-
-            $this->getParserContext()
-                ->addForm($contactForm)
-                ->setGeneralError($error_message)
-            ;
-        } else {
-            $this->redirectToRoute('contact.success');
-        }
-    }
 }
