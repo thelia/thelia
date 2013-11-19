@@ -1,0 +1,47 @@
+{extends file="layout.tpl"}
+
+
+{block name="body-class"}page-search{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+{$breadcrumbs = [
+['title' => {intl l="Search"}, 'url'=>{url path="/search"}]
+]}
+{/block}
+
+{block name="main-content"}
+<div class="main">
+
+    {$limit={$smarty.get.limit|default:8}}
+    {$product_page={$smarty.get.page|default:1}}
+    {$product_order={$smarty.get.order|default:'alpha'}}
+
+    <article class="col-main  {$smarty.get.mode|default:"grid"}"  role="main" aria-labelledby="main-label">
+
+        <h1 id="main-label" class="page-header">{intl l="Search Result for"} <small>{$smarty.get.q}</small></h1>
+        {assign var="amount" value="{count type="product" title="{$smarty.get.q}"}"}
+        {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order amount={$amount}}
+        <div id="category-products">
+            <div class="products-content">
+                {ifloop rel="product_list"}
+                    <ul class="product-col-3">
+                        {loop type="product" name="product_list" title="{$smarty.get.q}"  limit=$limit page=$product_page order=$product_order}
+                            {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="369" height="247"}
+                        {/loop}
+                    </ul>
+                {/ifloop}
+                {elseloop  rel="product_list"}
+                    <h2 class="text-center">{intl l="No results found"} </h2>
+                {/elseloop}
+            </div>
+        </div><!-- /#category-products -->
+        {ifloop rel="product_list"}
+            {include file="includes/toolbar.html" toolbar="bottom" amount={$amount}}
+        {/ifloop}
+    </article>
+
+</div><!-- /.layout -->
+{/block}
+
+{block name="after-javascript-include"}{/block}

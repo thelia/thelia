@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class AlphaNumStringType implements TypeInterface
+class AlphaNumStringType extends BaseType
 {
     public function getType()
     {
@@ -37,11 +37,21 @@ class AlphaNumStringType implements TypeInterface
 
     public function isValid($value)
     {
-        return preg_match('#^[a-zA-Z0-9\-_]+$#', $value) ? true : false;
+        return preg_match('#^[a-zA-Z0-9\-_\.]+$#', $value) ? true : false;
     }
 
     public function getFormattedValue($value)
     {
         return $this->isValid($value) ? $value : null;
+    }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
     }
 }

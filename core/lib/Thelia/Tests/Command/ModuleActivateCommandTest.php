@@ -41,6 +41,9 @@ class ModuleActivateCommandTest extends \PHPUnit_Framework_TestCase
         $module = ModuleQuery::create()->findOne();
 
         if (null !== $module) {
+
+            $prev_activation_status = $module->getActivate();
+
             $application = new Application($this->getKernel());
 
             $module->setActivate(BaseModule::IS_NOT_ACTIVATED);
@@ -58,7 +61,12 @@ class ModuleActivateCommandTest extends \PHPUnit_Framework_TestCase
                 "module" => $module->getCode(),
             ));
 
-            $this->assertEquals(BaseModule::IS_ACTIVATED, ModuleQuery::create()->findPk($module->getId())->getActivate());
+            $activated = ModuleQuery::create()->findPk($module->getId())->getActivate();
+
+            // Restore activation status
+            $module->setActivate($prev_activation_status)->save();
+
+            $this->assertEquals(BaseModule::IS_ACTIVATED, $activated);
         }
     }
 

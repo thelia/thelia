@@ -79,6 +79,7 @@ class Customer extends BaseCustomer implements UserInterface
                 $address = new Address();
 
                 $address
+                    ->setLabel("default")
                     ->setCompany($company)
                     ->setTitleId($titleId)
                     ->setFirstname($firstname)

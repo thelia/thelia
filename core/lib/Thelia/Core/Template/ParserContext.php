@@ -23,7 +23,7 @@
 
 namespace Thelia\Core\Template;
 
-use Thelia\Model\ConfigQuery;
+use Thelia\Core\Thelia;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Form\BaseForm;
 /**
@@ -39,7 +39,7 @@ class ParserContext implements \IteratorAggregate
     public function __construct(Request $request)
     {
         // Setup basic variables
-        $this->set('THELIA_VERSION'	, ConfigQuery::read('thelia_version', 'undefined'))
+        $this->set('THELIA_VERSION'	, Thelia::THELIA_VERSION)
         ;
     }
 

@@ -185,7 +185,7 @@ class CurrencyTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), 'RESTRICT', 'RESTRICT', 'Orders');
-        $this->addRelation('Cart', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), null, null, 'Carts');
+        $this->addRelation('Cart', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), 'CASCADE', 'RESTRICT', 'Carts');
         $this->addRelation('ProductPrice', '\\Thelia\\Model\\ProductPrice', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), 'CASCADE', null, 'ProductPrices');
         $this->addRelation('CurrencyI18n', '\\Thelia\\Model\\CurrencyI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CurrencyI18ns');
     } // buildRelations()
@@ -210,6 +210,7 @@ class CurrencyTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+                CartTableMap::clearInstancePool();
                 ProductPriceTableMap::clearInstancePool();
                 CurrencyI18nTableMap::clearInstancePool();
             }

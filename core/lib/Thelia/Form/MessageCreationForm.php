@@ -25,6 +25,7 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints;
 use Thelia\Model\MessageQuery;
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Core\Translation\Translator;
 
 class MessageCreationForm extends BaseForm
 {
@@ -41,7 +42,7 @@ class MessageCreationForm extends BaseForm
         $this->formBuilder
             ->add("name", "text", array(
                 "constraints" => $name_constraints,
-                "label" => "Name *",
+                "label" => Translator::getInstance()->trans('Name *'),
                 "label_attr" => array(
                     "for" => "name"
                 )
@@ -50,7 +51,7 @@ class MessageCreationForm extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "Purpose *",
+                "label" => Translator::getInstance()->trans('Purpose *'),
                 "label_attr" => array(
                     "for" => "purpose"
                 )
@@ -74,7 +75,7 @@ class MessageCreationForm extends BaseForm
         $message = MessageQuery::create()->findOneByName($value);
 
         if ($message) {
-            $context->addViolation(sprintf("A message with name \"%s\" already exists.", $value));
+            $context->addViolation(Translator::getInstance()->trans('A message with name "%name" already exists.', array('%name' => $value)));
         }
     }
 

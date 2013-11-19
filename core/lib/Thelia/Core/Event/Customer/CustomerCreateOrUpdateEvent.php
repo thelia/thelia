@@ -31,7 +31,7 @@ use Thelia\Model\Customer;
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CustomerCreateOrUpdateEvent extends ActionEvent
+class CustomerCreateOrUpdateEvent extends CustomerEvent
 {
     //base parameters for creating new customer
     protected $title;
@@ -52,11 +52,6 @@ class CustomerCreateOrUpdateEvent extends ActionEvent
     protected $sponsor;
     protected $discount;
     protected $company;
-
-    /**
-     * @var \Thelia\Model\Customer
-     */
-    protected $customer;
 
     /**
      * @param int    $title     the title customer id
@@ -242,21 +237,4 @@ class CustomerCreateOrUpdateEvent extends ActionEvent
     {
         return $this->sponsor;
     }
-
-    /**
-     * @param Customer $customer
-     */
-    public function setCustomer(Customer $customer)
-    {
-        $this->customer = $customer;
-    }
-
-    /**
-     * @return Customer
-     */
-    public function getCustomer()
-    {
-        return $this->customer;
-    }
-
 }

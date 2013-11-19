@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class IntListType implements TypeInterface
+class IntListType extends BaseType
 {
     public function getType()
     {
@@ -49,5 +49,15 @@ class IntListType implements TypeInterface
     public function getFormattedValue($values)
     {
         return $this->isValid($values) ? explode(',', $values) : null;
+    }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
     }
 }

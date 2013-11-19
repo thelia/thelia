@@ -38,9 +38,9 @@ class CreateAdminUser extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName("thelia:create-admin")
-            ->setDescription("Create a new adminsitration user")
-            ->setHelp("The <info>thelia:create-admin</info> command create a new administration user.")
+            ->setName("admin:create")
+            ->setDescription("Create a new administrator user")
+            ->setHelp("The <info>admin:create</info> command create a new administration user.")
             ->addOption(
                 'login_name',
                 null,
@@ -134,6 +134,8 @@ class CreateAdminUser extends ContainerAwareCommand
 
             $output->writeln("Passwords are different, please try again.");
         } while (true);
+
+        $admin->setProfile(null);
 
         return $admin;
     }

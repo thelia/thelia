@@ -44,7 +44,6 @@ use Thelia\Model;
 class TheliaHttpKernel extends HttpKernel
 {
     protected static $session;
-
     protected $container;
 
     public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
@@ -84,7 +83,6 @@ class TheliaHttpKernel extends HttpKernel
             $request = $this->initSession($request);
             $this->initParam($request);
         }
-
         $this->container->enterScope('request');
         $this->container->set('request', $request, 'request');
 
@@ -237,9 +235,8 @@ class TheliaHttpKernel extends HttpKernel
             $session = self::$session;
         }
 
-        $request->setSession($session);
-
         $session->start();
+        $request->setSession($session);
 
         return $request;
     }

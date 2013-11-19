@@ -65,6 +65,30 @@ class CartItem extends BaseCartItem
         return $this;
     }
 
+    public function addQuantity($value)
+    {
+        $currentQuantity = $this->getQuantity();
+        $newQuantity = $currentQuantity + $value;
+
+        if($value <= 0)
+        {
+            $value = $currentQuantity;
+        }
+
+        if(ConfigQuery::read("verifyStock", 1) == 1)
+        {
+            $productSaleElements = $this->getProductSaleElements();
+
+            if($productSaleElements->getQuantity() < $newQuantity) {
+                $newQuantity = $currentQuantity;
+            }
+        }
+
+        $this->setQuantity($newQuantity);
+
+        return $this;
+    }
+
     public function getRealPrice()
     {
         return $this->getPromo() == 1 ? $this->getPromoPrice() : $this->getPrice();

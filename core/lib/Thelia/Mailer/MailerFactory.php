@@ -52,7 +52,7 @@ class MailerFactory {
         if($transporterEvent->hasTransporter()) {
             $transporter = $transporterEvent->getTransporter();
         } else {
-            if (ConfigQuery::read("smtp.enabled")) {
+            if (ConfigQuery::isSmtpEnable()) {
                 $transporter = $this->configureSmtp();
             } else {
                 $transporter = \Swift_MailTransport::newInstance();
@@ -65,14 +65,14 @@ class MailerFactory {
     private function configureSmtp()
     {
         $smtpTransporter = new \Swift_SmtpTransport();
-        $smtpTransporter->setHost(Configquery::read('smtp.host', 'localhost'))
-            ->setPort(ConfigQuery::read('smtp.host'))
-            ->setEncryption(ConfigQuery::read('smtp.encryption'))
-            ->setUsername(ConfigQuery::read('smtp.username'))
-            ->setPassword(ConfigQuery::read('smtp.password'))
-            ->setAuthMode(ConfigQuery::read('smtp.authmode'))
-            ->setTimeout(ConfigQuery::read('smtp.timeout', 30))
-            ->setSourceIp(ConfigQuery::read('smtp.sourceip'))
+        $smtpTransporter->setHost(Configquery::getSmtpHost())
+            ->setPort(ConfigQuery::getSmtpPort())
+            ->setEncryption(ConfigQuery::getSmtpEncryption())
+            ->setUsername(ConfigQuery::getSmtpUsername())
+            ->setPassword(ConfigQuery::getSmtpPassword())
+            ->setAuthMode(ConfigQuery::getSmtpAuthMode())
+            ->setTimeout(ConfigQuery::getSmtpTimeout())
+            ->setSourceIp(ConfigQuery::getSmtpSourceIp())
         ;
         return $smtpTransporter;
     }

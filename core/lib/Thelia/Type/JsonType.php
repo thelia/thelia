@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class JsonType implements TypeInterface
+class JsonType extends BaseType
 {
     public function getType()
     {
@@ -45,5 +45,15 @@ class JsonType implements TypeInterface
     public function getFormattedValue($value)
     {
         return $this->isValid($value) ? json_decode($value, true) : null;
+    }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
     }
 }

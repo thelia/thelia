@@ -29,6 +29,8 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
+use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -39,26 +41,22 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
-use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
-use Thelia\Type\BooleanOrBothType;
 
 /**
  *
  * Product loop
  *
- *
  * Class Product
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Product extends BaseI18nLoop
+class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
-    public $timestampable = true;
-    public $versionable = true;
+    protected $timestampable = true;
+    protected $versionable = true;
 
     /**
      * @return ArgumentCollection
@@ -66,6 +64,7 @@ class Product extends BaseI18nLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
+            Argument::createBooleanTypeArgument('complex', false),
             Argument::createIntListTypeArgument('id'),
             new Argument(
                 'ref',
@@ -87,6 +86,7 @@ class Product extends BaseI18nLoop
             Argument::createIntTypeArgument('depth', 1),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createIntTypeArgument('currency'),
+            Argument::createAnyTypeArgument('title'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -129,13 +129,429 @@ class Product extends BaseI18nLoop
         );
     }
 
+    public function getSearchIn()
+    {
+        return array(
+            "ref",
+            "title",
+        );
+    }
+
     /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     * @throws \InvalidArgumentException
+     * @param ProductQuery $search
+     * @param $searchTerm
+     * @param $searchIn
+     * @param $searchCriteria
      */
-    public function exec(&$pagination)
+    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
+    {
+
+        $search->_and();
+        foreach ($searchIn as $index => $searchInElement) {
+            if ($index > 0) {
+                $search->_or();
+            }
+            switch ($searchInElement) {
+                case "ref":
+                    $search->filterByRef($searchTerm, $searchCriteria);
+                    break;
+                case "title":
+                    $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$searchCriteria." ?", $searchTerm, \PDO::PARAM_STR);
+                    break;
+            }
+        }
+    }
+
+    public function buildModelCriteria()
+    {
+        $complex = $this->getComplex();
+        if (true === $complex) {
+            return $this->buildComplex();
+        }
+
+        $currencyId = $this->getCurrency();
+        if (null !== $currencyId) {
+            $currency = CurrencyQuery::create()->findOneById($currencyId);
+            if (null === $currency) {
+                throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
+            }
+        } else {
+            $currency = $this->request->getSession()->getCurrency();
+        }
+
+        $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
+        $defaultCurrencySuffix = '_default_currency';
+
+        $search = ProductQuery::create();
+        $search->innerJoinProductSaleElements('pse');
+        $search->addJoinCondition('pse', '`pse`.IS_DEFAULT=1');
+
+        $priceJoin = new Join();
+        $priceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'price');
+        $priceJoin->setJoinType(Criteria::LEFT_JOIN);
+
+        $search->addJoinObject($priceJoin, 'price_join')
+            ->addJoinCondition('price_join', '`price`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
+
+        if ($defaultCurrency->getId() != $currency->getId()) {
+            $priceJoinDefaultCurrency = new Join();
+            $priceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'price' . $defaultCurrencySuffix);
+            $priceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
+
+            $search->addJoinObject($priceJoinDefaultCurrency, 'price_join' . $defaultCurrencySuffix)
+                ->addJoinCondition('price_join' . $defaultCurrencySuffix, '`price' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+
+            /**
+             * rate value is checked as a float in overloaded getRate method.
+             */
+            $priceToCompareAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN
+                    CASE WHEN `pse`.PROMO=1 THEN `price' . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `price' . $defaultCurrencySuffix . '`.PRICE END * ' . $currency->getRate() . '
+                ELSE
+                    CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END
+                END';
+
+            $search->withColumn('ROUND(' . $priceToCompareAsSQL . ', 2)', 'real_price');
+            $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price' . $defaultCurrencySuffix . '`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END', 'price');
+            $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price' . $defaultCurrencySuffix . '`.PROMO_PRICE * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END', 'promo_price');
+        } else {
+            $priceToCompareAsSQL = 'CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END';
+
+            $search->withColumn('ROUND(' . $priceToCompareAsSQL . ', 2)', 'real_price');
+            $search->withColumn('`price`.PRICE', 'price');
+            $search->withColumn('`price`.PROMO_PRICE', 'promo_price');
+        }
+
+        /* manage translations */
+        $this->configureI18nProcessing($search);
+
+        $id = $this->getId();
+
+        if (!is_null($id)) {
+            $search->filterById($id, Criteria::IN);
+        }
+
+        $ref = $this->getRef();
+
+        if (!is_null($ref)) {
+            $search->filterByRef($ref, Criteria::IN);
+        }
+
+        $title = $this->getTitle();
+
+        if (!is_null($title)) {
+            $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
+        }
+
+        $category = $this->getCategory();
+        $categoryDefault = $this->getCategoryDefault();
+
+        if (!is_null($category) ||!is_null($categoryDefault)) {
+
+            $categoryIds = array();
+            if (!is_array($category)) {
+                $category = array();
+            }
+            if (!is_array($categoryDefault)) {
+                $categoryDefault = array();
+            }
+
+            $categoryIds = array_merge($categoryIds, $category, $categoryDefault);
+            $categories =CategoryQuery::create()->filterById($categoryIds, Criteria::IN)->find();
+
+            $depth = $this->getDepth();
+
+            if (null !== $depth) {
+                foreach (CategoryQuery::findAllChild($category, $depth) as $subCategory) {
+                    $categories->prepend($subCategory);
+                }
+            }
+
+            $search->filterByCategory(
+                $categories,
+                Criteria::IN
+            );
+        }
+
+        $new = $this->getNew();
+
+        if ($new === true) {
+            $search->where('`pse`.NEWNESS' . Criteria::EQUAL . '1');
+        } elseif ($new === false) {
+            $search->where('`pse`.NEWNESS' . Criteria::EQUAL . '0');
+        }
+
+        $promo = $this->getPromo();
+
+        if ($promo === true) {
+            $search->where('`pse`.PROMO' . Criteria::EQUAL . '1');
+        } elseif ($promo === false) {
+            $search->where('`pse`.PROMO' . Criteria::EQUAL . '0');
+        }
+
+        $min_stock = $this->getMin_stock();
+
+        if (null != $min_stock) {
+            $search->where('`pse`.QUANTITY' . Criteria::GREATER_THAN . '?', $min_stock, \PDO::PARAM_INT);
+        }
+
+        $min_weight = $this->getMin_weight();
+
+        if (null != $min_weight) {
+            $search->where('`pse`.WEIGHT' . Criteria::GREATER_THAN . '?', $min_weight, \PDO::PARAM_STR);
+        }
+
+        $max_weight = $this->getMax_weight();
+
+        if (null != $max_weight) {
+            $search->where('`is_max_weight`.WEIGHT' . Criteria::LESS_THAN . '?', $max_weight, \PDO::PARAM_STR);
+        }
+
+        $min_price = $this->getMin_price();
+
+        if (null !== $min_price) {
+
+            if (false === ConfigQuery::useTaxFreeAmounts()) {
+                // @todo
+            }
+
+            $search->where('ROUND(' . $priceToCompareAsSQL . ', 2)>=?', $min_price, \PDO::PARAM_STR);
+        }
+
+        $max_price = $this->getMax_price();
+
+        if (null !== $max_price) {
+            if (false === ConfigQuery::useTaxFreeAmounts()) {
+                // @todo
+            }
+
+            $search->where('ROUND(' . $priceToCompareAsSQL . ', 2)<=?', $max_price, \PDO::PARAM_STR);
+        }
+
+        $current = $this->getCurrent();
+
+        if ($current === true) {
+            $search->filterById($this->request->get("product_id"), Criteria::EQUAL);
+        } elseif ($current === false) {
+            $search->filterById($this->request->get("product_id"), Criteria::NOT_IN);
+        }
+
+        $current_category = $this->getCurrent_category();
+
+        if ($current_category === true) {
+            $search->filterByCategory(
+                CategoryQuery::create()->filterByProduct(
+                    ProductCategoryQuery::create()->filterByProductId(
+                        $this->request->get("product_id"),
+                        Criteria::EQUAL
+                    )->find(),
+                    Criteria::IN
+                )->find(),
+                Criteria::IN
+            );
+        } elseif ($current_category === false) {
+            $search->filterByCategory(
+                CategoryQuery::create()->filterByProduct(
+                    ProductCategoryQuery::create()->filterByProductId(
+                        $this->request->get("product_id"),
+                        Criteria::EQUAL
+                    )->find(),
+                    Criteria::IN
+                )->find(),
+                Criteria::NOT_IN
+            );
+        }
+
+        $visible = $this->getVisible();
+
+        if ($visible !== Type\BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
+
+        $exclude = $this->getExclude();
+
+        if (!is_null($exclude)) {
+            $search->filterById($exclude, Criteria::NOT_IN);
+        }
+
+        $exclude_category = $this->getExclude_category();
+
+        if (!is_null($exclude_category)) {
+            $search->filterByCategory(
+                CategoryQuery::create()->filterById($exclude_category, Criteria::IN)->find(),
+                Criteria::NOT_IN
+            );
+        }
+
+        $feature_availability = $this->getFeature_availability();
+
+        $this->manageFeatureAv($search, $feature_availability);
+
+        $feature_values = $this->getFeature_values();
+
+        $this->manageFeatureValue($search, $feature_values);
+
+        $search->groupBy(ProductTableMap::ID);
+
+        $search->withColumn('`pse`.ID', 'pse_id');
+        $search->withColumn('`pse`.NEWNESS', 'is_new');
+        $search->withColumn('`pse`.PROMO', 'is_promo');
+        $search->withColumn('`pse`.QUANTITY', 'quantity');
+        $search->withColumn('`pse`.WEIGHT', 'weight');
+        $search->withColumn('`pse`.EAN_CODE', 'ean_code');
+
+        $orders  = $this->getOrder();
+
+        foreach ($orders as $order) {
+            switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
+                case "alpha":
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
+                    break;
+                case "min_price":
+                    $search->addAscendingOrderByColumn('real_price');
+                    break;
+                case "max_price":
+                    $search->addDescendingOrderByColumn('real_price');
+                    break;
+                case "manual":
+                    if(null === $categoryIds || count($categoryIds) != 1)
+                        throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "manual_reverse":
+                    if(null === $categoryIds || count($categoryIds) != 1)
+                        throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+                case "ref":
+                    $search->orderByRef(Criteria::ASC);
+                    break;
+                case "promo":
+                    $search->addDescendingOrderByColumn('is_promo');
+                    break;
+                case "new":
+                    $search->addDescendingOrderByColumn('is_new');
+                    break;
+                case "given_id":
+                    if(null === $id)
+                        throw new \InvalidArgumentException('Given_id order cannot be set without `id` argument');
+                    foreach ($id as $singleId) {
+                        $givenIdMatched = 'given_id_matched_' . $singleId;
+                        $search->withColumn(ProductTableMap::ID . "='$singleId'", $givenIdMatched);
+                        $search->orderBy($givenIdMatched, Criteria::DESC);
+                    }
+                    break;
+                case "random":
+                    $search->clearOrderByColumns();
+                    $search->addAscendingOrderByColumn('RAND()');
+                    break(2);
+            }
+        }
+
+        return $search;
+    }
+
+    public function parseResults(LoopResult $loopResult)
+    {
+        $complex = $this->getComplex();
+        if (true === $complex) {
+            return $this->parseComplex($loopResult);
+        }
+
+        $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
+
+        foreach ($loopResult->getResultDataCollection() as $product) {
+
+            $loopResultRow = new LoopResultRow($product);
+
+            $price = $product->getVirtualColumn('price');
+            try {
+                $taxedPrice = $product->getTaxedPrice(
+                    $taxCountry,
+                    $price
+                );
+            } catch (TaxEngineException $e) {
+                $taxedPrice = null;
+            }
+            $promoPrice = $product->getVirtualColumn('promo_price');
+            try {
+                $taxedPromoPrice = $product->getTaxedPromoPrice(
+                    $taxCountry,
+                    $promoPrice
+                );
+            } catch (TaxEngineException $e) {
+                $taxedPromoPrice = null;
+            }
+
+            // Find previous and next product, in the default category.
+            $default_category_id = $product->getDefaultCategoryId();
+
+            $previous = ProductQuery::create()
+                ->joinProductCategory()
+                ->where('ProductCategory.category_id = ?', $default_category_id)
+                ->filterByPosition($product->getPosition(), Criteria::LESS_THAN)
+                ->orderByPosition(Criteria::DESC)
+                ->findOne()
+            ;
+
+            $next = ProductQuery::create()
+                ->joinProductCategory()
+                ->where('ProductCategory.category_id = ?', $default_category_id)
+                ->filterByPosition($product->getPosition(), Criteria::GREATER_THAN)
+                ->orderByPosition(Criteria::ASC)
+                ->findOne()
+            ;
+
+            $loopResultRow
+                ->set("ID"                      , $product->getId())
+                ->set("REF"                     , $product->getRef())
+                ->set("IS_TRANSLATED"           , $product->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE"                  , $this->locale)
+                ->set("TITLE"                   , $product->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO"                   , $product->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION"             , $product->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM"            , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("URL"                     , $product->getUrl($this->locale))
+                ->set("BEST_PRICE"              , $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
+                ->set("BEST_PRICE_TAX"          , $taxedPrice - $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
+                ->set("BEST_TAXED_PRICE"        , $product->getVirtualColumn('is_promo') ? $taxedPromoPrice : $taxedPrice)
+                ->set("PRICE"                   , $price)
+                ->set("PRICE_TAX"               , $taxedPrice - $price)
+                ->set("TAXED_PRICE"             , $taxedPrice)
+                ->set("PROMO_PRICE"             , $promoPrice)
+                ->set("PROMO_PRICE_TAX"         , $taxedPromoPrice - $promoPrice)
+                ->set("TAXED_PROMO_PRICE"       , $taxedPromoPrice)
+                ->set("PRODUCT_SALE_ELEMENT"    , $product->getVirtualColumn('pse_id'))
+                ->set("WEIGHT"                  , $product->getVirtualColumn('weight'))
+                ->set("QUANTITY"                , $product->getVirtualColumn('quantity'))
+                ->set("EAN_CODE"                , $product->getVirtualColumn('ean_code'))
+                ->set("IS_PROMO"                , $product->getVirtualColumn('is_promo'))
+                ->set("IS_NEW"                  , $product->getVirtualColumn('is_new'))
+                ->set("POSITION"                , $product->getPosition())
+                ->set("VISIBLE"                 , $product->getVisible() ? "1" : "0")
+                ->set("TEMPLATE"                , $product->getTemplateId())
+                ->set("HAS_PREVIOUS"            , $previous != null ? 1 : 0)
+                ->set("HAS_NEXT"                , $next != null ? 1 : 0)
+                ->set("PREVIOUS"                , $previous != null ? $previous->getId() : -1)
+                ->set("NEXT"                    , $next != null ? $next->getId() : -1)
+                ->set("DEFAULT_CATEGORY"        , $default_category_id)
+                ->set("TAX_RULE_ID"             , $product->getTaxRuleId())
+
+            ;
+
+            $loopResult->addRow($loopResultRow);
+        }
+
+        return $loopResult;
+    }
+
+    public function buildComplex()
     {
         $currencyId = $this->getCurrency();
         if (null !== $currencyId) {
@@ -153,7 +569,7 @@ class Product extends BaseI18nLoop
         $search = ProductQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $attributeNonStrictMatch = $this->getAttribute_non_strict_match();
         $isPSELeftJoinList = array();
@@ -170,6 +586,17 @@ class Product extends BaseI18nLoop
         if (!is_null($ref)) {
             $search->filterByRef($ref, Criteria::IN);
         }
+
+
+        $title = $this->getTitle();
+
+        if (!is_null($title)) {
+
+            $search->where(" CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
+        }
+
+
+
 
         $category = $this->getCategory();
         $categoryDefault = $this->getCategoryDefault();
@@ -301,7 +728,7 @@ class Product extends BaseI18nLoop
                  * In propel we trust : $currency->getRate() always returns a float.
                  * Or maybe not : rate value is checked as a float in overloaded getRate method.
                  */
-                $MinPriceToCompareAsSQL = 'CASE WHEN ISNULL(CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END) THEN
+                $MinPriceToCompareAsSQL = 'CASE WHEN ISNULL(CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END) OR `min_price_data`.FROM_DEFAULT_CURRENCY = 1 THEN
                     CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data' . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `min_price_data' . $defaultCurrencySuffix . '`.PRICE END * ' . $currency->getRate() . '
                 ELSE
                     CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END
@@ -339,7 +766,7 @@ class Product extends BaseI18nLoop
                  * In propel we trust : $currency->getRate() always returns a float.
                  * Or maybe not : rate value is checked as a float in overloaded getRate method.
                  */
-                $MaxPriceToCompareAsSQL = 'CASE WHEN ISNULL(CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END) THEN
+                $MaxPriceToCompareAsSQL = 'CASE WHEN ISNULL(CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END) OR `min_price_data`.FROM_DEFAULT_CURRENCY = 1 THEN
                     CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data' . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `max_price_data' . $defaultCurrencySuffix . '`.PRICE END * ' . $currency->getRate() . '
                 ELSE
                     CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END
@@ -461,7 +888,7 @@ class Product extends BaseI18nLoop
 
         $visible = $this->getVisible();
 
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
+        if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
 
         $exclude = $this->getExclude();
 
@@ -480,59 +907,11 @@ class Product extends BaseI18nLoop
 
         $feature_availability = $this->getFeature_availability();
 
-        if (null !== $feature_availability) {
-            foreach ($feature_availability as $feature => $feature_choice) {
-                foreach ($feature_choice['values'] as $feature_av) {
-                    $featureAlias = 'fa_' . $feature;
-                    if($feature_av != '*')
-                        $featureAlias .= '_' . $feature_av;
-                    $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
-                        ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
-                    if($feature_av != '*')
-                        $search->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_AV_ID = ?", $feature_av, null, \PDO::PARAM_INT);
-                }
-
-                /* format for mysql */
-                $sqlWhereString = $feature_choice['expression'];
-                if ($sqlWhereString == '*') {
-                    $sqlWhereString = 'NOT ISNULL(`fa_' . $feature . '`.ID)';
-                } else {
-                    $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
-                    $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
-                    $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
-                }
-
-                $search->where("(" . $sqlWhereString . ")");
-            }
-        }
+        $this->manageFeatureAv($search, $feature_availability);
 
         $feature_values = $this->getFeature_values();
 
-        if (null !== $feature_values) {
-            foreach ($feature_values as $feature => $feature_choice) {
-                foreach ($feature_choice['values'] as $feature_value) {
-                    $featureAlias = 'fv_' . $feature;
-                    if($feature_value != '*')
-                        $featureAlias .= '_' . $feature_value;
-                    $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
-                        ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
-                    if($feature_value != '*')
-                        $search->addJoinCondition($featureAlias, "`$featureAlias`.BY_DEFAULT = ?", $feature_value, null, \PDO::PARAM_STR);
-                }
-
-                /* format for mysql */
-                $sqlWhereString = $feature_choice['expression'];
-                if ($sqlWhereString == '*') {
-                    $sqlWhereString = 'NOT ISNULL(`fv_' . $feature . '`.ID)';
-                } else {
-                    $sqlWhereString = preg_replace('#([a-zA-Z0-9_\-]+)#', 'NOT ISNULL(`fv_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
-                    $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
-                    $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
-                }
-
-                $search->where("(" . $sqlWhereString . ")");
-            }
-        }
+        $this->manageFeatureValue($search, $feature_values);
 
         $search->groupBy(ProductTableMap::ID);
 
@@ -593,22 +972,25 @@ class Product extends BaseI18nLoop
             }
         }
 
-        /* perform search */
-        $products = $this->search($search, $pagination);
+        return $search;
+    }
 
-        $loopResult = new LoopResult($products);
+    public function parseComplex(LoopResult $results)
+    {
+        $loopResult = new LoopResult($results);
 
         $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
 
-        foreach ($products as $product) {
+        foreach ($loopResult->getResultDataCollection() as $product) {
 
-            $loopResultRow = new LoopResultRow($loopResult, $product, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow = new LoopResultRow($product);
 
             $price = $product->getRealLowestPrice();
 
             try {
                 $taxedPrice = $product->getTaxedPrice(
-                    $taxCountry
+                    $taxCountry,
+                    $product->getRealLowestPrice()
                 );
             } catch (TaxEngineException $e) {
                 $taxedPrice = null;
@@ -637,12 +1019,12 @@ class Product extends BaseI18nLoop
                 ->set("ID"               , $product->getId())
                 ->set("REF"              , $product->getRef())
                 ->set("IS_TRANSLATED"    , $product->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"           , $locale)
+                ->set("LOCALE"           , $this->locale)
                 ->set("TITLE"            , $product->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO"            , $product->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION"      , $product->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM"     , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL"              , $product->getUrl($locale))
+                ->set("URL"              , $product->getUrl($this->locale))
                 ->set("BEST_PRICE"       , $price)
                 ->set("BEST_PRICE_TAX"   , $taxedPrice - $price)
                 ->set("BEST_TAXED_PRICE" , $taxedPrice)
@@ -656,12 +1038,71 @@ class Product extends BaseI18nLoop
                 ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)
                 ->set("NEXT"             , $next != null ? $next->getId() : -1)
                 ->set("DEFAULT_CATEGORY" , $default_category_id)
+                ->set("TAX_RULE_ID"      , $product->getTaxRuleId())
 
-                ;
+            ;
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
+    }
+
+    protected function manageFeatureAv(&$search, $feature_availability)
+    {
+        if (null !== $feature_availability) {
+            foreach ($feature_availability as $feature => $feature_choice) {
+                foreach ($feature_choice['values'] as $feature_av) {
+                    $featureAlias = 'fa_' . $feature;
+                    if($feature_av != '*')
+                        $featureAlias .= '_' . $feature_av;
+                    $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
+                        ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
+                    if($feature_av != '*')
+                        $search->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_AV_ID = ?", $feature_av, null, \PDO::PARAM_INT);
+                }
+
+                /* format for mysql */
+                $sqlWhereString = $feature_choice['expression'];
+                if ($sqlWhereString == '*') {
+                    $sqlWhereString = 'NOT ISNULL(`fa_' . $feature . '`.ID)';
+                } else {
+                    $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
+                    $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
+                    $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
+                }
+
+                $search->where("(" . $sqlWhereString . ")");
+            }
+        }
+    }
+
+    protected function manageFeatureValue(&$search, $feature_values)
+    {
+        if (null !== $feature_values) {
+            foreach ($feature_values as $feature => $feature_choice) {
+                foreach ($feature_choice['values'] as $feature_value) {
+                    $featureAlias = 'fv_' . $feature;
+                    if($feature_value != '*')
+                        $featureAlias .= '_' . $feature_value;
+                    $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
+                        ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
+                    if($feature_value != '*')
+                        $search->addJoinCondition($featureAlias, "`$featureAlias`.BY_DEFAULT = ?", $feature_value, null, \PDO::PARAM_STR);
+                }
+
+                /* format for mysql */
+                $sqlWhereString = $feature_choice['expression'];
+                if ($sqlWhereString == '*') {
+                    $sqlWhereString = 'NOT ISNULL(`fv_' . $feature . '`.ID)';
+                } else {
+                    $sqlWhereString = preg_replace('#([a-zA-Z0-9_\-]+)#', 'NOT ISNULL(`fv_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
+                    $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
+                    $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
+                }
+
+                $search->where("(" . $sqlWhereString . ")");
+            }
+        }
     }
 }

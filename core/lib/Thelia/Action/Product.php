@@ -52,16 +52,10 @@ use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
-use Thelia\Model\AttributeAvQuery;
-use Thelia\Model\AttributeCombination;
-use Thelia\Core\Event\Product\ProductCreateCombinationEvent;
-use Propel\Runtime\Propel;
-use Thelia\Model\Map\ProductTableMap;
-use Thelia\Core\Event\Product\ProductDeleteCombinationEvent;
-use Thelia\Model\ProductPrice;
-use Thelia\Model\ProductSaleElements;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
+use Thelia\Model\Map\ProductTableMap;
+use Propel\Runtime\Propel;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
@@ -84,8 +78,6 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             // Set the default tax rule to this product
             ->setTaxRule(TaxRuleQuery::create()->findOneByIsDefault(true))
-
-            //public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight) {
 
             ->create(
                     $event->getDefaultCategory(),
@@ -267,21 +259,37 @@ class Product extends BaseAction implements EventSubscriberInterface
 
     public function setProductTemplate(ProductSetTemplateEvent $event)
     {
-        $product = $event->getProduct();
 
-        // Delete all product feature relations
-        FeatureProductQuery::create()->filterByProduct($product)->delete();
+        $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
-        // Delete all product attributes sale elements
-        ProductSaleElementsQuery::create()->filterByProduct($product)->delete();
+        $con->beginTransaction();
 
-        // Update the product template
-        $template_id = $event->getTemplateId();
+        try {
 
-        // Set it to null if it's zero.
-        if ($template_id <= 0) $template_id = NULL;
+            $product = $event->getProduct();
 
-        $product->setTemplateId($template_id)->save();
+            // Delete all product feature relations
+            FeatureProductQuery::create()->filterByProduct($product)->delete($con);
+
+            // Delete all product attributes sale elements
+            ProductSaleElementsQuery::create()->filterByProduct($product)->delete($con);
+
+            // Update the product template
+            $template_id = $event->getTemplateId();
+
+            // Set it to null if it's zero.
+            if ($template_id <= 0) $template_id = NULL;
+
+            $product->setTemplateId($template_id)->save($con);
+
+            // Store all the stuff !
+            $con->commit();
+        } catch (\Exception $ex) {
+
+            $con->rollback();
+
+            throw $ex;
+        }
     }
 
     /**
@@ -304,6 +312,11 @@ class Product extends BaseAction implements EventSubscriberInterface
         return $this->genericUpdatePosition(ProductAssociatedContentQuery::create(), $event);
     }
 
+    /**
+     * Update the value of a product feature.
+     *
+     * @param FeatureProductUpdateEvent $event
+     */
     public function updateFeatureProductValue(FeatureProductUpdateEvent $event)
     {
         // If the feature is not free text, it may have one ore more values.
@@ -346,6 +359,11 @@ class Product extends BaseAction implements EventSubscriberInterface
         $event->setFeatureProduct($featureProduct);
     }
 
+    /**
+     * Delete a product feature value
+     *
+     * @param FeatureProductDeleteEvent $event
+     */
     public function deleteFeatureProductValue(FeatureProductDeleteEvent $event)
     {
         $featureProduct = FeatureProductQuery::create()
@@ -353,76 +371,6 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->filterByFeatureId($event->getFeatureId())
             ->delete()
         ;
-    }
-
-    public function createProductCombination(ProductCreateCombinationEvent $event)
-    {
-        $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
-
-        $con->beginTransaction();
-
-        try {
-            $product = $event->getProduct();
-
-            // Create an empty product sale element
-            $salesElement = new ProductSaleElements();
-
-            $salesElement
-                ->setProduct($product)
-                ->setRef($product->getRef())
-                ->setPromo(0)
-                ->setNewness(0)
-                ->setWeight(0)
-                ->setIsDefault(false)
-                ->save($con)
-            ;
-
-            // Create an empty product price in the default currency
-            $product_price = new ProductPrice();
-
-            $product_price
-                ->setProductSaleElements($salesElement)
-                ->setPromoPrice(0)
-                ->setPrice(0)
-                ->setCurrencyId($event->getCurrencyId())
-                ->save($con)
-            ;
-
-            $combinationAttributes = $event->getAttributeAvList();
-
-            if (count($combinationAttributes) > 0) {
-
-                foreach ($combinationAttributes as $attributeAvId) {
-
-                    $attributeAv = AttributeAvQuery::create()->findPk($attributeAvId);
-
-                    if ($attributeAv !== null) {
-                        $attributeCombination = new AttributeCombination();
-
-                        $attributeCombination
-                            ->setAttributeAvId($attributeAvId)
-                            ->setAttribute($attributeAv->getAttribute())
-                            ->setProductSaleElements($salesElement)
-                            ->save();
-                    }
-                }
-            }
-
-            // Store all the stuff !
-            $con->commit();
-        } catch (\Exception $ex) {
-
-            $con->rollback();
-
-            throw $ex;
-        }
-    }
-
-    public function deleteProductCombination(ProductDeleteCombinationEvent $event)
-    {
-        if (null !== $pse = ProductSaleElementsQuery::create()->findPk($event->getProductSaleElementId())) {
-            $pse->delete();
-        }
     }
 
     /**
@@ -436,18 +384,15 @@ class Product extends BaseAction implements EventSubscriberInterface
             TheliaEvents::PRODUCT_DELETE            => array("delete", 128),
             TheliaEvents::PRODUCT_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
 
-            TheliaEvents::PRODUCT_UPDATE_POSITION   => array("updatePosition", 128),
+            TheliaEvents::PRODUCT_UPDATE_POSITION => array("updatePosition", 128),
 
             TheliaEvents::PRODUCT_ADD_CONTENT               => array("addContent", 128),
             TheliaEvents::PRODUCT_REMOVE_CONTENT            => array("removeContent", 128),
-            TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION => array("updateAccessoryPosition", 128),
             TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION   => array("updateContentPosition", 128),
 
-            TheliaEvents::PRODUCT_ADD_COMBINATION    => array("createProductCombination", 128),
-            TheliaEvents::PRODUCT_DELETE_COMBINATION => array("deleteProductCombination", 128),
-
-            TheliaEvents::PRODUCT_ADD_ACCESSORY     => array("addAccessory", 128),
-            TheliaEvents::PRODUCT_REMOVE_ACCESSORY  => array("removeAccessory", 128),
+            TheliaEvents::PRODUCT_ADD_ACCESSORY             => array("addAccessory", 128),
+            TheliaEvents::PRODUCT_REMOVE_ACCESSORY          => array("removeAccessory", 128),
+            TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION => array("updateAccessoryPosition", 128),
 
             TheliaEvents::PRODUCT_ADD_CATEGORY    => array("addCategory", 128),
             TheliaEvents::PRODUCT_REMOVE_CATEGORY => array("removeCategory", 128),
@@ -456,7 +401,6 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE => array("updateFeatureProductValue", 128),
             TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE => array("deleteFeatureProductValue", 128),
-
         );
     }
 }

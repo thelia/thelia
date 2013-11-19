@@ -57,7 +57,7 @@ class ProductPriceTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class ProductPriceTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the PRODUCT_SALE_ELEMENTS_ID field
@@ -88,6 +88,11 @@ class ProductPriceTableMap extends TableMap
      * the column name for the PROMO_PRICE field
      */
     const PROMO_PRICE = 'product_price.PROMO_PRICE';
+
+    /**
+     * the column name for the FROM_DEFAULT_CURRENCY field
+     */
+    const FROM_DEFAULT_CURRENCY = 'product_price.FROM_DEFAULT_CURRENCY';
 
     /**
      * the column name for the CREATED_AT field
@@ -111,12 +116,12 @@ class ProductPriceTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('ProductSaleElementsId', 'CurrencyId', 'Price', 'PromoPrice', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('productSaleElementsId', 'currencyId', 'price', 'promoPrice', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, ProductPriceTableMap::CURRENCY_ID, ProductPriceTableMap::PRICE, ProductPriceTableMap::PROMO_PRICE, ProductPriceTableMap::CREATED_AT, ProductPriceTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('PRODUCT_SALE_ELEMENTS_ID', 'CURRENCY_ID', 'PRICE', 'PROMO_PRICE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('product_sale_elements_id', 'currency_id', 'price', 'promo_price', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('ProductSaleElementsId', 'CurrencyId', 'Price', 'PromoPrice', 'FromDefaultCurrency', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('productSaleElementsId', 'currencyId', 'price', 'promoPrice', 'fromDefaultCurrency', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, ProductPriceTableMap::CURRENCY_ID, ProductPriceTableMap::PRICE, ProductPriceTableMap::PROMO_PRICE, ProductPriceTableMap::FROM_DEFAULT_CURRENCY, ProductPriceTableMap::CREATED_AT, ProductPriceTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('PRODUCT_SALE_ELEMENTS_ID', 'CURRENCY_ID', 'PRICE', 'PROMO_PRICE', 'FROM_DEFAULT_CURRENCY', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('product_sale_elements_id', 'currency_id', 'price', 'promo_price', 'from_default_currency', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -126,12 +131,12 @@ class ProductPriceTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('ProductSaleElementsId' => 0, 'CurrencyId' => 1, 'Price' => 2, 'PromoPrice' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('productSaleElementsId' => 0, 'currencyId' => 1, 'price' => 2, 'promoPrice' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID => 0, ProductPriceTableMap::CURRENCY_ID => 1, ProductPriceTableMap::PRICE => 2, ProductPriceTableMap::PROMO_PRICE => 3, ProductPriceTableMap::CREATED_AT => 4, ProductPriceTableMap::UPDATED_AT => 5, ),
-        self::TYPE_RAW_COLNAME   => array('PRODUCT_SALE_ELEMENTS_ID' => 0, 'CURRENCY_ID' => 1, 'PRICE' => 2, 'PROMO_PRICE' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        self::TYPE_FIELDNAME     => array('product_sale_elements_id' => 0, 'currency_id' => 1, 'price' => 2, 'promo_price' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('ProductSaleElementsId' => 0, 'CurrencyId' => 1, 'Price' => 2, 'PromoPrice' => 3, 'FromDefaultCurrency' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('productSaleElementsId' => 0, 'currencyId' => 1, 'price' => 2, 'promoPrice' => 3, 'fromDefaultCurrency' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID => 0, ProductPriceTableMap::CURRENCY_ID => 1, ProductPriceTableMap::PRICE => 2, ProductPriceTableMap::PROMO_PRICE => 3, ProductPriceTableMap::FROM_DEFAULT_CURRENCY => 4, ProductPriceTableMap::CREATED_AT => 5, ProductPriceTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('PRODUCT_SALE_ELEMENTS_ID' => 0, 'CURRENCY_ID' => 1, 'PRICE' => 2, 'PROMO_PRICE' => 3, 'FROM_DEFAULT_CURRENCY' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('product_sale_elements_id' => 0, 'currency_id' => 1, 'price' => 2, 'promo_price' => 3, 'from_default_currency' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -152,8 +157,9 @@ class ProductPriceTableMap extends TableMap
         // columns
         $this->addForeignPrimaryKey('PRODUCT_SALE_ELEMENTS_ID', 'ProductSaleElementsId', 'INTEGER' , 'product_sale_elements', 'ID', true, null, null);
         $this->addForeignPrimaryKey('CURRENCY_ID', 'CurrencyId', 'INTEGER' , 'currency', 'ID', true, null, null);
-        $this->addColumn('PRICE', 'Price', 'FLOAT', true, null, null);
-        $this->addColumn('PROMO_PRICE', 'PromoPrice', 'FLOAT', false, null, null);
+        $this->addColumn('PRICE', 'Price', 'FLOAT', true, null, 0);
+        $this->addColumn('PROMO_PRICE', 'PromoPrice', 'FLOAT', true, null, 0);
+        $this->addColumn('FROM_DEFAULT_CURRENCY', 'FromDefaultCurrency', 'BOOLEAN', true, 1, true);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -371,6 +377,7 @@ class ProductPriceTableMap extends TableMap
             $criteria->addSelectColumn(ProductPriceTableMap::CURRENCY_ID);
             $criteria->addSelectColumn(ProductPriceTableMap::PRICE);
             $criteria->addSelectColumn(ProductPriceTableMap::PROMO_PRICE);
+            $criteria->addSelectColumn(ProductPriceTableMap::FROM_DEFAULT_CURRENCY);
             $criteria->addSelectColumn(ProductPriceTableMap::CREATED_AT);
             $criteria->addSelectColumn(ProductPriceTableMap::UPDATED_AT);
         } else {
@@ -378,6 +385,7 @@ class ProductPriceTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.CURRENCY_ID');
             $criteria->addSelectColumn($alias . '.PRICE');
             $criteria->addSelectColumn($alias . '.PROMO_PRICE');
+            $criteria->addSelectColumn($alias . '.FROM_DEFAULT_CURRENCY');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

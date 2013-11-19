@@ -12,6 +12,7 @@ use Thelia\Core\Event\Product\ProductEvent;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\ProductSaleElementsQuery;
 
 class Product extends BaseProduct
 {
@@ -40,11 +41,30 @@ class Product extends BaseProduct
         return $amount;
     }
 
-    public function getTaxedPrice(Country $country)
+    public function getTaxedPrice(Country $country, $price)
     {
         $taxCalculator = new Calculator();
+        return round($taxCalculator->load($this, $country)->getTaxedPrice($price), 2);
+    }
 
-        return $taxCalculator->load($this, $country)->getTaxedPrice($this->getRealLowestPrice());
+    public function getTaxedPromoPrice(Country $country, $price)
+    {
+        $taxCalculator = new Calculator();
+        return round($taxCalculator->load($this, $country)->getTaxedPrice($price), 2);
+    }
+
+    /**
+     * Return the default PSE for this product.
+     */
+    public function getDefaultSaleElements() {
+        return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->find();
+    }
+
+    /**
+     * Return PSE count fir this product.
+     */
+    public function countSaleElements() {
+        return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->count();
     }
 
     /**
@@ -100,7 +120,7 @@ class Product extends BaseProduct
         ;
 
         if ($productCategory == null || $productCategory->getCategoryId() != $defaultCategoryId) {
-            exit;
+
             // Delete the old default category
             if ($productCategory !== null) $productCategory->delete();
 
@@ -131,10 +151,10 @@ class Product extends BaseProduct
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
         $con->beginTransaction();
-
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEPRODUCT, new ProductEvent($this));
 
         try {
+
             // Create the product
             $this->save($con);
 
@@ -146,29 +166,8 @@ class Product extends BaseProduct
 
             $this->setTaxRuleId($taxRuleId);
 
-            // Create an empty product sale element
-            $sale_elements = new ProductSaleElements();
-
-            $sale_elements
-                ->setProduct($this)
-                ->setRef($this->getRef())
-                ->setPromo(0)
-                ->setNewness(0)
-                ->setWeight($baseWeight)
-                ->setIsDefault(true)
-                ->save($con)
-            ;
-
-            // Create an empty product price in the default currency
-            $product_price = new ProductPrice();
-
-            $product_price
-                ->setProductSaleElements($sale_elements)
-                ->setPromoPrice($basePrice)
-                ->setPrice($basePrice)
-                ->setCurrencyId($priceCurrencyId)
-                ->save($con)
-            ;
+            // Create the default product sale element of this product
+            $sale_elements = $this->createProductSaleElement($con, $baseWeight, $basePrice, $basePrice, $priceCurrencyId, true);
 
             // Store all the stuff !
             $con->commit();
@@ -181,6 +180,40 @@ class Product extends BaseProduct
 
             throw $ex;
         }
+    }
+
+    /**
+     * Create a basic product sale element attached to this product.
+     */
+    public function createProductSaleElement(ConnectionInterface $con, $weight, $basePrice, $salePrice, $currencyId, $isDefault, $isPromo = false, $isNew = false, $quantity = 0, $eanCode = '', $ref = false) {
+
+        // Create an empty product sale element
+        $sale_elements = new ProductSaleElements();
+
+        $sale_elements
+            ->setProduct($this)
+            ->setRef($ref == false ? $this->getRef() : $ref)
+            ->setPromo($isPromo)
+            ->setNewness($isNew)
+            ->setWeight($weight)
+            ->setIsDefault($isDefault)
+            ->setEanCode($eanCode)
+            ->setQuantity($quantity)
+            ->save($con)
+        ;
+
+        // Create an empty product price in the default currency
+        $product_price = new ProductPrice();
+
+        $product_price
+            ->setProductSaleElements($sale_elements)
+            ->setPromoPrice($salePrice)
+            ->setPrice($basePrice)
+            ->setCurrencyId($currencyId)
+            ->save($con)
+        ;
+
+        return $sale_elements;
     }
 
     /**

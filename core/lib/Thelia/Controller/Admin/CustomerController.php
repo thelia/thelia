@@ -22,130 +22,112 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+
 use Propel\Runtime\Exception\PropelException;
-use Symfony\Component\Form\Form;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Form\CustomerModification;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Form\CustomerCreateForm;
+use Thelia\Form\CustomerUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
 use Thelia\Core\Translation\Translator;
+use Thelia\Tools\Password;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\Address;
 
 /**
  * Class CustomerController
  * @package Thelia\Controller\Admin
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CustomerController extends BaseAdminController
+class CustomerController extends AbstractCrudController
 {
-    public function indexAction()
+    public function __construct()
     {
-        if (null !== $response = $this->checkAuth("admin.customer.view")) return $response;
-        return $this->render("customers", array("display_customer" => 20));
+
+        parent::__construct(
+                'customer',
+                'lastname',
+                'customer_order',
+
+                AdminResources::CUSTOMER,
+
+                TheliaEvents::CUSTOMER_CREATEACCOUNT,
+                TheliaEvents::CUSTOMER_UPDATEACCOUNT,
+                TheliaEvents::CUSTOMER_DELETEACCOUNT
+        );
     }
 
-    public function viewAction($customer_id)
+    protected function getCreationForm()
     {
-        if (null !== $response = $this->checkAuth("admin.customer.view")) return $response;
-        return $this->render("customer-edit", array(
-            "customer_id" => $customer_id
-        ));
+        return new CustomerCreateForm($this->getRequest());
     }
 
-    /**
-     * update customer action
-     *
-     * @param $customer_id
-     * @return mixed|\Symfony\Component\HttpFoundation\Response
-     */
-    public function updateAction($customer_id)
+    protected function getUpdateForm()
     {
-        if (null !== $response = $this->checkAuth("admin.customer.update")) return $response;
-
-        $message = false;
-
-        $customerModification = new CustomerModification($this->getRequest());
-
-        try {
-            $customer = CustomerQuery::create()->findPk($customer_id);
-
-            if (null === $customer) {
-                throw new \InvalidArgumentException(sprintf("%d customer id does not exist", $customer_id));
-            }
-
-            $form = $this->validateForm($customerModification);
-
-            $event = $this->createEventInstance($form->getData());
-            $event->setCustomer($customer);
-
-            $this->dispatch(TheliaEvents::CUSTOMER_UPDATEACCOUNT, $event);
-
-            $customerUpdated = $event->getCustomer();
-
-            $this->adminLogAppend(sprintf("Customer with Ref %s (ID %d) modified", $customerUpdated->getRef() , $customerUpdated->getId()));
-
-            if ($this->getRequest()->get("save_mode") == "close") {
-                $this->redirectToRoute("admin.customers");
-            } else {
-                $this->redirectSuccess($customerModification);
-            }
-
-        } catch (FormValidationException $e) {
-            $message = sprintf("Please check your input: %s", $e->getMessage());
-        } catch (PropelException $e) {
-            $message = $e->getMessage();
-        } catch (\Exception $e) {
-            $message = sprintf("Sorry, an error occured: %s", $e->getMessage()." ".$e->getFile());
-        }
-
-        if ($message !== false) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("Error during customer login process : %s.", $message));
-
-            $customerModification->setErrorMessage($message);
-
-            $this->getParserContext()
-                ->addForm($customerModification)
-                ->setGeneralError($message)
-            ;
-        }
-
-        return $this->render("customer-edit", array(
-            "customer_id" => $customer_id
-        ));
+        return new CustomerUpdateForm($this->getRequest());
     }
 
-    public function deleteAction()
+    protected function getCreationEvent($formData)
     {
-        if (null !== $response = $this->checkAuth("admin.customer.delete")) return $response;
+        return $this->createEventInstance($formData);
+    }
 
-        $message = null;
+    protected function getUpdateEvent($formData)
+    {
+        $event = $this->createEventInstance($formData);
 
-        try {
-            $customer_id = $this->getRequest()->get("customer_id");
-            $customer = CustomerQuery::create()->findPk($customer_id);
+        $event->setCustomer($this->getExistingObject());
 
-            if (null === $customer) {
-                throw new \InvalidArgumentException(Translator::getInstance("The customer you want to delete does not exist"));
-            }
+        return $event;
+    }
 
-            $event = new CustomerEvent($customer);
+    protected function getDeleteEvent()
+    {
+        return new CustomerEvent($this->getExistingObject());
+    }
 
-            $this->dispatch(TheliaEvents::CUSTOMER_DELETEACCOUNT, $event);
-        } catch (\Exception $e) {
-            $message = $e->getMessage();
-        }
+    protected function eventContainsObject($event)
+    {
+        return $event->hasCustomer();
+    }
 
-        $params = array(
-            "customer_page" => $this->getRequest()->get("customer_page", 1)
+    protected function hydrateObjectForm($object)
+    {
+        // Get default adress of the customer
+        $address = $object->getDefaultAddress();
+
+        // Prepare the data that will hydrate the form
+        $data = array(
+                'id'        => $object->getId(),
+                'firstname' => $object->getFirstname(),
+                'lastname'  => $object->getLastname(),
+                'email'     => $object->getEmail(),
+                'title'     => $object->getTitleId(),
         );
 
-        if ($message) {
-            $params["delete_error_message"] = $message;
+        if ($address !== null) {
+                $data['company']   = $address->getCompany();
+                $data['address1']  = $address->getAddress1();
+                $data['address2']  = $address->getAddress2();
+                $data['address3']  = $address->getAddress3();
+                $data['phone']     = $address->getPhone();
+                $data['cellphone'] = $address->getCellphone();
+                $data['zipcode']   = $address->getZipcode();
+                $data['city']      = $address->getCity();
+                $data['country']   = $address->getCountryId();
         }
 
-        $this->redirectToRoute("admin.customers", $params);
+        // A loop is used in the template
+        return new CustomerUpdateForm($this->getRequest(), 'form', $data);
+    }
 
+    protected function getObjectFromEvent($event)
+    {
+        return $event->hasCustomer() ? $event->getCustomer() : null;
     }
 
     /**
@@ -155,26 +137,75 @@ class CustomerController extends BaseAdminController
     private function createEventInstance($data)
     {
         $customerCreateEvent = new CustomerCreateOrUpdateEvent(
-            $data["title"],
-            $data["firstname"],
-            $data["lastname"],
-            $data["address1"],
-            $data["address2"],
-            $data["address3"],
-            $data["phone"],
-            $data["cellphone"],
-            $data["zipcode"],
-            $data["city"],
-            $data["country"],
-            isset($data["email"])?$data["email"]:null,
-            isset($data["password"]) ? $data["password"]:null,
-            $this->getRequest()->getSession()->getLang()->getId(),
-            isset($data["reseller"])?$data["reseller"]:null,
-            isset($data["sponsor"])?$data["sponsor"]:null,
-            isset($data["discount"])?$data["discount"]:null,
-            isset($data["company"])?$data["company"]:null
+                $data["title"],
+                $data["firstname"],
+                $data["lastname"],
+                $data["address1"],
+                $data["address2"],
+                $data["address3"],
+                $data["phone"],
+                $data["cellphone"],
+                $data["zipcode"],
+                $data["city"],
+                $data["country"],
+                isset($data["email"])?$data["email"]:null,
+                isset($data["password"]) && ! empty($data["password"]) ? $data["password"]:null,
+                $this->getRequest()->getSession()->getLang()->getId(),
+                isset($data["reseller"])?$data["reseller"]:null,
+                isset($data["sponsor"])?$data["sponsor"]:null,
+                isset($data["discount"])?$data["discount"]:null,
+                isset($data["company"])?$data["company"]:null
         );
 
         return $customerCreateEvent;
+    }
+
+    protected function getExistingObject()
+    {
+        return CustomerQuery::create()->findPk($this->getRequest()->get('customer_id', 0));
+    }
+
+    protected function getObjectLabel($object)
+    {
+        return $object->getRef() . "(".$object->getLastname()." ".$object->getFirstname().")";
+    }
+
+    protected function getObjectId($object)
+    {
+        return $object->getId();
+    }
+
+    protected function getEditionArguments()
+    {
+        return array(
+                'customer_id' => $this->getRequest()->get('customer_id', 0),
+                'page'        => $this->getRequest()->get('page', 1)
+        );
+    }
+
+    protected function renderListTemplate($currentOrder)
+    {
+        return $this->render('customers', array(
+                'customer_order'   => $currentOrder,
+                'display_customer' => 20,
+                'page'             => $this->getRequest()->get('page', 1)
+        ));
+    }
+
+    protected function redirectToListTemplate()
+    {
+        $this->redirectToRoute('admin.customers', array(
+                'page' => $this->getRequest()->get('page', 1))
+        );
+    }
+
+    protected function renderEditionTemplate()
+    {
+        return $this->render('customer-edit', $this->getEditionArguments());
+    }
+
+    protected function redirectToEditionTemplate()
+    {
+        $this->redirectToRoute("admin.customer.update.view", $this->getEditionArguments());
     }
 }

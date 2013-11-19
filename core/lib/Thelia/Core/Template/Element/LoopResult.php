@@ -32,14 +32,40 @@ class LoopResult implements \Iterator
     private $position;
     protected $collection = array();
 
-    public $modelCollection = null;
+    public $resultsCollection = null;
 
-    public function __construct($modelCollection = null)
+    protected $versioned = false;
+    protected $timestamped = false;
+    protected $countable = false;
+
+    public function __construct($resultsCollection)
     {
         $this->position = 0;
-        if ($modelCollection instanceof ObjectCollection || $modelCollection instanceof PropelModelPager || is_array($modelCollection)) {
-            $this->modelCollection = $modelCollection;
-        }
+        $this->resultsCollection = $resultsCollection;
+    }
+
+    /**
+     * @param boolean $countable
+     */
+    public function setCountable($countable = true)
+    {
+        $this->countable = true === $countable;
+    }
+
+    /**
+     * @param boolean $timestamped
+     */
+    public function setTimestamped($timestamped = true)
+    {
+        $this->timestamped = true === $timestamped;
+    }
+
+    /**
+     * @param boolean $versioned
+     */
+    public function setVersioned($versioned = true)
+    {
+        $this->versioned = true === $versioned;
     }
 
     public function isEmpty()
@@ -49,6 +75,21 @@ class LoopResult implements \Iterator
 
     public function addRow(LoopResultRow $row)
     {
+        if (true === $this->versioned) {
+            foreach ($this->getVersionOutputs() as $output) {
+                $row->set($output[0], $row->model->$output[1]());
+            }
+        }
+        if (true === $this->timestamped) {
+            foreach ($this->getTimestampOutputs() as $output) {
+                $row->set($output[0], $row->model->$output[1]());
+            }
+        }
+        if (true === $this->countable) {
+            $row->set('LOOP_COUNT', 1 + $this->getCount());
+            $row->set('LOOP_TOTAL', $this->getResultDataCollectionCount());
+        }
+
         $this->collection[] = $row;
     }
 
@@ -57,15 +98,20 @@ class LoopResult implements \Iterator
         return count($this->collection);
     }
 
-    public function getModelCollectionCount()
+    public function getResultDataCollectionCount()
     {
-        if ($this->modelCollection instanceof ObjectCollection || $this->modelCollection instanceof PropelModelPager) {
-            return $this->modelCollection->count();
-        } elseif (is_array($this->modelCollection)) {
-            return count($this->modelCollection);
+        if ($this->resultsCollection instanceof ObjectCollection || $this->resultsCollection instanceof PropelModelPager) {
+            return $this->resultsCollection->count();
+        } elseif (is_array($this->resultsCollection)) {
+            return count($this->resultsCollection);
         } else {
             return 0;
         }
+    }
+
+    public function getResultDataCollection()
+    {
+        return $this->resultsCollection;
     }
 
     /**
@@ -122,5 +168,22 @@ class LoopResult implements \Iterator
     public function rewind()
     {
         $this->position = 0;
+    }
+
+    protected function getTimestampOutputs()
+    {
+        return array(
+            array('CREATE_DATE', 'getCreatedAt'),
+            array('UPDATE_DATE', 'getUpdatedAt'),
+        );
+    }
+
+    protected function getVersionOutputs()
+    {
+        return array(
+            array('VERSION', 'getVersion'),
+            array('VERSION_DATE', 'getVersionCreatedAt'),
+            array('VERSION_AUTHOR', 'getVersionCreatedBy'),
+        );
     }
 }

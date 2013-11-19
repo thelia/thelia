@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
@@ -46,10 +47,7 @@ class FeatureAvController extends AbstractCrudController
             'manual',
             'order',
 
-            'admin.configuration.features-av.view',
-            'admin.configuration.features-av.create',
-            'admin.configuration.features-av.update',
-            'admin.configuration.features-av.delete',
+            AdminResources::FEATURE,
 
             TheliaEvents::FEATURE_AV_CREATE,
             TheliaEvents::FEATURE_AV_UPDATE,

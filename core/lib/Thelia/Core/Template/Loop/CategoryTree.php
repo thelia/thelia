@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Loop;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -45,7 +46,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class CategoryTree extends BaseI18nLoop
+class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 {
     /**
      * @return ArgumentCollection
@@ -59,13 +60,13 @@ class CategoryTree extends BaseI18nLoop
     }
 
     // changement de rubrique
-    protected function buildCategoryTree($parent, $visible, $level, $previousLevel, $max_level, $exclude, LoopResult &$loopResult)
+    protected function buildCategoryTree($parent, $visible, $level, $previousLevel, $max_level, $exclude, &$resultsList)
     {
         if ($level > $max_level) return;
 
         $search = CategoryQuery::create();
 
-        $locale = $this->configureI18nProcessing($search, array(
+        $this->configureI18nProcessing($search, array(
                     'TITLE'
                 ));
 
@@ -81,37 +82,45 @@ class CategoryTree extends BaseI18nLoop
 
         foreach ($results as $result) {
 
-            $loopResultRow = new LoopResultRow();
+            $resultsList[] = array(
+                "ID" => $result->getId(),
+                "TITLE" => $result->getVirtualColumn('i18n_TITLE'),
+                "PARENT" => $result->getParent(),
+                "URL" => $result->getUrl($this->locale),
+                "VISIBLE" => $result->getVisible() ? "1" : "0",
+                "LEVEL" => $level,
+                'CHILD_COUNT' => $result->countChild(),
+                'PREV_LEVEL' => $previousLevel,
+            );
 
-            $loopResultRow
-                ->set("ID", $result->getId())->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
-                ->set("PARENT", $result->getParent())->set("URL", $result->getUrl($locale))
-                ->set("VISIBLE", $result->getVisible() ? "1" : "0")->set("LEVEL", $level)
-                ->set('CHILD_COUNT', $result->countChild())->set('PREV_LEVEL', $previousLevel)
-            ;
-
-            $loopResult->addRow($loopResultRow);
-
-            $this->buildCategoryTree($result->getId(), $visible, 1 + $level, $level, $max_level, $exclude, $loopResult);
+            $this->buildCategoryTree($result->getId(), $visible, 1 + $level, $level, $max_level, $exclude, $resultsList);
         }
     }
 
-    /**
-     * @param $pagination (ignored)
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach($loopResult->getResultDataCollection() as $result) {
+            $loopResultRow = new LoopResultRow($result);
+            foreach($result as $output => $outputValue) {
+                $loopResultRow->set($output, $outputValue);
+            }
+            $loopResult->addRow($loopResultRow);
+        }
+
+        return $loopResult;
+    }
+
+    public function buildArray()
     {
         $id = $this->getCategory();
         $depth = $this->getDepth();
         $visible = $this->getVisible();
         $exclude = $this->getExclude();
 
-        $loopResult = new LoopResult();
+        $resultsList = array();
 
-        $this->buildCategoryTree($id, $visible, 0, 0, $depth, $exclude, $loopResult);
+        $this->buildCategoryTree($id, $visible, 0, 0, $depth, $exclude, $resultsList);
 
-        return $loopResult;
+        return $resultsList;
     }
 }

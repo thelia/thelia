@@ -24,12 +24,13 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Model\ConfigQuery;
+use Thelia\Core\Template\TemplateHelper;
 
 /**
  *
@@ -55,7 +56,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         $parser = $this->container->get("thelia.parser");
 
         // Define the template thant shoud be used
-        $parser->setTemplate(ConfigQuery::getActiveTemplate());
+        $parser->setTemplate(TemplateHelper::getInstance()->getActiveFrontTemplate());
 
         //$event->getRequest()->attributes->set('_view', ConfigQuery::getPageNotFoundView());
 

@@ -5,7 +5,7 @@ use Thelia\Condition\Implementation\MatchForEveryoneManager;
 use Thelia\Condition\Implementation\MatchForTotalAmountManager;
 use Thelia\Condition\Implementation\MatchForXArticlesManager;
 use Thelia\Condition\Operators;
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 use Thelia\Coupon\ConditionCollection;
 
 
@@ -424,8 +424,9 @@ try {
             $stock->setQuantity($faker->randomNumber(1,50));
             $stock->setPromo($faker->randomNumber(0,1));
             $stock->setNewness($faker->randomNumber(0,1));
-            $stock->setWeight($faker->randomFloat(2, 100,10000));
+            $stock->setWeight($faker->randomFloat(2, 1, 5));
             $stock->setIsDefault($i == 0);
+            $stock->setEanCode(substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 13));
             $stock->save();
 
             $productPrice = new \Thelia\Model\ProductPrice();
@@ -644,7 +645,7 @@ function generateCouponFixtures(\Thelia\Core\Thelia $thelia)
 {
     /** @var $container ContainerInterface Service Container */
     $container = $thelia->getContainer();
-    /** @var AdapterInterface $adapter */
+    /** @var FacadeInterface $adapter */
     $adapter = $container->get('thelia.adapter');
 
     // Coupons

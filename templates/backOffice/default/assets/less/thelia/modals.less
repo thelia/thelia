@@ -1,0 +1,30 @@
+//
+// Modals
+// --------------------------------------------------
+
+// Base modal
+.modal {
+  form {
+        margin-bottom: 0;
+    }
+}
+
+.modal-header {
+    h3 {
+        margin-bottom: 0;
+    }
+}
+
+// Body (where all modal content resides)
+.modal-body {
+  max-height: none;
+  .scrollable {
+      border: 1px solid @input-border;
+      border-radius: @input-border-radius;
+      height: 458px;
+      overflow: auto;
+      padding-bottom: 5px;
+      padding-left: 10px;
+      padding-top: 5px;
+  }
+}

@@ -1,0 +1,305 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Translations'}{/block}
+
+{block name="check-resource"}admin.configuration.variable{/block}
+{block name="check-access"}update{/block}
+
+{block name="main-content"}
+<div class="variables translations">
+
+    <div id="wrapper" class="container">
+
+        <ul class="breadcrumb">
+			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+            <li><a href="{url path='/admin/configuration/translations'}">{intl l="Translations"}</a></li>
+        </ul>
+
+		<div class="row">
+			<div class="col-md-12 general-block-decorator">
+				<div class="row">
+
+					<div class="col-md-12 title title-without-tabs">
+					   {intl l="Translation"}
+					</div>
+
+                    <div class="form-container">
+                         <div class="col-md-12">
+						    <form method="POST" id="translation_form" action="{url path='/admin/configuration/translations/update'}">
+                                <fieldset>
+
+	                                {include
+	                                    file      = "includes/inner-form-toolbar.html"
+	                                    close_url = {url path='/admin/configuration'}
+	                                }
+
+                                    <input type="hidden" name="edit_language_id" value="{$edit_language_id}" />
+
+	                                <div class="row">
+	                                    <div class="col-md-4">
+			                                <div class="form-group">
+												<label class="control-label" for="item_to_translate">{intl l='Select which items you want to translate'}</label>
+
+												<select id="item_to_translate" required="required" name="item_to_translate" class="submit-on-change form-control">
+	                                                <option value="">{intl l='Please select items to translate'}</option>
+	                                                <option value="fo" {if $item_to_translate=='fo'}selected="selected"{/if}>{intl l='Front-office templates'}</option>
+                                                    <option value="pf" {if $item_to_translate=='pf'}selected="selected"{/if}>{intl l='PDF templates'}</option>
+			                                        <option value="bo" {if $item_to_translate=='bo'}selected="selected"{/if}>{intl l='Back-office templates'}</option>
+			                                        <option value="mo" {if $item_to_translate=='mo'}selected="selected"{/if}>{intl l='Modules'}</option>
+	                                                <option value="co" {if $item_to_translate=='co'}selected="selected"{/if}>{intl l='Thelia core'}</option>
+												</select>
+			                                </div>
+		                                </div>
+
+	                                    {if $item_to_translate == 'mo'}
+		                                    <div class="col-md-4 item-id-selector">
+		                                        <div class="form-group">
+		                                            <label class="control-label" for="item_id">{intl l='Select the module you want to translate'}</label>
+
+		                                            <select id="item_id" required="required" name="item_id" class="submit-on-change form-control">
+		                                                <option value="">{intl l='Please select the module to translate'}</option>
+					                                    {loop type="module" name="translate-module" backend_context=1}
+					                                        <option value="{$ID}" {if $item_id == $ID}selected="selected"{/if}>{$TITLE}</option>
+					                                    {/loop}
+					                                </select>
+					                            </div>
+		                                    </div>
+	                                    {else if $item_to_translate == 'fo'}
+	                                        <div class="col-md-4 item-id-selector">
+	                                            <div class="form-group">
+	                                                <label class="control-label" for="item_id">{intl l='Select the front-office template you want to translate'}</label>
+
+	                                                <select id="item_id" required="required" name="item_id" class="submit-on-change form-control">
+	                                                    <option value="">{intl l='Please select the F.O. template to translate'}</option>
+	                                                    {loop type="template" name="translate-fo-template" template-type="front-office" backend_context=1}
+	                                                        <option value="{$NAME}" {if $item_id == $NAME}selected="selected"{/if}>{$NAME}</option>
+	                                                    {/loop}
+	                                                </select>
+	                                            </div>
+	                                        </div>
+	                                    {else if $item_to_translate == 'bo'}
+	                                        <div class="col-md-4 item-id-selector">
+	                                            <div class="form-group">
+	                                                <label class="control-label" for="item_id">{intl l='Select the back-office template you want to translate'}</label>
+
+	                                                <select id="item_id" required="required" name="item_id" class="submit-on-change form-control">
+	                                                    <option value="">{intl l='Please select the B.O. template to translate'}</option>
+	                                                    {loop type="template" name="translate-fo-template" template-type="back-office" backend_context=1}
+	                                                        <option value="{$NAME}" {if $item_id == $NAME}selected="selected"{/if}>{$NAME}</option>
+	                                                    {/loop}
+	                                                </select>
+	                                            </div>
+	                                        </div>
+	                                    {else if $item_to_translate == 'pf'}
+	                                        <div class="col-md-4 item-id-selector">
+	                                            <div class="form-group">
+	                                                <label class="control-label" for="item_id">{intl l='Select the PDF template you want to translate'}</label>
+
+	                                                <select id="item_id" required="required" name="item_id" class="submit-on-change form-control">
+	                                                    <option value="">{intl l='Please select the PDF template to translate'}</option>
+	                                                    {loop type="template" name="translate-pdf-template" template-type="pdf" backend_context=1}
+	                                                        <option value="{$NAME}" {if $item_id == $NAME}selected="selected"{/if}>{$NAME}</option>
+	                                                    {/loop}
+	                                                </select>
+	                                            </div>
+	                                        </div>
+	                                    {/if}
+
+
+	                                    <div class="col-md-4">
+			                                <div class="form-group">
+			                                    <label class="control-label">&nbsp;</label>
+			                                    <label class="checkbox control-label">
+			                                       <input class="submit-on-change" type="checkbox" name="view_missing_traductions_only" value="1" {if $view_missing_traductions_only}checked="checked"{/if}> {intl l='View only missing translations'}
+			                                    </label>
+			                                </div>
+	                                    </div>
+	                                </div>
+                                </fieldset>
+
+                                {* -- STRINGS TO TRANSLATE --------------------------------------------- *}
+
+                                {$currfile = false}
+                                {$close_last_panel = false}
+
+                                {$idx = 0}
+
+                                {foreach $all_strings as $info}
+
+                                    <input type="hidden" id="text_{$idx}" name="text[]" value="{$info.text}" />
+
+                                    {$not_translated = empty($info.translation)}
+
+                                    {if $view_missing_traductions_only != 1 || $not_translated }
+
+                                        {* Create a liste of files names *}
+
+                                        {if count($info.files) > 1}
+                                            {$label = {intl l='In pages:'}}
+                                            {capture name="banner" assign=file_names}
+                                                <ul>
+                                                {foreach $info.files as $file}
+                                                   <li>{$file}</li>
+                                                {/foreach}
+                                                </ul>
+                                            {/capture}
+                                        {else}
+                                            {$label = {intl l='In page'}}
+                                            {$file_names = $info.files.0}
+                                        {/if}
+
+                                        {* Display current file liste, if required *}
+
+                                        {if $file_names != $currfile}
+
+                                            {if $currfile !== false}
+                                                {* Close current panel *}
+                                                </tbody></table></div>
+                                                {$close_last_panel = false}
+                                            {/if}
+
+                                            {$currfile = $file_names}
+
+											<div class="panel panel-default">
+											    <div class="panel-heading">
+                                                    {loop name="lang_list" type="lang" id=$edit_language_id}
+                                                        <img src="{image file="assets/img/flags/{$CODE}.gif"}" alt="{$TITLE}" />
+                                                    {/loop}
+
+                                                    {$label} {$file_names nofilter}
+
+											    </div>
+
+											    <table class="table table-condensed table-hover">
+											        <tbody>
+											        {$close_last_panel = true}
+                                        {/if}
+
+	                                    <tr>
+	                                        <td class="col-md-6">
+	                                            {$info.text}
+
+
+												{if $info.dollar}
+												    <div>
+												        <span class="label label-warning">{intl l='Warning'}</span>
+												        {intl l='Il seems that this string contains a Smarty variable (&#36;). If \'s the case, it cannot be transleted properly.'}
+												    </div>
+												{/if}
+		                                    </td>
+
+	                                        <td class="col-md-6" >
+	                                            <div class="input-group {if $not_translated}has-error{/if}">
+												    <span class="input-group-addon"><a href="#" data-text-num="{$idx}" class="copy-translation" title="{intl l='Copy source text in input field'}"><span class="glyphicon glyphicon-chevron-right"></span></a></span>
+												    <input type="text" id="translation_{$idx}" class="translation_field form-control" name="translation[]" value="{$info.translation}" />
+												</div>
+	                                        </td>
+	                                    </tr>
+
+	                                {else}
+
+	                                   {* Text is not displayed, put it in a hidden field *}
+	                                   <input type="hidden" id="translation_{$idx}" name="translation[]" value="{$info.translation}" />
+
+                                    {/if}
+
+                                    {$idx = $idx + 1}
+                                {/foreach}
+
+                                {if isset($all_strings) }
+
+                                    {if empty($all_strings) }
+                                        <div class="alert alert-info">
+                                            {intl l='<strong>Did not found any text to translate</strong>. It\'s probably normal. If not, please be sure to use Smarty\'s "intl" function in templates, or the Translator::trans() method in PHP files.'}
+                                        </div>
+                                    {else if $view_missing_traductions_only == 1 && $currfile == false }
+		                                <div class="alert alert-success">
+		                                    {intl l='<strong>Congratulations</strong>, all text is now translated !'}
+		                                </div>
+		                            {/if}
+
+		                            {if $close_last_panel}
+	                                    {* close the last panel *}
+	                                    </tbody></table></div>
+	                                {/if}
+	                            {/if}
+
+	                            {if $max_input_vars_warning}
+	                            <div class="alert alert-danger">
+	                               {intl l='<strong>Cannot translate all fields.</strong> According to your PHP configuration, forms cannot contains more than
+	                                        %current_max_input_vars input fields, but at least %required_max_input_vars are required. Please change the value of max_input_vars in your PHP configuration
+	                                        of change the translation file by hand.'
+
+	                                current_max_input_vars=$current_max_input_vars
+	                                required_max_input_vars=$required_max_input_vars
+	                                }
+	                            </div>
+	                            {/if}
+
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+   </div>
+</div>
+{/block}
+
+{block name="javascript-initialization"}
+<script>
+    $(function() {
+
+        var translation_changed = false;
+
+        $('#item_to_translate').change(function() {
+        	$('#item-id').val('');
+        	$('.item-id-selector').hide();
+        });
+
+        $('.submit-on-change').change(function() {
+            $('#translation_form').submit();
+        });
+
+        $('input.translation_field').change(function() { translation_changed = true; });
+
+        $('.copy-translation').click(function(ev) {
+        	var num = $(this).data('text-num');
+
+        	$('#translation_' + num).val($('#text_' + num).val());
+
+        	translation_changed = true;
+
+        	ev.preventDefault();
+        })
+
+        $('#translation_form').submit(function(ev) {
+
+            if (translation_changed
+                &&
+                ! confirm("{intl l='Some of your translations are not saved. Continue anyway ?'}") ) {
+
+            	ev.preventDefault();
+            }
+        });
+
+     // Intercept language changes, to reload string when changing language
+        $('.form-submit-button').click(function(ev) {
+            // For a submit throught the save buttons, do not show the change warning.
+            translation_changed = false;
+        });
+
+        // Intercept language changes, to reload string when changing language
+        $('.language-change-button').click(function(ev) {
+
+        	$('input[name=edit_language_id]').val($(this).data('language-id'));
+
+        	$('#translation_form').submit();
+
+        	ev.preventDefault();
+        });
+    });
+</script>
+{/block}

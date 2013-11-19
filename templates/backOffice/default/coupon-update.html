@@ -1,0 +1,149 @@
+{extends file="admin-layout.tpl"}
+
+{block name="check-resource"}admin.coupon{/block}
+{block name="check-access"}update{/block}
+
+{block name="page-title"}{intl l='Update coupon'}{/block}
+
+{block name="main-content"}
+<section id="wrapper" class="container">
+
+    <nav>
+        <ul class="breadcrumb">
+            <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
+            <li><a href="{url path='admin/coupon'}">{intl l='Coupon'}</a></li>
+            <li>{intl l='Update'} {$couponCode}</li>
+        </ul>
+    </nav>
+
+    <div class="page-header">
+        <h1>{intl l='Coupons : '}<small>{intl l='Update'} {$couponCode}</small></h1>
+    </div>
+
+    {form name="thelia.admin.coupon.creation"}
+        {include file='coupon/form.html' formAction={url path={$formAction}} form=$form noConditions=false}
+    {/form}
+
+</section> <!-- #wrapper -->
+{/block}
+
+{block name="javascript-initialization"}
+    {javascripts file='assets/js/main.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/json2.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/coupon.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    <script src="{url file='/tinymce/tinymce.min.js'}"></script>
+    <script>
+        tinymce.init({
+            selector: ".wysiwyg",
+            theme: "modern",
+            menubar : false,
+            language: "",
+            plugins: [
+                "advlist autolink link image lists charmap print preview hr anchor pagebreak",
+                "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
+                "table contextmenu directionality emoticons paste textcolor filemanager"
+            ],
+            toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | styleselect | filemanager | link unlink anchor | image media | forecolor backcolor  | print preview code ",
+            image_advtab: true ,
+            external_filemanager_path:"{url file='/tinymce/plugins/filemanager/'}'",
+            filemanager_title:"{intl l='Files manager'}" ,
+            external_plugins: { "filemanager" : "{url file='/tinymce/plugins/filemanager/plugin.min.js'}"}
+        });
+
+        $(function($){
+//            miniBrowser(0, '/test_to_remove/datas_coupon_edit.json');
+
+            // Init Conditions
+            $.couponManager.initConditions = function() {
+                var conditions = [];
+                {foreach from=$conditionsObject key=k item=condition}
+                    // Init condition
+                    var condition = {};
+                    condition['serviceId'] = '{$condition.serviceId nofilter}';
+                    condition['operators'] = {};
+                    condition['values'] = {};
+
+                    {foreach from=$condition.validators.setOperators key=input item=operator}
+                        condition['operators']['{$input nofilter}'] = '{$operator nofilter}';
+                        condition['values']['{$input nofilter}'] = '{$condition.validators.setValues[$input] nofilter}';
+                    {/foreach}
+
+                    // Add condition
+                    conditions.push(condition);
+                {/foreach}
+
+                return conditions;
+            };
+
+            // Save Conditions AJAX
+            $.couponManager.saveConditionAjax = function() {
+                $('#condition-add-operators-values').html('<div class="loading" ></div>');
+                var $url = '{$urlAjaxUpdateConditions}';
+                $.ajax({
+                    type: "POST",
+                    url: $url,
+                    data: {literal}{{/literal}conditions:JSON.stringify($.couponManager.conditionsToSave){literal}}{/literal},
+                    statusCode: {
+                        404: function() {
+                            $('#condition-add-operators-values').html(
+                                '{intl l='Please retry'}'
+                            );
+                        }
+                    }
+                }).done(function(data) {
+                    $('#condition-list').html(data);
+                    $('#condition-add-operators-values').html('');
+                    // Set the condition selector
+                    $("#category-condition option").filter(function() {
+                        return $(this).val() == 'thelia.condition.match_for_everyone';
+                    }).prop('selected', true);
+
+                    $.couponManager.onClickUpdateCondition();
+                    $.couponManager.onClickDeleteCondition();
+                });
+            };
+
+            // Reload condition inputs
+            $.couponManager.loadConditionInputs = function(conditionId, callBack) {
+                $('#condition-add-operators-values').html('<div class="loading" ></div>');
+                var url = "{$urlAjaxGetConditionInput}";
+                url = url.replace('conditionId', conditionId)
+                $.ajax({
+                    url: url,
+                    statusCode: {
+                        404: function() {
+                            $('#condition-add-operators-values').html(
+                                '{intl l='Please select another condition'}'
+                            );
+                        }
+                    }
+                }).done(function(data) {
+                    $('#condition-add-operators-values').html(data);
+                    $.couponManager.conditionToSave.serviceId = conditionId;
+                    if (conditionId == -1) {
+                        // Placeholder can't be saved
+                        $('#condition-save-btn').hide();
+                    } else {
+                        $('#condition-save-btn').show();
+                    }
+                    return callBack();
+                });
+            };
+
+            // Conditions which will be saved
+            $.couponManager.conditionsToSave = $.couponManager.initConditions();
+
+            $('#condition-save-btn').hide();
+
+        });
+    </script>
+{/block}

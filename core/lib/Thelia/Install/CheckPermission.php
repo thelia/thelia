@@ -45,6 +45,7 @@ class CheckPermission extends BaseInstall
     const DIR_LOG  =            'log';
     const DIR_CACHE =           'cache';
     const DIR_WEB =             'web';
+    const DIR_SESSION =         'local/session';
 
     /** @var array Directory needed to be writable */
     protected $directoriesToBeWritable = array(
@@ -52,13 +53,22 @@ class CheckPermission extends BaseInstall
         self::DIR_LOG,
         self::DIR_CACHE,
         self::DIR_WEB,
+        self::DIR_SESSION,
     );
 
     /** @var array Minimum server configuration necessary */
     protected $minServerConfigurationNecessary = array(
-        'memory_limit' => 134217728,
+        'memory_limit' => 157286400,
         'post_max_size' => 20971520,
         'upload_max_filesize' => 2097152
+    );
+
+    protected $extensions = array(
+        'curl',
+        'gd',
+        'intl',
+        'mcrypt',
+        'pdo_mysql',
     );
 
     protected $validationMessages = array();
@@ -101,6 +111,14 @@ class CheckPermission extends BaseInstall
             );
         }
 
+        foreach ($this->extensions as $extension) {
+            $this->validationMessages[$extension] = array(
+                'text' => '',
+                'hint' => $this->getI18nExtensionHint(),
+                'status' => true,
+            );
+        }
+
         parent::__construct($verifyInstall);
     }
 
@@ -134,6 +152,15 @@ class CheckPermission extends BaseInstall
                 $this->isValid = false;
                 $this->validationMessages[$key]['status'] = false;
                 $this->validationMessages[$key]['text'] = $this->getI18nConfigText($key, $this->formatBytes($value), ini_get($key), false);;
+            }
+        }
+
+        foreach ($this->extensions as $extension) {
+            $this->validationMessages[$extension]['text'] = $this->getI18nExtensionText($extension, true);
+            if (false === extension_loaded($extension)) {
+                $this->isValid = false;
+                $this->validationMessages[$extension]['status'] = false;
+                $this->validationMessages[$extension]['text'] = $this->getI18nExtensionText($extension, false);
             }
         }
 
@@ -174,7 +201,6 @@ class CheckPermission extends BaseInstall
     }
 
 
-
     /**
      * Get Translated text about the directory state
      *
@@ -187,23 +213,35 @@ class CheckPermission extends BaseInstall
     {
         if ($this->translator !== null) {
             if ($isValid) {
-                $sentence = 'Your directory <strong>%directory%</strong> is writable';
+                $sentence = 'Your directory %directory% is writable';
             } else {
-                $sentence = 'Your directory <strong>%directory%</strong> is not writable';
+                $sentence = 'Your directory %directory% is not writable';
             }
 
             $translatedText = $this->translator->trans(
                 $sentence,
                 array(
                     '%directory%' => $directory
-                ),
-                'install-wizard'
+                )
             );
         } else {
             $translatedText = sprintf('Your directory %s needs to be writable', $directory);
         }
 
         return $translatedText;
+    }
+
+    protected function getI18nExtensionText($extension, $isValid)
+    {
+        if ($isValid) {
+            $sentence = '%extension% php extension is loaded';
+        } else {
+            $sentence = '%extension% php extension is not loaded';
+        }
+
+        return $this->translator->trans($sentence, array(
+            '%extension%' => $extension
+        ));
     }
 
     /**
@@ -216,7 +254,7 @@ class CheckPermission extends BaseInstall
     protected function getI18nDirectoryHint($directory)
     {
         if ($this->translator !== null) {
-            $sentence = '<span class="label label-primary">chmod 777 %directory%</span> on your server with admin rights could help';
+            $sentence = 'chmod 777 %directory% on your server with admin rights could help';
             $translatedText = $this->translator->trans(
                 $sentence,
                 array(
@@ -246,9 +284,9 @@ class CheckPermission extends BaseInstall
     protected function getI18nConfigText($key, $expectedValue, $currentValue, $isValid)
     {
         if ($isValid) {
-            $sentence = 'Your <span class="label label-primary">%key%</span> server configuration (currently %currentValue%) is well enough to run Thelia2 (%expectedValue% needed)';
+            $sentence = 'Your %key% server configuration (currently %currentValue%) is well enough to run Thelia2 (%expectedValue% needed)';
         } else {
-            $sentence = 'Your <span class="label label-primary">%key%</span> server configuration (currently %currentValue%) is not sufficient enough in order to run Thelia2 (%expectedValue% needed)';
+            $sentence = 'Your %key% server configuration (currently %currentValue%) is not sufficient enough in order to run Thelia2 (%expectedValue% needed)';
         }
 
         $translatedText = $this->translator->trans(
@@ -264,6 +302,11 @@ class CheckPermission extends BaseInstall
         return $translatedText;
     }
 
+    protected function getI18nExtensionHint()
+    {
+        return $this->translator->trans('This extension must be installed and loaded');
+    }
+
     /**
      * Get Translated hint about the config requirement issue
      *
@@ -271,11 +314,9 @@ class CheckPermission extends BaseInstall
      */
     protected function getI18nConfigHint()
     {
-        $sentence = 'Modifying this value on your server <span class="label label-primary">php.ini</span> file with admin rights could help';
+        $sentence = 'Modifying this value on your server php.ini file with admin rights could help';
         $translatedText = $this->translator->trans(
-            $sentence,
-            array(),
-            'install-wizard'
+            $sentence
         );
 
         return $translatedText;
@@ -294,9 +335,9 @@ class CheckPermission extends BaseInstall
     {
         if ($this->translator !== null) {
             if ($isValid) {
-                $sentence = 'Your PHP version <span class="label label-primary">%currentValue%</span> is well enough to run Thelia2 (%expectedValue% needed)';
+                $sentence = 'Your PHP version %currentValue% is well enough to run Thelia2 (%expectedValue% needed)';
             } else {
-                $sentence = 'Your PHP version <span class="label label-primary">%currentValue%</span> is not sufficient enough to run Thelia2 (%expectedValue% needed)';
+                $sentence = 'Your PHP version %currentValue% is not sufficient enough to run Thelia2 (%expectedValue% needed)';
             }
 
             $translatedText = $this->translator->trans(
@@ -304,8 +345,7 @@ class CheckPermission extends BaseInstall
                 array(
                     '%expectedValue%' => $expectedValue,
                     '%currentValue%' => $currentValue,
-                ),
-                'install-wizard'
+                )
             );
         } else {
             $translatedText = sprintf('Thelia needs at least PHP %s (%s currently)', $expectedValue, $currentValue);
@@ -324,8 +364,7 @@ class CheckPermission extends BaseInstall
         $sentence = 'Upgrading your version of PHP with admin rights could help';
         $translatedText = $this->translator->trans(
             $sentence,
-            array(),
-            'install-wizard'
+            array()
         );
 
         return $translatedText;
@@ -342,6 +381,10 @@ class CheckPermission extends BaseInstall
     protected function verifyServerMemoryValues($key, $necessaryValueInBytes)
     {
         $serverValueInBytes = $this->returnBytes(ini_get($key));
+
+        if($serverValueInBytes == -1) {
+            return true;
+        }
 
         return ($serverValueInBytes >= $necessaryValueInBytes);
     }

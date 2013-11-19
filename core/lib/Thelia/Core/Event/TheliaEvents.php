@@ -72,9 +72,19 @@ final class TheliaEvents
     const CUSTOMER_UPDATEACCOUNT = "action.updateCustomer";
 
     /**
+     * sent on customer account update profile
+     */
+    const CUSTOMER_UPDATEPROFILE = "action.updateProfileCustomer";
+
+    /**
      * sent on customer removal
      */
     const CUSTOMER_DELETEACCOUNT = "action.deleteCustomer";
+
+    /**
+     * sent on customer address removal
+     */
+    const CUSTOMER_ADDRESS_DELETE = "action.customer.deleteAddress";
 
     /**
      * sent when a customer need a new password
@@ -134,6 +144,11 @@ final class TheliaEvents
      */
     const ADDRESS_DELETE = "action.deleteAddress";
 
+    /**
+     * sent when an address is tag as default
+     */
+    const ADDRESS_DEFAULT = "action.defaultAddress";
+
     const BEFORE_CREATEADDRESS = "action.before_createAddress";
     const AFTER_CREATEADDRESS  = "action.after_createAddress";
 
@@ -173,9 +188,6 @@ final class TheliaEvents
     const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
     const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
 
-//    const FOLDER_ADD_CONTENT      = "action.categoryAddContent";
-//    const FOLDER_REMOVE_CONTENT   = "action.categoryRemoveContent";
-
     const BEFORE_CREATEFOLDER = "action.before_createFolder";
     const AFTER_CREATEFOLDER 	= "action.after_createFolder";
 
@@ -196,7 +208,6 @@ final class TheliaEvents
     const CONTENT_ADD_FOLDER      = "action.contentAddFolder";
     const CONTENT_REMOVE_FOLDER   = "action.contentRemoveFolder";
 
-
     const BEFORE_CREATECONTENT = "action.before_createContent";
     const AFTER_CREATECONTENT	= "action.after_createContent";
 
@@ -206,16 +217,57 @@ final class TheliaEvents
     const BEFORE_UPDATECONTENT = "action.before_updateContent";
     const AFTER_UPDATECONTENT 	= "action.after_updateContent";
 
+    // -- country management -----------------------------------------------
+
+    const COUNTRY_CREATE            = "action.createCountry";
+    const COUNTRY_UPDATE            = "action.updateCountry";
+    const COUNTRY_DELETE            = "action.deleteCountry";
+    const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
+    //const COUNTRY_UPDATE_POSITION   = "action.updateFolderPosition";
+
+    const BEFORE_CREATECOUNTRY = "action.before_createCountry";
+    const AFTER_CREATECOUNTRY 	= "action.after_createCountry";
+
+    const BEFORE_DELETECOUNTRY = "action.before_deleteCountry";
+    const AFTER_DELETECOUNTRY 	= "action.after_deleteCountry";
+
+    const BEFORE_UPDATECOUNTRY = "action.before_updateCountry";
+    const AFTER_UPDATECOUNTRY 	= "action.after_updateCountry";
+
+    // -- AREA CONFIGURATION MANAGEMENT
+
+    const AREA_CREATE = 'action.createArea';
+    const AREA_UPDATE = 'action.updateArea';
+    const AREA_DELETE = 'action.deleteArea';
+
+    const AREA_ADD_COUNTRY = 'action.area.addCountry';
+    const AREA_REMOVE_COUNTRY = 'action.area.removeCountry';
+    const AREA_POSTAGE_UPDATE = 'action.area.postageUpdate';
+
+    const BEFORE_CREATEAREA = 'action.before_createArea';
+    const AFTER_CREATEAREA = 'action.after_createArea';
+
+    const BEFORE_UPDATEAREA = 'action.before_updateArea';
+    const AFTER_UPDATEAREA = 'action.after_updateArea';
+
+    const BEFORE_DELETEAREA = 'action.before_deleteArea';
+    const AFTER_DELETEAREA = 'action.after_deleteArea';
+
+    // -- SHIPPING ZONE MANAGEMENT
+
+    const SHIPPING_ZONE_ADD_AREA = 'action.shippingZone.addArea';
+    const SHIPPING_ZONE_REMOVE_AREA = 'action.shippingZone.removeArea';
+
     // -- Categories Associated Content ----------------------------------------
 
-    const BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT   = "action.before_createCategoryAssociatedContent";
-    const AFTER_CREATECATEGORY_ASSOCIATED_CONTENT 	= "action.after_createCategoryAssociatedContent";
+    const BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT = "action.before_createCategoryAssociatedContent";
+    const AFTER_CREATECATEGORY_ASSOCIATED_CONTENT  = "action.after_createCategoryAssociatedContent";
 
-    const BEFORE_DELETECATEGORY_ASSOCIATED_CONTENT   = "action.before_deleteCategoryAssociatedContent";
-    const AFTER_DELETECATEGORY_ASSOCIATED_CONTENT 	= "action.after_deleteCategoryAssociatedContent";
+    const BEFORE_DELETECATEGORY_ASSOCIATED_CONTENT = "action.before_deleteCategoryAssociatedContent";
+    const AFTER_DELETECATEGORY_ASSOCIATED_CONTENT  = "action.after_deleteCategoryAssociatedContent";
 
-    const BEFORE_UPDATECATEGORY_ASSOCIATED_CONTENT   = "action.before_updateCategoryAssociatedContent";
-    const AFTER_UPDATECATEGORY_ASSOCIATED_CONTENT 	= "action.after_updateCategoryAssociatedContent";
+    const BEFORE_UPDATECATEGORY_ASSOCIATED_CONTENT = "action.before_updateCategoryAssociatedContent";
+    const AFTER_UPDATECATEGORY_ASSOCIATED_CONTENT  = "action.after_updateCategoryAssociatedContent";
 
     // -- Product management -----------------------------------------------
 
@@ -229,8 +281,11 @@ final class TheliaEvents
     const PRODUCT_REMOVE_CONTENT          = "action.productRemoveContent";
     const PRODUCT_UPDATE_CONTENT_POSITION = "action.updateProductContentPosition";
 
-    const PRODUCT_ADD_COMBINATION    = "action.productAddCombination";
-    const PRODUCT_DELETE_COMBINATION = "action.productDeleteCombination";
+    const PRODUCT_ADD_PRODUCT_SALE_ELEMENT    = "action.addProductSaleElement";
+    const PRODUCT_DELETE_PRODUCT_SALE_ELEMENT = "action.deleteProductSaleElement";
+    const PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT = "action.updateProductSaleElement";
+
+    const PRODUCT_COMBINATION_GENERATION = "action.productCombineationGeneration";
 
     const PRODUCT_SET_TEMPLATE = "action.productSetTemplate";
 
@@ -310,8 +365,8 @@ final class TheliaEvents
      * sent on modify article action
      */
     const CART_UPDATEITEM = "action.updateArticle";
-
     const CART_DELETEITEM = "action.deleteArticle";
+    const CART_CLEAR = "action.clear";
 
     /**
      * Order linked event
@@ -493,6 +548,39 @@ final class TheliaEvents
 
     const CHANGE_DEFAULT_CURRENCY = 'action.changeDefaultCurrency';
 
+    // -- Tax management ---------------------------------------------
+
+    const TAX_CREATE          = "action.createTax";
+    const TAX_UPDATE          = "action.updateTax";
+    const TAX_DELETE          = "action.deleteTax";
+
+    // -- Profile management ---------------------------------------------
+
+    const PROFILE_CREATE                    = "action.createProfile";
+    const PROFILE_UPDATE                    = "action.updateProfile";
+    const PROFILE_DELETE                    = "action.deleteProfile";
+    const PROFILE_RESOURCE_ACCESS_UPDATE    = "action.updateProfileResourceAccess";
+    const PROFILE_MODULE_ACCESS_UPDATE      = "action.updateProfileModuleAccess";
+
+    // -- Administrator management ---------------------------------------------
+
+    const ADMINISTRATOR_CREATE                    = "action.createAdministrator";
+    const ADMINISTRATOR_UPDATE                    = "action.updateAdministrator";
+    const ADMINISTRATOR_DELETE                    = "action.deleteAdministrator";
+    const ADMINISTRATOR_UPDATEPASSWORD          = 'action.generatePassword';
+
+    // -- Mailing System management ---------------------------------------------
+
+    const MAILING_SYSTEM_UPDATE                    = "action.updateMailingSystem";
+
+    // -- Tax Rules management ---------------------------------------------
+
+    const TAX_RULE_CREATE          = "action.createTaxRule";
+    const TAX_RULE_UPDATE          = "action.updateTaxRule";
+    const TAX_RULE_DELETE          = "action.deleteTaxRule";
+    const TAX_RULE_SET_DEFAULT     = "action.setDefaultTaxRule";
+    const TAX_RULE_TAXES_UPDATE     = "action.updateTaxesTaxRule";
+
     // -- Product templates management -----------------------------------------
 
     const TEMPLATE_CREATE          = "action.createTemplate";
@@ -599,4 +687,46 @@ final class TheliaEvents
 
     const GENERATE_PDF = 'thelia.generatePdf';
 
+    /**
+     * sent when a module is activated or deactivated
+     */
+    const MODULE_TOGGLE_ACTIVATION = 'thelia.module.toggleActivation';
+
+    /**
+     * module
+     */
+    const MODULE_UPDATE = 'thelia.module.update';
+    const MODULE_DELETE = 'thelia.module.delete';
+
+    /**
+     * sent for clearing cache
+     */
+    const CACHE_CLEAR = 'thelia.cache.clear';
+
+    /**
+     * sent for subscribing to the newsletter
+     */
+    const NEWSLETTER_SUBSCRIBE = 'thelia.newsletter.subscribe';
+    const NEWSLETTER_UPDATE = 'thelia.newsletter.update';
+    const NEWSLETTER_UNSUBSCRIBE = 'thelia.newsletter.unsubscribe';
+
+    /************ LANG MANAGEMENT ****************************/
+
+    const LANG_UPDATE                           = 'action.lang.update';
+    const LANG_CREATE                           = 'action.lang.create';
+    const LANG_DELETE                           = 'action.lang.delete';
+
+    const LANG_DEFAULTBEHAVIOR                  = 'action.lang.defaultBehavior';
+    const LANG_URL                              = 'action.lang.url';
+
+    const LANG_TOGGLEDEFAULT                    = 'action.lang.toggleDefault';
+
+    const BEFORE_UPDATELANG                     = 'action.lang.beforeUpdate';
+    const AFTER_UPDATELANG                      = 'action.lang.afterUpdate';
+
+    const BEFORE_CREATELANG                     = 'action.lang.beforeCreate';
+    const AFTER_CREATELANG                      = 'action.lang.afterCreate';
+
+    const BEFORE_DELETELANG                     = 'action.lang.beforeDelete';
+    const AFTER_DELETELANG                      = 'action.lang.afterDelete';
 }

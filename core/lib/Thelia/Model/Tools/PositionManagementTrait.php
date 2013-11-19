@@ -120,10 +120,10 @@ trait PositionManagementTrait {
             try {
                 $this
                     ->setPosition($result->getPosition())
-                    ->save()
+                    ->save($cnx)
                 ;
 
-                $result->setDispatcher($this->getDispatcher())->setPosition($my_position)->save();
+                $result->setDispatcher($this->getDispatcher())->setPosition($my_position)->save($cnx);
 
                 $cnx->commit();
             }

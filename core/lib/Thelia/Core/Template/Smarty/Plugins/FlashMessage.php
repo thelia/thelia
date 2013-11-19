@@ -74,13 +74,18 @@ class FlashMessage extends AbstractSmartyPlugin
     public function getFlashMessage($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
         if ($repeat) {
-            $key = $params['key'];
-            $flashBag = $this->request->getSession()->get('flashMessage');
-            $template->assign('value', $flashBag[$key]);
 
-            // Reset flash message (can be read once)
-            unset($flashBag[$key]);
-            $this->request->getSession()->set('flashMessage', $flashBag);
+            if (false !== $key = $this->getParam($params, 'key', false)) {
+
+                $flashBag = $this->request->getSession()->get('flashMessage');
+
+                $template->assign('value', $flashBag[$key]);
+
+                // Reset flash message (can be read once)
+                unset($flashBag[$key]);
+
+                $this->request->getSession()->set('flashMessage', $flashBag);
+            }
         } else {
             return $content;
         }

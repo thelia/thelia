@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -42,9 +43,9 @@ use Thelia\Model\CountryQuery;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Country extends BaseI18nLoop
+class Country extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -59,17 +60,12 @@ class Country extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = CountryQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -99,27 +95,32 @@ class Country extends BaseI18nLoop
 
         $search->addAscendingOrderByColumn('i18n_TITLE');
 
-        /* perform search */
-        $countries = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($countries);
+    }
 
-        foreach ($countries as $country) {
-            $loopResultRow = new LoopResultRow($loopResult, $country, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $country) {
+            $loopResultRow = new LoopResultRow($country);
             $loopResultRow->set("ID", $country->getId())
                 ->set("IS_TRANSLATED",$country->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("TITLE",$country->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $country->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $country->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $country->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("ISOCODE", $country->getIsocode())
                 ->set("ISOALPHA2", $country->getIsoalpha2())
-                ->set("ISOALPHA3", $country->getIsoalpha3());
+                ->set("ISOALPHA3", $country->getIsoalpha3())
+                ->set("IS_DEFAULT", $country->getByDefault() ? "1" : "0")
+                ->set("IS_SHOP_COUNTRY", $country->getShopCountry() ? "1" : "0")
+            ;
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
+
     }
 }

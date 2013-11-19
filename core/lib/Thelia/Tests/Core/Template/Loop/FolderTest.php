@@ -53,8 +53,19 @@ class FolderTest extends BaseLoopTestor
     public function testSearchById()
     {
         $folder = FolderQuery::create()->findOne();
+        if(null === $folder) {
+            $folder = new \Thelia\Model\Folder();
+            $folder->setParent(0);
+            $folder->setVisible(1);
+            $folder->setTitle('foo');
+            $folder->save();
+        }
 
-        $this->baseTestSearchById($folder->getId());
+        $otherParameters = array(
+            "visible" => "*",
+        );
+
+        $this->baseTestSearchById($folder->getId(), $otherParameters);
     }
 
     public function testSearchLimit()

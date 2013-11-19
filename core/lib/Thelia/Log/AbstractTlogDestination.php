@@ -31,9 +31,6 @@ abstract class AbstractTlogDestination
     //Tableau des lignes de logs stockés avant utilisation par ecrire()
     protected $_logs;
 
-    // Vaudra true si on est dans le back office.
-    protected $flag_back_office = false;
-
     public function __construct()
     {
         $this->_configs = array();
@@ -50,8 +47,8 @@ abstract class AbstractTlogDestination
     public function setConfig($name, $value)
     {
         foreach ($this->_configs as $config) {
-            if ($config->name == $name) {
-                $config->value = $value;
+            if ($config->getName() == $name) {
+                $config->setValue($value);
                 // Appliquer les changements
                 $this->configure();
 
@@ -63,25 +60,20 @@ abstract class AbstractTlogDestination
     }
 
     //Récupère la valeur affectée à une configuration de la destination
-    public function getConfig($name)
+    public function getConfig($name, $default = false)
     {
         foreach ($this->_configs as $config) {
-            if ($config->name == $name) {
-                return $config->value;
+            if ($config->getName() == $name) {
+                return $config->getValue();
             }
         }
 
-        return false;
+        return $default;
     }
 
     public function getConfigs()
     {
         return $this->_configs;
-    }
-
-    public function SetBackOfficeMode($bool)
-    {
-            $this->flag_back_office = $bool;
     }
 
     //Ajoute une ligne de logs à la destination
@@ -90,15 +82,13 @@ abstract class AbstractTlogDestination
         $this->_logs[] = $string;
     }
 
-    protected function InsertAfterBody(&$res, $logdata)
+    protected function insertAfterBody(&$res, $logdata)
     {
-            $match = array();
+        $match = array();
 
-            if (preg_match("/(<body[^>]*>)/i", $res, $match)) {
-                    $res = str_replace($match[0], $match[0] . "\n" . $logdata, $res);
-            } else {
-                    $res = $logdata . $res;
-            }
+        if (preg_match("/(<body[^>]*>)/i", $res, $match)) {
+                $res = str_replace($match[0], $match[0] . "\n" . $logdata, $res);
+        }
     }
 
     // Demande à la destination de se configurer pour être prête
@@ -106,7 +96,7 @@ abstract class AbstractTlogDestination
     // que seul le paramètre de configuration indiqué a été modifié.
     protected function configure()
     {
-            // Cette methode doit etre surchargée si nécessaire.
+        // Cette methode doit etre surchargée si nécessaire.
     }
 
     //Lance l'écriture de tous les logs par la destination

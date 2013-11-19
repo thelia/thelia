@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="module">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element type="xs:string" minOccurs="1" name="fullnamespace">
+                    <xs:annotation>
+                        <xs:documentation>The full namespace for the main class module (for example MyModule\MyModule)</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="descriptive" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation>complete description, each description must be identify by ISO CODE 639</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:string" name="title" minOccurs="1" maxOccurs="1"/>
+                            <xs:element type="xs:string" name="subtitle" minOccurs="0" maxOccurs="1"/>
+                            <xs:element type="xs:string" name="description" minOccurs="0" maxOccurs="1"/>
+                            <xs:element type="xs:string" name="postscriptum" minOccurs="0" maxOccurs="1"/>
+                        </xs:sequence>
+                        <xs:attribute type="xs:string" name="locale"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element type="xs:string" name="version">
+                    <xs:annotation>
+                        <xs:documentation>Module version</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="author">
+                    <xs:annotation>
+                        <xs:documentation>Module author</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:string" name="name" minOccurs="1" maxOccurs="1"/>
+                            <xs:element type="xs:string" name="company" minOccurs="0" maxOccurs="1"/>
+                            <xs:element type="xs:string" name="email" minOccurs="1" maxOccurs="1"/>
+                            <xs:element type="xs:anyURI" name="website" minOccurs="0" maxOccurs="1"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="type">
+                    <xs:annotation>
+                        <xs:documentation>module type : classic, delivery, payment</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="classic"/>
+                            <xs:enumeration value="delivery"/>
+                            <xs:enumeration value="payment"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="required" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Les plugins qui doivent déjà être présents</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="module" maxOccurs="unbounded" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:string">
+                                            <xs:attribute type="xs:string" name="version" use="optional"/>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="thelia">
+                    <xs:annotation>
+                        <xs:documentation>minimum required version of Thelia in 'dot' format (for example 1.2.3.4)</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="[0-9.]+"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="stability">
+                    <xs:annotation>
+                        <xs:documentation>current module stability: alpha, beta, rc, prod</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="alpha"/>
+                            <xs:enumeration value="beta"/>
+                            <xs:enumeration value="rc"/>
+                            <xs:enumeration value="prod"/>
+                            <xs:enumeration value="other"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element type="xs:string" name="documentation" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Le nom du fichier contenant la documentation. Ce fichier doit se trouver dans le répertoire du plugin.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element type="xs:anyURI" name="urlmiseajour" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>L'URL a interroger pour vérifier la présence d'une nouvelle version, appellé avec le nom du plugin et sa version</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

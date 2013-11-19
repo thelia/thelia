@@ -53,8 +53,19 @@ class ContentTest extends BaseLoopTestor
     public function testSearchById()
     {
         $content = ContentQuery::create()->findOne();
+        if(null === $content) {
+            $content = new \Thelia\Model\Content();
+            $content->setDefaultFolder(0);
+            $content->setVisible(1);
+            $content->setTitle('foo');
+            $content->save();
+        }
 
-        $this->baseTestSearchById($content->getId());
+        $otherParameters = array(
+            "visible" => "*",
+        );
+
+        $this->baseTestSearchById($content->getId(), $otherParameters);
     }
 
     public function testSearchLimit()

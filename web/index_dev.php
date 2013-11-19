@@ -21,9 +21,8 @@
 /*                                                                                */
 /**********************************************************************************/
 
-
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Thelia;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpKernel\HttpCache\HttpCache;
 
@@ -36,7 +35,6 @@ require __DIR__ . '/../core/bootstrap.php';
 $trustedIp = array(
   '::1',
   '127.0.0.1',
-  '192.168.56.1'
 );
 
 $request = Request::createFromGlobals();

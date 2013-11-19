@@ -30,7 +30,8 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterCouponPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterListenersPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterParserPluginPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass;
-use Thelia\Core\DependencyInjection\Compiler\RegisterRulePass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterCouponConditionPass;
+use Thelia\Core\DependencyInjection\Compiler\TranslatorPass;
 
 /**
  * First Bundle use in Thelia
@@ -59,12 +60,12 @@ class TheliaBundle extends Bundle
         $container->addScope(new Scope('request'));
 
         $container
+            ->addCompilerPass(new TranslatorPass())
             ->addCompilerPass(new RegisterListenersPass())
             ->addCompilerPass(new RegisterParserPluginPass())
             ->addCompilerPass(new RegisterRouterPass())
             ->addCompilerPass(new RegisterCouponPass())
-            ->addCompilerPass(new RegisterRulePass())
+            ->addCompilerPass(new RegisterCouponConditionPass())
         ;
-
     }
 }

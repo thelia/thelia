@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -36,7 +37,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Feed extends BaseLoop
+class Feed extends BaseLoop  implements ArraySearchLoopInterface
 {
     public function getArgDefinitions()
     {
@@ -46,12 +47,7 @@ class Feed extends BaseLoop
         );
     }
 
-    /**
-     *
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildArray()
     {
         $cachedir = THELIA_ROOT . 'cache/feeds';
 
@@ -71,34 +67,23 @@ class Feed extends BaseLoop
 
         $items = $feed->get_items();
 
-        $limit = min(count($items), $this->getLimit());
+        return $items;
 
-        $indexes = array();
-        for ($idx = 0; $idx < $limit; $idx++) {
-            $indexes[] = $idx;
-        }
+    }
 
-        $loopResult = new LoopResult($indexes);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $item) {
 
-        foreach ($indexes as $idx) {
+            $loopResultRow = new LoopResultRow();
 
-            $item = $items[$idx];
-
-            $link = $item->get_permalink();
-
-            $title = $item->get_title();
-            $author = $item->get_author();
-            $description = $item->get_description();
-
-            $date = $item->get_date('d/m/Y');
-
-            $loopResultRow = new LoopResultRow($loopResult, null, $this->versionable, $this->timestampable, $this->countable);
-
-            $loopResultRow->set("URL", $item->get_permalink());
-            $loopResultRow->set("TITLE", $item->get_title());
-            $loopResultRow->set("AUTHOR", $item->get_author());
-            $loopResultRow->set("DESCRIPTION", $item->get_description());
-            $loopResultRow->set("DATE", $item->get_date('d/m/Y')); // FIXME - date format should be an intl parameter
+            $loopResultRow
+                ->set("URL"         , $item->get_permalink())
+                ->set("TITLE"       , $item->get_title())
+                ->set("AUTHOR"      , $item->get_author())
+                ->set("DESCRIPTION" , $item->get_description())
+                ->set("DATE"        , $item->get_date('U')) // FIXME - date format should be an intl parameter
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

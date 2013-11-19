@@ -1,0 +1,66 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Thelia Shipping zones'}{/block}
+
+{block name="check-resource"}admin.configuration.shipping-zone{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+<div class="shipping-zones">
+
+    <div id="wrapper" class="container">
+
+        <ul class="breadcrumb">
+            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+            <li><a href="{url path='/admin/configuration/shipping_zones'}">{intl l="Shipping zones"}</a></li>
+        </ul>
+
+        {module_include location='shipping_zones_top'}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <caption>
+                               {intl l='Thelia Shipping zones'}                           
+                            </caption>
+                            <thead>
+    	                        <tr>	                           
+                                   <th>{intl l="Name"}</th>
+
+                                   {module_include location='shipping_zones_table_header'}
+
+                                   <th>{intl l="Actions"}</th>
+    	                        </tr>
+                            </thead>
+
+                            <tbody>
+                                {loop type="delivery" name="delivery.list" backend_context="1"}
+                                <tr>
+                                   <td><a href="{url path="/admin/configuration/shipping_zones/update/$ID"}">{$TITLE}</a></td>
+
+                                    {module_include location='shipping_zones_table_row'}
+
+                                    <td>
+                                        <div class="btn-group">
+                                           {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.shipping-zone" access="UPDATE"}
+                                               <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                           {/loop}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {/loop}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {module_include location='shipping_zones_bottom'}
+
+    </div>
+</div>
+{/block}

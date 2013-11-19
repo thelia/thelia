@@ -52,8 +52,10 @@ class BaseAction
     /**
      * Changes object position, selecting absolute ou relative change.
      *
-     * @param $query the query to retrieve the object to move
+     * @param ModelCriteria       $query
      * @param UpdatePositionEvent $event
+     *
+     * @return mixed
      */
     protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event)
     {
@@ -70,19 +72,5 @@ class BaseAction
             else if ($mode == UpdatePositionEvent::POSITION_DOWN)
                 return $object->movePositionDown();
         }
-    }
-
-    /**
-     * Helper to append a message to the admin log.
-     *
-     * @param string $message
-     */
-    public function adminLogAppend($message)
-    {
-        AdminLog::append(
-            $message,
-            $this->container->get('request'),
-            $this->container->get('thelia.securityContext')->getAdminUser()
-        );
     }
 }

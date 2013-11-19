@@ -155,7 +155,7 @@ class FormatTest extends \PHPUnit_Framework_TestCase
      * test formatDate without mandatory parameters
      *
      * @covers ::formatDate
-     * @expectedException \Thelia\Core\Template\Smarty\Exception\SmartyPluginException
+     * @expectedException Thelia\Core\Template\Smarty\Exception\SmartyPluginException
      */
     public function testFormatDateWithoutDate()
     {
@@ -165,20 +165,21 @@ class FormatTest extends \PHPUnit_Framework_TestCase
 
         $render = $formatClass->formatDate(array());
 
-        $this->assertEquals($dateTime->format("Y-m-d H:i:s"), $render);
+        $this->assertEmpty($render);
     }
 
     /**
      * test formatNumber without mandatory parameters
      *
      * @covers ::formatNumber
-     * @expectedException \Thelia\Core\Template\Smarty\Exception\SmartyPluginException
      */
     public function testFormatNumberWithoutParams()
     {
         $formatClass = new Format($this->request);
 
         $render = $formatClass->formatNumber(array());
+
+        $this->assertEmpty($render);
     }
 
     /**

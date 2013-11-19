@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "852879ecc2e39e5cf283a3b1c5051a8e",
+    "hash": "009aced8b279e1c14558460fff2cc993",
     "packages": [
         {
             "name": "ensepar/html2pdf",
@@ -949,7 +949,7 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v2.3.5",
+            "version": "v2.3.6",
             "target-dir": "Symfony/Component/Finder",
             "source": {
                 "type": "git",

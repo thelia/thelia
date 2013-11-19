@@ -72,15 +72,24 @@ abstract class ProductPrice implements ActiveRecordInterface
 
     /**
      * The value for the price field.
+     * Note: this column has a database default value of: 0
      * @var        double
      */
     protected $price;
 
     /**
      * The value for the promo_price field.
+     * Note: this column has a database default value of: 0
      * @var        double
      */
     protected $promo_price;
+
+    /**
+     * The value for the from_default_currency field.
+     * Note: this column has a database default value of: true
+     * @var        boolean
+     */
+    protected $from_default_currency;
 
     /**
      * The value for the created_at field.
@@ -113,10 +122,25 @@ abstract class ProductPrice implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->price = 0;
+        $this->promo_price = 0;
+        $this->from_default_currency = true;
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\ProductPrice object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -415,6 +439,17 @@ abstract class ProductPrice implements ActiveRecordInterface
     }
 
     /**
+     * Get the [from_default_currency] column value.
+     *
+     * @return   boolean
+     */
+    public function getFromDefaultCurrency()
+    {
+
+        return $this->from_default_currency;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -547,6 +582,35 @@ abstract class ProductPrice implements ActiveRecordInterface
     } // setPromoPrice()
 
     /**
+     * Sets the value of the [from_default_currency] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\ProductPrice The current object (for fluent API support)
+     */
+    public function setFromDefaultCurrency($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->from_default_currency !== $v) {
+            $this->from_default_currency = $v;
+            $this->modifiedColumns[] = ProductPriceTableMap::FROM_DEFAULT_CURRENCY;
+        }
+
+
+        return $this;
+    } // setFromDefaultCurrency()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -598,6 +662,18 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->price !== 0) {
+                return false;
+            }
+
+            if ($this->promo_price !== 0) {
+                return false;
+            }
+
+            if ($this->from_default_currency !== true) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -637,13 +713,16 @@ abstract class ProductPrice implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductPriceTableMap::translateFieldName('PromoPrice', TableMap::TYPE_PHPNAME, $indexType)];
             $this->promo_price = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductPriceTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductPriceTableMap::translateFieldName('FromDefaultCurrency', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->from_default_currency = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductPriceTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductPriceTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductPriceTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -656,7 +735,7 @@ abstract class ProductPrice implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = ProductPriceTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = ProductPriceTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\ProductPrice object", 0, $e);
@@ -911,6 +990,9 @@ abstract class ProductPrice implements ActiveRecordInterface
         if ($this->isColumnModified(ProductPriceTableMap::PROMO_PRICE)) {
             $modifiedColumns[':p' . $index++]  = 'PROMO_PRICE';
         }
+        if ($this->isColumnModified(ProductPriceTableMap::FROM_DEFAULT_CURRENCY)) {
+            $modifiedColumns[':p' . $index++]  = 'FROM_DEFAULT_CURRENCY';
+        }
         if ($this->isColumnModified(ProductPriceTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -939,6 +1021,9 @@ abstract class ProductPrice implements ActiveRecordInterface
                         break;
                     case 'PROMO_PRICE':
                         $stmt->bindValue($identifier, $this->promo_price, PDO::PARAM_STR);
+                        break;
+                    case 'FROM_DEFAULT_CURRENCY':
+                        $stmt->bindValue($identifier, (int) $this->from_default_currency, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1014,9 +1099,12 @@ abstract class ProductPrice implements ActiveRecordInterface
                 return $this->getPromoPrice();
                 break;
             case 4:
-                return $this->getCreatedAt();
+                return $this->getFromDefaultCurrency();
                 break;
             case 5:
+                return $this->getCreatedAt();
+                break;
+            case 6:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1052,8 +1140,9 @@ abstract class ProductPrice implements ActiveRecordInterface
             $keys[1] => $this->getCurrencyId(),
             $keys[2] => $this->getPrice(),
             $keys[3] => $this->getPromoPrice(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[4] => $this->getFromDefaultCurrency(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1114,9 +1203,12 @@ abstract class ProductPrice implements ActiveRecordInterface
                 $this->setPromoPrice($value);
                 break;
             case 4:
-                $this->setCreatedAt($value);
+                $this->setFromDefaultCurrency($value);
                 break;
             case 5:
+                $this->setCreatedAt($value);
+                break;
+            case 6:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1147,8 +1239,9 @@ abstract class ProductPrice implements ActiveRecordInterface
         if (array_key_exists($keys[1], $arr)) $this->setCurrencyId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setPrice($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setPromoPrice($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[4], $arr)) $this->setFromDefaultCurrency($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
 
     /**
@@ -1164,6 +1257,7 @@ abstract class ProductPrice implements ActiveRecordInterface
         if ($this->isColumnModified(ProductPriceTableMap::CURRENCY_ID)) $criteria->add(ProductPriceTableMap::CURRENCY_ID, $this->currency_id);
         if ($this->isColumnModified(ProductPriceTableMap::PRICE)) $criteria->add(ProductPriceTableMap::PRICE, $this->price);
         if ($this->isColumnModified(ProductPriceTableMap::PROMO_PRICE)) $criteria->add(ProductPriceTableMap::PROMO_PRICE, $this->promo_price);
+        if ($this->isColumnModified(ProductPriceTableMap::FROM_DEFAULT_CURRENCY)) $criteria->add(ProductPriceTableMap::FROM_DEFAULT_CURRENCY, $this->from_default_currency);
         if ($this->isColumnModified(ProductPriceTableMap::CREATED_AT)) $criteria->add(ProductPriceTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ProductPriceTableMap::UPDATED_AT)) $criteria->add(ProductPriceTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1240,6 +1334,7 @@ abstract class ProductPrice implements ActiveRecordInterface
         $copyObj->setCurrencyId($this->getCurrencyId());
         $copyObj->setPrice($this->getPrice());
         $copyObj->setPromoPrice($this->getPromoPrice());
+        $copyObj->setFromDefaultCurrency($this->getFromDefaultCurrency());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1380,10 +1475,12 @@ abstract class ProductPrice implements ActiveRecordInterface
         $this->currency_id = null;
         $this->price = null;
         $this->promo_price = null;
+        $this->from_default_currency = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

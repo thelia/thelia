@@ -129,8 +129,9 @@ class URL
 
             // If only a path is requested, be sure to remove the script name (index.php or index_dev.php), if any.
             if ($path_only == self::PATH_TO_FILE) {
+
                 // As the base_url always ends with '/', if we don't find / at the end, we have a script.
-                if (substr($base_url, -1) != '/') $base_url = dirname($base_url);
+                if (substr($base_url, -3) == 'php') $base_url = dirname($base_url);
             }
 
             // Normalize the given path
@@ -198,7 +199,7 @@ class URL
      public function retrieve($view, $viewId, $viewLocale)
      {
          if (ConfigQuery::isRewritingEnable()) {
-             $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
+             URL::getInstance()->absoluteUrl($this->retriever->loadViewUrl($view, $viewLocale, $viewId));
          } else {
              $allParametersWithoutView = array();
              $allParametersWithoutView['locale'] = $viewLocale;

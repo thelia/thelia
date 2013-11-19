@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -45,9 +46,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class AttributeCombination extends BaseI18nLoop
+class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -66,17 +67,12 @@ class AttributeCombination extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = AttributeCombinationQuery::create();
 
         /* manage attribute translations */
-        $locale = $this->configureI18nProcessing(
+        $this->configureI18nProcessing(
             $search,
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             AttributeTableMap::TABLE_NAME,
@@ -84,7 +80,7 @@ class AttributeCombination extends BaseI18nLoop
         );
 
         /* manage attributeAv translations */
-        $locale = $this->configureI18nProcessing(
+        $this->configureI18nProcessing(
             $search,
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             AttributeAvTableMap::TABLE_NAME,
@@ -108,15 +104,17 @@ class AttributeCombination extends BaseI18nLoop
             }
         }
 
-        $attributeCombinations = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($attributeCombinations);
+    }
 
-        foreach ($attributeCombinations as $attributeCombination) {
-            $loopResultRow = new LoopResultRow($loopResult, $attributeCombination, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $attributeCombination) {
+            $loopResultRow = new LoopResultRow($attributeCombination);
 
             $loopResultRow
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("ATTRIBUTE_TITLE", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE'))
                 ->set("ATTRIBUTE_CHAPO", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_CHAPO'))
                 ->set("ATTRIBUTE_DESCRIPTION", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
@@ -130,5 +128,6 @@ class AttributeCombination extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

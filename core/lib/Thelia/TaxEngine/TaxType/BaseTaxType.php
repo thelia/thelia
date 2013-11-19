@@ -23,6 +23,7 @@
 namespace Thelia\TaxEngine\TaxType;
 
 use Thelia\Exception\TaxEngineException;
+use Thelia\Model\Product;
 use Thelia\Type\TypeInterface;
 
 /**
@@ -34,13 +35,18 @@ abstract class BaseTaxType
 {
     protected $requirements = null;
 
-    public abstract function calculate($untaxedPrice);
-
     public abstract function pricePercentRetriever();
 
-    public abstract function fixAmountRetriever();
+    public abstract function fixAmountRetriever(Product $product);
 
     public abstract function getRequirementsList();
+
+    public abstract function getTitle();
+
+    public function calculate(Product $product, $untaxedPrice)
+    {
+        return $untaxedPrice * $this->pricePercentRetriever() + $this->fixAmountRetriever($product);
+    }
 
     public function loadRequirements($requirementsValues)
     {

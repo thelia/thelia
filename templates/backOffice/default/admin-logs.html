@@ -1,0 +1,234 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Thelia Mailing System'}{/block}
+
+{block name="check-resource"}admin.configuration.admin-logs{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+    <div class="admin-logs">
+
+        <div id="wrapper" class="container">
+
+            <ul class="breadcrumb">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                <li><a href="{url path='/admin/configuration/adminLogs'}">{intl l="Administration logs"}</a></li>
+            </ul>
+
+            {module_include location='admin_logs_top'}
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="general-block-decorator">
+
+                        <div class="title title-without-tabs">{intl l="Administration logs"}</div>
+
+                        <div class="row inner-toolbar">
+                            <div class="col-md-12 inner-actions clearfix">
+                                <button type="button" class="btn btn-default btn-success pull-right js-show-logs" title="{intl l='Show logs'}">{intl l='Show logs'} <span class="glyphicon glyphicon-eye-open"></span></button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+	                        <div class="col-md-12">
+	                            <div>
+	                                <strong>{intl l='Period'} :</strong>
+	                            </div>
+
+	                            <div class="row">
+	                                <div class="col-lg-3 clearfix">
+	                                    <div class="input-group">
+	                                        <span class="input-group-addon">{intl l='From'}</span>
+	                                        <input class="form-control" type="text" id="from_date" readonly="readonly">
+	                                        <span class="input-group-btn">
+	                                            <button class="btn btn-default js-show-datepicker" data-datepicker-selector="#from_date" type="button">
+	                                                <span class="glyphicon glyphicon-calendar"></span>
+	                                            </button>
+	                                        </span>
+	                                    </div>
+	                                </div>
+	                                <div class="col-lg-3 clearfix input-group">
+	                                    <div class="input-group">
+	                                        <span class="input-group-addon">{intl l='To'}</span>
+	                                        <input class="form-control" type="text" id="to_date" readonly="readonly">
+	                                        <span class="input-group-btn">
+	                                            <button class="btn btn-default js-show-datepicker" data-datepicker-selector="#to_date" type="button">
+	                                                <span class="glyphicon glyphicon-calendar"></span>
+	                                            </button>
+	                                        </span>
+	                                    </div>
+	                                </div>
+	                            </div>
+	                        </div>
+                        </div>
+
+                        <div class="row">
+	                        <div class="col-md-12">
+	                            <div>
+	                                <strong>{intl l='Administrators'} :</strong>
+	                            </div>
+
+	                            <div class="row">
+	                            {loop type="admin" name="admin-list" backend_context="1"}
+	                                {if ($LOOP_COUNT-1)%4 == 0 AND $LOOP_COUNT != 0 AND $LOOP_COUNT != $LOOP_TOTAL}
+	                                    </div>
+	                                    <div class="row">
+	                                {/if}
+	                                <div class="col-md-3">
+	                                    <input id="admin_{$ID}" data-id="{$LOGIN}" class="js-admin" type="checkbox" checked>
+	                                    <label for="admin_{$ID}" style="font-weight: normal;">{$LOGIN} ({$FIRSTNAME|upper} {$LASTNAME|ucwords})</label>
+	                                </div>
+	                            {/loop}
+	                            </div>
+	                        </div>
+	                    </div>
+
+                        <div class="row">
+	                        <div class="col-md-12">
+	                            <div>
+	                                <strong>{intl l='Resources'} :</strong>
+	                            </div>
+
+	                            <div class="row">
+	                            {loop type="resource" name="resources-list" backend_context="1"}
+	                                {if ($LOOP_COUNT-1)%4 == 0 AND $LOOP_COUNT != 0 AND $LOOP_COUNT != $LOOP_TOTAL}
+	                                    </div>
+	                                    <div class="row">
+	                                {/if}
+	                                <div class="col-md-3">
+	                                    <input id="resource_{$ID}" data-id="{$CODE}" class="js-resource" type="checkbox" checked>
+	                                    <label for="resource_{$ID}" style="font-weight: normal;">{$TITLE}</label>
+	                                </div>
+	                            {/loop}
+	                            </div>
+
+	                        </div>
+                        </div>
+
+                        <div class="row">
+	                        <div class="col-md-12">
+	                            <div>
+	                                <strong>{intl l='Modules'} :</strong>
+	                            </div>
+
+	                            <div class="row">
+	                            {loop type="module" name="modules-list" backend_context="1"}
+	                                {if ($LOOP_COUNT-1)%4 == 0 AND $LOOP_COUNT != 0 AND $LOOP_COUNT != $LOOP_TOTAL}
+	                                    </div>
+	                                    <div class="row">
+	                                {/if}
+	                                <div class="col-md-3">
+	                                    <input id="module_{$ID}" data-id="{$CODE}" class="js-module" type="checkbox" checked>
+	                                    <label for="module_{$ID}" style="font-weight: normal;">{$TITLE}</label>
+	                                </div>
+	                            {/loop}
+	                            </div>
+
+	                        </div>
+                        </div>
+
+                        <div class="row inner-toolbar">
+                            <div class="col-md-12 inner-actions clearfix">
+                                <button type="button" class="btn btn-default btn-success pull-right js-show-logs" title="{intl l='Show logs'}">{intl l='Show logs'} <span class="glyphicon glyphicon-eye-open"></span></button>
+                            </div>
+                        </div>
+
+                        <div id="loading-block" class="col-md-12 loading-block"></div>
+
+                        <div class="col-md-12 clearfix" id="logger-display"></div>
+                    </div>
+                </div>
+            </div>
+
+            {module_include location='admin_logs_bottom'}
+
+        </div>
+    </div>
+{/block}
+
+{block name="javascript-initialization"}
+    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/jquery.ui/jquery.ui.datepicker/jquery.ui.datepicker.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {stylesheets file='assets/js/jquery.ui/jquery.ui.theme.css'}
+        <link rel="stylesheet" href="{$asset_url}">
+    {/stylesheets}
+    {stylesheets file='assets/js/jquery.ui/jquery.ui.datepicker/jquery.ui.datepicker.css'}
+        <link rel="stylesheet" href="{$asset_url}">
+    {/stylesheets}
+
+    {javascripts file="assets/js/jquery/jquery.ui.ui.datepicker/i18n/jquery.ui.datepicker-{lang attr="locale"}.js" catchException="true"}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+
+
+    <script type="text/javascript">
+
+        jQuery(function($) {
+
+            $('#from_date').datepicker({
+                maxDate: "-1d",
+                showOn: 'manual'
+            });
+            $('#from_date').datepicker( "setDate", "-7d" );
+
+            $('#to_date').datepicker({
+                maxDate: "0",
+                showOn: 'manual'
+            });
+            $('#to_date').datepicker( "setDate", "0" );
+
+            $('.js-show-datepicker').click(function(e){
+                $($(this).data('datepicker-selector')).datepicker('show');
+            });
+
+            $('.js-show-logs').click(function(e) {
+
+                $('.js-show-logs').attr('disabled', true);
+                $('#logger-display').html('');
+                $('#loading-block').show();
+
+                var admins = new Array();
+                var resources = new Array();
+                var modules = new Array();
+
+                $('.js-admin:checked').each(function(k, v) {
+                    admins.push($(v).data('id'));
+                })
+                $('.js-resource:checked').each(function(k, v) {
+                    resources.push($(v).data('id'));
+                })
+                $('.js-module:checked').each(function(k, v) {
+                    modules.push($(v).data('id'));
+                })
+
+                var fromDate = new Date( $('#from_date').datepicker( "getDate" ) );
+                var toDate = new Date( $('#to_date').datepicker( "getDate" ) );
+
+                $.post(
+                    "{url path='/admin/configuration/adminLogs/logger'}",
+                    {
+                        fromDate:       $.datepicker.formatDate("yy-mm-dd", fromDate),
+                        toDate:         $.datepicker.formatDate("yy-mm-dd", toDate),
+                        admins:         admins,
+                        resources:      resources,
+                        modules:        modules
+                    },
+                    function(html) {
+                        $('#loading-block').hide();
+                        $('#logger-display').html(html);
+                        $('.js-show-logs').attr('disabled', false);
+                    }
+                );
+            });
+        });
+
+    </script>
+{/block}

@@ -24,7 +24,7 @@
 namespace Thelia\Condition;
 
 use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -42,9 +42,9 @@ interface ConditionManagerInterface
     /**
      * Constructor
      *
-     * @param AdapterInterface $adapter Service adapter
+     * @param FacadeInterface $adapter Service adapter
      */
-    function __construct(AdapterInterface $adapter);
+    function __construct(FacadeInterface $adapter);
 
     /**
      * Get Rule Service id
@@ -52,20 +52,6 @@ interface ConditionManagerInterface
      * @return string
      */
     public function getServiceId();
-
-//    /**
-//     * Check if backoffice inputs are relevant or not
-//     *
-//     * @return bool
-//     */
-//    public function checkBackOfficeInput();
-
-//    /**
-//     * Check if Checkout inputs are relevant or not
-//     *
-//     * @return bool
-//     */
-//    public function checkCheckoutInput();
 
     /**
      * Check validators relevancy and store them
@@ -77,13 +63,6 @@ interface ConditionManagerInterface
      * @return $this
      */
     public function setValidatorsFromForm(array $operators, array $values);
-
-//    /**
-//     * Check if the current Checkout matches this condition
-//     *
-//     * @return bool
-//     */
-//    public function isMatching();
 
     /**
      * Test if the current application state matches conditions
@@ -120,17 +99,6 @@ interface ConditionManagerInterface
      * @return array
      */
     public function getValidators();
-
-//    /**
-//     * Populate a Condition from a form admin
-//     *
-//     * @param array $operators Condition Operator set by the Admin
-//     * @param array $values    Condition Values set by the Admin
-//     *
-//     * @return bool
-//     */
-//    public function populateFromForm(array$operators, array $values);
-
 
     /**
      * Return a serializable Condition

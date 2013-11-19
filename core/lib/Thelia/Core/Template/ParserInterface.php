@@ -33,7 +33,7 @@ interface ParserInterface
     /**
      *
      */
-    public function getContent();
+    public function render($realTemplateName, array $parameters = array());
 
     public function setContent($content);
 

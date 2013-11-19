@@ -23,11 +23,13 @@
 
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Model\CategoryQuery;
 use Thelia\Form\CategoryModificationForm;
 use Thelia\Form\CategoryCreationForm;
@@ -54,10 +56,7 @@ class CategoryController extends AbstractCrudController
             'manual',
             'category_order',
 
-            'admin.categories.default',
-            'admin.categories.create',
-            'admin.categories.update',
-            'admin.categories.delete',
+            AdminResources::CATEGORY,
 
             TheliaEvents::CATEGORY_CREATE,
             TheliaEvents::CATEGORY_UPDATE,
@@ -216,7 +215,7 @@ class CategoryController extends AbstractCrudController
     public function setToggleVisibilityAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $event = new CategoryToggleVisibilityEvent($this->getExistingObject());
 
@@ -296,7 +295,7 @@ class CategoryController extends AbstractCrudController
     public function addRelatedContentAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $content_id = intval($this->getRequest()->get('content_id'));
 
@@ -321,12 +320,12 @@ class CategoryController extends AbstractCrudController
     /**
      * Add category pictures
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     public function addRelatedPictureAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.categories.update")) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -354,7 +353,7 @@ class CategoryController extends AbstractCrudController
     public function deleteRelatedContentAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $content_id = intval($this->getRequest()->get('content_id'));
 

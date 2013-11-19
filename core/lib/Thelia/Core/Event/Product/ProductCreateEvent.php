@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Product;
 
-
 class ProductCreateEvent extends ProductEvent
 {
     protected $ref;

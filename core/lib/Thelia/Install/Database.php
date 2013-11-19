@@ -40,21 +40,33 @@ class Database
 
     /**
      * Insert all sql needed in database
+     * Default insert /install/thelia.sql and /install/insert.sql
      *
-     * @param $dbName
+     * @param string $dbName        Database name
+     * @param array  $extraSqlFiles SQL Files uri to insert
      */
-    public function insertSql($dbName = null)
+    public function insertSql($dbName = null, array $extraSqlFiles = null)
     {
-        if($dbName) {
+        if ($dbName) {
             $this->connection->query(sprintf("use %s", $dbName));
         }
 
         $sql = array();
-        $sql = array_merge(
-            $sql,
-            $this->prepareSql(file_get_contents(THELIA_ROOT . "/install/thelia.sql")),
-            $this->prepareSql(file_get_contents(THELIA_ROOT . "/install/insert.sql"))
-        );
+
+        if (null === $extraSqlFiles) {
+            $sql = array_merge(
+                $sql,
+                $this->prepareSql(file_get_contents(THELIA_ROOT . '/install/thelia.sql')),
+                $this->prepareSql(file_get_contents(THELIA_ROOT . '/install/insert.sql'))
+            );
+        } else {
+            foreach ($extraSqlFiles as $fileToInsert) {
+                $sql = array_merge(
+                    $sql,
+                    $this->prepareSql(file_get_contents($fileToInsert))
+                );
+            }
+        }
 
         for ($i = 0; $i < count($sql); $i ++) {
             if (!empty($sql[$i])) {
@@ -75,7 +87,7 @@ class Database
         $sql = trim($sql);
         $query = array();
 
-        $tab = explode(";", $sql);
+        $tab = explode(";\n", $sql);
 
         for ($i=0; $i<count($tab); $i++) {
             $queryTemp = str_replace("-CODE-", ";',", $tab[$i]);

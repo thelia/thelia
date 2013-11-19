@@ -22,6 +22,8 @@
 /*************************************************************************************/
 
 namespace Thelia\Form;
+
+use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
@@ -57,115 +59,122 @@ class AddressCreateForm extends BaseForm
     {
         $this->formBuilder
             ->add("label", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Address label"),
-                "label_attr" => array(
-                    "for" => "label_create"
-                ),
-                "required" => true
-            ))
+                    "constraints" => array(
+                        new NotBlank()
+                    ),
+                    "label" => Translator::getInstance()->trans("Address label"),
+                    "label_attr" => array(
+                        "for" => "address_label"
+                    )
+                ))
             ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Title"),
-                "label_attr" => array(
-                    "for" => "title_create"
-                )
-            ))
+                    "constraints" => array(
+                        new Constraints\NotBlank()
+                    ),
+                    "label" => Translator::getInstance()->trans("Title"),
+                    "label_attr" => array(
+                        "for" => "title"
+                    )
+                ))
             ->add("firstname", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Firstname"),
-                "label_attr" => array(
-                    "for" => "firstname_create"
-                )
-            ))
+                    "constraints" => array(
+                        new Constraints\NotBlank()
+                    ),
+                    "label" => Translator::getInstance()->trans("First Name"),
+                    "label_attr" => array(
+                        "for" => "firstname"
+                    )
+                ))
             ->add("lastname", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Lastname"),
-                "label_attr" => array(
-                    "for" => "lastname_create"
-                )
-            ))
-            ->add("address1", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Street Address"),
-                "label_attr" => array(
-                    "for" => "address1_create"
-                )
-            ))
-            ->add("address2", "text", array(
-                "label" => Translator::getInstance()->trans("Additional address"),
-                "label_attr" => array(
-                    "for" => "address2_create"
-                )
-            ))
-            ->add("address3", "text", array(
-                "label" => Translator::getInstance()->trans("Additional address"),
-                "label_attr" => array(
-                    "for" => "address3_create"
-                )
-            ))
-            ->add("zipcode", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Zip code"),
-                "label_attr" => array(
-                    "for" => "zipcode_create"
-                )
-            ))
-            ->add("city", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("City"),
-                "label_attr" => array(
-                    "for" => "city_create"
-                )
-            ))
-            ->add("country", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Country"),
-                "label_attr" => array(
-                    "for" => "country_create"
-                )
-            ))
-            ->add("phone", "text", array(
-                "label" => Translator::getInstance()->trans("Phone"),
-                "label_attr" => array(
-                    "for" => "phone_create"
-                )
-            ))
-            ->add("cellphone", "text", array(
-                "label" => Translator::getInstance()->trans("Cellphone"),
-                "label_attr" => array(
-                    "for" => "cellphone_create"
-                )
-            ))
+                    "constraints" => array(
+                        new Constraints\NotBlank()
+                    ),
+                    "label" => Translator::getInstance()->trans("Last Name"),
+                    "label_attr" => array(
+                        "for" => "lastname"
+                    )
+                ))
             ->add("company", "text", array(
-                "label" => Translator::getInstance()->trans("Company"),
-                "label_attr" => array(
-                    "for" => "company_create"
-                )
-            ))
-            ->add("is_default", "integer", array(
-                "label" => Translator::getInstance()->trans("Make this address has my primary address"),
-                "label_attr" => array(
-                    "for" => "default_address"
-                )
-            ))
-            ;
+                    "label" => Translator::getInstance()->trans("Company Name"),
+                    "label_attr" => array(
+                        "for" => "company"
+                    ),
+                    "required" => false
+                ))
+            ->add("address1", "text", array(
+                    "constraints" => array(
+                        new Constraints\NotBlank()
+                    ),
+                    "label" => Translator::getInstance()->trans("Street Address"),
+                    "label_attr" => array(
+                        "for" => "address1"
+                    )
+                ))
+            ->add("address2", "text", array(
+                    "label" => Translator::getInstance()->trans("Address Line 2"),
+                    "label_attr" => array(
+                        "for" => "address2"
+                    ),
+                    "required" => false
+                ))
+            ->add("address3", "text", array(
+                    "label" => Translator::getInstance()->trans("Address Line 3"),
+                    "label_attr" => array(
+                        "for" => "address3"
+                    ),
+                    "required" => false
+                ))
+            ->add("city", "text", array(
+                    "constraints" => array(
+                        new Constraints\NotBlank()
+                    ),
+                    "label" => Translator::getInstance()->trans("City"),
+                    "label_attr" => array(
+                        "for" => "city"
+                    )
+                ))
+            ->add("zipcode", "text", array(
+                    "constraints" => array(
+                        new Constraints\NotBlank()
+                    ),
+                    "label" => Translator::getInstance()->trans("Zip code"),
+                    "label_attr" => array(
+                        "for" => "zipcode"
+                    )
+                ))
+            ->add("country", "text", array(
+                    "constraints" => array(
+                        new Constraints\NotBlank()
+                    ),
+                    "label" => Translator::getInstance()->trans("Country"),
+                    "label_attr" => array(
+                        "for" => "country"
+                    )
+                ))
+            // Phone
+            ->add("phone", "text", array(
+                    "label" => Translator::getInstance()->trans("Phone"),
+                    "label_attr" => array(
+                        "for" => "phone"
+                    ),
+                    "required" => false
+                ))
+            ->add("cellphone", "text", array(
+                    "label" => Translator::getInstance()->trans("Cellphone"),
+                    "label_attr" => array(
+                        "for" => "cellphone"
+                    ),
+                    "required" => false
+                ))
+            // Default address
+            ->add("is_default", "checkbox", array(
+                    "label" => Translator::getInstance()->trans("Make this address as my primary address"),
+                    "label_attr" => array(
+                        "for" => "default_address"
+                    ),
+                    "required" => false
+                ))
+        ;
     }
 
     /**

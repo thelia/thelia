@@ -23,10 +23,12 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Config\ConfigDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Model\ConfigQuery;
 use Thelia\Form\ConfigModificationForm;
 use Thelia\Form\ConfigCreationForm;
@@ -45,10 +47,7 @@ class ConfigController extends AbstractCrudController
             'name',
             'order',
 
-            'admin.configuration.variables.view',
-            'admin.configuration.variables.create',
-            'admin.configuration.variables.update',
-            'admin.configuration.variables.delete',
+            AdminResources::CONFIG,
 
             TheliaEvents::CONFIG_CREATE,
             TheliaEvents::CONFIG_UPDATE,
@@ -182,12 +181,12 @@ class ConfigController extends AbstractCrudController
     /**
      * Change values modified directly from the variable list
      *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * @return Thelia\Core\HttpFoundation\Response the response
      */
     public function changeValuesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.variables.update")) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         $variables = $this->getRequest()->get('variable', array());
 

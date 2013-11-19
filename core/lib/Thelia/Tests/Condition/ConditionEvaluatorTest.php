@@ -25,7 +25,7 @@ namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 use Thelia\Coupon\ConditionCollection;
 use Thelia\Model\CurrencyQuery;
 
@@ -57,21 +57,21 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getTranslator')
             ->will($this->returnValue($stubTranslator));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
             ->will($this->returnValue($currencies));
 
@@ -94,17 +94,17 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
             ->method('has')
             ->will($this->returnValue(true));
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getCartTotalPrice')
             ->will($this->returnValue(401.00));
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => '>',
             MatchForTotalAmountManager::INPUT2 => '=='
@@ -131,21 +131,21 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getTranslator')
             ->will($this->returnValue($stubTranslator));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
             ->will($this->returnValue($currencies));
 
@@ -168,17 +168,17 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
             ->method('has')
             ->will($this->returnValue(true));
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getCartTotalPrice')
             ->will($this->returnValue(400.00));
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => '>',
             MatchForTotalAmountManager::INPUT2 => '=='
@@ -205,21 +205,21 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getTranslator')
             ->will($this->returnValue($stubTranslator));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
             ->will($this->returnValue($currencies));
 
@@ -242,20 +242,20 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
             ->method('has')
             ->will($this->returnValue(true));
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getCartTotalPrice')
             ->will($this->returnValue(401.00));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(5));
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => '>',
             MatchForTotalAmountManager::INPUT2 => '=='
@@ -265,7 +265,7 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
             MatchForTotalAmountManager::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
-        $condition2 = new MatchForXArticlesManager($stubAdapter);
+        $condition2 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => '>'
         );
@@ -292,21 +292,21 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getTranslator')
             ->will($this->returnValue($stubTranslator));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
             ->will($this->returnValue($currencies));
 
@@ -329,20 +329,20 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
             ->method('has')
             ->will($this->returnValue(true));
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getCartTotalPrice')
             ->will($this->returnValue(400.00));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(5));
 
-        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => '>',
             MatchForTotalAmountManager::INPUT2 => '=='
@@ -352,7 +352,7 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
             MatchForTotalAmountManager::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
-        $condition2 = new MatchForXArticlesManager($stubAdapter);
+        $condition2 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => '>'
         );

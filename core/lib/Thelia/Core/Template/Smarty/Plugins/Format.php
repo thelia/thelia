@@ -28,6 +28,7 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\Exception\SmartyPluginException;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Tools\DateTimeFormat;
+use Thelia\Tools\NumberFormat;
 
 /**
  *
@@ -69,25 +70,33 @@ class Format extends AbstractSmartyPlugin
      */
     public function formatDate($params, $template = null)
     {
+        $date = $this->getParam($params, "date", false);
 
-        if (array_key_exists("date", $params) === false) {
-            throw new SmartyPluginException("date is a mandatory parameter in format_date function");
+        if ($date === false) {
+
+            // Check if we have a timestamp
+            $timestamp = $this->getParam($params, "timestamp", false);
+
+            if ($timestamp === false) {
+                // No timestamp => error
+                throw new SmartyPluginException("Either date or timestamp is a mandatory parameter in format_date function");
+            } else {
+                $date = new \DateTime();
+                $date->setTimestamp($timestamp);
+            }
         }
 
-        $date = $params["date"];
-
-        if (!$date instanceof \DateTime) {
+        if (!($date instanceof \DateTime)) {
             return "";
         }
 
-        if (array_key_exists("format", $params)) {
-            $format = $params["format"];
-        } else {
-            $format = DateTimeFormat::getInstance($this->request)->getFormat(array_key_exists("output", $params) ? $params["output"] : null);
+        $format = $this->getParam($params, "format", false);
+
+        if ($format === false) {
+            $format = DateTimeFormat::getInstance($this->request)->getFormat($this->getParam($params, "output", null));
         }
 
         return $date->format($format);
-
     }
 
     /**
@@ -109,23 +118,22 @@ class Format extends AbstractSmartyPlugin
      */
     public function formatNumber($params, $template = null)
     {
-        if (array_key_exists("number", $params) ===  false) {
-            throw new SmartyPluginException("number is a mandatory parameter in format_number function");
-        }
+        $number = $this->getParam($params, "number", false);
 
-        $number = $params["number"];
-
-        if (empty($number)) {
+        if ($number ===  false) {
             return "";
         }
 
-        $lang = $this->request->getSession()->getLang();
+        if ($number == '') {
+            return "";
+        }
 
-        $decimals = array_key_exists("decimals", $params) ? $params["decimals"] : $lang->getDecimals();
-        $decPoint = array_key_exists("dec_point", $params) ? $params["dec_point"] : $lang->getDecimalSeparator();
-        $thousandsSep = array_key_exists("thousands_sep", $params) ? $params["thousands_sep"] : $lang->getThousandsSeparator();
-
-        return number_format($number, $decimals, $decPoint, $thousandsSep);
+        return NumberFormat::getInstance($this->request)->format(
+                $number,
+                $this->getParam($params, "decimals", null),
+                $this->getParam($params, "dec_point", null),
+                $this->getParam($params, "thousands_sep", null)
+        );
     }
 
     /**

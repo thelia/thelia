@@ -23,12 +23,17 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Type\AlphaNumStringListType;
+use Thelia\Type\EnumListType;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -36,45 +41,64 @@ use Thelia\Core\Template\Loop\Argument\Argument;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Auth extends BaseLoop
+class Auth extends BaseLoop implements ArraySearchLoopInterface
 {
     public function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createAnyTypeArgument('roles', null, true),
-            Argument::createAnyTypeArgument('permissions'),
+            new Argument(
+                'role',
+                new TypeCollection(
+                    new AlphaNumStringListType()
+                ),
+                null,
+                true
+            ),
+            new Argument(
+                'resource',
+                new TypeCollection(
+                    new AlphaNumStringListType()
+                )
+            ),
+            new Argument(
+                'module',
+                new TypeCollection(
+                    new AlphaNumStringListType()
+                )
+            ),
+            new Argument(
+                'access',
+                new TypeCollection(
+                    new EnumListType(array(AccessManager::VIEW, AccessManager::CREATE, AccessManager::UPDATE, AccessManager::DELETE))
+                )
+            ),
             Argument::createAnyTypeArgument('context', 'front', false)
          );
     }
 
-    private function _explode($commaSeparatedValues)
+    public function buildArray()
     {
-
-        $array = explode(',', $commaSeparatedValues);
-
-        if (array_walk($array, function(&$item) {
-            $item = strtoupper(trim($item));
-        })) {
-            return $array;
-        }
-
         return array();
     }
 
-    /**
-     *
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function parseResults(LoopResult $loopResult)
     {
-        $roles = $this->_explode($this->getRoles());
-        $permissions = $this->_explode($this->getPermissions());
+        $roles = $this->getRole();
+        $resource = $this->getResource();
+        $module = $this->getModule();
+        $access = $this->getAccess();
 
-        $loopResult = new LoopResult();
+        if(null !== $module) {
+            $in = true;
+        }
 
         try {
-            if (true === $this->securityContext->isGranted($roles, $permissions == null ? array() : $permissions)) {
+            if (true === $this->securityContext->isGranted(
+                    $roles,
+                    $resource === null ? array() : $resource,
+                    $module === null ? array() : $module,
+                    $access === null ? array() : $access)
+            ) {
 
                 // Create an empty row: loop is no longer empty :)
                 $loopResult->addRow(new LoopResultRow());

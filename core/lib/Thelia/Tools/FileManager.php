@@ -118,20 +118,6 @@ class FileManager
             $directory = $this->getUploadDir($parentType, $fileType);
             $fileName = $this->renameFile($model->getId(), $uploadedFile);
 
-            $this->adminLogAppend(
-                $this->translator->trans(
-                    'Uploading %type% %fileName% to %directory% for parent_id %parentId% (%parentType%)',
-                    array(
-                        '%type%' => $fileType,
-                        '%fileName%' => $uploadedFile->getClientOriginalName(),
-                        '%directory%' => $directory . '/' . $fileName,
-                        '%parentId%' => $parentId,
-                        '%parentType%' => $parentType
-                    ),
-                    'image'
-                )
-            );
-
             $newUploadedFile = $uploadedFile->move($directory, $fileName);
             $model->setFile($fileName);
 
@@ -280,20 +266,6 @@ class FileManager
     public function sanitizeFileName($string)
     {
         return strtolower(preg_replace('/[^a-zA-Z0-9-_\.]/', '', $string));
-    }
-
-    /**
-     * Helper to append a message to the admin log.
-     *
-     * @param string $message
-     */
-    public function adminLogAppend($message)
-    {
-        AdminLog::append(
-            $message,
-            $this->container->get('request'),
-            $this->container->get('thelia.securityContext')->getAdminUser()
-        );
     }
 
     /**

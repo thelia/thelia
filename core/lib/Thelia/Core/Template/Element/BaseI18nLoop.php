@@ -36,6 +36,8 @@ use Thelia\Model\Tools\ModelCriteriaTools;
  */
 abstract class BaseI18nLoop extends BaseLoop
 {
+    protected $locale;
+
     /**
      * Define common loop arguments
      *
@@ -65,9 +67,7 @@ abstract class BaseI18nLoop extends BaseLoop
     {
         /* manage translations */
 
-        $fr = $this->getForce_return();
-
-        return ModelCriteriaTools::getI18n(
+        $this->locale = ModelCriteriaTools::getI18n(
             $this->getBackend_context(),
             $this->getLang(),
             $search,

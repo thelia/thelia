@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Product;
 
-
 class ProductDeleteEvent extends ProductEvent
 {
     public function __construct($product_id)

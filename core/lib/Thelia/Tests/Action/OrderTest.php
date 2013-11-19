@@ -24,6 +24,7 @@
 namespace Thelia\Tests\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -250,6 +251,10 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             throw new \Exception('No Payment Module fixture found');
         }
 
+        /* define payment module in container */
+        $paymentModuleClass = $paymentModule->getFullNamespace();
+        $this->container->set(sprintf('module.%s', $paymentModule->getCode()), new $paymentModuleClass());
+
         $this->orderEvent->getOrder()->chosenDeliveryAddress = $validDeliveryAddress->getId();
         $this->orderEvent->getOrder()->chosenInvoiceAddress = $validInvoiceAddress->getId();
         $this->orderEvent->getOrder()->setDeliveryModuleId($deliveryModule->getId());
@@ -347,7 +352,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
             /* check tax */
             $orderProductTaxList = $orderProduct->getOrderProductTaxes();
-            foreach ($cartItem->getProduct()->getTaxRule()->getTaxDetail($validDeliveryAddress->getCountry(), $cartItem->getPrice(), $cartItem->getPromoPrice()) as $index => $tax) {
+            foreach ($cartItem->getProduct()->getTaxRule()->getTaxDetail($cartItem->getProduct(), $validDeliveryAddress->getCountry(), $cartItem->getPrice(), $cartItem->getPromoPrice()) as $index => $tax) {
                 $orderProductTax = $orderProductTaxList[$index];
                 $this->assertEquals($tax->getAmount(), $orderProductTax->getAmount());
                 $this->assertEquals($tax->getPromoAmount(), $orderProductTax->getPromoAmount());

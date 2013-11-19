@@ -1,0 +1,403 @@
+<?php
+/*************************************************************************************/
+/*                                                                                   */
+/*      Thelia	                                                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : info@thelia.net                                                      */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      This program is free software; you can redistribute it and/or modify         */
+/*      it under the terms of the GNU General Public License as published by         */
+/*      the Free Software Foundation; either version 3 of the License                */
+/*                                                                                   */
+/*      This program is distributed in the hope that it will be useful,              */
+/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
+/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
+/*      GNU General Public License for more details.                                 */
+/*                                                                                   */
+/*      You should have received a copy of the GNU General Public License            */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*                                                                                   */
+/*************************************************************************************/
+
+namespace Thelia\Controller\Admin;
+
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Event\Profile\ProfileEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Form\ProfileCreationForm;
+use Thelia\Form\ProfileModificationForm;
+use Thelia\Form\ProfileUpdateModuleAccessForm;
+use Thelia\Form\ProfileUpdateResourceAccessForm;
+use Thelia\Model\ProfileQuery;
+
+class ProfileController extends AbstractCrudController
+{
+    public function __construct()
+    {
+        parent::__construct(
+            'profile',
+            'manual',
+            'order',
+
+            AdminResources::PROFILE,
+
+            TheliaEvents::PROFILE_CREATE,
+            TheliaEvents::PROFILE_UPDATE,
+            TheliaEvents::PROFILE_DELETE
+        );
+    }
+
+    protected function getCreationForm()
+    {
+        return new ProfileCreationForm($this->getRequest());
+    }
+
+    protected function getUpdateForm()
+    {
+        return new ProfileModificationForm($this->getRequest());
+    }
+
+    protected function getCreationEvent($formData)
+    {
+        $event = new ProfileEvent();
+
+        $event->setLocale($formData['locale']);
+        $event->setCode($formData['code']);
+        $event->setTitle($formData['title']);
+        $event->setChapo($formData['chapo']);
+        $event->setDescription($formData['description']);
+        $event->setPostscriptum($formData['postscriptum']);
+
+        return $event;
+    }
+
+    protected function getUpdateEvent($formData)
+    {
+        $event = new ProfileEvent();
+
+        $event->setLocale($formData['locale']);
+        $event->setId($formData['id']);
+        $event->setTitle($formData['title']);
+        $event->setChapo($formData['chapo']);
+        $event->setDescription($formData['description']);
+        $event->setPostscriptum($formData['postscriptum']);
+
+        return $event;
+    }
+
+    protected function getDeleteEvent()
+    {
+        $event = new ProfileEvent();
+
+        $event->setId(
+            $this->getRequest()->get('profile_id', 0)
+        );
+
+        return $event;
+    }
+
+    protected function eventContainsObject($event)
+    {
+        return $event->hasProfile();
+    }
+
+    protected function hydrateObjectForm($object)
+    {
+        $data = array(
+            'id'           => $object->getId(),
+            'locale'       => $object->getLocale(),
+            'title'        => $object->getTitle(),
+            'description'  => $object->getDescription(),
+            'code'         => $object->getCode(),
+        );
+
+        // Setup the object form
+        return new ProfileModificationForm($this->getRequest(), "form", $data);
+    }
+
+    protected function hydrateResourceUpdateForm($object)
+    {
+        $data = array(
+            'id'           => $object->getId(),
+        );
+
+        // Setup the object form
+        return new ProfileUpdateResourceAccessForm($this->getRequest(), "form", $data);
+    }
+
+    protected function hydrateModuleUpdateForm($object)
+    {
+        $data = array(
+            'id'           => $object->getId(),
+        );
+
+        // Setup the object form
+        return new ProfileUpdateModuleAccessForm($this->getRequest(), "form", $data);
+    }
+
+    protected function getObjectFromEvent($event)
+    {
+        return $event->hasProfile() ? $event->getProfile() : null;
+    }
+
+    protected function getExistingObject()
+    {
+        return ProfileQuery::create()
+            ->joinWithI18n($this->getCurrentEditionLocale())
+            ->findOneById($this->getRequest()->get('profile_id'));
+    }
+
+    protected function getObjectLabel($object)
+    {
+        return $object->getTitle();
+    }
+
+    protected function getObjectId($object)
+    {
+        return $object->getId();
+    }
+
+    protected function getViewArguments()
+    {
+        return array();
+    }
+
+    protected function getRouteArguments($profile_id = null)
+    {
+        return array(
+            'profile_id' => $profile_id === null ? $this->getRequest()->get('profile_id') : $profile_id,
+        );
+    }
+
+    protected function renderListTemplate($currentOrder)
+    {
+        // We always return to the feature edition form
+        return $this->render(
+            'profiles',
+            array()
+        );
+    }
+
+    protected function renderEditionTemplate()
+    {
+        // We always return to the feature edition form
+        return $this->render('profile-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
+    }
+
+    protected function redirectToEditionTemplate($request = null, $country = null)
+    {
+        // We always return to the feature edition form
+        $this->redirectToRoute(
+            "admin.configuration.profiles.update",
+            $this->getViewArguments($country),
+            $this->getRouteArguments()
+        );
+    }
+
+    /**
+     * Put in this method post object creation processing if required.
+     *
+     * @param  ProfileEvent $createEvent the create event
+     * @return Response     a response, or null to continue normal processing
+     */
+    protected function performAdditionalCreateAction($createEvent)
+    {
+        $this->redirectToRoute(
+            "admin.configuration.profiles.update",
+            $this->getViewArguments(),
+            $this->getRouteArguments($createEvent->getProfile()->getId())
+        );
+    }
+
+    protected function redirectToListTemplate()
+    {
+        $this->redirectToRoute(
+            "admin.configuration.profiles.list"
+        );
+    }
+
+    public function updateAction()
+    {
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+
+        $object = $this->getExistingObject();
+
+        if ($object != null) {
+
+            // Hydrate the form and pass it to the parser
+            $resourceAccessForm = $this->hydrateResourceUpdateForm($object);
+            $moduleAccessForm = $this->hydrateModuleUpdateForm($object);
+
+            // Pass it to the parser
+            $this->getParserContext()->addForm($resourceAccessForm);
+            $this->getParserContext()->addForm($moduleAccessForm);
+        }
+
+        return parent::updateAction();
+    }
+
+    protected function getUpdateResourceAccessEvent($formData)
+    {
+        $event = new ProfileEvent();
+
+        $event->setId($formData['id']);
+        $event->setResourceAccess($this->getResourceAccess($formData));
+
+        return $event;
+    }
+
+    protected function getUpdateModuleAccessEvent($formData)
+    {
+        $event = new ProfileEvent();
+
+        $event->setId($formData['id']);
+        $event->setModuleAccess($this->getModuleAccess($formData));
+
+        return $event;
+    }
+
+    protected function getResourceAccess($formData)
+    {
+        $requirements = array();
+        foreach ($formData as $data => $value) {
+            if (!strstr($data, ':')) {
+                continue;
+            }
+
+            $explosion = explode(':', $data);
+
+            $prefix = array_shift ( $explosion );
+
+            if ($prefix != ProfileUpdateResourceAccessForm::RESOURCE_ACCESS_FIELD_PREFIX) {
+                continue;
+            }
+
+            $requirements[implode('.', $explosion)] = $value;
+        }
+
+        return $requirements;
+    }
+
+    protected function getModuleAccess($formData)
+    {
+        $requirements = array();
+        foreach ($formData as $data => $value) {
+            if (!strstr($data, ':')) {
+                continue;
+            }
+
+            $explosion = explode(':', $data);
+
+            $prefix = array_shift ( $explosion );
+
+            if ($prefix != ProfileUpdateModuleAccessForm::MODULE_ACCESS_FIELD_PREFIX) {
+                continue;
+            }
+
+            $requirements[implode('.', $explosion)] = $value;
+        }
+
+        return $requirements;
+    }
+
+    public function processUpdateResourceAccess()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+
+        $error_msg = false;
+
+        // Create the form from the request
+        $changeForm = new ProfileUpdateResourceAccessForm($this->getRequest());
+
+        try {
+            // Check the form against constraints violations
+            $form = $this->validateForm($changeForm, "POST");
+
+            // Get the form field values
+            $data = $form->getData();
+
+            $changeEvent = $this->getUpdateResourceAccessEvent($data);
+
+            $this->dispatch(TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE, $changeEvent);
+
+            if (! $this->eventContainsObject($changeEvent))
+                throw new \LogicException(
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName)));
+
+            // Log object modification
+            if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
+                $this->adminLogAppend($this->resourceCode, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+            }
+
+            if ($response == null) {
+                $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
+            } else {
+                return $response;
+            }
+        } catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext($this->getTranslator()->trans("%obj modification", array('%obj' => 'taxrule')), $error_msg, $changeForm, $ex);
+
+        // At this point, the form has errors, and should be redisplayed.
+        return $this->renderEditionTemplate();
+    }
+
+    public function processUpdateModuleAccess()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+
+        $error_msg = false;
+
+        // Create the form from the request
+        $changeForm = new ProfileUpdateModuleAccessForm($this->getRequest());
+
+        try {
+            // Check the form against constraints violations
+            $form = $this->validateForm($changeForm, "POST");
+
+            // Get the form field values
+            $data = $form->getData();
+
+            $changeEvent = $this->getUpdateModuleAccessEvent($data);
+
+            $this->dispatch(TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE, $changeEvent);
+
+            if (! $this->eventContainsObject($changeEvent))
+                throw new \LogicException(
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName)));
+
+            // Log object modification
+            if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
+                $this->adminLogAppend($this->resourceCode, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+            }
+
+            if ($response == null) {
+                $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
+            } else {
+                return $response;
+            }
+        } catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext($this->getTranslator()->trans("%obj modification", array('%obj' => 'taxrule')), $error_msg, $changeForm, $ex);
+
+        // At this point, the form has errors, and should be redisplayed.
+        return $this->renderEditionTemplate();
+    }
+}

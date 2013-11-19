@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -49,9 +50,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class ProductSaleElements extends BaseLoop
+class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -77,13 +78,7 @@ class ProductSaleElements extends BaseLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     * @throws \InvalidArgumentException
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = ProductSaleElementsQuery::create();
 
@@ -136,22 +131,24 @@ class ProductSaleElements extends BaseLoop
         /**
          * rate value is checked as a float in overloaded getRate method.
          */
-        $priceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) THEN `price_default_currency`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END, 2)';
-        $promoPriceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) THEN `price_default_currency`.PROMO_PRICE  * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END, 2)';
+        $priceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END, 2)';
+        $promoPriceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END, 2)';
         $search->withColumn($priceSelectorAsSQL, 'price_PRICE')
             ->withColumn($promoPriceSelectorAsSQL, 'price_PROMO_PRICE')
             ->withColumn('CASE WHEN ' . ProductSaleElementsTableMap::PROMO . ' = 1 THEN ' . $promoPriceSelectorAsSQL . ' ELSE ' . $priceSelectorAsSQL . ' END', 'price_FINAL_PRICE');
 
         $search->groupById();
 
-        $PSEValues = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($PSEValues);
+    }
 
+    public function parseResults(LoopResult $loopResult)
+    {
         $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
 
-        foreach ($PSEValues as $PSEValue) {
-            $loopResultRow = new LoopResultRow($loopResult, $PSEValue, $this->versionable, $this->timestampable, $this->countable);
+        foreach ($loopResult->getResultDataCollection() as $PSEValue) {
+            $loopResultRow = new LoopResultRow($PSEValue);
 
             $price = $PSEValue->getPrice();
             try {
@@ -177,6 +174,7 @@ class ProductSaleElements extends BaseLoop
                 ->set("IS_NEW"            , $PSEValue->getNewness() === 1 ? 1 : 0)
                 ->set("IS_DEFAULT"        , $PSEValue->getIsDefault() === 1 ? 1 : 0)
                 ->set("WEIGHT"            , $PSEValue->getWeight())
+                ->set("EAN_CODE"          , $PSEValue->getEanCode())
                 ->set("PRICE"             , $price)
                 ->set("PRICE_TAX"         , $taxedPrice - $price)
                 ->set("TAXED_PRICE"       , $taxedPrice)
@@ -188,5 +186,6 @@ class ProductSaleElements extends BaseLoop
         }
 
         return $loopResult;
+
     }
 }

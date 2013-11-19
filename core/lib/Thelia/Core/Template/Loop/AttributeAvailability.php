@@ -28,6 +28,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -43,9 +44,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class AttributeAvailability extends BaseI18nLoop
+class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -66,17 +67,12 @@ class AttributeAvailability extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = AttributeAvQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -121,25 +117,30 @@ class AttributeAvailability extends BaseI18nLoop
             }
         }
 
-        /* perform search */
-        $attributesAv = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($attributesAv);
+    }
 
-        foreach ($attributesAv as $attributeAv) {
-            $loopResultRow = new LoopResultRow($loopResult, $attributeAv, $this->versionable, $this->timestampable, $this->countable);
-            $loopResultRow->set("ID", $attributeAv->getId())
-                ->set("IS_TRANSLATED",$attributeAv->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
-                ->set("TITLE",$attributeAv->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $attributeAv->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("POSITION", $attributeAv->getPosition());
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $attributeAv) {
+            $loopResultRow = new LoopResultRow($attributeAv);
+            $loopResultRow
+                ->set("ID"           , $attributeAv->getId())
+                ->set("ATTRIBUTE_ID" , $attributeAv->getAttributeId())
+                ->set("IS_TRANSLATED", $attributeAv->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE"       , $this->locale)
+                ->set("TITLE"        , $attributeAv->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO"        , $attributeAv->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION"  , $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM" , $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("POSITION"     , $attributeAv->getPosition())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
+
     }
 }

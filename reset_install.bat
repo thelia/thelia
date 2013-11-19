@@ -26,7 +26,7 @@ if exist local\config\database.yml (
     php install\faker.php
 
     echo [INFO] Adding admin
-    php Thelia thelia:create-admin
+    php Thelia admin:create
 
     echo [SUCCESS] Reset done
 )

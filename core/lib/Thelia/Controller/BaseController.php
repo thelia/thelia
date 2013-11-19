@@ -22,7 +22,9 @@
 /*************************************************************************************/
 namespace Thelia\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\Event\PdfEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -31,7 +33,9 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\OrderQuery;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Template\ParserContext;
@@ -52,23 +56,40 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
-class BaseController extends ContainerAware
+abstract class BaseController extends ContainerAware
 {
 
     /**
      * Return an empty response (after an ajax request, for example)
+     * @param  int                                        $status
+     * @return \Thelia\Core\HttpFoundation\Response
      */
-    protected function nullResponse()
+    protected function nullResponse($status = 200)
     {
-        return new Response();
+        return new Response(null, $status);
     }
 
     /**
      * Return a JSON response
      */
-    protected function jsonResponse($json_data)
+    protected function jsonResponse($json_data, $status = 200)
     {
-        return new Response($json_data, 200, array('content-type' => 'application/json'));
+        return new Response($json_data, $status, array('content-type' => 'application/json'));
+    }
+
+    /**
+     * @param $pdf
+     * @param $fileName
+     * @param $status
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function pdfResponse($pdf, $fileName, $status = 200)
+    {
+        return Response::create($pdf, $status,
+            array(
+                'Content-type' => "application/pdf",
+                'Content-Disposition' => sprintf('Attachment;filename=%s.pdf', $fileName),
+            ));
     }
 
     /**
@@ -160,8 +181,12 @@ class BaseController extends ContainerAware
         }
 
         foreach ($form->all() as $child) {
+
             if (!$child->isValid()) {
-                $errors .= $this->getErrorMessages($child) . ', ';
+
+                $fieldName = $child->getConfig()->getOption('label', $child->getName());
+
+                $errors .= sprintf("[%s] %s, ", $fieldName, $this->getErrorMessages($child));
             }
         }
 
@@ -199,6 +224,35 @@ class BaseController extends ContainerAware
         } else {
             throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
         }
+    }
+
+    protected function generateOrderPdf($order_id, $fileName)
+    {
+        $html = $this->renderRaw(
+            $fileName,
+            array(
+                'order_id' => $order_id
+            ),
+            TemplateHelper::getInstance()->getActivePdfTemplate()->getPath()
+        );
+
+        $order = OrderQuery::create()->findPk($order_id);
+
+        try {
+            $pdfEvent = new PdfEvent($html);
+
+            $this->dispatch(TheliaEvents::GENERATE_PDF, $pdfEvent);
+
+            if ($pdfEvent->hasPdf()) {
+                return $this->pdfResponse($pdfEvent->getPdf(), $order->getRef());
+            }
+
+        } catch (\Exception $e) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during generating invoice pdf for order id : %d with message "%s"', $order_id, $e->getMessage()));
+
+        }
+
+
     }
 
     /**
@@ -303,4 +357,30 @@ class BaseController extends ContainerAware
 
         return $mailer->getSwiftMailer();
     }
+
+    /**
+     * @return a ParserInterface instance parser
+     */
+    abstract protected function getParser($template = null);
+
+    /**
+     * Render the given template, and returns the result as an Http Response.
+     *
+     * @param $templateName the complete template name, with extension
+     * @param  array                                      $args   the template arguments
+     * @param  int                                        $status http code status
+     * @return \Thelia\Core\HttpFoundation\Response
+     */
+    abstract protected function render($templateName, $args = array(), $status = 200);
+
+    /**
+     * Render the given template, and returns the result as a string.
+     *
+     * @param $templateName the complete template name, with extension
+     * @param array $args        the template arguments
+     * @param null  $templateDir
+     *
+     * @return string
+     */
+    abstract protected function renderRaw($templateName, $args = array(), $templateDir = null);
 }

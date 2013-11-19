@@ -63,7 +63,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
 
         // Add atribute to all product templates if required
         if ($event->getAddToAllTemplates() != 0) {
-            // TODO: add to all product template
+            $this->doAddToAllTemplates($feature);
         }
     }
 

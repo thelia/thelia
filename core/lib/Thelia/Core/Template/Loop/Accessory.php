@@ -45,6 +45,9 @@ use Thelia\Type;
  */
 class Accessory extends Product
 {
+    protected $accessoryId;
+    protected $accessoryPosition;
+
     /**
      * @return ArgumentCollection
      */
@@ -64,12 +67,7 @@ class Accessory extends Product
         return $argumentCollection;
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = AccessoryQuery::create();
 
@@ -93,40 +91,45 @@ class Accessory extends Product
 
         $accessories = $this->search($search);
 
-        $accessoryIdList = array(0);
-        $accessoryPosition = $accessoryId = array();
+        $this->accessoryIdList = array(0);
+        $this->accessoryPosition = $this->accessoryId = array();
 
         foreach ($accessories as $accessory) {
 
             $accessoryProductId = $accessory->getAccessory();
 
-            array_push($accessoryIdList, $accessoryProductId);
+            array_push($this->accessoryIdList, $accessoryProductId);
 
-            $accessoryPosition[$accessoryProductId] = $accessory->getPosition();
-            $accessoryId[$accessoryProductId] = $accessory->getId();
+            $this->accessoryPosition[$accessoryProductId] = $accessory->getPosition();
+            $this->accessoryId[$accessoryProductId] = $accessory->getId();
         }
 
         $receivedIdList = $this->getId();
 
         /* if an Id list is receive, loop will only match accessories from this list */
         if ($receivedIdList === null) {
-            $this->args->get('id')->setValue( implode(',', $accessoryIdList) );
+            $this->args->get('id')->setValue( implode(',', $this->accessoryIdList) );
         } else {
-            $this->args->get('id')->setValue( implode(',', array_intersect($receivedIdList, $accessoryIdList)) );
+            $this->args->get('id')->setValue( implode(',', array_intersect($receivedIdList, $this->accessoryIdList)) );
         }
 
-        $loopResult = parent::exec($pagination);
+        return parent::buildModelCriteria();
+    }
 
-        foreach ($loopResult as $loopResultRow) {
+    public function parseResults(LoopResult $results)
+    {
+        $results = parent::parseResults($results);
+
+        foreach ($results as $loopResultRow) {
 
             $accessoryProductId = $loopResultRow->get('ID');
 
             $loopResultRow
-                ->set("ID"      , $accessoryId[$accessoryProductId])
-                ->set("POSITION", $accessoryPosition[$accessoryProductId])
+                ->set("ID"      , $this->accessoryId[$accessoryProductId])
+                ->set("POSITION", $this->accessoryPosition[$accessoryProductId])
                 ;
         }
 
-        return $loopResult;
+        return $results;
     }
 }

@@ -58,6 +58,7 @@ class RegisterRouterPass implements CompilerPassInterface
             $priority = isset($attributes[0]["priority"]) ? $attributes[0]["priority"] : 0;
             $router = $container->getDefinition($id);
             $router->addMethodCall("setOption", array("matcher_cache_class", $container::camelize("ProjectUrlMatcher".$id)));
+            $router->addMethodCall("setOption", array("generator_cache_class", $container::camelize("ProjectUrlGenerator".$id)));
 
             $chainRouter->addMethodCall("add", array(new Reference($id), $priority));
 
@@ -66,25 +67,26 @@ class RegisterRouterPass implements CompilerPassInterface
             $modules = \Thelia\Model\ModuleQuery::getActivated();
 
             foreach ($modules as $module) {
-                $moduleCode = ucfirst($module->getCode());
-                if (file_exists(THELIA_MODULE_DIR . "/" . $moduleCode . "/Config/routing.xml")) {
+                $moduleBaseDir = $module->getBaseDir();
+                if (file_exists(THELIA_MODULE_DIR . "/" . $moduleBaseDir . "/Config/routing.xml")) {
                     $definition = new Definition(
                         $container->getParameter("router.class"),
                         array(
                             new Reference("router.module.xmlLoader"),
-                            ucfirst($module->getCode()) . "/Config/routing.xml",
+                            $moduleBaseDir . "/Config/routing.xml",
                             array(
                                 "cache_dir" => $container->getParameter("kernel.cache_dir"),
                                 "debug" => $container->getParameter("kernel.debug"),
-                                "matcher_cache_class" => $container::camelize("ProjectUrlMatcher".$moduleCode)
+                                "matcher_cache_class" => $container::camelize("ProjectUrlMatcher".$moduleBaseDir),
+                                "generator_cache_class" => $container::camelize("ProjectUrlGenerator".$moduleBaseDir),
                             ),
                             new Reference("request.context")
                         )
                     );
 
-                    $container->setDefinition("router.".$moduleCode, $definition);
+                    $container->setDefinition("router.".$moduleBaseDir, $definition);
 
-                    $chainRouter->addMethodCall("add", array(new Reference("router.".$moduleCode), 1));
+                    $chainRouter->addMethodCall("add", array(new Reference("router.".$moduleBaseDir), 150));
                 }
             }
         }

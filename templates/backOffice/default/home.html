@@ -1,0 +1,411 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Back-office home'}{/block}
+
+{block name="main-content"}
+	<div class="homepage">
+	      <div id="wrapper" class="container">
+
+		    {module_include location='home_top'}
+
+			<div class="col-md-12 general-block-decorator dashboard">
+
+				<div class="title title-without-tabs clearfix">
+					{intl l='Dashboard'}
+                    <div class="btn-group pull-right">
+						<button type="button" class="btn btn-default js-stats-change-month" data-month-offset="-1"><span class="glyphicon glyphicon-chevron-left"></span></button>
+						<button type="button" class="btn btn-default" disabled><span class="glyphicon glyphicon-calendar"></span></button>
+						<button type="button" class="btn btn-default js-stats-change-month" data-month-offset="+1"><span class="glyphicon glyphicon-chevron-right"></span></button>
+					</div>
+				</div>
+
+				<div class="text-center clearfix">
+					<div class="btn-group">
+						<button type="button" class="btn btn-default active" data-toggle="jqplot" data-target="sales"><span class="glyphicon glyphicon-euro"></span> {intl l="Sales"}</button>
+						<button type="button" class="btn btn-primary" data-toggle="jqplot" data-target="registration"><span class="glyphicon glyphicon-user"></span> {intl l="New customers"}</button>
+						<button type="button" class="btn btn-success" data-toggle="jqplot" data-target="orders"><span class="glyphicon glyphicon-shopping-cart"></span> {intl l="Orders"}</button>
+						<button type="button" class="btn btn-info" data-toggle="jqplot" data-target="first-orders"><span class="glyphicon glyphicon-thumbs-up"></span> {intl l="First orders"}</button>
+						<button type="button" class="btn btn-danger" data-toggle="jqplot" data-target="aborted-orders"><span class="glyphicon glyphicon-thumbs-down"></span> {intl l="Aborted orders"}</button>
+					</div>
+				</div>
+
+				<hr/>
+
+				<div class="jqplot-content">
+					<div id="jqplot"></div>
+				</div>
+
+ 			</div>
+
+
+	 		<div class="row">
+	 			<div class="col-md-4">
+					<div class="general-block-decorator">
+						<div class="title title-without-tabs">{intl l="Shop Informations"}</div>
+						<div class="table-responsive">
+							<table class="table table-striped">
+								<tbody>
+									<tr>
+										<th>{intl l="Customers"}</th>
+		                                <td>
+                                            {count type="customer" current="false" backend_context="1"}
+		                                </td>
+									</tr>
+									<tr>
+										<th>{intl l="Categories"}</th>
+		                                <td>
+                                            {count type="category" visible="*" backend_context="1"}
+		                                </td>
+									</tr>
+									<tr>
+										<th>{intl l="Products"}</th>
+		                                <td>
+                                            {count type="product" visible="*" backend_context="1"}
+		                                </td>
+									</tr>
+									<tr>
+										<th>{intl l="Online products"}</th>
+		                                <td>
+                                            {count type="product" visible="true" backend_context="1"}
+		                                </td>
+									</tr>
+									<tr>
+										<th>{intl l="Offline products"}</th>
+		                                <td>
+                                            {count type="product" visible="false" backend_context="1"}
+		                                </td>
+									</tr>
+									<tr>
+										<th>{intl l="Orders"}</th>
+		                                <td>
+                                            {count type="order" status="*" backend_context="1"}
+		                                </td>
+									</tr>
+					            </tbody>
+					        </table>
+					    </div>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="general-block-decorator">
+						<div class="title title-without-tabs">{intl l="Sales statistics"}</div>
+
+						<ul class="nav nav-tabs">
+							<li class="active"><a href="#statjour" data-toggle="tab">{intl l="Today"}</a></li>
+							<li><a href="#statmois" data-toggle="tab">{intl l="This month"}</a></li>
+							<li><a href="#statannee" data-toggle="tab">{intl l="This year"}</a></li>
+						</ul>
+
+						<div class="tab-content">
+							<div class="tab-pane fade active in" id="statjour">
+								<div class="table-responsive">
+									<table class="table table-striped">
+		                                <tbody>
+                                            <tr>
+                                                <th>{intl l="Overall sales"}</th>
+                                                <td>{stats key="sales" startDate="today" endDate="today"} €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Sales excluding shipping"}</th>
+                                                <td>
+                                                    {$salesNoShipping = {stats key="sales" startDate="today" endDate="today" includeShipping="false"}}
+                                                    {$salesNoShipping} €
+                                                </td>
+                                            </tr>
+		                                    <tr>
+		                                        <th>{intl l="Yesterday sales"}</th>
+		                                        <td>{stats key="sales" startDate="yesterday" endDate="yesterday"} €</td>
+		                                    </tr>
+		                                    <tr>
+		                                        <th>{intl l="Orders"}</th>
+		                                        <td>
+                                                    {$orderCount =  {stats key="orders" startDate="today" endDate="today"}}
+                                                    {$orderCount}
+                                                </td>
+		                                    </tr>
+		                                    <tr>
+		                                        <th>{intl l="Average cart"}</th>
+		                                        <td>
+                                                    {if $orderCount == 0}
+                                                        0 €
+                                                    {else}
+                                                        {($salesNoShipping/$orderCount)|round:"2"} €
+		                                            {/if}
+                                                </td>
+		                                    </tr>
+		                           		</tbody>
+		                        	</table>
+		                        </div>
+	                        </div>
+							<div class="tab-pane fade" id="statmois">
+								<div class="table-responsive">
+		                            <table class="table table-striped">
+		                                <tbody>
+                                            <tr>
+                                                <th>{intl l="Overall sales"}</th>
+                                                <td>{stats key="sales" startDate="this_month" endDate="this_month"} €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Sales excluding shipping"}</th>
+                                                <td>
+                                                    {$salesNoShipping = {stats key="sales" startDate="this_month" endDate="this_month" includeShipping="false"}}
+                                                    {$salesNoShipping} €
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Previous month sales"}</th>
+                                                <td>{stats key="sales" startDate="last_month" endDate="last_month"} €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Orders"}</th>
+                                                <td>
+                                                    {$orderCount =  {stats key="orders" startDate="this_month" endDate="this_month"}}
+                                                    {$orderCount}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Average cart"}</th>
+                                                <td>
+                                                    {if $orderCount == 0}
+                                                        0 €
+                                                    {else}
+                                                        {($salesNoShipping/$orderCount)|round:"2"} €
+                                                    {/if}
+                                                </td>
+                                            </tr>
+		                           		</tbody>
+		                        	</table>
+		                        </div>
+							</div>
+							<div class="tab-pane fade" id="statannee">
+								<div class="table-responsive">
+		                            <table class="table table-striped">
+		                                <tbody>
+                                            <tr>
+                                                <th>{intl l="Overall sales"}</th>
+                                                <td>{stats key="sales" startDate="this_year" endDate="this_year"} €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Sales excluding shipping"}</th>
+                                                <td>
+                                                    {$salesNoShipping = {stats key="sales" startDate="this_year" endDate="this_year" includeShipping="false"}}
+                                                    {$salesNoShipping} €
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Previous year sales"}</th>
+                                                <td>{stats key="sales" startDate="last_year" endDate="last_year"} €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Orders"}</th>
+                                                <td>
+                                                    {$orderCount =  {stats key="orders" startDate="this_year" endDate="this_year"}}
+                                                    {$orderCount}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Average cart"}</th>
+                                                <td>
+                                                    {if $orderCount == 0}
+                                                        0 €
+                                                    {else}
+                                                        {($salesNoShipping/$orderCount)|round:"2"} €
+                                                    {/if}
+                                                </td>
+                                            </tr>
+		                           		</tbody>
+		                            </table>
+		                        </div>
+	                        </div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="general-block-decorator">
+						<div class="title title-without-tabs">{intl l="Thelia informations"}</div>
+						<div class="table-responsive">
+							<table class="table table-striped">
+								<tbody>
+									<tr>
+										<th>{intl l="Current version"}</th>
+										<td>{$THELIA_VERSION}</td>
+									</tr>
+									<tr>
+										<th>{intl l="Latest version available"}</th>
+										<td><a href="">V1.5.4.2</a></td>
+									</tr>
+									<tr>
+										<th>{intl l="News"}</th>
+										<td><a href="" target="_blank">{intl l="Click here"}</a></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			{module_include location='home_bottom'}
+		</div>
+	</div>
+{/block}
+
+{block name="javascript-initialization"}
+
+	{javascripts file='assets/js/jqplot/jquery.jqplot.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/jqplot/plugins/jqplot.highlighter.min.js'}
+        <script type="text/javascript" src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/jqplot/plugins/jqplot.barRenderer.min.js'}
+        <script type="text/javascript" src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/jqplot/plugins/jqplot.pieRenderer.min.js'}
+        <script type="text/javascript" src="{$asset_url}"></script>
+    {/javascripts}
+
+<script>
+
+jQuery(function($){
+
+    var jQplotDate = new Date();
+    jQplotDate.setDate(1); // Set day to 1 so we can add month without 30/31 days of month troubles.
+    var url = "{url path='/admin/home/stats'}";
+    var jQplotData; // json data
+    var jQPlotInstance; // global instance
+
+    var jQPlotsOptions = {
+        animate: true,
+        axesDefaults: {
+            tickOptions: { showMark: true, showGridline: true }
+        },
+        axes: {
+            xaxis: {
+                borderColor: '#ccc',
+                ticks : [],
+                tickOptions:    { showGridline: false }
+            },
+            yaxis: {
+                tickOptions: { showGridline: true, showMark: false, showLabel: false, shadow: false }
+            }
+        },
+        seriesDefaults: {
+            lineWidth: 3,
+            shadow : false,
+            markerOptions: { shadow : false, style: 'filledCircle', size: 12 }
+        },
+        grid: {
+            background: '#FFF',
+            shadow : false,
+            borderColor : '#FFF'
+        },
+        highlighter: {
+            show: true,
+            sizeAdjust: 7,
+            tooltipLocation: 'n',
+            tooltipContentEditor: function(str, seriesIndex, pointIndex, plot){
+
+                // Return axis value : data value
+                //return jQPlotsOptions.axes.xaxis.ticks[pointIndex][1] + ': ' + plot.data[seriesIndex][pointIndex][1];
+                return plot.data[seriesIndex][pointIndex][1];
+            }
+        }
+    };
+
+    {literal}
+
+    // Get initial data Json
+    retrieveJQPlotJson(jQplotDate.getMonth()+1, jQplotDate.getFullYear());
+
+    $('[data-toggle="jqplot"]').click(function(){
+
+        $(this).toggleClass('active');
+        jsonSuccessLoad();
+
+    });
+
+    $('.js-stats-change-month').click(function(e){
+        $('.js-stats-change-month').attr('disabled', true);
+        jQplotDate.setMonth(parseInt(jQplotDate.getMonth()) + parseInt($(this).data('month-offset')));
+        retrieveJQPlotJson(jQplotDate.getMonth()+1, jQplotDate.getFullYear(), function(){$('.js-stats-change-month').attr('disabled', false);});
+
+    });
+
+    function retrieveJQPlotJson(month, year, callback) {
+        console.log(month, year);
+
+        $.getJSON(url, {month: month, year: year})
+            .done(function(data) {
+                jQplotData = data;
+                jsonSuccessLoad();
+                if(callback) {
+                    callback();
+                }
+            })
+            .fail(jsonFailLoad);
+    }
+
+    function initJqplotData(json) {
+        var series = [];
+        var seriesColors = [];
+        $('[data-toggle="jqplot"].active').each(function(i){
+            var position = $(this).index();
+            series.push(json.series[position].data);
+            seriesColors.push(json.series[position].color);
+        });
+
+        // Number of days to display ( = data.length in one serie)
+        var days = json.series[0].data.length;
+
+        // Add days to xaxis
+        var ticks = [];
+        for(var i = 1; i < (days+1); i++){
+            ticks.push([i-1, i]);
+        }
+        jQPlotsOptions.axes.xaxis.ticks = ticks;
+
+        // Graph title
+        jQPlotsOptions.title = json.title;
+
+        // Graph series colors
+        jQPlotsOptions.seriesColors = seriesColors;
+
+        return series;
+    }
+
+    function jsonFailLoad(data) {
+        $('#jqplot').html('<div class="alert alert-danger">An error occurred while reading from JSON file</div>');
+    }
+
+    function jsonSuccessLoad() {
+
+        // Init jQPlot
+        var series = initJqplotData(jQplotData);
+
+        console.log('END_INIT', series);
+
+        // Start jQPlot
+        if(jQPlotInstance) {
+            jQPlotInstance.destroy();
+            console.log('OLD_DELETED');
+        }
+        jQPlotInstance = $.jqplot("jqplot", series, jQPlotsOptions);
+
+        console.log('END_LAUNCH');
+
+        $(window).bind('resize', function(event, ui) {
+            jQPlotInstance.replot( { resetAxes: true } );
+        });
+
+    }
+
+    {/literal}
+
+});
+
+</script>
+{/block}

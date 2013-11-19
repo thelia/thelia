@@ -23,10 +23,12 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Feature\FeatureDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Feature\FeatureUpdateEvent;
 use Thelia\Core\Event\Feature\FeatureCreateEvent;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Model\FeatureQuery;
 use Thelia\Form\FeatureModificationForm;
 use Thelia\Form\FeatureCreationForm;
@@ -50,10 +52,7 @@ class FeatureController extends AbstractCrudController
             'manual',
             'order',
 
-            'admin.configuration.features.view',
-            'admin.configuration.features.create',
-            'admin.configuration.features.update',
-            'admin.configuration.features.delete',
+            AdminResources::FEATURE,
 
             TheliaEvents::FEATURE_CREATE,
             TheliaEvents::FEATURE_UPDATE,
@@ -158,23 +157,6 @@ class FeatureController extends AbstractCrudController
             'postscriptum' => $object->getPostscriptum()
         );
 
-        // Setup features values
-        /*
-         * FIXME : doesn't work. "We get a This form should not contain extra fields." error
-        $attr_av_list = FeatureAvQuery::create()
-                    ->joinWithI18n($this->getCurrentEditionLocale())
-                    ->filterByFeatureId($object->getId())
-                    ->find();
-
-        $attr_array = array();
-
-        foreach ($attr_av_list as $attr_av) {
-            $attr_array[$attr_av->getId()] = $attr_av->getTitle();
-        }
-
-        $data['feature_values'] = $attr_array;
-        */
-
         // Setup the object form
         return new FeatureModificationForm($this->getRequest(), "form", $data);
     }
@@ -253,7 +235,7 @@ class FeatureController extends AbstractCrudController
     protected function addRemoveFromAllTemplates($eventType)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.features.update")) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
         try {
             if (null !== $object = $this->getExistingObject()) {

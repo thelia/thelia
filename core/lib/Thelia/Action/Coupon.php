@@ -35,6 +35,7 @@ use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\ConditionCollection;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon as CouponModel;
+use Thelia\Model\CouponQuery;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -68,7 +69,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     public function update(CouponCreateOrUpdateEvent $event)
     {
-        $coupon = $event->getCoupon();
+        $coupon = $event->getCouponModel();
 
         $this->createOrUpdate($coupon, $event);
     }
@@ -76,13 +77,13 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     /**
      * Occurring when a Coupon condition is about to be updated
      *
-     * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon Rule
+     * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon condition
      */
     public function updateCondition(CouponCreateOrUpdateEvent $event)
     {
-        $coupon = $event->getCoupon();
+        $modelCoupon = $event->getCouponModel();
 
-        $this->createOrUpdateCondition($coupon, $event);
+        $this->createOrUpdateCondition($modelCoupon, $event);
     }
 
     /**
@@ -104,6 +105,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $coupon = $couponFactory->buildCouponFromCode($event->getCode());
 
         $isValid = $coupon->isMatching();
+
         if ($isValid) {
             /** @var Request $request */
             $request = $this->container->get('request');
@@ -119,8 +121,21 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $request->getSession()->setConsumedCoupons($consumedCoupons);
 
             $totalDiscount = $couponManager->getDiscount();
+            // @todo insert false product in cart with the name of the coupon and the discount as negative price
 
-            // @todo modify Cart total discount
+            // Decrement coupon quantity
+            // @todo move this part in after order event
+            $couponQuery = CouponQuery::create();
+            $couponModel = $couponQuery->findOneByCode($coupon->getCode());
+            $couponManager->decrementeQuantity($couponModel);
+
+            $request
+                ->getSession()
+                ->getCart()
+                ->setDiscount($totalDiscount)
+                ->save()
+            ;
+
         }
 
         $event->setIsValid($isValid);
@@ -153,7 +168,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->getCode(),
             $event->getTitle(),
             $event->getAmount(),
-            $event->getType(),
+            $event->getServiceId(),
             $event->isRemovingPostage(),
             $event->getShortDescription(),
             $event->getDescription(),
@@ -166,7 +181,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->getLocale()
         );
 
-        $event->setCoupon($coupon);
+        $event->setCouponModel($coupon);
     }
 
     /**
@@ -188,7 +203,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->getLocale()
         );
 
-        $event->setCoupon($coupon);
+        $event->setCouponModel($coupon);
     }
 
     /**

@@ -26,7 +26,7 @@ namespace Thelia\Coupon\Type;
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 use Thelia\Coupon\ConditionCollection;
 use Thelia\Coupon\RuleOrganizerInterface;
 use Thelia\Exception\InvalidConditionException;
@@ -44,7 +44,7 @@ use Thelia\Exception\InvalidConditionException;
  */
 abstract class CouponAbstract implements CouponInterface
 {
-    /** @var  AdapterInterface Provide necessary value from Thelia */
+    /** @var  FacadeInterface Provide necessary value from Thelia */
     protected $adapter = null;
 
     /** @var Translator Service Translator */
@@ -104,9 +104,9 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Constructor
      *
-     * @param AdapterInterface $adapter Service adapter
+     * @param FacadeInterface $adapter Service adapter
      */
-    public function __construct(AdapterInterface $adapter)
+    public function __construct(FacadeInterface $adapter)
     {
         $this->adapter = $adapter;
         $this->translator = $adapter->getTranslator();
@@ -195,7 +195,7 @@ abstract class CouponAbstract implements CouponInterface
      *
      * @return float Amount removed from the Total Checkout
      */
-    public function getDiscount()
+    public function exec()
     {
         return $this->amount;
     }
@@ -298,7 +298,7 @@ abstract class CouponAbstract implements CouponInterface
 
     /**
      * Check if the current state of the application is matching this Coupon conditions
-     * Thelia variables are given by the AdapterInterface
+     * Thelia variables are given by the FacadeInterface
      *
      * @return bool
      */
@@ -306,6 +306,5 @@ abstract class CouponAbstract implements CouponInterface
     {
         return $this->conditionEvaluator->isMatching($this->conditions);
     }
-
 
 }

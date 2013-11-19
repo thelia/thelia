@@ -1,0 +1,105 @@
+// Thelia : Shopping Cart
+
+
+// Cart Empty
+.cart-empty { margin: 0; padding: 40px; }
+
+// Cart Mini
+.table-cart-mini { margin-bottom: 0; }
+
+
+// Cart
+.table-cart {
+    .table-bordered;
+
+    thead,
+    tbody,
+    tfooter {
+        > tr {
+            > th,
+            > td {
+                &.image { border-right-color: transparent; }
+            }
+        }
+    }
+
+    thead {
+        th {
+            background-color: #f5f5f5;
+            text-transform: uppercase;
+        }
+    }
+
+    tbody {
+        td {
+            &.image {}
+            &.product {
+                .name {
+                    margin-top: 0;
+                }
+            }
+            &.unitprice {
+                .price {
+                    color: @text-color;
+                }
+                .old-price {
+                    .price {
+                        font-size: @font-size-base;
+                    }
+                }
+            }
+            &.qty {
+                .group-qty {
+                    margin-bottom: 0;
+                }
+            }
+            &.subprice {
+                .price {
+                    color: @brand-primary;
+                }
+            }
+        }
+    }
+
+    tfoot {
+        td {
+            &.shipping {
+                .price {
+                    color: @text-color;
+                    font-size: ceil(@font-size-base * 1.3);
+                }
+            }
+            &.coupon {}
+            &.total {
+                .price {
+                    font-size: ceil(@font-size-base * 1.3);
+                }
+            }
+            &.empty {
+                border-bottom-color: transparent; border-left-color: transparent;
+            }
+        }
+    }
+}
+
+// Message if no product in the cart
+.cart-warning {
+  clear: both;
+  .alert; .alert-warning;
+  margin-bottom: 0;
+  text-align: center;
+
+  > a { color: inherit; }
+
+  &:before {
+    .icon(@warning-sign);
+    display: block;
+    font-size: 2.2em;
+  }
+}
+
+// Qty (js enabled)
+.js .group-qty {
+  .form-inline .form-group { display: block; }
+  .btn-cart-update { .sr-only; }
+}

@@ -31,17 +31,12 @@ use Thelia\Type\FloatType;
  */
 class FixAmountTaxType extends BaseTaxType
 {
-    public function calculate($untaxedPrice)
-    {
-        return $this->getRequirement("amount");
-    }
-
     public function pricePercentRetriever()
     {
         return 0;
     }
 
-    public function fixAmountRetriever()
+    public function fixAmountRetriever(\Thelia\Model\Product $product)
     {
         return $this->getRequirement("amount");
     }
@@ -51,5 +46,10 @@ class FixAmountTaxType extends BaseTaxType
         return array(
             'amount' => new FloatType(),
         );
+    }
+
+    public function getTitle()
+    {
+        return "Fix amount Tax";
     }
 }

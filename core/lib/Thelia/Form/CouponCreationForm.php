@@ -109,7 +109,7 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'isEnabled',
-                'checkbox',
+                'text',
                 array()
             )
             ->add(
@@ -124,17 +124,17 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'isCumulative',
-                'checkbox',
+                'text',
                 array()
             )
             ->add(
                 'isRemovingPostage',
-                'checkbox',
+                'text',
                 array()
             )
             ->add(
                 'isAvailableOnSpecialOffers',
-                'checkbox',
+                'text',
                 array()
             )
             ->add(

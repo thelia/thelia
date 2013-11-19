@@ -35,22 +35,41 @@ if($_SESSION['install']['step'] == 5) {
         ->setLastname('admin')
         ->save();
 
-    $config = new \Thelia\Model\Config();
-    $config->setName('contact_email')
-        ->setValue($_POST['email_contact'])
-        ->save();
-    ;
+
+    \Thelia\Model\ConfigQuery::create()
+        ->filterByName('contact_email')
+        ->update(array('Value' => $_POST['email_contact']));
+
+    \Thelia\Model\ConfigQuery::create()
+        ->filterByName('company_name')
+        ->update(array('Value' => $_POST['company_name']));
+
+    \Thelia\Model\ConfigQuery::create()
+        ->filterByName('url_site')
+        ->update(array('Value' => $_POST['url_site']));
 }
 
+//clean up cache directories
+$fs = new \Symfony\Component\Filesystem\Filesystem();
+
+$fs->remove(THELIA_ROOT . '/cache/prod');
+$fs->remove(THELIA_ROOT . '/cache/dev');
+
+
+$request = \Thelia\Core\HttpFoundation\Request::createFromGlobals();
 $_SESSION['install']['step'] = $step;
 ?>
 
     <div class="well">
         <p class="lead text-center">
-            Thank you have installed Thelia
+            Thanks, you have installed Thelia
         </p>
         <p class="lead text-center">
             Don't forget to delete the web/install directory.
+        </p>
+
+        <p class="lead text-center">
+            <a href="<?php echo $request->getSchemeAndHttpHost(); ?>/admin">Go to back office</a>
         </p>
 
     </div>

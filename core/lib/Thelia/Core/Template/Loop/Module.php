@@ -24,10 +24,13 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -45,9 +48,9 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Module extends BaseI18nLoop
+class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $timestampable = true;
 
     /**
      * @return ArgumentCollection
@@ -56,6 +59,13 @@ class Module extends BaseI18nLoop
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
+            Argument::createIntTypeArgument('profile'),
+            new Argument(
+                'code',
+                new Type\TypeCollection(
+                    new Type\AlphaNumStringListType()
+                )
+            ),
             new Argument(
                 'module_type',
                 new Type\TypeCollection(
@@ -71,22 +81,31 @@ class Module extends BaseI18nLoop
         );
     }
 
-    /**
-     * @param $pagination
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
         $search = ModuleQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
+        }
+
+        $profile = $this->getProfile();
+
+        if (null !== $profile) {
+            $search->leftJoinProfileModule('profile_module')
+                ->addJoinCondition('profile_module', 'profile_module.PROFILE_ID=?', $profile, null, \PDO::PARAM_INT)
+                ->withColumn('profile_module.access', 'access');
+        }
+
+        $code = $this->getCode();
+
+        if (null !== $code) {
+            $search->filterByCode($code, Criteria::IN);
         }
 
         $moduleType = $this->getModule_type();
@@ -109,16 +128,17 @@ class Module extends BaseI18nLoop
 
         $search->orderByPosition();
 
-        /* perform search */
-        $modules = $this->search($search, $pagination);
+        return $search;
 
-        $loopResult = new LoopResult($modules);
+    }
 
-        foreach ($modules as $module) {
-            $loopResultRow = new LoopResultRow($loopResult, $module, $this->versionable, $this->timestampable, $this->countable);
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $module) {
+            $loopResultRow = new LoopResultRow($module);
             $loopResultRow->set("ID", $module->getId())
                 ->set("IS_TRANSLATED",$module->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
+                ->set("LOCALE",$this->locale)
                 ->set("TITLE",$module->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $module->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $module->getVirtualColumn('i18n_DESCRIPTION'))
@@ -129,9 +149,43 @@ class Module extends BaseI18nLoop
                 ->set("CLASS", $module->getFullNamespace())
                 ->set("POSITION", $module->getPosition());
 
+            $hasConfigurationInterface = false;
+
+            /* first test if module defines it's own config route */
+            $routerId = "router." . $module->getBaseDir();
+            if($this->container->has($routerId)) {
+                try {
+                    if($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
+                        $hasConfigurationInterface = true;
+                    }
+                } catch(ResourceNotFoundException $e) {
+                    /* $hasConfigurationInterface stays false */
+                }
+            }
+
+            /* if not ; test if it uses admin inclusion : module_configuration.html */
+            if(false === $hasConfigurationInterface) {
+                if(file_exists( sprintf("%s/%s/AdminIncludes/%s.html", THELIA_MODULE_DIR, $module->getBaseDir(), "module_configuration"))) {
+                    $hasConfigurationInterface = true;
+                }
+            }
+
+            $loopResultRow->set("CONFIGURABLE", $hasConfigurationInterface ? 1 : 0);
+
+            if (null !== $this->getProfile()) {
+                $accessValue = $module->getVirtualColumn('access');
+                $manager = new AccessManager($accessValue);
+
+                $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW)? 1 : 0)
+                    ->set("CREATABLE", $manager->can(AccessManager::CREATE) ? 1 : 0)
+                    ->set("UPDATABLE", $manager->can(AccessManager::UPDATE)? 1 : 0)
+                    ->set("DELETABLE", $manager->can(AccessManager::DELETE)? 1 : 0);
+            }
+
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
+
     }
 }

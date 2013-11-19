@@ -23,15 +23,19 @@
 namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
+use Thelia\Core\HttpKernel\Exception\NotFountHttpException;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateHelper;
 use Thelia\Exception\OrderException;
+use Thelia\Model\ConfigQuery;
 use Thelia\Tools\Redirect;
 use Thelia\Tools\URL;
 use Thelia\Core\Security\Exception\AuthenticationException;
@@ -74,9 +78,11 @@ class ViewListener implements EventSubscriberInterface
     {
 
         $parser = $this->container->get('thelia.parser');
+        $parser->setTemplate(TemplateHelper::getInstance()->getActiveFrontTemplate());
+        $request = $this->container->get('request');
 
         try {
-            $content = $parser->getContent();
+            $content = $parser->render($request->attributes->get('_view').".html");
 
             if ($content instanceof Response) {
                 $response = $content;$event->setResponse($content);
@@ -84,17 +90,17 @@ class ViewListener implements EventSubscriberInterface
                 $response = new Response($content, $parser->getStatus() ?: 200);
             }
 
-            $response->setCache(array(
+/*            $response->setCache(array(
                 'last_modified' => new \DateTime(),
                 'max_age'       => 600,
                 's_maxage'      => 600,
                 'private'       => false,
                 'public'        => true,
-            ));
+            ));*/
 
             $event->setResponse($response);
         } catch (ResourceNotFoundException $e) {
-            $event->setResponse(new Response($e->getMessage(), 404));
+            throw new NotFoundHttpException();
         } catch (AuthenticationException $ex) {
 
             // Redirect to the login template

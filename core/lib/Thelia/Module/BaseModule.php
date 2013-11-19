@@ -24,7 +24,12 @@
 
 namespace Thelia\Module;
 
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\Map\ModuleImageTableMap;
 use Thelia\Model\ModuleI18n;
@@ -34,7 +39,8 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleImage;
 use Thelia\Model\ModuleQuery;
 
-abstract class BaseModule extends ContainerAware
+
+class BaseModule extends ContainerAware implements BaseModuleInterface
 {
     const CLASSIC_MODULE_TYPE = 1;
     const DELIVERY_MODULE_TYPE = 2;
@@ -43,40 +49,106 @@ abstract class BaseModule extends ContainerAware
     const IS_ACTIVATED = 1;
     const IS_NOT_ACTIVATED = 0;
 
-    public function __construct()
-    {
+    protected $reflected;
 
-    }
+    protected $dispatcher = null;
+    protected $request = null;
 
-    public function activate()
+    public function activate($moduleModel = null)
     {
-        $moduleModel = $this->getModuleModel();
+        if (null === $moduleModel) {
+            $moduleModel = $this->getModuleModel();
+        }
+
         if ($moduleModel->getActivate() == self::IS_NOT_ACTIVATED) {
-            $moduleModel->setActivate(self::IS_ACTIVATED);
-            $moduleModel->save();
+            $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
+            $con->beginTransaction();
             try {
-                $this->afterActivation();
+                if ($this->preActivation($con)) {
+                    $moduleModel->setActivate(self::IS_ACTIVATED);
+                    $moduleModel->save($con);
+                    $this->postActivation($con);
+                    $con->commit();
+                }
             } catch (\Exception $e) {
-                $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
-                $moduleModel->save();
+                $con->rollBack();
                 throw $e;
             }
         }
     }
 
+    public function deActivate($moduleModel = null)
+    {
+        if (null === $moduleModel) {
+            $moduleModel = $this->getModuleModel();
+        }
+        if ($moduleModel->getActivate() == self::IS_ACTIVATED) {
+            $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
+            $con->beginTransaction();
+            try {
+                if ($this->preDeactivation($con)) {
+                    $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
+                    $moduleModel->save($con);
+                    $this->postDeactivation($con);
+
+                    $con->commit();
+                }
+            } catch (\Exception $e) {
+                $con->rollBack();
+                throw $e;
+            }
+
+        }
+    }
+
     public function hasContainer()
     {
-        return null === $this->container;
+        return null !== $this->container;
     }
 
     public function getContainer()
     {
         if ($this->hasContainer() === false) {
-            throw new \RuntimeException("Sorry, container his not available in this context");
+            throw new \RuntimeException("Sorry, container is not available in this context");
         }
 
         return $this->container;
     }
+
+
+    public function hasRequest() {
+        return null !== $this->request;
+    }
+
+    public function setRequest(Request $request) {
+        $this->request = $request;
+    }
+
+    public function getRequest() {
+        if ($this->hasRequest() === false) {
+            throw new \RuntimeException("Sorry, the request is not available in this context");
+        }
+
+        return $this->request;
+    }
+
+
+    public function hasDispatcher() {
+        return null !== $this->dispatcher;
+    }
+
+    public function setDispatcher(EventDispatcherInterface $dispatcher) {
+        $this->dispatcher = $dispatcher;
+    }
+
+    public function getDispatcher() {
+        if ($this->hasDispatcher() === false) {
+            throw new \RuntimeException("Sorry, the dispatcher is not available in this context");
+        }
+
+        return $this->dispatcher;
+    }
+
 
     public function setTitle(Module $module, $titles)
     {
@@ -99,17 +171,18 @@ abstract class BaseModule extends ContainerAware
         }
     }
 
-    public function deployImageFolder(Module $module, $folderPath)
+    public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null)
     {
         try {
             $directoryBrowser = new \DirectoryIterator($folderPath);
         } catch (\UnexpectedValueException $e) {
             throw $e;
         }
-
-        $con = \Propel\Runtime\Propel::getConnection(
-            ModuleImageTableMap::DATABASE_NAME
-        );
+        if (null === $con) {
+            $con = \Propel\Runtime\Propel::getConnection(
+                ModuleImageTableMap::DATABASE_NAME
+            );
+        }
 
         /* browse the directory */
         $imagePosition = 1;
@@ -178,9 +251,42 @@ abstract class BaseModule extends ContainerAware
         return $moduleModel;
     }
 
-    abstract public function getCode();
-    abstract public function install();
-    abstract public function afterActivation();
-    abstract public function destroy();
+    public function getCode()
+    {
+        if (null === $this->reflected) {
+            $this->reflected = new \ReflectionObject($this);
+        }
 
+        return basename(dirname($this->reflected->getFileName()));
+    }
+
+    public function install(ConnectionInterface $con = null)
+    {
+        // Implement this method to do something useful.
+    }
+
+    public function preActivation(ConnectionInterface $con = null)
+    {
+        return true;
+    }
+
+    public function postActivation(ConnectionInterface $con = null)
+    {
+        // Implement this method to do something useful.
+    }
+
+    public function preDeactivation(ConnectionInterface $con = null)
+    {
+        return true;
+    }
+
+    public function postDeactivation(ConnectionInterface $con = null)
+    {
+        // Implement this method to do something useful.
+    }
+
+    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
+    {
+        // Implement this method to do something useful.
+    }
 }

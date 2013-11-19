@@ -1,0 +1,416 @@
+{extends file="admin-layout.tpl"}
+
+{block name="check-resource"}admin.product{/block}
+{block name="check-access"}update{/block}
+
+{block name="page-title"}{intl l='Edit product'}{/block}
+
+{block name="main-content"}
+<div class="catalog edit-product">
+
+	<div id="wrapper" class="container">
+
+        {include file="includes/catalog-breadcrumb.html" editing_category="false" editing_product="true"}
+
+        <div class="row">
+            {loop name="product_edit" type="product" visible="*" id=$product_id backend_context="1" lang=$edit_language_id}
+            <div class="col-md-12 general-block-decorator">
+                <div class="row">
+                    <div class="col-md-7 title">
+						{intl l='Edit product %title' title=$TITLE}
+		            </div>
+
+	                <div class="col-md-5 actions">
+
+	                    {if $HAS_PREVIOUS != 0}
+			                <a href="{url path='/admin/products/update' product_id=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous product'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                        {else}
+                            <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
+		                {/if}
+
+		                <a  href="{$URL}" target="_blank" class="btn btn-default" title="{intl l='Preview product page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
+
+                        {if $HAS_NEXT != 0}
+                            <a href="{url path='/admin/products/update' product_id=$NEXT}" class="btn btn-default" title="{intl l='Edit next product'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                        {else}
+                            <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                         {/if}
+	                </div>
+                </div>
+
+	            <div class="row">
+	                <div class="col-md-12">
+
+						<ul class="nav nav-tabs" id="tabbed-menu">
+		                    <li>
+		                          <a href="#general"
+		                             {* data-href="{url path='/admin/products/general/tab' product_id=$product_id}" *}
+		                             data-toggle="tab">{intl l="General"}</a>
+		                    </li>
+
+                            <li>
+                                <a href="#details" data-toggle="tab">{intl l="Details"}</a>
+                            </li>
+
+                            <li><a href="#attributes"
+                                   data-href="{url path='/admin/products/attributes/tab' product_id=$product_id}"
+                                   data-toggle="tab">{intl l="Attributes &amp; Features"}</a>
+                            </li>
+
+                            <li>
+                                <a href="#related"
+                                   data-href="{url path='/admin/products/related/tab' folder_id=$folder_id accessory_category_id=$accessory_category_id product_id=$product_id}"
+                                   data-toggle="tab">{intl l="Associations"}</a>
+                            </li>
+
+		                    <li>
+                                <a href="#images"
+                                   data-toggle="tab"
+                                   data-href="{url path="/admin/image/type/product/{$product_id}/form-ajax"}"
+                                   data-callback="$.imageUploadManager.initImageDropZone">
+                                    {intl l="Images"}
+                                </a>
+                            </li>
+		                    <li>
+                                <a href="#documents"
+                                   data-toggle="tab"
+                                   data-href="{url path="/admin/document/type/product/{$product_id}/form-ajax"}"
+                                   data-callback="$.documentUploadManager.initDocumentDropZone">
+                                    {intl l="Documents"}
+                                </a>
+		                    <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
+		 				</ul>
+
+		                <div class="tab-content">
+
+		                    <div class="tab-pane fade" id="general">
+                                {include file="includes/product-general-tab.html"}
+		                    </div>
+
+                            <div class="tab-pane fade" id="details">
+                                {include file="includes/product-details-tab.html"}
+                            </div>
+
+                            <div class="tab-pane fade" id="attributes">
+                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                            </div>
+
+		                    <div class="tab-pane fade" id="related">
+		                        <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+		                    </div>
+
+		                    <div class="tab-pane fade" id="images">
+		                        <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+		                    </div>
+
+		                    <div class="tab-pane fade" id="documents">
+                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+		                    </div>
+
+		                    <div class="tab-pane fade" id="modules">
+                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+		                    </div>
+		                 </div>
+                    </div>
+                </div>
+		    </div>
+            {/loop}
+ 		</div>
+	</div>
+</div>
+
+{/block}
+
+{block name="javascript-initialization"}
+
+    {javascripts file='assets/js/dropzone.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/image-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/document-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+	{javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+	    <script src="{$asset_url}"></script>
+	{/javascripts}
+
+    {javascripts file='assets/js/jquery.typewatch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+<script src="{url file='/tinymce/tinymce.min.js'}"></script>
+
+<script>
+	tinymce.init({
+		selector: ".wysiwyg",
+		theme: "modern",
+		menubar : false,
+		language: "",
+		plugins: [
+		     "advlist autolink link image lists charmap print preview hr anchor pagebreak",
+		     "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
+		     "table contextmenu directionality emoticons paste textcolor filemanager"
+		],
+		toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | styleselect | filemanager | link unlink anchor | image media | forecolor backcolor  | print preview code ",
+		image_advtab: true ,
+		external_filemanager_path:"{url file='/tinymce/plugins/filemanager/'}'",
+		filemanager_title:"{intl l='Files manager'}" ,
+		external_plugins: { "filemanager" : "{url file='/tinymce/plugins/filemanager/plugin.min.js'}"}
+	 });
+</script>
+
+<script>
+$(function() {
+
+    // Atomatic ajax tab load, if data-href is defined.
+    $('.nav-tabs a[data-href]').on('shown.bs.tab', function(ev) {
+        var $this = $(this);
+        $($this.attr('href')).load($this.data('href'), function(ev) {
+            eval($this.data('callback') + '();');
+        });
+    });
+
+    // Load active tab
+    $('.nav-tabs a[href="#{$current_tab}"]').trigger("click");
+
+    // -- Product details management tab ---------------------------------------
+
+	// Load value on attribute selection
+	$('#attribute_id').change(function(event) {
+	    var val = $(this).val();
+
+	    if (val != "") {
+	        $.ajax({
+	             url      : '{url path="/admin/product/$product_id/attribute-values/"}' + $(this).val() + '.xml',
+	             type     : 'get',
+	             dataType : 'json',
+	             success  : function(json) {
+	                 $('#attribute_value_id :not(:first-child)').remove();
+
+	                 var have_content = false;
+
+	                 $.each(json, function(idx, value) {
+	                     $('#attribute_value_id').append($('<option>').text(value.title).attr('value', value.id));
+
+	                     have_content = true; // Lame...
+	                 });
+
+	                 if (have_content) {
+	                     $('#attribute_value_selector_empty').addClass('hide');
+	                     $('#attribute_value_selector').removeClass('hide');
+	                 }
+	                 else {
+	                     $('#attribute_value_selector_empty').removeClass('hide');
+	                     $('#attribute_value_selector').addClass('hide');
+	                 }
+
+	             }
+	        });
+	    }
+	    else {
+	        $('#attribute_value_selector_empty').addClass('hide');
+	        $('#attribute_value_selector').addClass('hide');
+	    }
+	});
+
+    // Add selected value to the combination
+    $('.add-value-to-combination').click(function(event) {
+
+    	// Hide error message
+    	$('#combination_attributes_error').text('').addClass('hide');
+
+    	// Select all elements
+    	$('#combination_attributes option').prop('selected', 'selected');
+
+        $.ajax({
+            url      : '{url path="/admin/product/$product_id/add-attribute-value-to-combination/"}'
+                            + $('#attribute_value_id').val()
+                            + '/'
+                            + $('#combination_attributes').val()
+                            + '.xml',
+            type     : 'get',
+            dataType : 'json',
+            success  : function(json) {
+                $('#combination_attributes option').remove();
+
+                var have_content = false;
+
+                $.each(json, function(idx, value) {
+                	if (idx != 'error')
+                	    $('#combination_attributes').append($('<option>').text(value.title).attr('value', value.id));
+                });
+
+                if (json.error)
+                    $('#combination_attributes_error').text(json.error).removeClass('hide');
+
+                $('#attribute_id').val('').change();
+            }
+       });
+
+    	event.preventDefault();
+    });
+
+    // Remove selected value from combination
+    $('.remove-value-from-combination').click(function() {
+
+    	$('#combination_attributes option:selected').remove();
+
+    	event.preventDefault();
+    });
+
+    // Set proper category ID in combination delete from
+    $('a.combination-delete').click(function(ev) {
+        $('#combination_delete_id').val($(this).data('id'));
+    });
+
+    // In create combination dialog, select all element of conbination list
+    $('#combination_creation_dialog_ok').click(function() {
+    	$('#combination_attributes option').prop('selected', 'selected');
+    });
+
+    // In details tab, process exchange rate usage checkbox changes
+    $('.use_exchange_rate_box').change(function(ev) {
+
+    	if ($(this).is(':checked')) {
+
+    		var pse_id = $(this).data('pse-id');
+
+    	    $('.price_field').prop('readonly', true);
+
+    	    // Reload prices
+            $.ajax({
+                url      : '{url path="/admin/product/load-converted-prices"}',
+                data     : {
+                    product_sale_element_id : pse_id,
+                    currency_id             : {$edit_currency_id}
+                },
+                type     : 'get',
+                dataType : 'json',
+                success  : function(json) {
+                	console.log(json);
+
+                    $('input[data-pse-id="'+pse_id+'"][data-price-type="price-with-tax"]').val(json.price_with_tax);
+                    $('input[data-pse-id="'+pse_id+'"][data-price-type="price-without-tax"]').val(json.price_without_tax);
+                    $('input[data-pse-id="'+pse_id+'"][data-price-type="sale-price-with-tax"]').val(json.sale_price_with_tax);
+                    $('input[data-pse-id="'+pse_id+'"][data-price-type="sale-price-without-tax"]').val(json.sale_price_without_tax);
+                },
+                error : function(jqXHR, textStatus, errorThrown) {
+                	alert("{intl l='Failed to get converted prices. Please try again.'} (" +errorThrown+ ")");
+                }
+           });
+
+    	}
+    	else {
+    	    $('.price_field').prop('readonly', false)
+    	}
+    });
+
+    function update_price(price, price_type, dest_field_id) {
+        var tax_rule_id = $('#tax_rule_field').val();
+
+        if (tax_rule_id != "") {
+
+            var operation;
+
+            if (price_type.indexOf('with-tax') != -1)
+                operation = 'from_tax';
+            else if (price_type.indexOf('without-tax') != -1)
+                operation = 'to_tax';
+            else
+                operation = '';
+
+            $.ajax({
+                url      : '{url path="/admin/product/calculate-price"}',
+                data     : {
+                    price      : price,
+                    action     : operation,
+                    product_id : {$product_id}
+                },
+                type     : 'get',
+                dataType : 'json',
+                success  : function(json) {
+                    $('#' + dest_field_id).val(json.result);
+                },
+                error : function(jqXHR, textStatus, errorThrown) {
+                    alert("{intl l='Failed to get prices. Please try again.'} (" +errorThrown+ ")");
+                }
+           });
+        }
+    }
+
+    // -- Combination builder stuff --------------------------------------------
+
+    $('#open_combination_builder').click(function(ev) {
+        if (! confirm("{intl l='Existing combinations will be deleted. Do you want to continue ?'}'")) {
+        	ev.preventDefault();
+        	ev.stopPropagation();
+        }
+    });
+
+    {include
+        file      = "includes/generic-js-dialog.html"
+        dialog_id = "combination_builder_dialog"
+        form_name = "thelia.admin.product_combination.build"
+    }
+
+    // Automatic update of price fields: any change in the taxed (resp. untaxed) price
+    // will update the untaxed (resp. taxed) one
+    $('.automatic_price_field').typeWatch({
+    	captureLength: 1,
+    	wait         : 300,
+    	callback     : function () {
+    		update_price($(this).val(), $(this).data('price-type'), $(this).data('rel-price'));
+    	}
+    });
+
+    // Count generated combinations in real time
+    function countGeneratedCombinations() {
+
+        var total = 0;
+
+    	var counter = {};
+
+    	var list = $('.attribute_av_value:checked');
+
+    	if (list.length > 0) {
+    		console.log("ok !");
+
+	    	list.each(function() {
+	    		var attr_id = $(this).data('attribute-id');
+
+	    		console.log("att="+attr_id);
+
+	    		if (undefined != counter[attr_id])
+	    			counter[attr_id]++;
+	    		else
+	    			counter[attr_id] = 1;
+	    	});
+
+	    	console.log(counter);
+
+	    	total = 1;
+
+	    	for(var count in counter) {
+	    		total *= counter[count];
+	    	}
+    	}
+
+    	return total;
+    }
+
+    $('.attribute_av_value').change(function(ev) {
+    	var total = countGeneratedCombinations();
+
+    	$('#number_of_generated_combinations').text(total);
+    });
+});
+</script>
+
+
+{/block}

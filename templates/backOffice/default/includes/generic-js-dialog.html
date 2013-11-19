@@ -1,0 +1,42 @@
+{*
+Javascript code to manage create dialog. Insert it in your template, in the javascript
+initialisation:
+
+	$(function() {
+	   <insert me here>
+	}
+
+Parameters:
+    $dialog_id = the dialog ID
+    $form_name = the form name
+
+*}
+
+{* re-display the form creation dialog if it contains errors *}
+
+{form name="{$form_name}"}
+    {if $form_error}
+        $('#{$dialog_id}').modal();
+    {/if}
+{/form}
+
+{* Always reset create dialog on close *}
+
+$('#{$dialog_id}').on('hidden.bs.modal', function() {
+
+    // Hide error message
+    $('#{$dialog_id}_error').remove();
+
+    // Clear error status
+    $("#{$dialog_id} .error").removeClass('error');
+
+    $('#{$dialog_id} .form-group').removeClass('has-error')
+
+    // Empty field values
+    $("#{$dialog_id} input[type=text], #{$dialog_id} select").val('');
+
+    // Uncheck boxes
+    $("#{$dialog_id} input[type=checkbox]").removeAttr('checked');
+
+    {$additionnal_js_code|default:''}
+});

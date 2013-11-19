@@ -39,11 +39,14 @@ class CountryCreationForm extends BaseForm
                     "for" => "title"
                 )
             ))
-            ->add("area", "text", array(
+            ->add("locale", "text", array(
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => Translator::getInstance()->trans("Country area *"),
+                "label_attr" => array("for" => "locale_create")
+            ))
+            ->add("area", "text", array(
+                "label" => Translator::getInstance()->trans("Country area"),
                 "label_attr" => array(
                     "for" => "area"
                 )

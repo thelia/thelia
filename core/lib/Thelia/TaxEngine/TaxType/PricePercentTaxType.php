@@ -31,17 +31,12 @@ use Thelia\Type\FloatType;
  */
 class PricePercentTaxType extends BaseTaxType
 {
-    public function calculate($untaxedPrice)
-    {
-        return $untaxedPrice * $this->getRequirement("percent") * 0.01;
-    }
-
     public function pricePercentRetriever()
     {
         return ($this->getRequirement("percent") * 0.01);
     }
 
-    public function fixAmountRetriever()
+    public function fixAmountRetriever(\Thelia\Model\Product $product)
     {
         return 0;
     }
@@ -52,6 +47,9 @@ class PricePercentTaxType extends BaseTaxType
             'percent' => new FloatType(),
         );
     }
-}
 
-//600 / (1 + 0,10 + 0,10)  =/= 600 / (1 + 0,10 ) + 600 / (1 + 0,10 )
+    public function getTitle()
+    {
+        return "Price % Tax";
+    }
+}

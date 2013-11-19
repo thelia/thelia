@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Loop;
 use Thelia\Core\Template\Element\BaseI18nLoop;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -41,9 +42,12 @@ use Thelia\Log\Tlog;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Image extends BaseI18nLoop
+class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public $timestampable = true;
+    protected $objectType;
+    protected $objectId;
+
+    protected $timestampable = true;
 
     /**
      * @var array Possible image sources
@@ -210,19 +214,16 @@ class Image extends BaseI18nLoop
         return $search;
     }
 
-    /**
-     * @param unknown $pagination
-     */
-    public function exec(&$pagination)
+    public function buildModelCriteria()
     {
 
         // Select the proper query to use, and get the object type
-        $object_type = $object_id = null;
+        $this->objectType = $this->objectId = null;
 
-        $search = $this->getSearchQuery($object_type, $object_id);
+        $search = $this->getSearchQuery($this->objectType, $this->objectId);
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -234,6 +235,14 @@ class Image extends BaseI18nLoop
         if (!is_null($exclude))
             $search->filterById($exclude, Criteria::NOT_IN);
 
+        // echo "sql=".$search->toString();
+
+        return $search;
+
+    }
+
+    public function parseResults(LoopResult $loopResult)
+    {
         // Create image processing event
         $event = new ImageEvent($this->request);
 
@@ -264,16 +273,11 @@ class Image extends BaseI18nLoop
 
         }
 
-        // echo "sql=".$search->toString();
-
-        $results = $this->search($search, $pagination);
-
-        $loopResult = new LoopResult($results);
-
-        foreach ($results as $result) {
-
+        foreach ($loopResult->getResultDataCollection() as $result) {
             // Create image processing event
-            $event = new ImageEvent($this->request);
+
+            // ERO : following is duplicated, guess it's useless at this point
+            //$event = new ImageEvent($this->request);
 
             // Setup required transformations
             if (! is_null($width)) $event->setWidth($width);
@@ -288,22 +292,22 @@ class Image extends BaseI18nLoop
             $source_filepath = sprintf("%s%s/%s/%s",
                 THELIA_ROOT,
                 ConfigQuery::read('images_library_path', 'local/media/images'),
-                $object_type,
+                $this->objectType,
                 $result->getFile()
-             );
+            );
 
             $event->setSourceFilepath($source_filepath);
-            $event->setCacheSubdirectory($object_type);
+            $event->setCacheSubdirectory($this->objectType);
 
             try {
                 // Dispatch image processing event
                 $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
 
-                $loopResultRow = new LoopResultRow($loopResult, $result, $this->versionable, $this->timestampable, $this->countable);
+                $loopResultRow = new LoopResultRow($result);
 
                 $loopResultRow
                     ->set("ID"                  , $result->getId())
-                    ->set("LOCALE"              ,$locale)
+                    ->set("LOCALE"              ,$this->locale)
                     ->set("IMAGE_URL"           , $event->getFileUrl())
                     ->set("ORIGINAL_IMAGE_URL"  , $event->getOriginalFileUrl())
                     ->set("IMAGE_PATH"          , $event->getCacheFilepath())
@@ -313,8 +317,8 @@ class Image extends BaseI18nLoop
                     ->set("DESCRIPTION"         , $result->getVirtualColumn('i18n_DESCRIPTION'))
                     ->set("POSTSCRIPTUM"        , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
                     ->set("POSITION"            , $result->getPosition())
-                    ->set("OBJECT_TYPE"         , $object_type)
-                    ->set("OBJECT_ID"           , $object_id)
+                    ->set("OBJECT_TYPE"         , $this->objectType)
+                    ->set("OBJECT_ID"           , $this->objectId)
                 ;
 
                 $loopResult->addRow($loopResultRow);
@@ -325,5 +329,6 @@ class Image extends BaseI18nLoop
         }
 
         return $loopResult;
+
     }
 }

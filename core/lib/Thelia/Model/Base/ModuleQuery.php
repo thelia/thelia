@@ -56,9 +56,9 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModuleQuery rightJoinAreaDeliveryModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AreaDeliveryModule relation
  * @method     ChildModuleQuery innerJoinAreaDeliveryModule($relationAlias = null) Adds a INNER JOIN clause to the query using the AreaDeliveryModule relation
  *
- * @method     ChildModuleQuery leftJoinGroupModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupModule relation
- * @method     ChildModuleQuery rightJoinGroupModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupModule relation
- * @method     ChildModuleQuery innerJoinGroupModule($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupModule relation
+ * @method     ChildModuleQuery leftJoinProfileModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProfileModule relation
+ * @method     ChildModuleQuery rightJoinProfileModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProfileModule relation
+ * @method     ChildModuleQuery innerJoinProfileModule($relationAlias = null) Adds a INNER JOIN clause to the query using the ProfileModule relation
  *
  * @method     ChildModuleQuery leftJoinModuleImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the ModuleImage relation
  * @method     ChildModuleQuery rightJoinModuleImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ModuleImage relation
@@ -793,40 +793,40 @@ abstract class ModuleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\GroupModule object
+     * Filter the query by a related \Thelia\Model\ProfileModule object
      *
-     * @param \Thelia\Model\GroupModule|ObjectCollection $groupModule  the related object to use as filter
+     * @param \Thelia\Model\ProfileModule|ObjectCollection $profileModule  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
-    public function filterByGroupModule($groupModule, $comparison = null)
+    public function filterByProfileModule($profileModule, $comparison = null)
     {
-        if ($groupModule instanceof \Thelia\Model\GroupModule) {
+        if ($profileModule instanceof \Thelia\Model\ProfileModule) {
             return $this
-                ->addUsingAlias(ModuleTableMap::ID, $groupModule->getModuleId(), $comparison);
-        } elseif ($groupModule instanceof ObjectCollection) {
+                ->addUsingAlias(ModuleTableMap::ID, $profileModule->getModuleId(), $comparison);
+        } elseif ($profileModule instanceof ObjectCollection) {
             return $this
-                ->useGroupModuleQuery()
-                ->filterByPrimaryKeys($groupModule->getPrimaryKeys())
+                ->useProfileModuleQuery()
+                ->filterByPrimaryKeys($profileModule->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByGroupModule() only accepts arguments of type \Thelia\Model\GroupModule or Collection');
+            throw new PropelException('filterByProfileModule() only accepts arguments of type \Thelia\Model\ProfileModule or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the GroupModule relation
+     * Adds a JOIN clause to the query using the ProfileModule relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
-    public function joinGroupModule($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinProfileModule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('GroupModule');
+        $relationMap = $tableMap->getRelation('ProfileModule');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -841,14 +841,14 @@ abstract class ModuleQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'GroupModule');
+            $this->addJoinObject($join, 'ProfileModule');
         }
 
         return $this;
     }
 
     /**
-     * Use the GroupModule relation GroupModule object
+     * Use the ProfileModule relation ProfileModule object
      *
      * @see useQuery()
      *
@@ -856,13 +856,13 @@ abstract class ModuleQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\GroupModuleQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProfileModuleQuery A secondary query class using the current class as primary query
      */
-    public function useGroupModuleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useProfileModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinGroupModule($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'GroupModule', '\Thelia\Model\GroupModuleQuery');
+            ->joinProfileModule($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProfileModule', '\Thelia\Model\ProfileModuleQuery');
     }
 
     /**

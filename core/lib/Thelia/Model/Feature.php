@@ -20,7 +20,7 @@ class Feature extends BaseFeature {
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEFEATURE, new FeatureEvent($this));
 
         // Set the current position for the new object
-        //$this->setPosition($this->getNextPosition());
+        $this->setPosition($this->getNextPosition());
 
         return true;
     }

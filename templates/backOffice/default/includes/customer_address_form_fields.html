@@ -1,0 +1,123 @@
+{* Customer address creation / modification fields, used in the customer-edit.html template *}
+
+{form_hidden_fields form=$form}
+
+<input type="hidden" name="customer_id" value="{$customer_id}">
+<input type="hidden" name="page" value="{$page}">
+
+{form_field form=$form field='success_url'}
+    <input type="hidden" name="{$name}" value="{url path='/admin/customer/update'} customer_id=$customer_id page=$page" />
+{/form_field}
+
+{form_field form=$form field='label'}
+    <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+        <input {if $required}required{/if} type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{$label}">
+    </div>
+{/form_field}
+
+{form_field form=$form field='company'}
+    <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+        <input {if $required}required{/if} type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Company'}">
+    </div>
+{/form_field}
+
+{form_field form=$form field='title'}
+    <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+
+        <select {if $required}required{/if} name="{$name}" id="{$label_attr.for}" class="form-control">
+            {loop type="title" name="title1"}
+                <option value="{$ID}" {if $value == $ID}selected{/if}>{$LONG}</option>
+            {/loop}
+        </select>
+    </div>
+{/form_field}
+
+<div class="row">
+    <div class="col-md-6">
+		{form_field form=$form field='firstname'}
+		    <div class="form-group {if $error}has-error{/if}">
+		        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+		        <input {if $required}required{/if} type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Firstname'}">
+		    </div>
+		{/form_field}
+	</div>
+    <div class="col-md-6">
+		{form_field form=$form field='lastname'}
+		    <div class="form-group {if $error}has-error{/if}">
+		        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+		        <input {if $required}required{/if} type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Lastname'}">
+		    </div>
+		{/form_field}
+    </div>
+</div>
+
+{form_field form=$form field='address1'}
+    <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+        <input {if $required}required{/if} type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Address'}">
+    </div>
+
+    <div class="form-group">
+        {form_field form=$form field='address2'}
+            <input {if $required}required{/if} type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
+        {/form_field}
+    </div>
+
+    <div class="form-group">
+        {form_field form=$form field='address3'}
+            <input {if $required}required{/if} type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
+        {/form_field}
+    </div>
+{/form_field}
+
+	<div class="row">
+	    <div class="col-md-3">
+			{form_field form=$form field='zipcode'}
+			    <div class="form-group {if $error}has-error{/if}">
+			        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+			        <input {if $required}required{/if} type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Zip code'}">
+			    </div>
+			{/form_field}
+	    </div>
+	    <div class="col-md-9">
+			{form_field form=$form field='city'}
+			    <div class="form-group {if $error}has-error{/if}">
+			        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+			        <input {if $required}required{/if} type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='City'}">
+			    </div>
+			{/form_field}
+		</div>
+	</div>
+
+{form_field form=$form field='country'}
+    <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+        <select {if $required}required{/if} name="{$name}" id="{$label_attr.for}" class="form-control">
+            {loop type="country" name="country1"}
+                <option value="{$ID}" {if $value == $ID}selected{/if}>{$TITLE}</option>
+            {/loop}
+        </select>
+    </div>
+{/form_field}
+
+<div class="row">
+    <div class="col-md-6">
+        {form_field form=$form field='phone'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+                <input {if $required}required{/if} type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Phone number'}">
+            </div>
+        {/form_field}
+    </div>
+    <div class="col-md-6">
+        {form_field form=$form field='cellphone'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+                <input {if $required}required{/if} type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Cellular phone number'}">
+            </div>
+        {/form_field}
+    </div>
+</div>

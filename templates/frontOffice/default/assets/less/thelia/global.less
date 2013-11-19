@@ -1,0 +1,125 @@
+// Thelia
+
+// Main Title
+.page-header { margin-top: 0; }
+
+// Collapse
+.no-js .collapse { display: block!important; }
+
+// Hide carousel arrow if no js
+.no-js #carousel .carousel-control { display: none; }
+
+// Loader (Overlay)
+.loader {
+  position: fixed;
+  background: #fff url(../img/ajax-loader.gif) no-repeat center center;
+  background-color: rgba(255,255,255,.5);
+  display: none;
+  left: 0; top: 0;
+  width: 100%;height: 100%;
+  z-index: 100;
+}
+.oldie { position: absolute; }
+
+// thumbnail
+.thumbnail {
+    /*&.active,
+    &:active {
+        border-style: solid;
+        border-width: 2px;
+    }*/
+    &.active { border-color: @gray-dark; }
+}
+
+// Layout
+.main { margin-bottom: @line-height-computed; }
+.layout-col-1,
+.layout-col-2-left,
+.layout-col-2-right {
+    .make-row();
+}
+
+/* 1 Column Layout */
+.layout-col-1 .col-main { .make-md-column(12); }
+
+/* 2 Columns Layout */
+.layout-col-2-left {
+    .col-main {
+        .make-md-column(9);
+        .make-md-column-push(3);
+    }
+    .col-left {
+        .make-md-column(3);
+        .make-md-column-pull(9);
+    }
+}
+.layout-col-2-right {
+    .col-main {
+        .make-md-column(9);
+    }
+    .col-right {
+        .make-md-column(3);
+    }
+}
+
+
+// List Responsive
+ul {
+    &.list-info,
+    &.list-address {
+        .make-row();
+        .list-unstyled();
+
+        > li {
+            .make-sm-column(4);
+        }
+    }
+}
+
+
+// Address Format
+.fn { font-weight: 600; display: block; }
+.adr, .org { font-size: @font-size-small; }
+
+// Address Book Table
+.table-address {
+    .radio {
+        margin-top: 0;
+        label { font-weight: 600; }
+    }
+    .group-btn {
+        text-align: right;
+    }
+
+    thead,
+    tbody,
+    tfoot {
+        > tr {
+            > th,
+            > td {
+                border-color: #f5f5f5;;
+                padding: 10px 10px 0;
+                @media (min-width: @screen-tablet) { padding: 30px 30px 0; }
+            }
+        }
+    }
+}
+
+
+.modal-dialog{
+  td{vertical-align: middle}
+
+  .close{
+    margin: 10px;
+    position: relative; z-index: 10;
+  }
+
+  .btn{
+    margin-left: 10px;
+  }
+}
+@media screen and (min-width: 768px){
+  .modal-dialog{
+    width: 800px;
+  }
+}

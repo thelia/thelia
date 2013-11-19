@@ -93,8 +93,12 @@ $_SESSION['install']['step'] = $step;
             <input id="email_contact" class="form-control" type="text" name="email_contact" placeholder="foo@bar.com" value="" required>
         </div>
         <div class="form-group">
-            <label for="site_name">Site name :</label>
-            <input id="site_name" class="form-control" type="text" name="site_name" placeholder="" value="" required>
+            <label for="site_name">Company name :</label>
+            <input id="site_name" class="form-control" type="text" name="company_name" placeholder="" value="" required>
+        </div>
+        <div class="form-group">
+            <label for="site_name">website url :</label>
+            <input id="site_name" class="form-control" type="text" name="url_site" placeholder="" value="http://<?php echo $_SERVER['SERVER_NAME']; ?>" required>
         </div>
         <div class="clearfix">
             <div class="control-btn">

@@ -205,7 +205,7 @@ class CustomerTableMap extends TableMap
         $this->addForeignKey('TITLE_ID', 'TitleId', 'INTEGER', 'customer_title', 'ID', true, null, null);
         $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 255, null);
         $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 255, null);
-        $this->addColumn('EMAIL', 'Email', 'VARCHAR', false, 50, null);
+        $this->addColumn('EMAIL', 'Email', 'VARCHAR', false, 255, null);
         $this->addColumn('PASSWORD', 'Password', 'VARCHAR', false, 255, null);
         $this->addColumn('ALGO', 'Algo', 'VARCHAR', false, 128, null);
         $this->addColumn('RESELLER', 'Reseller', 'TINYINT', false, null, null);
@@ -226,7 +226,7 @@ class CustomerTableMap extends TableMap
         $this->addRelation('CustomerTitle', '\\Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('Address', '\\Thelia\\Model\\Address', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), 'CASCADE', 'RESTRICT', 'Addresses');
         $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), 'RESTRICT', 'RESTRICT', 'Orders');
-        $this->addRelation('Cart', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), null, null, 'Carts');
+        $this->addRelation('Cart', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), 'CASCADE', 'RESTRICT', 'Carts');
     } // buildRelations()
 
     /**
@@ -249,6 +249,7 @@ class CustomerTableMap extends TableMap
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 AddressTableMap::clearInstancePool();
+                CartTableMap::clearInstancePool();
             }
 
     /**

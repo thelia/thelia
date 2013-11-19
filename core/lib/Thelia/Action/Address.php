@@ -60,17 +60,21 @@ class Address extends BaseAction implements EventSubscriberInterface
         $address->delete();
     }
 
+    public function useDefault(AddressEvent $event)
+    {
+        $address = $event->getAddress();
+
+        $address->makeItDefault();
+    }
+
     protected function createOrUpdate(AddressModel $addressModel, AddressCreateOrUpdateEvent $event)
     {
         $addressModel->setDispatcher($this->getDispatcher());
         $con = Propel::getWriteConnection(AddressTableMap::DATABASE_NAME);
         $con->beginTransaction();
         try {
-            if ($addressModel->isNew()) {
-                $addressModel->setLabel($event->getLabel());
-            }
-
             $addressModel
+                ->setLabel($event->getLabel())
                 ->setTitleId($event->getTitle())
                 ->setFirstname($event->getFirstname())
                 ->setLastname($event->getLastname())
@@ -125,7 +129,8 @@ class Address extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::ADDRESS_CREATE => array("create", 128),
             TheliaEvents::ADDRESS_UPDATE => array("update", 128),
-            TheliaEvents::ADDRESS_DELETE => array("delete", 128)
+            TheliaEvents::ADDRESS_DELETE => array("delete", 128),
+            TheliaEvents::ADDRESS_DEFAULT => array('useDefault', 128),
         );
     }
 }

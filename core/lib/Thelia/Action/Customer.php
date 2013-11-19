@@ -60,11 +60,33 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     }
 
-    public function delete(CustomerEvent $event)
+    public function updateProfile(CustomerCreateOrUpdateEvent $event)
     {
+
         $customer = $event->getCustomer();
 
-        $customer->delete();
+        $customer->setDispatcher($this->getDispatcher());
+
+        $customer
+            ->setTitleId($event->getTitle())
+            ->setFirstname($event->getFirstname())
+            ->setLastname($event->getLastname())
+            ->setEmail($event->getEmail(), true)
+            ->setPassword($event->getPassword())
+            ->setReseller($event->getReseller())
+            ->setSponsor($event->getSponsor())
+            ->setDiscount($event->getDiscount())
+            ->save();
+
+        $event->setCustomer($customer);
+    }
+
+    public function delete(CustomerEvent $event)
+    {
+        if (null !== $customer = $event->getCustomer()) {
+
+            $customer->delete();
+        }
     }
 
     private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event)
@@ -110,11 +132,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $this->getSecurityContext()->clearCustomerUser();
     }
 
-    public function changePassword(ActionEvent $event)
-    {
-    // TODO
-    }
-
     /**
      * Return the security context
      *
@@ -148,11 +165,12 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::CUSTOMER_CREATEACCOUNT => array("create", 128),
-            TheliaEvents::CUSTOMER_UPDATEACCOUNT => array("modify", 128),
-            TheliaEvents::CUSTOMER_LOGOUT        => array("logout", 128),
-            TheliaEvents::CUSTOMER_LOGIN         => array("login" , 128),
-            TheliaEvents::CUSTOMER_DELETEACCOUNT => array("delete", 128),
+            TheliaEvents::CUSTOMER_CREATEACCOUNT    => array('create', 128),
+            TheliaEvents::CUSTOMER_UPDATEACCOUNT    => array('modify', 128),
+            TheliaEvents::CUSTOMER_UPDATEPROFILE     => array('updateProfile', 128),
+            TheliaEvents::CUSTOMER_LOGOUT           => array('logout', 128),
+            TheliaEvents::CUSTOMER_LOGIN            => array('login', 128),
+            TheliaEvents::CUSTOMER_DELETEACCOUNT    => array('delete', 128),
         );
     }
 }

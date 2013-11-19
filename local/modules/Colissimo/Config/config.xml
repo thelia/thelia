@@ -5,9 +5,7 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <loops>
-        <!-- sample definition
-        <loop name="MySuperLoop" class="MyModule\Loop\MySuperLoop" />
-        -->
+        <loop class="Colissimo\Loop\Price" name="colissimo"/>
     </loops>
 
     <forms>

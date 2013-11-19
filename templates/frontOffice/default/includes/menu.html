@@ -1,0 +1,46 @@
+<section id="categories" class="block block-nav" role="navigation" aria-labelledby="categories-label">
+    <div class="block-heading"><h3 class="block-title" id="categories-label">{intl l="Categories"}</h3></div>
+    <div class="block-content">
+        <nav class="nav-categories">
+            {* define current ID *}
+            {loop name="current_cat" type="category" current="yes"}
+                {assign var="current_category_id" value="{$PARENT}"}
+            {/loop}
+            {* define the function *}
+            {function menu level=0}
+                {if $level == 0}
+                    <ul  id="category" class="accordion">
+                    {else}
+                        {if $parent == $current_category_id}
+                            <ul id="collapse{$parent}" class="in">
+                            {else}
+                            <ul id="collapse{$parent}" class="collapse">
+                        {/if}
+                {/if}
+
+                    {loop name="cat-parent-$level" type="category" parent=$parent}
+
+                        {assign var="product_count" value="0"}
+                        {loop name="product_count" type="product" category="{$ID}"}
+                            {if $LOOP_COUNT == 1}
+                                {assign var="product_count" value="{$LOOP_TOTAL}"}
+                            {/if}
+                        {/loop}
+
+                            {if $CHILD_COUNT> 0}
+                                <li><a href="{$URL}#collapse{$ID}" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#collapse{$ID}">{$TITLE} ({$PRODUCT_COUNT})</a>
+                                {menu parent=$ID level=$level+1}
+                                </li>
+                            {else}
+                                <li><a href="{$URL}">{$TITLE} ({$product_count})</a></li>
+                            {/if}
+                    {/loop}
+
+                </ul>
+            {/function}
+
+            {menu parent='0'}
+
+        </nav>
+    </div>
+</section>

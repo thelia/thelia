@@ -20,7 +20,7 @@ class Attribute extends BaseAttribute {
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEATTRIBUTE, new AttributeEvent($this));
 
         // Set the current position for the new object
-        //$this->setPosition($this->getNextPosition());
+        $this->setPosition($this->getNextPosition());
 
         return true;
     }

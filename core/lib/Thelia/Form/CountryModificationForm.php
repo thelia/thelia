@@ -23,81 +23,21 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\GreaterThan;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
 
-class CountryModificationForm extends CurrencyCreationForm
+class CountryModificationForm extends CountryCreationForm
 {
+    use StandardDescriptionFieldsTrait;
+
     protected function buildForm()
     {
         parent::buildForm(true);
 
         $this->formBuilder
             ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Country title *"),
-                "label_attr" => array(
-                    "for" => "title"
-                )
-            ))
-            ->add("short-description", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Country short description *"),
-                "label_attr" => array(
-                    "for" => "short-description"
-                )
-            ))
-            ->add("description", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Country description *"),
-                "label_attr" => array(
-                    "for" => "description"
-                )
-            ))
-            ->add("area", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Country area *"),
-                "label_attr" => array(
-                    "for" => "area"
-                )
-            ))
-            ->add("isocode", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("ISO Code *"),
-                "label_attr" => array(
-                    "for" => "isocode"
-                )
-            ))
-            ->add("isoalpha2", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Alpha code 2 *"),
-                "label_attr" => array(
-                    "for" => "isoalpha2"
-                )
-            ))
-            ->add("isoalpha3", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Alpha code 3 *"),
-                "label_attr" => array(
-                    "for" => "isoalpha3"
-                )
-            ))
         ;
+
+        // Add standard description fields, excluding title and locale, which a re defined in parent class
+        $this->addStandardDescFields(array('title', 'locale'));
     }
 
     public function getName()

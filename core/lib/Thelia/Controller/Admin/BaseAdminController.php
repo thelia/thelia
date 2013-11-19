@@ -26,7 +26,7 @@ use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Thelia\Controller\BaseController;
-use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Model\ConfigQuery;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -43,6 +43,7 @@ use Symfony\Component\Routing\Router;
 use Thelia\Model\Admin;
 use Thelia\Core\Security\Token\CookieTokenProvider;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Core\Template\TemplateHelper;
 
 class BaseAdminController extends BaseController
 {
@@ -51,18 +52,20 @@ class BaseAdminController extends BaseController
     /**
      * Helper to append a message to the admin log.
      *
-     * @param unknown $message
+     * @param string $resource
+     * @param string $action
+     * @param string $message
      */
-    public function adminLogAppend($message)
+    public function adminLogAppend($resource, $action, $message)
     {
-        AdminLog::append($message, $this->getRequest(), $this->getSecurityContext()->getAdminUser());
+        AdminLog::append($resource, $action, $message, $this->getRequest(), $this->getSecurityContext()->getAdminUser());
     }
 
     /**
      * This method process the rendering of view called from an admin page
      *
      * @param  unknown  $template
-     * @return Response the reponse which contains the rendered view
+     * @return Response the response which contains the rendered view
      */
     public function processTemplateAction($template)
     {
@@ -83,7 +86,7 @@ class BaseAdminController extends BaseController
     /**
      * Return a 404 error
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function pageNotFound()
     {
@@ -95,43 +98,49 @@ class BaseAdminController extends BaseController
      *
      * @param mixed $message a message string, or an exception instance
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
-    protected function errorPage($message)
+    protected function errorPage($message, $status = 500)
     {
         if ($message instanceof \Exception) {
             $message = $this->getTranslator()->trans("Sorry, an error occured: %msg", array('%msg' => $message->getMessage()));
         }
 
-        return $this->render('general_error', array(
-                "error_message" => $message)
+        return $this->render('general_error',
+            array(
+                "error_message" => $message
+            ),
+            $status
         );
     }
 
     /**
      * Check current admin user authorisations. An ADMIN role is assumed.
      *
-     * @param mixed $permissions a single permission or an array of permissions.
+     * @param mixed $resources a single resource or an array of resources.
+     * @param mixed $modules   a single module or an array of modules.
+     * @param mixed $accesses  a single access or an array of accesses.
      *
      * @return mixed null if authorization is granted, or a Response object which contains the error page otherwise
-     *
      */
-    protected function checkAuth($permissions)
+    protected function checkAuth($resources, $modules, $accesses)
     {
-         $permArr = is_array($permissions) ? $permissions : array($permissions);
+        $resources = is_array($resources) ? $resources : array($resources);
+        $modules = is_array($modules) ? $modules : array($modules);
+        $accesses = is_array($accesses) ? $accesses : array($accesses);
 
-         if ($this->getSecurityContext()->isGranted(array("ADMIN"), $permArr)) {
+         if ($this->getSecurityContext()->isGranted(array("ADMIN"), $resources, $modules, $accesses)) {
              // Okay !
              return null;
          }
 
          // Log the problem
-         $this->adminLogAppend("User is not granted for permissions %s", implode(", ", $permArr));
+         $this->adminLogAppend(implode(",", $resources), implode(",", $accesses), "User is not granted for resources %s with accesses %s", implode(", ", $resources), implode(", ", $accesses));
 
          // Generate the proper response
          $response = new Response();
 
-         return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"));
+         return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"), 403);
     }
 
     /*
@@ -191,8 +200,8 @@ class BaseAdminController extends BaseController
     {
         $parser = $this->container->get("thelia.parser");
 
-        // Define the template thant shoud be used
-        $parser->setTemplate($template ?: ConfigQuery::read('base_admin_template', 'admin/default'));
+        // Define the template that should be used
+        $parser->setTemplate($template ?: TemplateHelper::getInstance()->getActiveAdminTemplate());
 
         return $parser;
     }
@@ -246,9 +255,9 @@ class BaseAdminController extends BaseController
      * @param unknown $routeId       the route ID, as found in Config/Resources/routing/admin.xml
      * @param unknown $urlParameters the URL parametrs, as a var/value pair array
      */
-    public function redirectToRoute($routeId, $urlParameters = array())
+    public function redirectToRoute($routeId, array $urlParameters = array(), array $routeParameters = array())
     {
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId), $urlParameters));
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, $routeParameters), $urlParameters));
     }
 
     /**
@@ -364,24 +373,23 @@ class BaseAdminController extends BaseController
      * Render the given template, and returns the result as an Http Response.
      *
      * @param $templateName the complete template name, with extension
-     * @param  array                                      $args the template arguments
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param  array                                      $args   the template arguments
+     * @param  int                                        $status http code status
+     * @return \Thelia\Core\HttpFoundation\Response
      */
-    protected function render($templateName, $args = array())
+    protected function render($templateName, $args = array(), $status = 200)
     {
-        $response = new Response();
-
-        return $response->setContent($this->renderRaw($templateName, $args));
+        return Response::create($this->renderRaw($templateName, $args), $status);
     }
 
     /**
      * Render the given template, and returns the result as a string.
      *
      * @param $templateName the complete template name, with extension
-     * @param  array $args the template arguments
-     * @param null $templateDir
+     * @param array $args        the template arguments
+     * @param null  $templateDir
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function renderRaw($templateName, $args = array(), $templateDir = null)
     {
@@ -428,7 +436,7 @@ class BaseAdminController extends BaseController
             Redirect::exec(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
         } catch (AuthorizationException $ex) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.
-            return $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."));
+            return $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."), 403);
         }
     }
 }

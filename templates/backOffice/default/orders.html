@@ -1,0 +1,167 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Orders'}{/block}
+
+{block name="check-resource"}admin.order{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+    {assign order_page {$smarty.get.page|default:1}}
+    {assign status_filter {$smarty.get.status|assertType:'IntListType'}}
+<div class="orders">
+
+    <div id="wrapper" class="container">
+
+        <ul class="breadcrumb">
+            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+            <li><a href="#">{intl l="Orders"}</a></li>
+        </ul>
+
+        {module_include location='orders_top'}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="general-block-decorator">
+                	<div class="table-responsive">
+	                    <table class="table table-striped table-condensed table-left-aligned">
+	                        <caption class="clearfix">
+	                           {intl l='Orders'}
+	                        </caption>
+
+                            {ifloop rel="order-list"}
+
+	                        <thead>
+		                        <tr>
+		                           <th>{intl l="Order n°"}</th>
+	                               <th>{intl l="Date & Hour"}</th>
+	                               <th>{intl l="Company"}</th>
+	                               <th>{intl l="Name"}</th>
+	                               <th>{intl l="Amount"}</th>
+	                               <th>{intl l="Status"}</th>
+
+	                               {module_include location='orders_table_header'}
+
+	                               <th class="actions">{intl l="Actions"}</th>
+		                        </tr>
+	                        </thead>
+
+	                        <tbody>
+
+                                {loop type="order" name="order-list" customer="*" backend_context="1" page={$order_page} limit={#max_displayed_orders#} status=$status_filter|default:'*'}
+
+                                    {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
+                                        {assign "orderInvoiceFirstName" $FIRSTNAME}
+                                        {assign "orderInvoiceLastName" $LASTNAME}
+                                        {assign "orderInvoiceCompany" $COMPANY}
+                                    {/loop}
+
+                                    {loop type="order-status" name="order-status" id=$STATUS}
+                                        {assign "orderStatus" $TITLE}
+                                        {assign "orderStatusLabel" "order_$CODE"}
+                                    {/loop}
+
+		                            <tr>
+
+		                               	<td><a href="{url path="/admin/order/update/$ID"}">{$REF}</a></td>
+		                               	<td>{format_date date=$CREATE_DATE}</td>
+		                               	<td>{$orderInvoiceCompany}</td>
+		                               	<td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
+		                               	<td>{$TOTAL_TAXED_AMOUNT}</td>
+		                               	<td><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
+
+		                                {module_include location='orders_table_row'}
+
+		                                <td>
+		                                    <div class="btn-group">
+
+				                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}
+				                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                    {if $STATUS !== 5}
+				                                        <a class="btn btn-default btn-xs order-cancel" title="{intl l='Cancel this order'}" href="#cancel_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
+                                                    {/if}
+				                                {/loop}
+				                            </div>
+		                                </td>
+		                            </tr>
+
+                                {/loop}
+
+	                        </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="7">
+
+                                        <div class="text-center">
+                                            <ul class="pagination pagination-centered">
+                                                {if $order_page != 1}
+                                                    <li><a href="{url path="/admin/orders" page="1"}">&laquo;</a></li>
+                                                {else}
+                                                    <li class="disabled"><a href="#">&laquo;</a></li>
+                                                {/if}
+
+                                                {pageloop rel="order-list"}
+                                                {if $PAGE != $CURRENT}
+                                                    <li><a href="{url path="/admin/orders" page=$PAGE}">{$PAGE}</a></li>
+
+                                                {else}
+                                                    <li class="active"><a href="#">{$PAGE}</a></li>
+                                                {/if}
+
+
+                                                {/pageloop}
+                                                {if $PAGE == $LAST && $LAST != $CURRENT}
+                                                    <li><a href="{url path="/admin/orders" page="$PAGE"}">&raquo;</a></li>
+                                                {else}
+                                                    <li class="disabled"><a href="#">&raquo;</a></li>
+                                                {/if}
+                                            </ul>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            </tfoot>
+
+                            {/ifloop}
+
+	                    </table>
+	                </div>
+                </div>
+            </div>
+        </div>
+
+        {module_include location='orders_bottom'}
+
+    </div>
+</div>
+
+{* Cancel order confirmation dialog *}
+
+{capture "cancel_order_dialog"}
+    <input type="hidden" name="order_page" value="{$order_page}">
+    <input type="hidden" name="order_id" id="cancel_order_id" />
+    <input type="hidden" name="status_id" value="5" />
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "cancel_order_dialog"
+    dialog_title    = {intl l="Delete an order"}
+    dialog_message  = {intl l="Do you really want to cancel this order ?"}
+
+    form_action         = {url path='/admin/order/update/status'}
+    form_content        = {$smarty.capture.cancel_order_dialog nofilter}
+    form_id             = "cancel-order-form"
+}
+
+{/block}
+
+{block name="javascript-initialization"}
+
+    <script type="text/javascript">
+        $(".order-cancel").click(function(){
+            $("#cancel_order_id").val($(this).attr("data-id"));
+        });
+    </script>
+
+{/block}

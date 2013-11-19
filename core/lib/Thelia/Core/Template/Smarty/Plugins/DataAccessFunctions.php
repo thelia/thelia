@@ -36,6 +36,7 @@ use Thelia\Model\ContentQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Tools\ModelCriteriaTools;
@@ -163,16 +164,17 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
     public function countryDataAccess($params, $smarty)
     {
-        if (array_key_exists('defaultCountry', self::$dataAccessCache)) {
-            $defaultCountry = self::$dataAccessCache['defaultCountry'];
-        } else {
-            $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
-            self::$dataAccessCache['defaultCountry'] = $defaultCountry;
-        }
-
-        switch ($params["attr"]) {
+        switch ($params["ask"]) {
             case "default":
-                return $defaultCountry->getId();
+                /*if (array_key_exists('defaultCountry', self::$dataAccessCache)) {
+                    $defaultCountry = self::$dataAccessCache['defaultCountry'];
+                } else {
+                    $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
+                    self::$dataAccessCache['defaultCountry'] = $defaultCountry;
+                }*/
+                $defaultCountry = CountryQuery::create()->filterByByDefault(1)->limit(1);
+
+                return $this->dataAccessWithI18n("defaultCountry", $params, $defaultCountry);
         }
     }
 
@@ -237,13 +239,104 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
     public function ConfigDataAccess($params, $smarty)
     {
-        if(false === array_key_exists("key", $params)) {
-            return null;
+        $key = $this->getParam($params, 'key', false);
+
+        if ($key === false) return null;
+
+        $default = $this->getParam($params, 'default', '');
+
+        return ConfigQuery::read($key, $default);
+    }
+
+    public function StatsAccess($params, $smarty)
+    {
+        if (false === array_key_exists("key", $params)) {
+            throw new \InvalidArgumentException(sprintf("missing key attribute in stats access function"));
+        }
+        if (false === array_key_exists("startDate", $params) || $params['startDate'] === '') {
+            throw new \InvalidArgumentException(sprintf("missing startDate attribute in stats access function"));
+        }
+        if (false === array_key_exists("endDate", $params) || $params['endDate'] === '') {
+            throw new \InvalidArgumentException(sprintf("missing endDate attribute in stats access function"));
         }
 
-        $key = $params['key'];
+        if (false !== array_key_exists("includeShipping", $params) && $params['includeShipping'] == 'false') {
+            $includeShipping = false;
+        } else {
+            $includeShipping = true;
+        }
 
-        return ConfigQuery::read($key);
+        if($params['startDate'] == 'today') {
+            $startDate = new \DateTime();
+            $startDate->setTime(0, 0, 0);
+        } elseif($params['startDate'] == 'yesterday') {
+            $startDate = new \DateTime();
+            $startDate->setTime(0, 0, 0);
+            $startDate->modify('-1 day');
+        } elseif($params['startDate'] == 'this_month') {
+            $startDate = new \DateTime();
+            $startDate->modify('first day of this month');
+            $startDate->setTime(0, 0, 0);
+        } elseif($params['startDate'] == 'last_month') {
+            $startDate = new \DateTime();
+            $startDate->modify('first day of last month');
+            $startDate->setTime(0, 0, 0);
+        } elseif($params['startDate'] == 'this_year') {
+            $startDate = new \DateTime();
+            $startDate->modify('first day of January this year');
+            $startDate->setTime(0, 0, 0);
+        } elseif($params['startDate'] == 'last_year') {
+            $startDate = new \DateTime();
+            $startDate->modify('first day of December last year');
+            $startDate->setTime(0, 0, 0);
+        } else {
+            try {
+                $startDate = new \DateTime($params['startDate']);
+            } catch(\Exception $e) {
+                throw new \InvalidArgumentException(sprintf("invalid startDate attribute '%s' in stats access function", $params['startDate']));
+            }
+        }
+
+        if($params['endDate'] == 'today') {
+            $endDate = new \DateTime();
+            $endDate->setTime(0, 0, 0);
+        } elseif($params['endDate'] == 'yesterday') {
+            $endDate = new \DateTime();
+            $endDate->setTime(0, 0, 0);
+            $endDate->modify('-1 day');
+        } elseif($params['endDate'] == 'this_month') {
+            $endDate = new \DateTime();
+            $endDate->modify('last day of this month');
+            $endDate->setTime(0, 0, 0);
+        } elseif($params['endDate'] == 'last_month') {
+            $endDate = new \DateTime();
+            $endDate->modify('last day of last month');
+            $endDate->setTime(0, 0, 0);
+        } elseif($params['endDate'] == 'this_year') {
+            $endDate = new \DateTime();
+            $endDate->modify('last day of December this year');
+            $endDate->setTime(0, 0, 0);
+        } elseif($params['endDate'] == 'last_year') {
+            $endDate = new \DateTime();
+            $endDate->modify('last day of January last year');
+            $endDate->setTime(0, 0, 0);
+        } else {
+            try {
+                $endDate = new \DateTime($params['endDate']);
+            } catch(\Exception $e) {
+                throw new \InvalidArgumentException(sprintf("invalid endDate attribute '%s' in stats access function", $params['endDate']));
+            }
+        }
+
+        switch( $params['key'] ) {
+            case 'sales' :
+                return OrderQuery::getSaleStats($startDate, $endDate, $includeShipping);
+            case 'orders' :
+                return OrderQuery::getOrderStats($startDate, $endDate, array(1,2,3,4));
+
+        }
+
+        throw new \InvalidArgumentException(sprintf("invalid key attribute '%s' in stats access function", $params['key']));
     }
 
     /**
@@ -357,6 +450,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'cart', $this, 'cartDataAccess'),
             new SmartyPluginDescriptor('function', 'order', $this, 'orderDataAccess'),
             new SmartyPluginDescriptor('function', 'config', $this, 'ConfigDataAccess'),
+            new SmartyPluginDescriptor('function', 'stats', $this, 'StatsAccess'),
         );
     }
 

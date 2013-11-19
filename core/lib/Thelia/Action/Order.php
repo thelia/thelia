@@ -25,11 +25,15 @@ namespace Thelia\Action;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Cart\CartTrait;
+use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\MessageQuery;
 use Thelia\Model\OrderProductAttributeCombination;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderProduct;
@@ -47,6 +51,8 @@ use Thelia\Tools\I18n;
  */
 class Order extends BaseAction implements EventSubscriberInterface
 {
+    use CartTrait;
+
     /**
      * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
@@ -97,7 +103,9 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\Order\OrderEvent $event
+     * @param OrderEvent $event
+     *
+     * @throws \Thelia\Exception\TheliaProcessException
      */
     public function create(OrderEvent $event)
     {
@@ -197,6 +205,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $taxRuleI18n = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'TaxRule', $product->getTaxRuleId());
 
             $taxDetail = $product->getTaxRule()->getTaxDetail(
+                $product,
                 $taxCountry,
                 $cartItem->getPrice(),
                 $cartItem->getPromoPrice(),
@@ -220,6 +229,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ->setWeight($pse->getWeight())
                 ->setTaxRuleTitle($taxRuleI18n->getTitle())
                 ->setTaxRuleDescription($taxRuleI18n->getDescription())
+                ->setEanCode($pse->getEanCode())
             ;
             $orderProduct->setDispatcher($this->getDispatcher());
             $orderProduct->save($con);
@@ -265,15 +275,11 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setPlacedOrder($placedOrder);
         $this->getSession()->setOrder($sessionOrder);
 
-        /* empty cart @todo */
+        /* empty cart */
+        $this->getDispatcher()->dispatch(TheliaEvents::CART_CLEAR, new CartEvent($this->getCart($this->getRequest())));
 
         /* call pay method */
-        $paymentModuleReflection = new \ReflectionClass($paymentModule->getFullNamespace());
-        $paymentModuleInstance = $paymentModuleReflection->newInstance();
-
-        $paymentModuleInstance->setRequest($this->getRequest());
-        $paymentModuleInstance->setDispatcher($this->getDispatcher());
-
+        $paymentModuleInstance = $this->container->get(sprintf('module.%s', $paymentModule->getCode()));
         $paymentModuleInstance->pay($placedOrder);
     }
 
@@ -282,7 +288,50 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function sendOrderEmail(OrderEvent $event)
     {
-        /* @todo */
+        $contact_email = ConfigQuery::read('contact_email');
+        if($contact_email) {
+            $order = $event->getOrder();
+            $customer = $order->getCustomer();
+
+            $parser = $this->container->get("thelia.parser");
+
+            $parser->assign('order_id', $order->getId());
+            $parser->assign('order_ref', $order->getRef());
+
+            $message = MessageQuery::create()
+                ->filterByName('order_confirmation')
+                ->findOne();
+
+            $message
+                ->setLocale($order->getLang()->getLocale());
+
+            $subject = $parser->fetch(sprintf("string:%s", $message->getSubject()));
+            $htmlMessage = $parser->fetch(sprintf("string:%s", $message->getHtmlMessage()));
+            $textMessage = $parser->fetch(sprintf("string:%s", $message->getTextMessage()));
+
+            $instance = \Swift_Message::newInstance($subject)
+                ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
+                ->addFrom(ConfigQuery::read('contact_email'), ConfigQuery::read('company_name'))
+            ;
+            $instance
+                ->setBody($htmlMessage, 'text/html')
+                ->addPart($textMessage, 'text/plain');
+
+            $mail = $this->getMailer()->send($instance);
+        }
+    }
+
+    /**
+     *
+     * return an instance of \Swift_Mailer with good Transporter configured.
+     *
+     * @return \Swift_Mailer
+     */
+    public function getMailer()
+    {
+        $mailer = $this->container->get('mailer');
+
+        return $mailer->getSwiftMailer();
     }
 
     /**

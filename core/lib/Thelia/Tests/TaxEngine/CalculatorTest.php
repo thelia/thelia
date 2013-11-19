@@ -126,12 +126,62 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
     {
         $taxRulesCollection = new ObjectCollection();
 
+        $aProduct = ProductQuery::create()->findOne();
+        if (null === $aProduct) {
+            return;
+        }
+
         $calculator = new Calculator();
 
         $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
         $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
 
+        $product = $this->getProperty('product');
+        $product->setValue($calculator, $aProduct);
+
         $calculator->getTaxedPrice('foo');
+    }
+
+    /**
+     * @expectedException \Thelia\Exception\TaxEngineException
+     * @expectedExceptionCode 501
+     */
+    public function testGetUntaxedPriceAndGetTaxAmountFromTaxedPriceWithNoProductLoaded()
+    {
+        $taxRulesCollection = new ObjectCollection();
+        $taxRulesCollection->setModel('\Thelia\Model\Tax');
+
+        $calculator = new Calculator();
+
+        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
+        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+
+        $calculator->getTaxAmountFromTaxedPrice(600.95);
+    }
+
+    /**
+     * @expectedException \Thelia\Exception\TaxEngineException
+     * @expectedExceptionCode 507
+     */
+    public function testGetUntaxedPriceAndGetTaxAmountFromTaxedPriceWithEmptyTaxRuleCollection()
+    {
+        $taxRulesCollection = new ObjectCollection();
+        $taxRulesCollection->setModel('\Thelia\Model\Tax');
+
+        $aProduct = ProductQuery::create()->findOne();
+        if (null === $aProduct) {
+            return;
+        }
+
+        $calculator = new Calculator();
+
+        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
+        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+
+        $product = $this->getProperty('product');
+        $product->setValue($calculator, $aProduct);
+
+        $calculator->getTaxAmountFromTaxedPrice(600.95);
     }
 
     public function testGetTaxedPriceAndGetTaxAmountFromUntaxedPrice()
@@ -163,10 +213,18 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
             ->setVirtualColumn('taxRuleCountryPosition', 3);
         $taxRulesCollection->append($tax);
 
+        $aProduct = ProductQuery::create()->findOne();
+        if (null === $aProduct) {
+            return;
+        }
+
         $calculator = new Calculator();
 
         $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
         $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+
+        $product = $this->getProperty('product');
+        $product->setValue($calculator, $aProduct);
 
         $taxAmount = $calculator->getTaxAmountFromUntaxedPrice(500);
         $taxedPrice = $calculator->getTaxedPrice(500);
@@ -211,10 +269,18 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
             ->setVirtualColumn('taxRuleCountryPosition', 3);
         $taxRulesCollection->append($tax);
 
+        $aProduct = ProductQuery::create()->findOne();
+        if (null === $aProduct) {
+            return;
+        }
+
         $calculator = new Calculator();
 
         $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
         $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+
+        $product = $this->getProperty('product');
+        $product->setValue($calculator, $aProduct);
 
         $taxAmount = $calculator->getTaxAmountFromTaxedPrice(600.95);
         $untaxedPrice = $calculator->getUntaxedPrice(600.95);

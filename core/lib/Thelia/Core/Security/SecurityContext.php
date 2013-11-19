@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Security;
 
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\HttpFoundation\Request;
 
@@ -122,7 +123,7 @@ class SecurityContext
     *
     * @return Boolean
     */
-    final public function isGranted(array $roles, array $permissions)
+    final public function isGranted(array $roles, array $resources, array $modules, array $accesses)
     {
         // Find a user which matches the required roles.
         $user = $this->getCustomerUser();
@@ -135,38 +136,65 @@ class SecurityContext
             }
         }
 
-        if ($user != null) {
-
-            if (empty($permissions)) {
-               return true;
-            }
-
-            // Get permissions from profile
-            // $userPermissions = $user->getPermissions(); FIXME
-
-            // TODO: Finalize permissions system !;
-
-            $userPermissions = array('*'); // FIXME !
-
-            $permissionsFound = true;
-
-            // User have all permissions ?
-            if (in_array('*', $userPermissions))
-               return true;
-
-            // Check that user's permissions matches required permissions
-            foreach ($permissions as $permission) {
-               if (! in_array($permission, $userPermissions)) {
-                   $permissionsFound = false;
-
-                   break;
-               }
-            }
-
-            return $permissionsFound;
+        if (null === $user) {
+            return false;
         }
 
-        return false;
+        if ((empty($resources) && empty($modules)) || empty($accesses)) {
+            return true;
+        }
+
+        if ( !method_exists($user, 'getPermissions') ) {
+            return false;
+        }
+
+        $userPermissions = $user->getPermissions();
+
+        if ($userPermissions === AdminResources::SUPERADMINISTRATOR) {
+            return true;
+        }
+
+        foreach ($resources as $resource) {
+            if ($resource === '') {
+                continue;
+            }
+
+            $resource = strtolower($resource);
+
+            if (!array_key_exists($resource, $userPermissions)) {
+                return false;
+            }
+
+            foreach ($accesses as $access) {
+                if (!$userPermissions[$resource]->can($access)) {
+                    return false;
+                }
+            }
+        }
+
+        foreach ($modules as $module) {
+            if ($module === '') {
+                continue;
+            }
+
+            if(!array_key_exists('module', $userPermissions)) {
+                return false;
+            }
+
+            $module = strtolower($module);
+
+            if (!array_key_exists($module, $userPermissions['module'])) {
+                return false;
+            }
+
+            foreach ($accesses as $access) {
+                if (!$userPermissions['module'][$module]->can($access)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
