@@ -934,13 +934,21 @@
         <default key="_controller">Thelia\Controller\Admin\ModuleController::processUpdateAction</default>
     </route>
 
-    <route id="admin.module.toggle-activation" path="/admin/modules/toggle-activation/{module_id}">
+    <route id="admin.module.toggle-activation" path="/admin/module/toggle-activation/{module_id}">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::toggleActivationAction</default>
         <requirement key="module_id">\d+</requirement>
     </route>
 
-    <route id="admin.module.delete" path="/admin/modules/delete">
+    <route id="admin.module.delete" path="/admin/module/delete">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::deleteAction</default>
+    </route>
+
+    <!--
+        Generic module route.
+        Will be use if module route is not define in module own config file.
+    -->
+    <route id="admin.module.configure" path="/admin/module/{module_code}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::configureAction</default>
     </route>
 
     <!-- end Modules rule management -->

@@ -188,6 +188,24 @@ class ModuleController extends AbstractCrudController
         return $this->render("modules");
     }
 
+    public function configureAction($module_code)
+    {
+        $module = ModuleQuery::create()->findOneByCode($module_code);
+
+        if(null === $module) {
+            throw new \InvalidArgumentException(sprintf("Module `%s` does not exists", $module_code));
+        }
+
+        if (null !== $response = $this->checkAuth(array(), $module_code, AccessManager::VIEW)) return $response;
+
+        return $this->render(
+            "module-configure",
+            array(
+                "module_code" => $module_code,
+            )
+        );
+    }
+
     public function toggleActivationAction($module_id)
     {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::UPDATE)) return $response;

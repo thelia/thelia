@@ -61,7 +61,11 @@ class ContentTest extends BaseLoopTestor
             $content->save();
         }
 
-        $this->baseTestSearchById($content->getId());
+        $otherParameters = array(
+            "visible" => "*",
+        );
+
+        $this->baseTestSearchById($content->getId(), $otherParameters);
     }
 
     public function testSearchLimit()

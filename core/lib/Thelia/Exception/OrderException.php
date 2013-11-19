@@ -38,6 +38,7 @@ class OrderException extends \RuntimeException
     const CART_EMPTY = 100;
 
     const UNDEFINED_DELIVERY = 200;
+    const DELIVERY_MODULE_UNAVAILABLE = 201;
 
     public function __construct($message, $code = null, $arguments = array(), $previous = null)
     {

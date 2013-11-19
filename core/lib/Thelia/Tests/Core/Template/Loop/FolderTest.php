@@ -61,7 +61,11 @@ class FolderTest extends BaseLoopTestor
             $folder->save();
         }
 
-        $this->baseTestSearchById($folder->getId());
+        $otherParameters = array(
+            "visible" => "*",
+        );
+
+        $this->baseTestSearchById($folder->getId(), $otherParameters);
     }
 
     public function testSearchLimit()

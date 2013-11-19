@@ -46,6 +46,9 @@ class TemplateHelper
         return self::$instance;
     }
 
+    /**
+     * @return TemplateDefinition
+     */
     public function getActivePdfTemplate() {
         return new TemplateDefinition(
                 ConfigQuery::read('active-pdf-template', 'default'),
@@ -53,6 +56,9 @@ class TemplateHelper
         );
     }
 
+    /**
+     * @return TemplateDefinition
+     */
     public function getActiveAdminTemplate() {
         return new TemplateDefinition(
                 ConfigQuery::read('active-admin-template', 'default'),
@@ -60,6 +66,9 @@ class TemplateHelper
         );
     }
 
+    /**
+     * @return TemplateDefinition
+     */
     public function getActiveFrontTemplate() {
         return new TemplateDefinition(
                 ConfigQuery::read('active-front-template', 'default'),
@@ -78,7 +87,7 @@ class TemplateHelper
             $baseDir = THELIA_TEMPLATE_DIR.TemplateDefinition::PDF_SUBDIR;
         }
         else {
-            $baseDir = THELIA_TEMPLATE_DIR;
+            $baseDir = THELIA_TEMPLATE_DIR.TemplateDefinition::FRONT_OFFICE_SUBDIR;
 
             $exclude = array(TemplateDefinition::BACK_OFFICE_SUBDIR, TemplateDefinition::PDF_SUBDIR);
         }
