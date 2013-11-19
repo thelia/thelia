@@ -32,7 +32,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
-use Thelia\Coupon\ConditionCollection;
+use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon as CouponModel;
 use Thelia\Model\CouponQuery;

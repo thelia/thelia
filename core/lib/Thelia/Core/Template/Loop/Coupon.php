@@ -106,7 +106,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
             /** @var CouponInterface $couponManager */
             $couponManager = $this->container->get($coupon->getType());
             $couponManager->set(
-                $this->container->get('thelia.adapter'),
+                $this->container->get('thelia.facade'),
                 $coupon->getCode(),
                 $coupon->getTitle(),
                 $coupon->getShortDescription(),

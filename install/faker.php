@@ -6,7 +6,7 @@ use Thelia\Condition\Implementation\MatchForTotalAmountManager;
 use Thelia\Condition\Implementation\MatchForXArticlesManager;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Coupon\ConditionCollection;
+use Thelia\Condition\ConditionCollection;
 
 
 require __DIR__ . '/../core/bootstrap.php';
@@ -646,7 +646,7 @@ function generateCouponFixtures(\Thelia\Core\Thelia $thelia)
     /** @var $container ContainerInterface Service Container */
     $container = $thelia->getContainer();
     /** @var FacadeInterface $adapter */
-    $adapter = $container->get('thelia.adapter');
+    $adapter = $container->get('thelia.facade');
 
     // Coupons
     $coupon1 = new Thelia\Model\Coupon();

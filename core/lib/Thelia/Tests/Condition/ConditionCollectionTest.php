@@ -22,6 +22,8 @@
 /**********************************************************************************/
 
 namespace Thelia\Condition;
+use Thelia\Condition\Implementation\MatchForTotalAmountManager;
+use Thelia\Model\CurrencyQuery;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -48,7 +50,54 @@ class ConditionCollectionTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new ConditionCollection;
+    }
+
+
+    /**
+     * Generate adapter stub
+     *
+     * @param int    $cartTotalPrice   Cart total price
+     * @param string $checkoutCurrency Checkout currency
+     * @param string $i18nOutput       Output from each translation
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    public function generateFacadeStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR', $i18nOutput = '')
+    {
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $currencies = CurrencyQuery::create();
+        $currencies = $currencies->find();
+        $stubFacade->expects($this->any())
+            ->method('getAvailableCurrencies')
+            ->will($this->returnValue($currencies));
+
+        $stubFacade->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue($cartTotalPrice));
+
+        $stubFacade->expects($this->any())
+            ->method('getCheckoutCurrency')
+            ->will($this->returnValue($checkoutCurrency));
+
+        $stubFacade->expects($this->any())
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
+
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubTranslator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnValue($i18nOutput));
+
+        $stubFacade->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+
+        return $stubFacade;
     }
 
     /**
@@ -61,49 +110,77 @@ class ConditionCollectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Thelia\Condition\ConditionCollection::getConditions
-     * @todo   Implement testGetConditions().
+     * @covers Thelia\Condition\ConditionCollection::add
      */
     public function testGetConditions()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
+        $stubFacade = $this->generateFacadeStub();
 
-    /**
-     * @covers Thelia\Condition\ConditionCollection::add
-     * @todo   Implement testAdd().
-     */
-    public function testAdd()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $operators = array(
+            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
         );
+        $values = array(
+            MatchForTotalAmountManager::INPUT1 => 400,
+            MatchForTotalAmountManager::INPUT2 => 'EUR');
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $collection = new ConditionCollection();
+        $collection->add($condition1);
+
+        $expected = $condition1;
+        $actual = $collection->getConditions()[0];
+
+        $this->assertEquals($expected, $actual);
+
+        $this->assertFalse($collection->isEmpty());
     }
 
     /**
      * @covers Thelia\Condition\ConditionCollection::isEmpty
-     * @todo   Implement testIsEmpty().
      */
     public function testIsEmpty()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $collection = new ConditionCollection();
+        $this->assertTrue($collection->isEmpty());
     }
 
     /**
      * @covers Thelia\Condition\ConditionCollection::__toString
-     * @todo   Implement test__toString().
      */
     public function test__toString()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
+        $stubFacade = $this->generateFacadeStub();
+
+        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $operators1 = array(
+            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
         );
+        $values1 = array(
+            MatchForTotalAmountManager::INPUT1 => 400,
+            MatchForTotalAmountManager::INPUT2 => 'EUR');
+        $condition1->setValidatorsFromForm($operators1, $values1);
+
+        $condition2 = new MatchForTotalAmountManager($stubFacade);
+        $operators2 = array(
+            MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR,
+            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+        );
+        $values2 = array(
+            MatchForTotalAmountManager::INPUT1 => 600,
+            MatchForTotalAmountManager::INPUT2 => 'EUR');
+        $condition2->setValidatorsFromForm($operators2, $values2);
+
+        $collection = new ConditionCollection();
+        $collection->add($condition1);
+        $collection->add($condition2);
+
+        $expected = '[{"conditionServiceId":"thelia.condition.match_for_total_amount","operators":{"price":">","currency":"=="},"values":{"price":400,"currency":"EUR"}},{"conditionServiceId":"thelia.condition.match_for_total_amount","operators":{"price":"<","currency":"=="},"values":{"price":600,"currency":"EUR"}}]';
+        $actual = $collection->__toString();;
+
+        $this->assertEquals($expected, $actual);
+
     }
 }

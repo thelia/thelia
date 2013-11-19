@@ -64,7 +64,7 @@ class CouponManager
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->adapter = $container->get('thelia.adapter');
+        $this->adapter = $container->get('thelia.facade');
         $this->coupons = $this->adapter->getCurrentCoupons();
     }
 
