@@ -142,4 +142,10 @@ class CartController extends BaseFrontController
         return $cartAdd;
     }
 
+    public function renderMiniCart()
+    {
+       $response = $this->render('includes/mini-cart');
+       return $response;
+    }
+
 }

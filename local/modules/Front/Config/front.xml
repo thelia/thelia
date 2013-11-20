@@ -13,6 +13,11 @@
         <default key="_view">includes/addedToCart</default>
     </route>
 
+    <route id="esi-minicart" path="/mini-cart">
+        <default key="_controller">Front\Controller\CartController::renderMiniCart</default>
+        <default key="_view">includes/mini-cart</default>
+    </route>
+
 
     <!-- Register -->
     <route id="customer.create.process" path="/register" methods="post">
