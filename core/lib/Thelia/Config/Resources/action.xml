@@ -4,12 +4,6 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
-    <parameters>
-        <parameter key="thelia.actionEvent" type="collection">
-
-        </parameter>
-    </parameters>
-
     <services>
 
         <service id="thelia.action.cart" class="Thelia\Action\Cart">
