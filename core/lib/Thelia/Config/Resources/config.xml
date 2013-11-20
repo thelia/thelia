@@ -7,6 +7,8 @@
     <parameters>
         <parameter key="esi.class">Symfony\Component\HttpKernel\HttpCache\Esi</parameter>
         <parameter key="esi_listener.class">Symfony\Component\HttpKernel\EventListener\EsiListener</parameter>
+        <parameter key="fragment.renderer.esi.class">Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer</parameter>
+        <parameter key="fragment.renderer.inline.class">Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
     </parameters>
 
     <services>
@@ -24,6 +26,14 @@
         <service id="esi_listener" class="%esi_listener.class%">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="esi" on-invalid="ignore" />
+        </service>
+        <service id="fragment.renderer.inline" class="%fragment.renderer.inline.class%">
+            <argument type="service" id="http_kernel" />
+        </service>
+
+        <service id="fragment.renderer.esi" class="%fragment.renderer.esi.class%">
+            <argument type="service" id="esi" />
+            <argument type="service" id="fragment.renderer.inline" />
         </service>
 		<!--
 		A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
