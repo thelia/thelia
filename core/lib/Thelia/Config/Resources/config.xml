@@ -4,11 +4,15 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
+    <parameters>
+        <parameter key="esi.class">Symfony\Component\HttpKernel\HttpCache\Esi</parameter>
+        <parameter key="esi_listener.class">Symfony\Component\HttpKernel\EventListener\EsiListener</parameter>
+        <parameter key="fragment.renderer.esi.class">Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer</parameter>
+        <parameter key="fragment.renderer.inline.class">Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
+    </parameters>
 
     <services>
-
         <!--  URL maganement -->
-
         <service id="thelia.url.manager" class="Thelia\Tools\URL">
             <argument type="service" id="service_container" />
         </service>
@@ -17,6 +21,20 @@
             <argument type="service" id="service_container" />
         </service>
 
+        <service id="esi" class="%esi.class%" />
+
+        <service id="esi_listener" class="%esi_listener.class%">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="esi" on-invalid="ignore" />
+        </service>
+        <service id="fragment.renderer.inline" class="%fragment.renderer.inline.class%">
+            <argument type="service" id="http_kernel" />
+        </service>
+
+        <service id="fragment.renderer.esi" class="%fragment.renderer.esi.class%">
+            <argument type="service" id="esi" />
+            <argument type="service" id="fragment.renderer.inline" />
+        </service>
 		<!--
 		A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
 		thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
@@ -70,8 +88,6 @@
         <service id="mailer" class="Thelia\Mailer\MailerFactory">
             <argument type="service" id="event_dispatcher"/>
         </service>
-
-
     </services>
 
 </config>

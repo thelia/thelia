@@ -21,64 +21,51 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Command;
+namespace Thelia\Core\HttpKernel\HttpCache;
 
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpCache\Esi;
+use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
+use Symfony\Component\HttpKernel\HttpCache\Store;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-use Thelia\Model\ModuleQuery;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 
 /**
- * activates a module
- *
- * Class ModuleActivateCommand
- * @package Thelia\Command
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
+ * Class HttpCache
+ * @package Thelia\Core\HttpKernel\HttpCache
+ * @author manuel raynaud <mraynaud@openstudio.fr>
  */
-class ModuleActivateCommand extends BaseModuleGenerate
+class HttpCache extends BaseHttpCache implements HttpKernelInterface
 {
-    protected function configure()
+
+    public function __construct(HttpKernelInterface $kernel, $options = array())
     {
-        $this
-            ->setName("module:activate")
-            ->setDescription("Activates a module")
-            ->addArgument(
-                "module" ,
-                InputArgument::REQUIRED,
-                "module to activate"
+        parent::__construct(
+            $kernel,
+            new Store($kernel->getCacheDir().'/http_cache'),
+            new Esi(),
+            array_merge(
+                array('debug' => $kernel->isDebug()),
+                $options
             )
-        ;
+        );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        $moduleCode = $this->formatModuleName($input->getArgument("module"));
-
-        $module = ModuleQuery::create()->findOneByCode($moduleCode);
-
-        if (null === $module) {
-            throw new \RuntimeException(sprintf("module %s not found", $moduleCode));
+        if (!($request instanceof \Thelia\Core\HttpFoundation\Request)) {
+            $request = TheliaRequest::create(
+                $request->getUri(),
+                $request->getMethod(),
+                $request->getMethod() == 'GET' ? $request->query->all() : $request->request->all(),
+                $request->cookies->all(),
+                $request->files->all(),
+                $request->server->all(),
+                $request->getContent()
+            );
         }
-
-        try {
-            $moduleReflection = new \ReflectionClass($module->getFullNamespace());
-
-            $moduleInstance = $moduleReflection->newInstance();
-
-            $moduleInstance->activate();
-        } catch (\Exception $e) {
-            throw new \RuntimeException(sprintf("Activation fail with Exception : [%d] %s", $e->getCode(), $e->getMessage()));
-        }
-
-        //impossible to change output class in CommandTester...
-        if (method_exists($output, "renderBlock")) {
-            $output->renderBlock(array(
-                '',
-                sprintf("Activation succeed for module %s", $moduleCode),
-                ''
-            ), "bg=green;fg=black");
-        }
+        return parent::handle($request, $type, $catch);
     }
+
 }
