@@ -288,8 +288,8 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function sendOrderEmail(OrderEvent $event)
     {
-        $contact_email = ConfigQuery::read('contact_email');
-        if($contact_email) {
+        $store_email = ConfigQuery::read('store_email');
+        if($store_email) {
             $order = $event->getOrder();
             $customer = $order->getCustomer();
 
@@ -311,7 +311,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             $instance = \Swift_Message::newInstance($subject)
                 ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
-                ->addFrom(ConfigQuery::read('contact_email'), ConfigQuery::read('company_name'))
+                ->addFrom($store_email, ConfigQuery::read('store_name'))
             ;
             $instance
                 ->setBody($htmlMessage, 'text/html')
