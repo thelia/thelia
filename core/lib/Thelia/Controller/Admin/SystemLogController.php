@@ -121,7 +121,7 @@ class SystemLogController extends BaseAdminController
 
     public function saveAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, array(), AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
 
