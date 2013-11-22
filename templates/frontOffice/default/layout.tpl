@@ -360,17 +360,21 @@ GNU General Public License : http://www.gnu.org/licenses/
                             <ul>
                                 <li class="contact-address">
                                     <address class="adr" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-                                        <span class="street-address" itemprop="streetAddress">Street name of my business</span><br>
-                                        <span class="postal-code" itemprop="postalCode">75000</span>
-                                        <span class="locality" itemprop="addressLocality">City, <span class="country-name">France</span></span>
+                                        <span class="street-address" itemprop="streetAddress">{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}</span><br>
+                                        <span class="postal-code" itemprop="postalCode">{config key="store_zipcode"}</span>
+                                        <span class="locality" itemprop="addressLocality">{config key="store_city"}{loop type="country" name="address.country.title" id={config key="store_country"}}, <span class="country-name">{$TITLE}</span>{/loop}</span>
                                     </address>
                                 </li>
+                                {if {config key="store_phone"} }
                                 <li class="contact-phone">
-                                    <span class="tel" itemprop="telephone">+33 (0)0 00 00 00 00</span>
+                                    <span class="tel" itemprop="telephone">{config key="store_phone"}</span>
                                 </li>
+                                {/if}
+                                {if {config key="store_email"} }
                                 <li class="contact-email">
-                                    {mailto address="contact@yourdomain.com" encode="hex" extra='class="email" itemprop="email"'}
+                                    {mailto address="{config key="store_email"}" encode="hex" extra='class="email" itemprop="email"'}
                                 </li>
+                                {/if}
                             </ul>
                         </div>
                     </section>
