@@ -100,5 +100,7 @@ final class AdminResources
 
     const SYSTEM_LOG = "admin.configuration.system-log";
 
+    const STORE = "admin.configuration.store";
+
     const TRANSLATIONS = "admin.configuration.translations";
 }
