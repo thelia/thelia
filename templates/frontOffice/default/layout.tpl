@@ -129,7 +129,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                         </div>
                     </li>
                     {/elseloop}
-                    {render_esi path="{url path="/mini-cart"}" alt="fail"}
+                    {include file="includes/mini-cart.html" nocache}
                 </ul>
                 {/nocache}
                 <ul class="nav navbar-nav navbar-categories">
