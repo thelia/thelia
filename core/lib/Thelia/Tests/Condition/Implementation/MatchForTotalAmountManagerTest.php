@@ -940,9 +940,9 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
                     'title' => 'Price',
                     'availableOperators' => array('==' => 'Price'),
                     'availableValues' => array(
-                        'EUR' => 'â‚¬',
+                        'EUR' => '€',
                         'USD' => '$',
-                        'GBP' => 'Â£',
+                        'GBP' => '£',
                     ),
                     'type' => 'select',
                     'class' => 'form-control',
