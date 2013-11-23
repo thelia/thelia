@@ -248,7 +248,7 @@ class CouponManager
 
         if ($oldMaxUsage > 0) {
             $oldMaxUsage--;
-            $coupon->setMaxUsage($$oldMaxUsage);
+            $coupon->setMaxUsage($oldMaxUsage);
 
             $coupon->save();
         }
