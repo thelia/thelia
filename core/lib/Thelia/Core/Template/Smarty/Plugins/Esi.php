@@ -21,64 +21,62 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Command;
+namespace Thelia\Core\Template\Smarty\Plugins;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer;
+use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
+use Thelia\Core\Template\Smarty\an;
+use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
-use Thelia\Model\ModuleQuery;
 
 /**
- * activates a module
- *
- * Class ModuleActivateCommand
- * @package Thelia\Command
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
+ * Class Esi
+ * @package Thelia\Core\Template\Smarty\Plugins
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ModuleActivateCommand extends BaseModuleGenerate
+class Esi extends AbstractSmartyPlugin
 {
-    protected function configure()
+
+    protected $esiFragmentRender;
+    protected $request;
+
+    public function __construct(EsiFragmentRenderer $esiFragmentRenderer, Request $request)
     {
-        $this
-            ->setName("module:activate")
-            ->setDescription("Activates a module")
-            ->addArgument(
-                "module" ,
-                InputArgument::REQUIRED,
-                "module to activate"
-            )
-        ;
+        $this->esiFragmentRender = $esiFragmentRenderer;
+        $this->request = $request;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    public function renderEsi($params, $template = null)
     {
-        $moduleCode = $this->formatModuleName($input->getArgument("module"));
+        $path = $this->getParam($params, 'path');
+        $alt = $this->getParam($params, 'alt');
+        $ignore_errors = $this->getParam($params, 'ignore_errors');
+        $comment = $this->getParam($params, 'comment');
 
-        $module = ModuleQuery::create()->findOneByCode($moduleCode);
-
-        if (null === $module) {
-            throw new \RuntimeException(sprintf("module %s not found", $moduleCode));
+        if(null === $path) {
+            return;
         }
 
-        try {
-            $moduleReflection = new \ReflectionClass($module->getFullNamespace());
+        $response = $this->esiFragmentRender->render($path, $this->request, array(
+            'alt' => $alt,
+            'ignore_errors' => $ignore_errors,
+            'comment' => $comment
+        ));
 
-            $moduleInstance = $moduleReflection->newInstance();
-
-            $moduleInstance->activate();
-        } catch (\Exception $e) {
-            throw new \RuntimeException(sprintf("Activation fail with Exception : [%d] %s", $e->getCode(), $e->getMessage()));
+        if (!$response->isSuccessful()) {
+            return null;
         }
 
-        //impossible to change output class in CommandTester...
-        if (method_exists($output, "renderBlock")) {
-            $output->renderBlock(array(
-                '',
-                sprintf("Activation succeed for module %s", $moduleCode),
-                ''
-            ), "bg=green;fg=black");
-        }
+        return $response->getContent();
+    }
+
+    /**
+     * @return an array of SmartyPluginDescriptor
+     */
+    public function getPluginDescriptors()
+    {
+        return array(
+            new SmartyPluginDescriptor('function', 'render_esi', $this, 'renderEsi')
+        );
     }
 }

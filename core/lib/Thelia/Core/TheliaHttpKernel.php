@@ -43,6 +43,7 @@ use Thelia\Model;
 
 class TheliaHttpKernel extends HttpKernel
 {
+    protected static $session;
 
     protected $container;
 
@@ -79,8 +80,11 @@ class TheliaHttpKernel extends HttpKernel
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         //$request->headers->set('X-Php-Ob-Level', ob_get_level());
-        $request = $this->initSession($request);
-        $this->initParam($request);
+        if ($type == HttpKernelInterface::MASTER_REQUEST) {
+            $request = $this->initSession($request);
+            $this->initParam($request);
+        }
+
         $this->container->enterScope('request');
         $this->container->set('request', $request, 'request');
 
@@ -211,26 +215,29 @@ class TheliaHttpKernel extends HttpKernel
 
     protected function initSession(Request $request)
     {
+        if(null === self::$session) {
+            $storage = new Session\Storage\NativeSessionStorage();
 
-        $storage = new Session\Storage\NativeSessionStorage();
+            if (Model\ConfigQuery::read("session_config.default")) {
+                $storage->setSaveHandler(new Session\Storage\Handler\NativeFileSessionHandler(Model\ConfigQuery::read("session_config.save_path", THELIA_ROOT . '/local/session/')));
+            } else {
+                $handlerString = Model\ConfigQuery::read("session_config.handlers", 'Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler');
 
-        if (Model\ConfigQuery::read("session_config.default")) {
-            $storage->setSaveHandler(new Session\Storage\Handler\NativeFileSessionHandler(Model\ConfigQuery::read("session_config.save_path", THELIA_LOCAL_DIR . 'session/')));
+                $handler = new $handlerString;
+
+                $storage->setSaveHandler($handler);
+            }
+
+            if (Model\ConfigQuery::read("session_config.config", null)) {
+                $storage->setOptions(json_decode(Model\ConfigQuery::read("session_config.config")));
+            }
+
+            self::$session = $session = new \Thelia\Core\HttpFoundation\Session\Session($storage);
         } else {
-            $handlerString = Model\ConfigQuery::read("session_config.handlers", 'Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler');
-
-            $handler = new $handlerString;
-
-            $storage->setSaveHandler($handler);
+            $session = self::$session;
         }
 
-        if (Model\ConfigQuery::read("session_config.config", null)) {
-           $storage->setOptions(json_decode(Model\ConfigQuery::read("session_config.config")));
-        }
-
-        $session = new \Thelia\Core\HttpFoundation\Session\Session($storage);
         $session->start();
-
         $request->setSession($session);
 
         return $request;
