@@ -146,14 +146,14 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsMatchingTrue()
     {
-        $stubConditionTrue1 = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticlesManager')
+        $stubConditionTrue1 = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticles')
             ->disableOriginalConstructor()
             ->getMock();
         $stubConditionTrue1->expects($this->any())
             ->method('isMatching')
             ->will($this->returnValue(true));
 
-        $stubConditionTrue2 = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticlesManager')
+        $stubConditionTrue2 = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticles')
             ->disableOriginalConstructor()
             ->getMock();
         $stubConditionTrue2->expects($this->any())
@@ -177,14 +177,14 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsMatchingFalse()
     {
-        $stubConditionTrue = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticlesManager')
+        $stubConditionTrue = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticles')
             ->disableOriginalConstructor()
             ->getMock();
         $stubConditionTrue->expects($this->any())
             ->method('isMatching')
             ->will($this->returnValue(true));
 
-        $stubConditionFalse = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticlesManager')
+        $stubConditionFalse = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticles')
             ->disableOriginalConstructor()
             ->getMock();
         $stubConditionFalse->expects($this->any())

@@ -51,7 +51,7 @@ class ConditionEvaluator
     public function isMatching(ConditionCollection $conditions)
     {
         $isMatching = true;
-        /** @var ConditionManagerInterface $condition */
+        /** @var ConditionInterface $condition */
         foreach ($conditions->getConditions() as $condition) {
             if (!$condition->isMatching()) {
                 $isMatching = false;

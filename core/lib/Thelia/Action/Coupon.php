@@ -25,7 +25,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Condition\ConditionFactory;
-use Thelia\Condition\ConditionManagerInterface;
+use Thelia\Condition\ConditionInterface;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -102,7 +102,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $couponManager = $this->container->get('thelia.coupon.manager');
 
         /** @var CouponInterface $coupon */
-        $coupon = $couponFactory->buildCouponFromCode($event->getCode());
+        $coupon = $couponFactory->buildCouponManagerFromCode($event->getCode());
 
         $isValid = $coupon->isMatching();
 
@@ -154,7 +154,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $coupon->setDispatcher($this->getDispatcher());
 
         // Set default condition if none found
-        /** @var ConditionManagerInterface $noConditionRule */
+        /** @var ConditionInterface $noConditionRule */
         $noConditionRule = $this->container->get('thelia.condition.match_for_everyone');
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->container->get('thelia.condition.factory');

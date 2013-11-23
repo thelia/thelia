@@ -84,7 +84,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue(new MatchForTotalAmountManager($stubFacade)));
+            ->will($this->returnValue(new MatchForTotalAmount($stubFacade)));
 
         $stubContainer->expects($this->any())
             ->method('has')
@@ -94,14 +94,14 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 40.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -148,7 +148,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue(new MatchForTotalAmountManager($stubFacade)));
+            ->will($this->returnValue(new MatchForTotalAmount($stubFacade)));
 
         $stubContainer->expects($this->any())
             ->method('has')
@@ -158,14 +158,14 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 40.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -210,7 +210,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue(new MatchForTotalAmountManager($stubFacade)));
+            ->will($this->returnValue(new MatchForTotalAmount($stubFacade)));
 
         $stubContainer->expects($this->any())
             ->method('has')
@@ -220,25 +220,25 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 40.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
-        $condition2 = new MatchForTotalAmountManager($stubFacade);
+        $condition2 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition2->setValidatorsFromForm($operators, $values);
 
@@ -287,7 +287,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
             ->disableOriginalConstructor()
             ->getMock();
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $stubContainer->expects($this->any())
             ->method('get')
             ->will($this->returnValue($condition1));
@@ -301,12 +301,12 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($stubContainer));
 
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 40.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -352,7 +352,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
             ->disableOriginalConstructor()
             ->getMock();
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $stubContainer->expects($this->any())
             ->method('get')
             ->will($this->returnValue($condition1));
@@ -366,12 +366,12 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($stubContainer));
 
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 40.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -421,7 +421,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue(new MatchForEveryoneManager($stubFacade)));
+            ->will($this->returnValue(new MatchForEveryone($stubFacade)));
 
         $stubContainer->expects($this->any())
             ->method('has')
@@ -437,7 +437,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $conditionFactory = new ConditionFactory($stubContainer);
 
 
-        $conditionNone = new MatchForEveryoneManager($stubFacade);
+        $conditionNone = new MatchForEveryone($stubFacade);
         $expectedCollection = new ConditionCollection();
         $expectedCollection->add($conditionNone);
 

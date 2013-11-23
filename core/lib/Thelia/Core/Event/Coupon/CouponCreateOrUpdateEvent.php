@@ -39,7 +39,7 @@ use Thelia\Model\Coupon;
  */
 class CouponCreateOrUpdateEvent extends ActionEvent
 {
-    /** @var ConditionCollection Array of ConditionManagerInterface */
+    /** @var ConditionCollection Array of ConditionInterface */
     protected $conditions = null;
 
     /** @var string Coupon code (ex: XMAS) */
@@ -280,7 +280,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Get Conditions
      *
-     * @return null|ConditionCollection Array of ConditionManagerInterface
+     * @return null|ConditionCollection Array of ConditionInterface
      */
     public function getConditions()
     {
@@ -290,7 +290,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Set Conditions
      *
-     * @param ConditionCollection $conditions Array of ConditionManagerInterface
+     * @param ConditionCollection $conditions Array of ConditionInterface
      *
      * @return $this
      */

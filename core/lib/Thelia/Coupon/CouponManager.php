@@ -24,7 +24,7 @@
 namespace Thelia\Coupon;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Condition\ConditionManagerInterface;
+use Thelia\Condition\ConditionInterface;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 
@@ -213,9 +213,9 @@ class CouponManager
     /**
      * Add an available ConstraintManager (Services)
      *
-     * @param ConditionManagerInterface $condition ConditionManagerInterface
+     * @param ConditionInterface $condition ConditionInterface
      */
-    public function addAvailableCondition(ConditionManagerInterface $condition)
+    public function addAvailableCondition(ConditionInterface $condition)
     {
         $this->availableConditions[] = $condition;
     }

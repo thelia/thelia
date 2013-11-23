@@ -37,13 +37,13 @@ use Thelia\Model\CurrencyQuery;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test MatchForTotalAmountManager Class
+ * Unit Test MatchForTotalAmount Class
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
+class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 {
     /** @var FacadeInterface $stubTheliaAdapter */
     protected $stubTheliaAdapter = null;
@@ -97,7 +97,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if validity test on BackOffice inputs are working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::setValidators
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
      * @expectedException \Thelia\Exception\InvalidConditionOperatorException
      *
      */
@@ -106,14 +106,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
         /** @var FacadeInterface $stubFacade */
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::IN,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::IN,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => '400',
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => '400',
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -126,7 +126,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if validity test on BackOffice inputs are working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::setValidators
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
      * @expectedException \Thelia\Exception\InvalidConditionOperatorException
      *
      */
@@ -135,14 +135,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
         /** @var FacadeInterface $stubFacade */
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::INFERIOR
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::INFERIOR
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => '400',
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => '400',
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -155,7 +155,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if validity test on BackOffice inputs are working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::setValidators
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
      * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
@@ -164,14 +164,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 'X',
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 'X',
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -184,7 +184,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if validity test on BackOffice inputs are working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::setValidators
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
      * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
@@ -193,14 +193,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400,
-            MatchForTotalAmountManager::INPUT2 => 'FLA');
+            MatchForTotalAmount::INPUT1 => 400,
+            MatchForTotalAmount::INPUT2 => 'FLA');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -213,7 +213,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testMatchingConditionInferior()
@@ -221,14 +221,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -241,7 +241,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testNotMatchingConditionInferior()
@@ -249,14 +249,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -269,7 +269,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testMatchingConditionInferiorEquals()
@@ -277,14 +277,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR_OR_EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::INFERIOR_OR_EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -297,7 +297,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testMatchingConditionInferiorEquals2()
@@ -305,14 +305,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR_OR_EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::INFERIOR_OR_EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -325,7 +325,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testNotMatchingConditionInferiorEquals()
@@ -333,14 +333,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(401, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR_OR_EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::INFERIOR_OR_EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -353,7 +353,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test equals operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testMatchingConditionEqual()
@@ -361,14 +361,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -381,7 +381,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test equals operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testNotMatchingConditionEqual()
@@ -389,14 +389,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -409,7 +409,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testMatchingConditionSuperiorEquals()
@@ -417,14 +417,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(401, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR_OR_EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -437,7 +437,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testMatchingConditionSuperiorEquals2()
@@ -445,14 +445,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR_OR_EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -465,7 +465,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testNotMatchingConditionSuperiorEquals()
@@ -473,14 +473,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR_OR_EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -493,7 +493,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testMatchingConditionSuperior()
@@ -501,14 +501,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(401, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -521,7 +521,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testNotMatchingConditionSuperior()
@@ -529,14 +529,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -549,7 +549,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check currency is checked
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testMatchingConditionCurrency()
@@ -557,14 +557,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -577,7 +577,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check currency is checked
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      *
      */
     public function testNotMatchingConditionCurrency()
@@ -585,14 +585,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(400.00, 'EUR');
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'USD');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'USD');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -605,7 +605,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check unknown currency
      *
-     * @covers Thelia\Condition\ConditionManagerAbstract::isCurrencyValid
+     * @covers Thelia\Condition\ConditionAbstract::isCurrencyValid
      * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
@@ -634,14 +634,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($currencies));
 
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'UNK');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'UNK');
         $condition1->setValidatorsFromForm($operators, $values);
 
 
@@ -672,7 +672,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check invalid currency
      *
-     * @covers Thelia\Condition\ConditionManagerAbstract::isPriceValid
+     * @covers Thelia\Condition\ConditionAbstract::isPriceValid
      * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
@@ -701,14 +701,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($currencies));
 
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 'notfloat',
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 'notfloat',
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
 
@@ -739,7 +739,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check invalid currency
      *
-     * @covers Thelia\Condition\ConditionManagerAbstract::isPriceValid
+     * @covers Thelia\Condition\ConditionAbstract::isPriceValid
      * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
@@ -768,14 +768,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($currencies));
 
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 0.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 0.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
 
@@ -855,7 +855,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check getName i18n
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::getName
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::getName
      *
      */
     public function testGetName()
@@ -863,7 +863,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Cart total amount');
 
         /** @var FacadeInterface $stubFacade */
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
 
         $actual = $condition1->getName();
         $expected = 'Cart total amount';
@@ -873,7 +873,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check tooltip i18n
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::getToolTip
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::getToolTip
      *
      */
     public function testGetToolTip()
@@ -881,14 +881,14 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'If cart total amount is <strong>%operator%</strong> %amount% %currency%');
 
         /** @var FacadeInterface $stubFacade */
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $actual = $condition1->getToolTip();
@@ -899,7 +899,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check validator
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmountManager::generateInputs
+     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::generateInputs
      *
      */
     public function testGetValidator()
@@ -907,21 +907,21 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Price');
 
         /** @var FacadeInterface $stubFacade */
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $actual = $condition1->getValidators();
 
         $validators = array(
             'inputs' => array(
-                MatchForTotalAmountManager::INPUT1 => array(
+                MatchForTotalAmount::INPUT1 => array(
                     'title' => 'Price',
                     'availableOperators' => array(
                         '<' => 'Price',
@@ -936,7 +936,7 @@ class MatchForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
                     'value' => '',
                     'selectedOperator' => ''
                 ),
-                MatchForTotalAmountManager::INPUT2 => array(
+                MatchForTotalAmount::INPUT2 => array(
                     'title' => 'Price',
                     'availableOperators' => array('==' => 'Price'),
                     'availableValues' => array(

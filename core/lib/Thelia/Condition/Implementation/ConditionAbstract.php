@@ -41,7 +41,7 @@ use Thelia\Type\FloatType;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-abstract class ConditionManagerAbstract implements ConditionManagerInterface
+abstract class ConditionAbstract implements ConditionInterface
 {
 
     /** @var string Service Id from Resources/config.xml  */

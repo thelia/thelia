@@ -22,7 +22,7 @@
 /**********************************************************************************/
 
 namespace Thelia\Condition;
-use Thelia\Condition\Implementation\MatchForTotalAmountManager;
+use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Model\CurrencyQuery;
 
 /**
@@ -116,14 +116,14 @@ class ConditionCollectionTest extends \PHPUnit_Framework_TestCase
     {
         $stubFacade = $this->generateFacadeStub();
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $collection = new ConditionCollection();
@@ -153,24 +153,24 @@ class ConditionCollectionTest extends \PHPUnit_Framework_TestCase
     {
         $stubFacade = $this->generateFacadeStub();
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators1 = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values1 = array(
-            MatchForTotalAmountManager::INPUT1 => 400,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 400,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators1, $values1);
 
-        $condition2 = new MatchForTotalAmountManager($stubFacade);
+        $condition2 = new MatchForTotalAmount($stubFacade);
         $operators2 = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values2 = array(
-            MatchForTotalAmountManager::INPUT1 => 600,
-            MatchForTotalAmountManager::INPUT2 => 'EUR');
+            MatchForTotalAmount::INPUT1 => 600,
+            MatchForTotalAmount::INPUT2 => 'EUR');
         $condition2->setValidatorsFromForm($operators2, $values2);
 
         $collection = new ConditionCollection();

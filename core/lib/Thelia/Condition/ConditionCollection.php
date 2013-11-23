@@ -24,14 +24,14 @@
 namespace Thelia\Condition;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Condition\ConditionManagerInterface;
+use Thelia\Condition\ConditionInterface;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Manage a set of ConditionManagerInterface
+ * Manage a set of ConditionInterface
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
@@ -39,13 +39,13 @@ use Thelia\Condition\ConditionManagerInterface;
  */
 class ConditionCollection
 {
-    /** @var array Array of ConditionManagerInterface */
+    /** @var array Array of ConditionInterface */
     protected $conditions = array();
 
     /**
      * Get Conditions
      *
-     * @return array Array of ConditionManagerInterface
+     * @return array Array of ConditionInterface
      */
     public function getConditions()
     {
@@ -53,13 +53,13 @@ class ConditionCollection
     }
 
     /**
-     * Add a ConditionManagerInterface to the Collection
+     * Add a ConditionInterface to the Collection
      *
-     * @param ConditionManagerInterface $condition Condition
+     * @param ConditionInterface $condition Condition
      *
      * @return $this
      */
-    public function add(ConditionManagerInterface $condition)
+    public function add(ConditionInterface $condition)
     {
         $this->conditions[] = $condition;
 
@@ -84,7 +84,7 @@ class ConditionCollection
     public function __toString()
     {
         $arrayToSerialize = array();
-        /** @var ConditionManagerInterface $condition */
+        /** @var ConditionInterface $condition */
         foreach ($this->getConditions() as $condition) {
             $arrayToSerialize[] = $condition->getSerializableCondition();
         }

@@ -53,7 +53,7 @@ abstract class CouponAbstract implements CouponInterface
     /** @var ConditionOrganizerInterface  */
     protected $organizer = null;
 
-    /** @var ConditionCollection Array of ConditionManagerInterface */
+    /** @var ConditionCollection Array of ConditionInterface */
     protected $conditions = null;
 
     /** @var ConditionEvaluator Condition validator */
@@ -214,7 +214,7 @@ abstract class CouponAbstract implements CouponInterface
      * Replace the existing Conditions by those given in parameter
      * If one Condition is badly implemented, no Condition will be added
      *
-     * @param ConditionCollection $conditions ConditionManagerInterface to add
+     * @param ConditionCollection $conditions ConditionInterface to add
      *
      * @return $this
      * @throws \Thelia\Exception\InvalidConditionException

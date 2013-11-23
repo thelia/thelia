@@ -24,40 +24,26 @@
 namespace Thelia\Condition\Implementation;
 
 use InvalidArgumentException;
-use Thelia\Condition\ConditionManagerAbstract;
-use Thelia\Condition\Operators;
-use Thelia\Exception\InvalidConditionOperatorException;
-use Thelia\Exception\InvalidConditionValueException;
+use Thelia\Condition\ConditionAbstract;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Check a Checkout against its Product number
+ * Allow every one, perform no check
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class MatchForXArticlesManager extends ConditionManagerAbstract
+class MatchForEveryone extends ConditionAbstract
 {
-    /** Condition 1st parameter : quantity */
-    CONST INPUT1 = 'quantity';
-
     /** @var string Service Id from Resources/config.xml  */
-    protected $serviceId = 'thelia.condition.match_for_x_articles';
+    protected $serviceId = 'thelia.condition.match_for_everyone';
 
     /** @var array Available Operators (Operators::CONST) */
-    protected $availableOperators = array(
-        self::INPUT1 => array(
-            Operators::INFERIOR,
-            Operators::INFERIOR_OR_EQUAL,
-            Operators::EQUAL,
-            Operators::SUPERIOR_OR_EQUAL,
-            Operators::SUPERIOR
-        )
-    );
+    protected $availableOperators = array();
 
     /**
      * Check validators relevancy and store them
@@ -70,10 +56,7 @@ class MatchForXArticlesManager extends ConditionManagerAbstract
      */
     public function setValidatorsFromForm(array $operators, array $values)
     {
-        $this->setValidators(
-            $operators[self::INPUT1],
-            $values[self::INPUT1]
-        );
+        $this->setValidators();
 
         return $this;
     }
@@ -81,37 +64,13 @@ class MatchForXArticlesManager extends ConditionManagerAbstract
     /**
      * Check validators relevancy and store them
      *
-     * @param string $quantityOperator Quantity Operator ex <
-     * @param int    $quantityValue    Quantity set to meet condition
-     *
-     * @throws \Thelia\Exception\InvalidConditionValueException
-     * @throws \Thelia\Exception\InvalidConditionOperatorException
+     * @throws \InvalidArgumentException
      * @return $this
      */
-    protected function setValidators($quantityOperator, $quantityValue)
+    protected function setValidators()
     {
-        $isOperator1Legit = $this->isOperatorLegit(
-            $quantityOperator,
-            $this->availableOperators[self::INPUT1]
-        );
-        if (!$isOperator1Legit) {
-            throw new InvalidConditionOperatorException(
-                get_class(), 'quantity'
-            );
-        }
-
-        if ((int) $quantityValue <= 0) {
-            throw new InvalidConditionValueException(
-                get_class(), 'quantity'
-            );
-        }
-
-        $this->operators = array(
-            self::INPUT1 => $quantityOperator,
-        );
-        $this->values = array(
-            self::INPUT1 => $quantityValue,
-        );
+        $this->operators = array();
+        $this->values = array();
 
         return $this;
     }
@@ -123,17 +82,7 @@ class MatchForXArticlesManager extends ConditionManagerAbstract
      */
     public function isMatching()
     {
-        $condition1 = $this->conditionValidator->variableOpComparison(
-            $this->facade->getNbArticlesInCart(),
-            $this->operators[self::INPUT1],
-            $this->values[self::INPUT1]
-        );
-
-        if ($condition1) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**
@@ -144,7 +93,7 @@ class MatchForXArticlesManager extends ConditionManagerAbstract
     public function getName()
     {
         return $this->translator->trans(
-            'Number of articles in cart',
+            'Everybody can use it (no condition)',
             array(),
             'condition'
         );
@@ -157,16 +106,9 @@ class MatchForXArticlesManager extends ConditionManagerAbstract
      */
     public function getToolTip()
     {
-        $i18nOperator = Operators::getI18n(
-            $this->translator, $this->operators[self::INPUT1]
-        );
-
         $toolTip = $this->translator->trans(
-            'If cart products quantity is <strong>%operator%</strong> %quantity%',
-            array(
-                '%operator%' => $i18nOperator,
-                '%quantity%' => $this->values[self::INPUT1]
-            ),
+            'Will return always true',
+            array(),
             'condition'
         );
 
@@ -180,21 +122,7 @@ class MatchForXArticlesManager extends ConditionManagerAbstract
      */
     protected function generateInputs()
     {
-        $name1 = $this->translator->trans(
-            'Quantity',
-            array(),
-            'condition'
-        );
-
-        return array(
-            self::INPUT1 => array(
-                'title' => $name1,
-                'availableOperators' => $this->availableOperators[self::INPUT1],
-                'type' => 'text',
-                'class' => 'form-control',
-                'value' => '',
-                'selectedOperator' => ''
-            )
-        );
+        return array();
     }
+
 }

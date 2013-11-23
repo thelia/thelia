@@ -71,7 +71,7 @@ class CouponFactory
      * @throws \Symfony\Component\Translation\Exception\NotFoundResourceException
      * @return CouponInterface ready to be processed
      */
-    public function buildCouponFromCode($couponCode)
+    public function buildCouponManagerFromCode($couponCode)
     {
         /** @var Coupon $couponModel */
         $couponModel = $this->facade->findOneCouponByCode($couponCode);
@@ -86,7 +86,7 @@ class CouponFactory
         }
 
         /** @var CouponInterface $couponInterface */
-        $couponInterface = $this->buildCouponInterfaceFromModel($couponModel);
+        $couponInterface = $this->buildCouponManagerFromModel($couponModel);
         if ($couponInterface->getConditions()->isEmpty()) {
             throw new InvalidConditionException(
                 get_class($couponInterface)
@@ -103,7 +103,7 @@ class CouponFactory
      *
      * @return CouponInterface ready to use CouponInterface object instance
      */
-    protected function buildCouponInterfaceFromModel(Coupon $model)
+    protected function buildCouponManagerFromModel(Coupon $model)
     {
         $isCumulative = ($model->getIsCumulative() == 1 ? true : false);
         $isRemovingPostage = ($model->getIsRemovingPostage() == 1 ? true : false);

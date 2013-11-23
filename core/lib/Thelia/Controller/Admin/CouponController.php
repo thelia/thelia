@@ -26,7 +26,7 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 use Thelia\Condition\ConditionFactory;
-use Thelia\Condition\ConditionManagerInterface;
+use Thelia\Condition\ConditionInterface;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -227,7 +227,7 @@ class CouponController extends BaseAdminController
 
             $args['conditionsObject'] = array();
 
-            /** @var ConditionManagerInterface $condition */
+            /** @var ConditionInterface $condition */
             foreach ($conditions->getConditions() as $condition) {
                 $args['conditionsObject'][] = array(
                     'serviceId' => $condition->getServiceId(),
@@ -519,7 +519,7 @@ class CouponController extends BaseAdminController
         $couponManager = $this->container->get('thelia.coupon.manager');
         $availableConditions = $couponManager->getAvailableConditions();
         $cleanedConditions = array();
-        /** @var ConditionManagerInterface $availableCondition */
+        /** @var ConditionInterface $availableCondition */
         foreach ($availableConditions as $availableCondition) {
             $condition = array();
             $condition['serviceId'] = $availableCondition->getServiceId();
@@ -564,7 +564,7 @@ class CouponController extends BaseAdminController
     protected function cleanConditionForTemplate(ConditionCollection $conditions)
     {
         $cleanedConditions = array();
-        /** @var $condition ConditionManagerInterface */
+        /** @var $condition ConditionInterface */
         foreach ($conditions->getConditions() as $condition) {
             $cleanedConditions[] = $condition->getToolTip();
         }

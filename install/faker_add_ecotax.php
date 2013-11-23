@@ -1,9 +1,9 @@
 <?php
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionFactory;
-use Thelia\Condition\Implementation\MatchForEveryoneManager;
-use Thelia\Condition\Implementation\MatchForTotalAmountManager;
-use Thelia\Condition\Implementation\MatchForXArticlesManager;
+use Thelia\Condition\Implementation\MatchForEveryone;
+use Thelia\Condition\Implementation\MatchForTotalAmount;
+use Thelia\Condition\Implementation\MatchForXArticles;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\AdapterInterface;
 use Thelia\Coupon\ConditionCollection;

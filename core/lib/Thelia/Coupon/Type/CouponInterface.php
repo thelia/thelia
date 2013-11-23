@@ -140,7 +140,7 @@ interface CouponInterface
     /**
      * Return condition to validate the Coupon or not
      *
-     * @return ConditionCollection A set of ConditionManagerInterface
+     * @return ConditionCollection A set of ConditionInterface
      */
     public function getConditions();
 
@@ -148,7 +148,7 @@ interface CouponInterface
      * Replace the existing Conditions by those given in parameter
      * If one Condition is badly implemented, no Condition will be added
      *
-     * @param ConditionCollection $conditions ConditionManagerInterface to add
+     * @param ConditionCollection $conditions ConditionInterface to add
      *
      * @return $this
      * @throws \Thelia\Exception\InvalidConditionException

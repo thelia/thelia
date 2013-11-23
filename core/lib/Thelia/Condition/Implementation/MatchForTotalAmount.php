@@ -24,7 +24,7 @@
 namespace Thelia\Condition\Implementation;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
-use Thelia\Condition\ConditionManagerAbstract;
+use Thelia\Condition\ConditionAbstract;
 use Thelia\Condition\Operators;
 use Thelia\Exception\InvalidConditionOperatorException;
 use Thelia\Model\Currency;
@@ -42,7 +42,7 @@ use Thelia\Model\CurrencyQuery;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class MatchForTotalAmountManager extends ConditionManagerAbstract
+class MatchForTotalAmount extends ConditionAbstract
 {
     /** Condition 1st parameter : price */
     CONST INPUT1 = 'price';

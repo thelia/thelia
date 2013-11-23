@@ -37,7 +37,7 @@ use Thelia\Coupon\FacadeInterface;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-interface ConditionManagerInterface
+interface ConditionInterface
 {
     /**
      * Constructor

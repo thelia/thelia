@@ -25,9 +25,9 @@ namespace Thelia\Coupon;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
-use Thelia\Condition\Implementation\MatchForTotalAmountManager;
+use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Operators;
-use Thelia\Coupon\Type\RemoveXAmountManager;
+use Thelia\Coupon\Type\RemoveXAmount;
 use Thelia\Model\Coupon;
 use Thelia\Model\CurrencyQuery;
 
@@ -131,25 +131,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $date = new \DateTime();
         $coupon1->setExpirationDate($date->setTimestamp(strtotime("today + 3 months")));
 
-        $condition1 = new MatchForTotalAmountManager($facade);
+        $condition1 = new MatchForTotalAmount($facade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 40.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
-        $condition2 = new MatchForTotalAmountManager($facade);
+        $condition2 = new MatchForTotalAmount($facade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition2->setValidatorsFromForm($operators, $values);
 
@@ -178,36 +178,67 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     }
 
     /**
-     * @covers Thelia\Coupon\CouponFactory::buildCouponFromCode
+     * @covers Thelia\Coupon\CouponFactory::buildCouponManagerFromCode
      */
     public function testBuildCouponFromCode()
     {
         $stubFacade = $this->generateFacadeStub();
 
-        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
 
         $conditionFactory = new ConditionFactory($stubContainer);
-        $expected = $this->generateCouponModel($stubFacade, $conditionFactory);
+        $couponModel = $this->generateCouponModel($stubFacade, $conditionFactory);
         $stubFacade->expects($this->any())
             ->method('findOneCouponByCode')
-            ->will($this->returnValue($expected));
-        $stubContainer->expects($this->at(0))
-            ->method('get')
-            ->will($this->returnValue($stubFacade));
+            ->will($this->returnValue($couponModel));
 
-        $couponManager = new RemoveXAmountManager();
-        $stubContainer->expects($this->at(1))
+        $couponManager = new RemoveXAmount($stubFacade);
+
+
+        $condition1 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $condition2 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
+        );
+        $condition2->setValidatorsFromForm($operators, $values);
+
+        $conditions = new ConditionCollection();
+        $conditions->add($condition1);
+        $conditions->add($condition2);
+        $stubConditionFactory = $this->getMockBuilder('\Thelia\Condition\ConditionFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubConditionFactory->expects($this->any())
+            ->method('unserializeConditionCollection')
+            ->will($this->returnValue($conditions));
+
+
+        $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue($couponManager));
+            ->will($this->onConsecutiveCalls($stubFacade, $couponManager, $stubConditionFactory));
+
         $stubContainer->expects($this->any())
             ->method('has')
             ->will($this->returnValue(true));
 
-
         $factory = new CouponFactory($stubContainer);
-        $actual = $factory->buildCouponFromCode('XMAS');
+        $expected = $couponManager;
+        $actual = $factory->buildCouponManagerFromCode('XMAS');
 
         $this->assertEquals($expected, $actual);
     }
