@@ -48,7 +48,7 @@ class CouponFactory
     protected $container = null;
 
     /** @var  FacadeInterface Provide necessary value from Thelia*/
-    protected $adapter;
+    protected $facade;
 
     /**
      * Constructor
@@ -58,7 +58,7 @@ class CouponFactory
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->adapter = $container->get('thelia.facade');
+        $this->facade = $container->get('thelia.facade');
     }
 
     /**
@@ -74,7 +74,7 @@ class CouponFactory
     public function buildCouponFromCode($couponCode)
     {
         /** @var Coupon $couponModel */
-        $couponModel = $this->adapter->findOneCouponByCode($couponCode);
+        $couponModel = $this->facade->findOneCouponByCode($couponCode);
         if ($couponModel === null) {
             throw new NotFoundResourceException(
                 'Coupon ' . $couponCode . ' not found in Database'
@@ -115,7 +115,7 @@ class CouponFactory
         /** @var CouponInterface $couponManager*/
         $couponManager = $this->container->get($model->getType());
         $couponManager->set(
-            $this->adapter,
+            $this->facade,
             $model->getCode(),
             $model->getTitle(),
             $model->getShortDescription(),

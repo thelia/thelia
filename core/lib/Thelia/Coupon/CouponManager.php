@@ -42,7 +42,7 @@ use Thelia\Model\Coupon;
 class CouponManager
 {
     /** @var FacadeInterface Provides necessary value from Thelia */
-    protected $adapter = null;
+    protected $facade = null;
 
     /** @var ContainerInterface Service Container */
     protected $container = null;
@@ -64,8 +64,8 @@ class CouponManager
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->adapter = $container->get('thelia.facade');
-        $this->coupons = $this->adapter->getCurrentCoupons();
+        $this->facade = $container->get('thelia.facade');
+        $this->coupons = $this->facade->getCurrentCoupons();
     }
 
 
@@ -87,12 +87,12 @@ class CouponManager
             $discount = $this->getEffect($couponsKept);
 
             if ($isRemovingPostage) {
-                $postage = $this->adapter->getCheckoutPostagePrice();
+                $postage = $this->facade->getCheckoutPostagePrice();
                 $discount += $postage;
             }
 
             // Just In Case test
-            $checkoutTotalPrice = $this->adapter->getCartTotalPrice();
+            $checkoutTotalPrice = $this->facade->getCartTotalPrice();
             if ($discount >= $checkoutTotalPrice) {
                 $discount = $checkoutTotalPrice;
             }
@@ -164,7 +164,7 @@ class CouponManager
 
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
-            if ($coupon->isMatching($this->adapter)) {
+            if ($coupon->isMatching($this->facade)) {
                 $couponsKept[] = $coupon;
             }
         }
@@ -184,7 +184,7 @@ class CouponManager
         $discount = 0.00;
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
-            $discount += $coupon->exec($this->adapter);
+            $discount += $coupon->exec($this->facade);
         }
 
         return $discount;

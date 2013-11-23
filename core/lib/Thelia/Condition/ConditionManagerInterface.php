@@ -47,7 +47,7 @@ interface ConditionManagerInterface
     function __construct(FacadeInterface $adapter);
 
     /**
-     * Get Rule Service id
+     * Get Condition Service id
      *
      * @return string
      */

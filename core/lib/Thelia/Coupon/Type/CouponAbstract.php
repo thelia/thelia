@@ -45,7 +45,7 @@ use Thelia\Exception\InvalidConditionException;
 abstract class CouponAbstract implements CouponInterface
 {
     /** @var  FacadeInterface Provide necessary value from Thelia */
-    protected $adapter = null;
+    protected $facade = null;
 
     /** @var Translator Service Translator */
     protected $translator = null;
@@ -104,13 +104,13 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Constructor
      *
-     * @param FacadeInterface $adapter Service adapter
+     * @param FacadeInterface $facade Service facade
      */
-    public function __construct(FacadeInterface $adapter)
+    public function __construct(FacadeInterface $facade)
     {
-        $this->adapter = $adapter;
-        $this->translator = $adapter->getTranslator();
-        $this->conditionEvaluator = $adapter->getConditionEvaluator();
+        $this->facade = $facade;
+        $this->translator = $facade->getTranslator();
+        $this->conditionEvaluator = $facade->getConditionEvaluator();
     }
 
     /**

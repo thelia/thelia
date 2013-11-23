@@ -27,6 +27,7 @@ use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\MatchForTotalAmountManager;
 use Thelia\Condition\Operators;
+use Thelia\Coupon\Type\RemoveXAmountManager;
 use Thelia\Model\Coupon;
 use Thelia\Model\CurrencyQuery;
 
@@ -192,9 +193,14 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $stubFacade->expects($this->any())
             ->method('findOneCouponByCode')
             ->will($this->returnValue($expected));
-        $stubContainer->expects($this->any())
+        $stubContainer->expects($this->at(0))
             ->method('get')
             ->will($this->returnValue($stubFacade));
+
+        $couponManager = new RemoveXAmountManager();
+        $stubContainer->expects($this->at(1))
+            ->method('get')
+            ->will($this->returnValue($couponManager));
         $stubContainer->expects($this->any())
             ->method('has')
             ->will($this->returnValue(true));
