@@ -84,7 +84,7 @@ class CouponFactory
 
         /** @var CouponInterface $couponInterface */
         $couponInterface = $this->buildCouponManagerFromModel($couponModel);
-        if ($couponInterface->getConditions()->isEmpty()) {
+        if ($couponInterface && $couponInterface->getConditions()->isEmpty()) {
             throw new InvalidConditionException(
                 get_class($couponInterface)
             );
