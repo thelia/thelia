@@ -103,7 +103,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $couponManager = $this->container->get('thelia.coupon.manager');
 
         /** @var CouponInterface $coupon */
-        $coupon = $couponFactory->buildCouponManagerFromCode($event->getCode());
+        $coupon = $couponFactory->buildCouponFromCode($event->getCode());
 
         if ($coupon) {
             $isValid = $coupon->isMatching();

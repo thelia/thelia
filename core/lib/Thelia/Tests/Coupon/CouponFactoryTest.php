@@ -174,7 +174,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     }
 
     /**
-     * @covers Thelia\Coupon\CouponFactory::buildCouponManagerFromCode
+     * @covers Thelia\Coupon\CouponFactory::buildCouponFromCode
      */
     public function testBuildCouponFromCode()
     {
@@ -234,13 +234,13 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $factory = new CouponFactory($stubContainer);
         $expected = $couponManager;
-        $actual = $factory->buildCouponManagerFromCode('XMAS');
+        $actual = $factory->buildCouponFromCode('XMAS');
 
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * @covers Thelia\Coupon\CouponFactory::buildCouponManagerFromCode
+     * @covers Thelia\Coupon\CouponFactory::buildCouponFromCode
      */
     public function testBuildCouponFromCodeUnknownCode()
     {
@@ -266,7 +266,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->will($this->returnValue(true));
 
         $factory = new CouponFactory($stubContainer);
-        $actual = $factory->buildCouponManagerFromCode('XMAS');
+        $actual = $factory->buildCouponFromCode('XMAS');
         $expected = false;
 
         $this->assertEquals($expected, $actual);
@@ -274,7 +274,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     }
 
     /**
-     * @covers Thelia\Coupon\CouponFactory::buildCouponManagerFromCode
+     * @covers Thelia\Coupon\CouponFactory::buildCouponFromCode
      * @expectedException \Thelia\Exception\CouponExpiredException
      */
     public function testBuildCouponFromCodeExpiredCoupon()
@@ -336,12 +336,12 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->will($this->returnValue(true));
 
         $factory = new CouponFactory($stubContainer);
-        $actual = $factory->buildCouponManagerFromCode('XMAS');
+        $actual = $factory->buildCouponFromCode('XMAS');
 
     }
 
     /**
-     * @covers Thelia\Coupon\CouponFactory::buildCouponManagerFromCode
+     * @covers Thelia\Coupon\CouponFactory::buildCouponFromCode
      * @expectedException \Thelia\Exception\InvalidConditionException
      */
     public function testBuildCouponFromCodeNoConditionCoupon()
@@ -400,7 +400,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $factory = new CouponFactory($stubContainer);
         $expected = $couponManager;
-        $actual = $factory->buildCouponManagerFromCode('XMAS');
+        $actual = $factory->buildCouponFromCode('XMAS');
 
     }
 }

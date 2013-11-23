@@ -70,7 +70,7 @@ class CouponFactory
      * @throws \Thelia\Exception\InvalidConditionException
      * @return CouponInterface ready to be processed
      */
-    public function buildCouponManagerFromCode($couponCode)
+    public function buildCouponFromCode($couponCode)
     {
         /** @var Coupon $couponModel */
         $couponModel = $this->facade->findOneCouponByCode($couponCode);
@@ -83,7 +83,7 @@ class CouponFactory
         }
 
         /** @var CouponInterface $couponInterface */
-        $couponInterface = $this->buildCouponManagerFromModel($couponModel);
+        $couponInterface = $this->buildCouponFromModel($couponModel);
         if ($couponInterface && $couponInterface->getConditions()->isEmpty()) {
             throw new InvalidConditionException(
                 get_class($couponInterface)
@@ -100,7 +100,7 @@ class CouponFactory
      *
      * @return CouponInterface ready to use CouponInterface object instance
      */
-    protected function buildCouponManagerFromModel(Coupon $model)
+    protected function buildCouponFromModel(Coupon $model)
     {
         $isCumulative = ($model->getIsCumulative() == 1 ? true : false);
         $isRemovingPostage = ($model->getIsRemovingPostage() == 1 ? true : false);
