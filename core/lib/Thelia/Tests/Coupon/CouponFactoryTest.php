@@ -45,10 +45,6 @@ use Thelia\Model\CurrencyQuery;
  */
 class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var CouponFactory
-     */
-    protected $object;
 
     /**
      * Sets up the fixture, for example, opens a network connection.

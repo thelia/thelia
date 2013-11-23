@@ -37,10 +37,6 @@ namespace Thelia\Coupon\Type;
  */
 class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var RemoveXAmount
-     */
-    protected $object;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -48,7 +44,6 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-//        $this->object = new RemoveXAmount;
     }
 
     /**

@@ -37,10 +37,6 @@ namespace Thelia\Coupon;
  */
 class CouponManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var CouponManager
-     */
-    protected $object;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -48,7 +44,6 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new CouponManager;
     }
 
     /**

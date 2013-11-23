@@ -37,10 +37,6 @@ namespace Thelia\Coupon;
  */
 class BaseFacadeTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var BaseFacade
-     */
-    protected $object;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -48,7 +44,6 @@ class BaseFacadeTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new BaseFacade;
     }
 
     /**

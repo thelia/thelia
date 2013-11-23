@@ -37,10 +37,6 @@ namespace Thelia\Coupon\Type;
  */
 class CouponAbstractTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var CouponAbstract
-     */
-    protected $object;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -48,7 +44,6 @@ class CouponAbstractTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-//        $this->object = new CouponAbstract();
     }
 
     /**
