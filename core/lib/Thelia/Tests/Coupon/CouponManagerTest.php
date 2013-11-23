@@ -22,6 +22,14 @@
 /**********************************************************************************/
 
 namespace Thelia\Coupon;
+use Thelia\Condition\ConditionCollection;
+use Thelia\Condition\ConditionEvaluator;
+use Thelia\Condition\ConditionFactory;
+use Thelia\Condition\Implementation\MatchForTotalAmount;
+use Thelia\Condition\Operators;
+use Thelia\Coupon\Type\RemoveXAmount;
+use Thelia\Model\Coupon;
+use Thelia\Model\CurrencyQuery;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -54,6 +62,71 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
     {
     }
 
+
+    /**
+     * Generate a valid Coupon model
+     */
+    public function generateCouponModel($facade, ConditionFactory $conditionFactory)
+    {
+        // Coupons
+        $coupon1 = new Coupon();
+        $coupon1->setCode('XMAS');
+        $coupon1->setType('thelia.coupon.type.remove_x_amount');
+        $coupon1->setTitle('Christmas coupon');
+        $coupon1->setShortDescription('Coupon for Christmas removing 10€ if your total checkout is more than 40€');
+        $coupon1->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras at luctus tellus. Integer turpis mauris, aliquet vitae risus tristique, pellentesque vestibulum urna. Vestibulum sodales laoreet lectus dictum suscipit. Praesent vulputate, sem id varius condimentum, quam magna tempor elit, quis venenatis ligula nulla eget libero. Cras egestas euismod tellus, id pharetra leo suscipit quis. Donec lacinia ac lacus et ultricies. Nunc in porttitor neque. Proin at quam congue, consectetur orci sed, congue nulla. Nulla eleifend nunc ligula, nec pharetra elit tempus quis. Vivamus vel mauris sed est dictum blandit. Maecenas blandit dapibus velit ut sollicitudin. In in euismod mauris, consequat viverra magna. Cras velit velit, sollicitudin commodo tortor gravida, tempus varius nulla.
+
+Donec rhoncus leo mauris, id porttitor ante luctus tempus. Curabitur quis augue feugiat, ullamcorper mauris ac, interdum mi. Quisque aliquam lorem vitae felis lobortis, id interdum turpis mattis. Vestibulum diam massa, ornare congue blandit quis, facilisis at nisl. In tortor metus, venenatis non arcu nec, sollicitudin ornare nisl. Nunc erat risus, varius nec urna at, iaculis lacinia elit. Aenean ut felis tempus, tincidunt odio non, sagittis nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec vitae hendrerit elit. Nunc sit amet gravida risus, euismod lobortis massa. Nam a erat mauris. Nam a malesuada lorem. Nulla id accumsan dolor, sed rhoncus tellus. Quisque dictum felis sed leo auctor, at volutpat lectus viverra. Morbi rutrum, est ac aliquam imperdiet, nibh sem sagittis justo, ac mattis magna lacus eu nulla.
+
+Duis interdum lectus nulla, nec pellentesque sapien condimentum at. Suspendisse potenti. Sed eu purus tellus. Nunc quis rhoncus metus. Fusce vitae tellus enim. Interdum et malesuada fames ac ante ipsum primis in faucibus. Etiam tempor porttitor erat vitae iaculis. Sed est elit, consequat non ornare vitae, vehicula eget lectus. Etiam consequat sapien mauris, eget consectetur magna imperdiet eget. Nunc sollicitudin luctus velit, in commodo nulla adipiscing fermentum. Fusce nisi sapien, posuere vitae metus sit amet, facilisis sollicitudin dui. Fusce ultricies auctor enim sit amet iaculis. Morbi at vestibulum enim, eget adipiscing eros.
+
+Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentesque elit erat, lacinia sed semper ac, sagittis vel elit. Nam eu convallis est. Curabitur rhoncus odio vitae consectetur pellentesque. Nam vitae arcu nec ante scelerisque dignissim vel nec neque. Suspendisse augue nulla, mollis eget dui et, tempor facilisis erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ac diam ipsum. Donec convallis dui ultricies velit auctor, non lobortis nulla ultrices. Morbi vitae dignissim ante, sit amet lobortis tortor. Nunc dapibus condimentum augue, in molestie neque congue non.
+
+Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
+        $coupon1->setAmount(10.00);
+        $coupon1->setIsUsed(true);
+        $coupon1->setIsEnabled(true);
+        $date = new \DateTime();
+        $coupon1->setExpirationDate($date->setTimestamp(strtotime("today + 3 months")));
+
+        $condition1 = new MatchForTotalAmount($facade);
+        $operators = array(
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $condition2 = new MatchForTotalAmount($facade);
+        $operators = array(
+            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
+        );
+        $condition2->setValidatorsFromForm($operators, $values);
+
+        $conditions = new ConditionCollection();
+        $conditions->add($condition1);
+        $conditions->add($condition2);
+
+        $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
+        $coupon1->setSerializedConditions($serializedConditions);
+
+
+        $coupon1->setMaxUsage(40);
+        $coupon1->setIsCumulative(true);
+        $coupon1->setIsRemovingPostage(false);
+        $coupon1->setIsAvailableOnSpecialOffers(true);
+
+        return $coupon1;
+    }
+
     /**
      * @covers Thelia\Coupon\CouponManager::getDiscount
      * @todo   Implement testGetDiscount().
@@ -68,61 +141,283 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Thelia\Coupon\CouponManager::addAvailableCoupon
-     * @todo   Implement testAddAvailableCoupon().
-     */
-    public function testAddAvailableCoupon()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
-
-    /**
      * @covers Thelia\Coupon\CouponManager::getAvailableCoupons
-     * @todo   Implement testGetAvailableCoupons().
      */
     public function testGetAvailableCoupons()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $stubFacade = $this->generateFacadeStub();
+        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+
+        $conditionFactory = new ConditionFactory($stubContainer);
+
+
+
+        $stubFacade->expects($this->any())
+            ->method('getCurrentCoupons')
+            ->will($this->returnValue(array()));
+
+        $conditions = new ConditionCollection();
+        $stubConditionFactory = $this->getMockBuilder('\Thelia\Condition\ConditionFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubConditionFactory->expects($this->any())
+            ->method('unserializeConditionCollection')
+            ->will($this->returnValue($conditions));
+
+        $couponManager = new RemoveXAmount($stubFacade);
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->onConsecutiveCalls($stubFacade, $couponManager, $stubConditionFactory, $stubFacade));
+        $stubContainer->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
+
+        $couponFactory = new CouponFactory($stubContainer);
+        $model1 = $this->generateCouponModel($stubFacade, $conditionFactory);
+        $coupon1 = $couponFactory->buildCouponFromModel($model1);
+        $coupon2 = clone $coupon1;
+
+
+        $couponManager = new CouponManager($stubContainer);
+        $couponManager->addAvailableCoupon($coupon1);
+        $couponManager->addAvailableCoupon($coupon2);
+        $actual = $couponManager->getAvailableCoupons();
+        $expected = array($coupon1, $coupon2);
+
+        $this->assertEquals($expected, $actual);
     }
 
     /**
      * @covers Thelia\Coupon\CouponManager::addAvailableCondition
-     * @todo   Implement testAddAvailableCondition().
-     */
-    public function testAddAvailableCondition()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
-
-    /**
      * @covers Thelia\Coupon\CouponManager::getAvailableConditions
-     * @todo   Implement testGetAvailableConditions().
      */
     public function testGetAvailableConditions()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
+        $stubFacade = $this->generateFacadeStub();
+        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+
+        $condition1 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
+        $values = array(
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $condition2 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
+        );
+        $condition2->setValidatorsFromForm($operators, $values);
+
+        $conditions = new ConditionCollection();
+        $conditions->add($condition1);
+        $conditions->add($condition2);
+
+        $stubFacade->expects($this->any())
+            ->method('getCurrentCoupons')
+            ->will($this->returnValue(array()));
+
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->onConsecutiveCalls($stubFacade));
+
+
+        $couponManager = new CouponManager($stubContainer);
+        $couponManager->addAvailableCondition($condition1);
+        $couponManager->addAvailableCondition($condition2);
+        $actual = $couponManager->getAvailableConditions();
+        $expected = array($condition1, $condition2);
+
+        $this->assertEquals($expected, $actual);
     }
 
     /**
      * @covers Thelia\Coupon\CouponManager::decrementQuantity
-     * @todo   Implement testDecrementeQuantity().
      */
     public function testDecrementeQuantity()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
+        $stubFacade = $this->generateFacadeStub();
+        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+
+        $coupon = new RemoveXAmount($stubFacade);
+        $date = new \DateTime();
+        $coupon->set($stubFacade, 'XMAS', '', '', '', 21.00, true, true, true, true, 254, $date->setTimestamp(strtotime("today + 3 months")) );
+
+        $condition1 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
+        $values = array(
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $condition2 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
+        );
+        $condition2->setValidatorsFromForm($operators, $values);
+
+        $conditions = new ConditionCollection();
+        $conditions->add($condition1);
+        $conditions->add($condition2);
+        $coupon->setConditions($conditions);
+
+        $stubFacade->expects($this->any())
+            ->method('getCurrentCoupons')
+            ->will($this->returnValue(array($coupon)));
+
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->onConsecutiveCalls($stubFacade));
+
+
+        $couponManager = new CouponManager($stubContainer);
+
+
+        $stubModel = $this->getMockBuilder('\Thelia\Model\Coupon')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubModel->expects($this->any())
+            ->method('getMaxUsage')
+            ->will($this->returnValue(21));
+        $stubModel->expects($this->any())
+            ->method('setMaxUsage')
+            ->will($this->returnValue(true));
+
+        $actual = $couponManager->decrementQuantity($stubModel);
+        $expected = 20;
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @covers Thelia\Coupon\CouponManager::decrementQuantity
+     */
+    public function testDecrementeQuantityIllimited()
+    {
+        $stubFacade = $this->generateFacadeStub();
+        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+
+        $coupon = new RemoveXAmount($stubFacade);
+        $date = new \DateTime();
+        $coupon->set($stubFacade, 'XMAS', '', '', '', 21.00, true, true, true, true, 254, $date->setTimestamp(strtotime("today + 3 months")) );
+
+        $condition1 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $condition2 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
+        );
+        $condition2->setValidatorsFromForm($operators, $values);
+
+        $conditions = new ConditionCollection();
+        $conditions->add($condition1);
+        $conditions->add($condition2);
+        $coupon->setConditions($conditions);
+
+        $stubFacade->expects($this->any())
+            ->method('getCurrentCoupons')
+            ->will($this->returnValue(array($coupon)));
+
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->onConsecutiveCalls($stubFacade));
+
+
+        $couponManager = new CouponManager($stubContainer);
+
+
+        $stubModel = $this->getMockBuilder('\Thelia\Model\Coupon')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubModel->expects($this->any())
+            ->method('getMaxUsage')
+            ->will($this->returnValue(-1));
+        $stubModel->expects($this->any())
+            ->method('setMaxUsage')
+            ->will($this->returnValue(true));
+
+        $actual = $couponManager->decrementQuantity($stubModel);
+        $expected = -1;
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Generate adapter stub
+     *
+     * @param int    $cartTotalPrice   Cart total price
+     * @param string $checkoutCurrency Checkout currency
+     * @param string $i18nOutput       Output from each translation
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    public function generateFacadeStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR', $i18nOutput = '')
+    {
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $currencies = CurrencyQuery::create();
+        $currencies = $currencies->find();
+        $stubFacade->expects($this->any())
+            ->method('getAvailableCurrencies')
+            ->will($this->returnValue($currencies));
+
+        $stubFacade->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue($cartTotalPrice));
+
+        $stubFacade->expects($this->any())
+            ->method('getCheckoutCurrency')
+            ->will($this->returnValue($checkoutCurrency));
+
+        $stubFacade->expects($this->any())
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
+
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubTranslator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnValue($i18nOutput));
+
+        $stubFacade->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+
+        return $stubFacade;
     }
 }

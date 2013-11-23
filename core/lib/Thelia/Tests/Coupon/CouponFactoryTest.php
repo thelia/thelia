@@ -269,7 +269,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $actual = $factory->buildCouponFromCode('XMAS');
         $expected = false;
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual, 'CouponFactory->buildCouponFromCode should return false if the given code is unknown');
 
     }
 
@@ -399,7 +399,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->will($this->returnValue(true));
 
         $factory = new CouponFactory($stubContainer);
-        $expected = $couponManager;
         $actual = $factory->buildCouponFromCode('XMAS');
 
     }
