@@ -100,7 +100,7 @@ class CouponFactory
      *
      * @return CouponInterface ready to use CouponInterface object instance
      */
-    protected function buildCouponFromModel(Coupon $model)
+    public function buildCouponFromModel(Coupon $model)
     {
         $isCumulative = ($model->getIsCumulative() == 1 ? true : false);
         $isRemovingPostage = ($model->getIsRemovingPostage() == 1 ? true : false);
