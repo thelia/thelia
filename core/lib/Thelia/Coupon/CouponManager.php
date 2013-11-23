@@ -239,7 +239,7 @@ class CouponManager
      *
      * @return bool
      */
-    public function decrementeQuantity(Coupon $coupon)
+    public function decrementQuantity(Coupon $coupon)
     {
         $ret = true;
         try {

@@ -115,7 +115,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Thelia\Coupon\CouponManager::decrementeQuantity
+     * @covers Thelia\Coupon\CouponManager::decrementQuantity
      * @todo   Implement testDecrementeQuantity().
      */
     public function testDecrementeQuantity()
