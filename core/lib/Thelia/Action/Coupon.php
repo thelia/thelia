@@ -94,6 +94,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     public function consume(CouponConsumeEvent $event)
     {
         $totalDiscount = 0;
+        $isValid = false;
 
         /** @var CouponFactory $couponFactory */
         $couponFactory = $this->container->get('thelia.coupon.factory');
@@ -104,39 +105,39 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         /** @var CouponInterface $coupon */
         $coupon = $couponFactory->buildCouponManagerFromCode($event->getCode());
 
-        $isValid = $coupon->isMatching();
+        if ($coupon) {
+            $isValid = $coupon->isMatching();
+            if ($isValid) {
+                /** @var Request $request */
+                $request = $this->container->get('request');
+                $consumedCoupons = $request->getSession()->getConsumedCoupons();
 
-        if ($isValid) {
-            /** @var Request $request */
-            $request = $this->container->get('request');
-            $consumedCoupons = $request->getSession()->getConsumedCoupons();
+                if (!isset($consumedCoupons) || !$consumedCoupons) {
+                    $consumedCoupons = array();
+                }
 
-            if (!isset($consumedCoupons) || !$consumedCoupons) {
-                $consumedCoupons = array();
+                // Prevent accumulation of the same Coupon on a Checkout
+                $consumedCoupons[$event->getCode()] = $event->getCode();
+
+                $request->getSession()->setConsumedCoupons($consumedCoupons);
+
+                $totalDiscount = $couponManager->getDiscount();
+                // @todo insert false product in cart with the name of the coupon and the discount as negative price
+
+                // Decrement coupon quantity
+                // @todo move this part in after order event
+                $couponQuery = CouponQuery::create();
+                $couponModel = $couponQuery->findOneByCode($coupon->getCode());
+                $couponManager->decrementeQuantity($couponModel);
+
+                $request
+                    ->getSession()
+                    ->getCart()
+                    ->setDiscount($totalDiscount)
+                    ->save();
             }
-
-            // Prevent accumulation of the same Coupon on a Checkout
-            $consumedCoupons[$event->getCode()] = $event->getCode();
-
-            $request->getSession()->setConsumedCoupons($consumedCoupons);
-
-            $totalDiscount = $couponManager->getDiscount();
-            // @todo insert false product in cart with the name of the coupon and the discount as negative price
-
-            // Decrement coupon quantity
-            // @todo move this part in after order event
-            $couponQuery = CouponQuery::create();
-            $couponModel = $couponQuery->findOneByCode($coupon->getCode());
-            $couponManager->decrementeQuantity($couponModel);
-
-            $request
-                ->getSession()
-                ->getCart()
-                ->setDiscount($totalDiscount)
-                ->save()
-            ;
-
         }
+
 
         $event->setIsValid($isValid);
         $event->setDiscount($totalDiscount);

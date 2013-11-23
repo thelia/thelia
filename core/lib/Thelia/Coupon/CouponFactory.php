@@ -68,7 +68,6 @@ class CouponFactory
      *
      * @throws \Thelia\Exception\CouponExpiredException
      * @throws \Thelia\Exception\InvalidConditionException
-     * @throws \Symfony\Component\Translation\Exception\NotFoundResourceException
      * @return CouponInterface ready to be processed
      */
     public function buildCouponManagerFromCode($couponCode)
@@ -76,9 +75,7 @@ class CouponFactory
         /** @var Coupon $couponModel */
         $couponModel = $this->facade->findOneCouponByCode($couponCode);
         if ($couponModel === null) {
-            throw new NotFoundResourceException(
-                'Coupon ' . $couponCode . ' not found in Database'
-            );
+           return false;
         }
 
         if ($couponModel->getExpirationDate() < new \DateTime()) {
