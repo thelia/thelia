@@ -237,20 +237,21 @@ class CouponManager
      *
      * @param \Thelia\Model\Coupon $coupon Coupon consumed
      *
-     * @return bool
+     * @return int Usage left after decremental
      */
     public function decrementQuantity(Coupon $coupon)
     {
-        $ret = true;
+        $ret = -1;
         try {
 
-        $oldMaxUsage = $coupon->getMaxUsage();
+        $usageLeft = $coupon->getMaxUsage();
 
-        if ($oldMaxUsage > 0) {
-            $oldMaxUsage--;
-            $coupon->setMaxUsage($oldMaxUsage);
+        if ($usageLeft > 0) {
+            $usageLeft--;
+            $coupon->setMaxUsage($usageLeft);
 
             $coupon->save();
+            $ret = $usageLeft;
         }
 
         } catch(\Exception $e) {
