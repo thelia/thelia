@@ -24,7 +24,7 @@
 namespace Thelia\Condition;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Condition\ConditionInterface;
+use Thelia\Condition\Implementation\ConditionInterface;
 
 /**
  * Created by JetBrains PhpStorm.

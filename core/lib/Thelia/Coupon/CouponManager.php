@@ -24,7 +24,7 @@
 namespace Thelia\Coupon;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Condition\ConditionInterface;
+use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 

@@ -24,7 +24,7 @@
 namespace Thelia\Condition\Implementation;
 
 use InvalidArgumentException;
-use Thelia\Condition\ConditionAbstract;
+use Thelia\Condition\Implementation\ConditionAbstract;
 
 /**
  * Created by JetBrains PhpStorm.

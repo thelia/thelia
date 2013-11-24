@@ -21,8 +21,9 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Condition;
+namespace Thelia\Condition\Implementation;
 
+use Thelia\Condition\SerializableCondition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 

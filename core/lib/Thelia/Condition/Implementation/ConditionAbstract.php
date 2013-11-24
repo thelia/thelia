@@ -21,9 +21,12 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Condition;
+namespace Thelia\Condition\Implementation;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
+use Thelia\Condition\ConditionEvaluator;
+use Thelia\Condition\Operators;
+use Thelia\Condition\SerializableCondition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;

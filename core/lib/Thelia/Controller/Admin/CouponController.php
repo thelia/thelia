@@ -26,7 +26,7 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 use Thelia\Condition\ConditionFactory;
-use Thelia\Condition\ConditionInterface;
+use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
