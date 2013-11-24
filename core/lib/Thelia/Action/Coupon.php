@@ -25,7 +25,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Condition\ConditionFactory;
-use Thelia\Condition\ConditionInterface;
+use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;

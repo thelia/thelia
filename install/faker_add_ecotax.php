@@ -1,12 +1,8 @@
 <?php
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Condition\ConditionFactory;
-use Thelia\Condition\Implementation\MatchForEveryone;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Implementation\MatchForXArticles;
 use Thelia\Condition\Operators;
-use Thelia\Coupon\AdapterInterface;
-use Thelia\Coupon\ConditionCollection;
 
 
 require __DIR__ . '/../core/bootstrap.php';

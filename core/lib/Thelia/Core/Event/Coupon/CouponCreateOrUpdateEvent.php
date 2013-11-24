@@ -23,7 +23,7 @@
 
 namespace Thelia\Core\Event\Coupon;
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Coupon\ConditionCollection;
+use Thelia\Condition\ConditionCollection;
 use Thelia\Model\Coupon;
 
 /**
