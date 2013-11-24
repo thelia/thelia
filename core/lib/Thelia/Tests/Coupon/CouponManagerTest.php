@@ -133,7 +133,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      * @covers Thelia\Coupon\CouponManager::sortCoupons
      * @covers Thelia\Coupon\CouponManager::getEffect
      */
-    public function testGetDiscount()
+    public function testGetDiscountCumulativeRemovingPostage()
     {
         $stubFacade = $this->generateFacadeStub();
         $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
@@ -151,30 +151,92 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $couponManager = new RemoveXAmount($stubFacade);
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->onConsecutiveCalls($stubFacade, $couponManager, $stubConditionFactory, $stubFacade));
+            ->will($this->onConsecutiveCalls($stubFacade, $couponManager, $stubConditionFactory, clone $couponManager, $stubConditionFactory, $stubFacade));
         $stubContainer->expects($this->any())
             ->method('has')
             ->will($this->returnValue(true));
 
         $couponFactory = new CouponFactory($stubContainer);
         $model1 = $this->generateCouponModel($stubFacade, $conditionFactory);
+        $model1->setAmount(21.00);
         $coupon1 = $couponFactory->buildCouponFromModel($model1);
+
+        $model2 = $this->generateCouponModel($stubFacade, $conditionFactory);
+        $model2->setCode('XMAS2')->setIsRemovingPostage(true)->setAmount(21.50);
+        $coupon2 = $couponFactory->buildCouponFromModel($model2);
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue(array($coupon1)));
+            ->will($this->returnValue(array($coupon1, $coupon2)));
         $stubFacade->expects($this->any())
             ->method('getCheckoutPostagePrice')
-            ->will($this->returnValue(35.00));
+            ->will($this->returnValue(8.30));
         $stubFacade->expects($this->any())
             ->method('getCartTotalPrice')
             ->will($this->returnValue(122.53));
 
         $couponManager = new CouponManager($stubContainer);
         $couponManager->addAvailableCoupon($coupon1);
-//        $couponManager->addAvailableCoupon($coupon2);
+        $couponManager->addAvailableCoupon($coupon2);
         $actual = $couponManager->getDiscount();
-        $expected = 45.00;
+        $expected = 50.80;
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @covers Thelia\Coupon\CouponManager::getDiscount
+     * @covers Thelia\Coupon\CouponManager::isCouponRemovingPostage
+     * @covers Thelia\Coupon\CouponManager::sortCoupons
+     * @covers Thelia\Coupon\CouponManager::getEffect
+     */
+    public function testGetDiscountNonCumulativeNotRemovingPostage()
+    {
+        $stubFacade = $this->generateFacadeStub();
+        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+
+        $conditionFactory = new ConditionFactory($stubContainer);
+
+        $conditions = new ConditionCollection();
+        $stubConditionFactory = $this->getMockBuilder('\Thelia\Condition\ConditionFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubConditionFactory->expects($this->any())
+            ->method('unserializeConditionCollection')
+            ->will($this->returnValue($conditions));
+
+        $couponManager = new RemoveXAmount($stubFacade);
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->onConsecutiveCalls($stubFacade, $couponManager, $stubConditionFactory, clone $couponManager, $stubConditionFactory, $stubFacade));
+        $stubContainer->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
+
+        $couponFactory = new CouponFactory($stubContainer);
+        $model1 = $this->generateCouponModel($stubFacade, $conditionFactory);
+        $model1->setAmount(21.00);
+        $coupon1 = $couponFactory->buildCouponFromModel($model1);
+
+        $model2 = $this->generateCouponModel($stubFacade, $conditionFactory);
+        $model2->setCode('XMAS2')->setIsRemovingPostage(false)->setAmount(21.50)->setIsCumulative(false);
+        $coupon2 = $couponFactory->buildCouponFromModel($model2);
+
+        $stubFacade->expects($this->any())
+            ->method('getCurrentCoupons')
+            ->will($this->returnValue(array($coupon1, $coupon2)));
+        $stubFacade->expects($this->any())
+            ->method('getCheckoutPostagePrice')
+            ->will($this->returnValue(8.30));
+        $stubFacade->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue(122.53));
+
+        $couponManager = new CouponManager($stubContainer);
+        $couponManager->addAvailableCoupon($coupon1);
+        $couponManager->addAvailableCoupon($coupon2);
+        $actual = $couponManager->getDiscount();
+        $expected = 21.50;
 
         $this->assertEquals($expected, $actual);
     }
