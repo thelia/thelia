@@ -37,12 +37,12 @@ if($_SESSION['install']['step'] == 5) {
 
 
     \Thelia\Model\ConfigQuery::create()
-        ->filterByName('contact_email')
-        ->update(array('Value' => $_POST['email_contact']));
+        ->filterByName('store_email')
+        ->update(array('Value' => $_POST['store_email']));
 
     \Thelia\Model\ConfigQuery::create()
-        ->filterByName('company_name')
-        ->update(array('Value' => $_POST['company_name']));
+        ->filterByName('store_name')
+        ->update(array('Value' => $_POST['store_name']));
 
     \Thelia\Model\ConfigQuery::create()
         ->filterByName('url_site')
