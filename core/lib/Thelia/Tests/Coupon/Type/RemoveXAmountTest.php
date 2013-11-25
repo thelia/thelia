@@ -101,6 +101,17 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Thelia\Coupon\Type\RemoveXAmount::set
+     * @covers Thelia\Coupon\Type\CouponAbstract::getCode
+     * @covers Thelia\Coupon\Type\CouponAbstract::getTitle
+     * @covers Thelia\Coupon\Type\CouponAbstract::getShortDescription
+     * @covers Thelia\Coupon\Type\CouponAbstract::getDescription
+     * @covers Thelia\Coupon\Type\CouponAbstract::isCumulative
+     * @covers Thelia\Coupon\Type\CouponAbstract::isRemovingPostage
+     * @covers Thelia\Coupon\Type\CouponAbstract::isAvailableOnSpecialOffers
+     * @covers Thelia\Coupon\Type\CouponAbstract::isEnabled
+     * @covers Thelia\Coupon\Type\CouponAbstract::getMaxUsage
+     * @covers Thelia\Coupon\Type\CouponAbstract::getExpirationDate
+     * @covers Thelia\Coupon\Type\CouponAbstract::setConditions
      */
     public function testSet()
     {
