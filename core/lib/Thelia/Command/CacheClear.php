@@ -52,7 +52,7 @@ class CacheClear extends ContainerAwareCommand
                 "without-assets",
                 null,
                 InputOption::VALUE_NONE,
-                "remove cache assets"
+                "do not clear the assets cache in the web space"
             )
         ;
     }
@@ -82,17 +82,17 @@ class CacheClear extends ContainerAwareCommand
         } catch (\UnexpectedValueException $e) {
             // throws same exception code for does not exist and permission denied ...
             if (!file_exists($dir)) {
-                $output->writeln(sprintf("<info>%s cache dir already clear</info>", $dir));
+                $output->writeln(sprintf("<info>%s cache dir already cleared</info>", $dir));
 
                 return;
             }
 
             throw $e;
         } catch (IOException $e) {
-            $output->writeln(sprintf("Error during clearing cache : %s", $e->getMessage()));
+            $output->writeln(sprintf("Error during clearing of cache : %s", $e->getMessage()));
         }
 
-        $output->writeln(sprintf("<info>%s cache dir cleared successfully</info>", $dir));
+        $output->writeln(sprintf("<info>%s cache directory cleared successfully</info>", $dir));
 
     }
 }

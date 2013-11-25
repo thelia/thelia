@@ -91,7 +91,11 @@
             <argument type="service" id="request" />
         </service>
 
-
+        <service id="smarty.plugin.esi" class="Thelia\Core\Template\Smarty\Plugins\Esi" scope="request">
+            <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="fragment.renderer.esi" />
+            <argument type="service" id="request" />
+        </service>
 
     </services>
 

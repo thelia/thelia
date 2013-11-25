@@ -159,7 +159,7 @@ function createProduct($faker, $categories, $template, $attribute, $feature, $co
                 }
 
                 $stock->setNewness($faker->randomNumber(0,1));
-                $stock->setWeight($faker->randomFloat(2, 100,10000));
+                $stock->setWeight($faker->randomFloat(2, 1,30));
                 $stock->save($con);
 
                 $productPrice = new \Thelia\Model\ProductPrice();
