@@ -101,6 +101,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Thelia\Coupon\Type\RemoveXPercent::set
+     * @covers Thelia\Coupon\Type\RemoveXPercent::exec
      */
     public function testSet()
     {
@@ -158,18 +159,8 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(254, $coupon->getMaxUsage());
         $this->assertEquals($date, $coupon->getExpirationDate());
-    }
 
-    /**
-     * @covers Thelia\Coupon\Type\RemoveXPercent::exec
-     * @todo   Implement testExec().
-     */
-    public function testExec()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->assertEquals(40.00, $coupon->exec());
     }
 
     /**

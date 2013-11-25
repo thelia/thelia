@@ -605,7 +605,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Check unknown currency
      *
-     * @covers Thelia\Condition\ConditionAbstract::isCurrencyValid
+     * @covers Thelia\Condition\Implementation\ConditionAbstract::isCurrencyValid
      * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
@@ -672,7 +672,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Check invalid currency
      *
-     * @covers Thelia\Condition\ConditionAbstract::isPriceValid
+     * @covers Thelia\Condition\Implementation\ConditionAbstract::isPriceValid
      * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
@@ -739,7 +739,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Check invalid currency
      *
-     * @covers Thelia\Condition\ConditionAbstract::isPriceValid
+     * @covers Thelia\Condition\Implementation\ConditionAbstract::isPriceValid
      * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */

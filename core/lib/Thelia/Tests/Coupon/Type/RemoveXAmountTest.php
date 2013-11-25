@@ -169,6 +169,8 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(254, $coupon->getMaxUsage());
         $this->assertEquals($date, $coupon->getExpirationDate());
+
+        $this->assertEquals(10.00, $coupon->exec());
     }
 
     /**
