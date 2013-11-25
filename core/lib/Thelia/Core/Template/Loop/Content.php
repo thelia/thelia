@@ -66,6 +66,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createBooleanTypeArgument('current_folder'),
             Argument::createIntTypeArgument('depth', 1),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
+            Argument::createAnyTypeArgument('title'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -148,6 +149,11 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
 
+        $title = $this->getTitle();
+
+        if (!is_null($title)) {
+            $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
+        }
 
         $orders  = $this->getOrder();
 
