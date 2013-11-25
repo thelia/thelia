@@ -362,7 +362,12 @@ GNU General Public License : http://www.gnu.org/licenses/
                                     <address class="adr" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
                                         <span class="street-address" itemprop="streetAddress">{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}</span><br>
                                         <span class="postal-code" itemprop="postalCode">{config key="store_zipcode"}</span>
-                                        <span class="locality" itemprop="addressLocality">{config key="store_city"}{loop type="country" name="address.country.title" id={config key="store_country"}}, <span class="country-name">{$TITLE}</span>{/loop}</span>
+                                        <span class="locality" itemprop="addressLocality">
+                                            {config key="store_city"}
+                                            {if {config key="store_country"} }
+                                                {loop type="country" name="address.country.title" id={config key="store_country"}}, <span class="country-name">{$TITLE}</span>{/loop}
+                                            {/if}
+                                        </span>
                                     </address>
                                 </li>
                                 {if {config key="store_phone"} }
