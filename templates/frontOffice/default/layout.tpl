@@ -1,9 +1,9 @@
 {* Declare assets directory, relative to template base directory *}
 {declare_assets directory='assets'}
 {block name="no-return-functions"}{/block}
-{assign var="company_name" value="{config key="company_name"}"}
-{if not $company_name}
-    {assign var="company_name" value="{intl l='Thelia V2'}"}
+{assign var="store_name" value="{config key="store_name"}"}
+{if not $store_name}
+    {assign var="store_name" value="{intl l='Thelia V2'}"}
 {/if}
 <!doctype html>
 <!--
@@ -37,14 +37,14 @@ GNU General Public License : http://www.gnu.org/licenses/
     <meta charset="utf-8">
 
     {* Page Title *}
-    <title>{block name="page-title"}{strip}{if $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title} - {/foreach}{/if}{$company_name}{/strip}{/block}</title>
+    <title>{block name="page-title"}{strip}{if $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title} - {/foreach}{/if}{$store_name}{/strip}{/block}</title>
 
     {* Meta Tags *}
     <meta name="generator" content="{intl l='Thelia V2'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     {block name="meta"}
-        <meta name="description" content="{$company_name}">
+        <meta name="description" content="{$store_name}">
         <meta name="robots" content="noindex,nofollow">
     {/block}
 
@@ -86,7 +86,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{navigate to="index"}">{$company_name}</a>
+                <a class="navbar-brand" href="{navigate to="index"}">{$store_name}</a>
             </div>
 
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
@@ -146,8 +146,8 @@ GNU General Public License : http://www.gnu.org/licenses/
     <header class="container" role="banner">
         <div class="header">
             <h1 class="logo">
-                <a href="{navigate to="index"}" title="{$company_name}">
-                    {images file='assets/img/logo.gif'}<img src="{$asset_url}" alt="{$company_name}">{/images}
+                <a href="{navigate to="index"}" title="{$store_name}">
+                    {images file='assets/img/logo.gif'}<img src="{$asset_url}" alt="{$store_name}">{/images}
                 </a>
             </h1>
 
@@ -356,21 +356,25 @@ GNU General Public License : http://www.gnu.org/licenses/
                     <section class="block block-contact" itemscope itemtype="http://schema.org/Organization">
                         <div class="block-heading"><h3 class="block-title">{intl l="Contact Us"}</h3></div>
                         <div class="block-content">
-                            <meta itemprop="name" content="{$company_name}">
+                            <meta itemprop="name" content="{$store_name}">
                             <ul>
                                 <li class="contact-address">
                                     <address class="adr" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-                                        <span class="street-address" itemprop="streetAddress">Street name of my business</span><br>
-                                        <span class="postal-code" itemprop="postalCode">75000</span>
-                                        <span class="locality" itemprop="addressLocality">City, <span class="country-name">France</span></span>
+                                        <span class="street-address" itemprop="streetAddress">{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}</span><br>
+                                        <span class="postal-code" itemprop="postalCode">{config key="store_zipcode"}</span>
+                                        <span class="locality" itemprop="addressLocality">{config key="store_city"}{loop type="country" name="address.country.title" id={config key="store_country"}}, <span class="country-name">{$TITLE}</span>{/loop}</span>
                                     </address>
                                 </li>
+                                {if {config key="store_phone"} }
                                 <li class="contact-phone">
-                                    <span class="tel" itemprop="telephone">+33 (0)0 00 00 00 00</span>
+                                    <span class="tel" itemprop="telephone">{config key="store_phone"}</span>
                                 </li>
+                                {/if}
+                                {if {config key="store_email"} }
                                 <li class="contact-email">
-                                    {mailto address="contact@yourdomain.com" encode="hex" extra='class="email" itemprop="email"'}
+                                    {mailto address="{config key="store_email"}" encode="hex" extra='class="email" itemprop="email"'}
                                 </li>
+                                {/if}
                             </ul>
                         </div>
                     </section>

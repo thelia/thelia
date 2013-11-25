@@ -512,6 +512,17 @@
         <default key="_controller">Thelia\Controller\Admin\ConfigController::deleteAction</default>
     </route>
 
+    <!--  Routes to the ConfigStore controller -->
+
+    <route id="admin.configuration.store.default" path="/admin/configuration/store">
+        <default key="_controller">Thelia\Controller\Admin\ConfigStoreController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.store.save" path="/admin/configuration/store/save">
+        <default key="_controller">Thelia\Controller\Admin\ConfigStoreController::saveAction</default>
+    </route>
+
+
     <!--  Routes to the SystemLog controller -->
 
     <route id="admin.configuration.system-logs.default" path="/admin/configuration/system-logs">
