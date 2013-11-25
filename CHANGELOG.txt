@@ -1,0 +1,11 @@
+2.0.0-beta2
+    http://doc.thelia.net is available in beta.
+    Increase performance in prod mode.
+    Front part (routes and controller) are now a dedicated module.
+    allow to create a customer in admin panel
+    translation is implemented :
+        - I18n directory in template or module.
+        - multiple extensions are available. We choose to used php but you can use other.
+        - You can translate your template or module from the admin.
+    Admin hook exists. With this hooks, a module can insert code in admin pages
+

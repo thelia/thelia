@@ -8,11 +8,11 @@
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">includes/mini-cart</default>
     </route>
+
     <route id="ajax.addCartMessage" path="/ajax/addCartMessage">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">includes/addedToCart</default>
     </route>
-
 
     <!-- Register -->
     <route id="customer.create.process" path="/register" methods="post">

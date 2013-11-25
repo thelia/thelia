@@ -84,7 +84,7 @@ class CustomerCreateForm extends AddressCreateForm
                         array($this, "verifyPasswordField")
                     )))
                 ),
-                "label" => "Password confirmation",
+                "label" => Translator::getInstance()->trans("Password confirmation"),
                 "label_attr" => array(
                     "for" => "password_confirmation"
                 )
@@ -102,6 +102,7 @@ class CustomerCreateForm extends AddressCreateForm
                 "constraints" => array(
                     new Constraints\True(array("message" => "Please accept the Terms and conditions in order to register."))
                 ),
+                "label"=>"Test",
                 "label_attr" => array(
                     "for" => "agreed"
                 )

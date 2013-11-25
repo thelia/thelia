@@ -85,18 +85,10 @@ class ViewListener implements EventSubscriberInterface
             $content = $parser->render($request->attributes->get('_view').".html");
 
             if ($content instanceof Response) {
-                $response = $content;$event->setResponse($content);
+                $response = $content;
             } else {
                 $response = new Response($content, $parser->getStatus() ?: 200);
             }
-
-/*            $response->setCache(array(
-                'last_modified' => new \DateTime(),
-                'max_age'       => 600,
-                's_maxage'      => 600,
-                'private'       => false,
-                'public'        => true,
-            ));*/
 
             $event->setResponse($response);
         } catch (ResourceNotFoundException $e) {

@@ -22,6 +22,7 @@
 /*************************************************************************************/
 namespace Thelia\Core\Bundle;
 
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Scope;
@@ -61,7 +62,7 @@ class TheliaBundle extends Bundle
 
         $container
             ->addCompilerPass(new TranslatorPass())
-            ->addCompilerPass(new RegisterListenersPass())
+            ->addCompilerPass(new RegisterListenersPass(), PassConfig::TYPE_AFTER_REMOVING)
             ->addCompilerPass(new RegisterParserPluginPass())
             ->addCompilerPass(new RegisterRouterPass())
             ->addCompilerPass(new RegisterCouponPass())
