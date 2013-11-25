@@ -102,16 +102,16 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Thelia\Coupon\Type\RemoveXAmount::set
      * @covers Thelia\Coupon\Type\CouponAbstract::getCode
-     * @covers Thelia\Coupon\Type\CouponAbstract::getTitle
-     * @covers Thelia\Coupon\Type\CouponAbstract::getShortDescription
-     * @covers Thelia\Coupon\Type\CouponAbstract::getDescription
-     * @covers Thelia\Coupon\Type\CouponAbstract::isCumulative
-     * @covers Thelia\Coupon\Type\CouponAbstract::isRemovingPostage
-     * @covers Thelia\Coupon\Type\CouponAbstract::isAvailableOnSpecialOffers
-     * @covers Thelia\Coupon\Type\CouponAbstract::isEnabled
-     * @covers Thelia\Coupon\Type\CouponAbstract::getMaxUsage
-     * @covers Thelia\Coupon\Type\CouponAbstract::getExpirationDate
-     * @covers Thelia\Coupon\Type\CouponAbstract::setConditions
+     * @covers Thelia\Coupon\Type\RemoveXAmount::getTitle
+     * @covers Thelia\Coupon\Type\RemoveXAmount::getShortDescription
+     * @covers Thelia\Coupon\Type\RemoveXAmount::getDescription
+     * @covers Thelia\Coupon\Type\RemoveXAmount::isCumulative
+     * @covers Thelia\Coupon\Type\RemoveXAmount::isRemovingPostage
+     * @covers Thelia\Coupon\Type\RemoveXAmount::isAvailableOnSpecialOffers
+     * @covers Thelia\Coupon\Type\RemoveXAmount::isEnabled
+     * @covers Thelia\Coupon\Type\RemoveXAmount::getMaxUsage
+     * @covers Thelia\Coupon\Type\RemoveXAmount::getExpirationDate
+     * @covers Thelia\Coupon\Type\RemoveXAmount::setConditions
      */
     public function testSet()
     {
