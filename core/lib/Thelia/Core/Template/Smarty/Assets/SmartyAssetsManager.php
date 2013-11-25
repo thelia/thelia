@@ -37,6 +37,8 @@ class SmartyAssetsManager
     private $web_root;
     private $path_relative_to_web_root;
 
+    static private $assetsDirectory = null;
+
     /**
      * Creates a new SmartyAssetsManager instance
      *
@@ -54,6 +56,7 @@ class SmartyAssetsManager
 
     public function prepareAssets($assets_directory, \Smarty_Internal_Template $template)
     {
+        self::$assetsDirectory = $assets_directory;
         $smartyParser = $template->smarty;
         $templateDefinition = $smartyParser->getTemplateDefinition();
         switch($templateDefinition->getType()) {
@@ -62,7 +65,7 @@ class SmartyAssetsManager
                 if(isset($frontOfficeTemplateDirectories[$templateDefinition->getName()])) {
                     /* create assets foreach directory : main @ modules */
                     foreach($frontOfficeTemplateDirectories[$templateDefinition->getName()] as $key => $directory) {
-                        $tpl_path = $directory . DS . $assets_directory;
+                        $tpl_path = $directory . DS . self::$assetsDirectory;
                         $asset_dir_absolute_path = realpath($tpl_path);
                         if(false !== $asset_dir_absolute_path) {
                             $this->assetsManager->prepareAssets(
@@ -81,7 +84,7 @@ class SmartyAssetsManager
                 if(isset($backOfficeTemplateDirectories[$templateDefinition->getName()])) {
                     /* create assets foreach directory : main @ modules */
                     foreach($backOfficeTemplateDirectories[$templateDefinition->getName()] as $key => $directory) {
-                        $tpl_path = $directory . DS . $assets_directory;
+                        $tpl_path = $directory . DS . self::$assetsDirectory;
                         $asset_dir_absolute_path = realpath($tpl_path);
                         if(false !== $asset_dir_absolute_path) {
                             $this->assetsManager->prepareAssets(
@@ -104,7 +107,7 @@ class SmartyAssetsManager
 
 //        $tpl_dir = dirname($template->source->filepath);
 //
-//        $tpl_path = $tpl_dir . DS . $assets_directory;
+//        $tpl_path = $tpl_dir . DS . self::$assetsDirectory;
 //        $asset_dir_absolute_path = realpath($tpl_path);
 //        if ($asset_dir_absolute_path === false) {
 //            /* no assets for current template */
@@ -176,6 +179,7 @@ class SmartyAssetsManager
 
         $url = $this->assetsManager->processAsset(
             $assetSource . DS . $file,
+            $assetSource . DS . self::$assetsDirectory,
             $this->web_root . $this->path_relative_to_web_root,
             $templateDefinition->getPath(),
             $assetOrigin,

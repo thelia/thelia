@@ -43,6 +43,7 @@ interface AssetManagerInterface {
      * Generates assets from $asset_path in $output_path, using $filters.
      *
      * @param          $assetSource
+     * @param          $assetDirectoryBase
      * @param          $webAssetsDirectoryBase
      * @param          $webAssetsTemplate
      * @param          $webAssetsKey
@@ -60,5 +61,5 @@ interface AssetManagerInterface {
      * @internal param string $asset_type the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
      * @return string                    The URL to the generated asset file.
      */
-    public function processAsset($assetSource, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug);
+    public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug);
 }

@@ -273,6 +273,7 @@ class AsseticAssetManager implements AssetManagerInterface
      * Generates assets from $asset_path in $output_path, using $filters.
      *
      * @param          $assetSource
+     * @param          $assetDirectoryBase
      * @param  string  $webAssetsDirectoryBase the full path to the asset file (or file collection, e.g. *.less)
      *
      * @param  string  $webAssetsTemplate      the full disk path to the base assets output directory in the web space
@@ -286,10 +287,12 @@ class AsseticAssetManager implements AssetManagerInterface
      *
      * @return string                    The URL to the generated asset file.
      */
-    public function processAsset($assetSource, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug)
+    public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug)
     {
         $assetName = basename($assetSource);
         $inputDirectory = realpath(dirname($assetSource));
+
+        $assetFileDirectoryInAssetDirectory = trim(str_replace(array($assetDirectoryBase, $assetName), '', $assetSource), DS);
 
         $am = new AssetManager();
         $fm = new FilterManager();
@@ -318,21 +321,24 @@ class AsseticAssetManager implements AssetManagerInterface
 
         $assetTargetFilename = $asset->getTargetPath();
 
-        // This is the final name of the generated asset
-        $assetDestinationPath = $outputDirectory . DS . $assetTargetFilename;
+        /*
+         * This is the final name of the generated asset
+         * We preserve file structure intending to keep - for example - relative css links working
+         */
+        $assetDestinationPath = $outputDirectory . DS . $assetFileDirectoryInAssetDirectory . DS . $assetTargetFilename;
 
         Tlog::getInstance()->addDebug("Asset destination full path: $assetDestinationPath");
 
         // We generate an asset only if it does not exists, or if the asset processing is forced in development mode
         if (! file_exists($assetDestinationPath) || ($this->debugMode && ConfigQuery::read('process_assets', true)) ) {
 
-            $writer = new AssetWriter($outputDirectory);
+            $writer = new AssetWriter($outputDirectory . DS . $assetFileDirectoryInAssetDirectory);
 
-            Tlog::getInstance()->addDebug("Writing asset to $outputDirectory");
+            Tlog::getInstance()->addDebug("Writing asset to $outputDirectory . DS . $assetFileDirectoryInAssetDirectory");
 
             $writer->writeAsset($asset);
         }
 
-        return rtrim($outputUrl, '/') . '/' . $outputRelativeWebPath . $assetTargetFilename;
+        return rtrim($outputUrl, DS) . DS . trim($outputRelativeWebPath, DS) . DS . trim($assetFileDirectoryInAssetDirectory, DS) . DS . ltrim($assetTargetFilename, DS);
     }
 }
