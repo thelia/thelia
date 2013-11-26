@@ -58,6 +58,11 @@ $fs->remove(THELIA_ROOT . '/cache/dev');
 
 $request = \Thelia\Core\HttpFoundation\Request::createFromGlobals();
 $_SESSION['install']['step'] = $step;
+
+// Retrieve the website url
+$url = $_SERVER['PHP_SELF'];
+$website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
+
 ?>
 
     <div class="well">
@@ -69,7 +74,7 @@ $_SESSION['install']['step'] = $step;
         </p>
 
         <p class="lead text-center">
-            <a href="<?php echo $request->getSchemeAndHttpHost(); ?>/admin">Go to back office</a>
+            <a href="<?php echo $request->getSchemeAndHttpHost().$website_url; ?>/admin">Go to back office</a>
         </p>
 
     </div>
