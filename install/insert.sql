@@ -10,6 +10,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('active-front-template', 'default', 0, 0, NOW(), NOW()),
 ('active-admin-template', 'default', 0, 0, NOW(), NOW()),
 ('active-pdf-template', 'default', 0, 0, NOW(), NOW()),
+('active-mail-template', 'default', 0, 0, NOW(), NOW()),
 ('default_lang_without_translation', '1', 1, 1, NOW(), NOW()),
 ('rewriting_enable', '0', 0, 0, NOW(), NOW()),
 ('imagine_graphic_driver', 'gd', 0, 0, NOW(), NOW()),

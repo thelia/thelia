@@ -93,7 +93,7 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow
                 ->set("NAME"          , $template->getName())
                 ->set("RELATIVE_PATH" , $template->getPath())
-                ->set("ABSOLUTE_PATH" , THELIA_TEMPLATE_DIR . $template->getPath())
+                ->set("ABSOLUTE_PATH" , $template->getAbsolutePath())
             ;
 
             $loopResult->addRow($loopResultRow);

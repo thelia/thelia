@@ -49,6 +49,16 @@ class TemplateHelper
     /**
      * @return TemplateDefinition
      */
+    public function getActiveMailTemplate() {
+        return new TemplateDefinition(
+                ConfigQuery::read('active-mail-template', 'default'),
+                TemplateDefinition::EMAIL
+        );
+    }
+
+    /**
+     * @return TemplateDefinition
+     */
     public function getActivePdfTemplate() {
         return new TemplateDefinition(
                 ConfigQuery::read('active-pdf-template', 'default'),

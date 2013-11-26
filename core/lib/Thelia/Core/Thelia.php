@@ -145,15 +145,15 @@ class Thelia extends Kernel
 
                     $code = ucfirst($module->getCode());
 
-                    $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . "/" . $code . "/Config"));
+                    $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
                     $loader->load("config.xml");
 
-                    if (is_dir($dir = THELIA_MODULE_DIR . "/" . $code . "/I18n")) {
+                    if (is_dir($dir = $module->getAbsoluteI18nPath())) {
                         $translationDirs[] = $dir;
                     }
 
                     /* is there a front-office template directory ? */
-                    $frontOfficeModuleTemplateDirectory = sprintf("%s%s%stemplates%s%s", THELIA_MODULE_DIR, $code, DS, DS, TemplateDefinition::FRONT_OFFICE_SUBDIR);
+                    $frontOfficeModuleTemplateDirectory = sprintf("%s%stemplates%s%s", $module->getAbsoluteBaseDir(), DS, DS, TemplateDefinition::FRONT_OFFICE_SUBDIR);
                     if (is_dir($frontOfficeModuleTemplateDirectory)) {
                         try {
                             $moduleFrontOfficeTemplateBrowser = new \DirectoryIterator($frontOfficeModuleTemplateDirectory);
@@ -178,7 +178,7 @@ class Thelia extends Kernel
                     }
 
                     /* is there a back-office template directory ? */
-                    $backOfficeModuleTemplateDirectory = sprintf("%s%s%stemplates%s%s", THELIA_MODULE_DIR, $code, DS, DS, TemplateDefinition::BACK_OFFICE_SUBDIR);
+                    $backOfficeModuleTemplateDirectory = sprintf("%s%stemplates%s%s", $module->getAbsoluteBaseDir(), DS, DS, TemplateDefinition::BACK_OFFICE_SUBDIR);
                     if (is_dir($backOfficeModuleTemplateDirectory)) {
                         try {
                             $moduleBackOfficeTemplateBrowser = new \DirectoryIterator($backOfficeModuleTemplateDirectory);
@@ -210,18 +210,20 @@ class Thelia extends Kernel
             //core translation
             $translationDirs[] = THELIA_ROOT . "core/lib/Thelia/Config/I18n";
 
+            $th = TemplateHelper::getInstance();
+
             // admin template
-            if (is_dir($dir = THELIA_TEMPLATE_DIR . TemplateHelper::getInstance()->getActiveAdminTemplate()->getI18nPath())) {
+            if (is_dir($dir = $th->getActiveAdminTemplate()->getAbsoluteI18nPath())) {
                 $translationDirs[] = $dir;
             }
 
             // front template
-            if (is_dir($dir = THELIA_TEMPLATE_DIR . TemplateHelper::getInstance()->getActiveFrontTemplate()->getI18nPath())) {
+            if (is_dir($dir = $th->getActiveFrontTemplate()->getAbsoluteI18nPath())) {
                 $translationDirs[] = $dir;
             }
 
             // PDF template
-            if (is_dir($dir = THELIA_TEMPLATE_DIR . TemplateHelper::getInstance()->getActivePdfTemplate()->getI18nPath())) {
+            if (is_dir($dir = $th->getActivePdfTemplate()->getAbsoluteI18nPath())) {
                 $translationDirs[] = $dir;
             }
 

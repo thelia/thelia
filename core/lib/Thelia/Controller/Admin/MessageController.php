@@ -30,6 +30,9 @@ use Thelia\Core\Event\Message\MessageCreateEvent;
 use Thelia\Model\MessageQuery;
 use Thelia\Form\MessageModificationForm;
 use Thelia\Form\MessageCreationForm;
+use Symfony\Component\Finder\Finder;
+use Thelia\Model\ConfigQuery;
+use Thelia\Core\Template\TemplateHelper;
 
 /**
  * Manages messages sent by mail
@@ -90,6 +93,10 @@ class MessageController extends AbstractCrudController
             ->setLocale($formData["locale"])
             ->setTitle($formData['title'])
             ->setSubject($formData['subject'])
+            ->setHtmlLayoutFileName($formData['html_layout_file_name'])
+            ->setHtmlTemplateFileName($formData['html_template_file_name'])
+            ->setTextLayoutFileName($formData['text_layout_file_name'])
+            ->setTextTemplateFileName($formData['text_template_file_name'])
             ->setHtmlMessage($formData['html_message'])
             ->setTextMessage($formData['text_message'])
         ;
@@ -111,14 +118,19 @@ class MessageController extends AbstractCrudController
     {
         // Prepare the data that will hydrate the form
         $data = array(
-            'id'           => $object->getId(),
-            'name'         => $object->getName(),
-            'secured'      => $object->getSecured(),
-            'locale'       => $object->getLocale(),
-            'title'        => $object->getTitle(),
-            'subject'      => $object->getSubject(),
-            'html_message' => $object->getHtmlMessage(),
-            'text_message' => $object->getTextMessage()
+            'id'            => $object->getId(),
+            'name'          => $object->getName(),
+            'secured'       => $object->getSecured(),
+            'locale'        => $object->getLocale(),
+            'title'         => $object->getTitle(),
+            'subject'       => $object->getSubject(),
+            'html_message'  => $object->getHtmlMessage(),
+            'text_message'  => $object->getTextMessage(),
+
+            'html_layout_file_name'   => $object->getHtmlLayoutFileName(),
+            'html_template_file_name' => $object->getHtmlTemplateFileName(),
+            'text_layout_file_name'   => $object->getTextLayoutFileName(),
+            'text_template_file_name' => $object->getTextTemplateFileName(),
         );
 
         // Setup the object form
@@ -152,17 +164,36 @@ class MessageController extends AbstractCrudController
         return $this->render('messages');
     }
 
+    protected function listDirectoryContent($requiredExtension) {
+
+        $list = array();
+
+        $dir = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath();
+
+        $finder = Finder::create()->files()->in($dir)->ignoreDotFiles(true)->sortByName()->name("*.$requiredExtension");
+
+        foreach ($finder as $file) {
+            $list[] = $file->getBasename();
+        }
+
+        return $list;
+    }
+
     protected function renderEditionTemplate()
     {
-        return $this->render('message-edit', array('message_id' => $this->getRequest()->get('message_id')));
+        return $this->render('message-edit', array(
+                'message_id'         => $this->getRequest()->get('message_id'),
+                'layout_list'        => $this->listDirectoryContent('tpl'),
+                'html_template_list' =>  $this->listDirectoryContent('html'),
+                'text_template_list' =>  $this->listDirectoryContent('txt'),
+        ));
     }
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.messages.update",
-                array('message_id' => $this->getRequest()->get('message_id'))
-        );
+        $this->redirectToRoute("admin.configuration.messages.update", array(
+                'message_id' => $this->getRequest()->get('message_id')
+        ));
     }
 
     protected function redirectToListTemplate()

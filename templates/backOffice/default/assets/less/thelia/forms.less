@@ -42,6 +42,11 @@ label {
     }
 }
 
+// Textarea in fixed fonts
+textarea.fixedfont {
+    font-family: @font-family-monospace;
+}
+
 // FORM FIELD FEEDBACK STATES
 // --------------------------
 
@@ -73,10 +78,10 @@ form .info {
 
 	.search-query {
 		outline: none;
-		.rounded(0px);			
+		.rounded(0px);
 
 		&:focus {
-			box-shadow: none;			
+			box-shadow: none;
 		}
 	}
 
