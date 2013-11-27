@@ -7,7 +7,7 @@ Layouts
 Mail layouts are used to provide a layout to all or some of the e-mails sent by
 the Thelia core or the modules.
 
-The layouts should have the 'tpl' extension, and shoud use {$message_body} as the
+The layouts should have the 'tpl' extension, and should use {$message_body} as the
 placeholder of the final message content.
 
 For example, a minimal layout is :
@@ -37,7 +37,7 @@ A Template contains the body of a specific message. It can be used  It may exten
 in this case, you SHOULD NOT select this layout as the message layout in the back office.
 
 HTML templates SHOULD have the 'html' extension to be displayed in the "Name of
-the text template file" menu in the back-office.
+the HTML template file" menu in the back-office.
 
 TEXT templates SHOULD have the 'text' extension to be displayed in the "Name of
 the text template file" menu in the back-office.
