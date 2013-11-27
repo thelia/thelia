@@ -73,6 +73,10 @@ if (!$err && $_SESSION['install']['step'] != $step) {
 
 $_SESSION['install']['step'] = $step;
 
+// Retrieve the website url
+$url = $_SERVER['PHP_SELF'];
+$website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
+
 ?>
 <form action="end.php" method="POST" >
     <div class="well">
@@ -90,15 +94,15 @@ $_SESSION['install']['step'] = $step;
         </div>
         <div class="form-group">
             <label for="email_contact">Contact email :</label>
-            <input id="email_contact" class="form-control" type="text" name="email_contact" placeholder="foo@bar.com" value="" required>
+            <input id="email_contact" class="form-control" type="text" name="store_email" placeholder="foo@bar.com" value="" required>
         </div>
         <div class="form-group">
             <label for="site_name">Company name :</label>
-            <input id="site_name" class="form-control" type="text" name="company_name" placeholder="" value="" required>
+            <input id="site_name" class="form-control" type="text" name="store_name" placeholder="" value="" required>
         </div>
         <div class="form-group">
             <label for="site_name">website url :</label>
-            <input id="site_name" class="form-control" type="text" name="url_site" placeholder="" value="http://<?php echo $_SERVER['SERVER_NAME']; ?>" required>
+            <input id="site_name" class="form-control" type="text" name="url_site" placeholder="" value="http://<?php echo $_SERVER['SERVER_NAME'].$website_url; ?>" required>
         </div>
         <div class="clearfix">
             <div class="control-btn">
