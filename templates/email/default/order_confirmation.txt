@@ -1,0 +1,40 @@
+{assign var="order_id" value=1}
+{loop name="order.invoice" type="order" id=$order_id customer="*"}
+    {loop name="currency.order" type="currency" id=$CURRENCY}
+        {assign "orderCurrency" $CODE}
+    {/loop}
+{loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
+{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}\r\n
+{$ADDRESS1} {$ADDRESS2} {$ADDRESS3}\r\n
+{$ZIPCODE} {$CITY}\r\n
+{loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}\r\n
+{/loop}
+Confirmation de commande {$REF} du {format_date date=$INVOICE_DATE}\r\n\r\n
+Les articles commandés:\r\n
+{loop type="order_product" name="order-products" order=$ID}
+{if $WAS_IN_PROMO == 1}
+    {assign "realPrice" $PROMO_PRICE}
+    {assign "realTax" $PROMO_PRICE_TAX}
+    {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+{else}
+    {assign "realPrice" $PRICE}
+    {assign "realTax" $PRICE_TAX}
+    {assign "realTaxedPrice" $TAXED_PRICE}
+{/if}
+    \r\n
+    Article : {$TITLE}
+{ifloop rel="combinations"}
+    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+    {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}\r\n
+{/loop}
+{/ifloop}\r\n
+    Quantité : {$QUANTITY}\r\n
+    Prix unitaire TTC : {$realTaxedPrice} {$orderCurrency}\r\n
+{/loop}
+\r\n-----------------------------------------\r\n
+Montant total TTC :    {$TOTAL_TAXED_AMOUNT - $POSTAGE} {$orderCurrency} \r\n
+Frais de port TTC :    {$POSTAGE} {$orderCurrency} \r\n
+Somme totale:            {$TOTAL_TAXED_AMOUNT} {$orderCurrency} \r\n
+==================================\r\n\r\n
+Votre facture est disponible dans la rubrique mon compte sur {config key="url_site"}
+{/loop}

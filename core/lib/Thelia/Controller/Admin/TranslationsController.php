@@ -71,8 +71,8 @@ class TranslationsController extends BaseAdminController
 
                 case 'mo' :
                     if (null !== $module = ModuleQuery::create()->findPk($item_id)) {
-                        $directory = THELIA_MODULE_DIR . $module->getBaseDir();
-                        $i18n_directory = THELIA_TEMPLATE_DIR . $module->getI18nPath();
+                        $directory = $module->getAbsoluteBaseDir();
+                        $i18n_directory = $module->getAbsoluteI18nPath();
                         $walkMode = TemplateHelper::WALK_MODE_PHP;
                     }
                     break;
@@ -97,8 +97,8 @@ class TranslationsController extends BaseAdminController
             }
 
             if ($template) {
-                $directory = THELIA_TEMPLATE_DIR . $template->getPath();
-                $i18n_directory = THELIA_TEMPLATE_DIR . $template->getI18nPath();
+                $directory = $template->getAbsolutePath();
+                $i18n_directory = $template->getAbsoluteI18nPath();
             }
 
             // Load strings to translate

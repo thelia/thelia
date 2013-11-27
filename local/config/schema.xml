@@ -29,6 +29,9 @@
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
     <column name="template_id" type="INTEGER" />
+    <column name="meta_title" size="255" type="VARCHAR" />
+    <column name="meta_description" type="LONGVARCHAR" />
+    <column name="meta_keyword" type="LONGVARCHAR" />
     <foreign-key foreignTable="tax_rule" name="fk_product_tax_rule_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_rule_id" />
     </foreign-key>
@@ -46,7 +49,7 @@
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+      <parameter name="i18n_columns" value="title, description, chapo, postscriptum, meta_title, meta_description, meta_keyword" />
     </behavior>
     <behavior name="versionable">
       <parameter name="log_created_at" value="true" />
@@ -820,6 +823,10 @@
     <column name="subject" type="LONGVARCHAR" />
     <column name="text_message" type="CLOB" />
     <column name="html_message" type="CLOB" />
+    <column name="text_layout_file_name" size="255" type="VARCHAR" />
+    <column name="text_template_file_name" size="255" type="VARCHAR" />
+    <column name="html_layout_file_name" size="255" type="VARCHAR" />
+    <column name="html_template_file_name" size="255" type="VARCHAR" />
     <unique name="name_UNIQUE">
       <unique-column name="name" />
     </unique>

@@ -28,10 +28,12 @@ class TemplateDefinition
     const FRONT_OFFICE = 1;
     const BACK_OFFICE = 2;
     const PDF = 3;
+    const EMAIL = 4;
 
     const FRONT_OFFICE_SUBDIR = 'frontOffice/';
     const BACK_OFFICE_SUBDIR = 'backOffice/';
     const PDF_SUBDIR = 'pdf/';
+    const EMAIL_SUBDIR = 'email/';
 
     /**
      * @var the template directory name (e.g. 'default')
@@ -64,6 +66,9 @@ class TemplateDefinition
             case TemplateDefinition::PDF:
                 $this->path = self::PDF_SUBDIR . $name;
                 break;
+            case TemplateDefinition::EMAIL:
+                $this->path = self::EMAIL_SUBDIR . $name;
+                break;
             default:
                 $this->path = $name;
                 break;
@@ -85,9 +90,26 @@ class TemplateDefinition
         return $this->getPath() . DS . 'I18n';
     }
 
+    public function getAbsoluteI18nPath() {
+        return THELIA_TEMPLATE_DIR . $this->getI18nPath();
+    }
+
     public function getPath()
     {
         return $this->path;
+    }
+
+    public function getAbsolutePath() {
+        return THELIA_TEMPLATE_DIR . $this->getPath();
+    }
+
+    public function getConfigPath()
+    {
+        return $this->getPath() . DS . 'configs';
+    }
+
+    public function getAbsoluteConfigPath() {
+        return THELIA_TEMPLATE_DIR . $this->getConfigPath();
     }
 
     public function setPath($path)
@@ -106,5 +128,4 @@ class TemplateDefinition
         $this->type = $type;
         return $this;
     }
-
 }

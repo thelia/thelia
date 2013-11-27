@@ -91,6 +91,24 @@ abstract class ProductI18n implements ActiveRecordInterface
     protected $postscriptum;
 
     /**
+     * The value for the meta_title field.
+     * @var        string
+     */
+    protected $meta_title;
+
+    /**
+     * The value for the meta_description field.
+     * @var        string
+     */
+    protected $meta_description;
+
+    /**
+     * The value for the meta_keyword field.
+     * @var        string
+     */
+    protected $meta_keyword;
+
+    /**
      * @var        Product
      */
     protected $aProduct;
@@ -441,6 +459,39 @@ abstract class ProductI18n implements ActiveRecordInterface
     }
 
     /**
+     * Get the [meta_title] column value.
+     *
+     * @return   string
+     */
+    public function getMetaTitle()
+    {
+
+        return $this->meta_title;
+    }
+
+    /**
+     * Get the [meta_description] column value.
+     *
+     * @return   string
+     */
+    public function getMetaDescription()
+    {
+
+        return $this->meta_description;
+    }
+
+    /**
+     * Get the [meta_keyword] column value.
+     *
+     * @return   string
+     */
+    public function getMetaKeyword()
+    {
+
+        return $this->meta_keyword;
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param      int $v new value
@@ -571,6 +622,69 @@ abstract class ProductI18n implements ActiveRecordInterface
     } // setPostscriptum()
 
     /**
+     * Set the value of [meta_title] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\ProductI18n The current object (for fluent API support)
+     */
+    public function setMetaTitle($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->meta_title !== $v) {
+            $this->meta_title = $v;
+            $this->modifiedColumns[] = ProductI18nTableMap::META_TITLE;
+        }
+
+
+        return $this;
+    } // setMetaTitle()
+
+    /**
+     * Set the value of [meta_description] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\ProductI18n The current object (for fluent API support)
+     */
+    public function setMetaDescription($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->meta_description !== $v) {
+            $this->meta_description = $v;
+            $this->modifiedColumns[] = ProductI18nTableMap::META_DESCRIPTION;
+        }
+
+
+        return $this;
+    } // setMetaDescription()
+
+    /**
+     * Set the value of [meta_keyword] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\ProductI18n The current object (for fluent API support)
+     */
+    public function setMetaKeyword($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->meta_keyword !== $v) {
+            $this->meta_keyword = $v;
+            $this->modifiedColumns[] = ProductI18nTableMap::META_KEYWORD;
+        }
+
+
+        return $this;
+    } // setMetaKeyword()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -628,6 +742,15 @@ abstract class ProductI18n implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductI18nTableMap::translateFieldName('Postscriptum', TableMap::TYPE_PHPNAME, $indexType)];
             $this->postscriptum = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductI18nTableMap::translateFieldName('MetaTitle', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->meta_title = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ProductI18nTableMap::translateFieldName('MetaDescription', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->meta_description = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ProductI18nTableMap::translateFieldName('MetaKeyword', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->meta_keyword = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -636,7 +759,7 @@ abstract class ProductI18n implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = ProductI18nTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = ProductI18nTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\ProductI18n object", 0, $e);
@@ -875,6 +998,15 @@ abstract class ProductI18n implements ActiveRecordInterface
         if ($this->isColumnModified(ProductI18nTableMap::POSTSCRIPTUM)) {
             $modifiedColumns[':p' . $index++]  = 'POSTSCRIPTUM';
         }
+        if ($this->isColumnModified(ProductI18nTableMap::META_TITLE)) {
+            $modifiedColumns[':p' . $index++]  = 'META_TITLE';
+        }
+        if ($this->isColumnModified(ProductI18nTableMap::META_DESCRIPTION)) {
+            $modifiedColumns[':p' . $index++]  = 'META_DESCRIPTION';
+        }
+        if ($this->isColumnModified(ProductI18nTableMap::META_KEYWORD)) {
+            $modifiedColumns[':p' . $index++]  = 'META_KEYWORD';
+        }
 
         $sql = sprintf(
             'INSERT INTO product_i18n (%s) VALUES (%s)',
@@ -903,6 +1035,15 @@ abstract class ProductI18n implements ActiveRecordInterface
                         break;
                     case 'POSTSCRIPTUM':
                         $stmt->bindValue($identifier, $this->postscriptum, PDO::PARAM_STR);
+                        break;
+                    case 'META_TITLE':
+                        $stmt->bindValue($identifier, $this->meta_title, PDO::PARAM_STR);
+                        break;
+                    case 'META_DESCRIPTION':
+                        $stmt->bindValue($identifier, $this->meta_description, PDO::PARAM_STR);
+                        break;
+                    case 'META_KEYWORD':
+                        $stmt->bindValue($identifier, $this->meta_keyword, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -977,6 +1118,15 @@ abstract class ProductI18n implements ActiveRecordInterface
             case 5:
                 return $this->getPostscriptum();
                 break;
+            case 6:
+                return $this->getMetaTitle();
+                break;
+            case 7:
+                return $this->getMetaDescription();
+                break;
+            case 8:
+                return $this->getMetaKeyword();
+                break;
             default:
                 return null;
                 break;
@@ -1012,6 +1162,9 @@ abstract class ProductI18n implements ActiveRecordInterface
             $keys[3] => $this->getDescription(),
             $keys[4] => $this->getChapo(),
             $keys[5] => $this->getPostscriptum(),
+            $keys[6] => $this->getMetaTitle(),
+            $keys[7] => $this->getMetaDescription(),
+            $keys[8] => $this->getMetaKeyword(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1074,6 +1227,15 @@ abstract class ProductI18n implements ActiveRecordInterface
             case 5:
                 $this->setPostscriptum($value);
                 break;
+            case 6:
+                $this->setMetaTitle($value);
+                break;
+            case 7:
+                $this->setMetaDescription($value);
+                break;
+            case 8:
+                $this->setMetaKeyword($value);
+                break;
         } // switch()
     }
 
@@ -1104,6 +1266,9 @@ abstract class ProductI18n implements ActiveRecordInterface
         if (array_key_exists($keys[3], $arr)) $this->setDescription($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setChapo($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setPostscriptum($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setMetaTitle($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setMetaDescription($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setMetaKeyword($arr[$keys[8]]);
     }
 
     /**
@@ -1121,6 +1286,9 @@ abstract class ProductI18n implements ActiveRecordInterface
         if ($this->isColumnModified(ProductI18nTableMap::DESCRIPTION)) $criteria->add(ProductI18nTableMap::DESCRIPTION, $this->description);
         if ($this->isColumnModified(ProductI18nTableMap::CHAPO)) $criteria->add(ProductI18nTableMap::CHAPO, $this->chapo);
         if ($this->isColumnModified(ProductI18nTableMap::POSTSCRIPTUM)) $criteria->add(ProductI18nTableMap::POSTSCRIPTUM, $this->postscriptum);
+        if ($this->isColumnModified(ProductI18nTableMap::META_TITLE)) $criteria->add(ProductI18nTableMap::META_TITLE, $this->meta_title);
+        if ($this->isColumnModified(ProductI18nTableMap::META_DESCRIPTION)) $criteria->add(ProductI18nTableMap::META_DESCRIPTION, $this->meta_description);
+        if ($this->isColumnModified(ProductI18nTableMap::META_KEYWORD)) $criteria->add(ProductI18nTableMap::META_KEYWORD, $this->meta_keyword);
 
         return $criteria;
     }
@@ -1197,6 +1365,9 @@ abstract class ProductI18n implements ActiveRecordInterface
         $copyObj->setDescription($this->getDescription());
         $copyObj->setChapo($this->getChapo());
         $copyObj->setPostscriptum($this->getPostscriptum());
+        $copyObj->setMetaTitle($this->getMetaTitle());
+        $copyObj->setMetaDescription($this->getMetaDescription());
+        $copyObj->setMetaKeyword($this->getMetaKeyword());
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -1286,6 +1457,9 @@ abstract class ProductI18n implements ActiveRecordInterface
         $this->description = null;
         $this->chapo = null;
         $this->postscriptum = null;
+        $this->meta_title = null;
+        $this->meta_description = null;
+        $this->meta_keyword = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();

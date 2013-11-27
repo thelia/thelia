@@ -55,8 +55,10 @@
 
 								{form_field form=$form field='name'}
 								<div class="form-group {if $error}has-error{/if}">
-									<label for="{$label_attr.for}" class="control-label">{$label} : </label>
-									<input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Variable name'}" placeholder="{intl l='Variable name'}" class="form-control">
+									<label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} :
+									<span class="label-help-block">{intl l="This the unique name of this message. Do not change this value unless you understand what you do."}</span>
+									</label>
+									<input type="text" id="{$label_attr.for}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Variable name'}" placeholder="{intl l='Variable name'}" class="form-control">
 								</div>
 					            {/form_field}
 
@@ -71,40 +73,126 @@
 
 								{form_field form=$form field='title'}
 								<div class="form-group {if $error}has-error{/if}">
-								    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-									<input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{$value}">
+								    <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} :
+								        <span class="label-help-block">{intl l="This is the message purpose, such as 'Order confirmation'."}</span>
+								    </label>
+									<input type="text" id="{$label_attr.for}" name="{$name}" {if $required}{if $required}required="required"{/if}{/if} title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{$value}">
 								</div>
 								{/form_field}
 
                                 {form_field form=$form field='subject'}
                                 <div class="form-group {if $error}has-error{/if}">
-                                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-									<input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Subject'}" placeholder="{intl l='Subject'}" class="form-control" value="{$value}">
-								</div>
-                                {/form_field}
-
-								{form_field form=$form field='html_message'}
-								<div class="form-group {if $error}has-error{/if}">
-								    <label for="{$label_attr.for}" class="control-label">
-								    	{$label} :
-								      <span class="label-help-block">{intl l="The mailing template in HTML format."}</span>
-								    </label>
-								    <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control">{$value}</textarea>
-								</div>
-								{/form_field}
-
-                                {form_field form=$form field='text_message'}
-                                <div class="form-group {if $error}has-error{/if}">
-                                    <label for="{$label_attr.for}" class="control-label">
-                                    	{$label} :
-                                      <span class="label-help-block">{intl l="The mailing template in text-only format."}</span>
+                                    <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} :
+                                        <span class="label-help-block">{intl l="This is the subject of the e-mail, such as 'Your order is confirmed'."}</span>
                                     </label>
-                                    <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control">{$value}</textarea>
-                                </div>
+									<input type="text" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{intl l='Subject'}" placeholder="{intl l='Subject'}" class="form-control" value="{$value}">
+								</div>
                                 {/form_field}
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading"><h3 class="panel-title">{intl l="HTML version of this message"}</h3></div>
+
+                                    <div class="panel-body">
+	                                    <div class="row">
+		                                    <div class="col-md-6">
+			                                {form_field form=$form field='html_layout_file_name'}
+				                                <div class="form-group {if $error}has-error{/if}">
+				                                    <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+				                                    <select id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="form-control">
+				                                        <option value="">{intl l='Use default layout'}</option>
+				                                        {foreach $layout_list as $layout}
+				                                            <option value="{$layout}" {if $layout == $value}selected="selected"{/if}>{$layout}</option>
+				                                        {/foreach}
+				                                    </select>
+				                                </div>
+			                                {/form_field}
+			                                </div>
+
+			                                <div class="col-md-6">
+				                                {form_field form=$form field='html_template_file_name'}
+				                                <div class="form-group {if $error}has-error{/if}">
+				                                    <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+			                                        <select data-toggle-textarea="html-message-content" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="textarea-toggle form-control">
+			                                            <option value="">{intl l='Use HTML message defined below'}</option>
+	                                                    {foreach $html_template_list as $template}
+	                                                        <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
+	                                                    {/foreach}
+			                                        </select>
+				                                </div>
+				                                {if ! empty($value)}{$disable_html='readonly="true"'}{/if}
+			                                {/form_field}
+			                                </div>
+                                        </div>
+
+                                        <div class="row">
+											<div class="col-md-12">
+												{form_field form=$form field='html_message'}
+												<div class="form-group {if $error}has-error{/if}">
+												    <label for="html-message-content" class="control-label">
+												    	{$label}{if $required} <span class="required">*</span>{/if} :
+												      <span class="label-help-block">{intl l="The mailing template in HTML format."}</span>
+												    </label>
+												    <textarea {$disable_html} {if $required}required="required"{/if} name="{$name}" id="html-message-content" rows="10" class="fixedfont form-control">{$value}</textarea>
+												</div>
+												{/form_field}
+											</div>
+										</div>
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading"><h3 class="panel-title">{intl l="Text version of this message"}</h3></div>
+
+                                    <div class="panel-body">
+                                        <div class="row">
+		                                    <div class="col-md-6">
+			                                    {form_field form=$form field='text_layout_file_name'}
+			                                    <div class="form-group {if $error}has-error{/if}">
+			                                        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+			                                        <select id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="form-control">
+			                                            <option value="">{intl l='Use default layout'}</option>
+	                                                    {foreach $layout_list as $layout}
+	                                                        <option value="{$layout}" {if $layout == $value}selected="selected"{/if}>{$layout}</option>
+	                                                    {/foreach}
+			                                        </select>
+			                                    </div>
+			                                    {/form_field}
+		                                    </div>
+
+		                                    <div class="col-md-6">
+			                                    {form_field form=$form field='text_template_file_name'}
+			                                    <div class="form-group {if $error}has-error{/if}">
+			                                        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+			                                        <select data-toggle-textarea="text-message-content" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="textarea-toggle form-control">
+			                                            <option value="">{intl l='Use Text message defined below'}</option>
+	                                                    {foreach $text_template_list as $template}
+	                                                        <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
+	                                                    {/foreach}
+			                                        </select>
+			                                    </div>
+			                                    {if ! empty($value)}{$disable_text='readonly="true"'}{/if}
+			                                    {/form_field}
+		                                    </div>
+		                                </div>
+
+                                        <div class="row">
+	                                        <div class="col-md-12">
+				                                {form_field form=$form field='text_message'}
+				                                <div class="form-group {if $error}has-error{/if}">
+				                                    <label for="text-message-content" class="control-label">
+				                                    	{$label}{if $required} <span class="required">*</span>{/if} :
+				                                      <span class="label-help-block">{intl l="The mailing template in text-only format."}</span>
+				                                    </label>
+				                                    <textarea {$disable_text} id="text-message-content" {if $required}required="required"{/if} name="{$name}" rows="10" class="fixedfont form-control">{$value}</textarea>
+				                                </div>
+				                                {/form_field}
+			                                </div>
+			                            </div>
+                                    </div>
+                                </div>
 
                                 <div class="form-group">
-                                    <p>{intl l='Message created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}}</p>
+                                    <p>{intl l='Message created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
                                 </div>
 
 							</form>
@@ -129,4 +217,20 @@
 
     </div>
 </div>
+{/block}
+
+{block name="javascript-initialization"}
+<script>
+	(function($) {
+	   $('select.textarea-toggle').change(function(ev) {
+		   if ($(this).val() != '') {
+			   $('#' + $(this).data('toggle-textarea')).addClass("disabled").prop('readonly', true);
+		   }
+		   else {
+               $('#' + $(this).data('toggle-textarea')).removeClass('disabled').prop('readonly', false);
+		   }
+	   });
+
+	 })(jQuery);
+</script>
 {/block}

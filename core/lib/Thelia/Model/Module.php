@@ -23,6 +23,13 @@ class Module extends BaseModule
     }
 
     /**
+     * @return the module's base directory path, relative to THELIA_MODULE_DIR
+     */
+    public function getAbsoluteBaseDir() {
+        return THELIA_MODULE_DIR . $this->getBaseDir();
+    }
+
+    /**
      * @return the module's config directory path, relative to THELIA_MODULE_DIR
      */
     public function getConfigPath() {
@@ -30,9 +37,23 @@ class Module extends BaseModule
     }
 
     /**
+     * @return the module's config absolute directory path
+     */
+    public function getAbsoluteConfigPath() {
+        return THELIA_MODULE_DIR . $this->getConfigPath();
+    }
+
+    /**
      * @return the module's i18N directory path, relative to THELIA_MODULE_DIR
      */
     public function getI18nPath() {
         return $this->getBaseDir() . DS . "I18n";
+    }
+
+    /**
+     * @return the module's i18N absolute directory path
+     */
+    public function getAbsoluteI18nPath() {
+        return THELIA_MODULE_DIR . $this->getI18nPath();
     }
 }
