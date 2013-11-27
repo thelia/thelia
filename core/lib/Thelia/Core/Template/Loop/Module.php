@@ -165,7 +165,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
             /* if not ; test if it uses admin inclusion : module_configuration.html */
             if(false === $hasConfigurationInterface) {
-                if(file_exists( sprintf("%s/%s/AdminIncludes/%s.html", THELIA_MODULE_DIR, $module->getBaseDir(), "module_configuration"))) {
+                if(file_exists( sprintf("%s/AdminIncludes/%s.html", $module->getAbsoluteBaseDir(), "module_configuration"))) {
                     $hasConfigurationInterface = true;
                 }
             }

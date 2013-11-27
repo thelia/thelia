@@ -22,12 +22,17 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Message;
-
 use Thelia\Core\Event\Message\MessageCreateEvent;
 
 class MessageUpdateEvent extends MessageCreateEvent
 {
     protected $message_id;
+
+    protected $html_layout_file_name;
+    protected $html_template_file_name;
+
+    protected $text_layout_file_name;
+    protected $text_template_file_name;
 
     protected $text_message;
     protected $html_message;
@@ -82,6 +87,54 @@ class MessageUpdateEvent extends MessageCreateEvent
     public function setSubject($subject)
     {
         $this->subject = $subject;
+
+        return $this;
+    }
+
+    public function getHtmlLayoutFileName()
+    {
+        return $this->html_layout_file_name;
+    }
+
+    public function setHtmlLayoutFileName($html_layout_file_name)
+    {
+        $this->html_layout_file_name = $html_layout_file_name;
+
+        return $this;
+    }
+
+    public function getHtmlTemplateFileName()
+    {
+        return $this->html_template_file_name;
+    }
+
+    public function setHtmlTemplateFileName($html_template_file_name)
+    {
+        $this->html_template_file_name = $html_template_file_name;
+
+        return $this;
+    }
+
+    public function getTextLayoutFileName()
+    {
+        return $this->text_layout_file_name;
+    }
+
+    public function setTextLayoutFileName($text_layout_file_name)
+    {
+        $this->text_layout_file_name = $text_layout_file_name;
+
+        return $this;
+    }
+
+    public function getTextTemplateFileName()
+    {
+        return $this->text_template_file_name;
+    }
+
+    public function setTextTemplateFileName($text_template_file_name)
+    {
+        $this->text_template_file_name = $text_template_file_name;
 
         return $this;
     }

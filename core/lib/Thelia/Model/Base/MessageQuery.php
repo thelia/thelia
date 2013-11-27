@@ -25,6 +25,10 @@ use Thelia\Model\Map\MessageTableMap;
  * @method     ChildMessageQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildMessageQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildMessageQuery orderBySecured($order = Criteria::ASC) Order by the secured column
+ * @method     ChildMessageQuery orderByTextLayoutFileName($order = Criteria::ASC) Order by the text_layout_file_name column
+ * @method     ChildMessageQuery orderByTextTemplateFileName($order = Criteria::ASC) Order by the text_template_file_name column
+ * @method     ChildMessageQuery orderByHtmlLayoutFileName($order = Criteria::ASC) Order by the html_layout_file_name column
+ * @method     ChildMessageQuery orderByHtmlTemplateFileName($order = Criteria::ASC) Order by the html_template_file_name column
  * @method     ChildMessageQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildMessageQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method     ChildMessageQuery orderByVersion($order = Criteria::ASC) Order by the version column
@@ -34,6 +38,10 @@ use Thelia\Model\Map\MessageTableMap;
  * @method     ChildMessageQuery groupById() Group by the id column
  * @method     ChildMessageQuery groupByName() Group by the name column
  * @method     ChildMessageQuery groupBySecured() Group by the secured column
+ * @method     ChildMessageQuery groupByTextLayoutFileName() Group by the text_layout_file_name column
+ * @method     ChildMessageQuery groupByTextTemplateFileName() Group by the text_template_file_name column
+ * @method     ChildMessageQuery groupByHtmlLayoutFileName() Group by the html_layout_file_name column
+ * @method     ChildMessageQuery groupByHtmlTemplateFileName() Group by the html_template_file_name column
  * @method     ChildMessageQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildMessageQuery groupByUpdatedAt() Group by the updated_at column
  * @method     ChildMessageQuery groupByVersion() Group by the version column
@@ -58,6 +66,10 @@ use Thelia\Model\Map\MessageTableMap;
  * @method     ChildMessage findOneById(int $id) Return the first ChildMessage filtered by the id column
  * @method     ChildMessage findOneByName(string $name) Return the first ChildMessage filtered by the name column
  * @method     ChildMessage findOneBySecured(int $secured) Return the first ChildMessage filtered by the secured column
+ * @method     ChildMessage findOneByTextLayoutFileName(string $text_layout_file_name) Return the first ChildMessage filtered by the text_layout_file_name column
+ * @method     ChildMessage findOneByTextTemplateFileName(string $text_template_file_name) Return the first ChildMessage filtered by the text_template_file_name column
+ * @method     ChildMessage findOneByHtmlLayoutFileName(string $html_layout_file_name) Return the first ChildMessage filtered by the html_layout_file_name column
+ * @method     ChildMessage findOneByHtmlTemplateFileName(string $html_template_file_name) Return the first ChildMessage filtered by the html_template_file_name column
  * @method     ChildMessage findOneByCreatedAt(string $created_at) Return the first ChildMessage filtered by the created_at column
  * @method     ChildMessage findOneByUpdatedAt(string $updated_at) Return the first ChildMessage filtered by the updated_at column
  * @method     ChildMessage findOneByVersion(int $version) Return the first ChildMessage filtered by the version column
@@ -67,6 +79,10 @@ use Thelia\Model\Map\MessageTableMap;
  * @method     array findById(int $id) Return ChildMessage objects filtered by the id column
  * @method     array findByName(string $name) Return ChildMessage objects filtered by the name column
  * @method     array findBySecured(int $secured) Return ChildMessage objects filtered by the secured column
+ * @method     array findByTextLayoutFileName(string $text_layout_file_name) Return ChildMessage objects filtered by the text_layout_file_name column
+ * @method     array findByTextTemplateFileName(string $text_template_file_name) Return ChildMessage objects filtered by the text_template_file_name column
+ * @method     array findByHtmlLayoutFileName(string $html_layout_file_name) Return ChildMessage objects filtered by the html_layout_file_name column
+ * @method     array findByHtmlTemplateFileName(string $html_template_file_name) Return ChildMessage objects filtered by the html_template_file_name column
  * @method     array findByCreatedAt(string $created_at) Return ChildMessage objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildMessage objects filtered by the updated_at column
  * @method     array findByVersion(int $version) Return ChildMessage objects filtered by the version column
@@ -167,7 +183,7 @@ abstract class MessageQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, NAME, SECURED, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM message WHERE ID = :p0';
+        $sql = 'SELECT ID, NAME, SECURED, TEXT_LAYOUT_FILE_NAME, TEXT_TEMPLATE_FILE_NAME, HTML_LAYOUT_FILE_NAME, HTML_TEMPLATE_FILE_NAME, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM message WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -365,6 +381,122 @@ abstract class MessageQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(MessageTableMap::SECURED, $secured, $comparison);
+    }
+
+    /**
+     * Filter the query on the text_layout_file_name column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByTextLayoutFileName('fooValue');   // WHERE text_layout_file_name = 'fooValue'
+     * $query->filterByTextLayoutFileName('%fooValue%'); // WHERE text_layout_file_name LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $textLayoutFileName The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildMessageQuery The current query, for fluid interface
+     */
+    public function filterByTextLayoutFileName($textLayoutFileName = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($textLayoutFileName)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $textLayoutFileName)) {
+                $textLayoutFileName = str_replace('*', '%', $textLayoutFileName);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(MessageTableMap::TEXT_LAYOUT_FILE_NAME, $textLayoutFileName, $comparison);
+    }
+
+    /**
+     * Filter the query on the text_template_file_name column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByTextTemplateFileName('fooValue');   // WHERE text_template_file_name = 'fooValue'
+     * $query->filterByTextTemplateFileName('%fooValue%'); // WHERE text_template_file_name LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $textTemplateFileName The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildMessageQuery The current query, for fluid interface
+     */
+    public function filterByTextTemplateFileName($textTemplateFileName = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($textTemplateFileName)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $textTemplateFileName)) {
+                $textTemplateFileName = str_replace('*', '%', $textTemplateFileName);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(MessageTableMap::TEXT_TEMPLATE_FILE_NAME, $textTemplateFileName, $comparison);
+    }
+
+    /**
+     * Filter the query on the html_layout_file_name column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByHtmlLayoutFileName('fooValue');   // WHERE html_layout_file_name = 'fooValue'
+     * $query->filterByHtmlLayoutFileName('%fooValue%'); // WHERE html_layout_file_name LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $htmlLayoutFileName The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildMessageQuery The current query, for fluid interface
+     */
+    public function filterByHtmlLayoutFileName($htmlLayoutFileName = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($htmlLayoutFileName)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $htmlLayoutFileName)) {
+                $htmlLayoutFileName = str_replace('*', '%', $htmlLayoutFileName);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(MessageTableMap::HTML_LAYOUT_FILE_NAME, $htmlLayoutFileName, $comparison);
+    }
+
+    /**
+     * Filter the query on the html_template_file_name column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByHtmlTemplateFileName('fooValue');   // WHERE html_template_file_name = 'fooValue'
+     * $query->filterByHtmlTemplateFileName('%fooValue%'); // WHERE html_template_file_name LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $htmlTemplateFileName The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildMessageQuery The current query, for fluid interface
+     */
+    public function filterByHtmlTemplateFileName($htmlTemplateFileName = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($htmlTemplateFileName)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $htmlTemplateFileName)) {
+                $htmlTemplateFileName = str_replace('*', '%', $htmlTemplateFileName);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(MessageTableMap::HTML_TEMPLATE_FILE_NAME, $htmlTemplateFileName, $comparison);
     }
 
     /**

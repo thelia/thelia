@@ -54,7 +54,7 @@ class Module extends AbstractSmartyPlugin
                     continue;
                 }
 
-                $file = sprintf("%s/%s/AdminIncludes/%s.html", THELIA_MODULE_DIR, $module->getBaseDir(), $location);
+                $file = sprintf("%s/AdminIncludes/%s.html", $module->getAbsoluteBaseDir(), $location);
 
                 if (file_exists($file)) {
                     $content .= file_get_contents($file);

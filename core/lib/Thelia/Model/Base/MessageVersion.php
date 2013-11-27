@@ -74,6 +74,30 @@ abstract class MessageVersion implements ActiveRecordInterface
     protected $secured;
 
     /**
+     * The value for the text_layout_file_name field.
+     * @var        string
+     */
+    protected $text_layout_file_name;
+
+    /**
+     * The value for the text_template_file_name field.
+     * @var        string
+     */
+    protected $text_template_file_name;
+
+    /**
+     * The value for the html_layout_file_name field.
+     * @var        string
+     */
+    protected $html_layout_file_name;
+
+    /**
+     * The value for the html_template_file_name field.
+     * @var        string
+     */
+    protected $html_template_file_name;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -422,6 +446,50 @@ abstract class MessageVersion implements ActiveRecordInterface
     }
 
     /**
+     * Get the [text_layout_file_name] column value.
+     *
+     * @return   string
+     */
+    public function getTextLayoutFileName()
+    {
+
+        return $this->text_layout_file_name;
+    }
+
+    /**
+     * Get the [text_template_file_name] column value.
+     *
+     * @return   string
+     */
+    public function getTextTemplateFileName()
+    {
+
+        return $this->text_template_file_name;
+    }
+
+    /**
+     * Get the [html_layout_file_name] column value.
+     *
+     * @return   string
+     */
+    public function getHtmlLayoutFileName()
+    {
+
+        return $this->html_layout_file_name;
+    }
+
+    /**
+     * Get the [html_template_file_name] column value.
+     *
+     * @return   string
+     */
+    public function getHtmlTemplateFileName()
+    {
+
+        return $this->html_template_file_name;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -569,6 +637,90 @@ abstract class MessageVersion implements ActiveRecordInterface
 
         return $this;
     } // setSecured()
+
+    /**
+     * Set the value of [text_layout_file_name] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\MessageVersion The current object (for fluent API support)
+     */
+    public function setTextLayoutFileName($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->text_layout_file_name !== $v) {
+            $this->text_layout_file_name = $v;
+            $this->modifiedColumns[] = MessageVersionTableMap::TEXT_LAYOUT_FILE_NAME;
+        }
+
+
+        return $this;
+    } // setTextLayoutFileName()
+
+    /**
+     * Set the value of [text_template_file_name] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\MessageVersion The current object (for fluent API support)
+     */
+    public function setTextTemplateFileName($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->text_template_file_name !== $v) {
+            $this->text_template_file_name = $v;
+            $this->modifiedColumns[] = MessageVersionTableMap::TEXT_TEMPLATE_FILE_NAME;
+        }
+
+
+        return $this;
+    } // setTextTemplateFileName()
+
+    /**
+     * Set the value of [html_layout_file_name] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\MessageVersion The current object (for fluent API support)
+     */
+    public function setHtmlLayoutFileName($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->html_layout_file_name !== $v) {
+            $this->html_layout_file_name = $v;
+            $this->modifiedColumns[] = MessageVersionTableMap::HTML_LAYOUT_FILE_NAME;
+        }
+
+
+        return $this;
+    } // setHtmlLayoutFileName()
+
+    /**
+     * Set the value of [html_template_file_name] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\MessageVersion The current object (for fluent API support)
+     */
+    public function setHtmlTemplateFileName($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->html_template_file_name !== $v) {
+            $this->html_template_file_name = $v;
+            $this->modifiedColumns[] = MessageVersionTableMap::HTML_TEMPLATE_FILE_NAME;
+        }
+
+
+        return $this;
+    } // setHtmlTemplateFileName()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -725,28 +877,40 @@ abstract class MessageVersion implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : MessageVersionTableMap::translateFieldName('Secured', TableMap::TYPE_PHPNAME, $indexType)];
             $this->secured = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : MessageVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : MessageVersionTableMap::translateFieldName('TextLayoutFileName', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->text_layout_file_name = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : MessageVersionTableMap::translateFieldName('TextTemplateFileName', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->text_template_file_name = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : MessageVersionTableMap::translateFieldName('HtmlLayoutFileName', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->html_layout_file_name = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : MessageVersionTableMap::translateFieldName('HtmlTemplateFileName', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->html_template_file_name = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : MessageVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : MessageVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : MessageVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : MessageVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : MessageVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : MessageVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : MessageVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : MessageVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : MessageVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version_created_by = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -756,7 +920,7 @@ abstract class MessageVersion implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 8; // 8 = MessageVersionTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 12; // 12 = MessageVersionTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\MessageVersion object", 0, $e);
@@ -986,6 +1150,18 @@ abstract class MessageVersion implements ActiveRecordInterface
         if ($this->isColumnModified(MessageVersionTableMap::SECURED)) {
             $modifiedColumns[':p' . $index++]  = 'SECURED';
         }
+        if ($this->isColumnModified(MessageVersionTableMap::TEXT_LAYOUT_FILE_NAME)) {
+            $modifiedColumns[':p' . $index++]  = 'TEXT_LAYOUT_FILE_NAME';
+        }
+        if ($this->isColumnModified(MessageVersionTableMap::TEXT_TEMPLATE_FILE_NAME)) {
+            $modifiedColumns[':p' . $index++]  = 'TEXT_TEMPLATE_FILE_NAME';
+        }
+        if ($this->isColumnModified(MessageVersionTableMap::HTML_LAYOUT_FILE_NAME)) {
+            $modifiedColumns[':p' . $index++]  = 'HTML_LAYOUT_FILE_NAME';
+        }
+        if ($this->isColumnModified(MessageVersionTableMap::HTML_TEMPLATE_FILE_NAME)) {
+            $modifiedColumns[':p' . $index++]  = 'HTML_TEMPLATE_FILE_NAME';
+        }
         if ($this->isColumnModified(MessageVersionTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -1020,6 +1196,18 @@ abstract class MessageVersion implements ActiveRecordInterface
                         break;
                     case 'SECURED':
                         $stmt->bindValue($identifier, $this->secured, PDO::PARAM_INT);
+                        break;
+                    case 'TEXT_LAYOUT_FILE_NAME':
+                        $stmt->bindValue($identifier, $this->text_layout_file_name, PDO::PARAM_STR);
+                        break;
+                    case 'TEXT_TEMPLATE_FILE_NAME':
+                        $stmt->bindValue($identifier, $this->text_template_file_name, PDO::PARAM_STR);
+                        break;
+                    case 'HTML_LAYOUT_FILE_NAME':
+                        $stmt->bindValue($identifier, $this->html_layout_file_name, PDO::PARAM_STR);
+                        break;
+                    case 'HTML_TEMPLATE_FILE_NAME':
+                        $stmt->bindValue($identifier, $this->html_template_file_name, PDO::PARAM_STR);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1101,18 +1289,30 @@ abstract class MessageVersion implements ActiveRecordInterface
                 return $this->getSecured();
                 break;
             case 3:
-                return $this->getCreatedAt();
+                return $this->getTextLayoutFileName();
                 break;
             case 4:
-                return $this->getUpdatedAt();
+                return $this->getTextTemplateFileName();
                 break;
             case 5:
-                return $this->getVersion();
+                return $this->getHtmlLayoutFileName();
                 break;
             case 6:
-                return $this->getVersionCreatedAt();
+                return $this->getHtmlTemplateFileName();
                 break;
             case 7:
+                return $this->getCreatedAt();
+                break;
+            case 8:
+                return $this->getUpdatedAt();
+                break;
+            case 9:
+                return $this->getVersion();
+                break;
+            case 10:
+                return $this->getVersionCreatedAt();
+                break;
+            case 11:
                 return $this->getVersionCreatedBy();
                 break;
             default:
@@ -1147,11 +1347,15 @@ abstract class MessageVersion implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
             $keys[2] => $this->getSecured(),
-            $keys[3] => $this->getCreatedAt(),
-            $keys[4] => $this->getUpdatedAt(),
-            $keys[5] => $this->getVersion(),
-            $keys[6] => $this->getVersionCreatedAt(),
-            $keys[7] => $this->getVersionCreatedBy(),
+            $keys[3] => $this->getTextLayoutFileName(),
+            $keys[4] => $this->getTextTemplateFileName(),
+            $keys[5] => $this->getHtmlLayoutFileName(),
+            $keys[6] => $this->getHtmlTemplateFileName(),
+            $keys[7] => $this->getCreatedAt(),
+            $keys[8] => $this->getUpdatedAt(),
+            $keys[9] => $this->getVersion(),
+            $keys[10] => $this->getVersionCreatedAt(),
+            $keys[11] => $this->getVersionCreatedBy(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1206,18 +1410,30 @@ abstract class MessageVersion implements ActiveRecordInterface
                 $this->setSecured($value);
                 break;
             case 3:
-                $this->setCreatedAt($value);
+                $this->setTextLayoutFileName($value);
                 break;
             case 4:
-                $this->setUpdatedAt($value);
+                $this->setTextTemplateFileName($value);
                 break;
             case 5:
-                $this->setVersion($value);
+                $this->setHtmlLayoutFileName($value);
                 break;
             case 6:
-                $this->setVersionCreatedAt($value);
+                $this->setHtmlTemplateFileName($value);
                 break;
             case 7:
+                $this->setCreatedAt($value);
+                break;
+            case 8:
+                $this->setUpdatedAt($value);
+                break;
+            case 9:
+                $this->setVersion($value);
+                break;
+            case 10:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 11:
                 $this->setVersionCreatedBy($value);
                 break;
         } // switch()
@@ -1247,11 +1463,15 @@ abstract class MessageVersion implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setSecured($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setVersion($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setVersionCreatedAt($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setVersionCreatedBy($arr[$keys[7]]);
+        if (array_key_exists($keys[3], $arr)) $this->setTextLayoutFileName($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setTextTemplateFileName($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setHtmlLayoutFileName($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setHtmlTemplateFileName($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setVersion($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setVersionCreatedAt($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setVersionCreatedBy($arr[$keys[11]]);
     }
 
     /**
@@ -1266,6 +1486,10 @@ abstract class MessageVersion implements ActiveRecordInterface
         if ($this->isColumnModified(MessageVersionTableMap::ID)) $criteria->add(MessageVersionTableMap::ID, $this->id);
         if ($this->isColumnModified(MessageVersionTableMap::NAME)) $criteria->add(MessageVersionTableMap::NAME, $this->name);
         if ($this->isColumnModified(MessageVersionTableMap::SECURED)) $criteria->add(MessageVersionTableMap::SECURED, $this->secured);
+        if ($this->isColumnModified(MessageVersionTableMap::TEXT_LAYOUT_FILE_NAME)) $criteria->add(MessageVersionTableMap::TEXT_LAYOUT_FILE_NAME, $this->text_layout_file_name);
+        if ($this->isColumnModified(MessageVersionTableMap::TEXT_TEMPLATE_FILE_NAME)) $criteria->add(MessageVersionTableMap::TEXT_TEMPLATE_FILE_NAME, $this->text_template_file_name);
+        if ($this->isColumnModified(MessageVersionTableMap::HTML_LAYOUT_FILE_NAME)) $criteria->add(MessageVersionTableMap::HTML_LAYOUT_FILE_NAME, $this->html_layout_file_name);
+        if ($this->isColumnModified(MessageVersionTableMap::HTML_TEMPLATE_FILE_NAME)) $criteria->add(MessageVersionTableMap::HTML_TEMPLATE_FILE_NAME, $this->html_template_file_name);
         if ($this->isColumnModified(MessageVersionTableMap::CREATED_AT)) $criteria->add(MessageVersionTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(MessageVersionTableMap::UPDATED_AT)) $criteria->add(MessageVersionTableMap::UPDATED_AT, $this->updated_at);
         if ($this->isColumnModified(MessageVersionTableMap::VERSION)) $criteria->add(MessageVersionTableMap::VERSION, $this->version);
@@ -1344,6 +1568,10 @@ abstract class MessageVersion implements ActiveRecordInterface
         $copyObj->setId($this->getId());
         $copyObj->setName($this->getName());
         $copyObj->setSecured($this->getSecured());
+        $copyObj->setTextLayoutFileName($this->getTextLayoutFileName());
+        $copyObj->setTextTemplateFileName($this->getTextTemplateFileName());
+        $copyObj->setHtmlLayoutFileName($this->getHtmlLayoutFileName());
+        $copyObj->setHtmlTemplateFileName($this->getHtmlTemplateFileName());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         $copyObj->setVersion($this->getVersion());
@@ -1435,6 +1663,10 @@ abstract class MessageVersion implements ActiveRecordInterface
         $this->id = null;
         $this->name = null;
         $this->secured = null;
+        $this->text_layout_file_name = null;
+        $this->text_template_file_name = null;
+        $this->html_layout_file_name = null;
+        $this->html_template_file_name = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->version = null;

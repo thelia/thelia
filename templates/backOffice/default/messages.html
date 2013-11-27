@@ -127,14 +127,14 @@
 
 	        {form_field form=$form field='name'}
 	        <div class="form-group {if $error}has-error{/if}">
-	            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-	            <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Mailing template name'}" placeholder="{intl l='Mailing template name'}" class="form-control">
+	            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+	            <input type="text" id="{$label_attr.for}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Mailing template name'}" placeholder="{intl l='Mailing template name'}" class="form-control">
 	        </div>
 	        {/form_field}
 
 	        {form_field form=$form field='title'}
 	        <div class="form-group {if $error}has-error{/if}">
-	            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+	            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
 
 	            {loop type="lang" name="default-lang" default_only="1"}
 
@@ -142,7 +142,7 @@
 	                <input type="hidden" name="edit_language_id" value="{$ID}" />
 
 	                <div class="input-group">
-	                    <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Mailing template purpose'}" placeholder="{intl l='Mailing template purpose'}" class="form-control">
+	                    <input type="text" id="{$label_attr.for}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Mailing template purpose'}" placeholder="{intl l='Mailing template purpose'}" class="form-control">
 	                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.gif"}" alt="{intl l=$TITLE}" /></span>
 	                </div>
 
