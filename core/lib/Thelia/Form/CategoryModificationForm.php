@@ -38,7 +38,7 @@ class CategoryModificationForm extends CategoryCreationForm
             ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
 
             ->add("url", "text", array(
-                "label"       => Translator::getInstance()->trans("Rewriten URL *"),
+                "label"       => Translator::getInstance()->trans("Rewritten URL *"),
                 "constraints" => array(new NotBlank()),
                 "label_attr" => array("for" => "rewriten_url")
             ))
