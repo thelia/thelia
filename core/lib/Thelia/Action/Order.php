@@ -289,7 +289,17 @@ class Order extends BaseAction implements EventSubscriberInterface
     public function sendOrderEmail(OrderEvent $event)
     {
         $contact_email = ConfigQuery::read('contact_email');
+
         if($contact_email) {
+
+            $message = MessageQuery::create()
+                ->filterByName('order_confirmation')
+                ->findOne();
+
+            if (false === $message) {
+                throw new \Exception("Failed to load message 'order_confirmation'.");
+            }
+
             $order = $event->getOrder();
             $customer = $order->getCustomer();
 
@@ -298,24 +308,16 @@ class Order extends BaseAction implements EventSubscriberInterface
             $parser->assign('order_id', $order->getId());
             $parser->assign('order_ref', $order->getRef());
 
-            $message = MessageQuery::create()
-                ->filterByName('order_confirmation')
-                ->findOne();
-
             $message
                 ->setLocale($order->getLang()->getLocale());
 
-            $subject = $parser->fetch(sprintf("string:%s", $message->getSubject()));
-            $htmlMessage = $parser->fetch(sprintf("string:%s", $message->getHtmlMessage()));
-            $textMessage = $parser->fetch(sprintf("string:%s", $message->getTextMessage()));
-
-            $instance = \Swift_Message::newInstance($subject)
+            $instance = \Swift_Message::newInstance()
                 ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
                 ->addFrom(ConfigQuery::read('contact_email'), ConfigQuery::read('company_name'))
             ;
-            $instance
-                ->setBody($htmlMessage, 'text/html')
-                ->addPart($textMessage, 'text/plain');
+
+            // Build subject and body
+            $message->build($parser, $instance);
 
             $mail = $this->getMailer()->send($instance);
         }

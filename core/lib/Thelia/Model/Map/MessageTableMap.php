@@ -57,7 +57,7 @@ class MessageTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 8;
+    const NUM_COLUMNS = 12;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class MessageTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 8;
+    const NUM_HYDRATE_COLUMNS = 12;
 
     /**
      * the column name for the ID field
@@ -83,6 +83,26 @@ class MessageTableMap extends TableMap
      * the column name for the SECURED field
      */
     const SECURED = 'message.SECURED';
+
+    /**
+     * the column name for the TEXT_LAYOUT_FILE_NAME field
+     */
+    const TEXT_LAYOUT_FILE_NAME = 'message.TEXT_LAYOUT_FILE_NAME';
+
+    /**
+     * the column name for the TEXT_TEMPLATE_FILE_NAME field
+     */
+    const TEXT_TEMPLATE_FILE_NAME = 'message.TEXT_TEMPLATE_FILE_NAME';
+
+    /**
+     * the column name for the HTML_LAYOUT_FILE_NAME field
+     */
+    const HTML_LAYOUT_FILE_NAME = 'message.HTML_LAYOUT_FILE_NAME';
+
+    /**
+     * the column name for the HTML_TEMPLATE_FILE_NAME field
+     */
+    const HTML_TEMPLATE_FILE_NAME = 'message.HTML_TEMPLATE_FILE_NAME';
 
     /**
      * the column name for the CREATED_AT field
@@ -130,12 +150,12 @@ class MessageTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Secured', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'name', 'secured', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
-        self::TYPE_COLNAME       => array(MessageTableMap::ID, MessageTableMap::NAME, MessageTableMap::SECURED, MessageTableMap::CREATED_AT, MessageTableMap::UPDATED_AT, MessageTableMap::VERSION, MessageTableMap::VERSION_CREATED_AT, MessageTableMap::VERSION_CREATED_BY, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'NAME', 'SECURED', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'secured', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
+        self::TYPE_PHPNAME       => array('Id', 'Name', 'Secured', 'TextLayoutFileName', 'TextTemplateFileName', 'HtmlLayoutFileName', 'HtmlTemplateFileName', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'name', 'secured', 'textLayoutFileName', 'textTemplateFileName', 'htmlLayoutFileName', 'htmlTemplateFileName', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
+        self::TYPE_COLNAME       => array(MessageTableMap::ID, MessageTableMap::NAME, MessageTableMap::SECURED, MessageTableMap::TEXT_LAYOUT_FILE_NAME, MessageTableMap::TEXT_TEMPLATE_FILE_NAME, MessageTableMap::HTML_LAYOUT_FILE_NAME, MessageTableMap::HTML_TEMPLATE_FILE_NAME, MessageTableMap::CREATED_AT, MessageTableMap::UPDATED_AT, MessageTableMap::VERSION, MessageTableMap::VERSION_CREATED_AT, MessageTableMap::VERSION_CREATED_BY, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'NAME', 'SECURED', 'TEXT_LAYOUT_FILE_NAME', 'TEXT_TEMPLATE_FILE_NAME', 'HTML_LAYOUT_FILE_NAME', 'HTML_TEMPLATE_FILE_NAME', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
+        self::TYPE_FIELDNAME     => array('id', 'name', 'secured', 'text_layout_file_name', 'text_template_file_name', 'html_layout_file_name', 'html_template_file_name', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
     );
 
     /**
@@ -145,12 +165,12 @@ class MessageTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Secured' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, 'Version' => 5, 'VersionCreatedAt' => 6, 'VersionCreatedBy' => 7, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'name' => 1, 'secured' => 2, 'createdAt' => 3, 'updatedAt' => 4, 'version' => 5, 'versionCreatedAt' => 6, 'versionCreatedBy' => 7, ),
-        self::TYPE_COLNAME       => array(MessageTableMap::ID => 0, MessageTableMap::NAME => 1, MessageTableMap::SECURED => 2, MessageTableMap::CREATED_AT => 3, MessageTableMap::UPDATED_AT => 4, MessageTableMap::VERSION => 5, MessageTableMap::VERSION_CREATED_AT => 6, MessageTableMap::VERSION_CREATED_BY => 7, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'NAME' => 1, 'SECURED' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, 'VERSION' => 5, 'VERSION_CREATED_AT' => 6, 'VERSION_CREATED_BY' => 7, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'secured' => 2, 'created_at' => 3, 'updated_at' => 4, 'version' => 5, 'version_created_at' => 6, 'version_created_by' => 7, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Secured' => 2, 'TextLayoutFileName' => 3, 'TextTemplateFileName' => 4, 'HtmlLayoutFileName' => 5, 'HtmlTemplateFileName' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, 'Version' => 9, 'VersionCreatedAt' => 10, 'VersionCreatedBy' => 11, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'name' => 1, 'secured' => 2, 'textLayoutFileName' => 3, 'textTemplateFileName' => 4, 'htmlLayoutFileName' => 5, 'htmlTemplateFileName' => 6, 'createdAt' => 7, 'updatedAt' => 8, 'version' => 9, 'versionCreatedAt' => 10, 'versionCreatedBy' => 11, ),
+        self::TYPE_COLNAME       => array(MessageTableMap::ID => 0, MessageTableMap::NAME => 1, MessageTableMap::SECURED => 2, MessageTableMap::TEXT_LAYOUT_FILE_NAME => 3, MessageTableMap::TEXT_TEMPLATE_FILE_NAME => 4, MessageTableMap::HTML_LAYOUT_FILE_NAME => 5, MessageTableMap::HTML_TEMPLATE_FILE_NAME => 6, MessageTableMap::CREATED_AT => 7, MessageTableMap::UPDATED_AT => 8, MessageTableMap::VERSION => 9, MessageTableMap::VERSION_CREATED_AT => 10, MessageTableMap::VERSION_CREATED_BY => 11, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'NAME' => 1, 'SECURED' => 2, 'TEXT_LAYOUT_FILE_NAME' => 3, 'TEXT_TEMPLATE_FILE_NAME' => 4, 'HTML_LAYOUT_FILE_NAME' => 5, 'HTML_TEMPLATE_FILE_NAME' => 6, 'CREATED_AT' => 7, 'UPDATED_AT' => 8, 'VERSION' => 9, 'VERSION_CREATED_AT' => 10, 'VERSION_CREATED_BY' => 11, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'secured' => 2, 'text_layout_file_name' => 3, 'text_template_file_name' => 4, 'html_layout_file_name' => 5, 'html_template_file_name' => 6, 'created_at' => 7, 'updated_at' => 8, 'version' => 9, 'version_created_at' => 10, 'version_created_by' => 11, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
     );
 
     /**
@@ -172,6 +192,10 @@ class MessageTableMap extends TableMap
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('NAME', 'Name', 'VARCHAR', true, 255, null);
         $this->addColumn('SECURED', 'Secured', 'TINYINT', false, null, null);
+        $this->addColumn('TEXT_LAYOUT_FILE_NAME', 'TextLayoutFileName', 'VARCHAR', false, 255, null);
+        $this->addColumn('TEXT_TEMPLATE_FILE_NAME', 'TextTemplateFileName', 'VARCHAR', false, 255, null);
+        $this->addColumn('HTML_LAYOUT_FILE_NAME', 'HtmlLayoutFileName', 'VARCHAR', false, 255, null);
+        $this->addColumn('HTML_TEMPLATE_FILE_NAME', 'HtmlTemplateFileName', 'VARCHAR', false, 255, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('VERSION', 'Version', 'INTEGER', false, null, 0);
@@ -354,6 +378,10 @@ class MessageTableMap extends TableMap
             $criteria->addSelectColumn(MessageTableMap::ID);
             $criteria->addSelectColumn(MessageTableMap::NAME);
             $criteria->addSelectColumn(MessageTableMap::SECURED);
+            $criteria->addSelectColumn(MessageTableMap::TEXT_LAYOUT_FILE_NAME);
+            $criteria->addSelectColumn(MessageTableMap::TEXT_TEMPLATE_FILE_NAME);
+            $criteria->addSelectColumn(MessageTableMap::HTML_LAYOUT_FILE_NAME);
+            $criteria->addSelectColumn(MessageTableMap::HTML_TEMPLATE_FILE_NAME);
             $criteria->addSelectColumn(MessageTableMap::CREATED_AT);
             $criteria->addSelectColumn(MessageTableMap::UPDATED_AT);
             $criteria->addSelectColumn(MessageTableMap::VERSION);
@@ -363,6 +391,10 @@ class MessageTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.NAME');
             $criteria->addSelectColumn($alias . '.SECURED');
+            $criteria->addSelectColumn($alias . '.TEXT_LAYOUT_FILE_NAME');
+            $criteria->addSelectColumn($alias . '.TEXT_TEMPLATE_FILE_NAME');
+            $criteria->addSelectColumn($alias . '.HTML_LAYOUT_FILE_NAME');
+            $criteria->addSelectColumn($alias . '.HTML_TEMPLATE_FILE_NAME');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
             $criteria->addSelectColumn($alias . '.VERSION');

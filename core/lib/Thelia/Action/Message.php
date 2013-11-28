@@ -82,8 +82,14 @@ class Message extends BaseAction implements EventSubscriberInterface
 
                 ->setTitle($event->getTitle())
                 ->setSubject($event->getSubject())
+
                 ->setHtmlMessage($event->getHtmlMessage())
                 ->setTextMessage($event->getTextMessage())
+
+                ->setHtmlLayoutFileName($event->getHtmlLayoutFileName())
+                ->setHtmlTemplateFileName($event->getHtmlTemplateFileName())
+                ->setTextLayoutFileName($event->getTextLayoutFileName())
+                ->setTextTemplateFileName($event->getTextTemplateFileName())
 
                 ->save();
 

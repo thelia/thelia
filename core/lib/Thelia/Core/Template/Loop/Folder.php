@@ -61,6 +61,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
+            Argument::createAnyTypeArgument('title'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -113,6 +114,12 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface
             if ($obj) {
                 $search->filterByContent($obj, Criteria::IN);
             }
+        }
+
+        $title = $this->getTitle();
+
+        if (!is_null($title)) {
+            $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
         }
 
         $visible = $this->getVisible();

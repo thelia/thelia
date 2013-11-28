@@ -1,0 +1,123 @@
+{extends file="email/template.tpl"}
+
+{* Open in browser  *}
+{block name="email-browsers"}{/block}
+
+{* Subject  *}
+{block name="email-subject"}Your order confirmation Nº __ORDER_REF__{/block}
+
+{* Title  *}
+{block name="email-title"}Thank you for your order!{/block}
+
+{* Content  *}
+{block name="email-content"}
+
+    {assign var="orderId" value="1"}
+
+    {loop name="order.invoice" type="order" id=$orderId customer="*"}
+        {loop name="currency.order" type="currency" id=$CURRENCY}
+            {assign "orderCurrencySymbol" $SYMBOL}
+            {assign var="orderCurrencyIsoCode" value=$ISOCODE}
+        {/loop}
+        {loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}
+            {assign var="customerRef" value=$REF}
+        {/loop}
+
+        Here are the details of your purchase:<br /><br />
+
+        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td valign="top" width="55%">
+                    <strong>Delivery address:</strong><br>
+                    {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                        {$FIRSTNAME} {$LASTNAME}<br />
+                        {$ADDRESS1}<br>
+                        {if $ADDRESS2 != ""}{$ADDRESS2}<br />{/if}
+                        {if $ADDRESS3 != ""}{$ADDRESS3}<br />{/if}
+                        {$CITY}<br />
+                        {$ZIPCODE}, {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}<br />
+                    {/loop}
+                </td>
+                <td valign="top">
+                    <strong>Billing address:</strong><br />
+                    {loop type="order_address" name="invoice_address" id=$INVOICE_ADDRESS}
+                    {$FIRSTNAME} {$LASTNAME}<br />
+                    {$ADDRESS1}<br>
+                    {if $ADDRESS2 != ""}{$ADDRESS2}<br />{/if}
+                    {if $ADDRESS3 != ""}{$ADDRESS3}<br />{/if}
+                    {$CITY}<br />
+                    {$ZIPCODE}, {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}<br />
+                    {/loop}
+                </td>
+            </tr>
+        </table>
+
+        <br />
+
+        <p>
+            Order Total: {$TOTAL_TAXED_AMOUNT} {$orderCurrencySymbol} <span style="font-size:90%;color:#777">{$orderCurrencyIsoCode}</span><br />
+            Order Number: {$REF}<br />
+            Paid With: {loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}<br />
+            Purchase Date: {format_date date=$CREATE_DATE output="date"}<br />
+            Delivery method: {loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}<br />
+        </p>
+
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size:13px;line-height:2em">
+            <tr style="color:#999;font-size:11px">
+                <td style="color:#999;border-bottom:1px solid #000">What You Purchased</td>
+                <td align="right" style="color:#999;border-bottom:1px solid #000">Price in {$orderCurrencyIsoCode}</td>
+            </tr>
+            {loop type="order_product" name="order-products" order=$ID}
+            {if $WAS_IN_PROMO == 1}
+                {assign "realPrice" $PROMO_PRICE}
+                {assign "realTax" $PROMO_PRICE_TAX}
+                {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+            {else}
+                {assign "realPrice" $PRICE}
+                {assign "realTax" $PRICE_TAX}
+                {assign "realTaxedPrice" $TAXED_PRICE}
+            {/if}
+                <tr>
+                    <td style="border-bottom:1px solid #000">
+                        <b>{$TITLE}</b> <i>({$REF})</i>
+                        {ifloop rel="combinations"}<br />
+                            {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                                <span style="color:#999;display:block;font-size:11px;line-height:1.2">* {$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}</span>
+                            {/loop}
+                        {/ifloop}
+                    </td>
+                    <td align="right" style="border-bottom:1px solid #000">
+                        {$QUANTITY} x {$realTaxedPrice} {$orderCurrencySymbol}
+                    </td>
+                </tr>
+            {/loop}
+            <tr>
+                <td align="right" style="text-align:right">Total</td>
+                <td align="right" style="text-align:right">{$TOTAL_TAXED_AMOUNT - $POSTAGE} {$orderCurrencySymbol}</td>
+            </tr>
+            <tr>
+                <td align="right" style="text-align:right">Shipping:</td>
+                <td align="right" style="text-align:right">{$POSTAGE} {$orderCurrencySymbol}</td>
+            </tr>
+            <tr>
+                <td align="right" style="text-align:right"><strong>Order Total</strong></td>
+                <td align="right" style="text-align:right"><strong>{$TOTAL_TAXED_AMOUNT} {$orderCurrencySymbol}</strong></td>
+            </tr>
+        </table>
+    {/loop}
+
+    <br />
+
+    <h2>Support</h2>
+    For any questions, or concerns, feel free to contact <a href="mailto:support@yourdomain.com" style="color:#3c69c1;text-decoration:none" target="_blank">support@yourdomain.com</a>.<br /><br />
+    <b>Our contact us at:</b> <br />
+    Thelia V2<br>
+    Street name of my business<br />
+    City<br />
+    75000, France
+
+    <br />
+    <br />
+    Thanks,<br />
+    The Thelia V2 team
+{/block}

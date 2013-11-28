@@ -116,6 +116,13 @@
 
                                 {module_include location='system_configuration_top'}
 
+                                {loop type="auth" name="pcc-store" role="ADMIN" resource="admin.configuration.store" access="VIEW"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/store'}">{intl l='Store'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/store'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
+
                                 {loop type="auth" name="pcc2" role="ADMIN" resource="admin.configuration.variable" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/variables'}">{intl l='System variables'}</a></td>
