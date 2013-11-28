@@ -23,6 +23,7 @@
 
 namespace Thelia\Coupon\Type;
 
+use Thelia\Coupon\FacadeInterface;
 use Thelia\Coupon\Type\CouponAbstract;
 
 /**
@@ -36,7 +37,7 @@ use Thelia\Coupon\Type\CouponAbstract;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RemoveXAmountManager extends CouponAbstract
+class RemoveXAmount extends CouponAbstract
 {
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_x_amount';
@@ -44,7 +45,7 @@ class RemoveXAmountManager extends CouponAbstract
     /**
      * Set Coupon
      *
-     * @param CouponInterface $adapter                    Provides necessary value from Thelia
+     * @param FacadeInterface $facade                     Provides necessary value from Thelia
      * @param string          $code                       Coupon code (ex: XMAS)
      * @param string          $title                      Coupon title (ex: Coupon for XMAS)
      * @param string          $shortDescription           Coupon short description
@@ -59,7 +60,7 @@ class RemoveXAmountManager extends CouponAbstract
      * @param \Datetime       $expirationDate             When the Code is expiring
      */
     public function set(
-        $adapter,
+        FacadeInterface $facade,
         $code,
         $title,
         $shortDescription,
@@ -87,7 +88,7 @@ class RemoveXAmountManager extends CouponAbstract
         $this->isEnabled = $isEnabled;
         $this->maxUsage = $maxUsage;
         $this->expirationDate = $expirationDate;
-        $this->adapter = $adapter;
+        $this->facade = $facade;
     }
 
     /**
@@ -97,7 +98,7 @@ class RemoveXAmountManager extends CouponAbstract
      */
     public function getName()
     {
-        return $this->adapter
+        return $this->facade
             ->getTranslator()
             ->trans('Remove X amount to total cart', array(), 'constraint');
     }
@@ -109,7 +110,7 @@ class RemoveXAmountManager extends CouponAbstract
      */
     public function getToolTip()
     {
-        $toolTip = $this->adapter
+        $toolTip = $this->facade
             ->getTranslator()
             ->trans(
                 'This coupon will remove the entered amount to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.',

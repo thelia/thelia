@@ -24,7 +24,6 @@
 namespace Thelia\Coupon;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Exception\CouponExpiredException;
@@ -48,7 +47,7 @@ class CouponFactory
     protected $container = null;
 
     /** @var  FacadeInterface Provide necessary value from Thelia*/
-    protected $adapter;
+    protected $facade;
 
     /**
      * Constructor
@@ -58,7 +57,7 @@ class CouponFactory
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->adapter = $container->get('thelia.adapter');
+        $this->facade = $container->get('thelia.facade');
     }
 
     /**
@@ -68,17 +67,14 @@ class CouponFactory
      *
      * @throws \Thelia\Exception\CouponExpiredException
      * @throws \Thelia\Exception\InvalidConditionException
-     * @throws \Symfony\Component\Translation\Exception\NotFoundResourceException
      * @return CouponInterface ready to be processed
      */
     public function buildCouponFromCode($couponCode)
     {
         /** @var Coupon $couponModel */
-        $couponModel = $this->adapter->findOneCouponByCode($couponCode);
+        $couponModel = $this->facade->findOneCouponByCode($couponCode);
         if ($couponModel === null) {
-            throw new NotFoundResourceException(
-                'Coupon ' . $couponCode . ' not found in Database'
-            );
+           return false;
         }
 
         if ($couponModel->getExpirationDate() < new \DateTime()) {
@@ -86,8 +82,8 @@ class CouponFactory
         }
 
         /** @var CouponInterface $couponInterface */
-        $couponInterface = $this->buildCouponInterfaceFromModel($couponModel);
-        if ($couponInterface->getConditions()->isEmpty()) {
+        $couponInterface = $this->buildCouponFromModel($couponModel);
+        if ($couponInterface && $couponInterface->getConditions()->isEmpty()) {
             throw new InvalidConditionException(
                 get_class($couponInterface)
             );
@@ -103,7 +99,7 @@ class CouponFactory
      *
      * @return CouponInterface ready to use CouponInterface object instance
      */
-    protected function buildCouponInterfaceFromModel(Coupon $model)
+    public function buildCouponFromModel(Coupon $model)
     {
         $isCumulative = ($model->getIsCumulative() == 1 ? true : false);
         $isRemovingPostage = ($model->getIsRemovingPostage() == 1 ? true : false);
@@ -115,7 +111,7 @@ class CouponFactory
         /** @var CouponInterface $couponManager*/
         $couponManager = $this->container->get($model->getType());
         $couponManager->set(
-            $this->adapter,
+            $this->facade,
             $model->getCode(),
             $model->getTitle(),
             $model->getShortDescription(),

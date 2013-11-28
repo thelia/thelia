@@ -26,7 +26,7 @@ namespace Thelia\Core\Template\Loop;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Util\PropelModelPager;
 use Thelia\Condition\ConditionFactory;
-use Thelia\Condition\ConditionManagerInterface;
+use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -106,7 +106,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
             /** @var CouponInterface $couponManager */
             $couponManager = $this->container->get($coupon->getType());
             $couponManager->set(
-                $this->container->get('thelia.adapter'),
+                $this->container->get('thelia.facade'),
                 $coupon->getCode(),
                 $coupon->getTitle(),
                 $coupon->getShortDescription(),
@@ -125,7 +125,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
             $daysLeftBeforeExpiration = floor($datediff/(60*60*24));
 
             $cleanedConditions = array();
-            /** @var ConditionManagerInterface $condition */
+            /** @var ConditionInterface $condition */
             foreach ($conditions->getConditions() as $condition) {
                 $cleanedConditions[] = $condition->getToolTip();
             }

@@ -21,27 +21,76 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Condition;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Condition\Implementation\ConditionInterface;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Manage how Condition could interact with a Checkout
+ * Manage a set of ConditionInterface
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-interface RuleOrganizerInterface
+class ConditionCollection
 {
+    /** @var array Array of ConditionInterface */
+    protected $conditions = array();
+
     /**
-     * Organize ConditionManagerInterface
+     * Get Conditions
      *
-     * @param array $conditions Array of ConditionManagerInterface
-     *
-     * @return array Array of ConditionManagerInterface sorted
+     * @return array Array of ConditionInterface
      */
-    public function organize(array $conditions);
+    public function getConditions()
+    {
+        return $this->conditions;
+    }
+
+    /**
+     * Add a ConditionInterface to the Collection
+     *
+     * @param ConditionInterface $condition Condition
+     *
+     * @return $this
+     */
+    public function add(ConditionInterface $condition)
+    {
+        $this->conditions[] = $condition;
+
+        return $this;
+    }
+
+    /**
+     * Check if there is at least one condition in the collection
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return (empty($this->conditions));
+    }
+
+    /**
+     * Allow to compare 2 set of conditions
+     *
+     * @return string Jsoned data
+     */
+    public function __toString()
+    {
+        $arrayToSerialize = array();
+        /** @var ConditionInterface $condition */
+        foreach ($this->getConditions() as $condition) {
+            $arrayToSerialize[] = $condition->getSerializableCondition();
+        }
+
+        return json_encode($arrayToSerialize);
+    }
+
+
 }

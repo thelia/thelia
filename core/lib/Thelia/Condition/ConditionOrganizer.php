@@ -21,76 +21,31 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Condition\ConditionManagerInterface;
+namespace Thelia\Condition;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Manage a set of ConditionManagerInterface
+ * Manage how Condition could interact with each others
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class ConditionCollection
+class ConditionOrganizer implements ConditionOrganizerInterface
 {
-    /** @var array Array of ConditionManagerInterface */
-    protected $conditions = array();
-
     /**
-     * Get Conditions
+     * Organize ConditionInterface
      *
-     * @return array Array of ConditionManagerInterface
+     * @param array $conditions Array of ConditionInterface
+     *
+     * @return array Array of ConditionInterface sorted
      */
-    public function getConditions()
+    public function organize(array $conditions)
     {
-        return $this->conditions;
+        // @todo: Implement organize() method.
     }
-
-    /**
-     * Add a ConditionManagerInterface to the Collection
-     *
-     * @param ConditionManagerInterface $condition Condition
-     *
-     * @return $this
-     */
-    public function add(ConditionManagerInterface $condition)
-    {
-        $this->conditions[] = $condition;
-
-        return $this;
-    }
-
-    /**
-     * Check if there is at least one condition in the collection
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return (empty($this->conditions));
-    }
-
-    /**
-     * Allow to compare 2 set of conditions
-     *
-     * @return string Jsoned data
-     */
-    public function __toString()
-    {
-        $arrayToSerialize = array();
-        /** @var ConditionManagerInterface $condition */
-        foreach ($this->getConditions() as $condition) {
-            $arrayToSerialize[] = $condition->getSerializableCondition();
-        }
-
-        return json_encode($arrayToSerialize);
-    }
-
 
 }

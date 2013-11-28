@@ -1,6 +1,6 @@
 <?php
-use Thelia\Condition\Implementation\MatchForTotalAmountManager;
-use Thelia\Condition\Implementation\MatchForXArticlesManager;
+use Thelia\Condition\Implementation\MatchForTotalAmount;
+use Thelia\Condition\Implementation\MatchForXArticles;
 use Imagine\Image\Point;
 
 require __DIR__ . '/../core/bootstrap.php';

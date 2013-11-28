@@ -21,31 +21,91 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Condition\Implementation;
+
+use Thelia\Condition\SerializableCondition;
+use Thelia\Core\Translation\Translator;
+use Thelia\Coupon\FacadeInterface;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Manage how Coupons could interact with a Checkout
+ * Manage how the application checks its state in order to check if it matches the implemented condition
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RuleOrganizer implements RuleOrganizerInterface
+interface ConditionInterface
 {
     /**
-     * Organize ConditionManagerInterface
+     * Constructor
      *
-     * @param array $conditions Array of ConditionManagerInterface
-     *
-     * @return array Array of ConditionManagerInterface sorted
+     * @param FacadeInterface $adapter Service adapter
      */
-    public function organize(array $conditions)
-    {
-        // @todo: Implement organize() method.
-    }
+    function __construct(FacadeInterface $adapter);
+
+    /**
+     * Get Condition Service id
+     *
+     * @return string
+     */
+    public function getServiceId();
+
+    /**
+     * Check validators relevancy and store them
+     *
+     * @param array $operators Operators the Admin set in BackOffice
+     * @param array $values    Values the Admin set in BackOffice
+     *
+     * @throws \InvalidArgumentException
+     * @return $this
+     */
+    public function setValidatorsFromForm(array $operators, array $values);
+
+    /**
+     * Test if the current application state matches conditions
+     *
+     * @return bool
+     */
+    public function isMatching();
+
+    /**
+     * Return all available Operators for this condition
+     *
+     * @return array Operators::CONST
+     */
+    public function getAvailableOperators();
+
+
+    /**
+     * Get I18n name
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * Get I18n tooltip
+     *
+     * @return string
+     */
+    public function getToolTip();
+
+    /**
+     * Return all validators
+     *
+     * @return array
+     */
+    public function getValidators();
+
+    /**
+     * Return a serializable Condition
+     *
+     * @return SerializableCondition
+     */
+    public function getSerializableCondition();
 
 }
