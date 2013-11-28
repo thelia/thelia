@@ -1652,6 +1652,9 @@ CREATE TABLE `product_i18n`
     `description` LONGTEXT,
     `chapo` TEXT,
     `postscriptum` TEXT,
+    `meta_title` VARCHAR(255),
+    `meta_description` TEXT,
+    `meta_keyword` TEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `product_i18n_FK_1`
         FOREIGN KEY (`id`)
