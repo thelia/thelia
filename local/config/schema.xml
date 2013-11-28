@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
@@ -823,10 +823,6 @@
     <column name="subject" type="LONGVARCHAR" />
     <column name="text_message" type="CLOB" />
     <column name="html_message" type="CLOB" />
-    <column name="text_layout_file_name" size="255" type="VARCHAR" />
-    <column name="text_template_file_name" size="255" type="VARCHAR" />
-    <column name="html_layout_file_name" size="255" type="VARCHAR" />
-    <column name="html_template_file_name" size="255" type="VARCHAR" />
     <unique name="name_UNIQUE">
       <unique-column name="name" />
     </unique>
