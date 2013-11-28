@@ -30,13 +30,13 @@ use Thelia\Log\Tlog;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Thrown when the Adapter is not set
+ * Thrown when the Facade is not set
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class MissingAdapterException extends \RuntimeException
+class MissingFacadeException extends \RuntimeException
 {
     /**
      * {@inheritdoc}

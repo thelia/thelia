@@ -28,7 +28,7 @@ namespace Thelia\Condition;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * A condition set by an admin ready to be serialized and stored in DataBase
+ * A condition ready to be serialized and stored in DataBase
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>

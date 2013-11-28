@@ -24,7 +24,7 @@
 namespace Thelia\Condition\Implementation;
 
 use InvalidArgumentException;
-use Thelia\Condition\ConditionManagerAbstract;
+use Thelia\Condition\Implementation\ConditionAbstract;
 use Thelia\Condition\Operators;
 use Thelia\Exception\InvalidConditionOperatorException;
 use Thelia\Exception\InvalidConditionValueException;
@@ -40,7 +40,7 @@ use Thelia\Exception\InvalidConditionValueException;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class MatchForXArticlesManager extends ConditionManagerAbstract
+class MatchForXArticles extends ConditionAbstract
 {
     /** Condition 1st parameter : quantity */
     CONST INPUT1 = 'quantity';

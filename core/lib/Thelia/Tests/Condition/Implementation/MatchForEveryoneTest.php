@@ -33,13 +33,13 @@ use Thelia\Model\Currency;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test MatchForEveryoneManager Class
+ * Unit Test MatchForEveryone Class
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
+class MatchForEveryoneTest extends \PHPUnit_Framework_TestCase
 {
     /** @var FacadeInterface $stubTheliaAdapter */
     protected $stubTheliaAdapter = null;
@@ -96,7 +96,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if validity test on BackOffice inputs are working
      *
-     * @covers Thelia\Condition\Implementation\MatchForEveryoneManager::setValidators
+     * @covers Thelia\Condition\Implementation\MatchForEveryone::setValidators
      *
      */
     public function testValidBackOfficeInputOperator()
@@ -104,7 +104,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
         $stubFacade = $this->generateFacadeStub(399, 'EUR');
 
         /** @var FacadeInterface $stubFacade */
-        $condition1 = new MatchForEveryoneManager($stubFacade);
+        $condition1 = new MatchForEveryone($stubFacade);
         $operators = array();
         $values = array();
         $condition1->setValidatorsFromForm($operators, $values);
@@ -119,7 +119,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if condition is always matching
      *
-     * @covers Thelia\Condition\Implementation\MatchForEveryoneManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForEveryone::isMatching
      *
      */
     public function testIsMatching()
@@ -127,7 +127,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
         $stubFacade = $this->generateFacadeStub(399, 'EUR');
 
         /** @var FacadeInterface $stubFacade */
-        $condition1 = new MatchForEveryoneManager($stubFacade);
+        $condition1 = new MatchForEveryone($stubFacade);
 
         $isValid = $condition1->isMatching();
 
@@ -139,7 +139,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check getName i18n
      *
-     * @covers Thelia\Condition\Implementation\MatchForEveryoneManager::getName
+     * @covers Thelia\Condition\Implementation\MatchForEveryone::getName
      *
      */
     public function testGetName()
@@ -147,7 +147,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Everybody can use it (no condition)');
 
         /** @var FacadeInterface $stubFacade */
-        $condition1 = new MatchForEveryoneManager($stubFacade);
+        $condition1 = new MatchForEveryone($stubFacade);
 
         $actual = $condition1->getName();
         $expected = 'Everybody can use it (no condition)';
@@ -157,7 +157,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check tooltip i18n
      *
-     * @covers Thelia\Condition\Implementation\MatchForEveryoneManager::getToolTip
+     * @covers Thelia\Condition\Implementation\MatchForEveryone::getToolTip
      *
      */
     public function testGetToolTip()
@@ -165,7 +165,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Will return always true');
 
         /** @var FacadeInterface $stubFacade */
-        $condition1 = new MatchForEveryoneManager($stubFacade);
+        $condition1 = new MatchForEveryone($stubFacade);
 
         $actual = $condition1->getToolTip();
         $expected = 'Will return always true';
@@ -175,15 +175,15 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check validator
      *
-     * @covers Thelia\Condition\Implementation\MatchForEveryoneManager::generateInputs
-     * @covers Thelia\Condition\Implementation\MatchForEveryoneManager::setValidatorsFromForm
+     * @covers Thelia\Condition\Implementation\MatchForEveryone::generateInputs
+     * @covers Thelia\Condition\Implementation\MatchForEveryone::setValidatorsFromForm
      */
     public function testGetValidator()
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR');
 
         /** @var FacadeInterface $stubFacade */
-        $condition1 = new MatchForEveryoneManager($stubFacade);
+        $condition1 = new MatchForEveryone($stubFacade);
         $actual1 = $condition1->setValidatorsFromForm(array(), array());
         $expected1 = $condition1;
         $actual2 = $condition1->getValidators();

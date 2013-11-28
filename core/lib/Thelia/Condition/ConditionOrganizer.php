@@ -37,11 +37,11 @@ namespace Thelia\Condition;
 class ConditionOrganizer implements ConditionOrganizerInterface
 {
     /**
-     * Organize ConditionManagerInterface
+     * Organize ConditionInterface
      *
-     * @param array $conditions Array of ConditionManagerInterface
+     * @param array $conditions Array of ConditionInterface
      *
-     * @return array Array of ConditionManagerInterface sorted
+     * @return array Array of ConditionInterface sorted
      */
     public function organize(array $conditions)
     {

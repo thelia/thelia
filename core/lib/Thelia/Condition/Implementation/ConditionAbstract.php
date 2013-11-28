@@ -21,9 +21,12 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Condition;
+namespace Thelia\Condition\Implementation;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
+use Thelia\Condition\ConditionEvaluator;
+use Thelia\Condition\Operators;
+use Thelia\Condition\SerializableCondition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
@@ -35,13 +38,13 @@ use Thelia\Type\FloatType;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Assist in writing a condition of whether the Rule is applied or not
+ * Assist in writing a condition of whether the Condition is applied or not
  *
  * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-abstract class ConditionManagerAbstract implements ConditionManagerInterface
+abstract class ConditionAbstract implements ConditionInterface
 {
 
     /** @var string Service Id from Resources/config.xml  */

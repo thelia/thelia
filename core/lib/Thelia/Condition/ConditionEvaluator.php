@@ -24,6 +24,7 @@
 namespace Thelia\Condition;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Condition\Operators;
 use Thelia\Condition\ConditionCollection;
 
@@ -51,7 +52,7 @@ class ConditionEvaluator
     public function isMatching(ConditionCollection $conditions)
     {
         $isMatching = true;
-        /** @var ConditionManagerInterface $condition */
+        /** @var ConditionInterface $condition */
         foreach ($conditions->getConditions() as $condition) {
             if (!$condition->isMatching()) {
                 $isMatching = false;

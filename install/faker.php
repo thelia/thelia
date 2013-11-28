@@ -1,9 +1,9 @@
 <?php
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionFactory;
-use Thelia\Condition\Implementation\MatchForEveryoneManager;
-use Thelia\Condition\Implementation\MatchForTotalAmountManager;
-use Thelia\Condition\Implementation\MatchForXArticlesManager;
+use Thelia\Condition\Implementation\MatchForEveryone;
+use Thelia\Condition\Implementation\MatchForTotalAmount;
+use Thelia\Condition\Implementation\MatchForXArticles;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Condition\ConditionCollection;
@@ -669,25 +669,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $date = new \DateTime();
     $coupon1->setExpirationDate($date->setTimestamp(strtotime("today + 3 months")));
 
-    $condition1 = new MatchForTotalAmountManager($adapter);
+    $condition1 = new MatchForTotalAmount($adapter);
     $operators = array(
-        MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-        MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+        MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+        MatchForTotalAmount::INPUT2 => Operators::EQUAL
     );
     $values = array(
-        MatchForTotalAmountManager::INPUT1 => 40.00,
-        MatchForTotalAmountManager::INPUT2 => 'EUR'
+        MatchForTotalAmount::INPUT1 => 40.00,
+        MatchForTotalAmount::INPUT2 => 'EUR'
     );
     $condition1->setValidatorsFromForm($operators, $values);
 
-    $condition2 = new MatchForTotalAmountManager($adapter);
+    $condition2 = new MatchForTotalAmount($adapter);
     $operators = array(
-        MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR,
-        MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+        MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
+        MatchForTotalAmount::INPUT2 => Operators::EQUAL
     );
     $values = array(
-        MatchForTotalAmountManager::INPUT1 => 400.00,
-        MatchForTotalAmountManager::INPUT2 => 'EUR'
+        MatchForTotalAmount::INPUT1 => 400.00,
+        MatchForTotalAmount::INPUT2 => 'EUR'
     );
     $condition2->setValidatorsFromForm($operators, $values);
 
@@ -727,12 +727,12 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $date = new \DateTime();
     $coupon2->setExpirationDate($date->setTimestamp(strtotime("today + 1 months")));
 
-    $condition1 = new MatchForXArticlesManager($adapter);
+    $condition1 = new MatchForXArticles($adapter);
     $operators = array(
-        MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR,
+        MatchForXArticles::INPUT1 => Operators::SUPERIOR,
     );
     $values = array(
-        MatchForXArticlesManager::INPUT1 => 4,
+        MatchForXArticles::INPUT1 => 4,
     );
     $condition1->setValidatorsFromForm($operators, $values);
     $conditions = new ConditionCollection();
@@ -771,7 +771,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $date = new \DateTime();
     $coupon3->setExpirationDate($date->setTimestamp(strtotime("today + 2 months")));
 
-    $condition1 = new MatchForEveryoneManager($adapter);
+    $condition1 = new MatchForEveryone($adapter);
     $operators = array();
     $values = array();
     $condition1->setValidatorsFromForm($operators, $values);

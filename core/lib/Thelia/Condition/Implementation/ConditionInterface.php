@@ -23,27 +23,36 @@
 
 namespace Thelia\Condition\Implementation;
 
-use InvalidArgumentException;
-use Thelia\Condition\ConditionManagerAbstract;
+use Thelia\Condition\SerializableCondition;
+use Thelia\Core\Translation\Translator;
+use Thelia\Coupon\FacadeInterface;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Allow every one, perform no check
+ * Manage how the application checks its state in order to check if it matches the implemented condition
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class MatchForEveryoneManager extends ConditionManagerAbstract
+interface ConditionInterface
 {
-    /** @var string Service Id from Resources/config.xml  */
-    protected $serviceId = 'thelia.condition.match_for_everyone';
+    /**
+     * Constructor
+     *
+     * @param FacadeInterface $adapter Service adapter
+     */
+    function __construct(FacadeInterface $adapter);
 
-    /** @var array Available Operators (Operators::CONST) */
-    protected $availableOperators = array();
+    /**
+     * Get Condition Service id
+     *
+     * @return string
+     */
+    public function getServiceId();
 
     /**
      * Check validators relevancy and store them
@@ -54,75 +63,49 @@ class MatchForEveryoneManager extends ConditionManagerAbstract
      * @throws \InvalidArgumentException
      * @return $this
      */
-    public function setValidatorsFromForm(array $operators, array $values)
-    {
-        $this->setValidators();
-
-        return $this;
-    }
+    public function setValidatorsFromForm(array $operators, array $values);
 
     /**
-     * Check validators relevancy and store them
-     *
-     * @throws \InvalidArgumentException
-     * @return $this
-     */
-    protected function setValidators()
-    {
-        $this->operators = array();
-        $this->values = array();
-
-        return $this;
-    }
-
-    /**
-     * Test if Customer meets conditions
+     * Test if the current application state matches conditions
      *
      * @return bool
      */
-    public function isMatching()
-    {
-        return true;
-    }
+    public function isMatching();
+
+    /**
+     * Return all available Operators for this condition
+     *
+     * @return array Operators::CONST
+     */
+    public function getAvailableOperators();
+
 
     /**
      * Get I18n name
      *
      * @return string
      */
-    public function getName()
-    {
-        return $this->translator->trans(
-            'Everybody can use it (no condition)',
-            array(),
-            'condition'
-        );
-    }
+    public function getName();
 
     /**
      * Get I18n tooltip
      *
      * @return string
      */
-    public function getToolTip()
-    {
-        $toolTip = $this->translator->trans(
-            'Will return always true',
-            array(),
-            'condition'
-        );
-
-        return $toolTip;
-    }
+    public function getToolTip();
 
     /**
-     * Generate inputs ready to be drawn
+     * Return all validators
      *
      * @return array
      */
-    protected function generateInputs()
-    {
-        return array();
-    }
+    public function getValidators();
+
+    /**
+     * Return a serializable Condition
+     *
+     * @return SerializableCondition
+     */
+    public function getSerializableCondition();
 
 }
