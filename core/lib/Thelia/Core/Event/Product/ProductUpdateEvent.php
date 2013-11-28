@@ -33,7 +33,6 @@ class ProductUpdateEvent extends ProductCreateEvent
     protected $description;
     protected $postscriptum;
 
-    protected $url;
     protected $parent;
 
     public function __construct($product_id)
@@ -85,18 +84,6 @@ class ProductUpdateEvent extends ProductCreateEvent
     public function setPostscriptum($postscriptum)
     {
         $this->postscriptum = $postscriptum;
-
-        return $this;
-    }
-
-    public function getUrl()
-    {
-        return $this->url;
-    }
-
-    public function setUrl($url)
-    {
-        $this->url = $url;
 
         return $this;
     }
