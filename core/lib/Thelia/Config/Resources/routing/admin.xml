@@ -263,6 +263,10 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::processUpdateAction</default>
     </route>
 
+    <route id="admin.products.seo.save" path="/admin/products/seo/save">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::processUpdateSeoAction</default>
+    </route>
+
     <route id="admin.products.set-default" path="/admin/products/toggle-online">
         <default key="_controller">Thelia\Controller\Admin\ProductController::setToggleVisibilityAction</default>
     </route>
