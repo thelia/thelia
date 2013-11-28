@@ -23,9 +23,12 @@
 namespace Thelia\Action;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Model\AdminLog;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Event\UpdateSeoEvent;
+
+use \Thelia\Model\Tools\UrlRewritingTrait;
 
 class BaseAction
 {
@@ -73,4 +76,35 @@ class BaseAction
                 return $object->movePositionDown();
         }
     }
+
+    /**
+     * Changes SEO Fields for an object.
+     *
+     * @param ModelCriteria       $query
+     * @param UpdateSeoEvent      $event
+     *
+     * @return mixed
+     */
+    protected function genericUpdateSeo(ModelCriteria $query, UpdateSeoEvent $event)
+    {
+        if (null !== $object = $query->findPk($event->getObjectId())) {
+
+            $object
+                ->setDispatcher($this->getDispatcher())
+
+                ->setLocale($event->getLocale())
+                ->setMetaTitle($event->getMetaTitle())
+                ->setMetaDescription($event->getMetaDescription())
+                ->setMetaKeyword($event->getMetaKeyword())
+
+                ->save()
+            ;
+
+            // Update the rewriten URL, if required
+            $object->setRewrittenUrl($event->getLocale(), $event->getUrl());
+
+           return $object;
+        }
+    }
+
 }

@@ -23,9 +23,12 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\AccessManager;
-use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Core\Security\AccessManager;
+
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Form\SeoForm;
 
 /**
  * An abstract CRUD controller for Thelia ADMIN, to manage basic CRUD operations on a givent object.
@@ -49,6 +52,7 @@ abstract class AbstractCrudController extends BaseAdminController
     protected $deleteEventIdentifier;
     protected $visibilityToggleEventIdentifier;
     protected $changePositionEventIdentifier;
+    protected $updateSeoEventIdentifier;
 
     /**
      * @param string $objectName the lower case object name. Example. "message"
@@ -64,6 +68,7 @@ abstract class AbstractCrudController extends BaseAdminController
      *
      * @param string $visibilityToggleEventIdentifier the dispatched visibility toggle TheliaEvent identifier, or null if the object has no visible options. Example: TheliaEvents::MESSAGE_TOGGLE_VISIBILITY
      * @param string $changePositionEventIdentifier   the dispatched position change TheliaEvent identifier, or null if the object has no position. Example: TheliaEvents::MESSAGE_UPDATE_POSITION
+     * @param string $updateSeoEventIdentifier   the dispatched update SEO change TheliaEvent identifier, or null if the object has no SEO. Example: TheliaEvents::MESSAGE_UPDATE_SEO
      */
     public function __construct(
             $objectName,
@@ -77,7 +82,8 @@ abstract class AbstractCrudController extends BaseAdminController
             $updateEventIdentifier,
             $deleteEventIdentifier,
             $visibilityToggleEventIdentifier = null,
-            $changePositionEventIdentifier = null
+            $changePositionEventIdentifier = null,
+            $updateSeoEventIdentifier = null
     ) {
             $this->objectName = $objectName;
 
@@ -91,6 +97,7 @@ abstract class AbstractCrudController extends BaseAdminController
             $this->deleteEventIdentifier = $deleteEventIdentifier;
             $this->visibilityToggleEventIdentifier = $visibilityToggleEventIdentifier;
             $this->changePositionEventIdentifier = $changePositionEventIdentifier;
+            $this->updateSeoEventIdentifier = $updateSeoEventIdentifier;
     }
 
     /**
@@ -139,7 +146,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Get the created object from an event.
      *
-     * @param unknown $createEvent
+     * @param unknown $event
      */
     abstract protected function getObjectFromEvent($event);
 
@@ -230,10 +237,21 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Put in this method post object position change processing if required.
      *
-     * @param  unknown  $deleteEvent the delete event
+     * @param  unknown  $positionChangeEvent the delete event
      * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalUpdatePositionAction($positionChangeEvent)
+    {
+        return null;
+    }
+
+    /**
+     * Put in this method post object update SEO processing if required.
+     *
+     * @param  unknown  $seoUpdateEvent the update event
+     * @return Response a response, or null to continue normal processing
+     */
+    protected function performAdditionalUpdateSeoAction($updateSeoEvent)
     {
         return null;
     }
@@ -418,6 +436,93 @@ abstract class AbstractCrudController extends BaseAdminController
 
         $this->setupFormErrorContext(
                 $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)), $error_msg, $changeForm, $ex);
+
+        // At this point, the form has errors, and should be redisplayed.
+        return $this->renderEditionTemplate();
+    }
+
+
+    /**
+     * Return the update SEO form for this object
+     */
+    protected function getUpdateSeoForm()
+    {
+        return new SeoForm($this->getRequest());
+    }
+
+    /**
+     * Creates the update SEO event with the provided form data
+     *
+     * @param $formData
+     * @return UpdateSeoEvent
+     */
+    protected function getUpdateSeoEvent($formData)
+    {
+
+        $updateSeoEvent = new UpdateSeoEvent($formData['id']);
+
+        $updateSeoEvent
+            ->setLocale($formData['locale'])
+            ->setMetaTitle($formData['meta_title'])
+            ->setMetaDescription($formData['meta_description'])
+            ->setMetaKeyword($formData['meta_keyword'])
+        ;
+
+        // Create and dispatch the change event
+        return $updateSeoEvent;
+    }
+
+    /**
+     * Update SEO modification, and either go back to the object list, or stay on the edition page.
+     *
+     * @return Thelia\Core\HttpFoundation\Response the response
+     */
+
+    public function processUpdateSeoAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+
+        $error_msg = false;
+
+        // Create the form from the request
+        $updateSeoForm = $this->getUpdateSeoForm($this->getRequest());
+
+        try {
+
+            // Check the form against constraints violations
+            $form = $this->validateForm($updateSeoForm, "POST");
+
+            // Get the form field values
+            $data = $form->getData();
+
+            $updateSeoEvent = $this->getUpdateSeoEvent($data);
+
+            $this->dispatch($this->updateSeoEventIdentifier, $updateSeoEvent);
+
+        } catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+
+        $response = $this->performAdditionalUpdateSeoAction($updateSeoEvent);
+
+        if ($response == null) {
+            // If we have to stay on the same page, do not redirect to the successUrl,
+            // just redirect to the edit page again.
+            if ($this->getRequest()->get('save_mode') == 'stay') {
+                $this->redirectToEditionTemplate($this->getRequest());
+            }
+
+            // Redirect to the success URL
+            $this->redirect($updateSeoForm->getSuccessUrl());
+        } else {
+            return $response;
+        }
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->renderEditionTemplate();

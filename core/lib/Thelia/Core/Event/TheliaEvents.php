@@ -160,6 +160,7 @@ final class TheliaEvents
     const CATEGORY_DELETE            = "action.deleteCategory";
     const CATEGORY_TOGGLE_VISIBILITY = "action.toggleCategoryVisibility";
     const CATEGORY_UPDATE_POSITION   = "action.updateCategoryPosition";
+    const CATEGORY_UPDATE_SEO        = "action.updateCategorySeo";
 
     const CATEGORY_ADD_CONTENT      = "action.categoryAddContent";
     const CATEGORY_REMOVE_CONTENT   = "action.categoryRemoveContent";
@@ -197,6 +198,7 @@ final class TheliaEvents
     const CONTENT_DELETE            = "action.deleteContent";
     const CONTENT_TOGGLE_VISIBILITY = "action.toggleContentVisibility";
     const CONTENT_UPDATE_POSITION   = "action.updateContentPosition";
+    const CONTENT_UPDATE_SEO        = "action.updateContentSeo";
 
     const CONTENT_ADD_FOLDER      = "action.contentAddFolder";
     const CONTENT_REMOVE_FOLDER   = "action.contentRemoveFolder";
@@ -269,6 +271,7 @@ final class TheliaEvents
     const PRODUCT_DELETE            = "action.deleteProduct";
     const PRODUCT_TOGGLE_VISIBILITY = "action.toggleProductVisibility";
     const PRODUCT_UPDATE_POSITION   = "action.updateProductPosition";
+    const PRODUCT_UPDATE_SEO        = "action.updateProductSeo";
 
     const PRODUCT_ADD_CONTENT             = "action.productAddContent";
     const PRODUCT_REMOVE_CONTENT          = "action.productRemoveContent";
