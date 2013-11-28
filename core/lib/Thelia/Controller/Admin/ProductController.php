@@ -1110,7 +1110,7 @@ class ProductController extends AbstractCrudController
             $this->dispatch(TheliaEvents::PRODUCT_COMBINATION_GENERATION, $event);
 
             // Log object modification
-            $this->adminLogAppend(sprintf("Combination generation for product reference %s", $event->getProduct()->getRef()));
+            $this->adminLogAppend($this->resourceCode, AccessManager::CREATE, sprintf("Combination generation for product reference %s", $event->getProduct()->getRef()));
 
            // Redirect to the success URL
            $this->redirect($changeForm->getSuccessUrl());
