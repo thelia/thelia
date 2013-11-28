@@ -42,6 +42,7 @@ use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductQuery;
+use Thelia\TaxEngine\TaxEngine;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -464,7 +465,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             return $this->parseComplex($loopResult);
         }
 
-        $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
+        $taxCountry = TaxEngine::getInstance($this->request->getSession())->getTaxCountry();
 
         foreach ($loopResult->getResultDataCollection() as $product) {
 
@@ -979,7 +980,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     {
         $loopResult = new LoopResult($results);
 
-        $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
+        $taxCountry = TaxEngine::getInstance($this->request->getSession())->getTaxCountry();
 
         foreach ($loopResult->getResultDataCollection() as $product) {
 
