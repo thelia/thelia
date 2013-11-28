@@ -135,7 +135,7 @@ class SmartyAssetsManager
             $file = substr($file, 3);
         }
 
-        $assetOrigin    = isset($params['origin']) ? $params['origin'] : "0";
+        $assetOrigin    = isset($params['source']) ? $params['source'] : "0";
         $filters        = isset($params['filters']) ? $params['filters'] : '';
         $debug          = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
 
