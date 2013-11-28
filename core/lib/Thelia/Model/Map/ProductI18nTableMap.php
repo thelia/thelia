@@ -57,7 +57,7 @@ class ProductI18nTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 9;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class ProductI18nTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 9;
 
     /**
      * the column name for the ID field
@@ -100,6 +100,21 @@ class ProductI18nTableMap extends TableMap
     const POSTSCRIPTUM = 'product_i18n.POSTSCRIPTUM';
 
     /**
+     * the column name for the META_TITLE field
+     */
+    const META_TITLE = 'product_i18n.META_TITLE';
+
+    /**
+     * the column name for the META_DESCRIPTION field
+     */
+    const META_DESCRIPTION = 'product_i18n.META_DESCRIPTION';
+
+    /**
+     * the column name for the META_KEYWORD field
+     */
+    const META_KEYWORD = 'product_i18n.META_KEYWORD';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -111,12 +126,12 @@ class ProductI18nTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Locale', 'Title', 'Description', 'Chapo', 'Postscriptum', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'locale', 'title', 'description', 'chapo', 'postscriptum', ),
-        self::TYPE_COLNAME       => array(ProductI18nTableMap::ID, ProductI18nTableMap::LOCALE, ProductI18nTableMap::TITLE, ProductI18nTableMap::DESCRIPTION, ProductI18nTableMap::CHAPO, ProductI18nTableMap::POSTSCRIPTUM, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', 'TITLE', 'DESCRIPTION', 'CHAPO', 'POSTSCRIPTUM', ),
-        self::TYPE_FIELDNAME     => array('id', 'locale', 'title', 'description', 'chapo', 'postscriptum', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'Locale', 'Title', 'Description', 'Chapo', 'Postscriptum', 'MetaTitle', 'MetaDescription', 'MetaKeyword', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'locale', 'title', 'description', 'chapo', 'postscriptum', 'metaTitle', 'metaDescription', 'metaKeyword', ),
+        self::TYPE_COLNAME       => array(ProductI18nTableMap::ID, ProductI18nTableMap::LOCALE, ProductI18nTableMap::TITLE, ProductI18nTableMap::DESCRIPTION, ProductI18nTableMap::CHAPO, ProductI18nTableMap::POSTSCRIPTUM, ProductI18nTableMap::META_TITLE, ProductI18nTableMap::META_DESCRIPTION, ProductI18nTableMap::META_KEYWORD, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', 'TITLE', 'DESCRIPTION', 'CHAPO', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORD', ),
+        self::TYPE_FIELDNAME     => array('id', 'locale', 'title', 'description', 'chapo', 'postscriptum', 'meta_title', 'meta_description', 'meta_keyword', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -126,12 +141,12 @@ class ProductI18nTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, 'Title' => 2, 'Description' => 3, 'Chapo' => 4, 'Postscriptum' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, 'chapo' => 4, 'postscriptum' => 5, ),
-        self::TYPE_COLNAME       => array(ProductI18nTableMap::ID => 0, ProductI18nTableMap::LOCALE => 1, ProductI18nTableMap::TITLE => 2, ProductI18nTableMap::DESCRIPTION => 3, ProductI18nTableMap::CHAPO => 4, ProductI18nTableMap::POSTSCRIPTUM => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, 'TITLE' => 2, 'DESCRIPTION' => 3, 'CHAPO' => 4, 'POSTSCRIPTUM' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, 'chapo' => 4, 'postscriptum' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, 'Title' => 2, 'Description' => 3, 'Chapo' => 4, 'Postscriptum' => 5, 'MetaTitle' => 6, 'MetaDescription' => 7, 'MetaKeyword' => 8, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, 'chapo' => 4, 'postscriptum' => 5, 'metaTitle' => 6, 'metaDescription' => 7, 'metaKeyword' => 8, ),
+        self::TYPE_COLNAME       => array(ProductI18nTableMap::ID => 0, ProductI18nTableMap::LOCALE => 1, ProductI18nTableMap::TITLE => 2, ProductI18nTableMap::DESCRIPTION => 3, ProductI18nTableMap::CHAPO => 4, ProductI18nTableMap::POSTSCRIPTUM => 5, ProductI18nTableMap::META_TITLE => 6, ProductI18nTableMap::META_DESCRIPTION => 7, ProductI18nTableMap::META_KEYWORD => 8, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, 'TITLE' => 2, 'DESCRIPTION' => 3, 'CHAPO' => 4, 'POSTSCRIPTUM' => 5, 'META_TITLE' => 6, 'META_DESCRIPTION' => 7, 'META_KEYWORD' => 8, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, 'chapo' => 4, 'postscriptum' => 5, 'meta_title' => 6, 'meta_description' => 7, 'meta_keyword' => 8, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -156,6 +171,9 @@ class ProductI18nTableMap extends TableMap
         $this->addColumn('DESCRIPTION', 'Description', 'CLOB', false, null, null);
         $this->addColumn('CHAPO', 'Chapo', 'LONGVARCHAR', false, null, null);
         $this->addColumn('POSTSCRIPTUM', 'Postscriptum', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('META_TITLE', 'MetaTitle', 'VARCHAR', false, 255, null);
+        $this->addColumn('META_DESCRIPTION', 'MetaDescription', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('META_KEYWORD', 'MetaKeyword', 'LONGVARCHAR', false, null, null);
     } // initialize()
 
     /**
@@ -359,6 +377,9 @@ class ProductI18nTableMap extends TableMap
             $criteria->addSelectColumn(ProductI18nTableMap::DESCRIPTION);
             $criteria->addSelectColumn(ProductI18nTableMap::CHAPO);
             $criteria->addSelectColumn(ProductI18nTableMap::POSTSCRIPTUM);
+            $criteria->addSelectColumn(ProductI18nTableMap::META_TITLE);
+            $criteria->addSelectColumn(ProductI18nTableMap::META_DESCRIPTION);
+            $criteria->addSelectColumn(ProductI18nTableMap::META_KEYWORD);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.LOCALE');
@@ -366,6 +387,9 @@ class ProductI18nTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.DESCRIPTION');
             $criteria->addSelectColumn($alias . '.CHAPO');
             $criteria->addSelectColumn($alias . '.POSTSCRIPTUM');
+            $criteria->addSelectColumn($alias . '.META_TITLE');
+            $criteria->addSelectColumn($alias . '.META_DESCRIPTION');
+            $criteria->addSelectColumn($alias . '.META_KEYWORD');
         }
     }
 

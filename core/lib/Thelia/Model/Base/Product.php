@@ -5866,6 +5866,78 @@ abstract class Product implements ActiveRecordInterface
         return $this;
     }
 
+
+        /**
+         * Get the [meta_title] column value.
+         *
+         * @return   string
+         */
+        public function getMetaTitle()
+        {
+        return $this->getCurrentTranslation()->getMetaTitle();
+    }
+
+
+        /**
+         * Set the value of [meta_title] column.
+         *
+         * @param      string $v new value
+         * @return   \Thelia\Model\ProductI18n The current object (for fluent API support)
+         */
+        public function setMetaTitle($v)
+        {    $this->getCurrentTranslation()->setMetaTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [meta_description] column value.
+         *
+         * @return   string
+         */
+        public function getMetaDescription()
+        {
+        return $this->getCurrentTranslation()->getMetaDescription();
+    }
+
+
+        /**
+         * Set the value of [meta_description] column.
+         *
+         * @param      string $v new value
+         * @return   \Thelia\Model\ProductI18n The current object (for fluent API support)
+         */
+        public function setMetaDescription($v)
+        {    $this->getCurrentTranslation()->setMetaDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [meta_keyword] column value.
+         *
+         * @return   string
+         */
+        public function getMetaKeyword()
+        {
+        return $this->getCurrentTranslation()->getMetaKeyword();
+    }
+
+
+        /**
+         * Set the value of [meta_keyword] column.
+         *
+         * @param      string $v new value
+         * @return   \Thelia\Model\ProductI18n The current object (for fluent API support)
+         */
+        public function setMetaKeyword($v)
+        {    $this->getCurrentTranslation()->setMetaKeyword($v);
+
+        return $this;
+    }
+
     // versionable behavior
 
     /**

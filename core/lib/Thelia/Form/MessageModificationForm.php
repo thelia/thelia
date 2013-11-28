@@ -34,10 +34,11 @@ class MessageModificationForm extends BaseForm
             ->add("id"           , "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
             ->add("name"         , "text"  , array(
                 "constraints" => array(new NotBlank()),
-                "label" => Translator::getInstance()->trans('Name *'),
+                "label" => Translator::getInstance()->trans('Name'),
                 "label_attr" => array(
                     "for" => "name"
-                )
+                ),
+                "required" => true
             ))
             ->add("secured"      , "text"  , array(
                 "label" => Translator::getInstance()->trans('Prevent mailing template modification or deletion, except for super-admin')
@@ -45,29 +46,61 @@ class MessageModificationForm extends BaseForm
             ->add("locale"       , "text"  , array())
             ->add("title"        , "text"  , array(
                 "constraints" => array(new NotBlank()),
-                "label" => Translator::getInstance()->trans('Title *'),
+                "label" => Translator::getInstance()->trans('Title'),
                 "label_attr" => array(
                     "for" => "title"
-                )
+                ),
+                "required" => true
             ))
             ->add("subject"      , "text"  , array(
                 "constraints" => array(new NotBlank()),
-                "label" => Translator::getInstance()->trans('Message subject *'),
+                "label" => Translator::getInstance()->trans('Message subject'),
                 "label_attr" => array(
                     "for" => "subject"
-                )
+                ),
+                "required" => true
             ))
             ->add("html_message" , "text"  , array(
                 "label" => Translator::getInstance()->trans('HTML Message'),
                 "label_attr" => array(
                     "for" => "html_message"
-                )
+                ),
+                "required" => false
             ))
             ->add("text_message" , "text"  , array(
                 "label" => Translator::getInstance()->trans('Text Message'),
                 "label_attr" => array(
                     "for" => "text_message"
-                )
+                ),
+                "required" => false
+            ))
+            ->add("html_layout_file_name" , "text"  , array(
+                    "label" => Translator::getInstance()->trans('Name of the HTML layout file'),
+                    "label_attr" => array(
+                            "for" => "html_layout_file_name"
+                ),
+                "required" => false
+            ))
+            ->add("html_template_file_name" , "text"  , array(
+                    "label" => Translator::getInstance()->trans('Name of the HTML template file'),
+                    "label_attr" => array(
+                            "for" => "html_template_file_name"
+                ),
+                "required" => false
+            ))
+            ->add("text_layout_file_name" , "text"  , array(
+                    "label" => Translator::getInstance()->trans('Name of the text layout file'),
+                    "label_attr" => array(
+                            "for" => "text_layout_file_name"
+                ),
+                "required" => false
+            ))
+            ->add("text_template_file_name" , "text"  , array(
+                    "label" => Translator::getInstance()->trans('Name of the text template file'),
+                    "label_attr" => array(
+                            "for" => "text_template_file_name"
+                ),
+                "required" => false
             ))
             ;
     }
