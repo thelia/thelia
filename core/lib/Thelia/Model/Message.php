@@ -6,6 +6,8 @@ use Thelia\Model\Base\Message as BaseMessage;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Message\MessageEvent;
+use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateHelper;
 
 class Message extends BaseMessage {
 
@@ -63,5 +65,98 @@ class Message extends BaseMessage {
     public function postDelete(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEMESSAGE, new MessageEvent($this));
+    }
+
+    /**
+     * Calculate the message body, given the HTML entered in the back-office, the message layout, and the message template
+     */
+    protected function getMessageBody($parser, $message, $layout, $template) {
+
+        $body = false;
+
+        $mail_template_path = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath() . DS;
+
+        // Try to get the body from template file, if a file is defined
+        if (! empty($template)) {
+            try {
+
+                $body = $parser->render($mail_template_path . $template);
+            } catch (ResourceNotFoundException $ex) {
+                // Ignore this.
+            }
+        }
+
+        // We did not get it ? Use the message entered in the back-office
+        if ($body === false) {
+            $body = $parser->renderString($message);
+        }
+
+        // Do we have a layout ?
+        if (! empty($layout)) {
+
+            // Populate the message body variable
+            $parser->assign('message_body', $body);
+
+            // Render the layout file
+            $body = $parser->render($mail_template_path . $layout);
+        }
+
+        return $body;
+    }
+
+    /**
+     * Get the HTML message body
+     */
+    public function getHtmlMessageBody(ParserInterface $parser) {
+
+        return $this->getMessageBody(
+                $parser,
+                $this->getHtmlMessage(),
+                $this->getHtmlLayoutFileName(),
+                $this->getHtmlTemplateFileName()
+        );
+    }
+
+    /**
+     * Get the TEXT message body
+     */
+    public function getTextMessageBody(ParserInterface $parser) {
+
+        return $this->getMessageBody(
+                $parser,
+                $this->getTextMessage(),
+                $this->getTextLayoutFileName(),
+                $this->getTextTemplateFileName()
+        );
+    }
+
+    /**
+     * Add a subject and a body (TEXT, HTML or both, depending on the message
+     * configuration.
+     */
+    public function buildMessage($parser, \Swift_Message $messageInstance) {
+
+        $subject     = $parser->fetch(sprintf("string:%s", $this->getSubject()));
+        $htmlMessage = $this->getHtmlMessageBody($parser);
+        $textMessage = $this->getTextMessageBody($parser);
+
+        $messageInstance->setSubject($subject);
+
+        // If we do not have an HTML message
+        if (empty($htmlMessage)) {
+            // Message body is the text message
+            $messageInstance->setBody($textMessage, 'text/plain');
+        }
+        else {
+            // The main body is the HTML messahe
+            $messageInstance->setBody($htmlMessage, 'text/html');
+
+            // Use the text as a message part, if we have one.
+            if (! empty($textMessage)) {
+                $messageInstance->addPart($textMessage, 'text/plain');
+            }
+        }
+
+        return $messageInstance;
     }
 }

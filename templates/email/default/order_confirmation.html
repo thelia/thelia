@@ -1,0 +1,107 @@
+{loop name="order.invoice" type="order" id=$order_id customer="*"}
+    {loop name="currency.order" type="currency" id=$CURRENCY}
+        {assign "orderCurrency" $SYMBOL}
+    {/loop}
+{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}
+    {assign var="customer_ref" value=$REF}
+{/loop}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="fr">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>courriel de confirmation de commande de {config key="url_site"} </title>
+    {literal}
+    <style type="text/css">body {font-family: Arial, Helvetica, sans-serif; font-size:100%; text-align:center;}#liencompte {margin:15px 0 ; text-align:center; font-size:10pt;}#wrapper {width:480pt;margin:0 auto;}#entete {padding-bottom:20px;margin-bottom:10px;border-bottom:1px dotted #000;}#logotexte {float:left;width:180pt;height:75pt;border:1pt solid #000;font-size:18pt;text-align:center;}#logoimg{float:left;}#h2 {margin:0;padding:0;font-size:140%;text-align:center;}#h3 {margin:0;padding:0;font-size:120%;text-align:center;}#tableprix {margin:0 auto;border-collapse:collapse;font-size:80%;}#intitules {font-weight:bold;text-align:center;}#ref {width:65pt;border:1px solid #000;}#designation {width:278pt;border:1px solid #000;}#pu {width:65pt;border:1px solid #000;}#qte {width:60pt;border:1px solid #000;}.ligneproduit{font-weight:normal;}.cellref{text-align:right;padding-right:6pt;border:1px solid #000;}.celldsg{text-align:left;padding-left:6pt;border:1px solid #000;}.cellpu{text-align:right;padding-right:6pt;border:1px solid #000;}.cellqte{text-align:right;padding-right:6pt;border:1px solid #000;}.lignevide{border-bottom:1px solid #000;}.totauxtitre{text-align:right;padding-right:6pt;border-left:1px solid #000;}.totauxcmdtitre{text-align:right;padding-right:6pt;border-left:1px solid #000;border-bottom:1px solid #000;}.totauxprix{text-align:right;padding-right:6pt;border:1px solid #000;}.blocadresses{display:inline;float:left;width:228pt;margin:12pt 4pt 12pt 5pt;font-size:80%;line-height:18pt;text-align:left;border:1px solid #000;}.stylenom{margin:0;padding:0 0 0 10pt;border-bottom:1px solid #000;}.styleliste{margin:0;padding:0 0 0 10pt;}</style>
+    {/literal}
+</head>
+<body>
+<div id="wrapper">
+    <div id="entete"><h1 id="logotexte">{config key="company_name"}</h1>
+        <h2 id="info">Confirmation de commande</h2>
+        <h3 id="commande">N&deg; {$REF} du <span style="font-size:80%">{format_date date=$INVOICE_DATE output="date"}</span></h3>
+    </div>
+    <table id="tableprix" border="0">
+        <tbody>
+        <tr id="intitules">
+            <th id="ref">R&eacute;f&eacute;rence</th>
+            <th id="designation">D&eacute;signation</th>
+            <th id="pu">P.U. &euro;</th>
+            <th id="qte">Qt&eacute;</th>
+        </tr>
+        {loop type="order_product" name="order-products" order=$ID}
+        {if $WAS_IN_PROMO == 1}
+            {assign "realPrice" $PROMO_PRICE}
+            {assign "realTax" $PROMO_PRICE_TAX}
+            {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+        {else}
+            {assign "realPrice" $PRICE}
+            {assign "realTax" $PRICE_TAX}
+            {assign "realTaxedPrice" $TAXED_PRICE}
+        {/if}
+            <tr class="ligneproduit">
+                <td class="cellref">{$REF}</td>
+                <td class="celldsg">{$TITLE}
+                    {ifloop rel="combinations"}
+                        {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                            {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
+                        {/loop}
+                    {/ifloop}
+                </td>
+                <td class="cellpu">{$orderCurrency} {$realTaxedPrice}</td>
+                <td class="cellqte">{$QUANTITY}</td>
+            </tr>
+        {/loop}
+        <!-- insere une ligne vide -->
+        <tr class="ligneproduit">
+            <td class="lignevide" colspan="4">&nbsp;</td>
+        </tr>
+        <tr class="ligneproduit">
+            <td class="totauxtitre" colspan="3">Montant total avant remise &euro;</td>
+            <td class="totauxprix">{$orderCurrency} {$TOTAL_TAXED_AMOUNT - $POSTAGE}</td>
+        </tr>
+        <tr class="ligneproduit">
+            <td class="totauxtitre" colspan="3">Port &euro;</td>
+            <td class="totauxprix">{$orderCurrency} {$POSTAGE}</td>
+        </tr>
+        <tr class="ligneproduit">
+            <td class="totauxcmdtitre" colspan="3">Montant total de la commande &euro;</td>
+            <td class="totauxprix">{$orderCurrency} {$TOTAL_TAXED_AMOUNT}</td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="blocadresses">
+        <p class="stylenom">LIVRAISON : {loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}</p>
+    {loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
+        <p class="styleliste">N&deg; de client : {$customer_ref}</p>
+        <p class="styleliste">Nom :
+            {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}</p>
+        <p class="styleliste">N&deg; et rue :
+            {$ADDRESS1}</p>
+        <p class="styleliste">Compl&eacute;ment : {$ADDRESS2}
+            {$ADDRESS3}</p>
+        <p class="styleliste">Code postal : {$ZIPCODE}</p>
+        <p class="styleliste">Ville : {$CITY}</p>
+        <p class="styleliste">Pays : {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}</p>
+    </div>
+    {/loop}
+    <div class="blocadresses">
+        <p class="stylenom">FACTURATION : paiement par {loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</p>
+    {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+        <p class="styleliste">N&deg; de client : {$customer_ref}</p>
+        <p class="styleliste">Nom :
+            {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}</p>
+        <p class="styleliste">N&deg; et rue :
+            {$ADDRESS1}</p>
+        <p class="styleliste">Compl&eacute;ment : {$ADDRESS2}
+            {$ADDRESS3}</p>
+        <p class="styleliste">Code postal : {$ZIPCODE}</p>
+        <p class="styleliste">Ville : {$CITY}</p>
+        <p class="styleliste">Pays : {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}</p>
+    </div>
+    {/loop}
+    <p id="liencompte">Le suivi de votre commande est disponible dans la rubrique mon compte sur <a href="{config key="url_site"}">{config key="url_site"}</a></p>
+</div>
+</body>
+</html>
+{/loop}

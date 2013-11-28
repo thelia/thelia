@@ -68,12 +68,14 @@ class RegisterRouterPass implements CompilerPassInterface
 
             foreach ($modules as $module) {
                 $moduleBaseDir = $module->getBaseDir();
-                if (file_exists(THELIA_MODULE_DIR . "/" . $moduleBaseDir . "/Config/routing.xml")) {
+                $routingConfigFilePath = $module->getAbsoluteBaseDir() . DS . "Config" . DS . "routing.xml";
+
+                if (file_exists($routingConfigFilePath)) {
                     $definition = new Definition(
                         $container->getParameter("router.class"),
                         array(
                             new Reference("router.module.xmlLoader"),
-                            $moduleBaseDir . "/Config/routing.xml",
+                            $routingConfigFilePath,
                             array(
                                 "cache_dir" => $container->getParameter("kernel.cache_dir"),
                                 "debug" => $container->getParameter("kernel.debug"),

@@ -27,6 +27,9 @@ use Thelia\Model\Map\ProductI18nTableMap;
  * @method     ChildProductI18nQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method     ChildProductI18nQuery orderByChapo($order = Criteria::ASC) Order by the chapo column
  * @method     ChildProductI18nQuery orderByPostscriptum($order = Criteria::ASC) Order by the postscriptum column
+ * @method     ChildProductI18nQuery orderByMetaTitle($order = Criteria::ASC) Order by the meta_title column
+ * @method     ChildProductI18nQuery orderByMetaDescription($order = Criteria::ASC) Order by the meta_description column
+ * @method     ChildProductI18nQuery orderByMetaKeyword($order = Criteria::ASC) Order by the meta_keyword column
  *
  * @method     ChildProductI18nQuery groupById() Group by the id column
  * @method     ChildProductI18nQuery groupByLocale() Group by the locale column
@@ -34,6 +37,9 @@ use Thelia\Model\Map\ProductI18nTableMap;
  * @method     ChildProductI18nQuery groupByDescription() Group by the description column
  * @method     ChildProductI18nQuery groupByChapo() Group by the chapo column
  * @method     ChildProductI18nQuery groupByPostscriptum() Group by the postscriptum column
+ * @method     ChildProductI18nQuery groupByMetaTitle() Group by the meta_title column
+ * @method     ChildProductI18nQuery groupByMetaDescription() Group by the meta_description column
+ * @method     ChildProductI18nQuery groupByMetaKeyword() Group by the meta_keyword column
  *
  * @method     ChildProductI18nQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildProductI18nQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -52,6 +58,9 @@ use Thelia\Model\Map\ProductI18nTableMap;
  * @method     ChildProductI18n findOneByDescription(string $description) Return the first ChildProductI18n filtered by the description column
  * @method     ChildProductI18n findOneByChapo(string $chapo) Return the first ChildProductI18n filtered by the chapo column
  * @method     ChildProductI18n findOneByPostscriptum(string $postscriptum) Return the first ChildProductI18n filtered by the postscriptum column
+ * @method     ChildProductI18n findOneByMetaTitle(string $meta_title) Return the first ChildProductI18n filtered by the meta_title column
+ * @method     ChildProductI18n findOneByMetaDescription(string $meta_description) Return the first ChildProductI18n filtered by the meta_description column
+ * @method     ChildProductI18n findOneByMetaKeyword(string $meta_keyword) Return the first ChildProductI18n filtered by the meta_keyword column
  *
  * @method     array findById(int $id) Return ChildProductI18n objects filtered by the id column
  * @method     array findByLocale(string $locale) Return ChildProductI18n objects filtered by the locale column
@@ -59,6 +68,9 @@ use Thelia\Model\Map\ProductI18nTableMap;
  * @method     array findByDescription(string $description) Return ChildProductI18n objects filtered by the description column
  * @method     array findByChapo(string $chapo) Return ChildProductI18n objects filtered by the chapo column
  * @method     array findByPostscriptum(string $postscriptum) Return ChildProductI18n objects filtered by the postscriptum column
+ * @method     array findByMetaTitle(string $meta_title) Return ChildProductI18n objects filtered by the meta_title column
+ * @method     array findByMetaDescription(string $meta_description) Return ChildProductI18n objects filtered by the meta_description column
+ * @method     array findByMetaKeyword(string $meta_keyword) Return ChildProductI18n objects filtered by the meta_keyword column
  *
  */
 abstract class ProductI18nQuery extends ModelCriteria
@@ -147,7 +159,7 @@ abstract class ProductI18nQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, LOCALE, TITLE, DESCRIPTION, CHAPO, POSTSCRIPTUM FROM product_i18n WHERE ID = :p0 AND LOCALE = :p1';
+        $sql = 'SELECT ID, LOCALE, TITLE, DESCRIPTION, CHAPO, POSTSCRIPTUM, META_TITLE, META_DESCRIPTION, META_KEYWORD FROM product_i18n WHERE ID = :p0 AND LOCALE = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -434,6 +446,93 @@ abstract class ProductI18nQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductI18nTableMap::POSTSCRIPTUM, $postscriptum, $comparison);
+    }
+
+    /**
+     * Filter the query on the meta_title column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByMetaTitle('fooValue');   // WHERE meta_title = 'fooValue'
+     * $query->filterByMetaTitle('%fooValue%'); // WHERE meta_title LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $metaTitle The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductI18nQuery The current query, for fluid interface
+     */
+    public function filterByMetaTitle($metaTitle = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($metaTitle)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $metaTitle)) {
+                $metaTitle = str_replace('*', '%', $metaTitle);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ProductI18nTableMap::META_TITLE, $metaTitle, $comparison);
+    }
+
+    /**
+     * Filter the query on the meta_description column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByMetaDescription('fooValue');   // WHERE meta_description = 'fooValue'
+     * $query->filterByMetaDescription('%fooValue%'); // WHERE meta_description LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $metaDescription The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductI18nQuery The current query, for fluid interface
+     */
+    public function filterByMetaDescription($metaDescription = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($metaDescription)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $metaDescription)) {
+                $metaDescription = str_replace('*', '%', $metaDescription);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ProductI18nTableMap::META_DESCRIPTION, $metaDescription, $comparison);
+    }
+
+    /**
+     * Filter the query on the meta_keyword column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByMetaKeyword('fooValue');   // WHERE meta_keyword = 'fooValue'
+     * $query->filterByMetaKeyword('%fooValue%'); // WHERE meta_keyword LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $metaKeyword The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductI18nQuery The current query, for fluid interface
+     */
+    public function filterByMetaKeyword($metaKeyword = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($metaKeyword)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $metaKeyword)) {
+                $metaKeyword = str_replace('*', '%', $metaKeyword);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ProductI18nTableMap::META_KEYWORD, $metaKeyword, $comparison);
     }
 
     /**
