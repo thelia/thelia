@@ -131,19 +131,19 @@ class TemplateHelper
     }
 
     /**
-     * Récursively examine files in a directory tree, and extract translatable strings.
+     * Recursively examine files in a directory tree, and extract translatable strings.
      *
      * Returns an array of translatable strings, each item having with the following structure:
-     * 'files' an arfray of file names in which the string appears,
+     * 'files' an array of file names in which the string appears,
      * 'text' the translatable text
      * 'translation' => the text translation, or an empty string if none available.
      * 'dollar'  => true if the translatable text contains a $
      *
      * @param string $directory the path to the directory to examine
      * @param string $walkMode type of file scanning: WALK_MODE_PHP or WALK_MODE_TEMPLATE
-     * @param Thelia\Core\Translation\Translator $translator the current translator
+     * @param \Thelia\Core\Translation\Translator $translator the current translator
      * @param string $currentLocale the current locale
-     * @param array $strings the liste of strings
+     * @param array $strings the list of strings
      * @throws \InvalidArgumentException if $walkMode contains an invalid value
      * @return number the total number of translatable texts
      */
@@ -258,15 +258,15 @@ class TemplateHelper
 
             fwrite($fp, ");\n");
 
-            @fclose($fh);
+            @fclose($fp);
         }
         else
         {
             throw new \RuntimeException(
-                    $this->getTranslator()->trans(
-                            "Failed to open translation file %file. Please be sure that this file is writable by your Web server",
-                            array('%file' => $file)
-                    )
+                Translator::getInstance()->trans(
+                    'Failed to open translation file %file. Please be sure that this file is writable by your Web server',
+                    array('%file' => $file)
+                )
             );
         }
     }
