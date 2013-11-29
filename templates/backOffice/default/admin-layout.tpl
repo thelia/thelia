@@ -13,7 +13,8 @@
 <!DOCTYPE html>
 <html lang="{$lang_code}">
 <head>
-    <title>{block name="page-title"}Default Page Title{/block} - {intl l='Thelia Back Office'}</title>
+    <meta charset="utf-8" />
+	<title>{block name="page-title"}Default Page Title{/block} - {intl l='Thelia Back Office'}</title>
 
     {images file='assets/img/favicon.ico'}<link rel="shortcut icon" href="{$asset_url}" />{/images}
 
