@@ -79,7 +79,7 @@ use Thelia\Tools\NumberFormat;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class ProductController extends AbstractCrudController
+class ProductController extends AbstractSeoCrudController
 {
     public function __construct()
     {
