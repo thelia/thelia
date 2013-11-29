@@ -315,9 +315,10 @@ class ProductController extends AbstractSeoCrudController
         }
 
         // The "SEO" tab form
+        $locale = $object->getLocale();
         $data = array(
             'id'               => $object->getId(),
-            'locale'           => $object->getLocale(),
+            'locale'           => $locale,
             'url'              => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
             'meta_title'       => $object->getMetaTitle(),
             'meta_description' => $object->getMetaDescription(),
@@ -326,6 +327,9 @@ class ProductController extends AbstractSeoCrudController
 
         $seoForm = new SeoForm($this->getRequest(), "form", $data);
         $this->getParserContext()->addForm($seoForm);
+
+        // URL based on the language
+        $this->getParserContext()->set('url_language', $this->getUrlLanguage($locale));
 
 
         // The "General" tab form
