@@ -339,6 +339,6 @@ class AsseticAssetManager implements AssetManagerInterface
             $writer->writeAsset($asset);
         }
 
-        return rtrim($outputUrl, DS) . DS . trim($outputRelativeWebPath, DS) . DS . trim($assetFileDirectoryInAssetDirectory, DS) . DS . ltrim($assetTargetFilename, DS);
+        return rtrim($outputUrl, '/') . '/' . trim($outputRelativeWebPath, '/') . '/' . trim($assetFileDirectoryInAssetDirectory, '/') . '/' . ltrim($assetTargetFilename, '/');
     }
 }
