@@ -84,13 +84,24 @@
         $(document).ready(function() {
            var url_management = "{url path="/admin/module/toggle-activation/"}";
            $(".module-activation").on("switch-change", function(e, data){
+
+        	   var module_id = $(this).data('id');
+        	   var is_checked = data.value;
+
                $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
                $.ajax({
                     url: url_management+$(this).data('id')
                }).done(function(){
                    $("#loading-event").remove();
                })
-                .fail(function(jqXHR, textStatus, errorThrown){
+               .success(function() {
+            	   if (is_checked)
+            		   $('#config-btn-' + module_id).removeClass('disabled');
+            	   else
+                       $('#config-btn-' + module_id).addClass('disabled');
+
+               })
+               .fail(function(jqXHR, textStatus, errorThrown){
                     $("#loading-event").remove();
                     $('#module-failed-body').html(jqXHR.responseJSON.error);
                     $("#module-failed").modal("show");
