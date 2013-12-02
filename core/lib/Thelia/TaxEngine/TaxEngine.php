@@ -42,13 +42,16 @@ class TaxEngine
      */
     protected $session = null;
 
-    static public function getInstance(Session $session)
+    static public function getInstance(Session $session = null)
     {
         if(null === self::$instance) {
             self::$instance = new TaxEngine();
         }
 
-        self::$instance->setSession($session);
+        if(null !== self::$instance) {
+            self::$instance->setSession($session);
+        }
+
         return self::$instance;
     }
 
