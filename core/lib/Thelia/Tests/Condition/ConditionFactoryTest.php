@@ -27,7 +27,7 @@ use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Coupon\ConditionCollection;
+use Thelia\Condition\ConditionCollection;
 use Thelia\Model\CurrencyQuery;
 
 /**
@@ -84,7 +84,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue(new MatchForTotalAmountManager($stubFacade)));
+            ->will($this->returnValue(new MatchForTotalAmount($stubFacade)));
 
         $stubContainer->expects($this->any())
             ->method('has')
@@ -94,14 +94,14 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 40.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -148,7 +148,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue(new MatchForTotalAmountManager($stubFacade)));
+            ->will($this->returnValue(new MatchForTotalAmount($stubFacade)));
 
         $stubContainer->expects($this->any())
             ->method('has')
@@ -158,14 +158,14 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 40.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -210,7 +210,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue(new MatchForTotalAmountManager($stubFacade)));
+            ->will($this->returnValue(new MatchForTotalAmount($stubFacade)));
 
         $stubContainer->expects($this->any())
             ->method('has')
@@ -220,25 +220,25 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
 
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 40.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
-        $condition2 = new MatchForTotalAmountManager($stubFacade);
+        $condition2 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 400.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition2->setValidatorsFromForm($operators, $values);
 
@@ -287,7 +287,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
             ->disableOriginalConstructor()
             ->getMock();
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $stubContainer->expects($this->any())
             ->method('get')
             ->will($this->returnValue($condition1));
@@ -301,12 +301,12 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($stubContainer));
 
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 40.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -352,7 +352,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
             ->disableOriginalConstructor()
             ->getMock();
-        $condition1 = new MatchForTotalAmountManager($stubFacade);
+        $condition1 = new MatchForTotalAmount($stubFacade);
         $stubContainer->expects($this->any())
             ->method('get')
             ->will($this->returnValue($condition1));
@@ -366,12 +366,12 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($stubContainer));
 
         $operators = array(
-            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmountManager::INPUT1 => 40.00,
-            MatchForTotalAmountManager::INPUT2 => 'EUR'
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -385,6 +385,66 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $actual);
 
+    }
+
+    /**
+     * Test condition serialization if collection is empty
+     *
+     * @covers Thelia\Condition\ConditionFactory::serializeConditionCollection
+     */
+    public function testSerializeConditionCollectionEmpty()
+    {
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+             ->disableOriginalConstructor()
+             ->getMock();
+
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubFacade->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+        $stubFacade->expects($this->any())
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
+
+        $currencies = CurrencyQuery::create();
+        $currencies = $currencies->find();
+        $stubFacade->expects($this->any())
+            ->method('getAvailableCurrencies')
+            ->will($this->returnValue($currencies));
+
+        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->returnValue(new MatchForEveryone($stubFacade)));
+
+        $stubContainer->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
+
+        $stubFacade->expects($this->any())
+            ->method('getContainer')
+            ->will($this->returnValue($stubContainer));
+
+
+        $conditions = new ConditionCollection();
+
+        $conditionFactory = new ConditionFactory($stubContainer);
+
+
+        $conditionNone = new MatchForEveryone($stubFacade);
+        $expectedCollection = new ConditionCollection();
+        $expectedCollection->add($conditionNone);
+
+        $expected = $conditionFactory->serializeConditionCollection($expectedCollection);
+        $actual = $conditionFactory->serializeConditionCollection($conditions);
+
+        $this->assertEquals($expected, $actual);
     }
 
     /**

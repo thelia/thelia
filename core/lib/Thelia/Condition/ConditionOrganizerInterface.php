@@ -21,108 +21,27 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Condition\Implementation;
-
-use InvalidArgumentException;
-use Thelia\Condition\ConditionManagerAbstract;
+namespace Thelia\Condition;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Allow every one, perform no check
+ * Manage how Condition could interact with each other
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class MatchForEveryoneManager extends ConditionManagerAbstract
+interface ConditionOrganizerInterface
 {
-    /** @var string Service Id from Resources/config.xml  */
-    protected $serviceId = 'thelia.condition.match_for_everyone';
-
-    /** @var array Available Operators (Operators::CONST) */
-    protected $availableOperators = array();
-
     /**
-     * Check validators relevancy and store them
+     * Organize ConditionInterface
      *
-     * @param array $operators Operators the Admin set in BackOffice
-     * @param array $values    Values the Admin set in BackOffice
+     * @param array $conditions Array of ConditionInterface
      *
-     * @throws \InvalidArgumentException
-     * @return $this
+     * @return array Array of ConditionInterface sorted
      */
-    public function setValidatorsFromForm(array $operators, array $values)
-    {
-        $this->setValidators();
-
-        return $this;
-    }
-
-    /**
-     * Check validators relevancy and store them
-     *
-     * @throws \InvalidArgumentException
-     * @return $this
-     */
-    protected function setValidators()
-    {
-        $this->operators = array();
-        $this->values = array();
-
-        return $this;
-    }
-
-    /**
-     * Test if Customer meets conditions
-     *
-     * @return bool
-     */
-    public function isMatching()
-    {
-        return true;
-    }
-
-    /**
-     * Get I18n name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->translator->trans(
-            'Everybody can use it (no condition)',
-            array(),
-            'condition'
-        );
-    }
-
-    /**
-     * Get I18n tooltip
-     *
-     * @return string
-     */
-    public function getToolTip()
-    {
-        $toolTip = $this->translator->trans(
-            'Will return always true',
-            array(),
-            'condition'
-        );
-
-        return $toolTip;
-    }
-
-    /**
-     * Generate inputs ready to be drawn
-     *
-     * @return array
-     */
-    protected function generateInputs()
-    {
-        return array();
-    }
-
+    public function organize(array $conditions);
 }

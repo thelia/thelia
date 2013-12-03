@@ -23,35 +23,30 @@
 
 namespace Thelia\Condition\Implementation;
 
-use Symfony\Component\Intl\Exception\NotImplementedException;
-use Thelia\Condition\ConditionManagerAbstract;
+use InvalidArgumentException;
+use Thelia\Condition\Implementation\ConditionAbstract;
 use Thelia\Condition\Operators;
 use Thelia\Exception\InvalidConditionOperatorException;
-use Thelia\Model\Currency;
-use Thelia\Model\CurrencyQuery;
+use Thelia\Exception\InvalidConditionValueException;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Condition AvailableForTotalAmount
- * Check if a Checkout total amount match criteria
+ * Check a Checkout against its Product number
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class MatchForTotalAmountManager extends ConditionManagerAbstract
+class MatchForXArticles extends ConditionAbstract
 {
-    /** Condition 1st parameter : price */
-    CONST INPUT1 = 'price';
-
-    /** Condition 1st parameter : currency */
-    CONST INPUT2 = 'currency';
+    /** Condition 1st parameter : quantity */
+    CONST INPUT1 = 'quantity';
 
     /** @var string Service Id from Resources/config.xml  */
-    protected $serviceId = 'thelia.condition.match_for_total_amount';
+    protected $serviceId = 'thelia.condition.match_for_x_articles';
 
     /** @var array Available Operators (Operators::CONST) */
     protected $availableOperators = array(
@@ -61,10 +56,7 @@ class MatchForTotalAmountManager extends ConditionManagerAbstract
             Operators::EQUAL,
             Operators::SUPERIOR_OR_EQUAL,
             Operators::SUPERIOR
-        ),
-        self::INPUT2 => array(
-            Operators::EQUAL,
-       )
+        )
     );
 
     /**
@@ -80,9 +72,7 @@ class MatchForTotalAmountManager extends ConditionManagerAbstract
     {
         $this->setValidators(
             $operators[self::INPUT1],
-            $values[self::INPUT1],
-            $operators[self::INPUT2],
-            $values[self::INPUT2]
+            $values[self::INPUT1]
         );
 
         return $this;
@@ -91,49 +81,36 @@ class MatchForTotalAmountManager extends ConditionManagerAbstract
     /**
      * Check validators relevancy and store them
      *
-     * @param string $priceOperator    Price Operator ex <
-     * @param float  $priceValue       Price set to meet condition
-     * @param string $currencyOperator Currency Operator ex =
-     * @param string $currencyValue    Currency set to meet condition
+     * @param string $quantityOperator Quantity Operator ex <
+     * @param int    $quantityValue    Quantity set to meet condition
      *
+     * @throws \Thelia\Exception\InvalidConditionValueException
      * @throws \Thelia\Exception\InvalidConditionOperatorException
      * @return $this
      */
-    protected function setValidators($priceOperator, $priceValue, $currencyOperator, $currencyValue)
+    protected function setValidators($quantityOperator, $quantityValue)
     {
         $isOperator1Legit = $this->isOperatorLegit(
-            $priceOperator,
+            $quantityOperator,
             $this->availableOperators[self::INPUT1]
         );
         if (!$isOperator1Legit) {
             throw new InvalidConditionOperatorException(
-                get_class(), 'price'
+                get_class(), 'quantity'
             );
         }
 
-        $isOperator1Legit = $this->isOperatorLegit(
-            $currencyOperator,
-            $this->availableOperators[self::INPUT2]
-        );
-        if (!$isOperator1Legit) {
-            throw new InvalidConditionOperatorException(
-                get_class(), 'price'
+        if ((int) $quantityValue <= 0) {
+            throw new InvalidConditionValueException(
+                get_class(), 'quantity'
             );
         }
-
-        $this->isPriceValid($priceValue);
-
-
-        $this->IsCurrencyValid($currencyValue);
-
 
         $this->operators = array(
-            self::INPUT1 => $priceOperator,
-            self::INPUT2 => $currencyOperator,
+            self::INPUT1 => $quantityOperator,
         );
         $this->values = array(
-            self::INPUT1 => $priceValue,
-            self::INPUT2 => $currencyValue,
+            self::INPUT1 => $quantityValue,
         );
 
         return $this;
@@ -146,30 +123,13 @@ class MatchForTotalAmountManager extends ConditionManagerAbstract
      */
     public function isMatching()
     {
-        $isOperator1Legit = $this->isOperatorLegit(
-            $this->operators[self::INPUT1],
-            $this->availableOperators[self::INPUT1]
-        );
-        $isOperator2Legit = $this->isOperatorLegit(
-            $this->operators[self::INPUT2],
-            $this->availableOperators[self::INPUT2]
-        );
-
-        if (!$isOperator1Legit || !$isOperator2Legit) {
-            return false;
-        }
-
         $condition1 = $this->conditionValidator->variableOpComparison(
-            $this->adapter->getCartTotalPrice(),
+            $this->facade->getNbArticlesInCart(),
             $this->operators[self::INPUT1],
             $this->values[self::INPUT1]
         );
-        $condition2 = $this->conditionValidator->variableOpComparison(
-            $this->adapter->getCheckoutCurrency(),
-            $this->operators[self::INPUT2],
-            $this->values[self::INPUT2]
-        );
-        if ($condition1 && $condition2) {
+
+        if ($condition1) {
             return true;
         }
 
@@ -184,7 +144,7 @@ class MatchForTotalAmountManager extends ConditionManagerAbstract
     public function getName()
     {
         return $this->translator->trans(
-            'Cart total amount',
+            'Number of articles in cart',
             array(),
             'condition'
         );
@@ -202,11 +162,10 @@ class MatchForTotalAmountManager extends ConditionManagerAbstract
         );
 
         $toolTip = $this->translator->trans(
-            'If cart total amount is <strong>%operator%</strong> %amount% %currency%',
+            'If cart products quantity is <strong>%operator%</strong> %quantity%',
             array(
                 '%operator%' => $i18nOperator,
-                '%amount%' => $this->values[self::INPUT1],
-                '%currency%' => $this->values[self::INPUT2]
+                '%quantity%' => $this->values[self::INPUT1]
             ),
             'condition'
         );
@@ -221,20 +180,8 @@ class MatchForTotalAmountManager extends ConditionManagerAbstract
      */
     protected function generateInputs()
     {
-        $currencies = CurrencyQuery::create()->find();
-        $cleanedCurrencies = array();
-        /** @var Currency $currency */
-        foreach ($currencies as $currency) {
-            $cleanedCurrencies[$currency->getCode()] = $currency->getSymbol();
-        }
-
         $name1 = $this->translator->trans(
-            'Price',
-            array(),
-            'condition'
-        );
-        $name2 = $this->translator->trans(
-            'Currency',
+            'Quantity',
             array(),
             'condition'
         );
@@ -243,22 +190,11 @@ class MatchForTotalAmountManager extends ConditionManagerAbstract
             self::INPUT1 => array(
                 'title' => $name1,
                 'availableOperators' => $this->availableOperators[self::INPUT1],
-                'availableValues' => '',
                 'type' => 'text',
                 'class' => 'form-control',
                 'value' => '',
                 'selectedOperator' => ''
-            ),
-            self::INPUT2 => array(
-                'title' => $name2,
-                'availableOperators' => $this->availableOperators[self::INPUT2],
-                'availableValues' => $cleanedCurrencies,
-                'type' => 'select',
-                'class' => 'form-control',
-                'value' => '',
-                'selectedOperator' => Operators::EQUAL
             )
         );
     }
-
 }

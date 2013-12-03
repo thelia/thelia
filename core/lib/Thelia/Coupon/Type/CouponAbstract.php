@@ -27,8 +27,8 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Coupon\ConditionCollection;
-use Thelia\Coupon\RuleOrganizerInterface;
+use Thelia\Condition\ConditionCollection;
+use Thelia\Condition\ConditionOrganizerInterface;
 use Thelia\Exception\InvalidConditionException;
 
 /**
@@ -45,15 +45,15 @@ use Thelia\Exception\InvalidConditionException;
 abstract class CouponAbstract implements CouponInterface
 {
     /** @var  FacadeInterface Provide necessary value from Thelia */
-    protected $adapter = null;
+    protected $facade = null;
 
     /** @var Translator Service Translator */
     protected $translator = null;
 
-    /** @var RuleOrganizerInterface  */
+    /** @var ConditionOrganizerInterface  */
     protected $organizer = null;
 
-    /** @var ConditionCollection Array of ConditionManagerInterface */
+    /** @var ConditionCollection Array of ConditionInterface */
     protected $conditions = null;
 
     /** @var ConditionEvaluator Condition validator */
@@ -104,19 +104,19 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Constructor
      *
-     * @param FacadeInterface $adapter Service adapter
+     * @param FacadeInterface $facade Service facade
      */
-    public function __construct(FacadeInterface $adapter)
+    public function __construct(FacadeInterface $facade)
     {
-        $this->adapter = $adapter;
-        $this->translator = $adapter->getTranslator();
-        $this->conditionEvaluator = $adapter->getConditionEvaluator();
+        $this->facade = $facade;
+        $this->translator = $facade->getTranslator();
+        $this->conditionEvaluator = $facade->getConditionEvaluator();
     }
 
     /**
      * Set Condition Organizer
      *
-     * @param RuleOrganizerInterface $organizer Manage Condition groups (&& and ||)
+     * @param ConditionOrganizerInterface $organizer Manage Condition groups (&& and ||)
      *
      * @return $this
      */
@@ -214,7 +214,7 @@ abstract class CouponAbstract implements CouponInterface
      * Replace the existing Conditions by those given in parameter
      * If one Condition is badly implemented, no Condition will be added
      *
-     * @param ConditionCollection $conditions ConditionManagerInterface to add
+     * @param ConditionCollection $conditions ConditionInterface to add
      *
      * @return $this
      * @throws \Thelia\Exception\InvalidConditionException

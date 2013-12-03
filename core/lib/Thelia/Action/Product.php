@@ -113,7 +113,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->save()
             ;
 
-            // Update the rewriten URL, if required
+            // Update the rewritten URL, if required
             $product->setRewrittenUrl($event->getLocale(), $event->getUrl());
 
             // Update default category (ifd required)

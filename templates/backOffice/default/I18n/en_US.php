@@ -183,7 +183,6 @@ return array(
 	'Images' => 'Images',
 	'Documents' => 'Documents',
 	'Rewritten URL' => 'Rewritten URL',
-	'Rewriten URL' => 'Rewriten URL',
 	'Top level' => 'Top level',
 	'Visibility' => 'Visibility',
 	'Category created on %date_create. Last modification: %date_change' => 'Category created on %date_create. Last modification: %date_change',

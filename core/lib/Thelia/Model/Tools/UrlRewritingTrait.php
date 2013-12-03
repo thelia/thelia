@@ -30,17 +30,17 @@ use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\RewritingUrl;
 use Thelia\Tools\URL;
 /**
- * A trait for managing Rewriten URLs from model classes
+ * A trait for managing Rewritten URLs from model classes
  */
 trait UrlRewritingTrait {
 
     /**
-     * @returns string the view name of the rewriten object (e.g., 'category', 'product')
+     * @returns string the view name of the rewritten object (e.g., 'category', 'product')
      */
     protected abstract function getRewrittenUrlViewName();
 
     /**
-     * Get the object URL for the given locale, rewriten if rewriting is enabled.
+     * Get the object URL for the given locale, rewritten if rewriting is enabled.
      *
      * @param string $locale a valid locale (e.g. en_US)
      */
@@ -53,7 +53,7 @@ trait UrlRewritingTrait {
     }
 
     /**
-     * Generate a rewriten URL from the object title, and store it in the rewriting table
+     * Generate a rewritten URL from the object title, and store it in the rewriting table
      *
      * @param string $locale a valid locale (e.g. en_US)
      */
@@ -112,7 +112,7 @@ trait UrlRewritingTrait {
     }
 
     /**
-     * return the rewriten URL for the given locale
+     * return the rewritten URL for the given locale
      *
      * @param string $locale a valid locale (e.g. en_US)
      * @return null
@@ -137,7 +137,7 @@ trait UrlRewritingTrait {
     }
 
     /**
-     * Set the rewriten URL for the given locale
+     * Set the rewritten URL for the given locale
      *
      * @param string $locale a valid locale (e.g. en_US)
      * @param $url the wanted url

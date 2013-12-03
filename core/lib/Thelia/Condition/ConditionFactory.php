@@ -24,8 +24,9 @@
 namespace Thelia\Condition;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Coupon\ConditionCollection;
+use Thelia\Condition\ConditionCollection;
 
 
 /**
@@ -58,7 +59,7 @@ class ConditionFactory
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->adapter = $container->get('thelia.adapter');
+        $this->adapter = $container->get('thelia.facade');
     }
 
     /**
@@ -71,7 +72,7 @@ class ConditionFactory
     public function serializeConditionCollection(ConditionCollection $collection)
     {
         if ($collection->isEmpty()) {
-            /** @var ConditionManagerInterface $conditionNone */
+            /** @var ConditionInterface $conditionNone */
             $conditionNone = $this->container->get(
                 'thelia.condition.match_for_everyone'
             );
@@ -80,7 +81,7 @@ class ConditionFactory
         $serializableConditions = array();
         $conditions = $collection->getConditions();
         if ($conditions !== null) {
-            /** @var $condition ConditionManagerInterface */
+            /** @var $condition ConditionInterface */
             foreach ($conditions as $condition) {
                 $serializableConditions[] = $condition->getSerializableCondition();
             }
@@ -106,7 +107,7 @@ class ConditionFactory
             /** @var SerializableCondition $condition */
             foreach ($unserializedConditions as $condition) {
                 if ($this->container->has($condition->conditionServiceId)) {
-                    /** @var ConditionManagerInterface $conditionManager */
+                    /** @var ConditionInterface $conditionManager */
                     $conditionManager = $this->build(
                         $condition->conditionServiceId,
                         (array) $condition->operators,
@@ -129,7 +130,7 @@ class ConditionFactory
      * @param array  $values             Values setting this Condition
      *
      * @throws \InvalidArgumentException
-     * @return ConditionManagerInterface Ready to use Condition or false
+     * @return ConditionInterface Ready to use Condition or false
      */
     public function build($conditionServiceId, array $operators, array $values)
     {
@@ -137,7 +138,7 @@ class ConditionFactory
             return false;
         }
 
-        /** @var ConditionManagerInterface $condition */
+        /** @var ConditionInterface $condition */
         $condition = $this->container->get($conditionServiceId);
         $condition->setValidatorsFromForm($operators, $values);
 
@@ -157,7 +158,7 @@ class ConditionFactory
             return false;
         }
 
-        /** @var ConditionManagerInterface $condition */
+        /** @var ConditionInterface $condition */
         $condition = $this->container->get($conditionServiceId);
 
         return $condition->getValidators();
