@@ -78,10 +78,10 @@ class TlogDestinationFile extends AbstractTlogDestination
 
                 } while (file_exists($file_path_bk));
 
-                rename($file_path, $file_path_bk);
+                @rename($file_path, $file_path_bk);
 
-                touch($file_path);
-                chmod($file_path, 0666);
+                @touch($file_path);
+                @chmod($file_path, 0666);
             }
 
             $this->fh = fopen($file_path, $mode);
