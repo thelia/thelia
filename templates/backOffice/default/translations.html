@@ -45,6 +45,7 @@
 	                                                <option value="">{intl l='Please select items to translate'}</option>
 	                                                <option value="fo" {if $item_to_translate=='fo'}selected="selected"{/if}>{intl l='Front-office templates'}</option>
                                                     <option value="pf" {if $item_to_translate=='pf'}selected="selected"{/if}>{intl l='PDF templates'}</option>
+                                                    <option value="ma" {if $item_to_translate=='ma'}selected="selected"{/if}>{intl l='E-mail templates'}</option>
 			                                        <option value="bo" {if $item_to_translate=='bo'}selected="selected"{/if}>{intl l='Back-office templates'}</option>
 			                                        <option value="mo" {if $item_to_translate=='mo'}selected="selected"{/if}>{intl l='Modules'}</option>
 	                                                <option value="co" {if $item_to_translate=='co'}selected="selected"{/if}>{intl l='Thelia core'}</option>
@@ -91,6 +92,19 @@
 	                                                </select>
 	                                            </div>
 	                                        </div>
+                                        {else if $item_to_translate == 'ma'}
+                                            <div class="col-md-4 item-id-selector">
+                                                <div class="form-group">
+                                                    <label class="control-label" for="item_id">{intl l='Select the E-mail template you want to translate'}</label>
+
+                                                    <select id="item_id" required="required" name="item_id" class="submit-on-change form-control">
+                                                        <option value="">{intl l='Please select the E-mail template to translate'}</option>
+                                                        {loop type="template" name="translate-fo-template" template-type="email" backend_context=1}
+                                                            <option value="{$NAME}" {if $item_id == $NAME}selected="selected"{/if}>{$NAME}</option>
+                                                        {/loop}
+                                                    </select>
+                                                </div>
+                                            </div>
 	                                    {else if $item_to_translate == 'pf'}
 	                                        <div class="col-md-4 item-id-selector">
 	                                            <div class="form-group">

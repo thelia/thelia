@@ -148,6 +148,8 @@ class Content extends BaseContent
 
     public function postDelete(ConnectionInterface $con = null)
     {
+        $this->markRewritenUrlObsolete();
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECONTENT, new ContentEvent($this));
     }
 }

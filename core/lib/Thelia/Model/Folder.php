@@ -100,6 +100,8 @@ class Folder extends BaseFolder
 
     public function postDelete(ConnectionInterface $con = null)
     {
+        $this->markRewritenUrlObsolete();
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEFOLDER, new FolderEvent($this));
     }
 }
