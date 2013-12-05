@@ -120,6 +120,12 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
                     if (! is_null($tpl_id)) $template[] = $tpl_id;
                 }
             }
+
+            // franck@cqfdev.fr - 05/12/2013 : if the given product has no template
+            // or if the product cannot be found, do not return anything.
+            if (empty($template)) {
+                return null;
+            }
         }
 
         if (! empty($template)) {
@@ -175,6 +181,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
                     break;
             }
         }
+echo "s=".$search->toString();
 
         return $search;
 

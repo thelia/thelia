@@ -652,7 +652,7 @@ class ProductController extends AbstractCrudController
 
             $this->dispatch(
                     TheliaEvents::PRODUCT_SET_TEMPLATE,
-                    new ProductSetTemplateEvent($product, $template_id)
+                    new ProductSetTemplateEvent($product, $template_id, $this->getCurrentEditionCurrency()->getId())
             );
         }
 

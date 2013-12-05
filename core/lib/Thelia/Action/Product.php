@@ -282,8 +282,12 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             $product->setTemplateId($template_id)->save($con);
 
+            // Create a new default product sale element
+            $product->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
+
             // Store all the stuff !
             $con->commit();
+
         } catch (\Exception $ex) {
 
             $con->rollback();
