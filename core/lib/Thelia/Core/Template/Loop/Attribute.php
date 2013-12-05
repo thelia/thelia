@@ -181,10 +181,8 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
                     break;
             }
         }
-echo "s=".$search->toString();
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
