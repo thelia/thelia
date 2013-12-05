@@ -39,6 +39,22 @@ class NumberFormat
         return new NumberFormat($request);
     }
 
+    /**
+     * Get a standard number, with '.' as decimal point and no thousands separator
+     * so that this number can be used to perform calculations.
+     *
+     * @param float $number the number
+     * @param string $decimals number of decimal figures
+     */
+    public function formatStandardNumber($number, $decimals = null) {
+
+        $lang = $this->request->getSession()->getLang();
+
+        if ($decimals == null) $decimals = $lang->getDecimals();
+
+        return number_format($number, $decimals, '.', '');
+    }
+
     public function format($number, $decimals = null, $decPoint = null, $thousandsSep = null)
     {
         $lang = $this->request->getSession()->getLang();
