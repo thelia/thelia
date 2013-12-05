@@ -267,7 +267,7 @@ class Product extends BaseProduct
             ->filterByView($this->getRewrittenUrlViewName())
             ->filterByViewId($this->getId())
             ->update(array(
-                "View" => ConfigQuery::getPassedUrlView()
+                "View" => ConfigQuery::getObsoleteRewrittenUrlView()
             ));
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
     }

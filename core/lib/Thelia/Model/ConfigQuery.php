@@ -77,14 +77,19 @@ class ConfigQuery extends BaseConfigQuery {
         return self::read("page_not_found_view", '404.html');
     }
 
-    public static function getPassedUrlView()
+    public static function getObsoleteRewrittenUrlView()
     {
-        return self::read('passed_url_view', 'passed-url');
+        return self::read('obsolete_rewriten_url_view', 'obsolete-rewritten-url');
     }
 
     public static function useTaxFreeAmounts()
     {
         return self::read('use_tax_free_amounts', 'default') == 1;
+    }
+
+    public static function checkAvailableStock()
+    {
+        return self::read('check-available-stock', 1) != 0;
     }
 
     /* smtp config */
