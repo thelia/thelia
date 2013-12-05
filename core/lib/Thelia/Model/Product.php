@@ -202,7 +202,7 @@ class Product extends BaseProduct
             ->save($con)
         ;
 
-        // Create an empty product price in the default currency
+        // Create an empty product price in the provided currency
         $product_price = new ProductPrice();
 
         $product_price
@@ -267,7 +267,7 @@ class Product extends BaseProduct
             ->filterByView($this->getRewrittenUrlViewName())
             ->filterByViewId($this->getId())
             ->update(array(
-                "View" => ConfigQuery::getPassedUrlView()
+                "View" => ConfigQuery::getObsoleteRewrittenUrlView()
             ));
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
     }
