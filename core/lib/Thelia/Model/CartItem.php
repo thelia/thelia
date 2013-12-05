@@ -51,7 +51,7 @@ class CartItem extends BaseCartItem
             $value = $currentQuantity;
         }
 
-        if(ConfigQuery::read("verifyStock", 1) == 1)
+        if(ConfigQuery::checkAvailableStock())
         {
             $productSaleElements = $this->getProductSaleElements();
 
@@ -75,7 +75,7 @@ class CartItem extends BaseCartItem
             $value = $currentQuantity;
         }
 
-        if(ConfigQuery::read("verifyStock", 1) == 1)
+        if(ConfigQuery::checkAvailableStock())
         {
             $productSaleElements = $this->getProductSaleElements();
 
