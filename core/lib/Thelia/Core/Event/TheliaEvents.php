@@ -679,8 +679,14 @@ final class TheliaEvents
     const MODULE_TOGGLE_ACTIVATION = 'thelia.module.toggleActivation';
 
     /**
+     * sent when module position is changed
+     */
+    const MODULE_UPDATE_POSITION = 'thelia.module.action.updatePosition';
+
+    /**
      * module
      */
+    const MODULE_CREATE = 'thelia.module.create';
     const MODULE_UPDATE = 'thelia.module.update';
     const MODULE_DELETE = 'thelia.module.delete';
 

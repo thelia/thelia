@@ -954,6 +954,10 @@
         <default key="_controller">Thelia\Controller\Admin\ModuleController::deleteAction</default>
     </route>
 
+    <route id="admin.module.delete" path="/admin/module/update-position">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::updatePositionAction</default>
+    </route>
+
     <!--
         Generic module route.
         Will be use if module route is not define in module own config file.

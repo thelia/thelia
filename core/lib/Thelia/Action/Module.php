@@ -33,6 +33,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
+use Thelia\Core\Event\UpdatePositionEvent;
 
 /**
  * Class Module
@@ -122,6 +123,16 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param CategoryChangePositionEvent $event
+     */
+    public function updatePosition(UpdatePositionEvent $event)
+    {
+        return $this->genericUpdatePosition(ModuleQuery::create(), $event);
+    }
+
     protected function cacheClear()
     {
         $cacheEvent = new CacheEvent($this->container->getParameter('kernel.cache_dir'));
@@ -153,6 +164,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleActivation', 128),
+            TheliaEvents::MODULE_UPDATE_POSITION => array('updatePosition', 128),
             TheliaEvents::MODULE_DELETE => array('delete', 128),
             TheliaEvents::MODULE_UPDATE => array('update', 128),
         );

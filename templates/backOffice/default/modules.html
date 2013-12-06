@@ -80,6 +80,10 @@
         <script src="{$asset_url}"></script>
     {/javascripts}
 
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
     <script>
         $(document).ready(function() {
            var url_management = "{url path="/admin/module/toggle-activation/"}";
@@ -112,6 +116,28 @@
            $(".module-delete-action").click(function(){
                 $("#delete_module_id").val($(this).data("id"));
            });
+
+           {* Inline editing of object position using bootstrap-editable *}
+
+           $('.modulePositionChange').editable({
+               type        : 'text',
+               title       : '{intl l="Enter new module position"}',
+               mode        : 'popup',
+               inputclass  : 'input-mini',
+               placement   : 'left',
+               success     : function(response, newValue) {
+                   // The URL template
+                   var url = "{url noamp='1' path='/admin/modules/update-position' module_id='__ID__' position='__POS__'}";
+
+                   // Perform subtitutions
+                   url = url.replace('__ID__', $(this).data('id'))
+                   .replace('__POS__', newValue);
+
+                   // Reload the page
+                   location.href = url;
+               }
+           });
+
         });
     </script>
 {/block}

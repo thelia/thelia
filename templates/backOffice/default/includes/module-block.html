@@ -6,9 +6,60 @@
             </caption>
             <thead>
             <tr>
-                <th>{intl l="Name"}</th>
-                <th>{intl l="Description"}</th>
-                <th>{intl l="Enable/Disable"}</th>
+                <th>
+                {admin_sortable_header
+                   current_order=$module_order
+                   order='alpha'
+                   reverse_order='alpha_reverse'
+                   path={url path='/admin/modules'}
+                   request_parameter_name='module_order'
+                   label="{intl l='Name'}"
+                }
+                </th>
+
+                <th>
+                {admin_sortable_header
+                   current_order=$module_order
+                   order='code'
+                   reverse_order='code_reverse'
+                   path={url path='/admin/modules'}
+                   request_parameter_name='module_order'
+                   label="{intl l='Code'}"
+                }
+                </th>
+
+                <th>
+                {admin_sortable_header
+                   current_order=$module_order
+                   order='title'
+                   reverse_order='title_reverse'
+                   path={url path='/admin/modules'}
+                   request_parameter_name='module_order'
+                   label="{intl l='Description'}"
+                }
+                </th>
+
+                <th class="text-center">
+                {admin_sortable_header
+                   current_order=$module_order
+                   order='enabled'
+                   reverse_order='enabled_reverse'
+                   path={url path='/admin/modules'}
+                   request_parameter_name='module_order'
+                   label="{intl l='Enable/Disable'}"
+                }
+                </th>
+
+                <th class="text-center">
+                {admin_sortable_header
+                   current_order=$module_order
+                   order='manual'
+                   reverse_order='manual_reverse'
+                   path={url path='/admin/modules'}
+                   request_parameter_name='module_order'
+                   label="{intl l='Position'}"
+                }
+                </th>
 
                 {module_include location='modules_table_header'}
 
@@ -17,11 +68,13 @@
             </thead>
 
             <tbody>
-            {loop type="module" name="module.{$module_type}" module_type={$module_type|default:1} backend_context=1}
+            {loop type="module" name="module.{$module_type}" module_type={$module_type|default:1} order=$module_order backend_context=1}
                 <tr>
-                    <td><a href="#">{$TITLE}</a></td>
+                    <td>{$TITLE}</td>
+                    <td>{$CODE}</td>
                     <td>{$CHAPO}</td>
-                    <td>
+
+                    <td class="text-center">
                         <div class="make-switch switch-small module-activation" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
                             <input type="checkbox" {if $ACTIVE}checked{/if}>
                         </div>
@@ -32,6 +85,18 @@
                                 <a title="{intl l="activate %title module" title=$TITLE}" href="{url path="/admin/module/toggle-activation/{$ID}"}">{intl l="activation"}</a>
                             {/if}
                         </noscript>
+                    </td>
+
+                    <td class="text-center">
+                        {admin_position_block
+                            resource="admin.modules"
+                            access="UPDATE"
+                            path={url path="admin/module/update-position"}
+                            url_parameter="module_id"
+                            in_place_edit_class="modulePositionChange"
+                            position=$POSITION
+                            id=$ID
+                        }
                     </td>
 
                     {module_include location='modules_table_row'}
