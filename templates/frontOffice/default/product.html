@@ -197,18 +197,20 @@
             {strip}
             {capture "additional"}
                 {ifloop rel="feature_info"}
-                    {ifloop rel="feature_value_info"}
+
                         <ul>
                             {loop name="feature_info" type="feature" product="{$ID}"}
+                                {ifloop rel="feature_value_info"}
                                 <li>
                                     <strong>{$TITLE}</strong> :
                                     {loop name="feature_value_info" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
                                     {$TITLE}
                                     {/loop}
                                 </li>
+                                {/ifloop}
                             {/loop}
                         </ul>
-                    {/ifloop}
+
                 {/ifloop}
             {/capture}
             {/strip}
@@ -221,7 +223,7 @@
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active in" id="description" itemprop="description" role="tabpanel" aria-labelledby="tab1">
-                        <p>{$DESCRIPTION|default:'N/A'}</p>
+                        <p>{$DESCRIPTION|default:'N/A' nofilter}</p>
                     </div>
                     {if $smarty.capture.additional ne ""}
                     <div class="tab-pane" id="additional" role="tabpanel" aria-labelledby="tab2">
