@@ -115,6 +115,13 @@ class Category extends BaseCategory
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        RewritingUrlQuery::create()
+            ->filterByView($this->getRewrittenUrlViewName())
+            ->filterByViewId($this->getId())
+            ->update(array(
+                "View" => ConfigQuery::getObsoleteRewrittenUrlView()
+            ));
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECATEGORY, new CategoryEvent($this));
     }
 }

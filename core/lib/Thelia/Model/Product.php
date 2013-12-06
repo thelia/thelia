@@ -269,6 +269,7 @@ class Product extends BaseProduct
             ->update(array(
                 "View" => ConfigQuery::getObsoleteRewrittenUrlView()
             ));
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
     }
 }
