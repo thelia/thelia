@@ -9,7 +9,7 @@
 
 
         <!-- Coupon module -->
-        <service id="thelia.adapter" class="Thelia\Coupon\BaseFacade">
+        <service id="thelia.facade" class="Thelia\Coupon\BaseFacade">
             <argument type="service" id="service_container" />
         </service>
         <service id="thelia.coupon.manager" class="Thelia\Coupon\CouponManager">
@@ -19,12 +19,12 @@
             <argument type="service" id="service_container" />
         </service>
 
-        <service id="thelia.coupon.type.remove_x_amount" class="Thelia\Coupon\Type\RemoveXAmountManager">
-            <argument type="service" id="thelia.adapter" />
+        <service id="thelia.coupon.type.remove_x_amount" class="Thelia\Coupon\Type\RemoveXAmount">
+            <argument type="service" id="thelia.facade" />
             <tag name="thelia.coupon.addCoupon"/>
         </service>
-        <service id="thelia.coupon.type.remove_x_percent" class="Thelia\Coupon\Type\RemoveXPercentManager">
-            <argument type="service" id="thelia.adapter" />
+        <service id="thelia.coupon.type.remove_x_percent" class="Thelia\Coupon\Type\RemoveXPercent">
+            <argument type="service" id="thelia.facade" />
             <tag name="thelia.coupon.addCoupon"/>
         </service>
 
@@ -35,18 +35,19 @@
         </service>
         <service id="thelia.condition.validator" class="Thelia\Condition\ConditionEvaluator">
         </service>
-        <service id="thelia.condition.match_for_everyone" class="Thelia\Condition\Implementation\MatchForEveryoneManager">
-            <argument type="service" id="thelia.adapter" />
+        <service id="thelia.condition.match_for_everyone" class="Thelia\Condition\Implementation\MatchForEveryone">
+            <argument type="service" id="thelia.facade" />
             <tag name="thelia.coupon.addCondition"/>
         </service>
-        <service id="thelia.condition.match_for_x_articles" class="Thelia\Condition\Implementation\MatchForXArticlesManager">
-            <argument type="service" id="thelia.adapter" />
+        <service id="thelia.condition.match_for_total_amount" class="Thelia\Condition\Implementation\MatchForTotalAmount">
+            <argument type="service" id="thelia.facade" />
             <tag name="thelia.coupon.addCondition"/>
         </service>
-        <service id="thelia.condition.match_for_total_amount" class="Thelia\Condition\Implementation\MatchForTotalAmountManager">
-            <argument type="service" id="thelia.adapter" />
+        <service id="thelia.condition.match_for_x_articles" class="Thelia\Condition\Implementation\MatchForXArticles">
+            <argument type="service" id="thelia.facade" />
             <tag name="thelia.coupon.addCondition"/>
         </service>
+
 
 
 

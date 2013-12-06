@@ -5,7 +5,7 @@
     allow to create a customer in admin panel
     translation is implemented :
         - I18n directory in template or module.
-        - multiple extensions are available. We choose to used php but you can use other.
+        - multiple extensions are available. We choose to use php but you can use other.
         - You can translate your template or module from the admin.
-    Admin hook exists. With this hooks, a module can insert code in admin pages
+    Admin hooks exist. With this hooks, a module can insert code in admin pages
 

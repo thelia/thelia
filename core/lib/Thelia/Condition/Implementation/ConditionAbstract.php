@@ -21,9 +21,12 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Condition;
+namespace Thelia\Condition\Implementation;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
+use Thelia\Condition\ConditionEvaluator;
+use Thelia\Condition\Operators;
+use Thelia\Condition\SerializableCondition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
@@ -35,13 +38,13 @@ use Thelia\Type\FloatType;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Assist in writing a condition of whether the Rule is applied or not
+ * Assist in writing a condition of whether the Condition is applied or not
  *
  * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-abstract class ConditionManagerAbstract implements ConditionManagerInterface
+abstract class ConditionAbstract implements ConditionInterface
 {
 
     /** @var string Service Id from Resources/config.xml  */
@@ -54,7 +57,7 @@ abstract class ConditionManagerAbstract implements ConditionManagerInterface
     protected $validators = array();
 
     /** @var  FacadeInterface Provide necessary value from Thelia */
-    protected $adapter = null;
+    protected $facade = null;
 
     /** @var Translator Service Translator */
     protected $translator = null;
@@ -71,13 +74,13 @@ abstract class ConditionManagerAbstract implements ConditionManagerInterface
     /**
      * Constructor
      *
-     * @param FacadeInterface $adapter Service adapter
+     * @param FacadeInterface $facade Service Facade
      */
-    public function __construct(FacadeInterface $adapter)
+    public function __construct(FacadeInterface $facade)
     {
-        $this->adapter = $adapter;
-        $this->translator = $adapter->getTranslator();
-        $this->conditionValidator = $adapter->getConditionEvaluator();
+        $this->facade = $facade;
+        $this->translator = $facade->getTranslator();
+        $this->conditionValidator = $facade->getConditionEvaluator();
     }
 
     /**
@@ -181,9 +184,9 @@ abstract class ConditionManagerAbstract implements ConditionManagerInterface
      * @return bool
      * @throws \Thelia\Exception\InvalidConditionValueException
      */
-    protected function IsCurrencyValid($currencyValue)
+    protected function isCurrencyValid($currencyValue)
     {
-        $availableCurrencies = $this->adapter->getAvailableCurrencies();
+        $availableCurrencies = $this->facade->getAvailableCurrencies();
         /** @var Currency $currency */
         $currencyFound = false;
         foreach ($availableCurrencies as $currency) {

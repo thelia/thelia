@@ -33,13 +33,13 @@ use Thelia\Coupon\FacadeInterface;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test MatchForXArticlesManager Class
+ * Unit Test MatchForXArticles Class
  *
  * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
+class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -54,7 +54,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if validity test on BackOffice inputs are working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::setValidators
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::setValidators
      * @expectedException \Thelia\Exception\InvalidConditionOperatorException
      */
     public function testInValidBackOfficeInputOperator()
@@ -72,12 +72,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::IN
+            MatchForXArticles::INPUT1 => Operators::IN
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 5
+            MatchForXArticles::INPUT1 => 5
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -91,7 +91,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if validity test on BackOffice inputs are working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::setValidators
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::setValidators
      * @expectedException \Thelia\Exception\InvalidConditionValueException
      */
     public function testInValidBackOfficeInputValue()
@@ -108,12 +108,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
+            MatchForXArticles::INPUT1 => Operators::SUPERIOR
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 'X'
+            MatchForXArticles::INPUT1 => 'X'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -127,7 +127,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
      *
      */
     public function testMatchingRuleInferior()
@@ -144,12 +144,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::INFERIOR
+            MatchForXArticles::INPUT1 => Operators::INFERIOR
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 5
+            MatchForXArticles::INPUT1 => 5
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -163,7 +163,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
      *
      */
     public function testNotMatchingRuleInferior()
@@ -180,12 +180,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::INFERIOR
+            MatchForXArticles::INPUT1 => Operators::INFERIOR
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 4,
+            MatchForXArticles::INPUT1 => 4,
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -199,7 +199,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
      *
      */
     public function testMatchingRuleInferiorEquals()
@@ -216,12 +216,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::INFERIOR_OR_EQUAL,
+            MatchForXArticles::INPUT1 => Operators::INFERIOR_OR_EQUAL,
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 5,
+            MatchForXArticles::INPUT1 => 5,
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -235,7 +235,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
      *
      */
     public function testMatchingRuleInferiorEquals2()
@@ -252,12 +252,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::INFERIOR_OR_EQUAL
+            MatchForXArticles::INPUT1 => Operators::INFERIOR_OR_EQUAL
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 4
+            MatchForXArticles::INPUT1 => 4
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -271,7 +271,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
      *
      */
     public function testNotMatchingRuleInferiorEquals()
@@ -288,12 +288,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::INFERIOR_OR_EQUAL
+            MatchForXArticles::INPUT1 => Operators::INFERIOR_OR_EQUAL
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 3
+            MatchForXArticles::INPUT1 => 3
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -307,7 +307,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test equals operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
      *
      */
     public function testMatchingRuleEqual()
@@ -324,12 +324,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::EQUAL
+            MatchForXArticles::INPUT1 => Operators::EQUAL
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 4
+            MatchForXArticles::INPUT1 => 4
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -343,7 +343,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test equals operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
      *
      */
     public function testNotMatchingRuleEqual()
@@ -360,12 +360,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::EQUAL
+            MatchForXArticles::INPUT1 => Operators::EQUAL
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 5
+            MatchForXArticles::INPUT1 => 5
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -379,7 +379,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
      *
      */
     public function testMatchingRuleSuperiorEquals()
@@ -396,12 +396,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL
+            MatchForXArticles::INPUT1 => Operators::SUPERIOR_OR_EQUAL
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 4
+            MatchForXArticles::INPUT1 => 4
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -415,7 +415,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
      *
      */
     public function testMatchingRuleSuperiorEquals2()
@@ -432,12 +432,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL
+            MatchForXArticles::INPUT1 => Operators::SUPERIOR_OR_EQUAL
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 3
+            MatchForXArticles::INPUT1 => 3
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -451,7 +451,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
      *
      */
     public function testNotMatchingRuleSuperiorEquals()
@@ -468,12 +468,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL
+            MatchForXArticles::INPUT1 => Operators::SUPERIOR_OR_EQUAL
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 5
+            MatchForXArticles::INPUT1 => 5
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -487,7 +487,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
      *
      */
     public function testMatchingRuleSuperior()
@@ -504,12 +504,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
+            MatchForXArticles::INPUT1 => Operators::SUPERIOR
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 3
+            MatchForXArticles::INPUT1 => 3
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -523,7 +523,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
      *
      */
     public function testNotMatchingRuleSuperior()
@@ -540,12 +540,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
+            MatchForXArticles::INPUT1 => Operators::SUPERIOR
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 4
+            MatchForXArticles::INPUT1 => 4
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -570,12 +570,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
+            MatchForXArticles::INPUT1 => Operators::SUPERIOR
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 4
+            MatchForXArticles::INPUT1 => 4
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -606,17 +606,17 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubFacade);
+        $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
+            MatchForXArticles::INPUT1 => Operators::SUPERIOR
         );
         $values = array(
-            MatchForXArticlesManager::INPUT1 => 4
+            MatchForXArticles::INPUT1 => 4
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
         $expected = array(
-            MatchForXArticlesManager::INPUT1 => array(
+            MatchForXArticles::INPUT1 => array(
                 Operators::INFERIOR,
                 Operators::INFERIOR_OR_EQUAL,
                 Operators::EQUAL,
@@ -625,6 +625,142 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $actual = $condition1->getAvailableOperators();
+
+        $this->assertEquals($expected, $actual);
+
+    }
+
+    /**
+     * Generate adapter stub
+     *
+     * @param int    $cartTotalPrice   Cart total price
+     * @param string $checkoutCurrency Checkout currency
+     * @param string $i18nOutput       Output from each translation
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    public function generateFacadeStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR', $i18nOutput = '')
+    {
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubFacade->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue($cartTotalPrice));
+
+        $stubFacade->expects($this->any())
+            ->method('getCheckoutCurrency')
+            ->will($this->returnValue($checkoutCurrency));
+
+        $stubFacade->expects($this->any())
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
+
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubTranslator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnValue($i18nOutput));
+
+        $stubFacade->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+
+        return $stubFacade;
+    }
+
+    /**
+     * Check getName i18n
+     *
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::getName
+     *
+     */
+    public function testGetName()
+    {
+        $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Number of articles in cart');
+
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForXArticles($stubFacade);
+
+        $actual = $condition1->getName();
+        $expected = 'Number of articles in cart';
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check tooltip i18n
+     *
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::getToolTip
+     *
+     */
+    public function testGetToolTip()
+    {
+        $stubFacade = $this->generateFacadeStub(399, 'EUR', 'If cart products quantity is <strong>superior to</strong> 4');
+
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForXArticles($stubFacade);
+        $operators = array(
+            MatchForXArticles::INPUT1 => Operators::SUPERIOR
+        );
+        $values = array(
+            MatchForXArticles::INPUT1 => 4
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $actual = $condition1->getToolTip();
+        $expected = 'If cart products quantity is <strong>superior to</strong> 4';
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check validator
+     *
+     * @covers Thelia\Condition\Implementation\MatchForXArticles::generateInputs
+     *
+     */
+    public function testGetValidator()
+    {
+        $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Price');
+
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForXArticles($stubFacade);
+        $operators = array(
+            MatchForXArticles::INPUT1 => Operators::SUPERIOR
+        );
+        $values = array(
+            MatchForXArticles::INPUT1 => 4
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $actual = $condition1->getValidators();
+
+        $validators = array(
+            'inputs' => array(
+                MatchForXArticles::INPUT1 => array(
+                    'title' => 'Price',
+                    'availableOperators' => array(
+                        '<' => 'Price',
+                        '<=' => 'Price',
+                        '==' => 'Price',
+                        '>=' => 'Price',
+                        '>' => 'Price'
+                    ),
+                    'type' => 'text',
+                    'class' => 'form-control',
+                    'value' => '',
+                    'selectedOperator' => ''
+                )
+            ),
+            'setOperators' => array(
+                'quantity' => '>'
+            ),
+            'setValues' => array(
+                'quantity' => 4
+            )
+        );
+        $expected = $validators;
 
         $this->assertEquals($expected, $actual);
 

@@ -24,7 +24,7 @@
 namespace Thelia\Coupon;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Condition\ConditionManagerInterface;
+use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 
@@ -42,7 +42,7 @@ use Thelia\Model\Coupon;
 class CouponManager
 {
     /** @var FacadeInterface Provides necessary value from Thelia */
-    protected $adapter = null;
+    protected $facade = null;
 
     /** @var ContainerInterface Service Container */
     protected $container = null;
@@ -64,8 +64,8 @@ class CouponManager
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->adapter = $container->get('thelia.adapter');
-        $this->coupons = $this->adapter->getCurrentCoupons();
+        $this->facade = $container->get('thelia.facade');
+        $this->coupons = $this->facade->getCurrentCoupons();
     }
 
 
@@ -87,12 +87,12 @@ class CouponManager
             $discount = $this->getEffect($couponsKept);
 
             if ($isRemovingPostage) {
-                $postage = $this->adapter->getCheckoutPostagePrice();
+                $postage = $this->facade->getCheckoutPostagePrice();
                 $discount += $postage;
             }
 
             // Just In Case test
-            $checkoutTotalPrice = $this->adapter->getCartTotalPrice();
+            $checkoutTotalPrice = $this->facade->getCartTotalPrice();
             if ($discount >= $checkoutTotalPrice) {
                 $discount = $checkoutTotalPrice;
             }
@@ -164,7 +164,7 @@ class CouponManager
 
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
-            if ($coupon->isMatching($this->adapter)) {
+            if ($coupon->isMatching($this->facade)) {
                 $couponsKept[] = $coupon;
             }
         }
@@ -184,7 +184,7 @@ class CouponManager
         $discount = 0.00;
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
-            $discount += $coupon->exec($this->adapter);
+            $discount += $coupon->exec($this->facade);
         }
 
         return $discount;
@@ -213,9 +213,9 @@ class CouponManager
     /**
      * Add an available ConstraintManager (Services)
      *
-     * @param ConditionManagerInterface $condition ConditionManagerInterface
+     * @param ConditionInterface $condition ConditionInterface
      */
-    public function addAvailableCondition(ConditionManagerInterface $condition)
+    public function addAvailableCondition(ConditionInterface $condition)
     {
         $this->availableConditions[] = $condition;
     }
@@ -237,20 +237,21 @@ class CouponManager
      *
      * @param \Thelia\Model\Coupon $coupon Coupon consumed
      *
-     * @return bool
+     * @return int Usage left after decremental
      */
-    public function decrementeQuantity(Coupon $coupon)
+    public function decrementQuantity(Coupon $coupon)
     {
-        $ret = true;
+        $ret = -1;
         try {
 
-        $oldMaxUsage = $coupon->getMaxUsage();
+        $usageLeft = $coupon->getMaxUsage();
 
-        if ($oldMaxUsage > 0) {
-            $oldMaxUsage--;
-            $coupon->setMaxUsage($$oldMaxUsage);
+        if ($usageLeft > 0) {
+            $usageLeft--;
+            $coupon->setMaxUsage($usageLeft);
 
             $coupon->save();
+            $ret = $usageLeft;
         }
 
         } catch(\Exception $e) {

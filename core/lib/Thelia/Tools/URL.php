@@ -286,7 +286,7 @@ class URL
      }
 
     /**
-      * Genenerate the file part of a rewriten URL from a given baseString, using a view, a view id and a locale
+      * Genenerate the file part of a rewritten URL from a given baseString, using a view, a view id and a locale
       *
       * @param $view
       * @param $viewId

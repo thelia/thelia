@@ -41,6 +41,8 @@ class HomeController extends BaseAdminController
 
     public function loadStatsAjaxAction()
     {
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
+        
         $data = new \stdClass();
 
         $data->title = "Stats on " . $this->getRequest()->query->get('month', date('m')) . "/" . $this->getRequest()->query->get('year', date('Y'));

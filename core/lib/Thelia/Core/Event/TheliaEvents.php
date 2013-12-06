@@ -39,20 +39,6 @@ final class TheliaEvents
     const BOOT = "thelia.boot";
 
     /**
-     * ACTION event
-     *
-     * Sent if no action are already present in Thelia action process ( see Thelia\Routing\Matcher\ActionMatcher)
-     */
-    const ACTION = "thelia.action";
-
-    /**
-     * INCLUDE event
-     *
-     * Sent before starting thelia inclusion
-     */
-    const INCLUSION = "thelia.include";
-
-    /**
      * Sent before the logout of the customer.
      */
     const CUSTOMER_LOGOUT = "action.customer_logout";
@@ -681,7 +667,7 @@ final class TheliaEvents
     const MAILTRANSPORTER_CONFIG = 'action.mailertransporter.config';
 
     /**
-     * sent when Thelia try to generate a rewriten url
+     * sent when Thelia try to generate a rewritten url
      */
     const GENERATE_REWRITTENURL = 'action.generate_rewritenurl';
 

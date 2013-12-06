@@ -94,6 +94,10 @@ class TranslationsController extends BaseAdminController
                 case 'pf' :
                     $template = new TemplateDefinition($item_id, TemplateDefinition::PDF);
                 break;
+
+                case 'ma' :
+                    $template = new TemplateDefinition($item_id, TemplateDefinition::EMAIL);
+                break;
             }
 
             if ($template) {

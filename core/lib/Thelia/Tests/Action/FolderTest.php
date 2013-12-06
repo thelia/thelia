@@ -162,13 +162,18 @@ class FolderTest extends BaseAction
 
     public function testUpdatePositionDown()
     {
-        $folder = FolderQuery::create()
-            ->filterByPosition(1)
+        $nextFolder = FolderQuery::create()
+            ->filterByPosition(2)
             ->findOne();
 
-        if (null === $folder) {
+        if (null === $nextFolder) {
             $this->fail('use fixtures before launching test, there is no folder in database');
         }
+
+        $folder = FolderQuery::create()
+            ->filterByPosition(1)
+            ->filterByParent($nextFolder->getParent())
+            ->findOne();
 
         $newPosition = $folder->getPosition()+1;
 

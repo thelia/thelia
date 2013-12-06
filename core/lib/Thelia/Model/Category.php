@@ -115,6 +115,8 @@ class Category extends BaseCategory
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        $this->markRewritenUrlObsolete();
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECATEGORY, new CategoryEvent($this));
     }
 }

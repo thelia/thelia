@@ -23,7 +23,8 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Coupon\ConditionCollection;
+use Thelia\Condition\ConditionCollection;
+use Thelia\Coupon\FacadeInterface;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -62,7 +63,7 @@ interface CouponInterface
     /**
      * Set Coupon
      *
-     * @param CouponInterface $adapter                    Provides necessary value from Thelia
+     * @param FacadeInterface $facade                     Provides necessary value from Thelia
      * @param string          $code                       Coupon code (ex: XMAS)
      * @param string          $title                      Coupon title (ex: Coupon for XMAS)
      * @param string          $shortDescription           Coupon short description
@@ -77,7 +78,7 @@ interface CouponInterface
      * @param \Datetime       $expirationDate             When the Code is expiring
      */
     public function set(
-        $adapter,
+        FacadeInterface $facade,
         $code,
         $title,
         $shortDescription,
@@ -139,20 +140,20 @@ interface CouponInterface
     /**
      * Return condition to validate the Coupon or not
      *
-     * @return ConditionCollection A set of ConditionManagerInterface
+     * @return ConditionCollection A set of ConditionInterface
      */
     public function getConditions();
 
     /**
-     * Replace the existing Rules by those given in parameter
-     * If one Rule is badly implemented, no Rule will be added
+     * Replace the existing Conditions by those given in parameter
+     * If one Condition is badly implemented, no Condition will be added
      *
-     * @param ConditionCollection $rules ConditionManagerInterface to add
+     * @param ConditionCollection $conditions ConditionInterface to add
      *
      * @return $this
      * @throws \Thelia\Exception\InvalidConditionException
      */
-    public function setConditions(ConditionCollection $rules);
+    public function setConditions(ConditionCollection $conditions);
 
     /**
      * Return Coupon expiration date
@@ -198,7 +199,7 @@ interface CouponInterface
      * A positive value
      *
      * Effects could also affect something else than the final Checkout price
-     * CouponAdapter $adapter could be use to directly pass a Session value
+     * FacadeInterface $facade could be used to directly pass a Session value
      * some would wish to modify
      * Hence affecting a wide variety of Thelia elements
      *
@@ -207,7 +208,7 @@ interface CouponInterface
     public function exec();
 
     /**
-     * Check if the current Coupon is matching its conditions (Rules)
+     * Check if the current Coupon is matching its conditions
      * Thelia variables are given by the FacadeInterface
      *
      * @return bool

@@ -22,18 +22,19 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Product;
-
 use Thelia\Model\Product;
 
 class ProductSetTemplateEvent extends ProductEvent
 {
-    public $template_id = null;
+    protected $template_id = null;
+    protected $currency_id = 0;
 
-    public function __construct(Product $product = null, $template_id)
+    public function __construct(Product $product = null, $template_id, $currency_id)
     {
         parent::__construct($product);
 
         $this->template_id = $template_id;
+        $this->currency_id = $currency_id;
     }
 
     public function getTemplateId()
@@ -48,4 +49,15 @@ class ProductSetTemplateEvent extends ProductEvent
         return $this;
     }
 
+    public function getCurrencyId()
+    {
+        return $this->currency_id;
+    }
+
+    public function setCurrencyId($currency_id)
+    {
+        $this->currency_id = $currency_id;
+
+        return $this;
+    }
 }
