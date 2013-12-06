@@ -1,10 +1,3 @@
-{* Declare assets directory, relative to template base directory *}
-{declare_assets directory='assets'}
-{block name="no-return-functions"}{/block}
-{assign var="store_name" value="{config key="store_name"}"}
-{if not $store_name}
-    {assign var="store_name" value="{intl l='Thelia V2'}"}
-{/if}
 <!doctype html>
 <!--
  ______   __  __     ______     __         __     ______
@@ -23,6 +16,12 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3 of the
 GNU General Public License : http://www.gnu.org/licenses/
 -->
+
+{* Declare assets directory, relative to template base directory *}
+{declare_assets directory='assets'}
+{block name="no-return-functions"}{/block}
+{assign var="store_name" value="{config key="store_name"}"}
+{if not $store_name}{assign var="store_name" value="{intl l='Thelia V2'}"}{/if}
 
 {* paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither *}
 <!--[if lt IE 7 ]><html class="no-js oldie ie6" lang="{lang attr="code"}"> <![endif]-->
