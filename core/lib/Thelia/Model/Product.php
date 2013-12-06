@@ -263,12 +263,8 @@ class Product extends BaseProduct
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-        RewritingUrlQuery::create()
-            ->filterByView($this->getRewrittenUrlViewName())
-            ->filterByViewId($this->getId())
-            ->update(array(
-                "View" => ConfigQuery::getObsoleteRewrittenUrlView()
-            ));
+        $this->markRewritenUrlObsolete();
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
     }
 }
