@@ -1201,10 +1201,10 @@ class ProductController extends AbstractCrudController
         }
 
         return new JsonResponse(array(
-            'price_with_tax'         => NumberFormat::getInstance($this->getRequest())->format($price_with_tax, null, '.'),
-            'price_without_tax'      => NumberFormat::getInstance($this->getRequest())->format($price_without_tax, null, '.'),
-            'sale_price_with_tax'    => NumberFormat::getInstance($this->getRequest())->format($sale_price_with_tax, null, '.'),
-            'sale_price_without_tax' => NumberFormat::getInstance($this->getRequest())->format($sale_price_without_tax, null, '.')
+            'price_with_tax'         => NumberFormat::getInstance($this->getRequest())->formatStandardNumber($price_with_tax),
+            'price_without_tax'      => NumberFormat::getInstance($this->getRequest())->formatStandardNumber($price_without_tax),
+            'sale_price_with_tax'    => NumberFormat::getInstance($this->getRequest())->formatStandardNumber($sale_price_with_tax),
+            'sale_price_without_tax' => NumberFormat::getInstance($this->getRequest())->formatStandardNumber($sale_price_without_tax)
         ));
     }
 
@@ -1236,7 +1236,8 @@ class ProductController extends AbstractCrudController
         if ($convert != 0) {
             $return_price = $prix * Currency::getDefaultCurrency()->getRate();
         }
+
         // Format the number using '.', to perform further calculation
-        return NumberFormat::getInstance($this->getRequest())->format($return_price, null, '.');
+        return NumberFormat::getInstance($this->getRequest())->formatStandardNumber($return_price);
     }
 }
