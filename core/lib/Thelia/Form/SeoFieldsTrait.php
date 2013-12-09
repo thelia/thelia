@@ -75,12 +75,12 @@ trait SeoFieldsTrait
                 )
             );
 
-        if (! in_array('meta_keyword', $exclude))
+        if (! in_array('meta_keywords', $exclude))
             $this->formBuilder
-                ->add('meta_keyword', 'text', array(
-                        'label' => Translator::getInstance()->trans('Meta Keyword'),
+                ->add('meta_keywords', 'text', array(
+                        'label' => Translator::getInstance()->trans('Meta Keywords'),
                         'label_attr' => array(
-                            'for' => 'meta_keyword'
+                            'for' => 'meta_keywords'
                         ),
                         'required' => false
                     )

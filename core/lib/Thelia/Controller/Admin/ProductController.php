@@ -68,7 +68,6 @@ use Thelia\Form\ProductModificationForm;
 use Thelia\Form\ProductSaleElementUpdateForm;
 use Thelia\Form\ProductDefaultSaleElementUpdateForm;
 use Thelia\Form\ProductCombinationGenerationForm;
-use Thelia\Form\SeoForm;
 
 use Thelia\TaxEngine\Calculator;
 use Thelia\Tools\NumberFormat;
@@ -314,23 +313,8 @@ class ProductController extends AbstractSeoCrudController
             $this->getParserContext()->addForm($combinationPseForm);
         }
 
-        // The "SEO" tab form
-        $locale = $object->getLocale();
-        $data = array(
-            'id'               => $object->getId(),
-            'locale'           => $locale,
-            'url'              => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
-            'meta_title'       => $object->getMetaTitle(),
-            'meta_description' => $object->getMetaDescription(),
-            'meta_keyword'     => $object->getMetaKeyword()
-        );
-
-        $seoForm = new SeoForm($this->getRequest(), "form", $data);
-        $this->getParserContext()->addForm($seoForm);
-
-        // URL based on the language
-        $this->getParserContext()->set('url_language', $this->getUrlLanguage($locale));
-
+        // Hydrate the "SEO" tab form
+        $this->hydrateSeoForm($object);
 
         // The "General" tab form
         $data = array(

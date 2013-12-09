@@ -38,7 +38,7 @@ use Thelia\Model\FolderQuery;
  * @package Thelia\Controller\Admin
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderController extends AbstractCrudController
+class FolderController extends AbstractSeoCrudController
 {
 
     public function __construct()
@@ -54,7 +54,8 @@ class FolderController extends AbstractCrudController
             TheliaEvents::FOLDER_UPDATE,
             TheliaEvents::FOLDER_DELETE,
             TheliaEvents::FOLDER_TOGGLE_VISIBILITY,
-            TheliaEvents::FOLDER_UPDATE_POSITION
+            TheliaEvents::FOLDER_UPDATE_POSITION,
+            TheliaEvents::FOLDER_UPDATE_SEO
         );
     }
 
@@ -81,6 +82,9 @@ class FolderController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
+        // Hydrate the "SEO" tab form
+        $this->hydrateSeoForm($object);
+
         // Prepare the data that will hydrate the form
         $data = array(
             'id'           => $object->getId(),
@@ -90,7 +94,6 @@ class FolderController extends AbstractCrudController
             'description'  => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum(),
             'visible'      => $object->getVisible(),
-            'url'          => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
             'parent'       => $object->getParent()
         );
 
@@ -132,7 +135,6 @@ class FolderController extends AbstractCrudController
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
-            ->setUrl($formData['url'])
             ->setParent($formData['parent'])
         ;
 

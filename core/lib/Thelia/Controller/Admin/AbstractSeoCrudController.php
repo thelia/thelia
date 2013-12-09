@@ -121,11 +121,35 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             ->setLocale($formData['locale'])
             ->setMetaTitle($formData['meta_title'])
             ->setMetaDescription($formData['meta_description'])
-            ->setMetaKeyword($formData['meta_keyword'])
+            ->setMetaKeywords($formData['meta_keywords'])
         ;
 
         // Create and dispatch the change event
         return $updateSeoEvent;
+    }
+
+    /**
+     * Hydrate the SEO form for this object, before passing it to the update template
+     *
+     * @param unknown $object
+     */
+    protected function hydrateSeoForm($object){
+        // The "SEO" tab form
+        $locale = $object->getLocale();
+        $data = array(
+            'id'               => $object->getId(),
+            'locale'           => $locale,
+            'url'              => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
+            'meta_title'       => $object->getMetaTitle(),
+            'meta_description' => $object->getMetaDescription(),
+            'meta_keywords'     => $object->getMetaKeywords()
+        );
+
+        $seoForm = new SeoForm($this->getRequest(), "form", $data);
+        $this->getParserContext()->addForm($seoForm);
+
+        // URL based on the language
+        $this->getParserContext()->set('url_language', $this->getUrlLanguage($locale));
     }
 
     /**

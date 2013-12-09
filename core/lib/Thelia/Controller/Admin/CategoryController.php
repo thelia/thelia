@@ -47,7 +47,7 @@ use Thelia\Model\CategoryAssociatedContentQuery;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class CategoryController extends AbstractCrudController
+class CategoryController extends AbstractSeoCrudController
 {
     public function __construct()
     {
@@ -62,7 +62,8 @@ class CategoryController extends AbstractCrudController
             TheliaEvents::CATEGORY_UPDATE,
             TheliaEvents::CATEGORY_DELETE,
             TheliaEvents::CATEGORY_TOGGLE_VISIBILITY,
-            TheliaEvents::CATEGORY_UPDATE_POSITION
+            TheliaEvents::CATEGORY_UPDATE_POSITION,
+            TheliaEvents::CATEGORY_UPDATE_SEO
         );
     }
 
@@ -102,7 +103,6 @@ class CategoryController extends AbstractCrudController
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
-            ->setUrl($formData['url'])
             ->setParent($formData['parent'])
         ;
 
@@ -130,7 +130,10 @@ class CategoryController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-        // Prepare the data that will hydrate the form
+        // Hydrate the "SEO" tab form
+        $this->hydrateSeoForm($object);
+
+        // The "General" tab form
         $data = array(
             'id'           => $object->getId(),
             'locale'       => $object->getLocale(),
@@ -139,7 +142,6 @@ class CategoryController extends AbstractCrudController
             'description'  => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum(),
             'visible'      => $object->getVisible(),
-            'url'          => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
             'parent'       => $object->getParent()
         );
 

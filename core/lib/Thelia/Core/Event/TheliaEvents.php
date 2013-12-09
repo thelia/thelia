@@ -181,6 +181,7 @@ final class TheliaEvents
     const FOLDER_DELETE            = "action.deleteFolder";
     const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
     const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
+    const FOLDER_UPDATE_SEO        = "action.updateFolderSeo";
 
     const BEFORE_CREATEFOLDER = "action.before_createFolder";
     const AFTER_CREATEFOLDER 	= "action.after_createFolder";

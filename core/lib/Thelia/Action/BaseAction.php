@@ -95,7 +95,7 @@ class BaseAction
                 ->setLocale($event->getLocale())
                 ->setMetaTitle($event->getMetaTitle())
                 ->setMetaDescription($event->getMetaDescription())
-                ->setMetaKeyword($event->getMetaKeyword())
+                ->setMetaKeywords($event->getMetaKeywords())
 
                 ->save()
             ;

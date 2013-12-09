@@ -37,8 +37,6 @@ class FolderUpdateEvent extends FolderCreateEvent
     protected $description;
     protected $postscriptum;
 
-    protected $url;
-
     public function __construct($folder_id)
     {
         $this->folder_id = $folder_id;
@@ -114,24 +112,6 @@ class FolderUpdateEvent extends FolderCreateEvent
     public function getPostscriptum()
     {
         return $this->postscriptum;
-    }
-
-    /**
-     * @param mixed $url
-     */
-    public function setUrl($url)
-    {
-        $this->url = $url;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getUrl()
-    {
-        return $this->url;
     }
 
 }

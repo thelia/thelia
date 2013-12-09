@@ -23,8 +23,6 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\GreaterThan;
-use Thelia\Core\Translation\Translator;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CategoryModificationForm extends CategoryCreationForm
 {
@@ -36,12 +34,6 @@ class CategoryModificationForm extends CategoryCreationForm
 
         $this->formBuilder
             ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
-
-            ->add("url", "text", array(
-                "label"       => Translator::getInstance()->trans("Rewritten URL *"),
-                "constraints" => array(new NotBlank()),
-                "label_attr" => array("for" => "rewriten_url")
-            ))
         ;
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class
