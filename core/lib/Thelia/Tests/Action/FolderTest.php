@@ -82,7 +82,6 @@ class FolderTest extends BaseAction
             ->setChapo('test folder update chapo')
             ->setDescription('update folder description')
             ->setPostscriptum('update folder postscriptum')
-            ->setUrl($folder->getRewrittenUrl('en_US'))
             ->setParent(0)
         ;
 

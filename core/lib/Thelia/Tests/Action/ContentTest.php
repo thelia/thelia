@@ -110,7 +110,6 @@ class ContentTest extends BaseAction
             ->setChapo('test update content short description')
             ->setDescription('test update content description')
             ->setPostscriptum('test update content postscriptum')
-            ->setUrl($content->getRewrittenUrl('en_US'))
             ->setDefaultFolder($folder->getId())
         ;
 
