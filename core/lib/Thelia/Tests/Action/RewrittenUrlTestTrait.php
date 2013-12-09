@@ -15,7 +15,30 @@ trait RewrittenUrlTestTrait
 
     public function setUp()
     {
-        new URL(null);
+        $stubRouterAdmin = $this->getMockBuilder('\Symfony\Component\Routing\Router')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getContext'))
+            ->getMock();
+
+        $stubRequestContext = $this->getMockBuilder('\Symfony\Component\Routing\RequestContext')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getHost'))
+            ->getMock();
+
+        $stubRequestContext->expects($this->any())
+            ->method('getHost')
+            ->will($this->returnValue('localhost'));
+
+        $stubRouterAdmin->expects($this->any())
+            ->method('getContext')
+            ->will($this->returnValue(
+                $stubRequestContext
+            ));
+
+        $container = $this->getContainer();
+        $container->set('router.admin', $stubRouterAdmin);
+
+        new URL($container);
     }
 
     /**
