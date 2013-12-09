@@ -85,7 +85,7 @@ class Content extends BaseAction implements EventSubscriberInterface
             try {
                 $content->setRewrittenUrl($event->getLocale(), $event->getUrl());
             } catch(UrlRewritingException $e) {
-                throw new FormValidationException($e->getMessage());
+                throw new FormValidationException($e->getMessage(), $e->getCode());
             }
 
             $content->updateDefaultFolder($event->getDefaultFolder());

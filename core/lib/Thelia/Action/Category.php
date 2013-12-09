@@ -96,7 +96,7 @@ class Category extends BaseAction implements EventSubscriberInterface
             try {
                 $category->setRewrittenUrl($event->getLocale(), $event->getUrl());
             } catch(UrlRewritingException $e) {
-                throw new FormValidationException($e->getMessage());
+                throw new FormValidationException($e->getMessage(), $e->getCode());
             }
 
             $event->setCategory($category);

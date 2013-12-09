@@ -62,7 +62,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
             try {
                 $folder->setRewrittenUrl($event->getLocale(), $event->getUrl());
             } catch(UrlRewritingException $e) {
-                throw new FormValidationException($e->getMessage());
+                throw new FormValidationException($e->getMessage(), $e->getCode());
             }
 
             $event->setFolder($folder);
