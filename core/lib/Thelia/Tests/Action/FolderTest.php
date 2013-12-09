@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Action;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Action\Folder;
 use Thelia\Core\Event\Folder\FolderCreateEvent;

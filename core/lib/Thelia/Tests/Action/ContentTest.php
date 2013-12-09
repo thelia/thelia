@@ -43,7 +43,6 @@ use Thelia\Model\FolderQuery;
  */
 class ContentTest extends BaseAction
 {
-    use RewrittenUrlTestTrait;
 
     public function getUpdateEvent(&$content)
     {
