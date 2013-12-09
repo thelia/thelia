@@ -58,7 +58,9 @@
             <argument type="service" id="thelia.translator" />
         </service>
 
-        <service id="smarty.plugin.module" class="Thelia\Core\Template\Smarty\Plugins\Module" >
+        <service id="smarty.plugin.module" class="Thelia\Core\Template\Smarty\Plugins\Module" scope="request">
+            <argument>%kernel.debug%</argument>
+            <argument type="service" id="request"/>
             <tag name="thelia.parser.register_plugin"/>
         </service>
 
