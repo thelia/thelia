@@ -29,6 +29,8 @@ use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Exception\UrlRewritingException;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Folder as FolderModel;
 
@@ -55,6 +57,13 @@ class Folder extends BaseAction implements EventSubscriberInterface
                 ->setPostscriptum($event->getPostscriptum())
                 ->save();
             ;
+
+            // Update the rewritten URL, if required
+            try {
+                $folder->setRewrittenUrl($event->getLocale(), $event->getUrl());
+            } catch(UrlRewritingException $e) {
+                throw new FormValidationException($e->getMessage());
+            }
 
             $event->setFolder($folder);
         }

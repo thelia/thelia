@@ -25,6 +25,8 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+use Thelia\Exception\UrlRewritingException;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Category as CategoryModel;
 
@@ -89,6 +91,13 @@ class Category extends BaseAction implements EventSubscriberInterface
                 ->setVisible($event->getVisible())
 
                 ->save();
+
+            // Update the rewritten URL, if required
+            try {
+                $category->setRewrittenUrl($event->getLocale(), $event->getUrl());
+            } catch(UrlRewritingException $e) {
+                throw new FormValidationException($e->getMessage());
+            }
 
             $event->setCategory($category);
         }
