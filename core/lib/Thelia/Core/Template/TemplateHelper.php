@@ -250,7 +250,7 @@ class TemplateHelper
 
                     $translation = str_replace("'", "\'", $translations[$key]);
 
-                    fwrite($fp, sprintf("\t'%s' => '%s',\n", $text, $translation));
+                    fwrite($fp, sprintf("    '%s' => '%s',\n", $text, $translation));
                 }
             }
 

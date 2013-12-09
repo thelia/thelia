@@ -8,29 +8,16 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
+/**
+ * Class RewrittenUrlTestTrait
+ * @package Thelia\Tests\Action
+
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ */
 trait RewrittenUrlTestTrait
 {
     abstract public function getUpdateEvent(&$object);
     abstract public function processUpdateAction($event);
-
-    public function setUp()
-    {
-        new URL(null);
-    }
-
-    /**
-     * @expectedException \Thelia\Form\Exception\FormValidationException
-     * @expectedExceptionCode 100
-     */
-    public function testUpdateEmptyUrl()
-    {
-        $object = null;
-        $event = $this->getUpdateEvent($object);
-
-        $event->setUrl('');
-
-        $updatedObject = $this->processUpdateAction($event);
-    }
 
     /**
      * @expectedException \Thelia\Form\Exception\FormValidationException
@@ -54,7 +41,7 @@ trait RewrittenUrlTestTrait
 
         $event->setUrl($existingUrl->getUrl());
 
-        $updatedObject = $this->processUpdateAction($event);
+        $this->processUpdateAction($event);
     }
 
     public function testUpdateUrl()

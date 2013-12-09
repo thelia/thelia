@@ -119,12 +119,16 @@
                                             </div>
 						                </div>
 
-                                        {include
-                                            file="includes/inner-form-toolbar.html"
-                                            hide_flags = true
-
-                                            close_url="{url path='/admin/folders' folder_id=$folder_id}"
-                                        }
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="control-group">
+                                                    <lablel>&nbsp;</lablel>
+                                                    <div class="controls">
+                                                        <p>{intl l='Folder created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
+                                                    </div>
+                                                 </div>
+                                            </div>
+                                        </div>
 
                                         <small>{intl l='Colder created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</small>
 

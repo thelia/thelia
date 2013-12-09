@@ -51,15 +51,10 @@ class URL
         self::$instance = $this;
 
         if ($container !== null)
-            $this->requestContext = $this->getContext($container);
+            $this->requestContext = $container->get('router.admin')->getContext();
 
         $this->retriever = new RewritingRetriever();
         $this->resolver = new RewritingResolver();
-    }
-
-    public function getContext($container)
-    {
-        return $container->get('router.admin')->getContext();
     }
 
     /**
