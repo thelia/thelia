@@ -1,0 +1,99 @@
+{extends file="layout.tpl"}
+
+{* Body Class *}
+{block name="body-class"}page-folder{/block}
+
+{* Page Title *}
+{block name='no-return-functions' append}
+    {loop name="folder.seo.title" type="folder" id="{folder attr="id"}"}
+    {$page_title = {$META_TITLE}}
+    {/loop}
+{/block}
+
+{* Meta *}
+{block name="meta"}
+    {loop name="folder.seo.meta" type="folder" id="{folder attr="id"}"}
+    {if $META_DESCRIPTION}<meta name="description" content="{$META_DESCRIPTION}">{/if}
+    {if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
+    {/loop}
+{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = []}
+    {loop name="folder_path" type="folder-path" folder="{folder attr="id"}"}
+    {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
+    {/loop}
+{/block}
+
+{* Content *}
+{block name="main-content"}
+    <div class="main">
+
+        <div class="col-main" role="main" aria-labelledby="main-label">
+
+        {loop name="folder" type="folder" id="{folder attr="id"}"}
+            <h1 id="main-label" class="page-header">{$TITLE}</h1>
+            {if $CHAPO}
+                <div class="folder-chapo">
+                    {$CHAPO}
+                </div>
+            {/if}
+            {if $DESCRIPTION}
+                <div class="folder-description">
+                    {$DESCRIPTION nofilter}
+                </div>
+            {/if}
+
+            <div id="folder-contents">
+                <div class="contents">
+                    {ifloop rel="folder_content"}
+                        <ul>
+                            {loop name="folder_content" type="content" folder="$ID"}
+                                <li class="item">
+                                    <article>
+                                        <a href="{$URL}" tabindex="-1" class="content-image">
+                                            {loop name="content_thumbnail" type="image" width="369" height="247" content=$ID limit="1"}
+                                                <img src="{$IMAGE_URL}" alt="{$TITLE}">
+                                            {/loop}
+                                            {elseloop rel="content_thumbnail"}
+                                                {images file='assets/img/280x196.png'}<img src="{$asset_url}" alt="{$TITLE}">{/images}
+                                            {/elseloop}
+                                            <span class="mask"></span>
+                                        </a>
+
+                                        <div class="content-info">
+                                            <h3 class="name"><a href="{$URL}">{$TITLE}</a></h3>
+
+                                            {if $CHAPO}
+                                            <div class="short-description">
+                                               {$CHAPO}
+                                            </div>
+                                            {/if}
+                                        </div>
+                                    </article><!-- /content -->
+                                </li>
+                            {/loop}
+                        </ul>
+                    {/ifloop}
+                    {elseloop  rel="folder_content"}
+                        <div class="folder-warning">
+                            {intl l="No Content in this folder."}
+                        </div>
+                    {/elseloop}
+                </div>
+            </div><!-- /#category-products -->
+
+
+            {if $POSTSCRIPTUM}
+                <small class="folder-postscriptum">
+                    {$POSTSCRIPTUM}
+                </small>
+            {/if}
+        {/loop}
+
+        </div>
+    </div>
+{/block}
+
+
