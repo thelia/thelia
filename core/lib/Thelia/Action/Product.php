@@ -392,12 +392,13 @@ class Product extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::PRODUCT_CREATE            => array("create", 128),
-            TheliaEvents::PRODUCT_UPDATE            => array("update", 128),
-            TheliaEvents::PRODUCT_DELETE            => array("delete", 128),
-            TheliaEvents::PRODUCT_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
+            TheliaEvents::PRODUCT_CREATE                    => array("create", 128),
+            TheliaEvents::PRODUCT_UPDATE                    => array("update", 128),
+            TheliaEvents::PRODUCT_DELETE                    => array("delete", 128),
+            TheliaEvents::PRODUCT_TOGGLE_VISIBILITY         => array("toggleVisibility", 128),
 
-            TheliaEvents::PRODUCT_UPDATE_POSITION => array("updatePosition", 128),
+            TheliaEvents::PRODUCT_UPDATE_POSITION           => array("updatePosition", 128),
+            TheliaEvents::PRODUCT_UPDATE_SEO                => array("updateSeo", 128),
 
             TheliaEvents::PRODUCT_ADD_CONTENT               => array("addContent", 128),
             TheliaEvents::PRODUCT_REMOVE_CONTENT            => array("removeContent", 128),
@@ -407,13 +408,13 @@ class Product extends BaseAction implements EventSubscriberInterface
             TheliaEvents::PRODUCT_REMOVE_ACCESSORY          => array("removeAccessory", 128),
             TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION => array("updateAccessoryPosition", 128),
 
-            TheliaEvents::PRODUCT_ADD_CATEGORY    => array("addCategory", 128),
-            TheliaEvents::PRODUCT_REMOVE_CATEGORY => array("removeCategory", 128),
+            TheliaEvents::PRODUCT_ADD_CATEGORY              => array("addCategory", 128),
+            TheliaEvents::PRODUCT_REMOVE_CATEGORY           => array("removeCategory", 128),
 
-            TheliaEvents::PRODUCT_SET_TEMPLATE => array("setProductTemplate", 128),
+            TheliaEvents::PRODUCT_SET_TEMPLATE              => array("setProductTemplate", 128),
 
-            TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE => array("updateFeatureProductValue", 128),
-            TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE => array("deleteFeatureProductValue", 128),
+            TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE      => array("updateFeatureProductValue", 128),
+            TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE      => array("deleteFeatureProductValue", 128),
         );
     }
 }
