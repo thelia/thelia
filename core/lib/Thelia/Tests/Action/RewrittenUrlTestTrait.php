@@ -8,52 +8,16 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
+/**
+ * Class RewrittenUrlTestTrait
+ * @package Thelia\Tests\Action
+
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ */
 trait RewrittenUrlTestTrait
 {
     abstract public function getUpdateEvent(&$object);
     abstract public function processUpdateAction($event);
-
-    public function setUp()
-    {
-        $stubRouterAdmin = $this->getMockBuilder('\Symfony\Component\Routing\Router')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getContext'))
-            ->getMock();
-
-        $stubRequestContext = $this->getMockBuilder('\Symfony\Component\Routing\RequestContext')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getHost'))
-            ->getMock();
-
-        $stubRequestContext->expects($this->any())
-            ->method('getHost')
-            ->will($this->returnValue('localhost'));
-
-        $stubRouterAdmin->expects($this->any())
-            ->method('getContext')
-            ->will($this->returnValue(
-                $stubRequestContext
-            ));
-
-        $container = $this->getContainer();
-        $container->set('router.admin', $stubRouterAdmin);
-
-        new URL($container);
-    }
-
-    /**
-     * @expectedException \Thelia\Form\Exception\FormValidationException
-     * @expectedExceptionCode 100
-     */
-    public function testUpdateEmptyUrl()
-    {
-        $object = null;
-        $event = $this->getUpdateEvent($object);
-
-        $event->setUrl('');
-
-        $updatedObject = $this->processUpdateAction($event);
-    }
 
     /**
      * @expectedException \Thelia\Form\Exception\FormValidationException
@@ -77,7 +41,7 @@ trait RewrittenUrlTestTrait
 
         $event->setUrl($existingUrl->getUrl());
 
-        $updatedObject = $this->processUpdateAction($event);
+        $this->processUpdateAction($event);
     }
 
     public function testUpdateUrl()
