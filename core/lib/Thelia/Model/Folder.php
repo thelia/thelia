@@ -100,12 +100,7 @@ class Folder extends BaseFolder
 
     public function postDelete(ConnectionInterface $con = null)
     {
-        RewritingUrlQuery::create()
-            ->filterByView($this->getRewrittenUrlViewName())
-            ->filterByViewId($this->getId())
-            ->update(array(
-                "View" => ConfigQuery::getObsoleteRewrittenUrlView()
-            ));
+        $this->markRewritenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEFOLDER, new FolderEvent($this));
     }

@@ -161,16 +161,6 @@
         width: 100%;
 }
 
-.btn-group {
-    white-space: nowrap; // prevent buttons from wrapping when in tight spaces (e.g., the table on the tests page)
-    > .btn {
-        float: inherit;
-    }
-    > .btn + .btn {
-        margin-left: -4px;
-    }
-}
-
 // -- Login form --------------------------------------------------------------
 
 .form-signin {
@@ -423,4 +413,19 @@
 .dropzone {
     border: 1px dashed #ddd;
     padding: 20px;
+}
+
+// No button wrap in button groups in td.action cells
+table {
+    td.actions {
+        .btn-group {
+            white-space: nowrap; // prevent buttons from wrapping when in tight spaces (e.g., the table on the tests page)
+            > .btn {
+                float: inherit;
+            }
+            > .btn + .btn {
+                margin-left: -4px;
+            }
+        }
+    }
 }

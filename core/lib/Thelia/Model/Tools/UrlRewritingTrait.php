@@ -31,6 +31,7 @@ use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\RewritingUrl;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
+use Thelia\Model\ConfigQuery;
 /**
  * A trait for managing Rewritten URLs from model classes
  */
@@ -136,6 +137,18 @@ trait UrlRewritingTrait {
         }
 
         return $url;
+    }
+
+    /**
+     * Mark the current URL as obseolete
+     */
+    public function markRewritenUrlObsolete() {
+        RewritingUrlQuery::create()
+            ->filterByView($this->getRewrittenUrlViewName())
+            ->filterByViewId($this->getId())
+            ->update(array(
+                "View" => ConfigQuery::getObsoleteRewrittenUrlView()
+            ));
     }
 
     /**
