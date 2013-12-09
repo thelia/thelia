@@ -58,6 +58,11 @@ $ php Thelia thelia:install
 
 You just have to follow all instructions.
 
+Contribute
+----------
+
+see the documentation : http://doc.thelia.net/en/documentation/contribute.html
+
 Usage
 -----
 
