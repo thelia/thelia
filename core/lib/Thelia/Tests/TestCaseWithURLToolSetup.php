@@ -30,15 +30,21 @@ namespace Thelia\Tests;
  */
 class TestCaseWithURLToolSetup extends \PHPUnit_Framework_TestCase
 {
+    private $container = null;
+
     public function __construct()
     {
+        $this->container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
+
+        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+
+        $this->container->set("event_dispatcher", $dispatcher);
+
         $this->setupURLTool();
     }
 
     protected function setupURLTool()
     {
-        $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
-
         $context = new \Symfony\Component\Routing\RequestContext(
                 '/thelia/index.php',
                 'GET',
@@ -57,8 +63,13 @@ class TestCaseWithURLToolSetup extends \PHPUnit_Framework_TestCase
             ->method('getContext')
             ->will($this->returnValue($context));
 
-        $container->set("router.admin", $router);
+        $this->container->set("router.admin", $router);
 
-        new \Thelia\Tools\URL($container);
+        new \Thelia\Tools\URL($this->container);
+    }
+
+    public function getContainer()
+    {
+        return $this->container;
     }
 }

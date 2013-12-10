@@ -240,20 +240,18 @@ class TemplateHelper
             fwrite($fp, '<' . "?php\n\n");
             fwrite($fp, "return array(\n");
 
-            $idx = 0;
+            // Sort keys alphabetically while keeping index
+            asort($texts);
 
-            foreach($texts as $text)
-            {
+            foreach ($texts as $key => $text) {
                 // Write only defined (not empty) translations
-                if (! empty($translations[$idx])) {
+                if (! empty($translations[$key])) {
                     $text = str_replace("'", "\'", $text);
 
-                    $translation = str_replace("'", "\'", $translations[$idx]);
+                    $translation = str_replace("'", "\'", $translations[$key]);
 
-                    fwrite($fp, sprintf("\t'%s' => '%s',\n", $text, $translation));
+                    fwrite($fp, sprintf("    '%s' => '%s',\n", $text, $translation));
                 }
-
-                $idx++;
             }
 
             fwrite($fp, ");\n");

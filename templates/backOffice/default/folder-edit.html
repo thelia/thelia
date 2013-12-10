@@ -131,7 +131,7 @@
                                                 <div class="control-group">
                                                     <lablel>&nbsp;</lablel>
                                                     <div class="controls">
-                                                        <p>{intl l='Colder created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
+                                                        <p>{intl l='Folder created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
                                                     </div>
                                                  </div>
                                             </div>
@@ -255,6 +255,7 @@
 		                    </div>
 
 		                    <div class="tab-pane fade" id="modules">
+                                {module_include location='folder-edit'}
 		                    </div>
 		                 </div>
                     </div>

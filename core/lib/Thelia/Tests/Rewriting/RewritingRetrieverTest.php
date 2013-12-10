@@ -101,7 +101,7 @@ class RewritingRetrieverTest extends \PHPUnit_Framework_TestCase
 
         $retriever->loadViewUrl('view', 'fr_FR', 1);
 
-        $this->assertEquals('foo.html', $retriever->rewrittenUrl);
+        $this->assertEquals(URL::getInstance()->absoluteUrl('foo.html'), $retriever->rewrittenUrl);
         $this->assertEquals(URL::getInstance()->viewUrl('view', array('locale' => 'fr_FR', 'view_id' => 1)), $retriever->url);
     }
 

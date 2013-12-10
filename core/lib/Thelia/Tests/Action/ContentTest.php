@@ -35,14 +35,45 @@ use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
+use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
  * Class ContentTest
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ContentTest extends BaseAction
+class ContentTest extends TestCaseWithURLToolSetup
 {
+    use RewrittenUrlTestTrait;
+
+    public function getUpdateEvent(&$content)
+    {
+        if(!$content instanceof \Thelia\Model\Content) {
+            $content = $this->getRandomContent();
+        }
+
+        $event = new ContentUpdateEvent($content->getId());
+        $event
+            ->setVisible(1)
+            ->setLocale($content->getLocale())
+            ->setTitle($content->getTitle())
+            ->setChapo($content->getChapo())
+            ->setDescription($content->getDescription())
+            ->setPostscriptum($content->getPostscriptum())
+            ->setDefaultFolder($content->getDefaultFolderId())
+        ;
+
+        return $event;
+    }
+
+    public function processUpdateAction($event)
+    {
+        $contentAction = new Content($this->getContainer());
+        $contentAction->update($event);
+
+        return $event->getContent();
+    }
+
     public function testCreateContent()
     {
         $folder = $this->getRandomFolder();
@@ -80,6 +111,7 @@ class ContentTest extends BaseAction
             ->setChapo('test update content short description')
             ->setDescription('test update content description')
             ->setPostscriptum('test update content postscriptum')
+            ->setUrl($content->getRewrittenUrl('en_US'))
             ->setDefaultFolder($folder->getId())
         ;
 

@@ -26,8 +26,10 @@ namespace Thelia\Model\Tools;
 use Thelia\Core\Event\GenerateRewrittenUrlEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\UrlRewritingException;
+use Thelia\Model\RewritingArgumentQuery;
 use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\RewritingUrl;
+use Thelia\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 use Thelia\Model\ConfigQuery;
 /**
@@ -153,12 +155,78 @@ trait UrlRewritingTrait {
      * Set the rewritten URL for the given locale
      *
      * @param string $locale a valid locale (e.g. en_US)
-     * @param $url the wanted url
+     * @param $url
      * @return $this
+     * @throws UrlRewritingException
+     * @throws \Thelia\Exception\UrlRewritingException
      */
     public function setRewrittenUrl($locale, $url)
     {
-        // TODO - code me !
+        $currentUrl = $this->getRewrittenUrl($locale);
+        if($currentUrl == $url) {
+            /* no url update */
+            return $this;
+        }
+
+        try {
+            $resolver = new RewritingResolver($url);
+
+            /* we can reassign old url */
+            if(null === $resolver->redirectedToUrl) {
+                /* else ... */
+                if($resolver->view == $this->getRewrittenUrlViewName() && $resolver->viewId == $this->getId()) {
+                    /* it's an url related to the current object */
+
+                    if($resolver->locale != $locale) {
+                        /* it is an url related to this product for another locale */
+                        throw new UrlRewritingException('URL_ALREADY_EXISTS', UrlRewritingException::URL_ALREADY_EXISTS);
+                    }
+
+                    if (count($resolver->otherParameters) > 0) {
+                        /* it is an url related to this product but with more arguments */
+                        throw new UrlRewritingException('URL_ALREADY_EXISTS', UrlRewritingException::URL_ALREADY_EXISTS);
+                    }
+
+                    /* here it must be a deprecated url */
+                } else {
+                    /* already related to another object */
+                    throw new UrlRewritingException('URL_ALREADY_EXISTS', UrlRewritingException::URL_ALREADY_EXISTS);
+                }
+            }
+        } catch(UrlRewritingException $e) {
+            /* It's all good if URL is not found */
+            if($e->getCode() !== UrlRewritingException::URL_NOT_FOUND) {
+                throw $e;
+            }
+        }
+
+        /* set the new URL */
+        if(isset($resolver)) {
+            /* erase the old one */
+            $rewritingUrl = RewritingUrlQuery::create()->findOneByUrl($url);
+            $rewritingUrl->setView($this->getRewrittenUrlViewName())
+                ->setViewId($this->getId())
+                ->setViewLocale($locale)
+                ->setRedirected(null)
+                ->save()
+            ;
+
+            /* erase additional arguments if any : only happens in case it erases a deprecated url */
+            RewritingArgumentQuery::create()->filterByRewritingUrl($rewritingUrl)->deleteAll();
+        } else {
+            /* just create it */
+            $rewritingUrl = new RewritingUrl();
+            $rewritingUrl->setUrl($url)
+                ->setView($this->getRewrittenUrlViewName())
+                ->setViewId($this->getId())
+                ->setViewLocale($locale)
+                ->save()
+            ;
+        }
+
+        /* deprecate the old one if needed */
+        $oldRewritingUrl = RewritingUrlQuery::create()->findOneByUrl($currentUrl);
+        $oldRewritingUrl->setRedirected($rewritingUrl->getId())->save();
 
         return $this;
     }

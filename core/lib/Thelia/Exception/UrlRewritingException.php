@@ -27,6 +27,8 @@ class UrlRewritingException extends \Exception
 {
     const UNKNOWN_EXCEPTION = 0;
 
+    const URL_ALREADY_EXISTS = 100;
+
     const URL_NOT_FOUND = 404;
 
     const RESOLVER_NULL_SEARCH = 800;

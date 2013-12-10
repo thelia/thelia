@@ -107,7 +107,7 @@ final class TheliaEvents
     /**
      * sent just before customer removal
      */
-    const BEFORE_DELETECUSTOMER = "action.before_updateCustomer";
+    const BEFORE_DELETECUSTOMER = "action.before_deleteCustomer";
 
     /**
      * sent just after customer removal
@@ -121,7 +121,7 @@ final class TheliaEvents
     const ADDRESS_CREATE = "action.createAddress";
 
     /**
-     * sent for address creation
+     * sent for address modification
      */
     const ADDRESS_UPDATE = "action.updateAddress";
 
@@ -135,7 +135,14 @@ final class TheliaEvents
      */
     const ADDRESS_DEFAULT = "action.defaultAddress";
 
+    /**
+     * sent once the address creation form has been successfully validated, and before address insertion in the database.
+     */
     const BEFORE_CREATEADDRESS = "action.before_createAddress";
+
+    /**
+     * Sent just after a successful insert of a new address in the database.
+     */
     const AFTER_CREATEADDRESS  = "action.after_createAddress";
 
     const BEFORE_UPDATEADDRESS = "action.before_updateAddress";

@@ -25,6 +25,8 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+use Thelia\Exception\UrlRewritingException;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Product as ProductModel;
 
@@ -114,7 +116,11 @@ class Product extends BaseAction implements EventSubscriberInterface
             ;
 
             // Update the rewritten URL, if required
-            $product->setRewrittenUrl($event->getLocale(), $event->getUrl());
+            try {
+                $product->setRewrittenUrl($event->getLocale(), $event->getUrl());
+            } catch(UrlRewritingException $e) {
+                throw new FormValidationException($e->getMessage(), $e->getCode());
+            }
 
             // Update default category (ifd required)
             $product->updateDefaultCategory($event->getDefaultCategory());

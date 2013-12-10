@@ -23,12 +23,28 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Model\ModuleQuery;
 
 class Module extends AbstractSmartyPlugin
 {
+    /**
+     * @var bool application debug mode
+     */
+    protected $debug;
+
+    /**
+     * @var Request $request
+     */
+    protected $request;
+
+    public function __construct($debug, Request $request)
+    {
+        $this->debug = $debug;
+        $this->request = $request;
+    }
     /**
      * Process theliaModule template inclusion function
      *
@@ -43,6 +59,10 @@ class Module extends AbstractSmartyPlugin
         $content = null;
 
         if (false !== $location = $this->getParam($params, 'location', false)) {
+
+            if($this->debug === true && $this->request->get('SHOW_INCLUDE')) {
+                echo sprintf('<div style="background-color: #C82D26; border-color: #000000; border: solid;">%s</div>', $location);
+            }
 
             $moduleLimit = $this->getParam($params, 'module', null);
 

@@ -30,14 +30,45 @@ use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\FolderQuery;
+use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
  * Class FolderTest
  * @package Thelia\Tests\Action\ImageTest
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderTest extends BaseAction
+class FolderTest extends TestCaseWithURLToolSetup
 {
+    use RewrittenUrlTestTrait;
+
+    public function getUpdateEvent(&$folder)
+    {
+        if(!$folder instanceof \Thelia\Model\Folder) {
+            $folder = $this->getRandomFolder();
+        }
+
+        $event = new FolderUpdateEvent($folder->getId());
+        $event
+            ->setVisible(1)
+            ->setLocale($folder->getLocale())
+            ->setTitle($folder->getTitle())
+            ->setChapo($folder->getChapo())
+            ->setDescription($folder->getDescription())
+            ->setPostscriptum($folder->getPostscriptum())
+            ->setParent($folder->getParent())
+        ;
+
+        return $event;
+    }
+
+    public function processUpdateAction($event)
+    {
+        $contentAction = new Folder($this->getContainer());
+        $contentAction->update($event);
+
+        return $event->getFolder();
+    }
+
     /**
      * test folder creation
      * @covers Thelia\Action\Folder::create
@@ -82,6 +113,7 @@ class FolderTest extends BaseAction
             ->setChapo('test folder update chapo')
             ->setDescription('update folder description')
             ->setPostscriptum('update folder postscriptum')
+            ->setUrl($folder->getRewrittenUrl('en_US'))
             ->setParent(0)
         ;
 
