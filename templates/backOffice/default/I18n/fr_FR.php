@@ -622,7 +622,7 @@ return array(
     'Product EAN Code' => 'Code EAN du produit',
     'Product Features' => 'Caractéristiques du produit',
     'Product accessories' => 'Accessoires du produit',
-    'Product attributes' => 'Attributs produit',
+    'Product attributes' => 'Déclinaisons produit',
     'Product catalog configuration' => 'Configuration du catalogue produit',
     'Product created on %date_create. Last modification: %date_change' => 'Produit créé le %date_create. Dernière modification le %date_change',
     'Product features' => 'Caractéristiques produit',
