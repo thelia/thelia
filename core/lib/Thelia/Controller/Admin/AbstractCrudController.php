@@ -385,7 +385,7 @@ abstract class AbstractCrudController extends BaseAdminController
         // Error (Default: false)
         $error_msg = false;
 
-        // Create the form from the request
+        // Create the Form from the request
         $changeForm = $this->getUpdateForm($this->getRequest());
 
         try {
@@ -416,7 +416,7 @@ abstract class AbstractCrudController extends BaseAdminController
             $response = $this->performAdditionalUpdateAction($changeEvent);
 
             if ($response == null) {
-                // If we have to stay on the same page, do not redirect to the succesUrl,
+                // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
                 if ($this->getRequest()->get('save_mode') == 'stay') {
                     $this->redirectToEditionTemplate($this->getRequest());
@@ -435,6 +435,7 @@ abstract class AbstractCrudController extends BaseAdminController
             $error_msg = $ex->getMessage();*/
         }
 
+        // At this point, the form has errors, and should be redisplayed.
         $this->setupFormErrorContext(
             $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)),
             $error_msg,
@@ -442,8 +443,8 @@ abstract class AbstractCrudController extends BaseAdminController
             $ex
         );
 
-        // At this point, the form has errors, and should be redisplayed.
-        return $this->renderEditionTemplate();
+
+        //return $this->renderEditionTemplate();
     }
 
     /**
