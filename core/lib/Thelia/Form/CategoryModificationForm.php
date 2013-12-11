@@ -23,6 +23,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CategoryModificationForm extends CategoryCreationForm
 {
@@ -33,11 +34,15 @@ class CategoryModificationForm extends CategoryCreationForm
         parent::buildForm(true);
 
         $this->formBuilder
-            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
+            ->add("id", "hidden", array(
+                    "constraints" => array(
+                        new GreaterThan(array('value' => 0))
+                    )
+                ))
         ;
 
-        // Add standard description fields, excluding title and locale, which a re defined in parent class
-        $this->addStandardDescFields(array('title', 'locale'));
+        // Add standard description fields, excluding title which is defined in parent class
+        $this->addStandardDescFields(array('title'));
     }
 
     public function getName()
