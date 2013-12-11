@@ -195,10 +195,25 @@ class CategoryController extends AbstractSeoCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
+        $category_id = $this->getRequest()->get('category_id', 0);
+        $this->redirectToListTemplateWithId($category_id);
+    }
+
+    protected function redirectToListTemplateWithId($category_id)
+    {
+        if($category_id > 0)
+        {
+            $this->redirectToRoute(
                 'admin.categories.default',
-                array('category_id' => $this->getRequest()->get('category_id', 0))
-        );
+                array('category_id' => $category_id)
+            );
+        }
+        else
+        {
+            $this->redirectToRoute(
+                'admin.catalog'
+            );
+        }
     }
 
     protected function renderEditionTemplate()
@@ -235,21 +250,16 @@ class CategoryController extends AbstractSeoCrudController
     protected function performAdditionalDeleteAction($deleteEvent)
     {
         // Redirect to parent category list
-        $this->redirectToRoute(
-                'admin.categories.default',
-                array('category_id' => $deleteEvent->getCategory()->getParent())
-        );
+        $category_id = $deleteEvent->getCategory()->getParent();
+        $this->redirectToListTemplateWithId($category_id);
     }
 
     protected function performAdditionalUpdateAction($updateEvent)
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
-
             // Redirect to parent category list
-            $this->redirectToRoute(
-                    'admin.categories.default',
-                    array('category_id' => $updateEvent->getCategory()->getParent())
-            );
+            $category_id = $updateEvent->getCategory()->getParent();
+            $this->redirectToListTemplateWithId($category_id);
         }
     }
 
@@ -260,10 +270,8 @@ class CategoryController extends AbstractSeoCrudController
 
         if ($category != null) {
             // Redirect to parent category list
-            $this->redirectToRoute(
-                    'admin.categories.default',
-                    array('category_id' => $category->getParent())
-            );
+            $category_id = $category->getParent();
+            $this->redirectToListTemplateWithId($category_id);
         }
 
         return null;
