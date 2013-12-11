@@ -35,13 +35,14 @@ use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
+use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
  * Class ContentTest
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ContentTest extends BaseAction
+class ContentTest extends TestCaseWithURLToolSetup
 {
 
     public function getUpdateEvent(&$content)
