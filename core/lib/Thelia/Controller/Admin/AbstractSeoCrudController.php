@@ -160,10 +160,17 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     public function processUpdateSeoAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE))
+            return $response;
 
-        // Create the form from the request
+        // Error (Default: false)
+        $error_msg = false;
+
+        // Create the Form from the request
         $updateSeoForm = $this->getUpdateSeoForm($this->getRequest());
+
+        // Pass the object id to the request
+        $this->getRequest()->attributes->set($this->objectName . '_id', $this->getRequest()->get('current_id'));
 
         try {
 
@@ -173,32 +180,41 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             // Get the form field values
             $data = $form->getData();
 
+            // Create a new event object with the modified fields
             $updateSeoEvent = $this->getUpdateSeoEvent($data);
 
+            // Dispatch Update SEO Event
             $this->dispatch($this->updateSeoEventIdentifier, $updateSeoEvent);
 
+            // Execute additional Action
+            $response = $this->performAdditionalUpdateSeoAction($updateSeoEvent);
+
+            if ($response == null) {
+                // If we have to stay on the same page, do not redirect to the successUrl,
+                // just redirect to the edit page again.
+                if ($this->getRequest()->get('save_mode') == 'stay') {
+                    $this->redirectToEditionTemplate($this->getRequest());
+                }
+
+                // Redirect to the success URL
+                $this->redirect($updateSeoForm->getSuccessUrl());
+            } else {
+                return $response;
+            }
         } catch (FormValidationException $ex) {
             // Form cannot be validated
-            return $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
-            // Any error
-            return $this->errorPage($ex);
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+            /*} catch (\Exception $ex) {
+                // Any other error
+                $error_msg = $ex->getMessage();*/
         }
 
-        $response = $this->performAdditionalUpdateSeoAction($updateSeoEvent);
-
-        if ($response == null) {
-            // If we have to stay on the same page, do not redirect to the successUrl,
-            // just redirect to the edit page again.
-            if ($this->getRequest()->get('save_mode') == 'stay') {
-                $this->redirectToEditionTemplate($this->getRequest());
-            }
-
-            // Redirect to the success URL
-            $this->redirect($updateSeoForm->getSuccessUrl());
-        } else {
-            return $response;
-        }
+        $this->setupFormErrorContext(
+            $this->getTranslator()->trans("%obj SEO modification", array('%obj' => $this->objectName)),
+            $error_msg,
+            $updateSeoForm,
+            $ex
+        );
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->renderEditionTemplate();
