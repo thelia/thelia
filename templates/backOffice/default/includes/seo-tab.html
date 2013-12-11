@@ -10,12 +10,13 @@
         }
 
         {* Hidden field *}
+        <input type="hidden" name="current_id" value="{$current_id}">
         <input type="hidden" name="current_tab" value="seo">
 
         {form_hidden_fields form=$form}
 
         {form_field form=$form field='success_url'}
-            <input type="hidden" name="{$name}" value="{$pageUrl}">
+            <input type="hidden" name="{$name}" value="{$closeUrl}">
         {/form_field}
 
         {* Display error message if exist *}
