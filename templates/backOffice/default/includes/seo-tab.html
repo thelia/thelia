@@ -5,20 +5,21 @@
         {include
             file = "includes/inner-form-toolbar.html"
             hide_submit_buttons = false
-
             page_url  = {$pageUrl}
             close_url = {$closeUrl}
         }
 
         {* Hidden field *}
-        <input type="hidden" name="product_id" value="{$product_id}">
         <input type="hidden" name="current_tab" value="seo">
 
         {form_hidden_fields form=$form}
 
         {form_field form=$form field='success_url'}
-            <input type="hidden" name="{$name}" value="{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}" />
+            <input type="hidden" name="{$name}" value="{$pageUrl}">
         {/form_field}
+
+        {* Display error message if exist *}
+        {include file='includes/notifications.html' message=$form_error_message}
 
         {form_field form=$form field='url'}
             <div class="form-group {if $error}has-error{/if}">
@@ -71,7 +72,6 @@
             file = "includes/inner-form-toolbar.html"
             hide_submit_buttons = false
             hide_flags = true
-
             page_url  = {$pageUrl}
             close_url = {$closeUrl}
         }

@@ -68,7 +68,8 @@
                                                 <input type="hidden" name="{$name}" value="{$close_url}">
                                             {/form_field}
 
-                                            {if $form_error and $form_error_message}{include file='includes/notifications.html' message=$form_error_message}{/if}
+                                            {* Display error message if exist *}
+                                            {include file='includes/notifications.html' message=$form_error_message}
 
                                             <div class="row">
                                                 <div class="col-md-8">
