@@ -28,6 +28,8 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 
+use Thelia\Exception\UrlRewritingException;
+use Thelia\Form\Exception\FormValidationException;
 use \Thelia\Model\Tools\UrlRewritingTrait;
 
 class BaseAction
@@ -100,8 +102,12 @@ class BaseAction
                 ->save()
             ;
 
-            // Update the rewriten URL, if required
-            $object->setRewrittenUrl($event->getLocale(), $event->getUrl());
+            // Update the rewritten URL, if required
+            try {
+                $object->setRewrittenUrl($event->getLocale(), $event->getUrl());
+            } catch(UrlRewritingException $e) {
+                throw new FormValidationException($e->getMessage(), $e->getCode());
+            }
 
            return $object;
         }
