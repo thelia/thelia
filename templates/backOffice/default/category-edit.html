@@ -10,7 +10,7 @@
     <div class="catalog edit-category">
         <div id="wrapper" class="container">
 
-            {include file="includes/catalog-breadcrumb.html" editing_category="true"} /{$category_id}/{$edit_language_id}/
+            {include file="includes/catalog-breadcrumb.html" editing_category="true"}
 
             <div class="row">
                 {loop name="category_edit" type="category" visible="*" id="{$category_id}" backend_context="1" lang="$edit_language_id"}
@@ -55,12 +55,16 @@
                                     <div class="form-container">
 
                                         {form name="thelia.admin.category.modification"}
-                                        <form method="POST" action="{url path="/admin/categories/update/$ID"}" {form_enctype form=$form} class="clearfix">
+                                        <form method="POST" action="{url path='/admin/categories/save'}" {form_enctype form=$form} class="clearfix">
 
                                             {include
                                                 file="includes/inner-form-toolbar.html"
                                                 close_url=$close_url
                                             }
+
+                                            {* Be sure to get the category ID, even if the form could not be validated *}
+                                            <input type="hidden" name="category_id" value="{$ID}" />
+                                            <input type="hidden" name="current_tab" value="general" />
 
                                             {form_hidden_fields form=$form}
 
@@ -129,6 +133,7 @@
                                         {include file="includes/seo-tab.html"
                                             form = $form
                                             formAction = "{url path='/admin/categories/seo/save'}"
+                                            current_id=$ID
                                             closeUrl = $close_url
                                         }
                                     {/form}
@@ -148,7 +153,7 @@
                                                 <p class="title title-without-tabs">{intl l='Related content'}</p>
                                                 <p>{intl l='You can attach here some content to this category'}</p>
 
-                                                <input type="hidden" name="category_id" value="{$category_id}" />
+                                                <input type="hidden" name="category_id" value="{$ID}" />
                                                 <input type="hidden" name="current_tab" value="associations" />
 
                                                 {ifloop rel="folders"}
@@ -212,7 +217,7 @@
                                                 </thead>
 
                                                 <tbody>
-                                                    {loop name="assigned_contents" type="associated_content" category="$category_id" backend_context="1" lang="$edit_language_id"}
+                                                    {loop name="assigned_contents" type="associated_content" category="$ID" backend_context="1" lang="$edit_language_id"}
                                                     <tr>
                                                         <td>{$ID}</td>
 
@@ -248,11 +253,11 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="images">
-                                    {include file='includes/image-upload-form.html' imageType='category' parentId=$category_id}
+                                    {include file='includes/image-upload-form.html' imageType='category' parentId=$ID}
                                 </div>
 
                                 <div class="tab-pane fade" id="documents">
-                                    {include file='includes/document-upload-form.html' documentType='category' parentId=$category_id}
+                                    {include file='includes/document-upload-form.html' documentType='category' parentId=$ID}
                                 </div>
 
                                 <div class="tab-pane fade" id="modules">
