@@ -3,6 +3,7 @@ namespace Thelia\Tests\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Exception\UrlRewritingException;
+use Thelia\Model\Base\ProductQuery;
 use Thelia\Model\Base\RewritingUrlQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Rewriting\RewritingResolver;
@@ -81,6 +82,17 @@ trait RewrittenUrlTestTrait
         $this->assertEquals($oldUrlEntry->getRedirected(), $newUrlEntry->getId());
 
         /* we can reassign old Url to another object */
-        //@todo
+        $aRandomProduct = ProductQuery::create()
+            ->filterById($object->getId(), Criteria::NOT_EQUAL)
+            ->findOne();
+
+        $failReassign = true;
+        try {
+            $aRandomProduct->setRewrittenUrl($aRandomProduct->getLocale(), $currentUrl);
+            $failReassign = false;
+        } catch(\Exception $e) {
+        }
+
+        $this->assertFalse($failReassign);
     }
 }
