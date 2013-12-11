@@ -139,7 +139,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         $data = array(
             'id'               => $object->getId(),
             'locale'           => $locale,
-            'url'              => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
+            'url'              => $object->getRewrittenUrl($locale),
             'meta_title'       => $object->getMetaTitle(),
             'meta_description' => $object->getMetaDescription(),
             'meta_keywords'     => $object->getMetaKeywords()
@@ -184,7 +184,6 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             // Any error
             return $this->errorPage($ex);
         }
-
 
         $response = $this->performAdditionalUpdateSeoAction($updateSeoEvent);
 
