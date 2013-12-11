@@ -231,7 +231,7 @@
         <default key="_controller">Thelia\Controller\Admin\CategoryController::addRelatedContentAction</default>
     </route>
 
-    <route id="admin.categories.related-content.add" path="/admin/categories/related-picture/add">
+    <route id="admin.categories.related-picture.add" path="/admin/categories/related-picture/add">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::addRelatedPictureAction</default>
     </route>
 
