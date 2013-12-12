@@ -9,6 +9,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 
 class CategoryImage extends BaseCategoryImage
 {
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     /**

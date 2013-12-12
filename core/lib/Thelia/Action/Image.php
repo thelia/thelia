@@ -305,8 +305,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     public function updatePosition(UpdateImagePositionEvent $event)
     {
         return $this->genericUpdatePosition($event->getQuery(), $event);
-
-        $out = true;
     }
 
     /**

@@ -126,8 +126,6 @@ $(function($){
                 });
             },
             stop: function( event, ui ) {
-                event.preventDefault();
-
                 /* update */
                 var newPosition = ui.item.find('.js-sorted-position').html();
                 var imageId = ui.item.data('sort-id');

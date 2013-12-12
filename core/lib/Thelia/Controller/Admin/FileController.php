@@ -25,7 +25,7 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Event\UpdateImagePositionEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
@@ -615,9 +615,10 @@ class FileController extends BaseAdminController
         }
 
         // Feed event
-        $imageUpdatePositionEvent = new UpdatePositionEvent(
+        $imageUpdateImagePositionEvent = new UpdateImagePositionEvent(
+            $fileManager->getImageModelQuery($parentType),
             $imageId,
-            UpdatePositionEvent::POSITION_ABSOLUTE,
+            UpdateImagePositionEvent::POSITION_ABSOLUTE,
             $position
         );
 
@@ -625,7 +626,7 @@ class FileController extends BaseAdminController
         try {
             $this->dispatch(
                 TheliaEvents::IMAGE_UPDATE_POSITION,
-                $imageUpdatePositionEvent
+                $imageUpdateImagePositionEvent
             );
         } catch (\Exception $e) {
 
