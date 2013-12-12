@@ -49,4 +49,14 @@ class ContentImage extends BaseContentImage
     {
         return $this->getContentId();
     }
+
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->reorderBeforeDelete(
+            array(
+                "content_id" => $this->getContentId(),
+            )
+        );
+        return true;
+    }
 }

@@ -9,14 +9,15 @@ Parameters:
 *}
 
 {ifloop rel="image"}
-    <div class="row">
-        {loop type="image" name="image" source="{$imageType}" order="manual-reverse" source_id="{$parentId}" width="200" height="100" resize_mode="borders"}
-            <div class="col-sm-6 col-md-3" >
+    <ul id="js-sort-image" class="row list-unstyled">
+        {loop type="image" name="image" source="{$imageType}" order="manual" source_id="{$parentId}" width="200" height="100" resize_mode="borders"}
+            <li class="col-sm-6 col-md-3 ui-state-default" data-sort-id="{$ID}">
                 <a href="{url path="/admin/image/type/$imageType/$ID/update"}" alt="{intl l='Update this image'}" class="thumbnail">
                     <img src="{$IMAGE_URL}" alt="{$TITLE}">
                 </a>
 
                 <div class="btn-group" >
+                    <a class="image-update-btn btn btn-default btn-xs disabled js-sorted-position" href="#">{$POSITION}</a>
                     <a class="image-update-btn btn btn-default btn-xs" href="{url path="/admin/image/type/$imageType/$ID/update"}" data-error-message="{intl l='Please retry'}">
                         <span class="glyphicon glyphicon-edit"></span>
                     </a>
@@ -24,9 +25,9 @@ Parameters:
                         <span class="glyphicon glyphicon-trash"></span>
                     </a>
                 </div>
-            </div>
+            </li>
         {/loop}
-    </div>
+    </ul>
 {/ifloop}
 {elseloop rel="image"}
 <div class="alert alert-info">{intl l='There is no images attached to this %type.' type=$imageType}</div>

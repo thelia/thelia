@@ -59,6 +59,11 @@
         <requirement key="parentType">.*</requirement>
         <requirement key="parentId">\d+</requirement>
     </route>
+    <route id="admin.image.update-position" path="/admin/image/type/{parentType}/{parentId}/update-position">
+        <default key="_controller">Thelia\Controller\Admin\FileController::updateImagePositionAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="parentId">\d+</requirement>
+    </route>
     <route id="admin.image.update.view" path="/admin/image/type/{parentType}/{imageId}/update" methods="get">
         <default key="_controller">Thelia\Controller\Admin\FileController::viewImageAction</default>
         <requirement key="parentType">.*</requirement>

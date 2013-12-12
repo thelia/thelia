@@ -49,4 +49,14 @@ class ProductImage extends BaseProductImage
     {
         return $this->getProductId();
     }
+
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->reorderBeforeDelete(
+            array(
+                "product_id" => $this->getProductId(),
+            )
+        );
+        return true;
+    }
 }
