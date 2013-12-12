@@ -199,19 +199,26 @@ trait PositionManagementTrait {
         }
     }
 
-    protected function reorderBeforeDelete()
+    protected function reorderBeforeDelete($fields = array())
     {
         // Find DATABASE_NAME constant
         $mapClassName = self::TABLE_MAP;
 
-        $sql = sprintf("UPDATE `%s` SET position=(position-1) WHERE parent=:parent AND position>:position", $mapClassName::TABLE_NAME);
+        $data = array();
+        $whereCriteria = array();
+
+        foreach($fields as $field => $value) {
+            $whereCriteria[] = $field . '=:' . $field;
+            $data[':' . $field] = $value;
+        }
+
+        $data[':position'] = $this->getPosition();
+
+        $sql = sprintf("UPDATE `%s` SET position=(position-1) WHERE " . (count($whereCriteria)>0 ? implode(" AND ", $whereCriteria) : '1') . " AND position>:position", $mapClassName::TABLE_NAME);
 
         $con = Propel::getConnection($mapClassName::DATABASE_NAME);
         $statement = $con->prepare($sql);
 
-        $statement->execute(array(
-            ':parent' => $this->getParent(),
-            ':position' => $this->getPosition()
-        ));
+        $statement->execute($data);
     }
 }

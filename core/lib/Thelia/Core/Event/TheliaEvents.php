@@ -424,6 +424,7 @@ final class TheliaEvents
      * Save given images
      */
     const IMAGE_UPDATE = "action.updateImages";
+    const IMAGE_UPDATE_POSITION = "action.updateImagePosition";
 
     /**
      * Delete given image

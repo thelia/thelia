@@ -25,6 +25,7 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Thelia\Core\Event\UpdateImagePositionEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
@@ -519,6 +520,8 @@ class FileController extends BaseAdminController
      */
     public function deleteImageAction($imageId, $parentType)
     {
+        $message = null;
+
         $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
@@ -569,14 +572,80 @@ class FileController extends BaseAdminController
                     'image'
                 )
             );
+            $message = $this->getTranslator()
+                ->trans(
+                    'Fail to delete image for %id% with parent id %parentId% (Exception : %e%)',
+                    array(
+                        '%id%' => $imageDeleteEvent->getImageToDelete()->getId(),
+                        '%parentId%' => $imageDeleteEvent->getImageToDelete()->getParentId(),
+                        '%e%' => $e->getMessage()
+                    ),
+                    'image'
+                );
         }
 
-        $message = $this->getTranslator()
-            ->trans(
-                'Images deleted successfully',
-                array(),
-                'image'
+        if(null === $message) {
+            $message = $this->getTranslator()
+                ->trans(
+                    'Images deleted successfully',
+                    array(),
+                    'image'
+                );
+        }
+
+        return new Response($message);
+    }
+
+    public function updateImagePositionAction($parentType, $parentId)
+    {
+        $message = null;
+
+        $imageId = $this->getRequest()->request->get('image_id');
+        $position = $this->getRequest()->request->get('position');
+
+        $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
+        $this->checkXmlHttpRequest();
+
+        $fileManager = new FileManager($this->container);
+        $imageModelQuery = $fileManager->getImageModelQuery($parentType);
+        $model = $imageModelQuery->findPk($imageId);
+
+        if ($model === null || $position === null) {
+            return $this->pageNotFound();
+        }
+
+        // Feed event
+        $imageUpdateImagePositionEvent = new UpdateImagePositionEvent(
+            $fileManager->getImageModelQuery($parentType),
+            $imageId,
+            UpdateImagePositionEvent::POSITION_ABSOLUTE,
+            $position
+        );
+
+        // Dispatch Event to the Action
+        try {
+            $this->dispatch(
+                TheliaEvents::IMAGE_UPDATE_POSITION,
+                $imageUpdateImagePositionEvent
             );
+        } catch (\Exception $e) {
+
+            $message = $this->getTranslator()
+                ->trans(
+                    'Fail to update image position',
+                    array(),
+                    'image'
+                ) . $e->getMessage();
+        }
+
+        if(null === $message) {
+            $message = $this->getTranslator()
+                ->trans(
+                    'Image position updated',
+                    array(),
+                    'image'
+                );
+        }
 
         return new Response($message);
     }
