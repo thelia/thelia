@@ -5,7 +5,7 @@ return array(
 	'Version %ver' => 'Version %ver',
 	'View site' => 'View site',
 	'View shop' => 'View shop',
-	'Profil' => 'Profil',
+	'Profil' => 'Profile',
 	'Close administation session' => 'Close administation session',
 	'Logout' => 'Logout',
 	'Home' => 'Home',
