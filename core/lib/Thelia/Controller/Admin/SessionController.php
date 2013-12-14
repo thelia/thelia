@@ -99,7 +99,7 @@ class SessionController extends BaseAdminController
             $this->getSecurityContext()->setAdminUser($user);
 
             // Log authentication success
-            AdminLog::append("admin", "LOGIN", "Authentication successful", $request, $user);
+            AdminLog::append("admin", "LOGIN", "Authentication successful", $request, $user, false);
 
             /**
              * FIXME: we have tou find a way to send cookie
