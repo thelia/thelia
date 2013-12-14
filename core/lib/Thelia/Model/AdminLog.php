@@ -18,7 +18,7 @@ class AdminLog extends BaseAdminLog
      * @param Request    $request
      * @param Base\Admin $adminUser
      */
-    public static function append($resource, $action, $message, Request $request, BaseAdminUser $adminUser = null) {
+    public static function append($resource, $action, $message, Request $request, BaseAdminUser $adminUser = null, $withRequestContent = true) {
 
 		$log = new AdminLog();
 
@@ -29,7 +29,7 @@ class AdminLog extends BaseAdminLog
 	       	->setResource($resource)
 	       	->setAction($action)
             ->setMessage($message)
-	       	->setRequest($request->__toString())
+	       	->setRequest($request->toString($withRequestContent))
 	    ;
 
         try {

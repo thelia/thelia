@@ -34,6 +34,11 @@ use Symfony\Component\HttpFoundation\Request as BaseRequest;
 class Request extends BaseRequest
 {
 
+    private $excludeContent = array(
+        'username',
+        'password'
+    );
+
     public function getProductId()
     {
         return $this->get("product_id");
@@ -65,5 +70,18 @@ class Request extends BaseRequest
     public function getSession()
     {
         return parent::getSession();
+    }
+
+    public function toString($withContent = true)
+    {
+        $string =
+            sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))."\r\n".
+            $this->headers."\r\n";
+
+        if (true === $withContent) {
+            $string .= $this->getContent();
+        }
+
+        return $string;
     }
 }
