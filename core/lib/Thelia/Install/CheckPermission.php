@@ -66,7 +66,7 @@ class CheckPermission extends BaseInstall
     protected $extensions = array(
         'curl',
         'gd',
-        'intl',
+//        'intl',
         'mcrypt',
         'pdo_mysql',
     );

@@ -3,12 +3,12 @@ language: php
 php:
   - "5.4"
   - "5.5"
+  - hhvm
 
 env:
   - DB_USER=root
 
 before_script:
-  - phpenv config-add travis.php.ini
   - composer self-update
   - composer install --prefer-dist --dev
   - sh -c "mysql -u$DB_USER -e 'SET FOREIGN_KEY_CHECKS = 0; DROP DATABASE IF EXISTS thelia;SET FOREIGN_KEY_CHECKS = 1;'; fi"
