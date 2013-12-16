@@ -28,6 +28,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
 use Thelia\Core\Event\Document\DocumentDeleteEvent;
 use Thelia\Core\Event\Document\DocumentEvent;
+use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Exception\ImageException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\FileManager;
@@ -195,6 +196,11 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         $event->setModelDocument($event->getModelDocument());
     }
 
+    public function updatePosition(UpdateFilePositionEvent $event)
+    {
+        return $this->genericUpdatePosition($event->getQuery(), $event);
+    }
+
     /**
      * Take care of deleting document in the database and file storage
      *
@@ -218,6 +224,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
             TheliaEvents::DOCUMENT_DELETE => array("deleteDocument", 128),
             TheliaEvents::DOCUMENT_SAVE => array("saveDocument", 128),
             TheliaEvents::DOCUMENT_UPDATE => array("updateDocument", 128),
+            TheliaEvents::DOCUMENT_UPDATE_POSITION => array("updatePosition", 128),
         );
     }
 }

@@ -95,6 +95,11 @@
         <requirement key="parentType">.*</requirement>
         <requirement key="parentId">\d+</requirement>
     </route>
+    <route id="admin.document.update-position" path="/admin/document/type/{parentType}/{parentId}/update-position">
+        <default key="_controller">Thelia\Controller\Admin\FileController::updateDocumentPositionAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="parentId">\d+</requirement>
+    </route>
     <route id="admin.document.update.view" path="/admin/document/type/{parentType}/{documentId}/update" methods="get">
         <default key="_controller">Thelia\Controller\Admin\FileController::viewDocumentAction</default>
         <requirement key="parentType">.*</requirement>

@@ -429,3 +429,16 @@ table {
         }
     }
 }
+
+// document list style
+ul.document-list {
+    > li {
+      padding: @table-condensed-cell-padding;
+      line-height: @line-height-base;
+      border-top: 1px solid @table-border-color;
+      &:nth-child(odd) {
+        background-color: @table-bg-accent;
+      }
+    }
+
+}
