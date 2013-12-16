@@ -23,10 +23,12 @@
 
 namespace Thelia\Module;
 
+use Thelia\Model\Order;
+
 interface PaymentModuleInterface extends BaseModuleInterface
 {
     /**
      * @return mixed
      */
-    public function pay();
+    public function pay(Order $order);
 }
