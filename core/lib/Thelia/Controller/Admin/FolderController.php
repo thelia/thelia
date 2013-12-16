@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
@@ -249,11 +250,15 @@ class FolderController extends AbstractSeoCrudController
         return $this->render('folder-edit', $this->getEditionArguments());
     }
 
-    protected function getEditionArguments()
+    protected function getEditionArguments(Request $request = null)
     {
+        if (null === $request) {
+            $request = $this->getRequest();
+        }
+
         return array(
-            'folder_id' => $this->getRequest()->get('folder_id', 0),
-            'current_tab' => $this->getRequest()->get('current_tab', 'general')
+            'folder_id' => $request->get('folder_id', 0),
+            'current_tab' => $request->get('current_tab', 'general')
         );
     }
 
@@ -311,9 +316,9 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Redirect to the edition template
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(Request $request = null)
     {
-        $this->redirect($this->getRoute('admin.folders.update', $this->getEditionArguments()));
+        $this->redirect($this->getRoute('admin.folders.update', $this->getEditionArguments($request)));
     }
 
     /**
