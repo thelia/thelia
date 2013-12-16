@@ -209,12 +209,24 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
                 $error_msg = $ex->getMessage();*/
         }
 
+        // Load object if exist
+        if (null !== $object = $this->getExistingObject()) {
+
+            // Hydrate the form abd pass it to the parser
+            $changeForm = $this->hydrateObjectForm($object);
+
+            // Pass it to the parser
+            $this->getParserContext()->addForm($changeForm);
+        }
+
         $this->setupFormErrorContext(
             $this->getTranslator()->trans("%obj SEO modification", array('%obj' => $this->objectName)),
             $error_msg,
             $updateSeoForm,
             $ex
         );
+
+
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->renderEditionTemplate();
