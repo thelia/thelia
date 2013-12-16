@@ -207,6 +207,10 @@ class FolderTest extends TestCaseWithURLToolSetup
             ->filterByParent($nextFolder->getParent())
             ->findOne();
 
+        if (null === $folder) {
+            $this->fail('use fixtures before launching test, there is not enough folder in database');
+        }
+
         $newPosition = $folder->getPosition()+1;
 
         $event = new UpdatePositionEvent($folder->getId(), UpdatePositionEvent::POSITION_DOWN);
