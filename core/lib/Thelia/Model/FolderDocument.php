@@ -50,4 +50,14 @@ class FolderDocument extends BaseFolderDocument
     {
         return $this->getFolderId();
     }
+
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->reorderBeforeDelete(
+            array(
+                "folder_id" => $this->getFolderId(),
+            )
+        );
+        return true;
+    }
 }
