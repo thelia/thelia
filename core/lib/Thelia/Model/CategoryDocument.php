@@ -50,4 +50,14 @@ class CategoryDocument extends BaseCategoryDocument
     {
         return $this->getCategoryId();
     }
+
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->reorderBeforeDelete(
+            array(
+                "category_id" => $this->getCategoryId(),
+            )
+        );
+        return true;
+    }
 }

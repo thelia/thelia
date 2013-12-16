@@ -40,7 +40,6 @@ $(function($){
             documentDropzone.removeFile(file);
             $.documentUploadManager.updateDocumentListAjax();
             $.documentUploadManager.onClickDeleteDocument();
-            $.documentUploadManager.sortDocument();
         });
 
 
@@ -66,6 +65,7 @@ $(function($){
                     data
                 );
                 $.documentUploadManager.onClickDeleteDocument();
+                $.documentUploadManager.sortDocument();
             });
     };
 
@@ -90,11 +90,16 @@ $(function($){
                     }
                 }
             }).done(function(data) {
-                $parent.parents('tr').remove();
+                $parent.parents('li').remove();
 
                 $(".document-manager .message").html(
                     data
                 );
+
+                /* refresh position */
+                $( "#js-sort-document").children('li').each(function(position, element) {
+                    $(element).find('.js-sorted-position').html(position + 1);
+                });
             });
             return false;
         });
