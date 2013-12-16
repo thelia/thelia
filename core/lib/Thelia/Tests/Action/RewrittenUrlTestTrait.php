@@ -3,11 +3,10 @@ namespace Thelia\Tests\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Exception\UrlRewritingException;
+use Thelia\Model\ProductQuery;
 use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\ProductQuery;
 use Thelia\Rewriting\RewritingResolver;
-use Thelia\Tools\URL;
 
 /**
  * Class RewrittenUrlTestTrait

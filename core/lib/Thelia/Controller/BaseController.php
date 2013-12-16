@@ -147,7 +147,7 @@ abstract class BaseController extends ContainerAware
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Request
+     * @return \Thelia\Core\HttpFoundation\Request
      */
     protected function getRequest()
     {
