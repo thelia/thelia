@@ -109,6 +109,8 @@ class BaseAction
                 throw new FormValidationException($e->getMessage(), $e->getCode());
             }
 
+           $event->setObject($object);
+
            return $object;
         }
     }

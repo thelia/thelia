@@ -18,7 +18,9 @@ use Thelia\Tools\URL;
 trait RewrittenUrlTestTrait
 {
     abstract public function getUpdateEvent(&$object);
+    abstract public function getUpdateSeoEvent(&$object);
     abstract public function processUpdateAction($event);
+    abstract public function processUpdateSeoAction($event);
 
     /**
      * @expectedException \Thelia\Form\Exception\FormValidationException
@@ -27,7 +29,7 @@ trait RewrittenUrlTestTrait
     public function testUpdateExistingUrl()
     {
         $object = null;
-        $event = $this->getUpdateEvent($object);
+        $event = $this->getUpdateSeoEvent($object);
 
         /* get an existing url */
         $existingUrl = RewritingUrlQuery::create()
@@ -42,13 +44,13 @@ trait RewrittenUrlTestTrait
 
         $event->setUrl($existingUrl->getUrl());
 
-        $this->processUpdateAction($event);
+        $this->processUpdateSeoAction($event);
     }
 
     public function testUpdateUrl()
     {
         $object = null;
-        $event = $this->getUpdateEvent($object);
+        $event = $this->getUpdateSeoEvent($object);
 
         $currentUrl = $object->getRewrittenUrl($object->getLocale());
 
@@ -70,7 +72,7 @@ trait RewrittenUrlTestTrait
 
         $event->setUrl($newUrl);
 
-        $updatedObject = $this->processUpdateAction($event);
+        $updatedObject = $this->processUpdateSeoAction($event);
 
         /* new URL is updated */
         $this->assertEquals($newUrl, $updatedObject->getRewrittenUrl($object->getLocale()));

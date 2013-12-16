@@ -30,6 +30,7 @@ use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\FolderQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
@@ -60,6 +61,29 @@ class FolderTest extends TestCaseWithURLToolSetup
         ;
 
         return $event;
+    }
+
+    public function getUpdateSeoEvent(&$folder)
+    {
+        if(!$folder instanceof \Thelia\Model\Folder) {
+            $folder = $this->getRandomFolder();
+        }
+
+        $event = new UpdateSeoEvent($folder->getId());
+
+        $event
+            ->setLocale($folder->getLocale())
+            ->setMetaTitle($folder->getMetaTitle())
+            ->setMetaDescription($folder->getMetaDescription())
+            ->setMetaKeywords($folder->getMetaKeywords());
+
+        return $event;
+    }
+
+    public function processUpdateSeoAction($event)
+    {
+        $contentAction = new Folder($this->getContainer());
+        return $contentAction->updateSeo($event);
     }
 
     public function processUpdateAction($event)

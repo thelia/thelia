@@ -165,4 +165,24 @@ class UpdateSeoEvent extends ActionEvent
 
         return $this;
     }
+
+    /**
+     * @param mixed $object
+     */
+    public function setObject($object)
+    {
+        $this->object = $object;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getObject()
+    {
+        return $this->object;
+    }
+
+
 }
