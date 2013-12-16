@@ -25,7 +25,7 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Thelia\Core\Event\UpdateImagePositionEvent;
+use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
@@ -615,10 +615,10 @@ class FileController extends BaseAdminController
         }
 
         // Feed event
-        $imageUpdateImagePositionEvent = new UpdateImagePositionEvent(
+        $imageUpdateImagePositionEvent = new UpdateFilePositionEvent(
             $fileManager->getImageModelQuery($parentType),
             $imageId,
-            UpdateImagePositionEvent::POSITION_ABSOLUTE,
+            UpdateFilePositionEvent::POSITION_ABSOLUTE,
             $position
         );
 
@@ -644,6 +644,60 @@ class FileController extends BaseAdminController
                     'Image position updated',
                     array(),
                     'image'
+                );
+        }
+
+        return new Response($message);
+    }
+
+    public function updateDocumentPositionAction($parentType, $parentId)
+    {
+        $message = null;
+
+        $documentId = $this->getRequest()->request->get('document_id');
+        $position = $this->getRequest()->request->get('position');
+
+        $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
+        $this->checkXmlHttpRequest();
+
+        $fileManager = new FileManager($this->container);
+        $documentModelQuery = $fileManager->getDocumentModelQuery($parentType);
+        $model = $documentModelQuery->findPk($documentId);
+
+        if ($model === null || $position === null) {
+            return $this->pageNotFound();
+        }
+
+        // Feed event
+        $documentUpdateDocumentPositionEvent = new UpdateFilePositionEvent(
+            $fileManager->getDocumentModelQuery($parentType),
+            $documentId,
+            UpdateFilePositionEvent::POSITION_ABSOLUTE,
+            $position
+        );
+
+        // Dispatch Event to the Action
+        try {
+            $this->dispatch(
+                TheliaEvents::DOCUMENT_UPDATE_POSITION,
+                $documentUpdateDocumentPositionEvent
+            );
+        } catch (\Exception $e) {
+
+            $message = $this->getTranslator()
+                ->trans(
+                    'Fail to update document position',
+                    array(),
+                    'document'
+                ) . $e->getMessage();
+        }
+
+        if(null === $message) {
+            $message = $this->getTranslator()
+                ->trans(
+                    'Document position updated',
+                    array(),
+                    'document'
                 );
         }
 

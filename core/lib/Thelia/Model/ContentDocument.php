@@ -7,6 +7,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 
 class ContentDocument extends BaseContentDocument
 {
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     /**

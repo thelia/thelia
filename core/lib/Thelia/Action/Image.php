@@ -28,7 +28,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
 use Thelia\Core\Event\Image\ImageDeleteEvent;
 use Thelia\Core\Event\Image\ImageEvent;
-use Thelia\Core\Event\UpdateImagePositionEvent;
+use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\FileManager;
 use Thelia\Tools\URL;
@@ -302,7 +302,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $event->setModelImage($event->getModelImage());
     }
 
-    public function updatePosition(UpdateImagePositionEvent $event)
+    public function updatePosition(UpdateFilePositionEvent $event)
     {
         return $this->genericUpdatePosition($event->getQuery(), $event);
     }

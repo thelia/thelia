@@ -404,6 +404,7 @@ final class TheliaEvents
      * Save given documents
      */
     const DOCUMENT_UPDATE = "action.updateDocument";
+    const DOCUMENT_UPDATE_POSITION = "action.updateDocumentPosition";
 
     /**
      * Delete given document

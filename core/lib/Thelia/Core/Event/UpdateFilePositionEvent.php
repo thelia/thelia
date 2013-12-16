@@ -25,7 +25,7 @@ namespace Thelia\Core\Event;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 
-class UpdateImagePositionEvent extends UpdatePositionEvent
+class UpdateFilePositionEvent extends UpdatePositionEvent
 {
     protected $query;
 

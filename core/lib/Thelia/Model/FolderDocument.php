@@ -7,6 +7,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 
 class FolderDocument extends BaseFolderDocument
 {
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     /**
