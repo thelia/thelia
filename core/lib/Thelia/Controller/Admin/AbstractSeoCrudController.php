@@ -122,6 +122,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             ->setMetaTitle($formData['meta_title'])
             ->setMetaDescription($formData['meta_description'])
             ->setMetaKeywords($formData['meta_keywords'])
+            ->setUrl($formData['url'])
         ;
 
         // Create and dispatch the change event
