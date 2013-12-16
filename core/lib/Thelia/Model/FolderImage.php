@@ -7,6 +7,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 
 class FolderImage extends BaseFolderImage
 {
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     /**
@@ -48,5 +49,15 @@ class FolderImage extends BaseFolderImage
     public function getParentId()
     {
         return $this->getFolderId();
+    }
+
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->reorderBeforeDelete(
+            array(
+                "folder_id" => $this->getFolderId(),
+            )
+        );
+        return true;
     }
 }

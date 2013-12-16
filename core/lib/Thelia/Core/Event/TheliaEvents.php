@@ -408,6 +408,7 @@ final class TheliaEvents
      * Save given documents
      */
     const DOCUMENT_UPDATE = "action.updateDocument";
+    const DOCUMENT_UPDATE_POSITION = "action.updateDocumentPosition";
 
     /**
      * Delete given document
@@ -428,6 +429,7 @@ final class TheliaEvents
      * Save given images
      */
     const IMAGE_UPDATE = "action.updateImages";
+    const IMAGE_UPDATE_POSITION = "action.updateImagePosition";
 
     /**
      * Delete given image

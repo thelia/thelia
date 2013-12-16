@@ -7,6 +7,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 
 class ProductDocument extends BaseProductDocument
 {
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     /**
@@ -48,6 +49,16 @@ class ProductDocument extends BaseProductDocument
     public function getParentId()
     {
         return $this->getProductId();
+    }
+
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->reorderBeforeDelete(
+            array(
+                "product_id" => $this->getProductId(),
+            )
+        );
+        return true;
     }
 
 }

@@ -6,9 +6,10 @@ $(function($){
 
 
 
-    // Remove image on click
+    // Remove document on click
     $.documentUploadManager.initDocumentDropZone = function() {
         $.documentUploadManager.onClickDeleteDocument();
+        $.documentUploadManager.sortDocument();
 
         var documentDropzone = new Dropzone("#documents-dropzone", {
             dictDefaultMessage : $('.btn-browse').html(),
@@ -64,10 +65,11 @@ $(function($){
                     data
                 );
                 $.documentUploadManager.onClickDeleteDocument();
+                $.documentUploadManager.sortDocument();
             });
     };
 
-    // Remove image on click
+    // Remove document on click
     $.documentUploadManager.onClickDeleteDocument = function() {
         $('.document-manager .document-delete-btn').on('click', function (e) {
             e.preventDefault();
@@ -88,13 +90,66 @@ $(function($){
                     }
                 }
             }).done(function(data) {
-                $parent.parents('tr').remove();
+                $parent.parents('li').remove();
 
                 $(".document-manager .message").html(
                     data
                 );
+
+                /* refresh position */
+                $( "#js-sort-document").children('li').each(function(position, element) {
+                    $(element).find('.js-sorted-position').html(position + 1);
+                });
             });
             return false;
         });
+    };
+
+    $.documentUploadManager.sortDocument = function() {
+        $( "#js-sort-document" ).sortable({
+            placeholder: "ui-sortable-placeholder col-sm-6 col-md-3",
+            change: function( event, ui ) {
+                /* refresh position */
+                var pickedElement = ui.item;
+                var position = 0;
+                $( "#js-sort-document").children('li').each(function(k, element) {
+                    if($(element).data('sort-id') == pickedElement.data('sort-id')) {
+                        return true;
+                    }
+                    position++;
+                    if($(element).is('.ui-sortable-placeholder')) {
+                        pickedElement.find('.js-sorted-position').html(position);
+                    } else {
+                        $(element).find('.js-sorted-position').html(position);
+                    }
+                });
+            },
+            stop: function( event, ui ) {
+                /* update */
+                var newPosition = ui.item.find('.js-sorted-position').html();
+                var documentId = ui.item.data('sort-id');
+
+                $.ajax({
+                    type: "POST",
+                    url: documentReorder,
+                    data: {
+                        document_id: documentId,
+                        position: newPosition
+                    },
+                    statusCode: {
+                        404: function() {
+                            $(".document-manager .message").html(
+                                documentReorderErrorMessage
+                            );
+                        }
+                    }
+                }).done(function(data) {
+                        $(".document-manager .message").html(
+                            data
+                        );
+                    });
+            }
+        });
+        $( "#js-sort-document" ).disableSelection();
     };
 });

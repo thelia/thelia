@@ -7,6 +7,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 
 class ContentDocument extends BaseContentDocument
 {
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     /**
@@ -48,5 +49,15 @@ class ContentDocument extends BaseContentDocument
     public function getParentId()
     {
         return $this->getContentId();
+    }
+
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->reorderBeforeDelete(
+            array(
+                "content_id" => $this->getContentId(),
+            )
+        );
+        return true;
     }
 }

@@ -21,14 +21,19 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Module;
+namespace Thelia\Core\Security\Exception;
 
-use Thelia\Model\Order;
-
-interface PaymentModuleInterface extends BaseModuleInterface
+class ResourceException extends \RuntimeException
 {
-    /**
-     * @return mixed
-     */
-    public function pay(Order $order);
+    const UNKNOWN_EXCEPTION = 0;
+
+    const RESOURCE_NOT_FOUND = 404;
+
+    public function __construct($message, $code = null, $previous = null)
+    {
+        if ($code === null) {
+            $code = self::UNKNOWN_EXCEPTION;
+        }
+        parent::__construct($message, $code, $previous);
+    }
 }
