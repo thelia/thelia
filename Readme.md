@@ -58,6 +58,14 @@ $ php Thelia thelia:install
 
 You just have to follow all instructions.
 
+Documentation
+-------------
+
+Thelia documentation is available at http://doc.thelia.net
+
+The documentation is also in beta version and some part can be obsolete cause to some refactor.
+
+
 Contribute
 ----------
 
