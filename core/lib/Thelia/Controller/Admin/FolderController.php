@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
@@ -38,7 +39,7 @@ use Thelia\Model\FolderQuery;
  * @package Thelia\Controller\Admin
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderController extends AbstractCrudController
+class FolderController extends AbstractSeoCrudController
 {
 
     public function __construct()
@@ -54,7 +55,8 @@ class FolderController extends AbstractCrudController
             TheliaEvents::FOLDER_UPDATE,
             TheliaEvents::FOLDER_DELETE,
             TheliaEvents::FOLDER_TOGGLE_VISIBILITY,
-            TheliaEvents::FOLDER_UPDATE_POSITION
+            TheliaEvents::FOLDER_UPDATE_POSITION,
+            TheliaEvents::FOLDER_UPDATE_SEO
         );
     }
 
@@ -81,6 +83,9 @@ class FolderController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
+        // Hydrate the "SEO" tab form
+        $this->hydrateSeoForm($object);
+
         // Prepare the data that will hydrate the form
         $data = array(
             'id'           => $object->getId(),
@@ -90,7 +95,6 @@ class FolderController extends AbstractCrudController
             'description'  => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum(),
             'visible'      => $object->getVisible(),
-            'url'          => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
             'parent'       => $object->getParent()
         );
 
@@ -132,7 +136,6 @@ class FolderController extends AbstractCrudController
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
-            ->setUrl($formData['url'])
             ->setParent($formData['parent'])
         ;
 
@@ -247,11 +250,15 @@ class FolderController extends AbstractCrudController
         return $this->render('folder-edit', $this->getEditionArguments());
     }
 
-    protected function getEditionArguments()
+    protected function getEditionArguments(Request $request = null)
     {
+        if (null === $request) {
+            $request = $this->getRequest();
+        }
+
         return array(
-            'folder_id' => $this->getRequest()->get('folder_id', 0),
-            'current_tab' => $this->getRequest()->get('current_tab', 'general')
+            'folder_id' => $request->get('folder_id', 0),
+            'current_tab' => $request->get('current_tab', 'general')
         );
     }
 
@@ -309,9 +316,9 @@ class FolderController extends AbstractCrudController
     /**
      * Redirect to the edition template
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate(Request $request = null)
     {
-        $this->redirect($this->getRoute('admin.folders.update', $this->getEditionArguments()));
+        $this->redirect($this->getRoute('admin.folders.update', $this->getEditionArguments($request)));
     }
 
     /**

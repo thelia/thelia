@@ -5916,24 +5916,24 @@ abstract class Product implements ActiveRecordInterface
 
 
         /**
-         * Get the [meta_keyword] column value.
+         * Get the [meta_keywords] column value.
          *
          * @return   string
          */
-        public function getMetaKeyword()
+        public function getMetaKeywords()
         {
-        return $this->getCurrentTranslation()->getMetaKeyword();
+        return $this->getCurrentTranslation()->getMetaKeywords();
     }
 
 
         /**
-         * Set the value of [meta_keyword] column.
+         * Set the value of [meta_keywords] column.
          *
          * @param      string $v new value
          * @return   \Thelia\Model\ProductI18n The current object (for fluent API support)
          */
-        public function setMetaKeyword($v)
-        {    $this->getCurrentTranslation()->setMetaKeyword($v);
+        public function setMetaKeywords($v)
+        {    $this->getCurrentTranslation()->setMetaKeywords($v);
 
         return $this;
     }

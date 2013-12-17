@@ -29,8 +29,7 @@ use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Exception\UrlRewritingException;
-use Thelia\Form\Exception\FormValidationException;
+use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Folder as FolderModel;
 
@@ -58,15 +57,20 @@ class Folder extends BaseAction implements EventSubscriberInterface
                 ->save();
             ;
 
-            // Update the rewritten URL, if required
-            try {
-                $folder->setRewrittenUrl($event->getLocale(), $event->getUrl());
-            } catch(UrlRewritingException $e) {
-                throw new FormValidationException($e->getMessage(), $e->getCode());
-            }
-
             $event->setFolder($folder);
         }
+    }
+
+    /**
+     * Change Folder SEO
+     *
+     * @param \Thelia\Core\Event\UpdateSeoEvent $event
+     *
+     * @return mixed
+     */
+    public function updateSeo(UpdateSeoEvent $event)
+    {
+        return $this->genericUpdateSeo(FolderQuery::create(), $event);
     }
 
     public function delete(FolderDeleteEvent $event)
@@ -158,6 +162,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
             TheliaEvents::FOLDER_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
 
             TheliaEvents::FOLDER_UPDATE_POSITION   => array("updatePosition", 128),
+            TheliaEvents::FOLDER_UPDATE_SEO        => array('updateSeo', 128)
         );
     }
 }

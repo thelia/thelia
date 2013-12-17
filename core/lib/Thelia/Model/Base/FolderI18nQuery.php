@@ -27,6 +27,9 @@ use Thelia\Model\Map\FolderI18nTableMap;
  * @method     ChildFolderI18nQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method     ChildFolderI18nQuery orderByChapo($order = Criteria::ASC) Order by the chapo column
  * @method     ChildFolderI18nQuery orderByPostscriptum($order = Criteria::ASC) Order by the postscriptum column
+ * @method     ChildFolderI18nQuery orderByMetaTitle($order = Criteria::ASC) Order by the meta_title column
+ * @method     ChildFolderI18nQuery orderByMetaDescription($order = Criteria::ASC) Order by the meta_description column
+ * @method     ChildFolderI18nQuery orderByMetaKeywords($order = Criteria::ASC) Order by the meta_keywords column
  *
  * @method     ChildFolderI18nQuery groupById() Group by the id column
  * @method     ChildFolderI18nQuery groupByLocale() Group by the locale column
@@ -34,6 +37,9 @@ use Thelia\Model\Map\FolderI18nTableMap;
  * @method     ChildFolderI18nQuery groupByDescription() Group by the description column
  * @method     ChildFolderI18nQuery groupByChapo() Group by the chapo column
  * @method     ChildFolderI18nQuery groupByPostscriptum() Group by the postscriptum column
+ * @method     ChildFolderI18nQuery groupByMetaTitle() Group by the meta_title column
+ * @method     ChildFolderI18nQuery groupByMetaDescription() Group by the meta_description column
+ * @method     ChildFolderI18nQuery groupByMetaKeywords() Group by the meta_keywords column
  *
  * @method     ChildFolderI18nQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildFolderI18nQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -52,6 +58,9 @@ use Thelia\Model\Map\FolderI18nTableMap;
  * @method     ChildFolderI18n findOneByDescription(string $description) Return the first ChildFolderI18n filtered by the description column
  * @method     ChildFolderI18n findOneByChapo(string $chapo) Return the first ChildFolderI18n filtered by the chapo column
  * @method     ChildFolderI18n findOneByPostscriptum(string $postscriptum) Return the first ChildFolderI18n filtered by the postscriptum column
+ * @method     ChildFolderI18n findOneByMetaTitle(string $meta_title) Return the first ChildFolderI18n filtered by the meta_title column
+ * @method     ChildFolderI18n findOneByMetaDescription(string $meta_description) Return the first ChildFolderI18n filtered by the meta_description column
+ * @method     ChildFolderI18n findOneByMetaKeywords(string $meta_keywords) Return the first ChildFolderI18n filtered by the meta_keywords column
  *
  * @method     array findById(int $id) Return ChildFolderI18n objects filtered by the id column
  * @method     array findByLocale(string $locale) Return ChildFolderI18n objects filtered by the locale column
@@ -59,6 +68,9 @@ use Thelia\Model\Map\FolderI18nTableMap;
  * @method     array findByDescription(string $description) Return ChildFolderI18n objects filtered by the description column
  * @method     array findByChapo(string $chapo) Return ChildFolderI18n objects filtered by the chapo column
  * @method     array findByPostscriptum(string $postscriptum) Return ChildFolderI18n objects filtered by the postscriptum column
+ * @method     array findByMetaTitle(string $meta_title) Return ChildFolderI18n objects filtered by the meta_title column
+ * @method     array findByMetaDescription(string $meta_description) Return ChildFolderI18n objects filtered by the meta_description column
+ * @method     array findByMetaKeywords(string $meta_keywords) Return ChildFolderI18n objects filtered by the meta_keywords column
  *
  */
 abstract class FolderI18nQuery extends ModelCriteria
@@ -147,7 +159,7 @@ abstract class FolderI18nQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, LOCALE, TITLE, DESCRIPTION, CHAPO, POSTSCRIPTUM FROM folder_i18n WHERE ID = :p0 AND LOCALE = :p1';
+        $sql = 'SELECT ID, LOCALE, TITLE, DESCRIPTION, CHAPO, POSTSCRIPTUM, META_TITLE, META_DESCRIPTION, META_KEYWORDS FROM folder_i18n WHERE ID = :p0 AND LOCALE = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -434,6 +446,93 @@ abstract class FolderI18nQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(FolderI18nTableMap::POSTSCRIPTUM, $postscriptum, $comparison);
+    }
+
+    /**
+     * Filter the query on the meta_title column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByMetaTitle('fooValue');   // WHERE meta_title = 'fooValue'
+     * $query->filterByMetaTitle('%fooValue%'); // WHERE meta_title LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $metaTitle The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildFolderI18nQuery The current query, for fluid interface
+     */
+    public function filterByMetaTitle($metaTitle = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($metaTitle)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $metaTitle)) {
+                $metaTitle = str_replace('*', '%', $metaTitle);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(FolderI18nTableMap::META_TITLE, $metaTitle, $comparison);
+    }
+
+    /**
+     * Filter the query on the meta_description column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByMetaDescription('fooValue');   // WHERE meta_description = 'fooValue'
+     * $query->filterByMetaDescription('%fooValue%'); // WHERE meta_description LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $metaDescription The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildFolderI18nQuery The current query, for fluid interface
+     */
+    public function filterByMetaDescription($metaDescription = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($metaDescription)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $metaDescription)) {
+                $metaDescription = str_replace('*', '%', $metaDescription);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(FolderI18nTableMap::META_DESCRIPTION, $metaDescription, $comparison);
+    }
+
+    /**
+     * Filter the query on the meta_keywords column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByMetaKeywords('fooValue');   // WHERE meta_keywords = 'fooValue'
+     * $query->filterByMetaKeywords('%fooValue%'); // WHERE meta_keywords LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $metaKeywords The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildFolderI18nQuery The current query, for fluid interface
+     */
+    public function filterByMetaKeywords($metaKeywords = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($metaKeywords)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $metaKeywords)) {
+                $metaKeywords = str_replace('*', '%', $metaKeywords);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(FolderI18nTableMap::META_KEYWORDS, $metaKeywords, $comparison);
     }
 
     /**

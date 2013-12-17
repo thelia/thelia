@@ -1635,6 +1635,9 @@ CREATE TABLE `category_i18n`
     `description` LONGTEXT,
     `chapo` TEXT,
     `postscriptum` TEXT,
+    `meta_title` VARCHAR(255),
+    `meta_description` TEXT,
+    `meta_keywords` TEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `category_i18n_FK_1`
         FOREIGN KEY (`id`)
@@ -1658,7 +1661,7 @@ CREATE TABLE `product_i18n`
     `postscriptum` TEXT,
     `meta_title` VARCHAR(255),
     `meta_description` TEXT,
-    `meta_keyword` TEXT,
+    `meta_keywords` TEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `product_i18n_FK_1`
         FOREIGN KEY (`id`)
@@ -1863,6 +1866,9 @@ CREATE TABLE `folder_i18n`
     `description` LONGTEXT,
     `chapo` TEXT,
     `postscriptum` TEXT,
+    `meta_title` VARCHAR(255),
+    `meta_description` TEXT,
+    `meta_keywords` TEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `folder_i18n_FK_1`
         FOREIGN KEY (`id`)
@@ -1884,6 +1890,9 @@ CREATE TABLE `content_i18n`
     `description` LONGTEXT,
     `chapo` TEXT,
     `postscriptum` TEXT,
+    `meta_title` VARCHAR(255),
+    `meta_description` TEXT,
+    `meta_keywords` TEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `content_i18n_FK_1`
         FOREIGN KEY (`id`)

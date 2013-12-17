@@ -78,7 +78,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface
         $search = FolderQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search, array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS'));
 
         $id = $this->getId();
 
@@ -164,19 +164,22 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($folder);
 
             $loopResultRow
-                ->set("ID", $folder->getId())
-                ->set("IS_TRANSLATED",$folder->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("TITLE",$folder->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $folder->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("PARENT", $folder->getParent())
-                ->set("URL", $folder->getUrl($this->locale))
-                ->set("CHILD_COUNT", $folder->countChild())
-                ->set("CONTENT_COUNT", $folder->countAllContents())
-                ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
-                ->set("POSITION", $folder->getPosition())
+                ->set("ID"                  , $folder->getId())
+                ->set("IS_TRANSLATED"       , $folder->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE"              , $this->locale)
+                ->set("TITLE"               , $folder->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO"               , $folder->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION"         , $folder->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM"        , $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("PARENT"              , $folder->getParent())
+                ->set("URL"                 , $folder->getUrl($this->locale))
+                ->set("META_TITLE"          , $folder->getVirtualColumn('i18n_META_TITLE'))
+                ->set("META_DESCRIPTION"    , $folder->getVirtualColumn('i18n_META_DESCRIPTION'))
+                ->set("META_KEYWORDS"       , $folder->getVirtualColumn('i18n_META_KEYWORDS'))
+                ->set("CHILD_COUNT"         , $folder->countChild())
+                ->set("CONTENT_COUNT"       , $folder->countAllContents())
+                ->set("VISIBLE"             , $folder->getVisible() ? "1" : "0")
+                ->set("POSITION"            , $folder->getPosition())
             ;
 
             $loopResult->addRow($loopResultRow);

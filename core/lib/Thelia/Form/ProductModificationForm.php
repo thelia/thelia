@@ -24,7 +24,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Thelia\Core\Translation\Translator;
-use Symfony\Component\Validator\Constraints\NotBlank;
+
 
 class ProductModificationForm extends ProductCreationForm
 {
@@ -39,17 +39,10 @@ class ProductModificationForm extends ProductCreationForm
                     "label"       => Translator::getInstance()->trans("Prodcut ID *"),
                     "label_attr"  => array("for" => "product_id_field"),
                     "constraints" => array(new GreaterThan(array('value' => 0)))
-
             ))
             ->add("template_id", "integer", array(
                     "label"       => Translator::getInstance()->trans("Product template"),
                     "label_attr"  => array("for" => "product_template_field")
-
-            ))
-            ->add("url", "text", array(
-                "label"       => Translator::getInstance()->trans("Rewritten URL *"),
-                "constraints" => array(new NotBlank()),
-                "label_attr" => array("for" => "rewriten_url_field")
             ))
         ;
 
