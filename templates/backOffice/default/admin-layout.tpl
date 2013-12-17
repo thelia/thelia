@@ -267,6 +267,6 @@
 
 	{* Modules scripts are included now *}
 	{module_include location='footer_js'}
-
+    {block name="javascript-last-call"}{/block}
 </body>
 </html>

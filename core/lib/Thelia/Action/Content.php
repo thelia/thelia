@@ -32,8 +32,7 @@ use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Exception\UrlRewritingException;
-use Thelia\Form\Exception\FormValidationException;
+use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
@@ -81,17 +80,22 @@ class Content extends BaseAction implements EventSubscriberInterface
                 ->save()
             ;
 
-            // Update the rewritten URL, if required
-            try {
-                $content->setRewrittenUrl($event->getLocale(), $event->getUrl());
-            } catch(UrlRewritingException $e) {
-                throw new FormValidationException($e->getMessage(), $e->getCode());
-            }
-
             $content->updateDefaultFolder($event->getDefaultFolder());
 
             $event->setContent($content);
         }
+    }
+
+    /**
+     * Change Content SEO
+     *
+     * @param \Thelia\Core\Event\UpdateSeoEvent $event
+     *
+     * @return mixed
+     */
+    public function updateSeo(UpdateSeoEvent $event)
+    {
+        return $this->genericUpdateSeo(ContentQuery::create(), $event);
     }
 
     public function updatePosition(UpdatePositionEvent $event)
@@ -203,6 +207,7 @@ class Content extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CONTENT_TOGGLE_VISIBILITY => array('toggleVisibility', 128),
 
             TheliaEvents::CONTENT_UPDATE_POSITION   => array('updatePosition', 128),
+            TheliaEvents::CONTENT_UPDATE_SEO        => array('updateSeo', 128),
 
             TheliaEvents::CONTENT_ADD_FOLDER        => array('addFolder', 128),
             TheliaEvents::CONTENT_REMOVE_FOLDER     => array('removeFolder', 128),

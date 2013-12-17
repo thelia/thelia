@@ -85,7 +85,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
         $search = ContentQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search, array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS'));
 
         $id = $this->getId();
 
@@ -215,17 +215,21 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $content) {
             $loopResultRow = new LoopResultRow($content);
 
-            $loopResultRow->set("ID", $content->getId())
-                ->set("IS_TRANSLATED",$content->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("TITLE",$content->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $content->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $content->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $content->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("POSITION", $content->getPosition())
-                ->set("DEFAULT_FOLDER", $content->getDefaultFolderId())
-                ->set("URL", $content->getUrl($this->locale))
-                ->set("VISIBLE", $content->getVisible())
+            $loopResultRow->set("ID"            , $content->getId())
+                ->set("IS_TRANSLATED"           , $content->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE"                  , $this->locale)
+                ->set("TITLE"                   , $content->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO"                   , $content->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION"             , $content->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM"            , $content->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("URL"                     , $content->getUrl($this->locale))
+                ->set("META_TITLE"              , $content->getVirtualColumn('i18n_META_TITLE'))
+                ->set("META_DESCRIPTION"        , $content->getVirtualColumn('i18n_META_DESCRIPTION'))
+                ->set("META_KEYWORDS"            , $content->getVirtualColumn('i18n_META_KEYWORDS'))
+                ->set("POSITION"                , $content->getPosition())
+                ->set("DEFAULT_FOLDER"          , $content->getDefaultFolderId())
+
+                ->set("VISIBLE"                 , $content->getVisible())
             ;
 
             $loopResult->addRow($loopResultRow);

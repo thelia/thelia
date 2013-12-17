@@ -1,11 +1,13 @@
 {*
     Params
-    - type : notification type (default alert)
+    - type (default: danger) : notification type
+    - dismissable (default: true) : Add a close button
     - message : modal message
 *}
+
 {if $message}
-<div class="{if $type}$type{else}alert alert-info{/if}">
-    <span class="icon-question-sign"></span>
+<div class="alert alert-{$type|default:danger}{if not $dismissable} alert-dismissable{/if}">
+    {if not $dismissable}<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>{/if}
     {$message}
 </div>
 {/if}

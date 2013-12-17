@@ -223,7 +223,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search, array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS'));
 
         $id = $this->getId();
 
@@ -519,6 +519,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("DESCRIPTION"             , $product->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM"            , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("URL"                     , $product->getUrl($this->locale))
+                ->set("META_TITLE"              , $product->getVirtualColumn('i18n_META_TITLE'))
+                ->set("META_DESCRIPTION"        , $product->getVirtualColumn('i18n_META_DESCRIPTION'))
+                ->set("META_KEYWORDS"            , $product->getVirtualColumn('i18n_META_KEYWORDS'))
                 ->set("BEST_PRICE"              , $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
                 ->set("BEST_PRICE_TAX"          , $taxedPrice - $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
                 ->set("BEST_TAXED_PRICE"        , $product->getVirtualColumn('is_promo') ? $taxedPromoPrice : $taxedPrice)
@@ -570,7 +573,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $search = ProductQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search, array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS'));
 
         $attributeNonStrictMatch = $this->getAttribute_non_strict_match();
         $isPSELeftJoinList = array();
@@ -1026,6 +1029,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("DESCRIPTION"      , $product->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM"     , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("URL"              , $product->getUrl($this->locale))
+                ->set("META_TITLE"       , $product->getVirtualColumn('i18n_META_TITLE'))
+                ->set("META_DESCRIPTION" , $product->getVirtualColumn('i18n_META_DESCRIPTION'))
+                ->set("META_KEYWORDS"     , $product->getVirtualColumn('i18n_META_KEYWORDS'))
                 ->set("BEST_PRICE"       , $price)
                 ->set("BEST_PRICE_TAX"   , $taxedPrice - $price)
                 ->set("BEST_TAXED_PRICE" , $taxedPrice)

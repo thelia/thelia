@@ -25,8 +25,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Thelia\Exception\UrlRewritingException;
-use Thelia\Form\Exception\FormValidationException;
+use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Category as CategoryModel;
 
@@ -74,8 +73,6 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function update(CategoryUpdateEvent $event)
     {
-        $search = CategoryQuery::create();
-
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
 
             $category
@@ -92,15 +89,20 @@ class Category extends BaseAction implements EventSubscriberInterface
 
                 ->save();
 
-            // Update the rewritten URL, if required
-            try {
-                $category->setRewrittenUrl($event->getLocale(), $event->getUrl());
-            } catch(UrlRewritingException $e) {
-                throw new FormValidationException($e->getMessage(), $e->getCode());
-            }
-
             $event->setCategory($category);
         }
+    }
+
+    /**
+     * Change a Category SEO
+     *
+     * @param \Thelia\Core\Event\UpdateSeoEvent $event
+     *
+     * @return mixed
+     */
+    public function updateSeo(UpdateSeoEvent $event)
+    {
+        return $this->genericUpdateSeo(CategoryQuery::create(), $event);
     }
 
     /**
@@ -190,6 +192,7 @@ class Category extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CATEGORY_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
 
             TheliaEvents::CATEGORY_UPDATE_POSITION   => array("updatePosition", 128),
+            TheliaEvents::CATEGORY_UPDATE_SEO        => array("updateSeo", 128),
 
             TheliaEvents::CATEGORY_ADD_CONTENT       => array("addContent", 128),
             TheliaEvents::CATEGORY_REMOVE_CONTENT    => array("removeContent", 128),

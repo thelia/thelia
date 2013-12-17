@@ -44,7 +44,6 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
  */
 class ContentTest extends TestCaseWithURLToolSetup
 {
-    use RewrittenUrlTestTrait;
 
     public function getUpdateEvent(&$content)
     {
@@ -111,7 +110,6 @@ class ContentTest extends TestCaseWithURLToolSetup
             ->setChapo('test update content short description')
             ->setDescription('test update content description')
             ->setPostscriptum('test update content postscriptum')
-            ->setUrl($content->getRewrittenUrl('en_US'))
             ->setDefaultFolder($folder->getId())
         ;
 
