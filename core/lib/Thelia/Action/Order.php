@@ -281,7 +281,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $sessionOrder = new \Thelia\Model\Order();
         $event->setOrder($sessionOrder);
         $event->setPlacedOrder($placedOrder);
-        $this->getSession()->setOrder($sessionOrder);
+        $this->getSession()->setOrder($placedOrder);
 
         /* empty cart */
         $this->getDispatcher()->dispatch(TheliaEvents::CART_CLEAR, new CartEvent($this->getCart($this->getRequest())));
@@ -298,7 +298,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $contact_email = ConfigQuery::read('contact_email');
 
-        if($contact_email) {
+        if ($contact_email) {
 
             $message = MessageQuery::create()
                 ->filterByName('order_confirmation')

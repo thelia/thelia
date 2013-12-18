@@ -61,7 +61,7 @@ abstract class BaseController extends ContainerAware
 
     /**
      * Return an empty response (after an ajax request, for example)
-     * @param  int                                        $status
+     * @param  int                                  $status
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function nullResponse($status = 200)
@@ -252,7 +252,6 @@ abstract class BaseController extends ContainerAware
 
         }
 
-
     }
 
     /**
@@ -367,8 +366,8 @@ abstract class BaseController extends ContainerAware
      * Render the given template, and returns the result as an Http Response.
      *
      * @param $templateName the complete template name, with extension
-     * @param  array                                      $args   the template arguments
-     * @param  int                                        $status http code status
+     * @param  array                                $args   the template arguments
+     * @param  int                                  $status http code status
      * @return \Thelia\Core\HttpFoundation\Response
      */
     abstract protected function render($templateName, $args = array(), $status = 200);

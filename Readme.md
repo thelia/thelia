@@ -22,7 +22,7 @@ Requirements
         * gd
         * curl
     * safe_mode off
-    * memory_limit at least 150M, preferably 256.
+    * memory_limit at least 128M, preferably 256.
     * post_max_size 20M
     * upload_max_filesize 2M
 * apache 2
@@ -44,10 +44,8 @@ Installation
 ------------
 
 ``` bash
-$ git clone https://github.com/thelia/thelia.git
-$ cd thelia
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar install --prefer-dist --optimize-autoloader
+$ php composer.phar create-project thelia/thelia path/ dev-master
 ```
 
 Finish the installation using cli tools :
@@ -57,6 +55,14 @@ $ php Thelia thelia:install
 ```
 
 You just have to follow all instructions.
+
+Documentation
+-------------
+
+Thelia documentation is available at http://doc.thelia.net
+
+The documentation is also in beta version and some part can be obsolete cause to some refactor.
+
 
 Contribute
 ----------

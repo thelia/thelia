@@ -209,8 +209,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 if ($product->countSaleElements() <= 0) {
                     // If we just deleted the last PSE, create a default one
                     $product->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
-                }
-                elseif ($pse->getIsDefault()) {
+                } elseif ($pse->getIsDefault()) {
 
                     // If we deleted the default PSE, make the last created one the default
                     $pse = ProductSaleElementsQuery::create()
@@ -238,8 +237,8 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      *
      * @param ProductCombinationGenerationEvent $event
      */
-    public function generateCombinations(ProductCombinationGenerationEvent $event) {
-
+    public function generateCombinations(ProductCombinationGenerationEvent $event)
+    {
         $con = Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
 
         $con->beginTransaction();
@@ -252,7 +251,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $isDefault = true;
 
             // Create all combinations
-            foreach($event->getCombinations() as $combinationAttributesAvIds) {
+            foreach ($event->getCombinations() as $combinationAttributesAvIds) {
 
                 // Create the PSE
                 $saleElement = $event->getProduct()->createProductSaleElement(
@@ -276,8 +275,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
 
             $con->rollback();
 
@@ -288,9 +286,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Create a combination for a given product sale element
      *
-     * @param ConnectionInterface $con the Propel connection
-     * @param ProductSaleElement $salesElement the product sale element
-     * @param unknown $combinationAttributes an array oif attributes av IDs
+     * @param ConnectionInterface $con                   the Propel connection
+     * @param ProductSaleElement  $salesElement          the product sale element
+     * @param unknown             $combinationAttributes an array oif attributes av IDs
      */
     protected function createCombination(ConnectionInterface $con, ProductSaleElements $salesElement, $combinationAttributes)
     {

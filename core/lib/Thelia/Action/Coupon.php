@@ -138,7 +138,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             }
         }
 
-
         $event->setIsValid($isValid);
         $event->setDiscount($totalDiscount);
     }

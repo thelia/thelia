@@ -34,7 +34,6 @@ use Thelia\Form\AttributeModificationForm;
 use Thelia\Form\AttributeCreationForm;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\AttributeAv;
-use Thelia\Model\AttributeAvQuery;
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
 use Thelia\Core\Event\Attribute\AttributeEvent;
 
