@@ -45,7 +45,7 @@ class FolderTest extends TestCaseWithURLToolSetup
 
     public function getUpdateEvent(&$folder)
     {
-        if(!$folder instanceof \Thelia\Model\Folder) {
+        if (!$folder instanceof \Thelia\Model\Folder) {
             $folder = $this->getRandomFolder();
         }
 
@@ -65,7 +65,7 @@ class FolderTest extends TestCaseWithURLToolSetup
 
     public function getUpdateSeoEvent(&$folder)
     {
-        if(!$folder instanceof \Thelia\Model\Folder) {
+        if (!$folder instanceof \Thelia\Model\Folder) {
             $folder = $this->getRandomFolder();
         }
 
@@ -83,6 +83,7 @@ class FolderTest extends TestCaseWithURLToolSetup
     public function processUpdateSeoAction($event)
     {
         $contentAction = new Folder($this->getContainer());
+
         return $contentAction->updateSeo($event);
     }
 

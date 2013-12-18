@@ -23,32 +23,31 @@
 
 namespace Thelia\Tools;
 
-
 /**
  * Class Password
  * @package Thelia\Tools
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Password 
+class Password
 {
 
-    private static function randgen($letter, $length) {
-
+    private static function randgen($letter, $length)
+    {
         return substr(str_shuffle($letter), 0, $length);
     }
 
     /**
      * generate a Random password with defined length
      *
-     * @param int $length
+     * @param  int   $length
      * @return mixed
      */
-    public static function generateRandom($length = 8){
-
+    public static function generateRandom($length = 8)
+    {
         $letter = "abcdefghijklmnopqrstuvwxyz";
         $letter .= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         $letter .= "0123456789";
 
         return self::randgen($letter, $length);
     }
-} 
+}

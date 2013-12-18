@@ -47,7 +47,7 @@ class ContentTest extends TestCaseWithURLToolSetup
 
     public function getUpdateEvent(&$content)
     {
-        if(!$content instanceof \Thelia\Model\Content) {
+        if (!$content instanceof \Thelia\Model\Content) {
             $content = $this->getRandomContent();
         }
 

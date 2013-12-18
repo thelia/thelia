@@ -290,7 +290,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $contact_email = ConfigQuery::read('contact_email');
 
-        if($contact_email) {
+        if ($contact_email) {
 
             $message = MessageQuery::create()
                 ->filterByName('order_confirmation')

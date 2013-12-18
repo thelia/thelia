@@ -73,8 +73,8 @@ class Delivery extends BaseSpecificModule
 
             try {
                 $postage = $moduleInstance->getPostage($country);
-            } catch(OrderException $e) {
-                switch($e->getCode()) {
+            } catch (OrderException $e) {
+                switch ($e->getCode()) {
                     case OrderException::DELIVERY_MODULE_UNAVAILABLE:
                         /* do not show this delivery module */
                         continue(2);

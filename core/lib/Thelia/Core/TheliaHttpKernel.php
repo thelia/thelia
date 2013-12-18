@@ -215,7 +215,7 @@ class TheliaHttpKernel extends HttpKernel
 
     protected function initSession(Request $request)
     {
-        if(null === self::$session) {
+        if (null === self::$session) {
             $storage = new Session\Storage\NativeSessionStorage();
 
             if (Model\ConfigQuery::read("session_config.default")) {

@@ -57,7 +57,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     {
         $cart = $this->getCart($this->request);
 
-        if(null === $cart) {
+        if (null === $cart) {
             return array();
         }
 
@@ -80,7 +80,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     {
         $taxCountry = CountryQuery::create()->findPk(64); // @TODO : make it magic;
 
-        foreach($loopResult->getResultDataCollection() as $cartItem) {
+        foreach ($loopResult->getResultDataCollection() as $cartItem) {
             $product = $cartItem->getProduct();
             $productSaleElement = $cartItem->getProductSaleElements();
 

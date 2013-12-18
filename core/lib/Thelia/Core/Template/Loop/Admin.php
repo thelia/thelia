@@ -33,7 +33,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\AdminQuery;
-use Thelia\Type;
 
 /**
  *

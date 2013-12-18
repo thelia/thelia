@@ -584,7 +584,7 @@ class FileController extends BaseAdminController
                 );
         }
 
-        if(null === $message) {
+        if (null === $message) {
             $message = $this->getTranslator()
                 ->trans(
                     'Images deleted successfully',
@@ -638,7 +638,7 @@ class FileController extends BaseAdminController
                 ) . $e->getMessage();
         }
 
-        if(null === $message) {
+        if (null === $message) {
             $message = $this->getTranslator()
                 ->trans(
                     'Image position updated',
@@ -692,7 +692,7 @@ class FileController extends BaseAdminController
                 ) . $e->getMessage();
         }
 
-        if(null === $message) {
+        if (null === $message) {
             $message = $this->getTranslator()
                 ->trans(
                     'Document position updated',

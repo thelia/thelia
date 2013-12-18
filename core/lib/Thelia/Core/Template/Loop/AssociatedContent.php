@@ -48,7 +48,7 @@ class AssociatedContent extends Content
 {
     protected $contentId;
     protected $contentPosition;
-    
+
     /**
      * @return ArgumentCollection
      */

@@ -23,12 +23,13 @@
 
 namespace Thelia\Core\Template\Assets;
 
-interface AssetManagerInterface {
+interface AssetManagerInterface
+{
     /**
      * Prepare an asset directory.
      *
-     * @param string $source_assets_directory the full path to the source asstes directory
-     * @param string $web_assets_directory_base the base directory of the web based asset directory
+     * @param  string            $source_assets_directory   the full path to the source asstes directory
+     * @param  string            $web_assets_directory_base the base directory of the web based asset directory
      * @throws \RuntimeException if something goes wrong.
      */
     public function prepareAssets($source_assets_directory, $web_assets_directory_base);
@@ -36,15 +37,15 @@ interface AssetManagerInterface {
     /**
      * Generates assets from $asset_path in $output_path, using $filters.
      *
-     * @param  string                    $asset_path  the full path to the asset file (or file collection, e.g. *.less)
+     * @param string $asset_path the full path to the asset file (or file collection, e.g. *.less)
      *
-     * @param  string                    $web_assets_directory_base the full disk path to the base assets output directory in the web space
-     * @param  string                    $output_url  the URL to the base assets output directory in the web space
+     * @param string $web_assets_directory_base the full disk path to the base assets output directory in the web space
+     * @param string $output_url                the URL to the base assets output directory in the web space
      *
-     * @param  string                    $asset_type  the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
-     * @param  array                     $filters a list of filters, as defined below (see switch($filter_name) ...)
+     * @param string $asset_type the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
+     * @param array  $filters    a list of filters, as defined below (see switch($filter_name) ...)
      *
-     * @param  boolean                   $debug the debug mode, true or false
+     * @param boolean $debug the debug mode, true or false
      *
      * @throws \InvalidArgumentException if an invalid filter name is found
      * @return string                    The URL to the generated asset file.

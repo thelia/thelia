@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Customer;
 
-use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Customer;
 
 class CustomerLoginEvent extends CustomerEvent

@@ -23,19 +23,12 @@
 
 namespace Thelia\Core\Template\Loop;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
-use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\ModuleQuery;
-
-use Thelia\Module\BaseModule;
 use Thelia\Type;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Template\TemplateDefinition;
@@ -72,7 +65,8 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
         );
     }
 
-    public function buildArray() {
+    public function buildArray()
+    {
         $type = $this->getArg(template_type);
 
         if ($type == 'front-office')

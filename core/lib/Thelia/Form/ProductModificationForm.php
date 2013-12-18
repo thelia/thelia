@@ -25,7 +25,6 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Thelia\Core\Translation\Translator;
 
-
 class ProductModificationForm extends ProductCreationForm
 {
     use StandardDescriptionFieldsTrait;

@@ -27,7 +27,6 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
-use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Form\OrderUpdateAddress;
@@ -36,7 +35,6 @@ use Thelia\Model\Base\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Tools\URL;
-use Thelia\Core\Template\TemplateHelper;
 
 /**
  * Class OrderController
@@ -203,20 +201,18 @@ class OrderController extends BaseAdminController
     public function generateInvoicePdf($order_id)
     {
         if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
-
         return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
     }
 
     public function generateDeliveryPdf($order_id)
     {
         if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
-
         return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
     }
 
     private function generateBackOfficeOrderPdf($order_id, $fileName)
     {
-        if(null === $response = $this->generateOrderPdf($order_id, $fileName)){
+        if (null === $response = $this->generateOrderPdf($order_id, $fileName)) {
             $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", array(
                 'order_id' => $order_id
             ))));
@@ -224,6 +220,5 @@ class OrderController extends BaseAdminController
 
         return $response;
     }
-
 
 }

@@ -62,7 +62,6 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-
     /**
      * Generate a valid Coupon model
      */
@@ -117,7 +116,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
         $coupon1->setSerializedConditions($serializedConditions);
-
 
         $coupon1->setMaxUsage(40);
         $coupon1->setIsCumulative(true);
@@ -307,8 +305,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $conditionFactory = new ConditionFactory($stubContainer);
 
-
-
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
             ->will($this->returnValue(array()));
@@ -333,7 +329,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $model1 = $this->generateCouponModel($stubFacade, $conditionFactory);
         $coupon1 = $couponFactory->buildCouponFromModel($model1);
         $coupon2 = clone $coupon1;
-
 
         $couponManager = new CouponManager($stubContainer);
         $couponManager->addAvailableCoupon($coupon1);
@@ -386,7 +381,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $stubContainer->expects($this->any())
             ->method('get')
             ->will($this->onConsecutiveCalls($stubFacade));
-
 
         $couponManager = new CouponManager($stubContainer);
         $couponManager->addAvailableCondition($condition1);
@@ -444,9 +438,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->method('get')
             ->will($this->onConsecutiveCalls($stubFacade));
 
-
         $couponManager = new CouponManager($stubContainer);
-
 
         $stubModel = $this->getMockBuilder('\Thelia\Model\Coupon')
             ->disableOriginalConstructor()
@@ -511,9 +503,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->method('get')
             ->will($this->onConsecutiveCalls($stubFacade));
 
-
         $couponManager = new CouponManager($stubContainer);
-
 
         $stubModel = $this->getMockBuilder('\Thelia\Model\Coupon')
             ->disableOriginalConstructor()
