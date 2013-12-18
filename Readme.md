@@ -22,7 +22,7 @@ Requirements
         * gd
         * curl
     * safe_mode off
-    * memory_limit at least 150M, preferably 256.
+    * memory_limit at least 128M, preferably 256.
     * post_max_size 20M
     * upload_max_filesize 2M
 * apache 2
