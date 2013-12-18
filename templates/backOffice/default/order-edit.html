@@ -112,12 +112,23 @@
                                                     <tr>
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Discount"}</strong></td>
-                                                        <td><strong>{$orderCurrency} 0</strong></td>
+                                                        <td><strong>{$orderCurrency} {$DISCOUNT}</strong></td>
                                                     </tr>
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Coupon code"}</strong></td>
-                                                        <td><strong>{$orderCurrency} 0</strong></td>
+                                                        <td>
+                                                            {ifloop rel="couponcode"}
+                                                            <ul>
+                                                            {loop type="order_coupon" name="couponcode" order=$ID}
+                                                                <li>{$CODE}</li>
+                                                            {/loop}
+                                                            </ul>
+                                                            {/ifloop}
+                                                            {elseloop rel="couponcode"}
+                                                                <strong>Ø</strong>
+                                                            {/elseloop}
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="2" class="td-unstyled"></td>

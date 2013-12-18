@@ -178,6 +178,11 @@ class Order extends BaseAction implements EventSubscriberInterface
             OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_NOT_PAID)->getId()
         );
 
+        /* memorize discount */
+        $placedOrder->setDiscount(
+            $cart->getDiscount()
+        );
+
         $placedOrder->save($con);
 
         /* fulfill order_products and decrease stock */
@@ -263,6 +268,9 @@ class Order extends BaseAction implements EventSubscriberInterface
         }
 
         /* discount @todo */
+        /* refresh discount */
+
+        /* memorize coupons */
 
         $con->commit();
 

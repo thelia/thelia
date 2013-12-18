@@ -147,7 +147,7 @@ abstract class ProfileResourceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT PROFILE_ID, RESOURCE_ID, ACCESS, CREATED_AT, UPDATED_AT FROM profile_resource WHERE PROFILE_ID = :p0 AND RESOURCE_ID = :p1';
+        $sql = 'SELECT `PROFILE_ID`, `RESOURCE_ID`, `ACCESS`, `CREATED_AT`, `UPDATED_AT` FROM `profile_resource` WHERE `PROFILE_ID` = :p0 AND `RESOURCE_ID` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);

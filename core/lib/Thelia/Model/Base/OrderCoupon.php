@@ -16,18 +16,18 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\CouponOrder as ChildCouponOrder;
-use Thelia\Model\CouponOrderQuery as ChildCouponOrderQuery;
 use Thelia\Model\Order as ChildOrder;
+use Thelia\Model\OrderCoupon as ChildOrderCoupon;
+use Thelia\Model\OrderCouponQuery as ChildOrderCouponQuery;
 use Thelia\Model\OrderQuery as ChildOrderQuery;
-use Thelia\Model\Map\CouponOrderTableMap;
+use Thelia\Model\Map\OrderCouponTableMap;
 
-abstract class CouponOrder implements ActiveRecordInterface
+abstract class OrderCoupon implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\CouponOrderTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\OrderCouponTableMap';
 
 
     /**
@@ -69,10 +69,76 @@ abstract class CouponOrder implements ActiveRecordInterface
     protected $order_id;
 
     /**
-     * The value for the value field.
+     * The value for the code field.
+     * @var        string
+     */
+    protected $code;
+
+    /**
+     * The value for the type field.
+     * @var        string
+     */
+    protected $type;
+
+    /**
+     * The value for the amount field.
      * @var        double
      */
-    protected $value;
+    protected $amount;
+
+    /**
+     * The value for the title field.
+     * @var        string
+     */
+    protected $title;
+
+    /**
+     * The value for the short_description field.
+     * @var        string
+     */
+    protected $short_description;
+
+    /**
+     * The value for the description field.
+     * @var        string
+     */
+    protected $description;
+
+    /**
+     * The value for the expiration_date field.
+     * @var        string
+     */
+    protected $expiration_date;
+
+    /**
+     * The value for the max_usage field.
+     * @var        int
+     */
+    protected $max_usage;
+
+    /**
+     * The value for the is_cumulative field.
+     * @var        boolean
+     */
+    protected $is_cumulative;
+
+    /**
+     * The value for the is_removing_postage field.
+     * @var        boolean
+     */
+    protected $is_removing_postage;
+
+    /**
+     * The value for the is_available_on_special_offers field.
+     * @var        boolean
+     */
+    protected $is_available_on_special_offers;
+
+    /**
+     * The value for the serialized_conditions field.
+     * @var        string
+     */
+    protected $serialized_conditions;
 
     /**
      * The value for the created_at field.
@@ -100,7 +166,7 @@ abstract class CouponOrder implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Thelia\Model\Base\CouponOrder object.
+     * Initializes internal state of Thelia\Model\Base\OrderCoupon object.
      */
     public function __construct()
     {
@@ -195,9 +261,9 @@ abstract class CouponOrder implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>CouponOrder</code> instance.  If
-     * <code>obj</code> is an instance of <code>CouponOrder</code>, delegates to
-     * <code>equals(CouponOrder)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>OrderCoupon</code> instance.  If
+     * <code>obj</code> is an instance of <code>OrderCoupon</code>, delegates to
+     * <code>equals(OrderCoupon)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -280,7 +346,7 @@ abstract class CouponOrder implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return CouponOrder The current object, for fluid interface
+     * @return OrderCoupon The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -312,7 +378,7 @@ abstract class CouponOrder implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return CouponOrder The current object, for fluid interface
+     * @return OrderCoupon The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -380,14 +446,144 @@ abstract class CouponOrder implements ActiveRecordInterface
     }
 
     /**
-     * Get the [value] column value.
+     * Get the [code] column value.
+     *
+     * @return   string
+     */
+    public function getCode()
+    {
+
+        return $this->code;
+    }
+
+    /**
+     * Get the [type] column value.
+     *
+     * @return   string
+     */
+    public function getType()
+    {
+
+        return $this->type;
+    }
+
+    /**
+     * Get the [amount] column value.
      *
      * @return   double
      */
-    public function getValue()
+    public function getAmount()
     {
 
-        return $this->value;
+        return $this->amount;
+    }
+
+    /**
+     * Get the [title] column value.
+     *
+     * @return   string
+     */
+    public function getTitle()
+    {
+
+        return $this->title;
+    }
+
+    /**
+     * Get the [short_description] column value.
+     *
+     * @return   string
+     */
+    public function getShortDescription()
+    {
+
+        return $this->short_description;
+    }
+
+    /**
+     * Get the [description] column value.
+     *
+     * @return   string
+     */
+    public function getDescription()
+    {
+
+        return $this->description;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [expiration_date] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
+     *
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getExpirationDate($format = NULL)
+    {
+        if ($format === null) {
+            return $this->expiration_date;
+        } else {
+            return $this->expiration_date instanceof \DateTime ? $this->expiration_date->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [max_usage] column value.
+     *
+     * @return   int
+     */
+    public function getMaxUsage()
+    {
+
+        return $this->max_usage;
+    }
+
+    /**
+     * Get the [is_cumulative] column value.
+     *
+     * @return   boolean
+     */
+    public function getIsCumulative()
+    {
+
+        return $this->is_cumulative;
+    }
+
+    /**
+     * Get the [is_removing_postage] column value.
+     *
+     * @return   boolean
+     */
+    public function getIsRemovingPostage()
+    {
+
+        return $this->is_removing_postage;
+    }
+
+    /**
+     * Get the [is_available_on_special_offers] column value.
+     *
+     * @return   boolean
+     */
+    public function getIsAvailableOnSpecialOffers()
+    {
+
+        return $this->is_available_on_special_offers;
+    }
+
+    /**
+     * Get the [serialized_conditions] column value.
+     *
+     * @return   string
+     */
+    public function getSerializedConditions()
+    {
+
+        return $this->serialized_conditions;
     }
 
     /**
@@ -434,7 +630,7 @@ abstract class CouponOrder implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\CouponOrder The current object (for fluent API support)
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -444,7 +640,7 @@ abstract class CouponOrder implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CouponOrderTableMap::ID;
+            $this->modifiedColumns[] = OrderCouponTableMap::ID;
         }
 
 
@@ -455,7 +651,7 @@ abstract class CouponOrder implements ActiveRecordInterface
      * Set the value of [order_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\CouponOrder The current object (for fluent API support)
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
      */
     public function setOrderId($v)
     {
@@ -465,7 +661,7 @@ abstract class CouponOrder implements ActiveRecordInterface
 
         if ($this->order_id !== $v) {
             $this->order_id = $v;
-            $this->modifiedColumns[] = CouponOrderTableMap::ORDER_ID;
+            $this->modifiedColumns[] = OrderCouponTableMap::ORDER_ID;
         }
 
         if ($this->aOrder !== null && $this->aOrder->getId() !== $v) {
@@ -477,32 +673,287 @@ abstract class CouponOrder implements ActiveRecordInterface
     } // setOrderId()
 
     /**
-     * Set the value of [value] column.
+     * Set the value of [code] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
+     */
+    public function setCode($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->code !== $v) {
+            $this->code = $v;
+            $this->modifiedColumns[] = OrderCouponTableMap::CODE;
+        }
+
+
+        return $this;
+    } // setCode()
+
+    /**
+     * Set the value of [type] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
+     */
+    public function setType($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->type !== $v) {
+            $this->type = $v;
+            $this->modifiedColumns[] = OrderCouponTableMap::TYPE;
+        }
+
+
+        return $this;
+    } // setType()
+
+    /**
+     * Set the value of [amount] column.
      *
      * @param      double $v new value
-     * @return   \Thelia\Model\CouponOrder The current object (for fluent API support)
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
      */
-    public function setValue($v)
+    public function setAmount($v)
     {
         if ($v !== null) {
             $v = (double) $v;
         }
 
-        if ($this->value !== $v) {
-            $this->value = $v;
-            $this->modifiedColumns[] = CouponOrderTableMap::VALUE;
+        if ($this->amount !== $v) {
+            $this->amount = $v;
+            $this->modifiedColumns[] = OrderCouponTableMap::AMOUNT;
         }
 
 
         return $this;
-    } // setValue()
+    } // setAmount()
+
+    /**
+     * Set the value of [title] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
+     */
+    public function setTitle($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->title !== $v) {
+            $this->title = $v;
+            $this->modifiedColumns[] = OrderCouponTableMap::TITLE;
+        }
+
+
+        return $this;
+    } // setTitle()
+
+    /**
+     * Set the value of [short_description] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
+     */
+    public function setShortDescription($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->short_description !== $v) {
+            $this->short_description = $v;
+            $this->modifiedColumns[] = OrderCouponTableMap::SHORT_DESCRIPTION;
+        }
+
+
+        return $this;
+    } // setShortDescription()
+
+    /**
+     * Set the value of [description] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
+     */
+    public function setDescription($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->description !== $v) {
+            $this->description = $v;
+            $this->modifiedColumns[] = OrderCouponTableMap::DESCRIPTION;
+        }
+
+
+        return $this;
+    } // setDescription()
+
+    /**
+     * Sets the value of [expiration_date] column to a normalized version of the date/time value specified.
+     *
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
+     */
+    public function setExpirationDate($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
+        if ($this->expiration_date !== null || $dt !== null) {
+            if ($dt !== $this->expiration_date) {
+                $this->expiration_date = $dt;
+                $this->modifiedColumns[] = OrderCouponTableMap::EXPIRATION_DATE;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setExpirationDate()
+
+    /**
+     * Set the value of [max_usage] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
+     */
+    public function setMaxUsage($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->max_usage !== $v) {
+            $this->max_usage = $v;
+            $this->modifiedColumns[] = OrderCouponTableMap::MAX_USAGE;
+        }
+
+
+        return $this;
+    } // setMaxUsage()
+
+    /**
+     * Sets the value of the [is_cumulative] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
+     */
+    public function setIsCumulative($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->is_cumulative !== $v) {
+            $this->is_cumulative = $v;
+            $this->modifiedColumns[] = OrderCouponTableMap::IS_CUMULATIVE;
+        }
+
+
+        return $this;
+    } // setIsCumulative()
+
+    /**
+     * Sets the value of the [is_removing_postage] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
+     */
+    public function setIsRemovingPostage($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->is_removing_postage !== $v) {
+            $this->is_removing_postage = $v;
+            $this->modifiedColumns[] = OrderCouponTableMap::IS_REMOVING_POSTAGE;
+        }
+
+
+        return $this;
+    } // setIsRemovingPostage()
+
+    /**
+     * Sets the value of the [is_available_on_special_offers] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
+     */
+    public function setIsAvailableOnSpecialOffers($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->is_available_on_special_offers !== $v) {
+            $this->is_available_on_special_offers = $v;
+            $this->modifiedColumns[] = OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS;
+        }
+
+
+        return $this;
+    } // setIsAvailableOnSpecialOffers()
+
+    /**
+     * Set the value of [serialized_conditions] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
+     */
+    public function setSerializedConditions($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->serialized_conditions !== $v) {
+            $this->serialized_conditions = $v;
+            $this->modifiedColumns[] = OrderCouponTableMap::SERIALIZED_CONDITIONS;
+        }
+
+
+        return $this;
+    } // setSerializedConditions()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\CouponOrder The current object (for fluent API support)
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -510,7 +961,7 @@ abstract class CouponOrder implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = CouponOrderTableMap::CREATED_AT;
+                $this->modifiedColumns[] = OrderCouponTableMap::CREATED_AT;
             }
         } // if either are not null
 
@@ -523,7 +974,7 @@ abstract class CouponOrder implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\CouponOrder The current object (for fluent API support)
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -531,7 +982,7 @@ abstract class CouponOrder implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = CouponOrderTableMap::UPDATED_AT;
+                $this->modifiedColumns[] = OrderCouponTableMap::UPDATED_AT;
             }
         } // if either are not null
 
@@ -576,22 +1027,58 @@ abstract class CouponOrder implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CouponOrderTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : OrderCouponTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CouponOrderTableMap::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : OrderCouponTableMap::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->order_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CouponOrderTableMap::translateFieldName('Value', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->value = (null !== $col) ? (double) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : OrderCouponTableMap::translateFieldName('Code', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->code = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CouponOrderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : OrderCouponTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->type = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OrderCouponTableMap::translateFieldName('Amount', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->amount = (null !== $col) ? (double) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OrderCouponTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->title = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OrderCouponTableMap::translateFieldName('ShortDescription', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->short_description = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : OrderCouponTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->description = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : OrderCouponTableMap::translateFieldName('ExpirationDate', TableMap::TYPE_PHPNAME, $indexType)];
+            if ($col === '0000-00-00 00:00:00') {
+                $col = null;
+            }
+            $this->expiration_date = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : OrderCouponTableMap::translateFieldName('MaxUsage', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->max_usage = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderCouponTableMap::translateFieldName('IsCumulative', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->is_cumulative = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderCouponTableMap::translateFieldName('IsRemovingPostage', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->is_removing_postage = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderCouponTableMap::translateFieldName('IsAvailableOnSpecialOffers', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->is_available_on_special_offers = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderCouponTableMap::translateFieldName('SerializedConditions', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->serialized_conditions = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderCouponTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CouponOrderTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderCouponTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -604,10 +1091,10 @@ abstract class CouponOrder implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = CouponOrderTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 16; // 16 = OrderCouponTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\CouponOrder object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\OrderCoupon object", 0, $e);
         }
     }
 
@@ -652,13 +1139,13 @@ abstract class CouponOrder implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(CouponOrderTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(OrderCouponTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildCouponOrderQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildOrderCouponQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -678,8 +1165,8 @@ abstract class CouponOrder implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see CouponOrder::setDeleted()
-     * @see CouponOrder::isDeleted()
+     * @see OrderCoupon::setDeleted()
+     * @see OrderCoupon::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -688,12 +1175,12 @@ abstract class CouponOrder implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CouponOrderTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildCouponOrderQuery::create()
+            $deleteQuery = ChildOrderCouponQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -730,7 +1217,7 @@ abstract class CouponOrder implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CouponOrderTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -740,16 +1227,16 @@ abstract class CouponOrder implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(CouponOrderTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(OrderCouponTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(CouponOrderTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(OrderCouponTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(CouponOrderTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(OrderCouponTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -761,7 +1248,7 @@ abstract class CouponOrder implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                CouponOrderTableMap::addInstanceToPool($this);
+                OrderCouponTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -834,30 +1321,63 @@ abstract class CouponOrder implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = CouponOrderTableMap::ID;
+        $this->modifiedColumns[] = OrderCouponTableMap::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . CouponOrderTableMap::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . OrderCouponTableMap::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(CouponOrderTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
+        if ($this->isColumnModified(OrderCouponTableMap::ID)) {
+            $modifiedColumns[':p' . $index++]  = '`ID`';
         }
-        if ($this->isColumnModified(CouponOrderTableMap::ORDER_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ORDER_ID';
+        if ($this->isColumnModified(OrderCouponTableMap::ORDER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`ORDER_ID`';
         }
-        if ($this->isColumnModified(CouponOrderTableMap::VALUE)) {
-            $modifiedColumns[':p' . $index++]  = 'VALUE';
+        if ($this->isColumnModified(OrderCouponTableMap::CODE)) {
+            $modifiedColumns[':p' . $index++]  = '`CODE`';
         }
-        if ($this->isColumnModified(CouponOrderTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
+        if ($this->isColumnModified(OrderCouponTableMap::TYPE)) {
+            $modifiedColumns[':p' . $index++]  = '`TYPE`';
         }
-        if ($this->isColumnModified(CouponOrderTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
+        if ($this->isColumnModified(OrderCouponTableMap::AMOUNT)) {
+            $modifiedColumns[':p' . $index++]  = '`AMOUNT`';
+        }
+        if ($this->isColumnModified(OrderCouponTableMap::TITLE)) {
+            $modifiedColumns[':p' . $index++]  = '`TITLE`';
+        }
+        if ($this->isColumnModified(OrderCouponTableMap::SHORT_DESCRIPTION)) {
+            $modifiedColumns[':p' . $index++]  = '`SHORT_DESCRIPTION`';
+        }
+        if ($this->isColumnModified(OrderCouponTableMap::DESCRIPTION)) {
+            $modifiedColumns[':p' . $index++]  = '`DESCRIPTION`';
+        }
+        if ($this->isColumnModified(OrderCouponTableMap::EXPIRATION_DATE)) {
+            $modifiedColumns[':p' . $index++]  = '`EXPIRATION_DATE`';
+        }
+        if ($this->isColumnModified(OrderCouponTableMap::MAX_USAGE)) {
+            $modifiedColumns[':p' . $index++]  = '`MAX_USAGE`';
+        }
+        if ($this->isColumnModified(OrderCouponTableMap::IS_CUMULATIVE)) {
+            $modifiedColumns[':p' . $index++]  = '`IS_CUMULATIVE`';
+        }
+        if ($this->isColumnModified(OrderCouponTableMap::IS_REMOVING_POSTAGE)) {
+            $modifiedColumns[':p' . $index++]  = '`IS_REMOVING_POSTAGE`';
+        }
+        if ($this->isColumnModified(OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS)) {
+            $modifiedColumns[':p' . $index++]  = '`IS_AVAILABLE_ON_SPECIAL_OFFERS`';
+        }
+        if ($this->isColumnModified(OrderCouponTableMap::SERIALIZED_CONDITIONS)) {
+            $modifiedColumns[':p' . $index++]  = '`SERIALIZED_CONDITIONS`';
+        }
+        if ($this->isColumnModified(OrderCouponTableMap::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+        }
+        if ($this->isColumnModified(OrderCouponTableMap::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
 
         $sql = sprintf(
-            'INSERT INTO coupon_order (%s) VALUES (%s)',
+            'INSERT INTO `order_coupon` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -866,19 +1386,52 @@ abstract class CouponOrder implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
+                    case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'ORDER_ID':
+                    case '`ORDER_ID`':
                         $stmt->bindValue($identifier, $this->order_id, PDO::PARAM_INT);
                         break;
-                    case 'VALUE':
-                        $stmt->bindValue($identifier, $this->value, PDO::PARAM_STR);
+                    case '`CODE`':
+                        $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case 'CREATED_AT':
+                    case '`TYPE`':
+                        $stmt->bindValue($identifier, $this->type, PDO::PARAM_STR);
+                        break;
+                    case '`AMOUNT`':
+                        $stmt->bindValue($identifier, $this->amount, PDO::PARAM_STR);
+                        break;
+                    case '`TITLE`':
+                        $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
+                        break;
+                    case '`SHORT_DESCRIPTION`':
+                        $stmt->bindValue($identifier, $this->short_description, PDO::PARAM_STR);
+                        break;
+                    case '`DESCRIPTION`':
+                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
+                        break;
+                    case '`EXPIRATION_DATE`':
+                        $stmt->bindValue($identifier, $this->expiration_date ? $this->expiration_date->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                        break;
+                    case '`MAX_USAGE`':
+                        $stmt->bindValue($identifier, $this->max_usage, PDO::PARAM_INT);
+                        break;
+                    case '`IS_CUMULATIVE`':
+                        $stmt->bindValue($identifier, (int) $this->is_cumulative, PDO::PARAM_INT);
+                        break;
+                    case '`IS_REMOVING_POSTAGE`':
+                        $stmt->bindValue($identifier, (int) $this->is_removing_postage, PDO::PARAM_INT);
+                        break;
+                    case '`IS_AVAILABLE_ON_SPECIAL_OFFERS`':
+                        $stmt->bindValue($identifier, (int) $this->is_available_on_special_offers, PDO::PARAM_INT);
+                        break;
+                    case '`SERIALIZED_CONDITIONS`':
+                        $stmt->bindValue($identifier, $this->serialized_conditions, PDO::PARAM_STR);
+                        break;
+                    case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case 'UPDATED_AT':
+                    case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
@@ -927,7 +1480,7 @@ abstract class CouponOrder implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CouponOrderTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = OrderCouponTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -950,12 +1503,45 @@ abstract class CouponOrder implements ActiveRecordInterface
                 return $this->getOrderId();
                 break;
             case 2:
-                return $this->getValue();
+                return $this->getCode();
                 break;
             case 3:
-                return $this->getCreatedAt();
+                return $this->getType();
                 break;
             case 4:
+                return $this->getAmount();
+                break;
+            case 5:
+                return $this->getTitle();
+                break;
+            case 6:
+                return $this->getShortDescription();
+                break;
+            case 7:
+                return $this->getDescription();
+                break;
+            case 8:
+                return $this->getExpirationDate();
+                break;
+            case 9:
+                return $this->getMaxUsage();
+                break;
+            case 10:
+                return $this->getIsCumulative();
+                break;
+            case 11:
+                return $this->getIsRemovingPostage();
+                break;
+            case 12:
+                return $this->getIsAvailableOnSpecialOffers();
+                break;
+            case 13:
+                return $this->getSerializedConditions();
+                break;
+            case 14:
+                return $this->getCreatedAt();
+                break;
+            case 15:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -981,17 +1567,28 @@ abstract class CouponOrder implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['CouponOrder'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['OrderCoupon'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['CouponOrder'][$this->getPrimaryKey()] = true;
-        $keys = CouponOrderTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['OrderCoupon'][$this->getPrimaryKey()] = true;
+        $keys = OrderCouponTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getOrderId(),
-            $keys[2] => $this->getValue(),
-            $keys[3] => $this->getCreatedAt(),
-            $keys[4] => $this->getUpdatedAt(),
+            $keys[2] => $this->getCode(),
+            $keys[3] => $this->getType(),
+            $keys[4] => $this->getAmount(),
+            $keys[5] => $this->getTitle(),
+            $keys[6] => $this->getShortDescription(),
+            $keys[7] => $this->getDescription(),
+            $keys[8] => $this->getExpirationDate(),
+            $keys[9] => $this->getMaxUsage(),
+            $keys[10] => $this->getIsCumulative(),
+            $keys[11] => $this->getIsRemovingPostage(),
+            $keys[12] => $this->getIsAvailableOnSpecialOffers(),
+            $keys[13] => $this->getSerializedConditions(),
+            $keys[14] => $this->getCreatedAt(),
+            $keys[15] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1020,7 +1617,7 @@ abstract class CouponOrder implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CouponOrderTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = OrderCouponTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1043,12 +1640,45 @@ abstract class CouponOrder implements ActiveRecordInterface
                 $this->setOrderId($value);
                 break;
             case 2:
-                $this->setValue($value);
+                $this->setCode($value);
                 break;
             case 3:
-                $this->setCreatedAt($value);
+                $this->setType($value);
                 break;
             case 4:
+                $this->setAmount($value);
+                break;
+            case 5:
+                $this->setTitle($value);
+                break;
+            case 6:
+                $this->setShortDescription($value);
+                break;
+            case 7:
+                $this->setDescription($value);
+                break;
+            case 8:
+                $this->setExpirationDate($value);
+                break;
+            case 9:
+                $this->setMaxUsage($value);
+                break;
+            case 10:
+                $this->setIsCumulative($value);
+                break;
+            case 11:
+                $this->setIsRemovingPostage($value);
+                break;
+            case 12:
+                $this->setIsAvailableOnSpecialOffers($value);
+                break;
+            case 13:
+                $this->setSerializedConditions($value);
+                break;
+            case 14:
+                $this->setCreatedAt($value);
+                break;
+            case 15:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1073,13 +1703,24 @@ abstract class CouponOrder implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = CouponOrderTableMap::getFieldNames($keyType);
+        $keys = OrderCouponTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setOrderId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setValue($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[2], $arr)) $this->setCode($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setType($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setAmount($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setTitle($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setShortDescription($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setDescription($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setExpirationDate($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setMaxUsage($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setIsCumulative($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setIsRemovingPostage($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setIsAvailableOnSpecialOffers($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setSerializedConditions($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setCreatedAt($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setUpdatedAt($arr[$keys[15]]);
     }
 
     /**
@@ -1089,13 +1730,24 @@ abstract class CouponOrder implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(CouponOrderTableMap::DATABASE_NAME);
+        $criteria = new Criteria(OrderCouponTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(CouponOrderTableMap::ID)) $criteria->add(CouponOrderTableMap::ID, $this->id);
-        if ($this->isColumnModified(CouponOrderTableMap::ORDER_ID)) $criteria->add(CouponOrderTableMap::ORDER_ID, $this->order_id);
-        if ($this->isColumnModified(CouponOrderTableMap::VALUE)) $criteria->add(CouponOrderTableMap::VALUE, $this->value);
-        if ($this->isColumnModified(CouponOrderTableMap::CREATED_AT)) $criteria->add(CouponOrderTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(CouponOrderTableMap::UPDATED_AT)) $criteria->add(CouponOrderTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(OrderCouponTableMap::ID)) $criteria->add(OrderCouponTableMap::ID, $this->id);
+        if ($this->isColumnModified(OrderCouponTableMap::ORDER_ID)) $criteria->add(OrderCouponTableMap::ORDER_ID, $this->order_id);
+        if ($this->isColumnModified(OrderCouponTableMap::CODE)) $criteria->add(OrderCouponTableMap::CODE, $this->code);
+        if ($this->isColumnModified(OrderCouponTableMap::TYPE)) $criteria->add(OrderCouponTableMap::TYPE, $this->type);
+        if ($this->isColumnModified(OrderCouponTableMap::AMOUNT)) $criteria->add(OrderCouponTableMap::AMOUNT, $this->amount);
+        if ($this->isColumnModified(OrderCouponTableMap::TITLE)) $criteria->add(OrderCouponTableMap::TITLE, $this->title);
+        if ($this->isColumnModified(OrderCouponTableMap::SHORT_DESCRIPTION)) $criteria->add(OrderCouponTableMap::SHORT_DESCRIPTION, $this->short_description);
+        if ($this->isColumnModified(OrderCouponTableMap::DESCRIPTION)) $criteria->add(OrderCouponTableMap::DESCRIPTION, $this->description);
+        if ($this->isColumnModified(OrderCouponTableMap::EXPIRATION_DATE)) $criteria->add(OrderCouponTableMap::EXPIRATION_DATE, $this->expiration_date);
+        if ($this->isColumnModified(OrderCouponTableMap::MAX_USAGE)) $criteria->add(OrderCouponTableMap::MAX_USAGE, $this->max_usage);
+        if ($this->isColumnModified(OrderCouponTableMap::IS_CUMULATIVE)) $criteria->add(OrderCouponTableMap::IS_CUMULATIVE, $this->is_cumulative);
+        if ($this->isColumnModified(OrderCouponTableMap::IS_REMOVING_POSTAGE)) $criteria->add(OrderCouponTableMap::IS_REMOVING_POSTAGE, $this->is_removing_postage);
+        if ($this->isColumnModified(OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS)) $criteria->add(OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS, $this->is_available_on_special_offers);
+        if ($this->isColumnModified(OrderCouponTableMap::SERIALIZED_CONDITIONS)) $criteria->add(OrderCouponTableMap::SERIALIZED_CONDITIONS, $this->serialized_conditions);
+        if ($this->isColumnModified(OrderCouponTableMap::CREATED_AT)) $criteria->add(OrderCouponTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(OrderCouponTableMap::UPDATED_AT)) $criteria->add(OrderCouponTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1110,8 +1762,8 @@ abstract class CouponOrder implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(CouponOrderTableMap::DATABASE_NAME);
-        $criteria->add(CouponOrderTableMap::ID, $this->id);
+        $criteria = new Criteria(OrderCouponTableMap::DATABASE_NAME);
+        $criteria->add(OrderCouponTableMap::ID, $this->id);
 
         return $criteria;
     }
@@ -1152,7 +1804,7 @@ abstract class CouponOrder implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\CouponOrder (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\OrderCoupon (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -1160,7 +1812,18 @@ abstract class CouponOrder implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setOrderId($this->getOrderId());
-        $copyObj->setValue($this->getValue());
+        $copyObj->setCode($this->getCode());
+        $copyObj->setType($this->getType());
+        $copyObj->setAmount($this->getAmount());
+        $copyObj->setTitle($this->getTitle());
+        $copyObj->setShortDescription($this->getShortDescription());
+        $copyObj->setDescription($this->getDescription());
+        $copyObj->setExpirationDate($this->getExpirationDate());
+        $copyObj->setMaxUsage($this->getMaxUsage());
+        $copyObj->setIsCumulative($this->getIsCumulative());
+        $copyObj->setIsRemovingPostage($this->getIsRemovingPostage());
+        $copyObj->setIsAvailableOnSpecialOffers($this->getIsAvailableOnSpecialOffers());
+        $copyObj->setSerializedConditions($this->getSerializedConditions());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1178,7 +1841,7 @@ abstract class CouponOrder implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\CouponOrder Clone of current object.
+     * @return                 \Thelia\Model\OrderCoupon Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1195,7 +1858,7 @@ abstract class CouponOrder implements ActiveRecordInterface
      * Declares an association between this object and a ChildOrder object.
      *
      * @param                  ChildOrder $v
-     * @return                 \Thelia\Model\CouponOrder The current object (for fluent API support)
+     * @return                 \Thelia\Model\OrderCoupon The current object (for fluent API support)
      * @throws PropelException
      */
     public function setOrder(ChildOrder $v = null)
@@ -1211,7 +1874,7 @@ abstract class CouponOrder implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildOrder object, it will not be re-added.
         if ($v !== null) {
-            $v->addCouponOrder($this);
+            $v->addOrderCoupon($this);
         }
 
 
@@ -1235,7 +1898,7 @@ abstract class CouponOrder implements ActiveRecordInterface
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aOrder->addCouponOrders($this);
+                $this->aOrder->addOrderCoupons($this);
              */
         }
 
@@ -1249,7 +1912,18 @@ abstract class CouponOrder implements ActiveRecordInterface
     {
         $this->id = null;
         $this->order_id = null;
-        $this->value = null;
+        $this->code = null;
+        $this->type = null;
+        $this->amount = null;
+        $this->title = null;
+        $this->short_description = null;
+        $this->description = null;
+        $this->expiration_date = null;
+        $this->max_usage = null;
+        $this->is_cumulative = null;
+        $this->is_removing_postage = null;
+        $this->is_available_on_special_offers = null;
+        $this->serialized_conditions = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1283,7 +1957,7 @@ abstract class CouponOrder implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(CouponOrderTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(OrderCouponTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -1291,11 +1965,11 @@ abstract class CouponOrder implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildCouponOrder The current object (for fluent API support)
+     * @return     ChildOrderCoupon The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = CouponOrderTableMap::UPDATED_AT;
+        $this->modifiedColumns[] = OrderCouponTableMap::UPDATED_AT;
 
         return $this;
     }

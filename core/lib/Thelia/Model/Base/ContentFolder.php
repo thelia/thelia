@@ -867,23 +867,23 @@ abstract class ContentFolder implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ContentFolderTableMap::CONTENT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'CONTENT_ID';
+            $modifiedColumns[':p' . $index++]  = '`CONTENT_ID`';
         }
         if ($this->isColumnModified(ContentFolderTableMap::FOLDER_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'FOLDER_ID';
+            $modifiedColumns[':p' . $index++]  = '`FOLDER_ID`';
         }
         if ($this->isColumnModified(ContentFolderTableMap::DEFAULT_FOLDER)) {
-            $modifiedColumns[':p' . $index++]  = 'DEFAULT_FOLDER';
+            $modifiedColumns[':p' . $index++]  = '`DEFAULT_FOLDER`';
         }
         if ($this->isColumnModified(ContentFolderTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
         if ($this->isColumnModified(ContentFolderTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
 
         $sql = sprintf(
-            'INSERT INTO content_folder (%s) VALUES (%s)',
+            'INSERT INTO `content_folder` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -892,19 +892,19 @@ abstract class ContentFolder implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'CONTENT_ID':
+                    case '`CONTENT_ID`':
                         $stmt->bindValue($identifier, $this->content_id, PDO::PARAM_INT);
                         break;
-                    case 'FOLDER_ID':
+                    case '`FOLDER_ID`':
                         $stmt->bindValue($identifier, $this->folder_id, PDO::PARAM_INT);
                         break;
-                    case 'DEFAULT_FOLDER':
+                    case '`DEFAULT_FOLDER`':
                         $stmt->bindValue($identifier, (int) $this->default_folder, PDO::PARAM_INT);
                         break;
-                    case 'CREATED_AT':
+                    case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case 'UPDATED_AT':
+                    case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
