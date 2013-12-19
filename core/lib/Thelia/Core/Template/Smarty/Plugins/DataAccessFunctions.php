@@ -211,6 +211,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         switch ($attribute) {
             case 'postage':
                 return $order->getPostage();
+            case 'discount':
+                return $order->getDiscount();
             case 'delivery_address':
                 return $order->chosenDeliveryAddress;
             case 'invoice_address':

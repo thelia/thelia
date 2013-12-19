@@ -877,23 +877,23 @@ abstract class ProfileResource implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ProfileResourceTableMap::PROFILE_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'PROFILE_ID';
+            $modifiedColumns[':p' . $index++]  = '`PROFILE_ID`';
         }
         if ($this->isColumnModified(ProfileResourceTableMap::RESOURCE_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'RESOURCE_ID';
+            $modifiedColumns[':p' . $index++]  = '`RESOURCE_ID`';
         }
         if ($this->isColumnModified(ProfileResourceTableMap::ACCESS)) {
-            $modifiedColumns[':p' . $index++]  = 'ACCESS';
+            $modifiedColumns[':p' . $index++]  = '`ACCESS`';
         }
         if ($this->isColumnModified(ProfileResourceTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
         if ($this->isColumnModified(ProfileResourceTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
 
         $sql = sprintf(
-            'INSERT INTO profile_resource (%s) VALUES (%s)',
+            'INSERT INTO `profile_resource` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -902,19 +902,19 @@ abstract class ProfileResource implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'PROFILE_ID':
+                    case '`PROFILE_ID`':
                         $stmt->bindValue($identifier, $this->profile_id, PDO::PARAM_INT);
                         break;
-                    case 'RESOURCE_ID':
+                    case '`RESOURCE_ID`':
                         $stmt->bindValue($identifier, $this->resource_id, PDO::PARAM_INT);
                         break;
-                    case 'ACCESS':
+                    case '`ACCESS`':
                         $stmt->bindValue($identifier, $this->access, PDO::PARAM_INT);
                         break;
-                    case 'CREATED_AT':
+                    case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case 'UPDATED_AT':
+                    case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

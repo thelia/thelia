@@ -152,7 +152,7 @@ abstract class AttributeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, POSITION, CREATED_AT, UPDATED_AT FROM attribute WHERE ID = :p0';
+        $sql = 'SELECT `ID`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `attribute` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

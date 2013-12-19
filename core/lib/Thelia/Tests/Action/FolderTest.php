@@ -224,13 +224,17 @@ class FolderTest extends TestCaseWithURLToolSetup
             ->findOne();
 
         if (null === $nextFolder) {
-            $this->fail('use fixtures before launching test, there is no folder in database');
+            $this->fail('use fixtures before launching test, there is not enough folder in database');
         }
 
         $folder = FolderQuery::create()
             ->filterByPosition(1)
             ->filterByParent($nextFolder->getParent())
             ->findOne();
+
+        if (null === $folder) {
+            $this->fail('use fixtures before launching test, there is not enough folder in database');
+        }
 
         $newPosition = $folder->getPosition()+1;
 

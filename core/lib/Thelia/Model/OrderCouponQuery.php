@@ -2,11 +2,11 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\CouponOrderQuery as BaseCouponOrderQuery;
+use Thelia\Model\Base\OrderCouponQuery as BaseOrderCouponQuery;
 
 
 /**
- * Skeleton subclass for performing query and update operations on the 'coupon_order' table.
+ * Skeleton subclass for performing query and update operations on the 'order_coupon' table.
  *
  *
  *
@@ -15,6 +15,7 @@ use Thelia\Model\Base\CouponOrderQuery as BaseCouponOrderQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class CouponOrderQuery extends BaseCouponOrderQuery {
+class OrderCouponQuery extends BaseOrderCouponQuery
+{
 
-} // CouponOrderQuery
+} // OrderCouponQuery

@@ -156,7 +156,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $couponFactory = new CouponFactory($stubContainer);
         $model1 = $this->generateCouponModel($stubFacade, $conditionFactory);
-        $model1->setAmount(21.00);
+        $model1->setCode('XMAS')->setIsRemovingPostage(false)->setAmount(21.00);
         $coupon1 = $couponFactory->buildCouponFromModel($model1);
 
         $model2 = $this->generateCouponModel($stubFacade, $conditionFactory);
@@ -174,12 +174,16 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->will($this->returnValue(122.53));
 
         $couponManager = new CouponManager($stubContainer);
+
         $couponManager->addAvailableCoupon($coupon1);
+
         $couponManager->addAvailableCoupon($coupon2);
+
         $actual = $couponManager->getDiscount();
-        $expected = 50.80;
+        $expected = 21 + 21.50;
 
         $this->assertEquals($expected, $actual);
+        $this->assertTrue($couponManager->isCouponRemovingPostage());
     }
 
     /**

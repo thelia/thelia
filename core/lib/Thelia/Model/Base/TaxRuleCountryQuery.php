@@ -155,7 +155,7 @@ abstract class TaxRuleCountryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT TAX_RULE_ID, COUNTRY_ID, TAX_ID, POSITION, CREATED_AT, UPDATED_AT FROM tax_rule_country WHERE TAX_RULE_ID = :p0 AND COUNTRY_ID = :p1 AND TAX_ID = :p2';
+        $sql = 'SELECT `TAX_RULE_ID`, `COUNTRY_ID`, `TAX_ID`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `tax_rule_country` WHERE `TAX_RULE_ID` = :p0 AND `COUNTRY_ID` = :p1 AND `TAX_ID` = :p2';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);

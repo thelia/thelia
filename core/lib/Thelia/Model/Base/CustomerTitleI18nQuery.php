@@ -139,7 +139,7 @@ abstract class CustomerTitleI18nQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, LOCALE, SHORT, LONG FROM customer_title_i18n WHERE ID = :p0 AND LOCALE = :p1';
+        $sql = 'SELECT `ID`, `LOCALE`, `SHORT`, `LONG` FROM `customer_title_i18n` WHERE `ID` = :p0 AND `LOCALE` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);

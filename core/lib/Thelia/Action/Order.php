@@ -30,6 +30,7 @@ use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Coupon\CouponManager;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;
@@ -73,6 +74,17 @@ class Order extends BaseAction implements EventSubscriberInterface
         $order = $event->getOrder();
 
         $order->setDeliveryModuleId($event->getDeliveryModule());
+
+        $event->setOrder($order);
+    }
+
+    /**
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
+     */
+    public function setPostage(OrderEvent $event)
+    {
+        $order = $event->getOrder();
+
         $order->setPostage($event->getPostage());
 
         $event->setOrder($order);
@@ -178,6 +190,11 @@ class Order extends BaseAction implements EventSubscriberInterface
             OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_NOT_PAID)->getId()
         );
 
+        /* memorize discount */
+        $placedOrder->setDiscount(
+            $cart->getDiscount()
+        );
+
         $placedOrder->save($con);
 
         /* fulfill order_products and decrease stock */
@@ -261,8 +278,6 @@ class Order extends BaseAction implements EventSubscriberInterface
                 $orderAttributeCombination->save($con);
             }
         }
-
-        /* discount @todo */
 
         $con->commit();
 
@@ -412,6 +427,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::ORDER_SET_DELIVERY_ADDRESS => array("setDeliveryAddress", 128),
             TheliaEvents::ORDER_SET_DELIVERY_MODULE => array("setDeliveryModule", 128),
+            TheliaEvents::ORDER_SET_POSTAGE => array("setPostage", 128),
             TheliaEvents::ORDER_SET_INVOICE_ADDRESS => array("setInvoiceAddress", 128),
             TheliaEvents::ORDER_SET_PAYMENT_MODULE => array("setPaymentModule", 128),
             TheliaEvents::ORDER_PAY => array("create", 128),

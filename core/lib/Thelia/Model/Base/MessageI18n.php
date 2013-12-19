@@ -858,26 +858,26 @@ abstract class MessageI18n implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(MessageI18nTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
+            $modifiedColumns[':p' . $index++]  = '`ID`';
         }
         if ($this->isColumnModified(MessageI18nTableMap::LOCALE)) {
-            $modifiedColumns[':p' . $index++]  = 'LOCALE';
+            $modifiedColumns[':p' . $index++]  = '`LOCALE`';
         }
         if ($this->isColumnModified(MessageI18nTableMap::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = 'TITLE';
+            $modifiedColumns[':p' . $index++]  = '`TITLE`';
         }
         if ($this->isColumnModified(MessageI18nTableMap::SUBJECT)) {
-            $modifiedColumns[':p' . $index++]  = 'SUBJECT';
+            $modifiedColumns[':p' . $index++]  = '`SUBJECT`';
         }
         if ($this->isColumnModified(MessageI18nTableMap::TEXT_MESSAGE)) {
-            $modifiedColumns[':p' . $index++]  = 'TEXT_MESSAGE';
+            $modifiedColumns[':p' . $index++]  = '`TEXT_MESSAGE`';
         }
         if ($this->isColumnModified(MessageI18nTableMap::HTML_MESSAGE)) {
-            $modifiedColumns[':p' . $index++]  = 'HTML_MESSAGE';
+            $modifiedColumns[':p' . $index++]  = '`HTML_MESSAGE`';
         }
 
         $sql = sprintf(
-            'INSERT INTO message_i18n (%s) VALUES (%s)',
+            'INSERT INTO `message_i18n` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -886,22 +886,22 @@ abstract class MessageI18n implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
+                    case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'LOCALE':
+                    case '`LOCALE`':
                         $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
-                    case 'TITLE':
+                    case '`TITLE`':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
                         break;
-                    case 'SUBJECT':
+                    case '`SUBJECT`':
                         $stmt->bindValue($identifier, $this->subject, PDO::PARAM_STR);
                         break;
-                    case 'TEXT_MESSAGE':
+                    case '`TEXT_MESSAGE`':
                         $stmt->bindValue($identifier, $this->text_message, PDO::PARAM_STR);
                         break;
-                    case 'HTML_MESSAGE':
+                    case '`HTML_MESSAGE`':
                         $stmt->bindValue($identifier, $this->html_message, PDO::PARAM_STR);
                         break;
                 }
