@@ -28,6 +28,7 @@ use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\CouponFactory;
@@ -122,13 +123,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 $request->getSession()->setConsumedCoupons($consumedCoupons);
 
                 $totalDiscount = $couponManager->getDiscount();
-                // @todo insert false product in cart with the name of the coupon and the discount as negative price
-
-                // Decrement coupon quantity
-                // @todo move this part in after order event
-                $couponQuery = CouponQuery::create();
-                $couponModel = $couponQuery->findOneByCode($coupon->getCode());
-                $couponManager->decrementQuantity($couponModel);
 
                 $request
                     ->getSession()
@@ -207,6 +201,47 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
+     */
+    public function testFreePostage(OrderEvent $event)
+    {
+        /** @var CouponManager $couponManager */
+        $couponManager = $this->container->get('thelia.coupon.manager');
+
+        if($couponManager->isCouponRemovingPostage()) {
+            $order = $event->getOrder();
+
+            $order->setPostage(0);
+
+            $event->setOrder($order);
+
+            $event->stopPropagation();
+        }
+    }
+
+    /**
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
+     */
+    public function decreaseCouponQuantity(OrderEvent $event)
+    {
+        $request = $this->container->get('request');
+
+        /** @var CouponManager $couponManager */
+        $couponManager = $this->container->get('thelia.coupon.manager');
+
+        $consumedCoupons = $request->getSession()->getConsumedCoupons();
+
+        if (is_array($consumedCoupons)) {
+            foreach($consumedCoupons as $couponCode) {
+                // Decrement coupon quantity
+                $couponQuery = CouponQuery::create();
+                $couponModel = $couponQuery->findOneByCode($couponCode);
+                $couponManager->decrementQuantity($couponModel);
+            }
+        }
+    }
+
+    /**
      * Returns an array of event names this subscriber listens to.
      *
      * The array keys are event names and the value can be:
@@ -232,7 +267,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::COUPON_CREATE => array("create", 128),
             TheliaEvents::COUPON_UPDATE => array("update", 128),
             TheliaEvents::COUPON_CONSUME => array("consume", 128),
-            TheliaEvents::COUPON_CONDITION_UPDATE => array("updateCondition", 128)
+            TheliaEvents::COUPON_CONDITION_UPDATE => array("updateCondition", 128),
+            TheliaEvents::ORDER_SET_POSTAGE => array("testFreePostage", 256),
+            TheliaEvents::ORDER_BEFORE_PAYMENT => array("decreaseCouponQuantity", 128),
         );
     }
 }

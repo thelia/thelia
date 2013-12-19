@@ -370,6 +370,7 @@ final class TheliaEvents
      */
     const ORDER_SET_DELIVERY_ADDRESS = "action.order.setDeliveryAddress";
     const ORDER_SET_DELIVERY_MODULE = "action.order.setDeliveryModule";
+    const ORDER_SET_POSTAGE = "action.order.setPostage";
     const ORDER_SET_INVOICE_ADDRESS = "action.order.setInvoiceAddress";
     const ORDER_SET_PAYMENT_MODULE = "action.order.setPaymentModule";
     const ORDER_PAY = "action.order.pay";

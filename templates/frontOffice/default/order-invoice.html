@@ -134,6 +134,9 @@
                     <tr >
                         <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
                         <td class="coupon">
+                            {form_field form=$form field='success_url'}
+                                <input type="hidden" name="{$name}" value="{url path="/order/invoice"}" />
+                            {/form_field}
                             {form_field form=$form field='coupon-code'}
                                 <div class="{if $error}has-error{/if}">
                                     <div class="input-group">
