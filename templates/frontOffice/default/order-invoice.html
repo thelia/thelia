@@ -122,8 +122,17 @@
 
                     </tbody>
                     <tfoot>
+
                     <tr >
-                        <td rowspan="3" colspan="3" class="empty">&nbsp;</td>
+                        <td rowspan="4" colspan="3" class="empty">&nbsp;</td>
+                        <th class="shipping">{intl l="Discount"}</th>
+                        <td class="shipping">
+                            <div class="shipping-price">
+                                <span class="price">{order attr="discount"} {currency attr="symbol"}</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr >
                         <th class="shipping">{intl l="Shipping Tax"}</th>
                         <td class="shipping">
                             <div class="shipping-price">

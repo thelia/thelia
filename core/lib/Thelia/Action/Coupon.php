@@ -37,6 +37,7 @@ use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon as CouponModel;
 use Thelia\Model\CouponQuery;
+use Thelia\Model\OrderCoupon;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -127,6 +128,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 $request
                     ->getSession()
                     ->getCart()
+                    ->setDiscount($totalDiscount)
+                    ->save();
+                $request
+                    ->getSession()
+                    ->getOrder()
                     ->setDiscount($totalDiscount)
                     ->save();
             }
@@ -222,7 +228,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     /**
      * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
-    public function decreaseCouponQuantity(OrderEvent $event)
+    public function afterOrder(OrderEvent $event)
     {
         $request = $this->container->get('request');
 
@@ -233,10 +239,31 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
         if (is_array($consumedCoupons)) {
             foreach($consumedCoupons as $couponCode) {
-                // Decrement coupon quantity
                 $couponQuery = CouponQuery::create();
                 $couponModel = $couponQuery->findOneByCode($couponCode);
+                $couponModel->setLocale($request->getSession()->getLang()->getLocale());
+
+                /* decrease coupon quantity */
                 $couponManager->decrementQuantity($couponModel);
+
+                /* memorize coupon */
+                $orderCoupon = new OrderCoupon();
+                $orderCoupon->setOrder($event->getOrder())
+                    ->setCode($couponModel->getCode())
+                    ->setType($couponModel->getType())
+                    ->setAmount($couponModel->getAmount())
+
+                    ->setTitle($couponModel->getTitle())
+                    ->setShortDescription($couponModel->getShortDescription())
+                    ->setDescription($couponModel->getDescription())
+
+                    ->setExpirationDate($couponModel->getExpirationDate())
+                    ->setIsCumulative($couponModel->getIsCumulative())
+                    ->setIsRemovingPostage($couponModel->getIsRemovingPostage())
+                    ->setIsAvailableOnSpecialOffers($couponModel->getIsAvailableOnSpecialOffers())
+                    ->setSerializedConditions($couponModel->getSerializedConditions())
+                ;
+                $orderCoupon->save();
             }
         }
     }
@@ -269,7 +296,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::COUPON_CONSUME => array("consume", 128),
             TheliaEvents::COUPON_CONDITION_UPDATE => array("updateCondition", 128),
             TheliaEvents::ORDER_SET_POSTAGE => array("testFreePostage", 256),
-            TheliaEvents::ORDER_BEFORE_PAYMENT => array("decreaseCouponQuantity", 128),
+            TheliaEvents::ORDER_BEFORE_PAYMENT => array("afterOrder", 128),
         );
     }
 }

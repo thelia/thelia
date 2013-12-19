@@ -118,13 +118,9 @@
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Coupon code"}</strong></td>
                                                         <td>
-                                                            {ifloop rel="couponcode"}
-                                                            <ul>
                                                             {loop type="order_coupon" name="couponcode" order=$ID}
-                                                                <li>{$CODE}</li>
+                                                                {$CODE}{if $LOOP_COUNT != $LOOP_TOTAL}, {/if}
                                                             {/loop}
-                                                            </ul>
-                                                            {/ifloop}
                                                             {elseloop rel="couponcode"}
                                                                 <strong>Ø</strong>
                                                             {/elseloop}

@@ -1275,7 +1275,6 @@
     <column name="short_description" required="true" type="LONGVARCHAR" />
     <column name="description" required="true" type="CLOB" />
     <column name="expiration_date" required="true" type="TIMESTAMP" />
-    <column name="max_usage" required="true" type="INTEGER" />
     <column name="is_cumulative" required="true" type="BOOLEAN" />
     <column name="is_removing_postage" required="true" type="BOOLEAN" />
     <column name="is_available_on_special_offers" required="true" type="BOOLEAN" />
