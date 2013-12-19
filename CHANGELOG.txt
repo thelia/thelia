@@ -8,4 +8,12 @@
         - multiple extensions are available. We choose to use php but you can use other.
         - You can translate your template or module from the admin.
     Admin hooks exist. With this hooks, a module can insert code in admin pages
+    change memory_limit parameter in installation process. 128M is now needed
+    assets can be used from template directory and from module
+    Product, Category, Folder and Content have a dedicated SEO panel
+    Allow to configure store information like email, address, phone number, etc.
+    email management : http://doc.thelia.net/en/documentation/templates/emails.html
+    Admin hooks can be display using SHOW_INCLUDE=1 in your query string and in dev mode (http://doc.thelia.net/en/documentation/modules/hook.html)
+    "How to contribute ?" see http://doc.thelia.net/en/documentation/contribute.html
+
 
