@@ -86,6 +86,18 @@ class TemplateHelper
         );
     }
 
+    /**
+     * Returns an array which contains all standard template definitions
+     */
+    public function getStandardTemplateDefinitions() {
+        return array(
+                $this->getActiveFrontTemplate(),
+                $this->getActiveAdminTemplate(),
+                $this->getActivePdfTemplate(),
+                $this->getActiveMailTemplate(),
+        );
+    }
+
     public function getList($templateType) {
 
         $list = $exclude = array();

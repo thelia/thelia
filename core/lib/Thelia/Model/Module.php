@@ -61,6 +61,15 @@ class Module extends BaseModule
     }
 
     /**
+     * Return the absolute path to one of the module's template directories
+     *
+     * @param int $templateSubdirName the name of the, probably one of TemplateDefinition::xxx_SUBDIR constants
+     */
+    public function getAbsoluteTemplateDirectoryPath($templateSubdirName) {
+        return sprintf("%s%stemplates%s%s", $this->getAbsoluteBaseDir(), DS, DS, $templateSubdirName);
+    }
+
+    /**
      * Calculate next position relative to module type
      */
     protected function addCriteriaToPositionQuery($query) {

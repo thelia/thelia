@@ -55,6 +55,7 @@ use Symfony\Component\Config\FileLocator;
 use Propel\Runtime\Propel;
 use Propel\Runtime\Connection\ConnectionManagerSingle;
 use Thelia\Core\Template\TemplateHelper;
+use Thelia\Log\Tlog;
 
 class Thelia extends Kernel
 {
@@ -106,6 +107,61 @@ class Thelia extends Kernel
     }
 
     /**
+     * Add all module's standard templates to the parser environment
+     *
+     * @param TheliaParser $parser the parser
+     * @param Module $module the Module.
+     */
+    protected function addStandardModuleTemplatesToParserEnvironment($parser, $module) {
+        $stdTpls = TemplateDefinition::getStandardTemplatesSubdirs();
+
+        foreach($stdTpls as $templateType => $templateSubdirName) {
+            $this->addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName);
+        }
+    }
+
+    /**
+     * Add a module template directory to the parser environment
+     *
+     * @param TheliaParser $parser the parser
+     * @param Module $module the Module.
+     * @param string $templateType the template type (one of the TemplateDefinition type constants)
+     * @param string $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
+     */
+    protected function addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName) {
+
+        // Get template path
+        $templateDirectory = $module->getAbsoluteTemplateDirectoryPath($templateSubdirName);
+
+        try {
+            $templateDirBrowser = new \DirectoryIterator($templateDirectory);
+
+            $code = ucfirst($module->getCode());
+
+            /* browse the directory */
+            foreach ($templateDirBrowser as $templateDirContent) {
+
+                /* is it a directory which is not . or .. ? */
+                if ($templateDirContent->isDir() && ! $templateDirContent->isDot()) {
+
+                    $parser->addMethodCall(
+                        'addTemplateDirectory',
+                        array(
+                            $templateType,
+                            $templateDirContent->getFilename(),
+                            $templateDirContent->getPathName(),
+                            $code
+                        )
+                    );
+                }
+            }
+        }
+        catch (\UnexpectedValueException $ex) {
+            // The directory does not exists, ignore it.
+        }
+    }
+
+    /**
      *
      * Load some configuration
      * Initialize all plugins
@@ -129,21 +185,18 @@ class Thelia extends Kernel
 
             $translationDirs = array();
             $parser = $container->getDefinition('thelia.parser');
+
             foreach ($modules as $module) {
 
                 try {
-
-                    $defintion = new Definition();
-                    $defintion->setClass($module->getFullNamespace());
-                    $defintion->addMethodCall("setContainer", array(new Reference('service_container')));
+                    $definition = new Definition();
+                    $definition->setClass($module->getFullNamespace());
+                    $definition->addMethodCall("setContainer", array(new Reference('service_container')));
 
                     $container->setDefinition(
                         "module.".$module->getCode(),
-                        $defintion
+                        $definition
                     );
-
-
-                    $code = ucfirst($module->getCode());
 
                     $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
                     $loader->load("config.xml");
@@ -152,79 +205,24 @@ class Thelia extends Kernel
                         $translationDirs[] = $dir;
                     }
 
-                    /* is there a front-office template directory ? */
-                    $frontOfficeModuleTemplateDirectory = sprintf("%s%stemplates%s%s", $module->getAbsoluteBaseDir(), DS, DS, TemplateDefinition::FRONT_OFFICE_SUBDIR);
-                    if (is_dir($frontOfficeModuleTemplateDirectory)) {
-                        try {
-                            $moduleFrontOfficeTemplateBrowser = new \DirectoryIterator($frontOfficeModuleTemplateDirectory);
-                        } catch (\UnexpectedValueException $e) {
-                            throw $e;
-                        }
+                    $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
 
-                        /* browse the directory */
-                        foreach ($moduleFrontOfficeTemplateBrowser as $moduleFrontOfficeTemplateContent) {
-                            /* is it a directory which is not . or .. ? */
-                            if ($moduleFrontOfficeTemplateContent->isDir() && !$moduleFrontOfficeTemplateContent->isDot()) {
-                                $parser->addMethodCall(
-                                    'addFrontOfficeTemplateDirectory',
-                                    array(
-                                        $moduleFrontOfficeTemplateContent->getFilename(),
-                                        $moduleFrontOfficeTemplateContent->getPathName(),
-                                        $code,
-                                    )
-                                );
-                            }
-                        }
-                    }
-
-                    /* is there a back-office template directory ? */
-                    $backOfficeModuleTemplateDirectory = sprintf("%s%stemplates%s%s", $module->getAbsoluteBaseDir(), DS, DS, TemplateDefinition::BACK_OFFICE_SUBDIR);
-                    if (is_dir($backOfficeModuleTemplateDirectory)) {
-                        try {
-                            $moduleBackOfficeTemplateBrowser = new \DirectoryIterator($backOfficeModuleTemplateDirectory);
-                        } catch (\UnexpectedValueException $e) {
-                            throw $e;
-                        }
-
-                        /* browse the directory */
-                        foreach ($moduleBackOfficeTemplateBrowser as $moduleBackOfficeTemplateContent) {
-                            /* is it a directory which is not . or .. ? */
-                            if ($moduleBackOfficeTemplateContent->isDir() && !$moduleBackOfficeTemplateContent->isDot()) {
-                                $parser->addMethodCall(
-                                    'addBackOfficeTemplateDirectory',
-                                    array(
-                                        $moduleBackOfficeTemplateContent->getFilename(),
-                                        $moduleBackOfficeTemplateContent->getPathName(),
-                                        $code,
-                                    )
-                                );
-                            }
-                        }
-                    }
                 } catch (\InvalidArgumentException $e) {
-                    // TODO: process module configuration exception
+                    Tlog::getInstance()->addError(sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()), $e);
                 }
             }
 
             // Load translation from templates
-            //core translation
+            // core translation
             $translationDirs[] = THELIA_ROOT . "core/lib/Thelia/Config/I18n";
 
+            // Standard templates (front, back, pdf, mail)
             $th = TemplateHelper::getInstance();
 
-            // admin template
-            if (is_dir($dir = $th->getActiveAdminTemplate()->getAbsoluteI18nPath())) {
-                $translationDirs[] = $dir;
-            }
-
-            // front template
-            if (is_dir($dir = $th->getActiveFrontTemplate()->getAbsoluteI18nPath())) {
-                $translationDirs[] = $dir;
-            }
-
-            // PDF template
-            if (is_dir($dir = $th->getActivePdfTemplate()->getAbsoluteI18nPath())) {
-                $translationDirs[] = $dir;
+            foreach($th->getStandardTemplateDefinitions() as $templateDefinition) {
+                if (is_dir($dir = $templateDefinition->getAbsoluteI18nPath())) {
+                    $translationDirs[] = $dir;
+                }
             }
 
             if ($translationDirs) {

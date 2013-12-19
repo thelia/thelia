@@ -16,6 +16,7 @@ use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Template\TemplateHelper;
+use Imagine\Exception\InvalidArgumentException;
 
 /**
  *
@@ -32,6 +33,8 @@ class SmartyParser extends Smarty implements ParserInterface
 
     protected $backOfficeTemplateDirectories = array();
     protected $frontOfficeTemplateDirectories = array();
+
+    protected $templateDirectories = array();
 
     /**
      * @var TemplateDefinition
@@ -94,19 +97,43 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
-     * @return array
+     * Add a template directory to the current template list
+     *
+     * @param unknown $templateType the template type (a TemplateDefinition type constant)
+     * @param string $templateName the template name
+     * @param string $templateDirectory path to the template dirtectory
+     * @param unknown $key ???
+     * @param string $unshift ??? Etienne ?
      */
-    public function getFrontOfficeTemplateDirectories()
-    {
-        return $this->frontOfficeTemplateDirectories;
+    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false) {
+
+        if(true === $unshift && isset($this->templateDirectories[$templateType][$templateName])) {
+
+            $this->templateDirectories[$templateType][$templateName] = array_merge(
+                    array(
+                        $key => $templateDirectory,
+                    ),
+                    $this->templateDirectories[$templateType][$templateName]
+            );
+        } else {
+            $this->templateDirectories[$templateType][$templateName][$key] = $templateDirectory;
+        }
     }
 
     /**
-     * @return array
+     * Return the registeted template directories for a givent template type
+     *
+     * @param unknown $templateType
+     * @throws InvalidArgumentException
+     * @return multitype:
      */
-    public function getBackOfficeTemplateDirectories()
+    public function getTemplateDirectories($templateType)
     {
-        return $this->backOfficeTemplateDirectories;
+        if (! isset($this->templateDirectories[$templateType])) {
+            throw new InvalidArgumentException("Failed to get template type %", $templateType);
+        }
+
+        return $this->templateDirectories[$templateType];
     }
 
     public function removeBlankLines($tpl_source, \Smarty_Internal_Template $template)
@@ -120,34 +147,6 @@ class SmartyParser extends Smarty implements ParserInterface
             return htmlspecialchars($content, ENT_QUOTES, Smarty::$_CHARSET);
         } else {
             return $content;
-        }
-    }
-
-    public function addBackOfficeTemplateDirectory($templateName, $templateDirectory, $key, $unshift = false)
-    {
-        if(true === $unshift && isset($this->backOfficeTemplateDirectories[$templateName])) {
-            $this->backOfficeTemplateDirectories[$templateName] = array_merge(
-                array(
-                    $key => $templateDirectory,
-                ),
-                $this->backOfficeTemplateDirectories[$templateName]
-            );
-        } else {
-            $this->backOfficeTemplateDirectories[$templateName][$key] = $templateDirectory;
-        }
-    }
-
-    public function addFrontOfficeTemplateDirectory($templateName, $templateDirectory, $key, $unshift = false)
-    {
-        if(true === $unshift && isset($this->frontOfficeTemplateDirectories[$templateName])) {
-            $this->frontOfficeTemplateDirectories[$templateName] = array_merge(
-                array(
-                    $key => $templateDirectory,
-                ),
-                $this->frontOfficeTemplateDirectories[$templateName]
-            );
-        } else {
-            $this->frontOfficeTemplateDirectories[$templateName][$key] = $templateDirectory;
         }
     }
 
@@ -166,40 +165,19 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->setConfigDir($configDirectory);
 
         /* add modules template directories */
-        switch($templateDefinition->getType()) {
-            case TemplateDefinition::FRONT_OFFICE:
-                /* add main template directory */
-                $this->addFrontOfficeTemplateDirectory($templateDefinition->getName(), THELIA_TEMPLATE_DIR . $this->getTemplate(), '0', true);
+        $this->addTemplateDirectory(
+                $templateDefinition->getType(),
+                $templateDefinition->getName(),
+                THELIA_TEMPLATE_DIR . $this->getTemplate(),
+                '0',
+                true
+        );
 
-                /* do not pass array directly to addTemplateDir since we cant control on keys */
-                if(isset($this->frontOfficeTemplateDirectories[$templateDefinition->getName()])) {
-                    foreach($this->frontOfficeTemplateDirectories[$templateDefinition->getName()] as $key => $directory) {
-                        $this->addTemplateDir($directory, $key);
-                    }
-                }
-                break;
-
-            case TemplateDefinition::BACK_OFFICE:
-                /* add main template directory */
-                $this->addBackOfficeTemplateDirectory($templateDefinition->getName(), THELIA_TEMPLATE_DIR . $this->getTemplate(), '0', true);
-
-                /* do not pass array directly to addTemplateDir since we cant control on keys */
-                if(isset($this->backOfficeTemplateDirectories[$templateDefinition->getName()])) {
-                    foreach($this->backOfficeTemplateDirectories[$templateDefinition->getName()] as $key => $directory) {
-                        $this->addTemplateDir($directory, $key);
-                    }
-                }
-                break;
-
-            case TemplateDefinition::PDF:
-                /* add main template directory */
-                $this->addTemplateDir(THELIA_TEMPLATE_DIR . $this->getTemplate(), 0);
-                break;
-
-            default:
-                /* add main template directory */
-                $this->addTemplateDir(THELIA_TEMPLATE_DIR . $this->getTemplate(), 0);
-                break;
+        /* do not pass array directly to addTemplateDir since we cant control on keys */
+        if (isset($this->templateDirectories[$templateDefinition->getType()][$templateDefinition->getName()])) {
+            foreach($this->templateDirectories[$templateDefinition->getType()][$templateDefinition->getName()] as $key => $directory) {
+                $this->addTemplateDir($directory, $key);
+            }
         }
     }
 

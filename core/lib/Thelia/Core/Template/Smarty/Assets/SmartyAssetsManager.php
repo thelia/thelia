@@ -57,77 +57,38 @@ class SmartyAssetsManager
     public function prepareAssets($assets_directory, \Smarty_Internal_Template $template)
     {
         self::$assetsDirectory = $assets_directory;
+
         $smartyParser = $template->smarty;
         $templateDefinition = $smartyParser->getTemplateDefinition();
-        switch($templateDefinition->getType()) {
-            case TemplateDefinition::FRONT_OFFICE:
-                $frontOfficeTemplateDirectories = $smartyParser->getFrontOfficeTemplateDirectories();
-                if(isset($frontOfficeTemplateDirectories[$templateDefinition->getName()])) {
-                    /* create assets foreach directory : main @ modules */
-                    foreach($frontOfficeTemplateDirectories[$templateDefinition->getName()] as $key => $directory) {
-                        $tpl_path = $directory . DS . self::$assetsDirectory;
-                        $asset_dir_absolute_path = realpath($tpl_path);
-                        if(false !== $asset_dir_absolute_path) {
-                            $this->assetsManager->prepareAssets(
-                                $asset_dir_absolute_path,
-                                $this->web_root . $this->path_relative_to_web_root,
-                                $templateDefinition->getPath(),
-                                $key
-                            );
-                        }
-                    }
+
+        // Get the registered template directories for the current template path
+        $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
+
+        if (isset($templateDirectories[$templateDefinition->getName()])) {
+
+            /* create assets foreach registered directory : main @ modules */
+            foreach($templateDirectories[$templateDefinition->getName()] as $key => $directory) {
+
+                $tpl_path = $directory . DS . self::$assetsDirectory;
+
+                $asset_dir_absolute_path = realpath($tpl_path);
+
+                if (false !== $asset_dir_absolute_path) {
+
+                    $this->assetsManager->prepareAssets(
+                            $asset_dir_absolute_path,
+                            $this->web_root . $this->path_relative_to_web_root,
+                            $templateDefinition->getPath(),
+                            $key
+                    );
                 }
-                break;
-
-            case TemplateDefinition::BACK_OFFICE:
-                $backOfficeTemplateDirectories = $smartyParser->getBackOfficeTemplateDirectories();
-                if(isset($backOfficeTemplateDirectories[$templateDefinition->getName()])) {
-                    /* create assets foreach directory : main @ modules */
-                    foreach($backOfficeTemplateDirectories[$templateDefinition->getName()] as $key => $directory) {
-                        $tpl_path = $directory . DS . self::$assetsDirectory;
-                        $asset_dir_absolute_path = realpath($tpl_path);
-                        if(false !== $asset_dir_absolute_path) {
-                            $this->assetsManager->prepareAssets(
-                                $asset_dir_absolute_path,
-                                $this->web_root . $this->path_relative_to_web_root,
-                                $templateDefinition->getPath(),
-                                $key
-                            );
-                        }
-                    }
-                }
-                break;
-
-            case TemplateDefinition::PDF:
-                break;
-
-            default:
-                break;
+            }
         }
-
-//        $tpl_dir = dirname($template->source->filepath);
-//
-//        $tpl_path = $tpl_dir . DS . self::$assetsDirectory;
-//        $asset_dir_absolute_path = realpath($tpl_path);
-//        if ($asset_dir_absolute_path === false) {
-//            /* no assets for current template */
-//            $tpl_path = THELIA_TEMPLATE_DIR . DS . $template->smarty->getTemplate();
-//            $asset_dir_absolute_path = realpath($tpl_path);
-//        }
-//
-//        if ($asset_dir_absolute_path === false) {
-//            throw new \Exception("Failed to get real path of '" . $tpl_path . "'");
-//        }
-//
-//        $this->assetsManager->prepareAssets(
-//                $asset_dir_absolute_path,
-//                $this->web_root . $this->path_relative_to_web_root
-//        );
     }
 
     public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template)
     {
-        $file           = $params['file'];
+        $file = $params['file'];
 
         /* we trick here relative thinking for file attribute */
         $file = ltrim($file, '/');
@@ -142,40 +103,13 @@ class SmartyAssetsManager
         $smartyParser = $template->smarty;
         $templateDefinition = $smartyParser->getTemplateDefinition();
 
-//        // Get template base path
-//        $tpl_path = $template->source->filepath;
-//
-//        // Get basedir
-//        $tpl_dir = dirname($tpl_path);
-//
-//        // Create absolute dir path
-//        $assetDir  = realpath($tpl_dir) . DS . dirname($file);
-//        $asset_file = basename($file);
+        $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
 
-        $assetSource = false;
-        switch($templateDefinition->getType()) {
-            case TemplateDefinition::FRONT_OFFICE:
-                $frontOfficeTemplateDirectories = $smartyParser->getFrontOfficeTemplateDirectories();
-                if(isset($frontOfficeTemplateDirectories[$templateDefinition->getName()][$assetOrigin])) {
-                    $assetSource = $frontOfficeTemplateDirectories[$templateDefinition->getName()][$assetOrigin];
-                }
-                break;
-
-            case TemplateDefinition::BACK_OFFICE:
-                $backOfficeTemplateDirectories = $smartyParser->getbackOfficeTemplateDirectories();
-                if(isset($backOfficeTemplateDirectories[$templateDefinition->getName()][$assetOrigin])) {
-                    $assetSource = $backOfficeTemplateDirectories[$templateDefinition->getName()][$assetOrigin];
-                }
-                break;
-
-            case TemplateDefinition::PDF:
-                break;
-
-            default:
-                break;
+        if (! isset($templateDirectories[$templateDefinition->getName()][$assetOrigin])) {
+            throw new \Exception("Failed to get real path of '/".dirname($file)."'");
         }
 
-        if ($assetSource === false) throw new \Exception("Failed to get real path of '/".dirname($file)."'");
+        $assetSource = $templateDirectories[$templateDefinition->getName()][$assetOrigin];
 
         $url = $this->assetsManager->processAsset(
             $assetSource . DS . $file,
