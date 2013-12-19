@@ -1616,7 +1616,6 @@ CREATE TABLE `order_coupon`
     `short_description` TEXT NOT NULL,
     `description` LONGTEXT NOT NULL,
     `expiration_date` DATETIME NOT NULL,
-    `max_usage` INTEGER NOT NULL,
     `is_cumulative` TINYINT(1) NOT NULL,
     `is_removing_postage` TINYINT(1) NOT NULL,
     `is_available_on_special_offers` TINYINT(1) NOT NULL,

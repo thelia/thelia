@@ -111,12 +111,6 @@ abstract class OrderCoupon implements ActiveRecordInterface
     protected $expiration_date;
 
     /**
-     * The value for the max_usage field.
-     * @var        int
-     */
-    protected $max_usage;
-
-    /**
      * The value for the is_cumulative field.
      * @var        boolean
      */
@@ -532,17 +526,6 @@ abstract class OrderCoupon implements ActiveRecordInterface
     }
 
     /**
-     * Get the [max_usage] column value.
-     *
-     * @return   int
-     */
-    public function getMaxUsage()
-    {
-
-        return $this->max_usage;
-    }
-
-    /**
      * Get the [is_cumulative] column value.
      *
      * @return   boolean
@@ -820,27 +803,6 @@ abstract class OrderCoupon implements ActiveRecordInterface
     } // setExpirationDate()
 
     /**
-     * Set the value of [max_usage] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
-     */
-    public function setMaxUsage($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->max_usage !== $v) {
-            $this->max_usage = $v;
-            $this->modifiedColumns[] = OrderCouponTableMap::MAX_USAGE;
-        }
-
-
-        return $this;
-    } // setMaxUsage()
-
-    /**
      * Sets the value of the [is_cumulative] column.
      * Non-boolean arguments are converted using the following rules:
      *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
@@ -1057,28 +1019,25 @@ abstract class OrderCoupon implements ActiveRecordInterface
             }
             $this->expiration_date = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : OrderCouponTableMap::translateFieldName('MaxUsage', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->max_usage = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderCouponTableMap::translateFieldName('IsCumulative', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : OrderCouponTableMap::translateFieldName('IsCumulative', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_cumulative = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderCouponTableMap::translateFieldName('IsRemovingPostage', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderCouponTableMap::translateFieldName('IsRemovingPostage', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_removing_postage = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderCouponTableMap::translateFieldName('IsAvailableOnSpecialOffers', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderCouponTableMap::translateFieldName('IsAvailableOnSpecialOffers', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_available_on_special_offers = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderCouponTableMap::translateFieldName('SerializedConditions', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderCouponTableMap::translateFieldName('SerializedConditions', TableMap::TYPE_PHPNAME, $indexType)];
             $this->serialized_conditions = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderCouponTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderCouponTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderCouponTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderCouponTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1091,7 +1050,7 @@ abstract class OrderCoupon implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 16; // 16 = OrderCouponTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 15; // 15 = OrderCouponTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\OrderCoupon object", 0, $e);
@@ -1354,9 +1313,6 @@ abstract class OrderCoupon implements ActiveRecordInterface
         if ($this->isColumnModified(OrderCouponTableMap::EXPIRATION_DATE)) {
             $modifiedColumns[':p' . $index++]  = '`EXPIRATION_DATE`';
         }
-        if ($this->isColumnModified(OrderCouponTableMap::MAX_USAGE)) {
-            $modifiedColumns[':p' . $index++]  = '`MAX_USAGE`';
-        }
         if ($this->isColumnModified(OrderCouponTableMap::IS_CUMULATIVE)) {
             $modifiedColumns[':p' . $index++]  = '`IS_CUMULATIVE`';
         }
@@ -1412,9 +1368,6 @@ abstract class OrderCoupon implements ActiveRecordInterface
                         break;
                     case '`EXPIRATION_DATE`':
                         $stmt->bindValue($identifier, $this->expiration_date ? $this->expiration_date->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
-                        break;
-                    case '`MAX_USAGE`':
-                        $stmt->bindValue($identifier, $this->max_usage, PDO::PARAM_INT);
                         break;
                     case '`IS_CUMULATIVE`':
                         $stmt->bindValue($identifier, (int) $this->is_cumulative, PDO::PARAM_INT);
@@ -1524,24 +1477,21 @@ abstract class OrderCoupon implements ActiveRecordInterface
                 return $this->getExpirationDate();
                 break;
             case 9:
-                return $this->getMaxUsage();
-                break;
-            case 10:
                 return $this->getIsCumulative();
                 break;
-            case 11:
+            case 10:
                 return $this->getIsRemovingPostage();
                 break;
-            case 12:
+            case 11:
                 return $this->getIsAvailableOnSpecialOffers();
                 break;
-            case 13:
+            case 12:
                 return $this->getSerializedConditions();
                 break;
-            case 14:
+            case 13:
                 return $this->getCreatedAt();
                 break;
-            case 15:
+            case 14:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1582,13 +1532,12 @@ abstract class OrderCoupon implements ActiveRecordInterface
             $keys[6] => $this->getShortDescription(),
             $keys[7] => $this->getDescription(),
             $keys[8] => $this->getExpirationDate(),
-            $keys[9] => $this->getMaxUsage(),
-            $keys[10] => $this->getIsCumulative(),
-            $keys[11] => $this->getIsRemovingPostage(),
-            $keys[12] => $this->getIsAvailableOnSpecialOffers(),
-            $keys[13] => $this->getSerializedConditions(),
-            $keys[14] => $this->getCreatedAt(),
-            $keys[15] => $this->getUpdatedAt(),
+            $keys[9] => $this->getIsCumulative(),
+            $keys[10] => $this->getIsRemovingPostage(),
+            $keys[11] => $this->getIsAvailableOnSpecialOffers(),
+            $keys[12] => $this->getSerializedConditions(),
+            $keys[13] => $this->getCreatedAt(),
+            $keys[14] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1661,24 +1610,21 @@ abstract class OrderCoupon implements ActiveRecordInterface
                 $this->setExpirationDate($value);
                 break;
             case 9:
-                $this->setMaxUsage($value);
-                break;
-            case 10:
                 $this->setIsCumulative($value);
                 break;
-            case 11:
+            case 10:
                 $this->setIsRemovingPostage($value);
                 break;
-            case 12:
+            case 11:
                 $this->setIsAvailableOnSpecialOffers($value);
                 break;
-            case 13:
+            case 12:
                 $this->setSerializedConditions($value);
                 break;
-            case 14:
+            case 13:
                 $this->setCreatedAt($value);
                 break;
-            case 15:
+            case 14:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1714,13 +1660,12 @@ abstract class OrderCoupon implements ActiveRecordInterface
         if (array_key_exists($keys[6], $arr)) $this->setShortDescription($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setDescription($arr[$keys[7]]);
         if (array_key_exists($keys[8], $arr)) $this->setExpirationDate($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setMaxUsage($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setIsCumulative($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setIsRemovingPostage($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setIsAvailableOnSpecialOffers($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setSerializedConditions($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setCreatedAt($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setUpdatedAt($arr[$keys[15]]);
+        if (array_key_exists($keys[9], $arr)) $this->setIsCumulative($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setIsRemovingPostage($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setIsAvailableOnSpecialOffers($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setSerializedConditions($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setCreatedAt($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setUpdatedAt($arr[$keys[14]]);
     }
 
     /**
@@ -1741,7 +1686,6 @@ abstract class OrderCoupon implements ActiveRecordInterface
         if ($this->isColumnModified(OrderCouponTableMap::SHORT_DESCRIPTION)) $criteria->add(OrderCouponTableMap::SHORT_DESCRIPTION, $this->short_description);
         if ($this->isColumnModified(OrderCouponTableMap::DESCRIPTION)) $criteria->add(OrderCouponTableMap::DESCRIPTION, $this->description);
         if ($this->isColumnModified(OrderCouponTableMap::EXPIRATION_DATE)) $criteria->add(OrderCouponTableMap::EXPIRATION_DATE, $this->expiration_date);
-        if ($this->isColumnModified(OrderCouponTableMap::MAX_USAGE)) $criteria->add(OrderCouponTableMap::MAX_USAGE, $this->max_usage);
         if ($this->isColumnModified(OrderCouponTableMap::IS_CUMULATIVE)) $criteria->add(OrderCouponTableMap::IS_CUMULATIVE, $this->is_cumulative);
         if ($this->isColumnModified(OrderCouponTableMap::IS_REMOVING_POSTAGE)) $criteria->add(OrderCouponTableMap::IS_REMOVING_POSTAGE, $this->is_removing_postage);
         if ($this->isColumnModified(OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS)) $criteria->add(OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS, $this->is_available_on_special_offers);
@@ -1819,7 +1763,6 @@ abstract class OrderCoupon implements ActiveRecordInterface
         $copyObj->setShortDescription($this->getShortDescription());
         $copyObj->setDescription($this->getDescription());
         $copyObj->setExpirationDate($this->getExpirationDate());
-        $copyObj->setMaxUsage($this->getMaxUsage());
         $copyObj->setIsCumulative($this->getIsCumulative());
         $copyObj->setIsRemovingPostage($this->getIsRemovingPostage());
         $copyObj->setIsAvailableOnSpecialOffers($this->getIsAvailableOnSpecialOffers());
@@ -1919,7 +1862,6 @@ abstract class OrderCoupon implements ActiveRecordInterface
         $this->short_description = null;
         $this->description = null;
         $this->expiration_date = null;
-        $this->max_usage = null;
         $this->is_cumulative = null;
         $this->is_removing_postage = null;
         $this->is_available_on_special_offers = null;

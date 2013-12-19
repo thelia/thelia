@@ -73,7 +73,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $order = $event->getOrder();
 
-        $order->setPostage($event->getPostage());
+        $order->setDeliveryModuleId($event->getDeliveryModule());
 
         $event->setOrder($order);
     }
