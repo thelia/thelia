@@ -65,7 +65,6 @@ class HttpCache extends BaseHttpCache implements HttpKernelInterface
                 $request->getContent()
             );
         }
-
         return parent::handle($request, $type, $catch);
     }
 

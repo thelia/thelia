@@ -53,7 +53,7 @@ class TaxRuleTest extends BaseLoopTestor
     public function testSearchById()
     {
         $tr = TaxRuleQuery::create()->findOne();
-        if (null === $tr) {
+        if(null === $tr) {
             $tr = new \Thelia\Model\TaxRule();
             $tr->setTitle('foo');
             $tr->save();

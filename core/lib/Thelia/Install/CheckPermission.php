@@ -58,7 +58,7 @@ class CheckPermission extends BaseInstall
 
     /** @var array Minimum server configuration necessary */
     protected $minServerConfigurationNecessary = array(
-        'memory_limit' => 134217728,
+        'memory_limit' => 157286400,
         'post_max_size' => 20971520,
         'upload_max_filesize' => 2097152
     );

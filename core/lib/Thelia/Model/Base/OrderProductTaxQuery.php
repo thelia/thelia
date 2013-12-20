@@ -155,7 +155,7 @@ abstract class OrderProductTaxQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ORDER_PRODUCT_ID`, `TITLE`, `DESCRIPTION`, `AMOUNT`, `PROMO_AMOUNT`, `CREATED_AT`, `UPDATED_AT` FROM `order_product_tax` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, ORDER_PRODUCT_ID, TITLE, DESCRIPTION, AMOUNT, PROMO_AMOUNT, CREATED_AT, UPDATED_AT FROM order_product_tax WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

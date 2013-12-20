@@ -53,7 +53,7 @@ class CategoryTest extends BaseLoopTestor
     public function testSearchById()
     {
         $category = CategoryQuery::create()->findOne();
-        if (null === $category) {
+        if(null === $category) {
             $category = new \Thelia\Model\Category();
             $category->setParent(0);
             $category->setVisible(1);

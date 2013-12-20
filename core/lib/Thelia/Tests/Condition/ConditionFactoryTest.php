@@ -431,9 +431,11 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
 
+
         $conditions = new ConditionCollection();
 
         $conditionFactory = new ConditionFactory($stubContainer);
+
 
         $conditionNone = new MatchForEveryone($stubFacade);
         $expectedCollection = new ConditionCollection();

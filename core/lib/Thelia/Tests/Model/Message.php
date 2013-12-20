@@ -23,6 +23,7 @@
 
 namespace Thelia\Tests\Model;
 
+
 use Thelia\Model\ConfigQuery;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Model\Message;
@@ -323,8 +324,8 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("TEXT Layout 6: TEXT <template> & content v=my-value", $instance->getChildren()[0]->getBody());
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown() {
+
         $dir = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath();
 
         ConfigQuery::write('active-mail-template', $this->backup_mail_template);

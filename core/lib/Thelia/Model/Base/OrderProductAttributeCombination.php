@@ -1128,44 +1128,44 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ORDER_PRODUCT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ORDER_PRODUCT_ID`';
+            $modifiedColumns[':p' . $index++]  = 'ORDER_PRODUCT_ID';
         }
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_TITLE)) {
-            $modifiedColumns[':p' . $index++]  = '`ATTRIBUTE_TITLE`';
+            $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_TITLE';
         }
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_CHAPO)) {
-            $modifiedColumns[':p' . $index++]  = '`ATTRIBUTE_CHAPO`';
+            $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_CHAPO';
         }
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '`ATTRIBUTE_DESCRIPTION`';
+            $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_DESCRIPTION';
         }
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUM)) {
-            $modifiedColumns[':p' . $index++]  = '`ATTRIBUTE_POSTSCRIPTUM`';
+            $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_POSTSCRIPTUM';
         }
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE)) {
-            $modifiedColumns[':p' . $index++]  = '`ATTRIBUTE_AV_TITLE`';
+            $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_AV_TITLE';
         }
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_CHAPO)) {
-            $modifiedColumns[':p' . $index++]  = '`ATTRIBUTE_AV_CHAPO`';
+            $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_AV_CHAPO';
         }
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '`ATTRIBUTE_AV_DESCRIPTION`';
+            $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_AV_DESCRIPTION';
         }
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_POSTSCRIPTUM)) {
-            $modifiedColumns[':p' . $index++]  = '`ATTRIBUTE_AV_POSTSCRIPTUM`';
+            $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_AV_POSTSCRIPTUM';
         }
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `order_product_attribute_combination` (%s) VALUES (%s)',
+            'INSERT INTO order_product_attribute_combination (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1174,40 +1174,40 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`ORDER_PRODUCT_ID`':
+                    case 'ORDER_PRODUCT_ID':
                         $stmt->bindValue($identifier, $this->order_product_id, PDO::PARAM_INT);
                         break;
-                    case '`ATTRIBUTE_TITLE`':
+                    case 'ATTRIBUTE_TITLE':
                         $stmt->bindValue($identifier, $this->attribute_title, PDO::PARAM_STR);
                         break;
-                    case '`ATTRIBUTE_CHAPO`':
+                    case 'ATTRIBUTE_CHAPO':
                         $stmt->bindValue($identifier, $this->attribute_chapo, PDO::PARAM_STR);
                         break;
-                    case '`ATTRIBUTE_DESCRIPTION`':
+                    case 'ATTRIBUTE_DESCRIPTION':
                         $stmt->bindValue($identifier, $this->attribute_description, PDO::PARAM_STR);
                         break;
-                    case '`ATTRIBUTE_POSTSCRIPTUM`':
+                    case 'ATTRIBUTE_POSTSCRIPTUM':
                         $stmt->bindValue($identifier, $this->attribute_postscriptum, PDO::PARAM_STR);
                         break;
-                    case '`ATTRIBUTE_AV_TITLE`':
+                    case 'ATTRIBUTE_AV_TITLE':
                         $stmt->bindValue($identifier, $this->attribute_av_title, PDO::PARAM_STR);
                         break;
-                    case '`ATTRIBUTE_AV_CHAPO`':
+                    case 'ATTRIBUTE_AV_CHAPO':
                         $stmt->bindValue($identifier, $this->attribute_av_chapo, PDO::PARAM_STR);
                         break;
-                    case '`ATTRIBUTE_AV_DESCRIPTION`':
+                    case 'ATTRIBUTE_AV_DESCRIPTION':
                         $stmt->bindValue($identifier, $this->attribute_av_description, PDO::PARAM_STR);
                         break;
-                    case '`ATTRIBUTE_AV_POSTSCRIPTUM`':
+                    case 'ATTRIBUTE_AV_POSTSCRIPTUM':
                         $stmt->bindValue($identifier, $this->attribute_av_postscriptum, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

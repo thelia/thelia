@@ -151,7 +151,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ATTRIBUTE_ID`, `ATTRIBUTE_AV_ID`, `PRODUCT_SALE_ELEMENTS_ID`, `CREATED_AT`, `UPDATED_AT` FROM `attribute_combination` WHERE `ATTRIBUTE_ID` = :p0 AND `ATTRIBUTE_AV_ID` = :p1 AND `PRODUCT_SALE_ELEMENTS_ID` = :p2';
+        $sql = 'SELECT ATTRIBUTE_ID, ATTRIBUTE_AV_ID, PRODUCT_SALE_ELEMENTS_ID, CREATED_AT, UPDATED_AT FROM attribute_combination WHERE ATTRIBUTE_ID = :p0 AND ATTRIBUTE_AV_ID = :p1 AND PRODUCT_SALE_ELEMENTS_ID = :p2';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);

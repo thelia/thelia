@@ -211,7 +211,7 @@ abstract class OrderProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ORDER_ID`, `PRODUCT_REF`, `PRODUCT_SALE_ELEMENTS_REF`, `TITLE`, `CHAPO`, `DESCRIPTION`, `POSTSCRIPTUM`, `QUANTITY`, `PRICE`, `PROMO_PRICE`, `WAS_NEW`, `WAS_IN_PROMO`, `WEIGHT`, `EAN_CODE`, `TAX_RULE_TITLE`, `TAX_RULE_DESCRIPTION`, `PARENT`, `CREATED_AT`, `UPDATED_AT` FROM `order_product` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, ORDER_ID, PRODUCT_REF, PRODUCT_SALE_ELEMENTS_REF, TITLE, CHAPO, DESCRIPTION, POSTSCRIPTUM, QUANTITY, PRICE, PROMO_PRICE, WAS_NEW, WAS_IN_PROMO, WEIGHT, EAN_CODE, TAX_RULE_TITLE, TAX_RULE_DESCRIPTION, PARENT, CREATED_AT, UPDATED_AT FROM order_product WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

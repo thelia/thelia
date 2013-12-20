@@ -12,84 +12,80 @@ use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\Area as ChildArea;
-use Thelia\Model\AreaQuery as ChildAreaQuery;
-use Thelia\Model\Map\AreaTableMap;
+use Thelia\Model\CouponOrder as ChildCouponOrder;
+use Thelia\Model\CouponOrderQuery as ChildCouponOrderQuery;
+use Thelia\Model\Map\CouponOrderTableMap;
 
 /**
- * Base class that represents a query for the 'area' table.
+ * Base class that represents a query for the 'coupon_order' table.
  *
  *
  *
- * @method     ChildAreaQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildAreaQuery orderByName($order = Criteria::ASC) Order by the name column
- * @method     ChildAreaQuery orderByPostage($order = Criteria::ASC) Order by the postage column
- * @method     ChildAreaQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
- * @method     ChildAreaQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method     ChildCouponOrderQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildCouponOrderQuery orderByOrderId($order = Criteria::ASC) Order by the order_id column
+ * @method     ChildCouponOrderQuery orderByValue($order = Criteria::ASC) Order by the value column
+ * @method     ChildCouponOrderQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildCouponOrderQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildAreaQuery groupById() Group by the id column
- * @method     ChildAreaQuery groupByName() Group by the name column
- * @method     ChildAreaQuery groupByPostage() Group by the postage column
- * @method     ChildAreaQuery groupByCreatedAt() Group by the created_at column
- * @method     ChildAreaQuery groupByUpdatedAt() Group by the updated_at column
+ * @method     ChildCouponOrderQuery groupById() Group by the id column
+ * @method     ChildCouponOrderQuery groupByOrderId() Group by the order_id column
+ * @method     ChildCouponOrderQuery groupByValue() Group by the value column
+ * @method     ChildCouponOrderQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildCouponOrderQuery groupByUpdatedAt() Group by the updated_at column
  *
- * @method     ChildAreaQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildAreaQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildAreaQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildCouponOrderQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildCouponOrderQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildCouponOrderQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildAreaQuery leftJoinCountry($relationAlias = null) Adds a LEFT JOIN clause to the query using the Country relation
- * @method     ChildAreaQuery rightJoinCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Country relation
- * @method     ChildAreaQuery innerJoinCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the Country relation
+ * @method     ChildCouponOrderQuery leftJoinOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the Order relation
+ * @method     ChildCouponOrderQuery rightJoinOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Order relation
+ * @method     ChildCouponOrderQuery innerJoinOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the Order relation
  *
- * @method     ChildAreaQuery leftJoinAreaDeliveryModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the AreaDeliveryModule relation
- * @method     ChildAreaQuery rightJoinAreaDeliveryModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AreaDeliveryModule relation
- * @method     ChildAreaQuery innerJoinAreaDeliveryModule($relationAlias = null) Adds a INNER JOIN clause to the query using the AreaDeliveryModule relation
+ * @method     ChildCouponOrder findOne(ConnectionInterface $con = null) Return the first ChildCouponOrder matching the query
+ * @method     ChildCouponOrder findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCouponOrder matching the query, or a new ChildCouponOrder object populated from the query conditions when no match is found
  *
- * @method     ChildArea findOne(ConnectionInterface $con = null) Return the first ChildArea matching the query
- * @method     ChildArea findOneOrCreate(ConnectionInterface $con = null) Return the first ChildArea matching the query, or a new ChildArea object populated from the query conditions when no match is found
+ * @method     ChildCouponOrder findOneById(int $id) Return the first ChildCouponOrder filtered by the id column
+ * @method     ChildCouponOrder findOneByOrderId(int $order_id) Return the first ChildCouponOrder filtered by the order_id column
+ * @method     ChildCouponOrder findOneByValue(double $value) Return the first ChildCouponOrder filtered by the value column
+ * @method     ChildCouponOrder findOneByCreatedAt(string $created_at) Return the first ChildCouponOrder filtered by the created_at column
+ * @method     ChildCouponOrder findOneByUpdatedAt(string $updated_at) Return the first ChildCouponOrder filtered by the updated_at column
  *
- * @method     ChildArea findOneById(int $id) Return the first ChildArea filtered by the id column
- * @method     ChildArea findOneByName(string $name) Return the first ChildArea filtered by the name column
- * @method     ChildArea findOneByPostage(double $postage) Return the first ChildArea filtered by the postage column
- * @method     ChildArea findOneByCreatedAt(string $created_at) Return the first ChildArea filtered by the created_at column
- * @method     ChildArea findOneByUpdatedAt(string $updated_at) Return the first ChildArea filtered by the updated_at column
- *
- * @method     array findById(int $id) Return ChildArea objects filtered by the id column
- * @method     array findByName(string $name) Return ChildArea objects filtered by the name column
- * @method     array findByPostage(double $postage) Return ChildArea objects filtered by the postage column
- * @method     array findByCreatedAt(string $created_at) Return ChildArea objects filtered by the created_at column
- * @method     array findByUpdatedAt(string $updated_at) Return ChildArea objects filtered by the updated_at column
+ * @method     array findById(int $id) Return ChildCouponOrder objects filtered by the id column
+ * @method     array findByOrderId(int $order_id) Return ChildCouponOrder objects filtered by the order_id column
+ * @method     array findByValue(double $value) Return ChildCouponOrder objects filtered by the value column
+ * @method     array findByCreatedAt(string $created_at) Return ChildCouponOrder objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildCouponOrder objects filtered by the updated_at column
  *
  */
-abstract class AreaQuery extends ModelCriteria
+abstract class CouponOrderQuery extends ModelCriteria
 {
 
     /**
-     * Initializes internal state of \Thelia\Model\Base\AreaQuery object.
+     * Initializes internal state of \Thelia\Model\Base\CouponOrderQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Area', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\CouponOrder', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildAreaQuery object.
+     * Returns a new ChildCouponOrderQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildAreaQuery
+     * @return ChildCouponOrderQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof \Thelia\Model\AreaQuery) {
+        if ($criteria instanceof \Thelia\Model\CouponOrderQuery) {
             return $criteria;
         }
-        $query = new \Thelia\Model\AreaQuery();
+        $query = new \Thelia\Model\CouponOrderQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -112,19 +108,19 @@ abstract class AreaQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildArea|array|mixed the result, formatted by the current formatter
+     * @return ChildCouponOrder|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = AreaTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = CouponOrderTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(AreaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(CouponOrderTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -143,11 +139,11 @@ abstract class AreaQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return   ChildArea A model object, or null if the key is not found
+     * @return   ChildCouponOrder A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, NAME, POSTAGE, CREATED_AT, UPDATED_AT FROM area WHERE ID = :p0';
+        $sql = 'SELECT ID, ORDER_ID, VALUE, CREATED_AT, UPDATED_AT FROM coupon_order WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -158,9 +154,9 @@ abstract class AreaQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            $obj = new ChildArea();
+            $obj = new ChildCouponOrder();
             $obj->hydrate($row);
-            AreaTableMap::addInstanceToPool($obj, (string) $key);
+            CouponOrderTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -173,7 +169,7 @@ abstract class AreaQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildArea|array|mixed the result, formatted by the current formatter
+     * @return ChildCouponOrder|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -215,12 +211,12 @@ abstract class AreaQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return ChildAreaQuery The current query, for fluid interface
+     * @return ChildCouponOrderQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(AreaTableMap::ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(CouponOrderTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -228,12 +224,12 @@ abstract class AreaQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return ChildAreaQuery The current query, for fluid interface
+     * @return ChildCouponOrderQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(AreaTableMap::ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(CouponOrderTableMap::ID, $keys, Criteria::IN);
     }
 
     /**
@@ -252,18 +248,18 @@ abstract class AreaQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildAreaQuery The current query, for fluid interface
+     * @return ChildCouponOrderQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(AreaTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CouponOrderTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(AreaTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CouponOrderTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -274,66 +270,39 @@ abstract class AreaQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(AreaTableMap::ID, $id, $comparison);
+        return $this->addUsingAlias(CouponOrderTableMap::ID, $id, $comparison);
     }
 
     /**
-     * Filter the query on the name column
+     * Filter the query on the order_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
-     * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
+     * $query->filterByOrderId(1234); // WHERE order_id = 1234
+     * $query->filterByOrderId(array(12, 34)); // WHERE order_id IN (12, 34)
+     * $query->filterByOrderId(array('min' => 12)); // WHERE order_id > 12
      * </code>
      *
-     * @param     string $name The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @see       filterByOrder()
      *
-     * @return ChildAreaQuery The current query, for fluid interface
-     */
-    public function filterByName($name = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($name)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $name)) {
-                $name = str_replace('*', '%', $name);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(AreaTableMap::NAME, $name, $comparison);
-    }
-
-    /**
-     * Filter the query on the postage column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPostage(1234); // WHERE postage = 1234
-     * $query->filterByPostage(array(12, 34)); // WHERE postage IN (12, 34)
-     * $query->filterByPostage(array('min' => 12)); // WHERE postage > 12
-     * </code>
-     *
-     * @param     mixed $postage The value to use as filter.
+     * @param     mixed $orderId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildAreaQuery The current query, for fluid interface
+     * @return ChildCouponOrderQuery The current query, for fluid interface
      */
-    public function filterByPostage($postage = null, $comparison = null)
+    public function filterByOrderId($orderId = null, $comparison = null)
     {
-        if (is_array($postage)) {
+        if (is_array($orderId)) {
             $useMinMax = false;
-            if (isset($postage['min'])) {
-                $this->addUsingAlias(AreaTableMap::POSTAGE, $postage['min'], Criteria::GREATER_EQUAL);
+            if (isset($orderId['min'])) {
+                $this->addUsingAlias(CouponOrderTableMap::ORDER_ID, $orderId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($postage['max'])) {
-                $this->addUsingAlias(AreaTableMap::POSTAGE, $postage['max'], Criteria::LESS_EQUAL);
+            if (isset($orderId['max'])) {
+                $this->addUsingAlias(CouponOrderTableMap::ORDER_ID, $orderId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -344,7 +313,48 @@ abstract class AreaQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(AreaTableMap::POSTAGE, $postage, $comparison);
+        return $this->addUsingAlias(CouponOrderTableMap::ORDER_ID, $orderId, $comparison);
+    }
+
+    /**
+     * Filter the query on the value column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByValue(1234); // WHERE value = 1234
+     * $query->filterByValue(array(12, 34)); // WHERE value IN (12, 34)
+     * $query->filterByValue(array('min' => 12)); // WHERE value > 12
+     * </code>
+     *
+     * @param     mixed $value The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCouponOrderQuery The current query, for fluid interface
+     */
+    public function filterByValue($value = null, $comparison = null)
+    {
+        if (is_array($value)) {
+            $useMinMax = false;
+            if (isset($value['min'])) {
+                $this->addUsingAlias(CouponOrderTableMap::VALUE, $value['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($value['max'])) {
+                $this->addUsingAlias(CouponOrderTableMap::VALUE, $value['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CouponOrderTableMap::VALUE, $value, $comparison);
     }
 
     /**
@@ -365,18 +375,18 @@ abstract class AreaQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildAreaQuery The current query, for fluid interface
+     * @return ChildCouponOrderQuery The current query, for fluid interface
      */
     public function filterByCreatedAt($createdAt = null, $comparison = null)
     {
         if (is_array($createdAt)) {
             $useMinMax = false;
             if (isset($createdAt['min'])) {
-                $this->addUsingAlias(AreaTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CouponOrderTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($createdAt['max'])) {
-                $this->addUsingAlias(AreaTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CouponOrderTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -387,7 +397,7 @@ abstract class AreaQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(AreaTableMap::CREATED_AT, $createdAt, $comparison);
+        return $this->addUsingAlias(CouponOrderTableMap::CREATED_AT, $createdAt, $comparison);
     }
 
     /**
@@ -408,18 +418,18 @@ abstract class AreaQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildAreaQuery The current query, for fluid interface
+     * @return ChildCouponOrderQuery The current query, for fluid interface
      */
     public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
         if (is_array($updatedAt)) {
             $useMinMax = false;
             if (isset($updatedAt['min'])) {
-                $this->addUsingAlias(AreaTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CouponOrderTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($updatedAt['max'])) {
-                $this->addUsingAlias(AreaTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CouponOrderTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -430,44 +440,46 @@ abstract class AreaQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(AreaTableMap::UPDATED_AT, $updatedAt, $comparison);
+        return $this->addUsingAlias(CouponOrderTableMap::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Country object
+     * Filter the query by a related \Thelia\Model\Order object
      *
-     * @param \Thelia\Model\Country|ObjectCollection $country  the related object to use as filter
+     * @param \Thelia\Model\Order|ObjectCollection $order The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildAreaQuery The current query, for fluid interface
+     * @return ChildCouponOrderQuery The current query, for fluid interface
      */
-    public function filterByCountry($country, $comparison = null)
+    public function filterByOrder($order, $comparison = null)
     {
-        if ($country instanceof \Thelia\Model\Country) {
+        if ($order instanceof \Thelia\Model\Order) {
             return $this
-                ->addUsingAlias(AreaTableMap::ID, $country->getAreaId(), $comparison);
-        } elseif ($country instanceof ObjectCollection) {
+                ->addUsingAlias(CouponOrderTableMap::ORDER_ID, $order->getId(), $comparison);
+        } elseif ($order instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useCountryQuery()
-                ->filterByPrimaryKeys($country->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(CouponOrderTableMap::ORDER_ID, $order->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByCountry() only accepts arguments of type \Thelia\Model\Country or Collection');
+            throw new PropelException('filterByOrder() only accepts arguments of type \Thelia\Model\Order or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Country relation
+     * Adds a JOIN clause to the query using the Order relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildAreaQuery The current query, for fluid interface
+     * @return ChildCouponOrderQuery The current query, for fluid interface
      */
-    public function joinCountry($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinOrder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Country');
+        $relationMap = $tableMap->getRelation('Order');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -482,14 +494,14 @@ abstract class AreaQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Country');
+            $this->addJoinObject($join, 'Order');
         }
 
         return $this;
     }
 
     /**
-     * Use the Country relation Country object
+     * Use the Order relation Order object
      *
      * @see useQuery()
      *
@@ -497,106 +509,33 @@ abstract class AreaQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CountryQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\OrderQuery A secondary query class using the current class as primary query
      */
-    public function useCountryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useOrderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinCountry($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Country', '\Thelia\Model\CountryQuery');
-    }
-
-    /**
-     * Filter the query by a related \Thelia\Model\AreaDeliveryModule object
-     *
-     * @param \Thelia\Model\AreaDeliveryModule|ObjectCollection $areaDeliveryModule  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildAreaQuery The current query, for fluid interface
-     */
-    public function filterByAreaDeliveryModule($areaDeliveryModule, $comparison = null)
-    {
-        if ($areaDeliveryModule instanceof \Thelia\Model\AreaDeliveryModule) {
-            return $this
-                ->addUsingAlias(AreaTableMap::ID, $areaDeliveryModule->getAreaId(), $comparison);
-        } elseif ($areaDeliveryModule instanceof ObjectCollection) {
-            return $this
-                ->useAreaDeliveryModuleQuery()
-                ->filterByPrimaryKeys($areaDeliveryModule->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByAreaDeliveryModule() only accepts arguments of type \Thelia\Model\AreaDeliveryModule or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the AreaDeliveryModule relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildAreaQuery The current query, for fluid interface
-     */
-    public function joinAreaDeliveryModule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('AreaDeliveryModule');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'AreaDeliveryModule');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the AreaDeliveryModule relation AreaDeliveryModule object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\AreaDeliveryModuleQuery A secondary query class using the current class as primary query
-     */
-    public function useAreaDeliveryModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinAreaDeliveryModule($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'AreaDeliveryModule', '\Thelia\Model\AreaDeliveryModuleQuery');
+            ->joinOrder($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Order', '\Thelia\Model\OrderQuery');
     }
 
     /**
      * Exclude object from result
      *
-     * @param   ChildArea $area Object to remove from the list of results
+     * @param   ChildCouponOrder $couponOrder Object to remove from the list of results
      *
-     * @return ChildAreaQuery The current query, for fluid interface
+     * @return ChildCouponOrderQuery The current query, for fluid interface
      */
-    public function prune($area = null)
+    public function prune($couponOrder = null)
     {
-        if ($area) {
-            $this->addUsingAlias(AreaTableMap::ID, $area->getId(), Criteria::NOT_EQUAL);
+        if ($couponOrder) {
+            $this->addUsingAlias(CouponOrderTableMap::ID, $couponOrder->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
     }
 
     /**
-     * Deletes all rows from the area table.
+     * Deletes all rows from the coupon_order table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -604,7 +543,7 @@ abstract class AreaQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AreaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CouponOrderTableMap::DATABASE_NAME);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
@@ -615,8 +554,8 @@ abstract class AreaQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            AreaTableMap::clearInstancePool();
-            AreaTableMap::clearRelatedInstancePool();
+            CouponOrderTableMap::clearInstancePool();
+            CouponOrderTableMap::clearRelatedInstancePool();
 
             $con->commit();
         } catch (PropelException $e) {
@@ -628,9 +567,9 @@ abstract class AreaQuery extends ModelCriteria
     }
 
     /**
-     * Performs a DELETE on the database, given a ChildArea or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ChildCouponOrder or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildArea object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ChildCouponOrder object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -641,13 +580,13 @@ abstract class AreaQuery extends ModelCriteria
      public function delete(ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AreaTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CouponOrderTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(AreaTableMap::DATABASE_NAME);
+        $criteria->setDbName(CouponOrderTableMap::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -657,10 +596,10 @@ abstract class AreaQuery extends ModelCriteria
             $con->beginTransaction();
 
 
-        AreaTableMap::removeInstanceFromPool($criteria);
+        CouponOrderTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            AreaTableMap::clearRelatedInstancePool();
+            CouponOrderTableMap::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -677,11 +616,11 @@ abstract class AreaQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildAreaQuery The current query, for fluid interface
+     * @return     ChildCouponOrderQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(AreaTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(CouponOrderTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
@@ -689,51 +628,51 @@ abstract class AreaQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of in days
      *
-     * @return     ChildAreaQuery The current query, for fluid interface
+     * @return     ChildCouponOrderQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(AreaTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(CouponOrderTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
      * Order by update date desc
      *
-     * @return     ChildAreaQuery The current query, for fluid interface
+     * @return     ChildCouponOrderQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
-        return $this->addDescendingOrderByColumn(AreaTableMap::UPDATED_AT);
+        return $this->addDescendingOrderByColumn(CouponOrderTableMap::UPDATED_AT);
     }
 
     /**
      * Order by update date asc
      *
-     * @return     ChildAreaQuery The current query, for fluid interface
+     * @return     ChildCouponOrderQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
-        return $this->addAscendingOrderByColumn(AreaTableMap::UPDATED_AT);
+        return $this->addAscendingOrderByColumn(CouponOrderTableMap::UPDATED_AT);
     }
 
     /**
      * Order by create date desc
      *
-     * @return     ChildAreaQuery The current query, for fluid interface
+     * @return     ChildCouponOrderQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
-        return $this->addDescendingOrderByColumn(AreaTableMap::CREATED_AT);
+        return $this->addDescendingOrderByColumn(CouponOrderTableMap::CREATED_AT);
     }
 
     /**
      * Order by create date asc
      *
-     * @return     ChildAreaQuery The current query, for fluid interface
+     * @return     ChildCouponOrderQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(AreaTableMap::CREATED_AT);
+        return $this->addAscendingOrderByColumn(CouponOrderTableMap::CREATED_AT);
     }
 
-} // AreaQuery
+} // CouponOrderQuery

@@ -23,9 +23,11 @@
 
 namespace Thelia\Controller\Admin;
 
+
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Form\ConfigStoreForm;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 /**
  * Class ConfigStoreController
@@ -78,7 +80,7 @@ class ConfigStoreController extends BaseAdminController
             $data = $form->getData();
 
             // Update store
-            foreach ($data as $name => $value) {
+            foreach($data as $name => $value) {
                 if(! in_array($name , array('success_url', 'error_message')))
                     ConfigQuery::write($name, $value, false);
             }

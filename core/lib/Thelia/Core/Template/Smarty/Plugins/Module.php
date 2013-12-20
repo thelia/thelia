@@ -48,7 +48,7 @@ class Module extends AbstractSmartyPlugin
     /**
      * Process theliaModule template inclusion function
      *
-     * @param unknown                   $params
+     * @param  unknown $params
      * @param \Smarty_Internal_Template $template
      * @internal param \Thelia\Core\Template\Smarty\Plugins\unknown $smarty
      *
@@ -60,7 +60,7 @@ class Module extends AbstractSmartyPlugin
 
         if (false !== $location = $this->getParam($params, 'location', false)) {
 
-            if ($this->debug === true && $this->request->get('SHOW_INCLUDE')) {
+            if($this->debug === true && $this->request->get('SHOW_INCLUDE')) {
                 echo sprintf('<div style="background-color: #C82D26; border-color: #000000; border: solid;">%s</div>', $location);
             }
 
@@ -70,7 +70,7 @@ class Module extends AbstractSmartyPlugin
 
             foreach ($modules as $module) {
 
-                if (null !== $moduleLimit && $moduleLimit != $module->getCode()) {
+                if(null !== $moduleLimit && $moduleLimit != $module->getCode()) {
                     continue;
                 }
 

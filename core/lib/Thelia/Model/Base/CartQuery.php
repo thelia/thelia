@@ -175,7 +175,7 @@ abstract class CartQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TOKEN`, `CUSTOMER_ID`, `ADDRESS_DELIVERY_ID`, `ADDRESS_INVOICE_ID`, `CURRENCY_ID`, `DISCOUNT`, `CREATED_AT`, `UPDATED_AT` FROM `cart` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, TOKEN, CUSTOMER_ID, ADDRESS_DELIVERY_ID, ADDRESS_INVOICE_ID, CURRENCY_ID, DISCOUNT, CREATED_AT, UPDATED_AT FROM cart WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

@@ -39,6 +39,7 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleImage;
 use Thelia\Model\ModuleQuery;
 
+
 class BaseModule extends ContainerAware implements BaseModuleInterface
 {
     const CLASSIC_MODULE_TYPE = 1;
@@ -114,18 +115,16 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         return $this->container;
     }
 
-    public function hasRequest()
-    {
+
+    public function hasRequest() {
         return null !== $this->request;
     }
 
-    public function setRequest(Request $request)
-    {
+    public function setRequest(Request $request) {
         $this->request = $request;
     }
 
-    public function getRequest()
-    {
+    public function getRequest() {
         if ($this->hasRequest() === false) {
             throw new \RuntimeException("Sorry, the request is not available in this context");
         }
@@ -133,24 +132,23 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         return $this->request;
     }
 
-    public function hasDispatcher()
-    {
+
+    public function hasDispatcher() {
         return null !== $this->dispatcher;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
+    public function setDispatcher(EventDispatcherInterface $dispatcher) {
         $this->dispatcher = $dispatcher;
     }
 
-    public function getDispatcher()
-    {
+    public function getDispatcher() {
         if ($this->hasDispatcher() === false) {
             throw new \RuntimeException("Sorry, the dispatcher is not available in this context");
         }
 
         return $this->dispatcher;
     }
+
 
     public function setTitle(Module $module, $titles)
     {

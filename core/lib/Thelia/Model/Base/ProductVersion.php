@@ -1107,41 +1107,41 @@ abstract class ProductVersion implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ProductVersionTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(ProductVersionTableMap::TAX_RULE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`TAX_RULE_ID`';
+            $modifiedColumns[':p' . $index++]  = 'TAX_RULE_ID';
         }
         if ($this->isColumnModified(ProductVersionTableMap::REF)) {
-            $modifiedColumns[':p' . $index++]  = '`REF`';
+            $modifiedColumns[':p' . $index++]  = 'REF';
         }
         if ($this->isColumnModified(ProductVersionTableMap::VISIBLE)) {
-            $modifiedColumns[':p' . $index++]  = '`VISIBLE`';
+            $modifiedColumns[':p' . $index++]  = 'VISIBLE';
         }
         if ($this->isColumnModified(ProductVersionTableMap::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+            $modifiedColumns[':p' . $index++]  = 'POSITION';
         }
         if ($this->isColumnModified(ProductVersionTableMap::TEMPLATE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`TEMPLATE_ID`';
+            $modifiedColumns[':p' . $index++]  = 'TEMPLATE_ID';
         }
         if ($this->isColumnModified(ProductVersionTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(ProductVersionTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
         if ($this->isColumnModified(ProductVersionTableMap::VERSION)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION`';
+            $modifiedColumns[':p' . $index++]  = 'VERSION';
         }
         if ($this->isColumnModified(ProductVersionTableMap::VERSION_CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'VERSION_CREATED_AT';
         }
         if ($this->isColumnModified(ProductVersionTableMap::VERSION_CREATED_BY)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
+            $modifiedColumns[':p' . $index++]  = 'VERSION_CREATED_BY';
         }
 
         $sql = sprintf(
-            'INSERT INTO `product_version` (%s) VALUES (%s)',
+            'INSERT INTO product_version (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1150,37 +1150,37 @@ abstract class ProductVersion implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`TAX_RULE_ID`':
+                    case 'TAX_RULE_ID':
                         $stmt->bindValue($identifier, $this->tax_rule_id, PDO::PARAM_INT);
                         break;
-                    case '`REF`':
+                    case 'REF':
                         $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
                         break;
-                    case '`VISIBLE`':
+                    case 'VISIBLE':
                         $stmt->bindValue($identifier, $this->visible, PDO::PARAM_INT);
                         break;
-                    case '`POSITION`':
+                    case 'POSITION':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case '`TEMPLATE_ID`':
+                    case 'TEMPLATE_ID':
                         $stmt->bindValue($identifier, $this->template_id, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`VERSION`':
+                    case 'VERSION':
                         $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
                         break;
-                    case '`VERSION_CREATED_AT`':
+                    case 'VERSION_CREATED_AT':
                         $stmt->bindValue($identifier, $this->version_created_at ? $this->version_created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`VERSION_CREATED_BY`':
+                    case 'VERSION_CREATED_BY':
                         $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }

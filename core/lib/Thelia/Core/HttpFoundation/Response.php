@@ -39,8 +39,8 @@ class Response extends BaseResponse
      *
      * @see \Thelia\Core\HttpFoundation\Response::sendContent()
      */
-    public function sendContent()
-    {
+    public function sendContent() {
+
         Tlog::getInstance()->write($this->content);
 
         parent::sendContent();

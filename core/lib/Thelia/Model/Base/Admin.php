@@ -1128,44 +1128,44 @@ abstract class Admin implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(AdminTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(AdminTableMap::PROFILE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`PROFILE_ID`';
+            $modifiedColumns[':p' . $index++]  = 'PROFILE_ID';
         }
         if ($this->isColumnModified(AdminTableMap::FIRSTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`FIRSTNAME`';
+            $modifiedColumns[':p' . $index++]  = 'FIRSTNAME';
         }
         if ($this->isColumnModified(AdminTableMap::LASTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`LASTNAME`';
+            $modifiedColumns[':p' . $index++]  = 'LASTNAME';
         }
         if ($this->isColumnModified(AdminTableMap::LOGIN)) {
-            $modifiedColumns[':p' . $index++]  = '`LOGIN`';
+            $modifiedColumns[':p' . $index++]  = 'LOGIN';
         }
         if ($this->isColumnModified(AdminTableMap::PASSWORD)) {
-            $modifiedColumns[':p' . $index++]  = '`PASSWORD`';
+            $modifiedColumns[':p' . $index++]  = 'PASSWORD';
         }
         if ($this->isColumnModified(AdminTableMap::ALGO)) {
-            $modifiedColumns[':p' . $index++]  = '`ALGO`';
+            $modifiedColumns[':p' . $index++]  = 'ALGO';
         }
         if ($this->isColumnModified(AdminTableMap::SALT)) {
-            $modifiedColumns[':p' . $index++]  = '`SALT`';
+            $modifiedColumns[':p' . $index++]  = 'SALT';
         }
         if ($this->isColumnModified(AdminTableMap::REMEMBER_ME_TOKEN)) {
-            $modifiedColumns[':p' . $index++]  = '`REMEMBER_ME_TOKEN`';
+            $modifiedColumns[':p' . $index++]  = 'REMEMBER_ME_TOKEN';
         }
         if ($this->isColumnModified(AdminTableMap::REMEMBER_ME_SERIAL)) {
-            $modifiedColumns[':p' . $index++]  = '`REMEMBER_ME_SERIAL`';
+            $modifiedColumns[':p' . $index++]  = 'REMEMBER_ME_SERIAL';
         }
         if ($this->isColumnModified(AdminTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(AdminTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `admin` (%s) VALUES (%s)',
+            'INSERT INTO admin (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1174,40 +1174,40 @@ abstract class Admin implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`PROFILE_ID`':
+                    case 'PROFILE_ID':
                         $stmt->bindValue($identifier, $this->profile_id, PDO::PARAM_INT);
                         break;
-                    case '`FIRSTNAME`':
+                    case 'FIRSTNAME':
                         $stmt->bindValue($identifier, $this->firstname, PDO::PARAM_STR);
                         break;
-                    case '`LASTNAME`':
+                    case 'LASTNAME':
                         $stmt->bindValue($identifier, $this->lastname, PDO::PARAM_STR);
                         break;
-                    case '`LOGIN`':
+                    case 'LOGIN':
                         $stmt->bindValue($identifier, $this->login, PDO::PARAM_STR);
                         break;
-                    case '`PASSWORD`':
+                    case 'PASSWORD':
                         $stmt->bindValue($identifier, $this->password, PDO::PARAM_STR);
                         break;
-                    case '`ALGO`':
+                    case 'ALGO':
                         $stmt->bindValue($identifier, $this->algo, PDO::PARAM_STR);
                         break;
-                    case '`SALT`':
+                    case 'SALT':
                         $stmt->bindValue($identifier, $this->salt, PDO::PARAM_STR);
                         break;
-                    case '`REMEMBER_ME_TOKEN`':
+                    case 'REMEMBER_ME_TOKEN':
                         $stmt->bindValue($identifier, $this->remember_me_token, PDO::PARAM_STR);
                         break;
-                    case '`REMEMBER_ME_SERIAL`':
+                    case 'REMEMBER_ME_SERIAL':
                         $stmt->bindValue($identifier, $this->remember_me_serial, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

@@ -87,7 +87,7 @@ class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSea
         }
 
         return $search;
-
+        
     }
 
     public function parseResults(LoopResult $loopResult)

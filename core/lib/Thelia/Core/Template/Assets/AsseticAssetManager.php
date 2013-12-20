@@ -51,7 +51,7 @@ class AsseticAssetManager implements AssetManagerInterface
     /**
      * Create a stamp form the modification time of the content of the given directory and all of its subdirectories
      *
-     * @param  string $directory ther directory name
+     * @param string $directory ther directory name
      * @return string the stamp of this directory
      */
     protected function getStamp($directory)
@@ -76,8 +76,7 @@ class AsseticAssetManager implements AssetManagerInterface
      *
      * @return bool
      */
-    protected function isSourceFile(\SplFileInfo $fileInfo)
-    {
+    protected function isSourceFile(\SplFileInfo $fileInfo) {
         return in_array($fileInfo->getExtension(), $this->source_file_extensions);
     }
 
@@ -85,14 +84,9 @@ class AsseticAssetManager implements AssetManagerInterface
      * Recursively copy assets from the source directory to the destination
      * directory in the web space, omitting source files.
      *
-<<<<<<< HEAD
      * @param Filesystem $fs
      * @param string $from_directory the source
      * @param string $to_directory the destination
-=======
-     * @param  string            $from_directory the source
-     * @param  string            $to_directory   the destination
->>>>>>> cleanmaster
      * @throws \RuntimeException if a problem occurs.
      */
     protected function copyAssets(Filesystem $fs, $from_directory, $to_directory)
@@ -130,7 +124,6 @@ class AsseticAssetManager implements AssetManagerInterface
     }
 
     /**
-<<<<<<< HEAD
      * Compute the destination directory path, from the source directory and the
      * base directory of the web assets
      *
@@ -140,34 +133,6 @@ class AsseticAssetManager implements AssetManagerInterface
      *
      * @internal param string $source_assets_directory the source directory
      * @return the full path of the destination directory
-=======
-     * Compite the assets path relative to the base template directory
-     *
-     * @param  string $source_assets_directory   the source directory
-     * @param  string $web_assets_directory_base base directory of the web assets
-     * @return the    full path of the destination directory
-     */
-    protected function getRelativeDirectoryPath($source_assets_directory, $web_assets_directory_base)
-    {
-        $source_assets_directory = realpath($source_assets_directory);
-
-        // Remove base path from asset source path to get a path relative to the template base
-        // and use it to create the destination path.
-        return str_replace(
-                realpath(THELIA_ROOT),
-                '',
-                $source_assets_directory
-        );
-    }
-
-    /**
-     * Compute the destination directory path, from the source directory and the
-     * base directory of the web assets
-     *
-     * @param  string $source_assets_directory   the source directory
-     * @param  string $web_assets_directory_base base directory of the web assets
-     * @return the    full path of the destination directory
->>>>>>> cleanmaster
      */
     protected function getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey)
     {
@@ -180,7 +145,6 @@ class AsseticAssetManager implements AssetManagerInterface
      * the source directory. If any change is detected, the whole asset directory
      * is copied in the web space.
      *
-<<<<<<< HEAD
      * @param string $sourceAssetsDirectory  the full path to the source asstes directory
      * @param string $webAssetsDirectoryBase the base directory of the web based asset directory
      * @param        $webAssetsTemplate
@@ -190,14 +154,6 @@ class AsseticAssetManager implements AssetManagerInterface
      */
     public function prepareAssets($sourceAssetsDirectory, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey) {
 
-=======
-     * @param  string            $source_assets_directory   the full path to the source asstes directory
-     * @param  string            $web_assets_directory_base the base directory of the web based asset directory
-     * @throws \RuntimeException if something goes wrong.
-     */
-    public function prepareAssets($source_assets_directory, $web_assets_directory_base)
-    {
->>>>>>> cleanmaster
         // Compute the absolute path of the output directory
         $to_directory = $this->getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey);
 
@@ -249,7 +205,8 @@ class AsseticAssetManager implements AssetManagerInterface
                     throw new \RuntimeException(
                             "Failed to create asset stamp file $stamp_file_path. Please check that your web server has the proper access rights to do that.");
                 }
-/*            } else {
+/*            }
+            else {
                 @fclose($fp);
             }
 */
@@ -259,13 +216,13 @@ class AsseticAssetManager implements AssetManagerInterface
     /**
      * Decode the filters names, and initialize the Assetic FilterManager
      *
-     * @param  FilterManager             $filterManager the Assetic filter manager
-     * @param  string                    $filters       a comma separated list of filter names
+     * @param FilterManager $filterManager the Assetic filter manager
+     * @param string $filters a comma separated list of filter names
      * @throws \InvalidArgumentException if a wrong filter is passed
-     * @return an                        array of filter names
+     * @return an array of filter names
      */
-    protected function decodeAsseticFilters(FilterManager $filterManager, $filters)
-    {
+    protected function decodeAsseticFilters(FilterManager $filterManager, $filters) {
+
         if (!empty($filters)) {
 
             $filter_list = explode(',', $filters);
@@ -304,7 +261,8 @@ class AsseticAssetManager implements AssetManagerInterface
                         break;
                 }
             }
-        } else {
+        }
+        else {
             $filter_list = array();
         }
 
@@ -314,7 +272,6 @@ class AsseticAssetManager implements AssetManagerInterface
     /**
      * Generates assets from $asset_path in $output_path, using $filters.
      *
-<<<<<<< HEAD
      * @param          $assetSource
      * @param          $assetDirectoryBase
      * @param  string  $webAssetsDirectoryBase the full path to the asset file (or file collection, e.g. *.less)
@@ -328,18 +285,6 @@ class AsseticAssetManager implements AssetManagerInterface
      *
      * @param  boolean $debug                  true / false
      *
-=======
-     * @param string $asset_path the full path to the asset file (or file collection, e.g. *.less)
-     *
-     * @param string $web_assets_directory_base the full disk path to the base assets output directory in the web space
-     * @param string $output_url                the URL to the base assets output directory in the web space
-     *
-     * @param string $asset_type the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
-     * @param array  $filters    a list of filters, as defined below (see switch($filter_name) ...)
-     *
-     * @param  boolean                   $debug true / false
-     * @throws \InvalidArgumentException if an invalid filter name is found
->>>>>>> cleanmaster
      * @return string                    The URL to the generated asset file.
      */
     public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug)

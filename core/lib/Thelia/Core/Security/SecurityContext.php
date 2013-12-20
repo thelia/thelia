@@ -177,7 +177,7 @@ class SecurityContext
                 continue;
             }
 
-            if (!array_key_exists('module', $userPermissions)) {
+            if(!array_key_exists('module', $userPermissions)) {
                 return false;
             }
 

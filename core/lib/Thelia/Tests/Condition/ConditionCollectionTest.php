@@ -52,6 +52,7 @@ class ConditionCollectionTest extends \PHPUnit_Framework_TestCase
     {
     }
 
+
     /**
      * Generate adapter stub
      *
