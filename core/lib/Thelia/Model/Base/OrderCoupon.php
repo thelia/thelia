@@ -1287,53 +1287,53 @@ abstract class OrderCoupon implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(OrderCouponTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(OrderCouponTableMap::ORDER_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ORDER_ID`';
+            $modifiedColumns[':p' . $index++]  = 'ORDER_ID';
         }
         if ($this->isColumnModified(OrderCouponTableMap::CODE)) {
-            $modifiedColumns[':p' . $index++]  = '`CODE`';
+            $modifiedColumns[':p' . $index++]  = 'CODE';
         }
         if ($this->isColumnModified(OrderCouponTableMap::TYPE)) {
-            $modifiedColumns[':p' . $index++]  = '`TYPE`';
+            $modifiedColumns[':p' . $index++]  = 'TYPE';
         }
         if ($this->isColumnModified(OrderCouponTableMap::AMOUNT)) {
-            $modifiedColumns[':p' . $index++]  = '`AMOUNT`';
+            $modifiedColumns[':p' . $index++]  = 'AMOUNT';
         }
         if ($this->isColumnModified(OrderCouponTableMap::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = '`TITLE`';
+            $modifiedColumns[':p' . $index++]  = 'TITLE';
         }
         if ($this->isColumnModified(OrderCouponTableMap::SHORT_DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '`SHORT_DESCRIPTION`';
+            $modifiedColumns[':p' . $index++]  = 'SHORT_DESCRIPTION';
         }
         if ($this->isColumnModified(OrderCouponTableMap::DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '`DESCRIPTION`';
+            $modifiedColumns[':p' . $index++]  = 'DESCRIPTION';
         }
         if ($this->isColumnModified(OrderCouponTableMap::EXPIRATION_DATE)) {
-            $modifiedColumns[':p' . $index++]  = '`EXPIRATION_DATE`';
+            $modifiedColumns[':p' . $index++]  = 'EXPIRATION_DATE';
         }
         if ($this->isColumnModified(OrderCouponTableMap::IS_CUMULATIVE)) {
-            $modifiedColumns[':p' . $index++]  = '`IS_CUMULATIVE`';
+            $modifiedColumns[':p' . $index++]  = 'IS_CUMULATIVE';
         }
         if ($this->isColumnModified(OrderCouponTableMap::IS_REMOVING_POSTAGE)) {
-            $modifiedColumns[':p' . $index++]  = '`IS_REMOVING_POSTAGE`';
+            $modifiedColumns[':p' . $index++]  = 'IS_REMOVING_POSTAGE';
         }
         if ($this->isColumnModified(OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS)) {
-            $modifiedColumns[':p' . $index++]  = '`IS_AVAILABLE_ON_SPECIAL_OFFERS`';
+            $modifiedColumns[':p' . $index++]  = 'IS_AVAILABLE_ON_SPECIAL_OFFERS';
         }
         if ($this->isColumnModified(OrderCouponTableMap::SERIALIZED_CONDITIONS)) {
-            $modifiedColumns[':p' . $index++]  = '`SERIALIZED_CONDITIONS`';
+            $modifiedColumns[':p' . $index++]  = 'SERIALIZED_CONDITIONS';
         }
         if ($this->isColumnModified(OrderCouponTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(OrderCouponTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `order_coupon` (%s) VALUES (%s)',
+            'INSERT INTO order_coupon (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1342,49 +1342,49 @@ abstract class OrderCoupon implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`ORDER_ID`':
+                    case 'ORDER_ID':
                         $stmt->bindValue($identifier, $this->order_id, PDO::PARAM_INT);
                         break;
-                    case '`CODE`':
+                    case 'CODE':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case '`TYPE`':
+                    case 'TYPE':
                         $stmt->bindValue($identifier, $this->type, PDO::PARAM_STR);
                         break;
-                    case '`AMOUNT`':
+                    case 'AMOUNT':
                         $stmt->bindValue($identifier, $this->amount, PDO::PARAM_STR);
                         break;
-                    case '`TITLE`':
+                    case 'TITLE':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
                         break;
-                    case '`SHORT_DESCRIPTION`':
+                    case 'SHORT_DESCRIPTION':
                         $stmt->bindValue($identifier, $this->short_description, PDO::PARAM_STR);
                         break;
-                    case '`DESCRIPTION`':
+                    case 'DESCRIPTION':
                         $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
-                    case '`EXPIRATION_DATE`':
+                    case 'EXPIRATION_DATE':
                         $stmt->bindValue($identifier, $this->expiration_date ? $this->expiration_date->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`IS_CUMULATIVE`':
+                    case 'IS_CUMULATIVE':
                         $stmt->bindValue($identifier, (int) $this->is_cumulative, PDO::PARAM_INT);
                         break;
-                    case '`IS_REMOVING_POSTAGE`':
+                    case 'IS_REMOVING_POSTAGE':
                         $stmt->bindValue($identifier, (int) $this->is_removing_postage, PDO::PARAM_INT);
                         break;
-                    case '`IS_AVAILABLE_ON_SPECIAL_OFFERS`':
+                    case 'IS_AVAILABLE_ON_SPECIAL_OFFERS':
                         $stmt->bindValue($identifier, (int) $this->is_available_on_special_offers, PDO::PARAM_INT);
                         break;
-                    case '`SERIALIZED_CONDITIONS`':
+                    case 'SERIALIZED_CONDITIONS':
                         $stmt->bindValue($identifier, $this->serialized_conditions, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

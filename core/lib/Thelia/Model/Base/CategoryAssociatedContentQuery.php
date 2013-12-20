@@ -151,7 +151,7 @@ abstract class CategoryAssociatedContentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CATEGORY_ID`, `CONTENT_ID`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `category_associated_content` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, CATEGORY_ID, CONTENT_ID, POSITION, CREATED_AT, UPDATED_AT FROM category_associated_content WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

@@ -156,7 +156,7 @@ abstract class AdminLogQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ADMIN_LOGIN`, `ADMIN_FIRSTNAME`, `ADMIN_LASTNAME`, `RESOURCE`, `ACTION`, `MESSAGE`, `REQUEST`, `CREATED_AT`, `UPDATED_AT` FROM `admin_log` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, ADMIN_LOGIN, ADMIN_FIRSTNAME, ADMIN_LASTNAME, RESOURCE, ACTION, MESSAGE, REQUEST, CREATED_AT, UPDATED_AT FROM admin_log WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

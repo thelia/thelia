@@ -171,7 +171,7 @@ abstract class AdminQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PROFILE_ID`, `FIRSTNAME`, `LASTNAME`, `LOGIN`, `PASSWORD`, `ALGO`, `SALT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT` FROM `admin` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, PROFILE_ID, FIRSTNAME, LASTNAME, LOGIN, PASSWORD, ALGO, SALT, REMEMBER_ME_TOKEN, REMEMBER_ME_SERIAL, CREATED_AT, UPDATED_AT FROM admin WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

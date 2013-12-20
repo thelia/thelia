@@ -1019,38 +1019,38 @@ abstract class AdminLog implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(AdminLogTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(AdminLogTableMap::ADMIN_LOGIN)) {
-            $modifiedColumns[':p' . $index++]  = '`ADMIN_LOGIN`';
+            $modifiedColumns[':p' . $index++]  = 'ADMIN_LOGIN';
         }
         if ($this->isColumnModified(AdminLogTableMap::ADMIN_FIRSTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`ADMIN_FIRSTNAME`';
+            $modifiedColumns[':p' . $index++]  = 'ADMIN_FIRSTNAME';
         }
         if ($this->isColumnModified(AdminLogTableMap::ADMIN_LASTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`ADMIN_LASTNAME`';
+            $modifiedColumns[':p' . $index++]  = 'ADMIN_LASTNAME';
         }
         if ($this->isColumnModified(AdminLogTableMap::RESOURCE)) {
-            $modifiedColumns[':p' . $index++]  = '`RESOURCE`';
+            $modifiedColumns[':p' . $index++]  = 'RESOURCE';
         }
         if ($this->isColumnModified(AdminLogTableMap::ACTION)) {
-            $modifiedColumns[':p' . $index++]  = '`ACTION`';
+            $modifiedColumns[':p' . $index++]  = 'ACTION';
         }
         if ($this->isColumnModified(AdminLogTableMap::MESSAGE)) {
-            $modifiedColumns[':p' . $index++]  = '`MESSAGE`';
+            $modifiedColumns[':p' . $index++]  = 'MESSAGE';
         }
         if ($this->isColumnModified(AdminLogTableMap::REQUEST)) {
-            $modifiedColumns[':p' . $index++]  = '`REQUEST`';
+            $modifiedColumns[':p' . $index++]  = 'REQUEST';
         }
         if ($this->isColumnModified(AdminLogTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(AdminLogTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `admin_log` (%s) VALUES (%s)',
+            'INSERT INTO admin_log (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1059,34 +1059,34 @@ abstract class AdminLog implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`ADMIN_LOGIN`':
+                    case 'ADMIN_LOGIN':
                         $stmt->bindValue($identifier, $this->admin_login, PDO::PARAM_STR);
                         break;
-                    case '`ADMIN_FIRSTNAME`':
+                    case 'ADMIN_FIRSTNAME':
                         $stmt->bindValue($identifier, $this->admin_firstname, PDO::PARAM_STR);
                         break;
-                    case '`ADMIN_LASTNAME`':
+                    case 'ADMIN_LASTNAME':
                         $stmt->bindValue($identifier, $this->admin_lastname, PDO::PARAM_STR);
                         break;
-                    case '`RESOURCE`':
+                    case 'RESOURCE':
                         $stmt->bindValue($identifier, $this->resource, PDO::PARAM_STR);
                         break;
-                    case '`ACTION`':
+                    case 'ACTION':
                         $stmt->bindValue($identifier, $this->action, PDO::PARAM_STR);
                         break;
-                    case '`MESSAGE`':
+                    case 'MESSAGE':
                         $stmt->bindValue($identifier, $this->message, PDO::PARAM_STR);
                         break;
-                    case '`REQUEST`':
+                    case 'REQUEST':
                         $stmt->bindValue($identifier, $this->request, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

@@ -863,23 +863,23 @@ abstract class AreaDeliveryModule implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(AreaDeliveryModuleTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(AreaDeliveryModuleTableMap::AREA_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`AREA_ID`';
+            $modifiedColumns[':p' . $index++]  = 'AREA_ID';
         }
         if ($this->isColumnModified(AreaDeliveryModuleTableMap::DELIVERY_MODULE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`DELIVERY_MODULE_ID`';
+            $modifiedColumns[':p' . $index++]  = 'DELIVERY_MODULE_ID';
         }
         if ($this->isColumnModified(AreaDeliveryModuleTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(AreaDeliveryModuleTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `area_delivery_module` (%s) VALUES (%s)',
+            'INSERT INTO area_delivery_module (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -888,19 +888,19 @@ abstract class AreaDeliveryModule implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`AREA_ID`':
+                    case 'AREA_ID':
                         $stmt->bindValue($identifier, $this->area_id, PDO::PARAM_INT);
                         break;
-                    case '`DELIVERY_MODULE_ID`':
+                    case 'DELIVERY_MODULE_ID':
                         $stmt->bindValue($identifier, $this->delivery_module_id, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

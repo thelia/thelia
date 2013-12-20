@@ -1151,35 +1151,35 @@ abstract class Country implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(CountryTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(CountryTableMap::AREA_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`AREA_ID`';
+            $modifiedColumns[':p' . $index++]  = 'AREA_ID';
         }
         if ($this->isColumnModified(CountryTableMap::ISOCODE)) {
-            $modifiedColumns[':p' . $index++]  = '`ISOCODE`';
+            $modifiedColumns[':p' . $index++]  = 'ISOCODE';
         }
         if ($this->isColumnModified(CountryTableMap::ISOALPHA2)) {
-            $modifiedColumns[':p' . $index++]  = '`ISOALPHA2`';
+            $modifiedColumns[':p' . $index++]  = 'ISOALPHA2';
         }
         if ($this->isColumnModified(CountryTableMap::ISOALPHA3)) {
-            $modifiedColumns[':p' . $index++]  = '`ISOALPHA3`';
+            $modifiedColumns[':p' . $index++]  = 'ISOALPHA3';
         }
         if ($this->isColumnModified(CountryTableMap::BY_DEFAULT)) {
-            $modifiedColumns[':p' . $index++]  = '`BY_DEFAULT`';
+            $modifiedColumns[':p' . $index++]  = 'BY_DEFAULT';
         }
         if ($this->isColumnModified(CountryTableMap::SHOP_COUNTRY)) {
-            $modifiedColumns[':p' . $index++]  = '`SHOP_COUNTRY`';
+            $modifiedColumns[':p' . $index++]  = 'SHOP_COUNTRY';
         }
         if ($this->isColumnModified(CountryTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(CountryTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `country` (%s) VALUES (%s)',
+            'INSERT INTO country (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1188,31 +1188,31 @@ abstract class Country implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`AREA_ID`':
+                    case 'AREA_ID':
                         $stmt->bindValue($identifier, $this->area_id, PDO::PARAM_INT);
                         break;
-                    case '`ISOCODE`':
+                    case 'ISOCODE':
                         $stmt->bindValue($identifier, $this->isocode, PDO::PARAM_STR);
                         break;
-                    case '`ISOALPHA2`':
+                    case 'ISOALPHA2':
                         $stmt->bindValue($identifier, $this->isoalpha2, PDO::PARAM_STR);
                         break;
-                    case '`ISOALPHA3`':
+                    case 'ISOALPHA3':
                         $stmt->bindValue($identifier, $this->isoalpha3, PDO::PARAM_STR);
                         break;
-                    case '`BY_DEFAULT`':
+                    case 'BY_DEFAULT':
                         $stmt->bindValue($identifier, $this->by_default, PDO::PARAM_INT);
                         break;
-                    case '`SHOP_COUNTRY`':
+                    case 'SHOP_COUNTRY':
                         $stmt->bindValue($identifier, (int) $this->shop_country, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

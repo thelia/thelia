@@ -183,7 +183,7 @@ abstract class CouponVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `TYPE`, `AMOUNT`, `IS_ENABLED`, `EXPIRATION_DATE`, `MAX_USAGE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `IS_USED`, `SERIALIZED_CONDITIONS`, `CREATED_AT`, `UPDATED_AT`, `VERSION` FROM `coupon_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
+        $sql = 'SELECT ID, CODE, TYPE, AMOUNT, IS_ENABLED, EXPIRATION_DATE, MAX_USAGE, IS_CUMULATIVE, IS_REMOVING_POSTAGE, IS_AVAILABLE_ON_SPECIAL_OFFERS, IS_USED, SERIALIZED_CONDITIONS, CREATED_AT, UPDATED_AT, VERSION FROM coupon_version WHERE ID = :p0 AND VERSION = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);

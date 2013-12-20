@@ -211,7 +211,7 @@ abstract class AddressQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `LABEL`, `CUSTOMER_ID`, `TITLE_ID`, `COMPANY`, `FIRSTNAME`, `LASTNAME`, `ADDRESS1`, `ADDRESS2`, `ADDRESS3`, `ZIPCODE`, `CITY`, `COUNTRY_ID`, `PHONE`, `CELLPHONE`, `IS_DEFAULT`, `CREATED_AT`, `UPDATED_AT` FROM `address` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, LABEL, CUSTOMER_ID, TITLE_ID, COMPANY, FIRSTNAME, LASTNAME, ADDRESS1, ADDRESS2, ADDRESS3, ZIPCODE, CITY, COUNTRY_ID, PHONE, CELLPHONE, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM address WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

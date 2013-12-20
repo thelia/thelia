@@ -14,13 +14,11 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateDefinition;
-<<<<<<< HEAD
+
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Template\TemplateHelper;
 use Imagine\Exception\InvalidArgumentException;
-=======
 use Thelia\Core\Translation\Translator;
->>>>>>> master
 
 /**
  *
@@ -167,7 +165,6 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->setConfigDir($configDirectory);
 
         /* add modules template directories */
-<<<<<<< HEAD
         $this->addTemplateDirectory(
                 $templateDefinition->getType(),
                 $templateDefinition->getName(),
@@ -181,32 +178,6 @@ class SmartyParser extends Smarty implements ParserInterface
             foreach($this->templateDirectories[$templateDefinition->getType()][$templateDefinition->getName()] as $key => $directory) {
                 $this->addTemplateDir($directory, $key);
             }
-=======
-        switch ($templateDefinition->getType()) {
-            case TemplateDefinition::FRONT_OFFICE:
-                /* do not pass array directly to addTemplateDir since we cant control on keys */
-                if (isset($this->frontOfficeTemplateDirectories[$templateDefinition->getName()])) {
-                    foreach ($this->frontOfficeTemplateDirectories[$templateDefinition->getName()] as $key => $directory) {
-                        $this->addTemplateDir($directory, $key);
-                    }
-                }
-                break;
-
-            case TemplateDefinition::BACK_OFFICE:
-                /* do not pass array directly to addTemplateDir since we cant control on keys */
-                if (isset($this->backOfficeTemplateDirectories[$templateDefinition->getName()])) {
-                    foreach ($this->backOfficeTemplateDirectories[$templateDefinition->getName()] as $key => $directory) {
-                        $this->addTemplateDir($directory, $key);
-                    }
-                }
-                break;
-
-            case TemplateDefinition::PDF:
-                break;
-
-            default:
-                break;
->>>>>>> master
         }
     }
 
@@ -215,62 +186,58 @@ class SmartyParser extends Smarty implements ParserInterface
         return $this->templateDefinition;
     }
 
-<<<<<<< HEAD
     public function getTemplate()
-=======
-    /**
-     * Return a rendered template, either from file or ftom a string
-     *
-     * @param string $resourceType    either 'string' (rendering from a string) or 'file' (rendering a file)
-     * @param string $resourceContent the resource content (a text, or a template file name)
-     * @param array  $parameters      an associative array of names / value pairs
-     *
-     * @return string the rendered template text
-     */
-    protected function internalRenderer($resourceType, $resourceContent, array $parameters)
->>>>>>> master
     {
         return $this->templateDefinition->getPath();
     }
 
     /**
-     * Return a rendered template file
+     * Return a rendered template, either from file or ftom a string
      *
-     * @param  string $realTemplateName the template name (from the template directory)
-     * @param  array  $parameters       an associative array of names / value pairs
+     * @param string $resourceType either 'string' (rendering from a string) or 'file' (rendering a file)
+     * @param string $resourceContent the resource content (a text, or a template file name)
+     * @param array $parameters an associative array of names / value pairs
+     *
      * @return string the rendered template text
      */
-    public function render($realTemplateName, array $parameters = array())
+    protected function internalRenderer($resourceType, $resourceContent, array $parameters)
     {
-<<<<<<< HEAD
-        if(false === $this->templateExists($realTemplateName)) {
-            throw new ResourceNotFoundException();
-        }
         // Assign the parserContext variables
         foreach ($this->parserContext as $var => $value) {
             $this->assign($var, $value);
-=======
-        if (false === $this->templateExists($realTemplateName)) {
-            throw new ResourceNotFoundException(Translator::getInstance()->trans("Template file %file cannot be found.", array('%file', $realTemplateName)));
->>>>>>> master
         }
 
         $this->assign($parameters);
 
-<<<<<<< HEAD
-        return $this->fetch(sprintf("file:%s", $realTemplateName));
-=======
+        return $this->fetch(sprintf("%s:%s", $resourceType, $resourceContent));
+    }
+
+    /**
+     * Return a rendered template file
+     *
+     * @param string $realTemplateName the template name (from the template directory)
+     * @param array $parameters an associative array of names / value pairs
+     * @return string the rendered template text
+     */
+    public function render($realTemplateName, array $parameters = array())
+    {
+        if (false === $this->templateExists($realTemplateName)) {
+            throw new ResourceNotFoundException(Translator::getInstance()->trans("Template file %file cannot be found.", array('%file', $realTemplateName)));
+        }
+
+        return $this->internalRenderer('file', $realTemplateName, $parameters);
+    }
+
     /**
      * Return a rendered template text
      *
-     * @param  string $templateText the template text
-     * @param  array  $parameters   an associative array of names / value pairs
+     * @param string $templateText the template text
+     * @param array $parameters an associative array of names / value pairs
      * @return string the rendered template text
      */
     public function renderString($templateText, array $parameters = array())
     {
         return $this->internalRenderer('string', $templateText, $parameters);
->>>>>>> master
     }
 
     /**

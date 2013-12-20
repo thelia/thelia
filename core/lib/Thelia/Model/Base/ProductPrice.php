@@ -979,29 +979,29 @@ abstract class ProductPrice implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`PRODUCT_SALE_ELEMENTS_ID`';
+            $modifiedColumns[':p' . $index++]  = 'PRODUCT_SALE_ELEMENTS_ID';
         }
         if ($this->isColumnModified(ProductPriceTableMap::CURRENCY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`CURRENCY_ID`';
+            $modifiedColumns[':p' . $index++]  = 'CURRENCY_ID';
         }
         if ($this->isColumnModified(ProductPriceTableMap::PRICE)) {
-            $modifiedColumns[':p' . $index++]  = '`PRICE`';
+            $modifiedColumns[':p' . $index++]  = 'PRICE';
         }
         if ($this->isColumnModified(ProductPriceTableMap::PROMO_PRICE)) {
-            $modifiedColumns[':p' . $index++]  = '`PROMO_PRICE`';
+            $modifiedColumns[':p' . $index++]  = 'PROMO_PRICE';
         }
         if ($this->isColumnModified(ProductPriceTableMap::FROM_DEFAULT_CURRENCY)) {
-            $modifiedColumns[':p' . $index++]  = '`FROM_DEFAULT_CURRENCY`';
+            $modifiedColumns[':p' . $index++]  = 'FROM_DEFAULT_CURRENCY';
         }
         if ($this->isColumnModified(ProductPriceTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(ProductPriceTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `product_price` (%s) VALUES (%s)',
+            'INSERT INTO product_price (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1010,25 +1010,25 @@ abstract class ProductPrice implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`PRODUCT_SALE_ELEMENTS_ID`':
+                    case 'PRODUCT_SALE_ELEMENTS_ID':
                         $stmt->bindValue($identifier, $this->product_sale_elements_id, PDO::PARAM_INT);
                         break;
-                    case '`CURRENCY_ID`':
+                    case 'CURRENCY_ID':
                         $stmt->bindValue($identifier, $this->currency_id, PDO::PARAM_INT);
                         break;
-                    case '`PRICE`':
+                    case 'PRICE':
                         $stmt->bindValue($identifier, $this->price, PDO::PARAM_STR);
                         break;
-                    case '`PROMO_PRICE`':
+                    case 'PROMO_PRICE':
                         $stmt->bindValue($identifier, $this->promo_price, PDO::PARAM_STR);
                         break;
-                    case '`FROM_DEFAULT_CURRENCY`':
+                    case 'FROM_DEFAULT_CURRENCY':
                         $stmt->bindValue($identifier, (int) $this->from_default_currency, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

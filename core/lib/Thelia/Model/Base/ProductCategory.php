@@ -867,23 +867,23 @@ abstract class ProductCategory implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ProductCategoryTableMap::PRODUCT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`PRODUCT_ID`';
+            $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
         }
         if ($this->isColumnModified(ProductCategoryTableMap::CATEGORY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`CATEGORY_ID`';
+            $modifiedColumns[':p' . $index++]  = 'CATEGORY_ID';
         }
         if ($this->isColumnModified(ProductCategoryTableMap::DEFAULT_CATEGORY)) {
-            $modifiedColumns[':p' . $index++]  = '`DEFAULT_CATEGORY`';
+            $modifiedColumns[':p' . $index++]  = 'DEFAULT_CATEGORY';
         }
         if ($this->isColumnModified(ProductCategoryTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(ProductCategoryTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `product_category` (%s) VALUES (%s)',
+            'INSERT INTO product_category (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -892,19 +892,19 @@ abstract class ProductCategory implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`PRODUCT_ID`':
+                    case 'PRODUCT_ID':
                         $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
                         break;
-                    case '`CATEGORY_ID`':
+                    case 'CATEGORY_ID':
                         $stmt->bindValue($identifier, $this->category_id, PDO::PARAM_INT);
                         break;
-                    case '`DEFAULT_CATEGORY`':
+                    case 'DEFAULT_CATEGORY':
                         $stmt->bindValue($identifier, (int) $this->default_category, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
