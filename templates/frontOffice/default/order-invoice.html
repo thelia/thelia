@@ -122,8 +122,17 @@
 
                     </tbody>
                     <tfoot>
+
                     <tr >
-                        <td rowspan="3" colspan="3" class="empty">&nbsp;</td>
+                        <td rowspan="4" colspan="3" class="empty">&nbsp;</td>
+                        <th class="shipping">{intl l="Discount"}</th>
+                        <td class="shipping">
+                            <div class="shipping-price">
+                                <span class="price">{order attr="discount"} {currency attr="symbol"}</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr >
                         <th class="shipping">{intl l="Shipping Tax"}</th>
                         <td class="shipping">
                             <div class="shipping-price">
@@ -134,6 +143,9 @@
                     <tr >
                         <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
                         <td class="coupon">
+                            {form_field form=$form field='success_url'}
+                                <input type="hidden" name="{$name}" value="{url path="/order/invoice"}" />
+                            {/form_field}
                             {form_field form=$form field='coupon-code'}
                                 <div class="{if $error}has-error{/if}">
                                     <div class="input-group">

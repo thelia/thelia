@@ -62,7 +62,6 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-
     /**
      * Generate a valid Coupon model
      */
@@ -118,7 +117,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
         $coupon1->setSerializedConditions($serializedConditions);
 
-
         $coupon1->setMaxUsage(40);
         $coupon1->setIsCumulative(true);
         $coupon1->setIsRemovingPostage(true);
@@ -158,7 +156,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $couponFactory = new CouponFactory($stubContainer);
         $model1 = $this->generateCouponModel($stubFacade, $conditionFactory);
-        $model1->setAmount(21.00);
+        $model1->setCode('XMAS')->setIsRemovingPostage(false)->setAmount(21.00);
         $coupon1 = $couponFactory->buildCouponFromModel($model1);
 
         $model2 = $this->generateCouponModel($stubFacade, $conditionFactory);
@@ -176,12 +174,16 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->will($this->returnValue(122.53));
 
         $couponManager = new CouponManager($stubContainer);
+
         $couponManager->addAvailableCoupon($coupon1);
+
         $couponManager->addAvailableCoupon($coupon2);
+
         $actual = $couponManager->getDiscount();
-        $expected = 50.80;
+        $expected = 21 + 21.50;
 
         $this->assertEquals($expected, $actual);
+        $this->assertTrue($couponManager->isCouponRemovingPostage());
     }
 
     /**
@@ -307,8 +309,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $conditionFactory = new ConditionFactory($stubContainer);
 
-
-
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
             ->will($this->returnValue(array()));
@@ -333,7 +333,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $model1 = $this->generateCouponModel($stubFacade, $conditionFactory);
         $coupon1 = $couponFactory->buildCouponFromModel($model1);
         $coupon2 = clone $coupon1;
-
 
         $couponManager = new CouponManager($stubContainer);
         $couponManager->addAvailableCoupon($coupon1);
@@ -386,7 +385,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $stubContainer->expects($this->any())
             ->method('get')
             ->will($this->onConsecutiveCalls($stubFacade));
-
 
         $couponManager = new CouponManager($stubContainer);
         $couponManager->addAvailableCondition($condition1);
@@ -444,9 +442,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->method('get')
             ->will($this->onConsecutiveCalls($stubFacade));
 
-
         $couponManager = new CouponManager($stubContainer);
-
 
         $stubModel = $this->getMockBuilder('\Thelia\Model\Coupon')
             ->disableOriginalConstructor()
@@ -511,9 +507,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->method('get')
             ->will($this->onConsecutiveCalls($stubFacade));
 
-
         $couponManager = new CouponManager($stubContainer);
-
 
         $stubModel = $this->getMockBuilder('\Thelia\Model\Coupon')
             ->disableOriginalConstructor()

@@ -968,29 +968,29 @@ abstract class Config implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ConfigTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
+            $modifiedColumns[':p' . $index++]  = '`ID`';
         }
         if ($this->isColumnModified(ConfigTableMap::NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'NAME';
+            $modifiedColumns[':p' . $index++]  = '`NAME`';
         }
         if ($this->isColumnModified(ConfigTableMap::VALUE)) {
-            $modifiedColumns[':p' . $index++]  = 'VALUE';
+            $modifiedColumns[':p' . $index++]  = '`VALUE`';
         }
         if ($this->isColumnModified(ConfigTableMap::SECURED)) {
-            $modifiedColumns[':p' . $index++]  = 'SECURED';
+            $modifiedColumns[':p' . $index++]  = '`SECURED`';
         }
         if ($this->isColumnModified(ConfigTableMap::HIDDEN)) {
-            $modifiedColumns[':p' . $index++]  = 'HIDDEN';
+            $modifiedColumns[':p' . $index++]  = '`HIDDEN`';
         }
         if ($this->isColumnModified(ConfigTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
         if ($this->isColumnModified(ConfigTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
 
         $sql = sprintf(
-            'INSERT INTO config (%s) VALUES (%s)',
+            'INSERT INTO `config` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -999,25 +999,25 @@ abstract class Config implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
+                    case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'NAME':
+                    case '`NAME`':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
-                    case 'VALUE':
+                    case '`VALUE`':
                         $stmt->bindValue($identifier, $this->value, PDO::PARAM_STR);
                         break;
-                    case 'SECURED':
+                    case '`SECURED`':
                         $stmt->bindValue($identifier, $this->secured, PDO::PARAM_INT);
                         break;
-                    case 'HIDDEN':
+                    case '`HIDDEN`':
                         $stmt->bindValue($identifier, $this->hidden, PDO::PARAM_INT);
                         break;
-                    case 'CREATED_AT':
+                    case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case 'UPDATED_AT':
+                    case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

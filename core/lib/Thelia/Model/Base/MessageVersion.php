@@ -1142,44 +1142,44 @@ abstract class MessageVersion implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(MessageVersionTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
+            $modifiedColumns[':p' . $index++]  = '`ID`';
         }
         if ($this->isColumnModified(MessageVersionTableMap::NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'NAME';
+            $modifiedColumns[':p' . $index++]  = '`NAME`';
         }
         if ($this->isColumnModified(MessageVersionTableMap::SECURED)) {
-            $modifiedColumns[':p' . $index++]  = 'SECURED';
+            $modifiedColumns[':p' . $index++]  = '`SECURED`';
         }
         if ($this->isColumnModified(MessageVersionTableMap::TEXT_LAYOUT_FILE_NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'TEXT_LAYOUT_FILE_NAME';
+            $modifiedColumns[':p' . $index++]  = '`TEXT_LAYOUT_FILE_NAME`';
         }
         if ($this->isColumnModified(MessageVersionTableMap::TEXT_TEMPLATE_FILE_NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'TEXT_TEMPLATE_FILE_NAME';
+            $modifiedColumns[':p' . $index++]  = '`TEXT_TEMPLATE_FILE_NAME`';
         }
         if ($this->isColumnModified(MessageVersionTableMap::HTML_LAYOUT_FILE_NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'HTML_LAYOUT_FILE_NAME';
+            $modifiedColumns[':p' . $index++]  = '`HTML_LAYOUT_FILE_NAME`';
         }
         if ($this->isColumnModified(MessageVersionTableMap::HTML_TEMPLATE_FILE_NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'HTML_TEMPLATE_FILE_NAME';
+            $modifiedColumns[':p' . $index++]  = '`HTML_TEMPLATE_FILE_NAME`';
         }
         if ($this->isColumnModified(MessageVersionTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
         if ($this->isColumnModified(MessageVersionTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
         if ($this->isColumnModified(MessageVersionTableMap::VERSION)) {
-            $modifiedColumns[':p' . $index++]  = 'VERSION';
+            $modifiedColumns[':p' . $index++]  = '`VERSION`';
         }
         if ($this->isColumnModified(MessageVersionTableMap::VERSION_CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'VERSION_CREATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
         }
         if ($this->isColumnModified(MessageVersionTableMap::VERSION_CREATED_BY)) {
-            $modifiedColumns[':p' . $index++]  = 'VERSION_CREATED_BY';
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
         }
 
         $sql = sprintf(
-            'INSERT INTO message_version (%s) VALUES (%s)',
+            'INSERT INTO `message_version` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1188,40 +1188,40 @@ abstract class MessageVersion implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
+                    case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'NAME':
+                    case '`NAME`':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
-                    case 'SECURED':
+                    case '`SECURED`':
                         $stmt->bindValue($identifier, $this->secured, PDO::PARAM_INT);
                         break;
-                    case 'TEXT_LAYOUT_FILE_NAME':
+                    case '`TEXT_LAYOUT_FILE_NAME`':
                         $stmt->bindValue($identifier, $this->text_layout_file_name, PDO::PARAM_STR);
                         break;
-                    case 'TEXT_TEMPLATE_FILE_NAME':
+                    case '`TEXT_TEMPLATE_FILE_NAME`':
                         $stmt->bindValue($identifier, $this->text_template_file_name, PDO::PARAM_STR);
                         break;
-                    case 'HTML_LAYOUT_FILE_NAME':
+                    case '`HTML_LAYOUT_FILE_NAME`':
                         $stmt->bindValue($identifier, $this->html_layout_file_name, PDO::PARAM_STR);
                         break;
-                    case 'HTML_TEMPLATE_FILE_NAME':
+                    case '`HTML_TEMPLATE_FILE_NAME`':
                         $stmt->bindValue($identifier, $this->html_template_file_name, PDO::PARAM_STR);
                         break;
-                    case 'CREATED_AT':
+                    case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case 'UPDATED_AT':
+                    case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case 'VERSION':
+                    case '`VERSION`':
                         $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
                         break;
-                    case 'VERSION_CREATED_AT':
+                    case '`VERSION_CREATED_AT`':
                         $stmt->bindValue($identifier, $this->version_created_at ? $this->version_created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case 'VERSION_CREATED_BY':
+                    case '`VERSION_CREATED_BY`':
                         $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }

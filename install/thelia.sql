@@ -652,6 +652,7 @@ CREATE TABLE `order`
     `transaction_ref` VARCHAR(100) COMMENT 'transaction reference - usually use to identify a transaction with banking modules',
     `delivery_ref` VARCHAR(100) COMMENT 'delivery reference - usually use to identify a delivery progress on a distant delivery tracker website',
     `invoice_ref` VARCHAR(100) COMMENT 'the invoice reference',
+    `discount` FLOAT,
     `postage` FLOAT NOT NULL,
     `payment_module_id` INTEGER NOT NULL,
     `delivery_module_id` INTEGER NOT NULL,
@@ -1110,28 +1111,6 @@ CREATE TABLE `coupon`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- coupon_order
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `coupon_order`;
-
-CREATE TABLE `coupon_order`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `order_id` INTEGER NOT NULL,
-    `value` FLOAT NOT NULL,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
-    INDEX `idx_coupon_order_order_id` (`order_id`),
-    CONSTRAINT `fk_coupon_order_order_id`
-        FOREIGN KEY (`order_id`)
-        REFERENCES `order` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
 -- admin_log
 -- ---------------------------------------------------------------------
 
@@ -1242,7 +1221,6 @@ CREATE TABLE `cart_item`
     `price` FLOAT,
     `promo_price` FLOAT,
     `price_end_of_life` DATETIME,
-    `discount` FLOAT DEFAULT 0,
     `promo` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1619,6 +1597,38 @@ CREATE TABLE `newsletter`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `email_UNIQUE` (`email`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- order_coupon
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_coupon`;
+
+CREATE TABLE `order_coupon`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_id` INTEGER NOT NULL,
+    `code` VARCHAR(45) NOT NULL,
+    `type` VARCHAR(255) NOT NULL,
+    `amount` FLOAT NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `short_description` TEXT NOT NULL,
+    `description` LONGTEXT NOT NULL,
+    `expiration_date` DATETIME NOT NULL,
+    `is_cumulative` TINYINT(1) NOT NULL,
+    `is_removing_postage` TINYINT(1) NOT NULL,
+    `is_available_on_special_offers` TINYINT(1) NOT NULL,
+    `serialized_conditions` TEXT NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_coupon_order_id` (`order_id`),
+    CONSTRAINT `fk_order_coupon_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

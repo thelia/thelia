@@ -40,16 +40,17 @@ class TemplateHelper
 
     private function __construct() {}
 
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (self::$instance == null) self::$instance = new TemplateHelper();
-
         return self::$instance;
     }
 
     /**
      * @return TemplateDefinition
      */
-    public function getActiveMailTemplate() {
+    public function getActiveMailTemplate()
+    {
         return new TemplateDefinition(
                 ConfigQuery::read('active-mail-template', 'default'),
                 TemplateDefinition::EMAIL
@@ -59,7 +60,8 @@ class TemplateHelper
     /**
      * @return TemplateDefinition
      */
-    public function getActivePdfTemplate() {
+    public function getActivePdfTemplate()
+    {
         return new TemplateDefinition(
                 ConfigQuery::read('active-pdf-template', 'default'),
                 TemplateDefinition::PDF
@@ -69,7 +71,8 @@ class TemplateHelper
     /**
      * @return TemplateDefinition
      */
-    public function getActiveAdminTemplate() {
+    public function getActiveAdminTemplate()
+    {
         return new TemplateDefinition(
                 ConfigQuery::read('active-admin-template', 'default'),
                 TemplateDefinition::BACK_OFFICE
@@ -79,7 +82,8 @@ class TemplateHelper
     /**
      * @return TemplateDefinition
      */
-    public function getActiveFrontTemplate() {
+    public function getActiveFrontTemplate()
+    {
         return new TemplateDefinition(
                 ConfigQuery::read('active-front-template', 'default'),
                 TemplateDefinition::FRONT_OFFICE
@@ -134,7 +138,6 @@ class TemplateHelper
         }
     }
 
-
     protected function normalize_path($path)
     {
         $path = str_replace(
@@ -155,28 +158,27 @@ class TemplateHelper
      * 'translation' => the text translation, or an empty string if none available.
      * 'dollar'  => true if the translatable text contains a $
      *
-     * @param string $directory the path to the directory to examine
-     * @param string $walkMode type of file scanning: WALK_MODE_PHP or WALK_MODE_TEMPLATE
-     * @param \Thelia\Core\Translation\Translator $translator the current translator
-     * @param string $currentLocale the current locale
-     * @param array $strings the list of strings
-     * @throws \InvalidArgumentException if $walkMode contains an invalid value
-     * @return number the total number of translatable texts
+     * @param  string                              $directory     the path to the directory to examine
+     * @param  string                              $walkMode      type of file scanning: WALK_MODE_PHP or WALK_MODE_TEMPLATE
+     * @param  \Thelia\Core\Translation\Translator $translator    the current translator
+     * @param  string                              $currentLocale the current locale
+     * @param  array                               $strings       the list of strings
+     * @throws \InvalidArgumentException           if $walkMode contains an invalid value
+     * @return number                              the total number of translatable texts
      */
-    public function walkDir($directory, $walkMode, Translator $translator, $currentLocale, &$strings) {
-
+    public function walkDir($directory, $walkMode, Translator $translator, $currentLocale, &$strings)
+    {
         $num_texts = 0;
 
         if ($walkMode == self::WALK_MODE_PHP) {
             $prefix = '\-\>[\s]*trans[\s]*\(';
 
             $allowed_exts = array('php');
-        } else if ($walkMode == self::WALK_MODE_TEMPLATE) {
+        } elseif ($walkMode == self::WALK_MODE_TEMPLATE) {
             $prefix = '\{intl[\s]l=';
 
             $allowed_exts = array('html', 'tpl', 'xml');
-        }
-        else {
+        } else {
             throw new \InvalidArgumentException(
                     Translator::getInstance()->trans('Invalid value for walkMode parameter: %value', array('%value' => $walkMode))
             );
@@ -210,18 +212,15 @@ class TemplateHelper
 
                                 Tlog::getInstance()->debug("Strings found: ", $matches[2]);
 
-                                foreach($matches[2] as $match) {
+                                foreach ($matches[2] as $match) {
 
                                     $hash = md5($match);
 
-                                    if (isset($strings[$hash]))
-                                    {
-                                        if (! in_array($short_path, $strings[$hash]['files']))
-                                        {
+                                    if (isset($strings[$hash])) {
+                                        if (! in_array($short_path, $strings[$hash]['files'])) {
                                             $strings[$hash]['files'][] = $short_path;
                                         }
-                                    }
-                                    else {
+                                    } else {
                                         $num_texts++;
 
                                         // remove \'
@@ -273,9 +272,7 @@ class TemplateHelper
             fwrite($fp, ");\n");
 
             @fclose($fp);
-        }
-        else
-        {
+        } else {
             throw new \RuntimeException(
                 Translator::getInstance()->trans(
                     'Failed to open translation file %file. Please be sure that this file is writable by your Web server',

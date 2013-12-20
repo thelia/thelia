@@ -28,7 +28,6 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\an;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 
-
 /**
  * Class Esi
  * @package Thelia\Core\Template\Smarty\Plugins
@@ -53,7 +52,7 @@ class Esi extends AbstractSmartyPlugin
         $ignore_errors = $this->getParam($params, 'ignore_errors');
         $comment = $this->getParam($params, 'comment');
 
-        if(null === $path) {
+        if (null === $path) {
             return;
         }
 

@@ -1,8 +1,8 @@
 If you contributes or contributed to this project and do not appear in this list below,
 please email us (info@thelia.net) or fork this file on Github and send a pull-request.
 
-Manuel Raynaud - mraynaud@openstudio.fr
-Etienne Roudeix - eroudeix@openstudio.fr
+Manuel Raynaud - manu@thelia.net
+Etienne Roudeix - etienne@thelia.net
 Franck Allimant - franck@allimant.org
 Guillaume Morel - gmorel@openstudio.fr
 Michael Espeche - mespeche@openstudio.fr

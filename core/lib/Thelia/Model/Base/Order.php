@@ -17,8 +17,6 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\CouponOrder as ChildCouponOrder;
-use Thelia\Model\CouponOrderQuery as ChildCouponOrderQuery;
 use Thelia\Model\Currency as ChildCurrency;
 use Thelia\Model\CurrencyQuery as ChildCurrencyQuery;
 use Thelia\Model\Customer as ChildCustomer;
@@ -30,6 +28,8 @@ use Thelia\Model\ModuleQuery as ChildModuleQuery;
 use Thelia\Model\Order as ChildOrder;
 use Thelia\Model\OrderAddress as ChildOrderAddress;
 use Thelia\Model\OrderAddressQuery as ChildOrderAddressQuery;
+use Thelia\Model\OrderCoupon as ChildOrderCoupon;
+use Thelia\Model\OrderCouponQuery as ChildOrderCouponQuery;
 use Thelia\Model\OrderProduct as ChildOrderProduct;
 use Thelia\Model\OrderProductQuery as ChildOrderProductQuery;
 use Thelia\Model\OrderQuery as ChildOrderQuery;
@@ -138,6 +138,12 @@ abstract class Order implements ActiveRecordInterface
     protected $invoice_ref;
 
     /**
+     * The value for the discount field.
+     * @var        double
+     */
+    protected $discount;
+
+    /**
      * The value for the postage field.
      * @var        double
      */
@@ -226,10 +232,10 @@ abstract class Order implements ActiveRecordInterface
     protected $collOrderProductsPartial;
 
     /**
-     * @var        ObjectCollection|ChildCouponOrder[] Collection to store aggregation of ChildCouponOrder objects.
+     * @var        ObjectCollection|ChildOrderCoupon[] Collection to store aggregation of ChildOrderCoupon objects.
      */
-    protected $collCouponOrders;
-    protected $collCouponOrdersPartial;
+    protected $collOrderCoupons;
+    protected $collOrderCouponsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -249,7 +255,7 @@ abstract class Order implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $couponOrdersScheduledForDeletion = null;
+    protected $orderCouponsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Thelia\Model\Base\Order object.
@@ -640,6 +646,17 @@ abstract class Order implements ActiveRecordInterface
     }
 
     /**
+     * Get the [discount] column value.
+     *
+     * @return   double
+     */
+    public function getDiscount()
+    {
+
+        return $this->discount;
+    }
+
+    /**
      * Get the [postage] column value.
      *
      * @return   double
@@ -982,6 +999,27 @@ abstract class Order implements ActiveRecordInterface
     } // setInvoiceRef()
 
     /**
+     * Set the value of [discount] column.
+     *
+     * @param      double $v new value
+     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     */
+    public function setDiscount($v)
+    {
+        if ($v !== null) {
+            $v = (double) $v;
+        }
+
+        if ($this->discount !== $v) {
+            $this->discount = $v;
+            $this->modifiedColumns[] = OrderTableMap::DISCOUNT;
+        }
+
+
+        return $this;
+    } // setDiscount()
+
+    /**
      * Set the value of [postage] column.
      *
      * @param      double $v new value
@@ -1217,28 +1255,31 @@ abstract class Order implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderTableMap::translateFieldName('InvoiceRef', TableMap::TYPE_PHPNAME, $indexType)];
             $this->invoice_ref = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderTableMap::translateFieldName('Postage', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->discount = (null !== $col) ? (double) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderTableMap::translateFieldName('Postage', TableMap::TYPE_PHPNAME, $indexType)];
             $this->postage = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderTableMap::translateFieldName('PaymentModuleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderTableMap::translateFieldName('PaymentModuleId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->payment_module_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderTableMap::translateFieldName('DeliveryModuleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderTableMap::translateFieldName('DeliveryModuleId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->delivery_module_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderTableMap::translateFieldName('StatusId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderTableMap::translateFieldName('StatusId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->status_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderTableMap::translateFieldName('LangId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderTableMap::translateFieldName('LangId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->lang_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : OrderTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1251,7 +1292,7 @@ abstract class Order implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 18; // 18 = OrderTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 19; // 19 = OrderTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Order object", 0, $e);
@@ -1346,7 +1387,7 @@ abstract class Order implements ActiveRecordInterface
             $this->aLang = null;
             $this->collOrderProducts = null;
 
-            $this->collCouponOrders = null;
+            $this->collOrderCoupons = null;
 
         } // if (deep)
     }
@@ -1559,17 +1600,17 @@ abstract class Order implements ActiveRecordInterface
                 }
             }
 
-            if ($this->couponOrdersScheduledForDeletion !== null) {
-                if (!$this->couponOrdersScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\CouponOrderQuery::create()
-                        ->filterByPrimaryKeys($this->couponOrdersScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->orderCouponsScheduledForDeletion !== null) {
+                if (!$this->orderCouponsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\OrderCouponQuery::create()
+                        ->filterByPrimaryKeys($this->orderCouponsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->couponOrdersScheduledForDeletion = null;
+                    $this->orderCouponsScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collCouponOrders !== null) {
-            foreach ($this->collCouponOrders as $referrerFK) {
+                if ($this->collOrderCoupons !== null) {
+            foreach ($this->collOrderCoupons as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1603,62 +1644,65 @@ abstract class Order implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(OrderTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
+            $modifiedColumns[':p' . $index++]  = '`ID`';
         }
         if ($this->isColumnModified(OrderTableMap::REF)) {
-            $modifiedColumns[':p' . $index++]  = 'REF';
+            $modifiedColumns[':p' . $index++]  = '`REF`';
         }
         if ($this->isColumnModified(OrderTableMap::CUSTOMER_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'CUSTOMER_ID';
+            $modifiedColumns[':p' . $index++]  = '`CUSTOMER_ID`';
         }
         if ($this->isColumnModified(OrderTableMap::INVOICE_ORDER_ADDRESS_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'INVOICE_ORDER_ADDRESS_ID';
+            $modifiedColumns[':p' . $index++]  = '`INVOICE_ORDER_ADDRESS_ID`';
         }
         if ($this->isColumnModified(OrderTableMap::DELIVERY_ORDER_ADDRESS_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'DELIVERY_ORDER_ADDRESS_ID';
+            $modifiedColumns[':p' . $index++]  = '`DELIVERY_ORDER_ADDRESS_ID`';
         }
         if ($this->isColumnModified(OrderTableMap::INVOICE_DATE)) {
-            $modifiedColumns[':p' . $index++]  = 'INVOICE_DATE';
+            $modifiedColumns[':p' . $index++]  = '`INVOICE_DATE`';
         }
         if ($this->isColumnModified(OrderTableMap::CURRENCY_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'CURRENCY_ID';
+            $modifiedColumns[':p' . $index++]  = '`CURRENCY_ID`';
         }
         if ($this->isColumnModified(OrderTableMap::CURRENCY_RATE)) {
-            $modifiedColumns[':p' . $index++]  = 'CURRENCY_RATE';
+            $modifiedColumns[':p' . $index++]  = '`CURRENCY_RATE`';
         }
         if ($this->isColumnModified(OrderTableMap::TRANSACTION_REF)) {
-            $modifiedColumns[':p' . $index++]  = 'TRANSACTION_REF';
+            $modifiedColumns[':p' . $index++]  = '`TRANSACTION_REF`';
         }
         if ($this->isColumnModified(OrderTableMap::DELIVERY_REF)) {
-            $modifiedColumns[':p' . $index++]  = 'DELIVERY_REF';
+            $modifiedColumns[':p' . $index++]  = '`DELIVERY_REF`';
         }
         if ($this->isColumnModified(OrderTableMap::INVOICE_REF)) {
-            $modifiedColumns[':p' . $index++]  = 'INVOICE_REF';
+            $modifiedColumns[':p' . $index++]  = '`INVOICE_REF`';
+        }
+        if ($this->isColumnModified(OrderTableMap::DISCOUNT)) {
+            $modifiedColumns[':p' . $index++]  = '`DISCOUNT`';
         }
         if ($this->isColumnModified(OrderTableMap::POSTAGE)) {
-            $modifiedColumns[':p' . $index++]  = 'POSTAGE';
+            $modifiedColumns[':p' . $index++]  = '`POSTAGE`';
         }
         if ($this->isColumnModified(OrderTableMap::PAYMENT_MODULE_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'PAYMENT_MODULE_ID';
+            $modifiedColumns[':p' . $index++]  = '`PAYMENT_MODULE_ID`';
         }
         if ($this->isColumnModified(OrderTableMap::DELIVERY_MODULE_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'DELIVERY_MODULE_ID';
+            $modifiedColumns[':p' . $index++]  = '`DELIVERY_MODULE_ID`';
         }
         if ($this->isColumnModified(OrderTableMap::STATUS_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'STATUS_ID';
+            $modifiedColumns[':p' . $index++]  = '`STATUS_ID`';
         }
         if ($this->isColumnModified(OrderTableMap::LANG_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'LANG_ID';
+            $modifiedColumns[':p' . $index++]  = '`LANG_ID`';
         }
         if ($this->isColumnModified(OrderTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
         if ($this->isColumnModified(OrderTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
 
         $sql = sprintf(
-            'INSERT INTO order (%s) VALUES (%s)',
+            'INSERT INTO `order` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1667,58 +1711,61 @@ abstract class Order implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
+                    case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'REF':
+                    case '`REF`':
                         $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
                         break;
-                    case 'CUSTOMER_ID':
+                    case '`CUSTOMER_ID`':
                         $stmt->bindValue($identifier, $this->customer_id, PDO::PARAM_INT);
                         break;
-                    case 'INVOICE_ORDER_ADDRESS_ID':
+                    case '`INVOICE_ORDER_ADDRESS_ID`':
                         $stmt->bindValue($identifier, $this->invoice_order_address_id, PDO::PARAM_INT);
                         break;
-                    case 'DELIVERY_ORDER_ADDRESS_ID':
+                    case '`DELIVERY_ORDER_ADDRESS_ID`':
                         $stmt->bindValue($identifier, $this->delivery_order_address_id, PDO::PARAM_INT);
                         break;
-                    case 'INVOICE_DATE':
+                    case '`INVOICE_DATE`':
                         $stmt->bindValue($identifier, $this->invoice_date ? $this->invoice_date->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case 'CURRENCY_ID':
+                    case '`CURRENCY_ID`':
                         $stmt->bindValue($identifier, $this->currency_id, PDO::PARAM_INT);
                         break;
-                    case 'CURRENCY_RATE':
+                    case '`CURRENCY_RATE`':
                         $stmt->bindValue($identifier, $this->currency_rate, PDO::PARAM_STR);
                         break;
-                    case 'TRANSACTION_REF':
+                    case '`TRANSACTION_REF`':
                         $stmt->bindValue($identifier, $this->transaction_ref, PDO::PARAM_STR);
                         break;
-                    case 'DELIVERY_REF':
+                    case '`DELIVERY_REF`':
                         $stmt->bindValue($identifier, $this->delivery_ref, PDO::PARAM_STR);
                         break;
-                    case 'INVOICE_REF':
+                    case '`INVOICE_REF`':
                         $stmt->bindValue($identifier, $this->invoice_ref, PDO::PARAM_STR);
                         break;
-                    case 'POSTAGE':
+                    case '`DISCOUNT`':
+                        $stmt->bindValue($identifier, $this->discount, PDO::PARAM_STR);
+                        break;
+                    case '`POSTAGE`':
                         $stmt->bindValue($identifier, $this->postage, PDO::PARAM_STR);
                         break;
-                    case 'PAYMENT_MODULE_ID':
+                    case '`PAYMENT_MODULE_ID`':
                         $stmt->bindValue($identifier, $this->payment_module_id, PDO::PARAM_INT);
                         break;
-                    case 'DELIVERY_MODULE_ID':
+                    case '`DELIVERY_MODULE_ID`':
                         $stmt->bindValue($identifier, $this->delivery_module_id, PDO::PARAM_INT);
                         break;
-                    case 'STATUS_ID':
+                    case '`STATUS_ID`':
                         $stmt->bindValue($identifier, $this->status_id, PDO::PARAM_INT);
                         break;
-                    case 'LANG_ID':
+                    case '`LANG_ID`':
                         $stmt->bindValue($identifier, $this->lang_id, PDO::PARAM_INT);
                         break;
-                    case 'CREATED_AT':
+                    case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case 'UPDATED_AT':
+                    case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
@@ -1817,24 +1864,27 @@ abstract class Order implements ActiveRecordInterface
                 return $this->getInvoiceRef();
                 break;
             case 11:
-                return $this->getPostage();
+                return $this->getDiscount();
                 break;
             case 12:
-                return $this->getPaymentModuleId();
+                return $this->getPostage();
                 break;
             case 13:
-                return $this->getDeliveryModuleId();
+                return $this->getPaymentModuleId();
                 break;
             case 14:
-                return $this->getStatusId();
+                return $this->getDeliveryModuleId();
                 break;
             case 15:
-                return $this->getLangId();
+                return $this->getStatusId();
                 break;
             case 16:
-                return $this->getCreatedAt();
+                return $this->getLangId();
                 break;
             case 17:
+                return $this->getCreatedAt();
+                break;
+            case 18:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1877,13 +1927,14 @@ abstract class Order implements ActiveRecordInterface
             $keys[8] => $this->getTransactionRef(),
             $keys[9] => $this->getDeliveryRef(),
             $keys[10] => $this->getInvoiceRef(),
-            $keys[11] => $this->getPostage(),
-            $keys[12] => $this->getPaymentModuleId(),
-            $keys[13] => $this->getDeliveryModuleId(),
-            $keys[14] => $this->getStatusId(),
-            $keys[15] => $this->getLangId(),
-            $keys[16] => $this->getCreatedAt(),
-            $keys[17] => $this->getUpdatedAt(),
+            $keys[11] => $this->getDiscount(),
+            $keys[12] => $this->getPostage(),
+            $keys[13] => $this->getPaymentModuleId(),
+            $keys[14] => $this->getDeliveryModuleId(),
+            $keys[15] => $this->getStatusId(),
+            $keys[16] => $this->getLangId(),
+            $keys[17] => $this->getCreatedAt(),
+            $keys[18] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1918,8 +1969,8 @@ abstract class Order implements ActiveRecordInterface
             if (null !== $this->collOrderProducts) {
                 $result['OrderProducts'] = $this->collOrderProducts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collCouponOrders) {
-                $result['CouponOrders'] = $this->collCouponOrders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collOrderCoupons) {
+                $result['OrderCoupons'] = $this->collOrderCoupons->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1989,24 +2040,27 @@ abstract class Order implements ActiveRecordInterface
                 $this->setInvoiceRef($value);
                 break;
             case 11:
-                $this->setPostage($value);
+                $this->setDiscount($value);
                 break;
             case 12:
-                $this->setPaymentModuleId($value);
+                $this->setPostage($value);
                 break;
             case 13:
-                $this->setDeliveryModuleId($value);
+                $this->setPaymentModuleId($value);
                 break;
             case 14:
-                $this->setStatusId($value);
+                $this->setDeliveryModuleId($value);
                 break;
             case 15:
-                $this->setLangId($value);
+                $this->setStatusId($value);
                 break;
             case 16:
-                $this->setCreatedAt($value);
+                $this->setLangId($value);
                 break;
             case 17:
+                $this->setCreatedAt($value);
+                break;
+            case 18:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -2044,13 +2098,14 @@ abstract class Order implements ActiveRecordInterface
         if (array_key_exists($keys[8], $arr)) $this->setTransactionRef($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setDeliveryRef($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setInvoiceRef($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setPostage($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setPaymentModuleId($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setDeliveryModuleId($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setStatusId($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setLangId($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setCreatedAt($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setUpdatedAt($arr[$keys[17]]);
+        if (array_key_exists($keys[11], $arr)) $this->setDiscount($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setPostage($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setPaymentModuleId($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setDeliveryModuleId($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setStatusId($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setLangId($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setCreatedAt($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setUpdatedAt($arr[$keys[18]]);
     }
 
     /**
@@ -2073,6 +2128,7 @@ abstract class Order implements ActiveRecordInterface
         if ($this->isColumnModified(OrderTableMap::TRANSACTION_REF)) $criteria->add(OrderTableMap::TRANSACTION_REF, $this->transaction_ref);
         if ($this->isColumnModified(OrderTableMap::DELIVERY_REF)) $criteria->add(OrderTableMap::DELIVERY_REF, $this->delivery_ref);
         if ($this->isColumnModified(OrderTableMap::INVOICE_REF)) $criteria->add(OrderTableMap::INVOICE_REF, $this->invoice_ref);
+        if ($this->isColumnModified(OrderTableMap::DISCOUNT)) $criteria->add(OrderTableMap::DISCOUNT, $this->discount);
         if ($this->isColumnModified(OrderTableMap::POSTAGE)) $criteria->add(OrderTableMap::POSTAGE, $this->postage);
         if ($this->isColumnModified(OrderTableMap::PAYMENT_MODULE_ID)) $criteria->add(OrderTableMap::PAYMENT_MODULE_ID, $this->payment_module_id);
         if ($this->isColumnModified(OrderTableMap::DELIVERY_MODULE_ID)) $criteria->add(OrderTableMap::DELIVERY_MODULE_ID, $this->delivery_module_id);
@@ -2153,6 +2209,7 @@ abstract class Order implements ActiveRecordInterface
         $copyObj->setTransactionRef($this->getTransactionRef());
         $copyObj->setDeliveryRef($this->getDeliveryRef());
         $copyObj->setInvoiceRef($this->getInvoiceRef());
+        $copyObj->setDiscount($this->getDiscount());
         $copyObj->setPostage($this->getPostage());
         $copyObj->setPaymentModuleId($this->getPaymentModuleId());
         $copyObj->setDeliveryModuleId($this->getDeliveryModuleId());
@@ -2172,9 +2229,9 @@ abstract class Order implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getCouponOrders() as $relObj) {
+            foreach ($this->getOrderCoupons() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addCouponOrder($relObj->copy($deepCopy));
+                    $copyObj->addOrderCoupon($relObj->copy($deepCopy));
                 }
             }
 
@@ -2630,8 +2687,8 @@ abstract class Order implements ActiveRecordInterface
         if ('OrderProduct' == $relationName) {
             return $this->initOrderProducts();
         }
-        if ('CouponOrder' == $relationName) {
-            return $this->initCouponOrders();
+        if ('OrderCoupon' == $relationName) {
+            return $this->initOrderCoupons();
         }
     }
 
@@ -2854,31 +2911,31 @@ abstract class Order implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collCouponOrders collection
+     * Clears out the collOrderCoupons collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addCouponOrders()
+     * @see        addOrderCoupons()
      */
-    public function clearCouponOrders()
+    public function clearOrderCoupons()
     {
-        $this->collCouponOrders = null; // important to set this to NULL since that means it is uninitialized
+        $this->collOrderCoupons = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collCouponOrders collection loaded partially.
+     * Reset is the collOrderCoupons collection loaded partially.
      */
-    public function resetPartialCouponOrders($v = true)
+    public function resetPartialOrderCoupons($v = true)
     {
-        $this->collCouponOrdersPartial = $v;
+        $this->collOrderCouponsPartial = $v;
     }
 
     /**
-     * Initializes the collCouponOrders collection.
+     * Initializes the collOrderCoupons collection.
      *
-     * By default this just sets the collCouponOrders collection to an empty array (like clearcollCouponOrders());
+     * By default this just sets the collOrderCoupons collection to an empty array (like clearcollOrderCoupons());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -2887,17 +2944,17 @@ abstract class Order implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initCouponOrders($overrideExisting = true)
+    public function initOrderCoupons($overrideExisting = true)
     {
-        if (null !== $this->collCouponOrders && !$overrideExisting) {
+        if (null !== $this->collOrderCoupons && !$overrideExisting) {
             return;
         }
-        $this->collCouponOrders = new ObjectCollection();
-        $this->collCouponOrders->setModel('\Thelia\Model\CouponOrder');
+        $this->collOrderCoupons = new ObjectCollection();
+        $this->collOrderCoupons->setModel('\Thelia\Model\OrderCoupon');
     }
 
     /**
-     * Gets an array of ChildCouponOrder objects which contain a foreign key that references this object.
+     * Gets an array of ChildOrderCoupon objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -2907,109 +2964,109 @@ abstract class Order implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildCouponOrder[] List of ChildCouponOrder objects
+     * @return Collection|ChildOrderCoupon[] List of ChildOrderCoupon objects
      * @throws PropelException
      */
-    public function getCouponOrders($criteria = null, ConnectionInterface $con = null)
+    public function getOrderCoupons($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collCouponOrdersPartial && !$this->isNew();
-        if (null === $this->collCouponOrders || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCouponOrders) {
+        $partial = $this->collOrderCouponsPartial && !$this->isNew();
+        if (null === $this->collOrderCoupons || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOrderCoupons) {
                 // return empty collection
-                $this->initCouponOrders();
+                $this->initOrderCoupons();
             } else {
-                $collCouponOrders = ChildCouponOrderQuery::create(null, $criteria)
+                $collOrderCoupons = ChildOrderCouponQuery::create(null, $criteria)
                     ->filterByOrder($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collCouponOrdersPartial && count($collCouponOrders)) {
-                        $this->initCouponOrders(false);
+                    if (false !== $this->collOrderCouponsPartial && count($collOrderCoupons)) {
+                        $this->initOrderCoupons(false);
 
-                        foreach ($collCouponOrders as $obj) {
-                            if (false == $this->collCouponOrders->contains($obj)) {
-                                $this->collCouponOrders->append($obj);
+                        foreach ($collOrderCoupons as $obj) {
+                            if (false == $this->collOrderCoupons->contains($obj)) {
+                                $this->collOrderCoupons->append($obj);
                             }
                         }
 
-                        $this->collCouponOrdersPartial = true;
+                        $this->collOrderCouponsPartial = true;
                     }
 
-                    $collCouponOrders->getInternalIterator()->rewind();
+                    $collOrderCoupons->getInternalIterator()->rewind();
 
-                    return $collCouponOrders;
+                    return $collOrderCoupons;
                 }
 
-                if ($partial && $this->collCouponOrders) {
-                    foreach ($this->collCouponOrders as $obj) {
+                if ($partial && $this->collOrderCoupons) {
+                    foreach ($this->collOrderCoupons as $obj) {
                         if ($obj->isNew()) {
-                            $collCouponOrders[] = $obj;
+                            $collOrderCoupons[] = $obj;
                         }
                     }
                 }
 
-                $this->collCouponOrders = $collCouponOrders;
-                $this->collCouponOrdersPartial = false;
+                $this->collOrderCoupons = $collOrderCoupons;
+                $this->collOrderCouponsPartial = false;
             }
         }
 
-        return $this->collCouponOrders;
+        return $this->collOrderCoupons;
     }
 
     /**
-     * Sets a collection of CouponOrder objects related by a one-to-many relationship
+     * Sets a collection of OrderCoupon objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $couponOrders A Propel collection.
+     * @param      Collection $orderCoupons A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return   ChildOrder The current object (for fluent API support)
      */
-    public function setCouponOrders(Collection $couponOrders, ConnectionInterface $con = null)
+    public function setOrderCoupons(Collection $orderCoupons, ConnectionInterface $con = null)
     {
-        $couponOrdersToDelete = $this->getCouponOrders(new Criteria(), $con)->diff($couponOrders);
+        $orderCouponsToDelete = $this->getOrderCoupons(new Criteria(), $con)->diff($orderCoupons);
 
 
-        $this->couponOrdersScheduledForDeletion = $couponOrdersToDelete;
+        $this->orderCouponsScheduledForDeletion = $orderCouponsToDelete;
 
-        foreach ($couponOrdersToDelete as $couponOrderRemoved) {
-            $couponOrderRemoved->setOrder(null);
+        foreach ($orderCouponsToDelete as $orderCouponRemoved) {
+            $orderCouponRemoved->setOrder(null);
         }
 
-        $this->collCouponOrders = null;
-        foreach ($couponOrders as $couponOrder) {
-            $this->addCouponOrder($couponOrder);
+        $this->collOrderCoupons = null;
+        foreach ($orderCoupons as $orderCoupon) {
+            $this->addOrderCoupon($orderCoupon);
         }
 
-        $this->collCouponOrders = $couponOrders;
-        $this->collCouponOrdersPartial = false;
+        $this->collOrderCoupons = $orderCoupons;
+        $this->collOrderCouponsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related CouponOrder objects.
+     * Returns the number of related OrderCoupon objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related CouponOrder objects.
+     * @return int             Count of related OrderCoupon objects.
      * @throws PropelException
      */
-    public function countCouponOrders(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countOrderCoupons(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collCouponOrdersPartial && !$this->isNew();
-        if (null === $this->collCouponOrders || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCouponOrders) {
+        $partial = $this->collOrderCouponsPartial && !$this->isNew();
+        if (null === $this->collOrderCoupons || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOrderCoupons) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getCouponOrders());
+                return count($this->getOrderCoupons());
             }
 
-            $query = ChildCouponOrderQuery::create(null, $criteria);
+            $query = ChildOrderCouponQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -3019,53 +3076,53 @@ abstract class Order implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collCouponOrders);
+        return count($this->collOrderCoupons);
     }
 
     /**
-     * Method called to associate a ChildCouponOrder object to this object
-     * through the ChildCouponOrder foreign key attribute.
+     * Method called to associate a ChildOrderCoupon object to this object
+     * through the ChildOrderCoupon foreign key attribute.
      *
-     * @param    ChildCouponOrder $l ChildCouponOrder
+     * @param    ChildOrderCoupon $l ChildOrderCoupon
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
-    public function addCouponOrder(ChildCouponOrder $l)
+    public function addOrderCoupon(ChildOrderCoupon $l)
     {
-        if ($this->collCouponOrders === null) {
-            $this->initCouponOrders();
-            $this->collCouponOrdersPartial = true;
+        if ($this->collOrderCoupons === null) {
+            $this->initOrderCoupons();
+            $this->collOrderCouponsPartial = true;
         }
 
-        if (!in_array($l, $this->collCouponOrders->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddCouponOrder($l);
+        if (!in_array($l, $this->collOrderCoupons->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddOrderCoupon($l);
         }
 
         return $this;
     }
 
     /**
-     * @param CouponOrder $couponOrder The couponOrder object to add.
+     * @param OrderCoupon $orderCoupon The orderCoupon object to add.
      */
-    protected function doAddCouponOrder($couponOrder)
+    protected function doAddOrderCoupon($orderCoupon)
     {
-        $this->collCouponOrders[]= $couponOrder;
-        $couponOrder->setOrder($this);
+        $this->collOrderCoupons[]= $orderCoupon;
+        $orderCoupon->setOrder($this);
     }
 
     /**
-     * @param  CouponOrder $couponOrder The couponOrder object to remove.
+     * @param  OrderCoupon $orderCoupon The orderCoupon object to remove.
      * @return ChildOrder The current object (for fluent API support)
      */
-    public function removeCouponOrder($couponOrder)
+    public function removeOrderCoupon($orderCoupon)
     {
-        if ($this->getCouponOrders()->contains($couponOrder)) {
-            $this->collCouponOrders->remove($this->collCouponOrders->search($couponOrder));
-            if (null === $this->couponOrdersScheduledForDeletion) {
-                $this->couponOrdersScheduledForDeletion = clone $this->collCouponOrders;
-                $this->couponOrdersScheduledForDeletion->clear();
+        if ($this->getOrderCoupons()->contains($orderCoupon)) {
+            $this->collOrderCoupons->remove($this->collOrderCoupons->search($orderCoupon));
+            if (null === $this->orderCouponsScheduledForDeletion) {
+                $this->orderCouponsScheduledForDeletion = clone $this->collOrderCoupons;
+                $this->orderCouponsScheduledForDeletion->clear();
             }
-            $this->couponOrdersScheduledForDeletion[]= clone $couponOrder;
-            $couponOrder->setOrder(null);
+            $this->orderCouponsScheduledForDeletion[]= clone $orderCoupon;
+            $orderCoupon->setOrder(null);
         }
 
         return $this;
@@ -3087,6 +3144,7 @@ abstract class Order implements ActiveRecordInterface
         $this->transaction_ref = null;
         $this->delivery_ref = null;
         $this->invoice_ref = null;
+        $this->discount = null;
         $this->postage = null;
         $this->payment_module_id = null;
         $this->delivery_module_id = null;
@@ -3118,8 +3176,8 @@ abstract class Order implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collCouponOrders) {
-                foreach ($this->collCouponOrders as $o) {
+            if ($this->collOrderCoupons) {
+                foreach ($this->collOrderCoupons as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -3129,10 +3187,10 @@ abstract class Order implements ActiveRecordInterface
             $this->collOrderProducts->clearIterator();
         }
         $this->collOrderProducts = null;
-        if ($this->collCouponOrders instanceof Collection) {
-            $this->collCouponOrders->clearIterator();
+        if ($this->collOrderCoupons instanceof Collection) {
+            $this->collOrderCoupons->clearIterator();
         }
-        $this->collCouponOrders = null;
+        $this->collOrderCoupons = null;
         $this->aCurrency = null;
         $this->aCustomer = null;
         $this->aOrderAddressRelatedByInvoiceOrderAddressId = null;

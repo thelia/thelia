@@ -23,19 +23,14 @@
 
 namespace Thelia\Controller\Admin;
 
-use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Security\AccessManager;
 use Thelia\Form\CustomerCreateForm;
 use Thelia\Form\CustomerUpdateForm;
-use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
-use Thelia\Core\Translation\Translator;
 use Thelia\Tools\Password;
-use Thelia\Model\AddressQuery;
 use Thelia\Model\Address;
 
 /**

@@ -83,7 +83,6 @@ class Cart extends BaseCart
 
         foreach($this->getCartItems() as $cartItem) {
             $subtotal = $cartItem->getRealPrice();
-            $subtotal -= $cartItem->getDiscount();
             /* we round it for the unit price, before the quantity factor */
             $subtotal = round($taxCalculator->load($cartItem->getProduct(), $country)->getTaxedPrice($subtotal), 2);
             $subtotal *= $cartItem->getQuantity();
@@ -102,7 +101,6 @@ class Cart extends BaseCart
 
         foreach($this->getCartItems() as $cartItem) {
             $subtotal = $cartItem->getRealPrice();
-            $subtotal -= $cartItem->getDiscount();
             $subtotal *= $cartItem->getQuantity();
 
             $total += $subtotal;

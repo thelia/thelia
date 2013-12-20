@@ -37,7 +37,7 @@ trait RewrittenUrlTestTrait
             ->filterByView(ConfigQuery::getObsoleteRewrittenUrlView(), Criteria::NOT_EQUAL)
             ->findOne();
 
-        if(null === $existingUrl) {
+        if (null === $existingUrl) {
             $this->fail('use fixtures before launching test, there is not enough rewritten url');
         }
 
@@ -55,12 +55,12 @@ trait RewrittenUrlTestTrait
 
         /* get a brand new URL */
         $exist = true;
-        while(true === $exist) {
+        while (true === $exist) {
             $newUrl = md5(rand(1, 999999)) . ".html";
             try {
                 new RewritingResolver($newUrl);
-            } catch(UrlRewritingException $e) {
-                if($e->getCode() === UrlRewritingException::URL_NOT_FOUND) {
+            } catch (UrlRewritingException $e) {
+                if ($e->getCode() === UrlRewritingException::URL_NOT_FOUND) {
                     /* It's all good if URL is not found */
                     $exist = false;
                 } else {
@@ -91,7 +91,7 @@ trait RewrittenUrlTestTrait
         try {
             $aRandomProduct->setRewrittenUrl($aRandomProduct->getLocale(), $currentUrl);
             $failReassign = false;
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
         }
 
         $this->assertFalse($failReassign);

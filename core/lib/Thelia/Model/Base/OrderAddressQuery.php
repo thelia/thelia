@@ -183,7 +183,7 @@ abstract class OrderAddressQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CUSTOMER_TITLE_ID, COMPANY, FIRSTNAME, LASTNAME, ADDRESS1, ADDRESS2, ADDRESS3, ZIPCODE, CITY, PHONE, COUNTRY_ID, CREATED_AT, UPDATED_AT FROM order_address WHERE ID = :p0';
+        $sql = 'SELECT `ID`, `CUSTOMER_TITLE_ID`, `COMPANY`, `FIRSTNAME`, `LASTNAME`, `ADDRESS1`, `ADDRESS2`, `ADDRESS3`, `ZIPCODE`, `CITY`, `PHONE`, `COUNTRY_ID`, `CREATED_AT`, `UPDATED_AT` FROM `order_address` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
