@@ -37,6 +37,7 @@ use Thelia\Form\FolderDocumentModification;
 use Thelia\Form\FolderImageModification;
 use Thelia\Form\ProductDocumentModification;
 use Thelia\Form\ProductImageModification;
+use Thelia\Model\AdminLog;
 use Thelia\Model\CategoryDocument;
 use Thelia\Model\CategoryDocumentQuery;
 use Thelia\Model\CategoryImage;

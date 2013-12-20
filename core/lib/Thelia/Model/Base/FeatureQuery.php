@@ -156,7 +156,7 @@ abstract class FeatureQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `VISIBLE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `feature` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, VISIBLE, POSITION, CREATED_AT, UPDATED_AT FROM feature WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

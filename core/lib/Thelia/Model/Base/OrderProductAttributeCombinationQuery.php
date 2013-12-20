@@ -171,7 +171,7 @@ abstract class OrderProductAttributeCombinationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ORDER_PRODUCT_ID`, `ATTRIBUTE_TITLE`, `ATTRIBUTE_CHAPO`, `ATTRIBUTE_DESCRIPTION`, `ATTRIBUTE_POSTSCRIPTUM`, `ATTRIBUTE_AV_TITLE`, `ATTRIBUTE_AV_CHAPO`, `ATTRIBUTE_AV_DESCRIPTION`, `ATTRIBUTE_AV_POSTSCRIPTUM`, `CREATED_AT`, `UPDATED_AT` FROM `order_product_attribute_combination` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, ORDER_PRODUCT_ID, ATTRIBUTE_TITLE, ATTRIBUTE_CHAPO, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_POSTSCRIPTUM, ATTRIBUTE_AV_TITLE, ATTRIBUTE_AV_CHAPO, ATTRIBUTE_AV_DESCRIPTION, ATTRIBUTE_AV_POSTSCRIPTUM, CREATED_AT, UPDATED_AT FROM order_product_attribute_combination WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

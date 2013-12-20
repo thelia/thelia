@@ -112,19 +112,12 @@
                                                     <tr>
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Discount"}</strong></td>
-                                                        <td><strong>{$orderCurrency} {$DISCOUNT}</strong></td>
+                                                        <td><strong>{$orderCurrency} 0</strong></td>
                                                     </tr>
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Coupon code"}</strong></td>
-                                                        <td>
-                                                            {loop type="order_coupon" name="couponcode" order=$ID}
-                                                                {$CODE}{if $LOOP_COUNT != $LOOP_TOTAL}, {/if}
-                                                            {/loop}
-                                                            {elseloop rel="couponcode"}
-                                                                <strong>Ø</strong>
-                                                            {/elseloop}
-                                                        </td>
+                                                        <td><strong>{$orderCurrency} 0</strong></td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="2" class="td-unstyled"></td>

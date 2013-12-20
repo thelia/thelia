@@ -776,20 +776,20 @@ abstract class CustomerTitleI18n implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(CustomerTitleI18nTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(CustomerTitleI18nTableMap::LOCALE)) {
-            $modifiedColumns[':p' . $index++]  = '`LOCALE`';
+            $modifiedColumns[':p' . $index++]  = 'LOCALE';
         }
         if ($this->isColumnModified(CustomerTitleI18nTableMap::SHORT)) {
-            $modifiedColumns[':p' . $index++]  = '`SHORT`';
+            $modifiedColumns[':p' . $index++]  = 'SHORT';
         }
         if ($this->isColumnModified(CustomerTitleI18nTableMap::LONG)) {
-            $modifiedColumns[':p' . $index++]  = '`LONG`';
+            $modifiedColumns[':p' . $index++]  = 'LONG';
         }
 
         $sql = sprintf(
-            'INSERT INTO `customer_title_i18n` (%s) VALUES (%s)',
+            'INSERT INTO customer_title_i18n (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -798,16 +798,16 @@ abstract class CustomerTitleI18n implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`LOCALE`':
+                    case 'LOCALE':
                         $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
-                    case '`SHORT`':
+                    case 'SHORT':
                         $stmt->bindValue($identifier, $this->short, PDO::PARAM_STR);
                         break;
-                    case '`LONG`':
+                    case 'LONG':
                         $stmt->bindValue($identifier, $this->long, PDO::PARAM_STR);
                         break;
                 }

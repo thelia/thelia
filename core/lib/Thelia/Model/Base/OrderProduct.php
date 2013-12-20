@@ -1523,68 +1523,68 @@ abstract class OrderProduct implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(OrderProductTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(OrderProductTableMap::ORDER_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ORDER_ID`';
+            $modifiedColumns[':p' . $index++]  = 'ORDER_ID';
         }
         if ($this->isColumnModified(OrderProductTableMap::PRODUCT_REF)) {
-            $modifiedColumns[':p' . $index++]  = '`PRODUCT_REF`';
+            $modifiedColumns[':p' . $index++]  = 'PRODUCT_REF';
         }
         if ($this->isColumnModified(OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF)) {
-            $modifiedColumns[':p' . $index++]  = '`PRODUCT_SALE_ELEMENTS_REF`';
+            $modifiedColumns[':p' . $index++]  = 'PRODUCT_SALE_ELEMENTS_REF';
         }
         if ($this->isColumnModified(OrderProductTableMap::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = '`TITLE`';
+            $modifiedColumns[':p' . $index++]  = 'TITLE';
         }
         if ($this->isColumnModified(OrderProductTableMap::CHAPO)) {
-            $modifiedColumns[':p' . $index++]  = '`CHAPO`';
+            $modifiedColumns[':p' . $index++]  = 'CHAPO';
         }
         if ($this->isColumnModified(OrderProductTableMap::DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '`DESCRIPTION`';
+            $modifiedColumns[':p' . $index++]  = 'DESCRIPTION';
         }
         if ($this->isColumnModified(OrderProductTableMap::POSTSCRIPTUM)) {
-            $modifiedColumns[':p' . $index++]  = '`POSTSCRIPTUM`';
+            $modifiedColumns[':p' . $index++]  = 'POSTSCRIPTUM';
         }
         if ($this->isColumnModified(OrderProductTableMap::QUANTITY)) {
-            $modifiedColumns[':p' . $index++]  = '`QUANTITY`';
+            $modifiedColumns[':p' . $index++]  = 'QUANTITY';
         }
         if ($this->isColumnModified(OrderProductTableMap::PRICE)) {
-            $modifiedColumns[':p' . $index++]  = '`PRICE`';
+            $modifiedColumns[':p' . $index++]  = 'PRICE';
         }
         if ($this->isColumnModified(OrderProductTableMap::PROMO_PRICE)) {
-            $modifiedColumns[':p' . $index++]  = '`PROMO_PRICE`';
+            $modifiedColumns[':p' . $index++]  = 'PROMO_PRICE';
         }
         if ($this->isColumnModified(OrderProductTableMap::WAS_NEW)) {
-            $modifiedColumns[':p' . $index++]  = '`WAS_NEW`';
+            $modifiedColumns[':p' . $index++]  = 'WAS_NEW';
         }
         if ($this->isColumnModified(OrderProductTableMap::WAS_IN_PROMO)) {
-            $modifiedColumns[':p' . $index++]  = '`WAS_IN_PROMO`';
+            $modifiedColumns[':p' . $index++]  = 'WAS_IN_PROMO';
         }
         if ($this->isColumnModified(OrderProductTableMap::WEIGHT)) {
-            $modifiedColumns[':p' . $index++]  = '`WEIGHT`';
+            $modifiedColumns[':p' . $index++]  = 'WEIGHT';
         }
         if ($this->isColumnModified(OrderProductTableMap::EAN_CODE)) {
-            $modifiedColumns[':p' . $index++]  = '`EAN_CODE`';
+            $modifiedColumns[':p' . $index++]  = 'EAN_CODE';
         }
         if ($this->isColumnModified(OrderProductTableMap::TAX_RULE_TITLE)) {
-            $modifiedColumns[':p' . $index++]  = '`TAX_RULE_TITLE`';
+            $modifiedColumns[':p' . $index++]  = 'TAX_RULE_TITLE';
         }
         if ($this->isColumnModified(OrderProductTableMap::TAX_RULE_DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '`TAX_RULE_DESCRIPTION`';
+            $modifiedColumns[':p' . $index++]  = 'TAX_RULE_DESCRIPTION';
         }
         if ($this->isColumnModified(OrderProductTableMap::PARENT)) {
-            $modifiedColumns[':p' . $index++]  = '`PARENT`';
+            $modifiedColumns[':p' . $index++]  = 'PARENT';
         }
         if ($this->isColumnModified(OrderProductTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(OrderProductTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `order_product` (%s) VALUES (%s)',
+            'INSERT INTO order_product (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1593,64 +1593,64 @@ abstract class OrderProduct implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`ORDER_ID`':
+                    case 'ORDER_ID':
                         $stmt->bindValue($identifier, $this->order_id, PDO::PARAM_INT);
                         break;
-                    case '`PRODUCT_REF`':
+                    case 'PRODUCT_REF':
                         $stmt->bindValue($identifier, $this->product_ref, PDO::PARAM_STR);
                         break;
-                    case '`PRODUCT_SALE_ELEMENTS_REF`':
+                    case 'PRODUCT_SALE_ELEMENTS_REF':
                         $stmt->bindValue($identifier, $this->product_sale_elements_ref, PDO::PARAM_STR);
                         break;
-                    case '`TITLE`':
+                    case 'TITLE':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
                         break;
-                    case '`CHAPO`':
+                    case 'CHAPO':
                         $stmt->bindValue($identifier, $this->chapo, PDO::PARAM_STR);
                         break;
-                    case '`DESCRIPTION`':
+                    case 'DESCRIPTION':
                         $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
-                    case '`POSTSCRIPTUM`':
+                    case 'POSTSCRIPTUM':
                         $stmt->bindValue($identifier, $this->postscriptum, PDO::PARAM_STR);
                         break;
-                    case '`QUANTITY`':
+                    case 'QUANTITY':
                         $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_STR);
                         break;
-                    case '`PRICE`':
+                    case 'PRICE':
                         $stmt->bindValue($identifier, $this->price, PDO::PARAM_STR);
                         break;
-                    case '`PROMO_PRICE`':
+                    case 'PROMO_PRICE':
                         $stmt->bindValue($identifier, $this->promo_price, PDO::PARAM_STR);
                         break;
-                    case '`WAS_NEW`':
+                    case 'WAS_NEW':
                         $stmt->bindValue($identifier, $this->was_new, PDO::PARAM_INT);
                         break;
-                    case '`WAS_IN_PROMO`':
+                    case 'WAS_IN_PROMO':
                         $stmt->bindValue($identifier, $this->was_in_promo, PDO::PARAM_INT);
                         break;
-                    case '`WEIGHT`':
+                    case 'WEIGHT':
                         $stmt->bindValue($identifier, $this->weight, PDO::PARAM_STR);
                         break;
-                    case '`EAN_CODE`':
+                    case 'EAN_CODE':
                         $stmt->bindValue($identifier, $this->ean_code, PDO::PARAM_STR);
                         break;
-                    case '`TAX_RULE_TITLE`':
+                    case 'TAX_RULE_TITLE':
                         $stmt->bindValue($identifier, $this->tax_rule_title, PDO::PARAM_STR);
                         break;
-                    case '`TAX_RULE_DESCRIPTION`':
+                    case 'TAX_RULE_DESCRIPTION':
                         $stmt->bindValue($identifier, $this->tax_rule_description, PDO::PARAM_STR);
                         break;
-                    case '`PARENT`':
+                    case 'PARENT':
                         $stmt->bindValue($identifier, $this->parent, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

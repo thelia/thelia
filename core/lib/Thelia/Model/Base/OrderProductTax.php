@@ -964,32 +964,32 @@ abstract class OrderProductTax implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(OrderProductTaxTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(OrderProductTaxTableMap::ORDER_PRODUCT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ORDER_PRODUCT_ID`';
+            $modifiedColumns[':p' . $index++]  = 'ORDER_PRODUCT_ID';
         }
         if ($this->isColumnModified(OrderProductTaxTableMap::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = '`TITLE`';
+            $modifiedColumns[':p' . $index++]  = 'TITLE';
         }
         if ($this->isColumnModified(OrderProductTaxTableMap::DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '`DESCRIPTION`';
+            $modifiedColumns[':p' . $index++]  = 'DESCRIPTION';
         }
         if ($this->isColumnModified(OrderProductTaxTableMap::AMOUNT)) {
-            $modifiedColumns[':p' . $index++]  = '`AMOUNT`';
+            $modifiedColumns[':p' . $index++]  = 'AMOUNT';
         }
         if ($this->isColumnModified(OrderProductTaxTableMap::PROMO_AMOUNT)) {
-            $modifiedColumns[':p' . $index++]  = '`PROMO_AMOUNT`';
+            $modifiedColumns[':p' . $index++]  = 'PROMO_AMOUNT';
         }
         if ($this->isColumnModified(OrderProductTaxTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(OrderProductTaxTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `order_product_tax` (%s) VALUES (%s)',
+            'INSERT INTO order_product_tax (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -998,28 +998,28 @@ abstract class OrderProductTax implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`ORDER_PRODUCT_ID`':
+                    case 'ORDER_PRODUCT_ID':
                         $stmt->bindValue($identifier, $this->order_product_id, PDO::PARAM_INT);
                         break;
-                    case '`TITLE`':
+                    case 'TITLE':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
                         break;
-                    case '`DESCRIPTION`':
+                    case 'DESCRIPTION':
                         $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
-                    case '`AMOUNT`':
+                    case 'AMOUNT':
                         $stmt->bindValue($identifier, $this->amount, PDO::PARAM_STR);
                         break;
-                    case '`PROMO_AMOUNT`':
+                    case 'PROMO_AMOUNT':
                         $stmt->bindValue($identifier, $this->promo_amount, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

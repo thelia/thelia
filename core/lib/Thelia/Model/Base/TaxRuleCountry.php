@@ -922,26 +922,26 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(TaxRuleCountryTableMap::TAX_RULE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`TAX_RULE_ID`';
+            $modifiedColumns[':p' . $index++]  = 'TAX_RULE_ID';
         }
         if ($this->isColumnModified(TaxRuleCountryTableMap::COUNTRY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`COUNTRY_ID`';
+            $modifiedColumns[':p' . $index++]  = 'COUNTRY_ID';
         }
         if ($this->isColumnModified(TaxRuleCountryTableMap::TAX_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`TAX_ID`';
+            $modifiedColumns[':p' . $index++]  = 'TAX_ID';
         }
         if ($this->isColumnModified(TaxRuleCountryTableMap::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+            $modifiedColumns[':p' . $index++]  = 'POSITION';
         }
         if ($this->isColumnModified(TaxRuleCountryTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(TaxRuleCountryTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `tax_rule_country` (%s) VALUES (%s)',
+            'INSERT INTO tax_rule_country (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -950,22 +950,22 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`TAX_RULE_ID`':
+                    case 'TAX_RULE_ID':
                         $stmt->bindValue($identifier, $this->tax_rule_id, PDO::PARAM_INT);
                         break;
-                    case '`COUNTRY_ID`':
+                    case 'COUNTRY_ID':
                         $stmt->bindValue($identifier, $this->country_id, PDO::PARAM_INT);
                         break;
-                    case '`TAX_ID`':
+                    case 'TAX_ID':
                         $stmt->bindValue($identifier, $this->tax_id, PDO::PARAM_INT);
                         break;
-                    case '`POSITION`':
+                    case 'POSITION':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

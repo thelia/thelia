@@ -181,6 +181,9 @@
 
 {* -- PRODUCT MANAGEMENT ---------------------------------------------------- *}
 
+     {* No product on toplevel category, e.g. id_category = 0 *}
+
+     {if $category_id > 0}
      <div class="row">
          <div class="col-md-12">
              <div class="general-block-decorator">
@@ -334,6 +337,9 @@
              </div>
             </div>
         </div>
+        {else}
+        <div class="alert alert-info">{intl l="To create a new product, select an existing category, or create a new one."}</div>
+        {/if}
 
         {module_include location='categories_bottom'}
 

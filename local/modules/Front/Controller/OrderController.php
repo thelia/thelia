@@ -41,6 +41,7 @@ use Thelia\Model\Base\OrderQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
+use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\URL;
 
 /**
@@ -95,7 +96,6 @@ class OrderController extends BaseFrontController
 
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
-            $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
 
             $this->redirectToRoute("order.invoice");
 
@@ -259,6 +259,19 @@ class OrderController extends BaseFrontController
         /* check customer */
         $this->checkAuth();
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
+    }
+
+    public function getDeliveryModuleListAjaxAction()
+    {
+        $country = $this->getRequest()->get(
+            'country_id',
+            TaxEngine::getInstance($this->getRequest()->getSession())->getDeliveryCountry()->getId()
+        );
+
+        $this->checkXmlHttpRequest();
+        $args = array('country' => $country);
+
+        return $this->render('ajax/order-delivery-module-list', $args);
     }
 
 

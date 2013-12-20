@@ -1392,56 +1392,56 @@ abstract class Customer implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(CustomerTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(CustomerTableMap::REF)) {
-            $modifiedColumns[':p' . $index++]  = '`REF`';
+            $modifiedColumns[':p' . $index++]  = 'REF';
         }
         if ($this->isColumnModified(CustomerTableMap::TITLE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`TITLE_ID`';
+            $modifiedColumns[':p' . $index++]  = 'TITLE_ID';
         }
         if ($this->isColumnModified(CustomerTableMap::FIRSTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`FIRSTNAME`';
+            $modifiedColumns[':p' . $index++]  = 'FIRSTNAME';
         }
         if ($this->isColumnModified(CustomerTableMap::LASTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`LASTNAME`';
+            $modifiedColumns[':p' . $index++]  = 'LASTNAME';
         }
         if ($this->isColumnModified(CustomerTableMap::EMAIL)) {
-            $modifiedColumns[':p' . $index++]  = '`EMAIL`';
+            $modifiedColumns[':p' . $index++]  = 'EMAIL';
         }
         if ($this->isColumnModified(CustomerTableMap::PASSWORD)) {
-            $modifiedColumns[':p' . $index++]  = '`PASSWORD`';
+            $modifiedColumns[':p' . $index++]  = 'PASSWORD';
         }
         if ($this->isColumnModified(CustomerTableMap::ALGO)) {
-            $modifiedColumns[':p' . $index++]  = '`ALGO`';
+            $modifiedColumns[':p' . $index++]  = 'ALGO';
         }
         if ($this->isColumnModified(CustomerTableMap::RESELLER)) {
-            $modifiedColumns[':p' . $index++]  = '`RESELLER`';
+            $modifiedColumns[':p' . $index++]  = 'RESELLER';
         }
         if ($this->isColumnModified(CustomerTableMap::LANG)) {
-            $modifiedColumns[':p' . $index++]  = '`LANG`';
+            $modifiedColumns[':p' . $index++]  = 'LANG';
         }
         if ($this->isColumnModified(CustomerTableMap::SPONSOR)) {
-            $modifiedColumns[':p' . $index++]  = '`SPONSOR`';
+            $modifiedColumns[':p' . $index++]  = 'SPONSOR';
         }
         if ($this->isColumnModified(CustomerTableMap::DISCOUNT)) {
-            $modifiedColumns[':p' . $index++]  = '`DISCOUNT`';
+            $modifiedColumns[':p' . $index++]  = 'DISCOUNT';
         }
         if ($this->isColumnModified(CustomerTableMap::REMEMBER_ME_TOKEN)) {
-            $modifiedColumns[':p' . $index++]  = '`REMEMBER_ME_TOKEN`';
+            $modifiedColumns[':p' . $index++]  = 'REMEMBER_ME_TOKEN';
         }
         if ($this->isColumnModified(CustomerTableMap::REMEMBER_ME_SERIAL)) {
-            $modifiedColumns[':p' . $index++]  = '`REMEMBER_ME_SERIAL`';
+            $modifiedColumns[':p' . $index++]  = 'REMEMBER_ME_SERIAL';
         }
         if ($this->isColumnModified(CustomerTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(CustomerTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `customer` (%s) VALUES (%s)',
+            'INSERT INTO customer (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1450,52 +1450,52 @@ abstract class Customer implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`REF`':
+                    case 'REF':
                         $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
                         break;
-                    case '`TITLE_ID`':
+                    case 'TITLE_ID':
                         $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
                         break;
-                    case '`FIRSTNAME`':
+                    case 'FIRSTNAME':
                         $stmt->bindValue($identifier, $this->firstname, PDO::PARAM_STR);
                         break;
-                    case '`LASTNAME`':
+                    case 'LASTNAME':
                         $stmt->bindValue($identifier, $this->lastname, PDO::PARAM_STR);
                         break;
-                    case '`EMAIL`':
+                    case 'EMAIL':
                         $stmt->bindValue($identifier, $this->email, PDO::PARAM_STR);
                         break;
-                    case '`PASSWORD`':
+                    case 'PASSWORD':
                         $stmt->bindValue($identifier, $this->password, PDO::PARAM_STR);
                         break;
-                    case '`ALGO`':
+                    case 'ALGO':
                         $stmt->bindValue($identifier, $this->algo, PDO::PARAM_STR);
                         break;
-                    case '`RESELLER`':
+                    case 'RESELLER':
                         $stmt->bindValue($identifier, $this->reseller, PDO::PARAM_INT);
                         break;
-                    case '`LANG`':
+                    case 'LANG':
                         $stmt->bindValue($identifier, $this->lang, PDO::PARAM_STR);
                         break;
-                    case '`SPONSOR`':
+                    case 'SPONSOR':
                         $stmt->bindValue($identifier, $this->sponsor, PDO::PARAM_STR);
                         break;
-                    case '`DISCOUNT`':
+                    case 'DISCOUNT':
                         $stmt->bindValue($identifier, $this->discount, PDO::PARAM_STR);
                         break;
-                    case '`REMEMBER_ME_TOKEN`':
+                    case 'REMEMBER_ME_TOKEN':
                         $stmt->bindValue($identifier, $this->remember_me_token, PDO::PARAM_STR);
                         break;
-                    case '`REMEMBER_ME_SERIAL`':
+                    case 'REMEMBER_ME_SERIAL':
                         $stmt->bindValue($identifier, $this->remember_me_serial, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

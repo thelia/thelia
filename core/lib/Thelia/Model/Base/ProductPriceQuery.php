@@ -155,7 +155,7 @@ abstract class ProductPriceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `PRODUCT_SALE_ELEMENTS_ID`, `CURRENCY_ID`, `PRICE`, `PROMO_PRICE`, `FROM_DEFAULT_CURRENCY`, `CREATED_AT`, `UPDATED_AT` FROM `product_price` WHERE `PRODUCT_SALE_ELEMENTS_ID` = :p0 AND `CURRENCY_ID` = :p1';
+        $sql = 'SELECT PRODUCT_SALE_ELEMENTS_ID, CURRENCY_ID, PRICE, PROMO_PRICE, FROM_DEFAULT_CURRENCY, CREATED_AT, UPDATED_AT FROM product_price WHERE PRODUCT_SALE_ELEMENTS_ID = :p0 AND CURRENCY_ID = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);

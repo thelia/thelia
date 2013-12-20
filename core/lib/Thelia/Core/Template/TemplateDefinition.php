@@ -35,6 +35,13 @@ class TemplateDefinition
     const PDF_SUBDIR = 'pdf/';
     const EMAIL_SUBDIR = 'email/';
 
+    protected static $standardTemplatesSubdirs = array(
+        self::FRONT_OFFICE => self::FRONT_OFFICE_SUBDIR,
+        self::BACK_OFFICE  => self::BACK_OFFICE_SUBDIR,
+        self::PDF          => self::PDF_SUBDIR,
+        self::EMAIL        => self::EMAIL_SUBDIR,
+    );
+
     /**
      * @var the template directory name (e.g. 'default')
      */
@@ -50,12 +57,13 @@ class TemplateDefinition
      */
     protected $type;
 
+
     public function __construct($name, $type)
     {
         $this->name = $name;
         $this->type = $type;
 
-        switch ($type) {
+        switch($type) {
             case TemplateDefinition::FRONT_OFFICE:
                 $this->path = self::FRONT_OFFICE_SUBDIR . $name;
                 break;
@@ -82,17 +90,14 @@ class TemplateDefinition
     public function setName($name)
     {
         $this->name = $name;
-
         return $this;
     }
 
-    public function getI18nPath()
-    {
+    public function getI18nPath() {
         return $this->getPath() . DS . 'I18n';
     }
 
-    public function getAbsoluteI18nPath()
-    {
+    public function getAbsoluteI18nPath() {
         return THELIA_TEMPLATE_DIR . $this->getI18nPath();
     }
 
@@ -101,8 +106,7 @@ class TemplateDefinition
         return $this->path;
     }
 
-    public function getAbsolutePath()
-    {
+    public function getAbsolutePath() {
         return THELIA_TEMPLATE_DIR . $this->getPath();
     }
 
@@ -111,15 +115,13 @@ class TemplateDefinition
         return $this->getPath() . DS . 'configs';
     }
 
-    public function getAbsoluteConfigPath()
-    {
+    public function getAbsoluteConfigPath() {
         return THELIA_TEMPLATE_DIR . $this->getConfigPath();
     }
 
     public function setPath($path)
     {
         $this->path = $path;
-
         return $this;
     }
 
@@ -131,7 +133,13 @@ class TemplateDefinition
     public function setType($type)
     {
         $this->type = $type;
-
         return $this;
+    }
+
+    /**
+     * Returns an iterator on the standard templates subdir names
+     */
+    public static function getStandardTemplatesSubdirsIterator() {
+        return new \ArrayIterator(self::$standardTemplatesSubdirs);
     }
 }

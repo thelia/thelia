@@ -236,6 +236,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterById($exclude, Criteria::NOT_IN);
 
         // echo "sql=".$search->toString();
+
         return $search;
 
     }

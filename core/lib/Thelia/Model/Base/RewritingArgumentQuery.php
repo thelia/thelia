@@ -143,7 +143,7 @@ abstract class RewritingArgumentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `REWRITING_URL_ID`, `PARAMETER`, `VALUE`, `CREATED_AT`, `UPDATED_AT` FROM `rewriting_argument` WHERE `REWRITING_URL_ID` = :p0 AND `PARAMETER` = :p1 AND `VALUE` = :p2';
+        $sql = 'SELECT REWRITING_URL_ID, PARAMETER, VALUE, CREATED_AT, UPDATED_AT FROM rewriting_argument WHERE REWRITING_URL_ID = :p0 AND PARAMETER = :p1 AND VALUE = :p2';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);

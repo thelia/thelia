@@ -1305,53 +1305,53 @@ abstract class CouponVersion implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(CouponVersionTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(CouponVersionTableMap::CODE)) {
-            $modifiedColumns[':p' . $index++]  = '`CODE`';
+            $modifiedColumns[':p' . $index++]  = 'CODE';
         }
         if ($this->isColumnModified(CouponVersionTableMap::TYPE)) {
-            $modifiedColumns[':p' . $index++]  = '`TYPE`';
+            $modifiedColumns[':p' . $index++]  = 'TYPE';
         }
         if ($this->isColumnModified(CouponVersionTableMap::AMOUNT)) {
-            $modifiedColumns[':p' . $index++]  = '`AMOUNT`';
+            $modifiedColumns[':p' . $index++]  = 'AMOUNT';
         }
         if ($this->isColumnModified(CouponVersionTableMap::IS_ENABLED)) {
-            $modifiedColumns[':p' . $index++]  = '`IS_ENABLED`';
+            $modifiedColumns[':p' . $index++]  = 'IS_ENABLED';
         }
         if ($this->isColumnModified(CouponVersionTableMap::EXPIRATION_DATE)) {
-            $modifiedColumns[':p' . $index++]  = '`EXPIRATION_DATE`';
+            $modifiedColumns[':p' . $index++]  = 'EXPIRATION_DATE';
         }
         if ($this->isColumnModified(CouponVersionTableMap::MAX_USAGE)) {
-            $modifiedColumns[':p' . $index++]  = '`MAX_USAGE`';
+            $modifiedColumns[':p' . $index++]  = 'MAX_USAGE';
         }
         if ($this->isColumnModified(CouponVersionTableMap::IS_CUMULATIVE)) {
-            $modifiedColumns[':p' . $index++]  = '`IS_CUMULATIVE`';
+            $modifiedColumns[':p' . $index++]  = 'IS_CUMULATIVE';
         }
         if ($this->isColumnModified(CouponVersionTableMap::IS_REMOVING_POSTAGE)) {
-            $modifiedColumns[':p' . $index++]  = '`IS_REMOVING_POSTAGE`';
+            $modifiedColumns[':p' . $index++]  = 'IS_REMOVING_POSTAGE';
         }
         if ($this->isColumnModified(CouponVersionTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS)) {
-            $modifiedColumns[':p' . $index++]  = '`IS_AVAILABLE_ON_SPECIAL_OFFERS`';
+            $modifiedColumns[':p' . $index++]  = 'IS_AVAILABLE_ON_SPECIAL_OFFERS';
         }
         if ($this->isColumnModified(CouponVersionTableMap::IS_USED)) {
-            $modifiedColumns[':p' . $index++]  = '`IS_USED`';
+            $modifiedColumns[':p' . $index++]  = 'IS_USED';
         }
         if ($this->isColumnModified(CouponVersionTableMap::SERIALIZED_CONDITIONS)) {
-            $modifiedColumns[':p' . $index++]  = '`SERIALIZED_CONDITIONS`';
+            $modifiedColumns[':p' . $index++]  = 'SERIALIZED_CONDITIONS';
         }
         if ($this->isColumnModified(CouponVersionTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(CouponVersionTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
         if ($this->isColumnModified(CouponVersionTableMap::VERSION)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION`';
+            $modifiedColumns[':p' . $index++]  = 'VERSION';
         }
 
         $sql = sprintf(
-            'INSERT INTO `coupon_version` (%s) VALUES (%s)',
+            'INSERT INTO coupon_version (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1360,49 +1360,49 @@ abstract class CouponVersion implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`CODE`':
+                    case 'CODE':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case '`TYPE`':
+                    case 'TYPE':
                         $stmt->bindValue($identifier, $this->type, PDO::PARAM_STR);
                         break;
-                    case '`AMOUNT`':
+                    case 'AMOUNT':
                         $stmt->bindValue($identifier, $this->amount, PDO::PARAM_STR);
                         break;
-                    case '`IS_ENABLED`':
+                    case 'IS_ENABLED':
                         $stmt->bindValue($identifier, (int) $this->is_enabled, PDO::PARAM_INT);
                         break;
-                    case '`EXPIRATION_DATE`':
+                    case 'EXPIRATION_DATE':
                         $stmt->bindValue($identifier, $this->expiration_date ? $this->expiration_date->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`MAX_USAGE`':
+                    case 'MAX_USAGE':
                         $stmt->bindValue($identifier, $this->max_usage, PDO::PARAM_INT);
                         break;
-                    case '`IS_CUMULATIVE`':
+                    case 'IS_CUMULATIVE':
                         $stmt->bindValue($identifier, (int) $this->is_cumulative, PDO::PARAM_INT);
                         break;
-                    case '`IS_REMOVING_POSTAGE`':
+                    case 'IS_REMOVING_POSTAGE':
                         $stmt->bindValue($identifier, (int) $this->is_removing_postage, PDO::PARAM_INT);
                         break;
-                    case '`IS_AVAILABLE_ON_SPECIAL_OFFERS`':
+                    case 'IS_AVAILABLE_ON_SPECIAL_OFFERS':
                         $stmt->bindValue($identifier, (int) $this->is_available_on_special_offers, PDO::PARAM_INT);
                         break;
-                    case '`IS_USED`':
+                    case 'IS_USED':
                         $stmt->bindValue($identifier, (int) $this->is_used, PDO::PARAM_INT);
                         break;
-                    case '`SERIALIZED_CONDITIONS`':
+                    case 'SERIALIZED_CONDITIONS':
                         $stmt->bindValue($identifier, $this->serialized_conditions, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`VERSION`':
+                    case 'VERSION':
                         $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
                         break;
                 }

@@ -40,6 +40,7 @@ use Thelia\Model\OrderQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Tools\ModelCriteriaTools;
+use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\DateTimeFormat;
 use Thelia\Cart\CartTrait;
 
@@ -181,10 +182,10 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     public function cartDataAccess($params, $smarty)
     {
         if (array_key_exists('currentCountry', self::$dataAccessCache)) {
-            $currentCountry = self::$dataAccessCache['currentCountry'];
+            $taxCountry = self::$dataAccessCache['currentCountry'];
         } else {
-            $currentCountry = CountryQuery::create()->findOneById(64); // @TODO : make it magic
-            self::$dataAccessCache['currentCountry'] = $currentCountry;
+            $taxCountry = TaxEngine::getInstance($this->request->getSession())->getDeliveryCountry();
+            self::$dataAccessCache['currentCountry'] = $taxCountry;
         }
 
         $cart = $this->getCart($this->request);
@@ -197,7 +198,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 $result = $cart->getTotalAmount();
                 break;
             case "total_taxed_price":
-                $result = $cart->getTaxedAmount($currentCountry);
+                $result = $cart->getTaxedAmount($taxCountry);
                 break;
         }
 
@@ -211,8 +212,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         switch ($attribute) {
             case 'postage':
                 return $order->getPostage();
-            case 'discount':
-                return $order->getDiscount();
             case 'delivery_address':
                 return $order->chosenDeliveryAddress;
             case 'invoice_address':
@@ -268,69 +267,69 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             $includeShipping = true;
         }
 
-        if ($params['startDate'] == 'today') {
+        if($params['startDate'] == 'today') {
             $startDate = new \DateTime();
             $startDate->setTime(0, 0, 0);
-        } elseif ($params['startDate'] == 'yesterday') {
+        } elseif($params['startDate'] == 'yesterday') {
             $startDate = new \DateTime();
             $startDate->setTime(0, 0, 0);
             $startDate->modify('-1 day');
-        } elseif ($params['startDate'] == 'this_month') {
+        } elseif($params['startDate'] == 'this_month') {
             $startDate = new \DateTime();
             $startDate->modify('first day of this month');
             $startDate->setTime(0, 0, 0);
-        } elseif ($params['startDate'] == 'last_month') {
+        } elseif($params['startDate'] == 'last_month') {
             $startDate = new \DateTime();
             $startDate->modify('first day of last month');
             $startDate->setTime(0, 0, 0);
-        } elseif ($params['startDate'] == 'this_year') {
+        } elseif($params['startDate'] == 'this_year') {
             $startDate = new \DateTime();
             $startDate->modify('first day of January this year');
             $startDate->setTime(0, 0, 0);
-        } elseif ($params['startDate'] == 'last_year') {
+        } elseif($params['startDate'] == 'last_year') {
             $startDate = new \DateTime();
             $startDate->modify('first day of December last year');
             $startDate->setTime(0, 0, 0);
         } else {
             try {
                 $startDate = new \DateTime($params['startDate']);
-            } catch (\Exception $e) {
+            } catch(\Exception $e) {
                 throw new \InvalidArgumentException(sprintf("invalid startDate attribute '%s' in stats access function", $params['startDate']));
             }
         }
 
-        if ($params['endDate'] == 'today') {
+        if($params['endDate'] == 'today') {
             $endDate = new \DateTime();
             $endDate->setTime(0, 0, 0);
-        } elseif ($params['endDate'] == 'yesterday') {
+        } elseif($params['endDate'] == 'yesterday') {
             $endDate = new \DateTime();
             $endDate->setTime(0, 0, 0);
             $endDate->modify('-1 day');
-        } elseif ($params['endDate'] == 'this_month') {
+        } elseif($params['endDate'] == 'this_month') {
             $endDate = new \DateTime();
             $endDate->modify('last day of this month');
             $endDate->setTime(0, 0, 0);
-        } elseif ($params['endDate'] == 'last_month') {
+        } elseif($params['endDate'] == 'last_month') {
             $endDate = new \DateTime();
             $endDate->modify('last day of last month');
             $endDate->setTime(0, 0, 0);
-        } elseif ($params['endDate'] == 'this_year') {
+        } elseif($params['endDate'] == 'this_year') {
             $endDate = new \DateTime();
             $endDate->modify('last day of December this year');
             $endDate->setTime(0, 0, 0);
-        } elseif ($params['endDate'] == 'last_year') {
+        } elseif($params['endDate'] == 'last_year') {
             $endDate = new \DateTime();
             $endDate->modify('last day of January last year');
             $endDate->setTime(0, 0, 0);
         } else {
             try {
                 $endDate = new \DateTime($params['endDate']);
-            } catch (\Exception $e) {
+            } catch(\Exception $e) {
                 throw new \InvalidArgumentException(sprintf("invalid endDate attribute '%s' in stats access function", $params['endDate']));
             }
         }
 
-        switch ($params['key']) {
+        switch( $params['key'] ) {
             case 'sales' :
                 return OrderQuery::getSaleStats($startDate, $endDate, $includeShipping);
             case 'orders' :

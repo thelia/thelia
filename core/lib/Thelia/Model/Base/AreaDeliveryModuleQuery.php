@@ -147,7 +147,7 @@ abstract class AreaDeliveryModuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `AREA_ID`, `DELIVERY_MODULE_ID`, `CREATED_AT`, `UPDATED_AT` FROM `area_delivery_module` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, AREA_ID, DELIVERY_MODULE_ID, CREATED_AT, UPDATED_AT FROM area_delivery_module WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

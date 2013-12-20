@@ -27,6 +27,8 @@ use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Tools\URL;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Model\Config;
+use Thelia\Model\ConfigQuery;
 use Thelia\Core\Template\TemplateHelper;
 
 /**
@@ -43,8 +45,8 @@ class AdminUtilities extends AbstractSmartyPlugin
         $this->securityContext = $securityContext;
     }
 
-    protected function fetch_snippet($smarty, $templateName, $variablesArray)
-    {
+    protected function fetch_snippet($smarty, $templateName, $variablesArray) {
+
         $data = '';
 
         $snippet_path = sprintf('%s/%s/%s.html',
@@ -97,6 +99,7 @@ class AdminUtilities extends AbstractSmartyPlugin
                 $module === null ? array() : array($module),
                 array($access))
         ) {
+
             return $this->fetch_snippet($smarty, 'includes/admin-utilities-position-block', array(
                     'admin_utilities_go_up_url'           => URL::getInstance()->absoluteUrl($path, array('mode' => 'up', $url_parameter => $id)),
                     'admin_utilities_in_place_edit_class' => $in_place_edit_class,

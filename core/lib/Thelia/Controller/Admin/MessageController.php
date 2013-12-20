@@ -31,6 +31,7 @@ use Thelia\Model\MessageQuery;
 use Thelia\Form\MessageModificationForm;
 use Thelia\Form\MessageCreationForm;
 use Symfony\Component\Finder\Finder;
+use Thelia\Model\ConfigQuery;
 use Thelia\Core\Template\TemplateHelper;
 
 /**
@@ -163,8 +164,8 @@ class MessageController extends AbstractCrudController
         return $this->render('messages');
     }
 
-    protected function listDirectoryContent($requiredExtension)
-    {
+    protected function listDirectoryContent($requiredExtension) {
+
         $list = array();
 
         $dir = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath();

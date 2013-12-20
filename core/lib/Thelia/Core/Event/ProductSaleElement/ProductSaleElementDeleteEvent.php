@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\ProductSaleElement;
+use Thelia\Model\Product;
 
 class ProductSaleElementDeleteEvent extends ProductSaleElementEvent
 {

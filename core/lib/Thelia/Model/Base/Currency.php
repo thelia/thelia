@@ -1084,32 +1084,32 @@ abstract class Currency implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(CurrencyTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(CurrencyTableMap::CODE)) {
-            $modifiedColumns[':p' . $index++]  = '`CODE`';
+            $modifiedColumns[':p' . $index++]  = 'CODE';
         }
         if ($this->isColumnModified(CurrencyTableMap::SYMBOL)) {
-            $modifiedColumns[':p' . $index++]  = '`SYMBOL`';
+            $modifiedColumns[':p' . $index++]  = 'SYMBOL';
         }
         if ($this->isColumnModified(CurrencyTableMap::RATE)) {
-            $modifiedColumns[':p' . $index++]  = '`RATE`';
+            $modifiedColumns[':p' . $index++]  = 'RATE';
         }
         if ($this->isColumnModified(CurrencyTableMap::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+            $modifiedColumns[':p' . $index++]  = 'POSITION';
         }
         if ($this->isColumnModified(CurrencyTableMap::BY_DEFAULT)) {
-            $modifiedColumns[':p' . $index++]  = '`BY_DEFAULT`';
+            $modifiedColumns[':p' . $index++]  = 'BY_DEFAULT';
         }
         if ($this->isColumnModified(CurrencyTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(CurrencyTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `currency` (%s) VALUES (%s)',
+            'INSERT INTO currency (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1118,28 +1118,28 @@ abstract class Currency implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`CODE`':
+                    case 'CODE':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case '`SYMBOL`':
+                    case 'SYMBOL':
                         $stmt->bindValue($identifier, $this->symbol, PDO::PARAM_STR);
                         break;
-                    case '`RATE`':
+                    case 'RATE':
                         $stmt->bindValue($identifier, $this->rate, PDO::PARAM_STR);
                         break;
-                    case '`POSITION`':
+                    case 'POSITION':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case '`BY_DEFAULT`':
+                    case 'BY_DEFAULT':
                         $stmt->bindValue($identifier, $this->by_default, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

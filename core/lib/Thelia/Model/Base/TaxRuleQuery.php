@@ -148,7 +148,7 @@ abstract class TaxRuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `IS_DEFAULT`, `CREATED_AT`, `UPDATED_AT` FROM `tax_rule` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM tax_rule WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

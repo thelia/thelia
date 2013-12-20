@@ -25,6 +25,7 @@ namespace Thelia\Core\Event\Administrator;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Admin;
 
+
 /**
  * Class AdministratorUpdatePasswordEvent
  * @package Thelia\Core\Event\Administrator
@@ -81,3 +82,4 @@ class AdministratorUpdatePasswordEvent extends ActionEvent
     }
 
 }
+

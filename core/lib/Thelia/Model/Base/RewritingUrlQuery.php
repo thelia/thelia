@@ -163,7 +163,7 @@ abstract class RewritingUrlQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `URL`, `VIEW`, `VIEW_ID`, `VIEW_LOCALE`, `REDIRECTED`, `CREATED_AT`, `UPDATED_AT` FROM `rewriting_url` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, URL, VIEW, VIEW_ID, VIEW_LOCALE, REDIRECTED, CREATED_AT, UPDATED_AT FROM rewriting_url WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

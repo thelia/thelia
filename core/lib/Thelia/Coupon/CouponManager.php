@@ -82,7 +82,14 @@ class CouponManager
         if (count($this->coupons) > 0) {
             $couponsKept = $this->sortCoupons($this->coupons);
 
+            $isRemovingPostage = $this->isCouponRemovingPostage($couponsKept);
+
             $discount = $this->getEffect($couponsKept);
+
+            if ($isRemovingPostage) {
+                $postage = $this->facade->getCheckoutPostagePrice();
+                $discount += $postage;
+            }
 
             // Just In Case test
             $checkoutTotalPrice = $this->facade->getCartTotalPrice();
@@ -96,24 +103,23 @@ class CouponManager
 
     /**
      * Check if there is a Coupon removing Postage
+     *
+     * @param array $couponsKept Array of CouponInterface sorted
+     *
      * @return bool
      */
-    public function isCouponRemovingPostage()
+    protected function isCouponRemovingPostage(array $couponsKept)
     {
-        if (count($this->coupons) == 0) {
-            return false;
-        }
-
-        $couponsKept = $this->sortCoupons($this->coupons);
+        $isRemovingPostage = false;
 
         /** @var CouponInterface $coupon */
         foreach ($couponsKept as $coupon) {
             if ($coupon->isRemovingPostage()) {
-                return true;
+                $isRemovingPostage = true;
             }
         }
 
-        return false;
+        return $isRemovingPostage;
     }
 
     /**

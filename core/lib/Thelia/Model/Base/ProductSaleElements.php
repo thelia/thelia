@@ -1231,41 +1231,41 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ProductSaleElementsTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(ProductSaleElementsTableMap::PRODUCT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`PRODUCT_ID`';
+            $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
         }
         if ($this->isColumnModified(ProductSaleElementsTableMap::REF)) {
-            $modifiedColumns[':p' . $index++]  = '`REF`';
+            $modifiedColumns[':p' . $index++]  = 'REF';
         }
         if ($this->isColumnModified(ProductSaleElementsTableMap::QUANTITY)) {
-            $modifiedColumns[':p' . $index++]  = '`QUANTITY`';
+            $modifiedColumns[':p' . $index++]  = 'QUANTITY';
         }
         if ($this->isColumnModified(ProductSaleElementsTableMap::PROMO)) {
-            $modifiedColumns[':p' . $index++]  = '`PROMO`';
+            $modifiedColumns[':p' . $index++]  = 'PROMO';
         }
         if ($this->isColumnModified(ProductSaleElementsTableMap::NEWNESS)) {
-            $modifiedColumns[':p' . $index++]  = '`NEWNESS`';
+            $modifiedColumns[':p' . $index++]  = 'NEWNESS';
         }
         if ($this->isColumnModified(ProductSaleElementsTableMap::WEIGHT)) {
-            $modifiedColumns[':p' . $index++]  = '`WEIGHT`';
+            $modifiedColumns[':p' . $index++]  = 'WEIGHT';
         }
         if ($this->isColumnModified(ProductSaleElementsTableMap::IS_DEFAULT)) {
-            $modifiedColumns[':p' . $index++]  = '`IS_DEFAULT`';
+            $modifiedColumns[':p' . $index++]  = 'IS_DEFAULT';
         }
         if ($this->isColumnModified(ProductSaleElementsTableMap::EAN_CODE)) {
-            $modifiedColumns[':p' . $index++]  = '`EAN_CODE`';
+            $modifiedColumns[':p' . $index++]  = 'EAN_CODE';
         }
         if ($this->isColumnModified(ProductSaleElementsTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(ProductSaleElementsTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `product_sale_elements` (%s) VALUES (%s)',
+            'INSERT INTO product_sale_elements (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1274,37 +1274,37 @@ abstract class ProductSaleElements implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`PRODUCT_ID`':
+                    case 'PRODUCT_ID':
                         $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
                         break;
-                    case '`REF`':
+                    case 'REF':
                         $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
                         break;
-                    case '`QUANTITY`':
+                    case 'QUANTITY':
                         $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_STR);
                         break;
-                    case '`PROMO`':
+                    case 'PROMO':
                         $stmt->bindValue($identifier, $this->promo, PDO::PARAM_INT);
                         break;
-                    case '`NEWNESS`':
+                    case 'NEWNESS':
                         $stmt->bindValue($identifier, $this->newness, PDO::PARAM_INT);
                         break;
-                    case '`WEIGHT`':
+                    case 'WEIGHT':
                         $stmt->bindValue($identifier, $this->weight, PDO::PARAM_STR);
                         break;
-                    case '`IS_DEFAULT`':
+                    case 'IS_DEFAULT':
                         $stmt->bindValue($identifier, (int) $this->is_default, PDO::PARAM_INT);
                         break;
-                    case '`EAN_CODE`':
+                    case 'EAN_CODE':
                         $stmt->bindValue($identifier, $this->ean_code, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

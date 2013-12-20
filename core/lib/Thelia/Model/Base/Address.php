@@ -1503,62 +1503,62 @@ abstract class Address implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(AddressTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(AddressTableMap::LABEL)) {
-            $modifiedColumns[':p' . $index++]  = '`LABEL`';
+            $modifiedColumns[':p' . $index++]  = 'LABEL';
         }
         if ($this->isColumnModified(AddressTableMap::CUSTOMER_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`CUSTOMER_ID`';
+            $modifiedColumns[':p' . $index++]  = 'CUSTOMER_ID';
         }
         if ($this->isColumnModified(AddressTableMap::TITLE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`TITLE_ID`';
+            $modifiedColumns[':p' . $index++]  = 'TITLE_ID';
         }
         if ($this->isColumnModified(AddressTableMap::COMPANY)) {
-            $modifiedColumns[':p' . $index++]  = '`COMPANY`';
+            $modifiedColumns[':p' . $index++]  = 'COMPANY';
         }
         if ($this->isColumnModified(AddressTableMap::FIRSTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`FIRSTNAME`';
+            $modifiedColumns[':p' . $index++]  = 'FIRSTNAME';
         }
         if ($this->isColumnModified(AddressTableMap::LASTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`LASTNAME`';
+            $modifiedColumns[':p' . $index++]  = 'LASTNAME';
         }
         if ($this->isColumnModified(AddressTableMap::ADDRESS1)) {
-            $modifiedColumns[':p' . $index++]  = '`ADDRESS1`';
+            $modifiedColumns[':p' . $index++]  = 'ADDRESS1';
         }
         if ($this->isColumnModified(AddressTableMap::ADDRESS2)) {
-            $modifiedColumns[':p' . $index++]  = '`ADDRESS2`';
+            $modifiedColumns[':p' . $index++]  = 'ADDRESS2';
         }
         if ($this->isColumnModified(AddressTableMap::ADDRESS3)) {
-            $modifiedColumns[':p' . $index++]  = '`ADDRESS3`';
+            $modifiedColumns[':p' . $index++]  = 'ADDRESS3';
         }
         if ($this->isColumnModified(AddressTableMap::ZIPCODE)) {
-            $modifiedColumns[':p' . $index++]  = '`ZIPCODE`';
+            $modifiedColumns[':p' . $index++]  = 'ZIPCODE';
         }
         if ($this->isColumnModified(AddressTableMap::CITY)) {
-            $modifiedColumns[':p' . $index++]  = '`CITY`';
+            $modifiedColumns[':p' . $index++]  = 'CITY';
         }
         if ($this->isColumnModified(AddressTableMap::COUNTRY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`COUNTRY_ID`';
+            $modifiedColumns[':p' . $index++]  = 'COUNTRY_ID';
         }
         if ($this->isColumnModified(AddressTableMap::PHONE)) {
-            $modifiedColumns[':p' . $index++]  = '`PHONE`';
+            $modifiedColumns[':p' . $index++]  = 'PHONE';
         }
         if ($this->isColumnModified(AddressTableMap::CELLPHONE)) {
-            $modifiedColumns[':p' . $index++]  = '`CELLPHONE`';
+            $modifiedColumns[':p' . $index++]  = 'CELLPHONE';
         }
         if ($this->isColumnModified(AddressTableMap::IS_DEFAULT)) {
-            $modifiedColumns[':p' . $index++]  = '`IS_DEFAULT`';
+            $modifiedColumns[':p' . $index++]  = 'IS_DEFAULT';
         }
         if ($this->isColumnModified(AddressTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(AddressTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `address` (%s) VALUES (%s)',
+            'INSERT INTO address (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1567,58 +1567,58 @@ abstract class Address implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`LABEL`':
+                    case 'LABEL':
                         $stmt->bindValue($identifier, $this->label, PDO::PARAM_STR);
                         break;
-                    case '`CUSTOMER_ID`':
+                    case 'CUSTOMER_ID':
                         $stmt->bindValue($identifier, $this->customer_id, PDO::PARAM_INT);
                         break;
-                    case '`TITLE_ID`':
+                    case 'TITLE_ID':
                         $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
                         break;
-                    case '`COMPANY`':
+                    case 'COMPANY':
                         $stmt->bindValue($identifier, $this->company, PDO::PARAM_STR);
                         break;
-                    case '`FIRSTNAME`':
+                    case 'FIRSTNAME':
                         $stmt->bindValue($identifier, $this->firstname, PDO::PARAM_STR);
                         break;
-                    case '`LASTNAME`':
+                    case 'LASTNAME':
                         $stmt->bindValue($identifier, $this->lastname, PDO::PARAM_STR);
                         break;
-                    case '`ADDRESS1`':
+                    case 'ADDRESS1':
                         $stmt->bindValue($identifier, $this->address1, PDO::PARAM_STR);
                         break;
-                    case '`ADDRESS2`':
+                    case 'ADDRESS2':
                         $stmt->bindValue($identifier, $this->address2, PDO::PARAM_STR);
                         break;
-                    case '`ADDRESS3`':
+                    case 'ADDRESS3':
                         $stmt->bindValue($identifier, $this->address3, PDO::PARAM_STR);
                         break;
-                    case '`ZIPCODE`':
+                    case 'ZIPCODE':
                         $stmt->bindValue($identifier, $this->zipcode, PDO::PARAM_STR);
                         break;
-                    case '`CITY`':
+                    case 'CITY':
                         $stmt->bindValue($identifier, $this->city, PDO::PARAM_STR);
                         break;
-                    case '`COUNTRY_ID`':
+                    case 'COUNTRY_ID':
                         $stmt->bindValue($identifier, $this->country_id, PDO::PARAM_INT);
                         break;
-                    case '`PHONE`':
+                    case 'PHONE':
                         $stmt->bindValue($identifier, $this->phone, PDO::PARAM_STR);
                         break;
-                    case '`CELLPHONE`':
+                    case 'CELLPHONE':
                         $stmt->bindValue($identifier, $this->cellphone, PDO::PARAM_STR);
                         break;
-                    case '`IS_DEFAULT`':
+                    case 'IS_DEFAULT':
                         $stmt->bindValue($identifier, $this->is_default, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

@@ -904,26 +904,26 @@ abstract class AttributeTemplate implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(AttributeTemplateTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(AttributeTemplateTableMap::ATTRIBUTE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ATTRIBUTE_ID`';
+            $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_ID';
         }
         if ($this->isColumnModified(AttributeTemplateTableMap::TEMPLATE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`TEMPLATE_ID`';
+            $modifiedColumns[':p' . $index++]  = 'TEMPLATE_ID';
         }
         if ($this->isColumnModified(AttributeTemplateTableMap::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+            $modifiedColumns[':p' . $index++]  = 'POSITION';
         }
         if ($this->isColumnModified(AttributeTemplateTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(AttributeTemplateTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `attribute_template` (%s) VALUES (%s)',
+            'INSERT INTO attribute_template (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -932,22 +932,22 @@ abstract class AttributeTemplate implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`ATTRIBUTE_ID`':
+                    case 'ATTRIBUTE_ID':
                         $stmt->bindValue($identifier, $this->attribute_id, PDO::PARAM_INT);
                         break;
-                    case '`TEMPLATE_ID`':
+                    case 'TEMPLATE_ID':
                         $stmt->bindValue($identifier, $this->template_id, PDO::PARAM_INT);
                         break;
-                    case '`POSITION`':
+                    case 'POSITION':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

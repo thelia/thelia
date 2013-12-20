@@ -23,6 +23,8 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
+use Thelia\Model\ConfigQuery;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Log\Tlog;
 use Thelia\Core\Translation\Translator;
 

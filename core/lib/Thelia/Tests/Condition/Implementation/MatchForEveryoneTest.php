@@ -197,5 +197,6 @@ class MatchForEveryoneTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected1, $actual1);
         $this->assertEquals($expected2, $actual2);
 
+
     }
 }

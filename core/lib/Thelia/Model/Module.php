@@ -5,10 +5,13 @@ namespace Thelia\Model;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\Module as BaseModule;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\Core\Event\TheliaEvents;
 
 class Module extends BaseModule
 {
     use ModelEventDispatcherTrait;
+
+    use \Thelia\Model\Tools\PositionManagementTrait;
 
     public function postSave(ConnectionInterface $con = null)
     {
@@ -55,5 +58,31 @@ class Module extends BaseModule
      */
     public function getAbsoluteI18nPath() {
         return THELIA_MODULE_DIR . $this->getI18nPath();
+    }
+
+    /**
+     * Return the absolute path to one of the module's template directories
+     *
+     * @param int $templateSubdirName the name of the, probably one of TemplateDefinition::xxx_SUBDIR constants
+     */
+    public function getAbsoluteTemplateDirectoryPath($templateSubdirName) {
+        return sprintf("%s%stemplates%s%s", $this->getAbsoluteBaseDir(), DS, DS, $templateSubdirName);
+    }
+
+    /**
+     * Calculate next position relative to module type
+     */
+    protected function addCriteriaToPositionQuery($query) {
+        $query->filterByType($this->getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preInsert(ConnectionInterface $con = null)
+    {
+        $this->setPosition($this->getNextPosition());
+
+        return true;
     }
 }

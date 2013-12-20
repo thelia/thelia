@@ -53,7 +53,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      *
      * @param string $visibilityToggleEventIdentifier the dispatched visibility toggle TheliaEvent identifier, or null if the object has no visible options. Example: TheliaEvents::MESSAGE_TOGGLE_VISIBILITY
      * @param string $changePositionEventIdentifier   the dispatched position change TheliaEvent identifier, or null if the object has no position. Example: TheliaEvents::MESSAGE_UPDATE_POSITION
-     * @param string $updateSeoEventIdentifier        the dispatched update SEO change TheliaEvent identifier, or null if the object has no SEO. Example: TheliaEvents::MESSAGE_UPDATE_SEO
+     * @param string $updateSeoEventIdentifier   the dispatched update SEO change TheliaEvent identifier, or null if the object has no SEO. Example: TheliaEvents::MESSAGE_UPDATE_SEO
     */
     public function __construct(
         $objectName,
@@ -134,8 +134,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      *
      * @param unknown $object
      */
-    protected function hydrateSeoForm($object)
-    {
+    protected function hydrateSeoForm($object){
         // The "SEO" tab form
         $locale = $object->getLocale();
         $data = array(
@@ -227,6 +226,8 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             $updateSeoForm,
             $ex
         );
+
+
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->renderEditionTemplate();

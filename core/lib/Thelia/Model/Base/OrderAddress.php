@@ -1248,50 +1248,50 @@ abstract class OrderAddress implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(OrderAddressTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(OrderAddressTableMap::CUSTOMER_TITLE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`CUSTOMER_TITLE_ID`';
+            $modifiedColumns[':p' . $index++]  = 'CUSTOMER_TITLE_ID';
         }
         if ($this->isColumnModified(OrderAddressTableMap::COMPANY)) {
-            $modifiedColumns[':p' . $index++]  = '`COMPANY`';
+            $modifiedColumns[':p' . $index++]  = 'COMPANY';
         }
         if ($this->isColumnModified(OrderAddressTableMap::FIRSTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`FIRSTNAME`';
+            $modifiedColumns[':p' . $index++]  = 'FIRSTNAME';
         }
         if ($this->isColumnModified(OrderAddressTableMap::LASTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`LASTNAME`';
+            $modifiedColumns[':p' . $index++]  = 'LASTNAME';
         }
         if ($this->isColumnModified(OrderAddressTableMap::ADDRESS1)) {
-            $modifiedColumns[':p' . $index++]  = '`ADDRESS1`';
+            $modifiedColumns[':p' . $index++]  = 'ADDRESS1';
         }
         if ($this->isColumnModified(OrderAddressTableMap::ADDRESS2)) {
-            $modifiedColumns[':p' . $index++]  = '`ADDRESS2`';
+            $modifiedColumns[':p' . $index++]  = 'ADDRESS2';
         }
         if ($this->isColumnModified(OrderAddressTableMap::ADDRESS3)) {
-            $modifiedColumns[':p' . $index++]  = '`ADDRESS3`';
+            $modifiedColumns[':p' . $index++]  = 'ADDRESS3';
         }
         if ($this->isColumnModified(OrderAddressTableMap::ZIPCODE)) {
-            $modifiedColumns[':p' . $index++]  = '`ZIPCODE`';
+            $modifiedColumns[':p' . $index++]  = 'ZIPCODE';
         }
         if ($this->isColumnModified(OrderAddressTableMap::CITY)) {
-            $modifiedColumns[':p' . $index++]  = '`CITY`';
+            $modifiedColumns[':p' . $index++]  = 'CITY';
         }
         if ($this->isColumnModified(OrderAddressTableMap::PHONE)) {
-            $modifiedColumns[':p' . $index++]  = '`PHONE`';
+            $modifiedColumns[':p' . $index++]  = 'PHONE';
         }
         if ($this->isColumnModified(OrderAddressTableMap::COUNTRY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`COUNTRY_ID`';
+            $modifiedColumns[':p' . $index++]  = 'COUNTRY_ID';
         }
         if ($this->isColumnModified(OrderAddressTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(OrderAddressTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `order_address` (%s) VALUES (%s)',
+            'INSERT INTO order_address (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1300,46 +1300,46 @@ abstract class OrderAddress implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`CUSTOMER_TITLE_ID`':
+                    case 'CUSTOMER_TITLE_ID':
                         $stmt->bindValue($identifier, $this->customer_title_id, PDO::PARAM_INT);
                         break;
-                    case '`COMPANY`':
+                    case 'COMPANY':
                         $stmt->bindValue($identifier, $this->company, PDO::PARAM_STR);
                         break;
-                    case '`FIRSTNAME`':
+                    case 'FIRSTNAME':
                         $stmt->bindValue($identifier, $this->firstname, PDO::PARAM_STR);
                         break;
-                    case '`LASTNAME`':
+                    case 'LASTNAME':
                         $stmt->bindValue($identifier, $this->lastname, PDO::PARAM_STR);
                         break;
-                    case '`ADDRESS1`':
+                    case 'ADDRESS1':
                         $stmt->bindValue($identifier, $this->address1, PDO::PARAM_STR);
                         break;
-                    case '`ADDRESS2`':
+                    case 'ADDRESS2':
                         $stmt->bindValue($identifier, $this->address2, PDO::PARAM_STR);
                         break;
-                    case '`ADDRESS3`':
+                    case 'ADDRESS3':
                         $stmt->bindValue($identifier, $this->address3, PDO::PARAM_STR);
                         break;
-                    case '`ZIPCODE`':
+                    case 'ZIPCODE':
                         $stmt->bindValue($identifier, $this->zipcode, PDO::PARAM_STR);
                         break;
-                    case '`CITY`':
+                    case 'CITY':
                         $stmt->bindValue($identifier, $this->city, PDO::PARAM_STR);
                         break;
-                    case '`PHONE`':
+                    case 'PHONE':
                         $stmt->bindValue($identifier, $this->phone, PDO::PARAM_STR);
                         break;
-                    case '`COUNTRY_ID`':
+                    case 'COUNTRY_ID':
                         $stmt->bindValue($identifier, $this->country_id, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

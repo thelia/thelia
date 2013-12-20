@@ -33,6 +33,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Form\ModuleModificationForm;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
+use Thelia\Core\Event\UpdatePositionEvent;
 
 /**
  * Class ModuleController
@@ -45,14 +46,30 @@ class ModuleController extends AbstractCrudController
     {
         parent::__construct(
             'module',
-            null,
-            null,
+            'manual',
+            'module_order',
 
             AdminResources::MODULE,
 
             null,
             TheliaEvents::MODULE_UPDATE,
-            null
+            null,
+            null,
+            TheliaEvents::MODULE_UPDATE_POSITION
+/*
+                $objectName,
+
+                $defaultListOrder = null,
+                $orderRequestParameterName = null,
+
+                $resourceCode,
+
+                $createEventIdentifier,
+                $updateEventIdentifier,
+                $deleteEventIdentifier,
+                $visibilityToggleEventIdentifier = null,
+                $changePositionEventIdentifier = null
+*/
         );
     }
 
@@ -90,6 +107,15 @@ class ModuleController extends AbstractCrudController
         return null;
     }
 
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    {
+        return new UpdatePositionEvent(
+                $this->getRequest()->get('module_id', null),
+                $positionChangeMode,
+                $positionValue
+        );
+    }
+
     protected function eventContainsObject($event)
     {
         return $event->hasModule();
@@ -123,6 +149,7 @@ class ModuleController extends AbstractCrudController
             ->findOneById($this->getRequest()->get('module_id'));
     }
 
+
     protected function getObjectLabel($object)
     {
         return $object->getTitle();
@@ -150,7 +177,7 @@ class ModuleController extends AbstractCrudController
         // We always return to the feature edition form
         return $this->render(
             'modules',
-            array()
+            array('module_order' => $currentOrder)
         );
     }
 
@@ -184,18 +211,19 @@ class ModuleController extends AbstractCrudController
         $moduleManagement = new ModuleManagement();
         $moduleManagement->updateModules();
 
-        return $this->render("modules");
+        return $this->renderList();
     }
 
     public function configureAction($module_code)
     {
         $module = ModuleQuery::create()->findOneByCode($module_code);
 
-        if (null === $module) {
+        if(null === $module) {
             throw new \InvalidArgumentException(sprintf("Module `%s` does not exists", $module_code));
         }
 
         if (null !== $response = $this->checkAuth(array(), $module_code, AccessManager::VIEW)) return $response;
+
         return $this->render(
             "module-configure",
             array(
