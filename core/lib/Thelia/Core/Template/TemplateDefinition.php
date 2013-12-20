@@ -137,9 +137,9 @@ class TemplateDefinition
     }
 
     /**
-     * Returns the standard templates subdir names
+     * Returns an iterator on the standard templates subdir names
      */
-    public static function getStandardTemplatesSubdirs() {
-        return self::$standardTemplatesSubdirs;
+    public static function getStandardTemplatesSubdirsIterator() {
+        return new \ArrayIterator(self::$standardTemplatesSubdirs);
     }
 }

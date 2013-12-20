@@ -113,7 +113,7 @@ class Thelia extends Kernel
      * @param Module $module the Module.
      */
     protected function addStandardModuleTemplatesToParserEnvironment($parser, $module) {
-        $stdTpls = TemplateDefinition::getStandardTemplatesSubdirs();
+        $stdTpls = TemplateDefinition::getStandardTemplatesSubdirsIterator();
 
         foreach($stdTpls as $templateType => $templateSubdirName) {
             $this->addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName);

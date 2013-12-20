@@ -59,9 +59,9 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
     {
         return new ArgumentCollection(
             new Argument(
-                'template_type',
+                'template-type',
                 new Type\TypeCollection(
-                    new Type\EnumListType(array(
+                    new Type\EnumType(array(
                         'front-office',
                         'back-office',
                         'pdf',
@@ -73,7 +73,7 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
     }
 
     public function buildArray() {
-        $type = $this->getArg(template_type);
+        $type = $this->getArg('template-type')->getValue();
 
         if ($type == 'front-office')
             $templateType = TemplateDefinition::FRONT_OFFICE;

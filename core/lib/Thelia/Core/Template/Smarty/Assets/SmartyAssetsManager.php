@@ -88,17 +88,16 @@ class SmartyAssetsManager
 
     public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template)
     {
-        $file = $params['file'];
+        $file           = $params['file'];
+        $assetOrigin    = isset($params['source']) ? $params['source'] : "0";
+        $filters        = isset($params['filters']) ? $params['filters'] : '';
+        $debug          = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
 
         /* we trick here relative thinking for file attribute */
         $file = ltrim($file, '/');
         while(substr($file, 0, 3) == '../') {
             $file = substr($file, 3);
         }
-
-        $assetOrigin    = isset($params['source']) ? $params['source'] : "0";
-        $filters        = isset($params['filters']) ? $params['filters'] : '';
-        $debug          = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
 
         $smartyParser = $template->smarty;
         $templateDefinition = $smartyParser->getTemplateDefinition();
