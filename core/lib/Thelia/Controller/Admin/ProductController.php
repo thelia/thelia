@@ -72,6 +72,7 @@ use Thelia\Form\ProductCombinationGenerationForm;
 use Thelia\TaxEngine\Calculator;
 use Thelia\Tools\NumberFormat;
 
+
 /**
  * Manages products
  *
@@ -1036,18 +1037,17 @@ class ProductController extends AbstractSeoCrudController
     }
 
     // Create combinations
-    protected function combine($input, &$output, &$tmp)
-    {
+    protected function combine($input, &$output, &$tmp) {
         $current = array_shift($input);
 
         if (count($input) > 0) {
-            foreach ($current as $element) {
+            foreach($current as $element) {
                 $tmp[] = $element;
                 $this->combine($input, $output, $tmp);
                 array_pop($tmp);
             }
         } else {
-            foreach ($current as $element) {
+            foreach($current as $element) {
                 $tmp[] = $element;
                 $output[] = $tmp;
                 array_pop($tmp);
@@ -1058,8 +1058,8 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Build combinations from the combination output builder
      */
-    public function buildCombinationsAction()
-    {
+    public function buildCombinationsAction() {
+
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
@@ -1082,7 +1082,7 @@ class ProductController extends AbstractSeoCrudController
             // from the list of attribute_id:attributes_av ID from the form.
             $combinations = $attributes_av_list = array();
 
-            foreach ($data['attribute_av'] as $item) {
+            foreach($data['attribute_av'] as $item) {
                 list($attribute_id, $attribute_av_id) = explode(':', $item);
 
                 if (! isset($attributes_av_list[$attribute_id]))

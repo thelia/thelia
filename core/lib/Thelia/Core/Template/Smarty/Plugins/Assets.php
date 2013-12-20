@@ -56,11 +56,10 @@ class Assets extends AbstractSmartyPlugin
     {
         try {
             return $this->assetManager->processSmartyPluginCall('js', $params, $content, $template, $repeat);
-        } catch (\Exception $e) {
+        } catch(\Exception $e) {
             $catchException = $this->getNormalizedParam($params, array('catchException'));
-            if ($catchException == "true") {
+            if($catchException == "true") {
                 $repeat = false;
-
                 return null;
             } else {
                 throw $e;

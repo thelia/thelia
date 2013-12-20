@@ -465,7 +465,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             return $this->parseComplex($loopResult);
         }
 
-        $taxCountry = TaxEngine::getInstance($this->request->getSession())->getTaxCountry();
+        $taxCountry = TaxEngine::getInstance($this->request->getSession())->getDeliveryCountry();
 
         foreach ($loopResult->getResultDataCollection() as $product) {
 
@@ -983,7 +983,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     {
         $loopResult = new LoopResult($results);
 
-        $taxCountry = TaxEngine::getInstance($this->request->getSession())->getTaxCountry();
+        $taxCountry = TaxEngine::getInstance($this->request->getSession())->getDeliveryCountry();
 
         foreach ($loopResult->getResultDataCollection() as $product) {
 

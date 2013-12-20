@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Log;
+use Thelia\Model\Config;
 use Thelia\Model\ConfigQuery;
 
 class TlogDestinationConfig

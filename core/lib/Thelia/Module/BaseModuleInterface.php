@@ -24,6 +24,8 @@
 namespace Thelia\Module;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 interface BaseModuleInterface
 {

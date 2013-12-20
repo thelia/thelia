@@ -196,19 +196,19 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
             /* first test if module defines it's own config route */
             $routerId = "router." . $module->getBaseDir();
-            if ($this->container->has($routerId)) {
+            if($this->container->has($routerId)) {
                 try {
-                    if ($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
+                    if($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
                         $hasConfigurationInterface = true;
                     }
-                } catch (ResourceNotFoundException $e) {
+                } catch(ResourceNotFoundException $e) {
                     /* $hasConfigurationInterface stays false */
                 }
             }
 
             /* if not ; test if it uses admin inclusion : module_configuration.html */
-            if (false === $hasConfigurationInterface) {
-                if (file_exists( sprintf("%s/AdminIncludes/%s.html", $module->getAbsoluteBaseDir(), "module_configuration"))) {
+            if(false === $hasConfigurationInterface) {
+                if(file_exists( sprintf("%s/AdminIncludes/%s.html", $module->getAbsoluteBaseDir(), "module_configuration"))) {
                     $hasConfigurationInterface = true;
                 }
             }

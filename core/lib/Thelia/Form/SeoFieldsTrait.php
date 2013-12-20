@@ -35,7 +35,7 @@ trait SeoFieldsTrait
     /**
      * Add seo meta title, meta description and meta keywords fields
      *
-     * @param array $exclude name of the fields that should not be added to the form
+     * @param array $exclude     name of the fields that should not be added to the form
      */
     protected function addSeoFields($exclude = array())
     {

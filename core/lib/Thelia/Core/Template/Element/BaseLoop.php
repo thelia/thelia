@@ -277,6 +277,7 @@ abstract class BaseLoop
         }
     }
 
+
     protected function searchArray(array $search, &$pagination = null)
     {
         if (false === $this->countable) {
@@ -285,7 +286,7 @@ abstract class BaseLoop
         if ($this->getArgValue('page') !== null) {
 
             $nbPage = ceil(count($search)/$this->getArgValue('limit'));
-            if ($this->getArgValue('page') > $nbPage || $this->getArgValue('page') <= 0) {
+            if($this->getArgValue('page') > $nbPage || $this->getArgValue('page') <= 0) {
                 return array();
             }
 
@@ -337,9 +338,9 @@ abstract class BaseLoop
      */
     public function exec(&$pagination)
     {
-        if ($this instanceof PropelSearchLoopInterface) {
+        if($this instanceof PropelSearchLoopInterface) {
             $searchModelCriteria = $this->buildModelCriteria();
-            if (null === $searchModelCriteria) {
+            if(null === $searchModelCriteria) {
                 $results = array();
             } else {
                 $results = $this->search(
@@ -349,7 +350,7 @@ abstract class BaseLoop
             }
         } elseif ($this instanceof ArraySearchLoopInterface) {
             $searchArray = $this->buildArray();
-            if (null === $searchArray) {
+            if(null === $searchArray) {
                 $results = array();
             } else {
                 $results = $this->searchArray(
@@ -361,13 +362,13 @@ abstract class BaseLoop
 
         $loopResult = new LoopResult($results);
 
-        if (true === $this->countable) {
+        if(true === $this->countable) {
             $loopResult->setCountable();
         }
-        if (true === $this->timestampable) {
+        if(true === $this->timestampable) {
             $loopResult->setTimestamped();
         }
-        if (true === $this->versionable) {
+        if(true === $this->versionable) {
             $loopResult->setVersioned();
         }
 
@@ -381,29 +382,29 @@ abstract class BaseLoop
          *  - ArraySearchLoopInterface
         */
         $searchInterface = false;
-        if ($this instanceof PropelSearchLoopInterface) {
-            if (true === $searchInterface) {
+        if($this instanceof PropelSearchLoopInterface) {
+            if(true === $searchInterface) {
                 throw new LoopException('Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`', LoopException::MULTIPLE_SEARCH_INTERFACE);
             }
             $searchInterface = true;
         }
-        if ($this instanceof ArraySearchLoopInterface) {
-            if (true === $searchInterface) {
+        if($this instanceof ArraySearchLoopInterface) {
+            if(true === $searchInterface) {
                 throw new LoopException('Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`', LoopException::MULTIPLE_SEARCH_INTERFACE);
             }
             $searchInterface = true;
         }
 
-        if (false === $searchInterface) {
+        if(false === $searchInterface) {
             throw new LoopException('Loop must implements one of the following interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`', LoopException::SEARCH_INTERFACE_NOT_FOUND);
         }
 
         /* Only PropelSearch allows timestamp and version */
-        if (!$this instanceof PropelSearchLoopInterface) {
-            if (true === $this->timestampable) {
+        if(!$this instanceof PropelSearchLoopInterface) {
+            if(true === $this->timestampable) {
                 throw new LoopException("Loop must implements 'PropelSearchLoopInterface' to be timestampable", LoopException::NOT_TIMESTAMPED);
             }
-            if (true === $this->versionable) {
+            if(true === $this->versionable) {
                 throw new LoopException("Loop must implements 'PropelSearchLoopInterface' to be versionable", LoopException::NOT_VERSIONED);
             }
         }

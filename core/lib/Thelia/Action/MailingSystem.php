@@ -35,7 +35,7 @@ class MailingSystem extends BaseAction implements EventSubscriberInterface
      */
     public function update(MailingSystemEvent $event)
     {
-        if ($event->getEnabled()) {
+        if($event->getEnabled()) {
             ConfigQuery::enableSmtp();
         } else {
             ConfigQuery::disableSmtp();

@@ -25,12 +25,11 @@ namespace Front\Controller;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
-use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Form\CouponCode;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Log\Tlog;
-use Thelia\Model\AddressQuery;
+use Thelia\Model\Order;
 
 /**
  * Class CouponController
@@ -65,25 +64,6 @@ class CouponController extends BaseFrontController
 
             // Dispatch Event to the Action
             $this->getDispatcher()->dispatch(TheliaEvents::COUPON_CONSUME, $couponConsumeEvent);
-
-            /* recalculate postage amount */
-            $order = $this->getSession()->getOrder();
-            if(null !== $order) {
-                $deliveryModule = $order->getModuleRelatedByDeliveryModuleId();
-                $deliveryAddress = AddressQuery::create()->findPk($order->chosenDeliveryAddress);
-
-                if(null !== $deliveryModule && null !== $deliveryAddress) {
-                    $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
-                    $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
-
-                    $orderEvent = new OrderEvent($order);
-                    $orderEvent->setPostage($postage);
-
-                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
-                }
-            }
-
-            $this->redirect($couponCodeForm->getSuccessUrl());
 
         } catch (FormValidationException $e) {
             $message = sprintf('Please check your coupon code: %s', $e->getMessage());

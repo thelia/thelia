@@ -24,13 +24,11 @@ namespace Front\Controller;
 
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Controller\Front\BaseFrontController;
-use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Form\CartAdd;
-use Thelia\Model\AddressQuery;
 
 class CartController extends BaseFrontController
 {
@@ -54,8 +52,6 @@ class CartController extends BaseFrontController
             $cartEvent->setProduct($form->get("product")->getData());
 
             $this->getDispatcher()->dispatch(TheliaEvents::CART_ADDITEM, $cartEvent);
-
-            $this->afterModifyCart();
 
             $this->redirectSuccess();
 
@@ -87,8 +83,6 @@ class CartController extends BaseFrontController
         try {
             $this->dispatch(TheliaEvents::CART_UPDATEITEM, $cartEvent);
 
-            $this->afterModifyCart();
-
             $this->redirectSuccess();
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
@@ -103,8 +97,6 @@ class CartController extends BaseFrontController
 
         try {
             $this->getDispatcher()->dispatch(TheliaEvents::CART_DELETEITEM, $cartEvent);
-
-            $this->afterModifyCart();
 
             $this->redirectSuccess();
         } catch (PropelException $e) {
@@ -149,26 +141,5 @@ class CartController extends BaseFrontController
 
         return $cartAdd;
     }
-
-    protected function afterModifyCart()
-    {
-        /* recalculate postage amount */
-        $order = $this->getSession()->getOrder();
-        if(null !== $order) {
-            $deliveryModule = $order->getModuleRelatedByDeliveryModuleId();
-            $deliveryAddress = AddressQuery::create()->findPk($order->chosenDeliveryAddress);
-
-            if(null !== $deliveryModule && null !== $deliveryAddress) {
-                $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
-                $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
-
-                $orderEvent = new OrderEvent($order);
-                $orderEvent->setPostage($postage);
-
-                $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
-            }
-        }
-    }
-
 
 }

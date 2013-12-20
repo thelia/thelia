@@ -25,29 +25,27 @@ namespace Thelia\Log\Destination;
 
 use Thelia\Log\AbstractTlogDestination;
 
-class TlogDestinationJavascriptConsole extends AbstractTlogDestination
-{
-    public function getTitle()
-    {
-        return "Browser's Javascript console";
-    }
+class TlogDestinationJavascriptConsole extends AbstractTlogDestination {
 
-    public function getDescription()
-    {
-        return "The Thelia logs are displayed in your browser's Javascript console.";
-    }
+	public function getTitle() {
+		return "Browser's Javascript console";
+	}
 
-    public function write(&$res)
-    {
-        $content = '<script>try {'."\n";
+	public function getDescription() {
+		return "The Thelia logs are displayed in your browser's Javascript console.";
+	}
 
-        foreach ($this->_logs as $line) {
-            $content .= "console.log('".str_replace("'", "\\'", str_replace(array("\r\n", "\r", "\n"), '\\n', $line))."');\n";
-        }
+    public function write(&$res) {
 
-        $content .= '} catch (ex) { alert("Les logs Thelia ne peuvent être affichés dans la console javascript:" + ex); }</script>'."\n";
+		$content = '<script>try {'."\n";
 
-        if (preg_match("|</body>|i", $res))
-            $res = preg_replace("|</body>|i", "$content</html>", $res);
+		foreach($this->_logs as $line) {
+			$content .= "console.log('".str_replace("'", "\\'", str_replace(array("\r\n", "\r", "\n"), '\\n', $line))."');\n";
+		}
+
+		$content .= '} catch(ex) { alert("Les logs Thelia ne peuvent être affichés dans la console javascript:" + ex); }</script>'."\n";
+
+		if (preg_match("|</body>|i", $res))
+			$res = preg_replace("|</body>|i", "$content</html>", $res);
    }
 }

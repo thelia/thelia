@@ -23,8 +23,12 @@
 
 namespace Thelia\Controller\Admin;
 
+
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Form\SystemLogConfigurationForm;
+use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Template\TemplateDefinition;
@@ -63,7 +67,7 @@ class TranslationsController extends BaseAdminController
 
         if (! empty($item_id) || $item_to_translate == 'co') {
 
-            switch ($item_to_translate) {
+            switch($item_to_translate) {
 
                 case 'mo' :
                     if (null !== $module = ModuleQuery::create()->findPk($item_id)) {
@@ -145,7 +149,8 @@ class TranslationsController extends BaseAdminController
                    $templateArguments['max_input_vars_warning']  = true;
                    $templateArguments['required_max_input_vars'] = $stringsCount;
                    $templateArguments['current_max_input_vars']  = ini_get('max_input_vars');
-                } else {
+                }
+                else {
                     $templateArguments['all_strings'] = $all_strings;
                 }
             }
@@ -157,12 +162,14 @@ class TranslationsController extends BaseAdminController
     public function defaultAction()
     {
         if (null !== $response = $this->checkAuth(AdminResources::TRANSLATIONS, array(), AccessManager::VIEW)) return $response;
+
         return $this->renderTemplate();
     }
 
     public function updateAction()
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
+
         return $this->renderTemplate();
     }
 }

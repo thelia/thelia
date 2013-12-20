@@ -98,7 +98,7 @@ class AddressController extends AbstractCrudController
     /**
      * Fills in the form data array
      *
-     * @param  unknown        $object
+     * @param unknown $object
      * @return multitype:NULL
      */
     protected function createFormDataArray($object)
@@ -309,8 +309,7 @@ class AddressController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
-    protected function getCustomerId()
-    {
+    protected function getCustomerId() {
         if (null !== $address = $this->getExistingObject())
             return $address->getCustomerId();
         else

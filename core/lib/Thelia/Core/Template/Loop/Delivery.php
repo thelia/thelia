@@ -29,6 +29,7 @@ use Thelia\Exception\OrderException;
 use Thelia\Model\CountryQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
+use Thelia\TaxEngine\TaxEngine;
 
 /**
  * Class Delivery
@@ -59,7 +60,7 @@ class Delivery extends BaseSpecificModule
                 throw new \InvalidArgumentException('Cannot found country id: `' . $countryId . '` in delivery loop');
             }
         } else {
-            $country = CountryQuery::create()->findOneByByDefault(1);
+            $country = TaxEngine::getInstance($this->request->getSession())->getDeliveryCountry();
         }
 
         foreach ($loopResult->getResultDataCollection() as $deliveryModule) {
@@ -73,8 +74,8 @@ class Delivery extends BaseSpecificModule
 
             try {
                 $postage = $moduleInstance->getPostage($country);
-            } catch (OrderException $e) {
-                switch ($e->getCode()) {
+            } catch(OrderException $e) {
+                switch($e->getCode()) {
                     case OrderException::DELIVERY_MODULE_UNAVAILABLE:
                         /* do not show this delivery module */
                         continue(2);

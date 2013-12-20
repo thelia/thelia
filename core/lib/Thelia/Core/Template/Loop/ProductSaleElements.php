@@ -37,6 +37,7 @@ use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\TaxEngine\TaxEngine;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -145,7 +146,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
-        $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
+        $taxCountry = TaxEngine::getInstance($this->request->getSession())->getDeliveryCountry();
 
         foreach ($loopResult->getResultDataCollection() as $PSEValue) {
             $loopResultRow = new LoopResultRow($PSEValue);

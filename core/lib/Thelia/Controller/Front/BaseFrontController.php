@@ -25,8 +25,10 @@ namespace Thelia\Controller\Front;
 use Symfony\Component\Routing\Router;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Tools\Redirect;
 use Thelia\Tools\URL;
@@ -104,8 +106,8 @@ class BaseFrontController extends BaseController
      * Render the given template, and returns the result as an Http Response.
      *
      * @param $templateName the complete template name, with extension
-     * @param  array                                $args   the template arguments
-     * @param  int                                  $status http code status
+     * @param  array                                      $args   the template arguments
+     * @param  int                                        $status http code status
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function render($templateName, $args = array(), $status = 200)

@@ -32,7 +32,6 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery orderByTransactionRef($order = Criteria::ASC) Order by the transaction_ref column
  * @method     ChildOrderQuery orderByDeliveryRef($order = Criteria::ASC) Order by the delivery_ref column
  * @method     ChildOrderQuery orderByInvoiceRef($order = Criteria::ASC) Order by the invoice_ref column
- * @method     ChildOrderQuery orderByDiscount($order = Criteria::ASC) Order by the discount column
  * @method     ChildOrderQuery orderByPostage($order = Criteria::ASC) Order by the postage column
  * @method     ChildOrderQuery orderByPaymentModuleId($order = Criteria::ASC) Order by the payment_module_id column
  * @method     ChildOrderQuery orderByDeliveryModuleId($order = Criteria::ASC) Order by the delivery_module_id column
@@ -52,7 +51,6 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery groupByTransactionRef() Group by the transaction_ref column
  * @method     ChildOrderQuery groupByDeliveryRef() Group by the delivery_ref column
  * @method     ChildOrderQuery groupByInvoiceRef() Group by the invoice_ref column
- * @method     ChildOrderQuery groupByDiscount() Group by the discount column
  * @method     ChildOrderQuery groupByPostage() Group by the postage column
  * @method     ChildOrderQuery groupByPaymentModuleId() Group by the payment_module_id column
  * @method     ChildOrderQuery groupByDeliveryModuleId() Group by the delivery_module_id column
@@ -101,9 +99,9 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery rightJoinOrderProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderProduct relation
  * @method     ChildOrderQuery innerJoinOrderProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderProduct relation
  *
- * @method     ChildOrderQuery leftJoinOrderCoupon($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderCoupon relation
- * @method     ChildOrderQuery rightJoinOrderCoupon($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderCoupon relation
- * @method     ChildOrderQuery innerJoinOrderCoupon($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderCoupon relation
+ * @method     ChildOrderQuery leftJoinCouponOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the CouponOrder relation
+ * @method     ChildOrderQuery rightJoinCouponOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CouponOrder relation
+ * @method     ChildOrderQuery innerJoinCouponOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the CouponOrder relation
  *
  * @method     ChildOrder findOne(ConnectionInterface $con = null) Return the first ChildOrder matching the query
  * @method     ChildOrder findOneOrCreate(ConnectionInterface $con = null) Return the first ChildOrder matching the query, or a new ChildOrder object populated from the query conditions when no match is found
@@ -119,7 +117,6 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrder findOneByTransactionRef(string $transaction_ref) Return the first ChildOrder filtered by the transaction_ref column
  * @method     ChildOrder findOneByDeliveryRef(string $delivery_ref) Return the first ChildOrder filtered by the delivery_ref column
  * @method     ChildOrder findOneByInvoiceRef(string $invoice_ref) Return the first ChildOrder filtered by the invoice_ref column
- * @method     ChildOrder findOneByDiscount(double $discount) Return the first ChildOrder filtered by the discount column
  * @method     ChildOrder findOneByPostage(double $postage) Return the first ChildOrder filtered by the postage column
  * @method     ChildOrder findOneByPaymentModuleId(int $payment_module_id) Return the first ChildOrder filtered by the payment_module_id column
  * @method     ChildOrder findOneByDeliveryModuleId(int $delivery_module_id) Return the first ChildOrder filtered by the delivery_module_id column
@@ -139,7 +136,6 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     array findByTransactionRef(string $transaction_ref) Return ChildOrder objects filtered by the transaction_ref column
  * @method     array findByDeliveryRef(string $delivery_ref) Return ChildOrder objects filtered by the delivery_ref column
  * @method     array findByInvoiceRef(string $invoice_ref) Return ChildOrder objects filtered by the invoice_ref column
- * @method     array findByDiscount(double $discount) Return ChildOrder objects filtered by the discount column
  * @method     array findByPostage(double $postage) Return ChildOrder objects filtered by the postage column
  * @method     array findByPaymentModuleId(int $payment_module_id) Return ChildOrder objects filtered by the payment_module_id column
  * @method     array findByDeliveryModuleId(int $delivery_module_id) Return ChildOrder objects filtered by the delivery_module_id column
@@ -235,7 +231,7 @@ abstract class OrderQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, REF, CUSTOMER_ID, INVOICE_ORDER_ADDRESS_ID, DELIVERY_ORDER_ADDRESS_ID, INVOICE_DATE, CURRENCY_ID, CURRENCY_RATE, TRANSACTION_REF, DELIVERY_REF, INVOICE_REF, DISCOUNT, POSTAGE, PAYMENT_MODULE_ID, DELIVERY_MODULE_ID, STATUS_ID, LANG_ID, CREATED_AT, UPDATED_AT FROM order WHERE ID = :p0';
+        $sql = 'SELECT ID, REF, CUSTOMER_ID, INVOICE_ORDER_ADDRESS_ID, DELIVERY_ORDER_ADDRESS_ID, INVOICE_DATE, CURRENCY_ID, CURRENCY_RATE, TRANSACTION_REF, DELIVERY_REF, INVOICE_REF, POSTAGE, PAYMENT_MODULE_ID, DELIVERY_MODULE_ID, STATUS_ID, LANG_ID, CREATED_AT, UPDATED_AT FROM order WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -735,47 +731,6 @@ abstract class OrderQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderTableMap::INVOICE_REF, $invoiceRef, $comparison);
-    }
-
-    /**
-     * Filter the query on the discount column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByDiscount(1234); // WHERE discount = 1234
-     * $query->filterByDiscount(array(12, 34)); // WHERE discount IN (12, 34)
-     * $query->filterByDiscount(array('min' => 12)); // WHERE discount > 12
-     * </code>
-     *
-     * @param     mixed $discount The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildOrderQuery The current query, for fluid interface
-     */
-    public function filterByDiscount($discount = null, $comparison = null)
-    {
-        if (is_array($discount)) {
-            $useMinMax = false;
-            if (isset($discount['min'])) {
-                $this->addUsingAlias(OrderTableMap::DISCOUNT, $discount['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($discount['max'])) {
-                $this->addUsingAlias(OrderTableMap::DISCOUNT, $discount['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(OrderTableMap::DISCOUNT, $discount, $comparison);
     }
 
     /**
@@ -1751,40 +1706,40 @@ abstract class OrderQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\OrderCoupon object
+     * Filter the query by a related \Thelia\Model\CouponOrder object
      *
-     * @param \Thelia\Model\OrderCoupon|ObjectCollection $orderCoupon  the related object to use as filter
+     * @param \Thelia\Model\CouponOrder|ObjectCollection $couponOrder  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function filterByOrderCoupon($orderCoupon, $comparison = null)
+    public function filterByCouponOrder($couponOrder, $comparison = null)
     {
-        if ($orderCoupon instanceof \Thelia\Model\OrderCoupon) {
+        if ($couponOrder instanceof \Thelia\Model\CouponOrder) {
             return $this
-                ->addUsingAlias(OrderTableMap::ID, $orderCoupon->getOrderId(), $comparison);
-        } elseif ($orderCoupon instanceof ObjectCollection) {
+                ->addUsingAlias(OrderTableMap::ID, $couponOrder->getOrderId(), $comparison);
+        } elseif ($couponOrder instanceof ObjectCollection) {
             return $this
-                ->useOrderCouponQuery()
-                ->filterByPrimaryKeys($orderCoupon->getPrimaryKeys())
+                ->useCouponOrderQuery()
+                ->filterByPrimaryKeys($couponOrder->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByOrderCoupon() only accepts arguments of type \Thelia\Model\OrderCoupon or Collection');
+            throw new PropelException('filterByCouponOrder() only accepts arguments of type \Thelia\Model\CouponOrder or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the OrderCoupon relation
+     * Adds a JOIN clause to the query using the CouponOrder relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function joinOrderCoupon($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinCouponOrder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('OrderCoupon');
+        $relationMap = $tableMap->getRelation('CouponOrder');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -1799,14 +1754,14 @@ abstract class OrderQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'OrderCoupon');
+            $this->addJoinObject($join, 'CouponOrder');
         }
 
         return $this;
     }
 
     /**
-     * Use the OrderCoupon relation OrderCoupon object
+     * Use the CouponOrder relation CouponOrder object
      *
      * @see useQuery()
      *
@@ -1814,13 +1769,13 @@ abstract class OrderQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\OrderCouponQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\CouponOrderQuery A secondary query class using the current class as primary query
      */
-    public function useOrderCouponQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useCouponOrderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinOrderCoupon($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'OrderCoupon', '\Thelia\Model\OrderCouponQuery');
+            ->joinCouponOrder($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CouponOrder', '\Thelia\Model\CouponOrderQuery');
     }
 
     /**

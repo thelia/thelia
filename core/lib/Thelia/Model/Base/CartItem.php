@@ -110,6 +110,13 @@ abstract class CartItem implements ActiveRecordInterface
     protected $price_end_of_life;
 
     /**
+     * The value for the discount field.
+     * Note: this column has a database default value of: 0
+     * @var        double
+     */
+    protected $discount;
+
+    /**
      * The value for the promo field.
      * @var        int
      */
@@ -159,6 +166,7 @@ abstract class CartItem implements ActiveRecordInterface
     public function applyDefaultValues()
     {
         $this->quantity = 1;
+        $this->discount = 0;
     }
 
     /**
@@ -519,6 +527,17 @@ abstract class CartItem implements ActiveRecordInterface
     }
 
     /**
+     * Get the [discount] column value.
+     *
+     * @return   double
+     */
+    public function getDiscount()
+    {
+
+        return $this->discount;
+    }
+
+    /**
      * Get the [promo] column value.
      *
      * @return   int
@@ -750,6 +769,27 @@ abstract class CartItem implements ActiveRecordInterface
     } // setPriceEndOfLife()
 
     /**
+     * Set the value of [discount] column.
+     *
+     * @param      double $v new value
+     * @return   \Thelia\Model\CartItem The current object (for fluent API support)
+     */
+    public function setDiscount($v)
+    {
+        if ($v !== null) {
+            $v = (double) $v;
+        }
+
+        if ($this->discount !== $v) {
+            $this->discount = $v;
+            $this->modifiedColumns[] = CartItemTableMap::DISCOUNT;
+        }
+
+
+        return $this;
+    } // setDiscount()
+
+    /**
      * Set the value of [promo] column.
      *
      * @param      int $v new value
@@ -826,6 +866,10 @@ abstract class CartItem implements ActiveRecordInterface
                 return false;
             }
 
+            if ($this->discount !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -880,16 +924,19 @@ abstract class CartItem implements ActiveRecordInterface
             }
             $this->price_end_of_life = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CartItemTableMap::translateFieldName('Promo', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CartItemTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->discount = (null !== $col) ? (double) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : CartItemTableMap::translateFieldName('Promo', TableMap::TYPE_PHPNAME, $indexType)];
             $this->promo = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : CartItemTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : CartItemTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : CartItemTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : CartItemTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -902,7 +949,7 @@ abstract class CartItem implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 11; // 11 = CartItemTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 12; // 12 = CartItemTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\CartItem object", 0, $e);
@@ -1184,6 +1231,9 @@ abstract class CartItem implements ActiveRecordInterface
         if ($this->isColumnModified(CartItemTableMap::PRICE_END_OF_LIFE)) {
             $modifiedColumns[':p' . $index++]  = 'PRICE_END_OF_LIFE';
         }
+        if ($this->isColumnModified(CartItemTableMap::DISCOUNT)) {
+            $modifiedColumns[':p' . $index++]  = 'DISCOUNT';
+        }
         if ($this->isColumnModified(CartItemTableMap::PROMO)) {
             $modifiedColumns[':p' . $index++]  = 'PROMO';
         }
@@ -1227,6 +1277,9 @@ abstract class CartItem implements ActiveRecordInterface
                         break;
                     case 'PRICE_END_OF_LIFE':
                         $stmt->bindValue($identifier, $this->price_end_of_life ? $this->price_end_of_life->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                        break;
+                    case 'DISCOUNT':
+                        $stmt->bindValue($identifier, $this->discount, PDO::PARAM_STR);
                         break;
                     case 'PROMO':
                         $stmt->bindValue($identifier, $this->promo, PDO::PARAM_INT);
@@ -1324,12 +1377,15 @@ abstract class CartItem implements ActiveRecordInterface
                 return $this->getPriceEndOfLife();
                 break;
             case 8:
-                return $this->getPromo();
+                return $this->getDiscount();
                 break;
             case 9:
-                return $this->getCreatedAt();
+                return $this->getPromo();
                 break;
             case 10:
+                return $this->getCreatedAt();
+                break;
+            case 11:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1369,9 +1425,10 @@ abstract class CartItem implements ActiveRecordInterface
             $keys[5] => $this->getPrice(),
             $keys[6] => $this->getPromoPrice(),
             $keys[7] => $this->getPriceEndOfLife(),
-            $keys[8] => $this->getPromo(),
-            $keys[9] => $this->getCreatedAt(),
-            $keys[10] => $this->getUpdatedAt(),
+            $keys[8] => $this->getDiscount(),
+            $keys[9] => $this->getPromo(),
+            $keys[10] => $this->getCreatedAt(),
+            $keys[11] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1447,12 +1504,15 @@ abstract class CartItem implements ActiveRecordInterface
                 $this->setPriceEndOfLife($value);
                 break;
             case 8:
-                $this->setPromo($value);
+                $this->setDiscount($value);
                 break;
             case 9:
-                $this->setCreatedAt($value);
+                $this->setPromo($value);
                 break;
             case 10:
+                $this->setCreatedAt($value);
+                break;
+            case 11:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1487,9 +1547,10 @@ abstract class CartItem implements ActiveRecordInterface
         if (array_key_exists($keys[5], $arr)) $this->setPrice($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setPromoPrice($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setPriceEndOfLife($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setPromo($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
+        if (array_key_exists($keys[8], $arr)) $this->setDiscount($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setPromo($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
     }
 
     /**
@@ -1509,6 +1570,7 @@ abstract class CartItem implements ActiveRecordInterface
         if ($this->isColumnModified(CartItemTableMap::PRICE)) $criteria->add(CartItemTableMap::PRICE, $this->price);
         if ($this->isColumnModified(CartItemTableMap::PROMO_PRICE)) $criteria->add(CartItemTableMap::PROMO_PRICE, $this->promo_price);
         if ($this->isColumnModified(CartItemTableMap::PRICE_END_OF_LIFE)) $criteria->add(CartItemTableMap::PRICE_END_OF_LIFE, $this->price_end_of_life);
+        if ($this->isColumnModified(CartItemTableMap::DISCOUNT)) $criteria->add(CartItemTableMap::DISCOUNT, $this->discount);
         if ($this->isColumnModified(CartItemTableMap::PROMO)) $criteria->add(CartItemTableMap::PROMO, $this->promo);
         if ($this->isColumnModified(CartItemTableMap::CREATED_AT)) $criteria->add(CartItemTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CartItemTableMap::UPDATED_AT)) $criteria->add(CartItemTableMap::UPDATED_AT, $this->updated_at);
@@ -1582,6 +1644,7 @@ abstract class CartItem implements ActiveRecordInterface
         $copyObj->setPrice($this->getPrice());
         $copyObj->setPromoPrice($this->getPromoPrice());
         $copyObj->setPriceEndOfLife($this->getPriceEndOfLife());
+        $copyObj->setDiscount($this->getDiscount());
         $copyObj->setPromo($this->getPromo());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1779,6 +1842,7 @@ abstract class CartItem implements ActiveRecordInterface
         $this->price = null;
         $this->promo_price = null;
         $this->price_end_of_life = null;
+        $this->discount = null;
         $this->promo = null;
         $this->created_at = null;
         $this->updated_at = null;

@@ -18,7 +18,7 @@ composer install --prefer-dist --optimize-autoloader
 cd local/config/
 
 echo -e "\n\033[01;34m[INFO] Building Models file\033[00m\n"
-../../bin/propel build -v --output-dir=../../core/lib/ --enable-identifier-quoting
+../../bin/propel build -v --output-dir=../../core/lib/
 
 echo -e "\n\033[01;34m[INFO] Building SQL CREATE file\033[00m\n"
 ../../bin/propel sql:build -v --output-dir=../../install/

@@ -14,7 +14,6 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateDefinition;
-
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Template\TemplateHelper;
 use Imagine\Exception\InvalidArgumentException;
@@ -73,6 +72,7 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
 
+
         $this->debugging = $debug;
 
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
@@ -80,7 +80,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
         // Si on n'est pas en mode debug, activer le cache, avec une lifetime de 15mn, et en vérifiant que les templates sources n'ont pas été modifiés.
 
-        if ($debug) {
+        if($debug) {
             $this->setCaching(Smarty::CACHING_OFF);
             $this->setForceCompile(true);
         } else {
@@ -88,6 +88,7 @@ class SmartyParser extends Smarty implements ParserInterface
         }
 
         //$this->enableSecurity();
+
 
         // The default HTTP status
         $this->status = 200;
@@ -190,7 +191,6 @@ class SmartyParser extends Smarty implements ParserInterface
     {
         return $this->templateDefinition->getPath();
     }
-
     /**
      * Return a rendered template, either from file or ftom a string
      *

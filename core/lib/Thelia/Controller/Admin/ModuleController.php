@@ -149,6 +149,7 @@ class ModuleController extends AbstractCrudController
             ->findOneById($this->getRequest()->get('module_id'));
     }
 
+
     protected function getObjectLabel($object)
     {
         return $object->getTitle();
@@ -217,11 +218,12 @@ class ModuleController extends AbstractCrudController
     {
         $module = ModuleQuery::create()->findOneByCode($module_code);
 
-        if (null === $module) {
+        if(null === $module) {
             throw new \InvalidArgumentException(sprintf("Module `%s` does not exists", $module_code));
         }
 
         if (null !== $response = $this->checkAuth(array(), $module_code, AccessManager::VIEW)) return $response;
+
         return $this->render(
             "module-configure",
             array(

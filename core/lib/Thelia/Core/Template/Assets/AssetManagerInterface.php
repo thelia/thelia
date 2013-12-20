@@ -23,8 +23,7 @@
 
 namespace Thelia\Core\Template\Assets;
 
-interface AssetManagerInterface
-{
+interface AssetManagerInterface {
     /**
      * Prepare an asset directory by checking that no changes occured in
      * the source directory. If any change is detected, the whole asset directory
@@ -36,6 +35,10 @@ interface AssetManagerInterface
      * @param string $webAssetsKey           the assets key : module name or 0 for base template
      *
      * @throws \RuntimeException if something goes wrong.
+     *
+     * @internal param string $source_assets_directory the full path to the source asstes directory
+     * @internal param string $web_assets_directory_base the base directory of the web based asset directory
+     * @internal param string $key the assets key : module name or 0 for base template
      */
     public function prepareAssets($sourceAssetsDirectory, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey);
 
@@ -54,6 +57,9 @@ interface AssetManagerInterface
      * @param  array   $filters                a list of filters, as defined below (see switch($filter_name) ...)
      *
      * @param  boolean $debug                  true / false
+     *
+     * @internal param string $web_assets_directory_base the full disk path to the base assets output directory in the web space
+     * @internal param string $output_url the URL to the base assets output directory in the web space
      *
      * @return string                          The URL to the generated asset file.
      */

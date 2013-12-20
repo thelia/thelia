@@ -156,6 +156,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
         $coupon1->setSerializedConditions($serializedConditions);
 
+
         $coupon1->setMaxUsage(40);
         $coupon1->setIsCumulative(true);
         $coupon1->setIsRemovingPostage(false);
@@ -189,6 +190,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $couponManager = new RemoveXAmount($stubFacade);
 
+
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
             MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
@@ -221,6 +223,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->method('unserializeConditionCollection')
             ->will($this->returnValue($conditions));
 
+
         $stubContainer->expects($this->any())
             ->method('get')
             ->will($this->onConsecutiveCalls($stubFacade, $couponManager, $stubConditionFactory));
@@ -251,6 +254,8 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->will($this->returnValue(null));
 
         $couponManager = new RemoveXAmount($stubFacade);
+
+
 
         $stubContainer->expects($this->any())
             ->method('get')
@@ -288,6 +293,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $couponManager = new RemoveXAmount($stubFacade);
 
+
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
             MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
@@ -320,6 +326,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->method('unserializeConditionCollection')
             ->will($this->returnValue($conditions));
 
+
         $stubContainer->expects($this->any())
             ->method('get')
             ->will($this->onConsecutiveCalls($stubFacade, $couponManager, $stubConditionFactory));
@@ -351,6 +358,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $couponManager = new RemoveXAmount($stubFacade);
 
+
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
             MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
@@ -380,6 +388,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $stubConditionFactory->expects($this->any())
             ->method('unserializeConditionCollection')
             ->will($this->returnValue($conditions));
+
 
         $stubContainer->expects($this->any())
             ->method('get')

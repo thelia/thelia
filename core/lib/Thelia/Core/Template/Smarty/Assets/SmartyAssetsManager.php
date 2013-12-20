@@ -42,9 +42,9 @@ class SmartyAssetsManager
     /**
      * Creates a new SmartyAssetsManager instance
      *
-     * @param AssetManagerInterface $assetsManager             an asset manager instance
-     * @param string                $web_root                  the disk path to the web root (with final /)
-     * @param string                $path_relative_to_web_root the path (relative to web root) where the assets will be generated
+     * @param AssetManagerInterface $assetsManager an asset manager instance
+     * @param string  $web_root                    the disk path to the web root (with final /)
+     * @param string  $path_relative_to_web_root   the path (relative to web root) where the assets will be generated
      */
     public function __construct(AssetManagerInterface $assetsManager, $web_root, $path_relative_to_web_root)
     {
