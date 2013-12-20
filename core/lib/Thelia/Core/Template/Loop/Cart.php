@@ -79,7 +79,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
-        $taxCountry = TaxEngine::getInstance($this->request->getSession())->getTaxCountry();
+        $taxCountry = TaxEngine::getInstance($this->request->getSession())->getDeliveryCountry();
 
         foreach($loopResult->getResultDataCollection() as $cartItem) {
             $product = $cartItem->getProduct();

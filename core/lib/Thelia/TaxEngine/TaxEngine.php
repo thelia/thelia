@@ -104,7 +104,7 @@ class TaxEngine
      * @param bool $force result is static cached ; even if a below parameter change between 2 calls, we need to keep coherent results. but you can force it.
      * @return null|TaxEngine
      */
-    public function getTaxCountry($force = false)
+    public function getDeliveryCountry($force = false)
     {
         if(false === $force || null === self::$taxCountry) {
             /* is there a logged in customer ? */

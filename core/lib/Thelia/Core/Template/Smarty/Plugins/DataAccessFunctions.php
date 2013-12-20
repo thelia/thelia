@@ -184,7 +184,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         if (array_key_exists('currentCountry', self::$dataAccessCache)) {
             $taxCountry = self::$dataAccessCache['currentCountry'];
         } else {
-            $taxCountry = TaxEngine::getInstance($this->request->getSession())->getTaxCountry();
+            $taxCountry = TaxEngine::getInstance($this->request->getSession())->getDeliveryCountry();
             self::$dataAccessCache['currentCountry'] = $taxCountry;
         }
 
