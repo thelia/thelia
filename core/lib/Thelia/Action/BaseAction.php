@@ -30,7 +30,6 @@ use Thelia\Core\Event\UpdateSeoEvent;
 
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Form\Exception\FormValidationException;
-use \Thelia\Model\Tools\UrlRewritingTrait;
 
 class BaseAction
 {
@@ -82,8 +81,8 @@ class BaseAction
     /**
      * Changes SEO Fields for an object.
      *
-     * @param ModelCriteria       $query
-     * @param UpdateSeoEvent      $event
+     * @param ModelCriteria  $query
+     * @param UpdateSeoEvent $event
      *
      * @return mixed
      */
@@ -105,7 +104,7 @@ class BaseAction
             // Update the rewritten URL, if required
             try {
                 $object->setRewrittenUrl($event->getLocale(), $event->getUrl());
-            } catch(UrlRewritingException $e) {
+            } catch (UrlRewritingException $e) {
                 throw new FormValidationException($e->getMessage(), $e->getCode());
             }
 

@@ -131,7 +131,6 @@ class Product extends BaseAction implements EventSubscriberInterface
         return $this->genericUpdateSeo(ProductQuery::create(), $event);
     }
 
-
     /**
      * Delete a product entry
      *

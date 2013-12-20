@@ -65,6 +65,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
     public function setReference($reference)
     {
         $this->reference = $reference;
+
         return $this;
     }
 
@@ -76,6 +77,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
     public function setPrice($price)
     {
         $this->price = $price;
+
         return $this;
     }
 
@@ -87,6 +89,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
     public function setWeight($weight)
     {
         $this->weight = $weight;
+
         return $this;
     }
 
@@ -98,6 +101,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
     public function setQuantity($quantity)
     {
         $this->quantity = $quantity;
+
         return $this;
     }
 
@@ -109,6 +113,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
     public function setSalePrice($sale_price)
     {
         $this->sale_price = $sale_price;
+
         return $this;
     }
 
@@ -120,6 +125,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
     public function setOnsale($onsale)
     {
         $this->onsale = $onsale;
+
         return $this;
     }
 
@@ -131,6 +137,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
     public function setIsnew($isnew)
     {
         $this->isnew = $isnew;
+
         return $this;
     }
 
@@ -142,6 +149,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
     public function setEanCode($ean_code)
     {
         $this->ean_code = $ean_code;
+
         return $this;
         return $this;
     }
@@ -154,6 +162,7 @@ class ProductCombinationGenerationEvent extends ProductEvent
     public function setCombinations($combinations)
     {
         $this->combinations = $combinations;
+
         return $this;
     }
 }

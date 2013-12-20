@@ -36,9 +36,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\CustomerQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
-use Thelia\Model\OrderQuery;
-use Thelia\Model\Map\OrderAddressTableMap;
-use Thelia\Model\Map\OrderTableMap;
 
 /**
  *
@@ -207,7 +204,6 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                 case 'registration_date_reverse':
                     $search->orderByCreatedAt(Criteria::DESC);
                     break;
-
 
             }
         }

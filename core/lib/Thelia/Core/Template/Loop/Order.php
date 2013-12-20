@@ -46,7 +46,7 @@ use Thelia\Type;
  */
 class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
-    protected  $countable = true;
+    protected $countable = true;
     protected $timestampable = true;
     protected $versionable = false;
 
@@ -175,7 +175,6 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -202,6 +201,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set("STATUS", $order->getStatusId())
                 ->set("LANG", $order->getLangId())
                 ->set("POSTAGE", $order->getPostage())
+                ->set("DISCOUNT", $order->getDiscount())
                 ->set("TOTAL_TAX", $tax)
                 ->set("TOTAL_AMOUNT", $amount - $tax)
                 ->set("TOTAL_TAXED_AMOUNT", $amount)

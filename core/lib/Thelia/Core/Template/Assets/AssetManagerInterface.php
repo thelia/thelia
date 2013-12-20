@@ -23,10 +23,12 @@
 
 namespace Thelia\Core\Template\Assets;
 
-interface AssetManagerInterface {
+interface AssetManagerInterface
+{
     /**
      * Prepare an asset directory.
      *
+<<<<<<< HEAD
      * @param $sourceAssetsDirectory
      * @param $webAssetsDirectoryBase
      * @param $webAssetsTemplate
@@ -36,12 +38,18 @@ interface AssetManagerInterface {
      * @internal param string $source_assets_directory the full path to the source asstes directory
      * @internal param string $web_assets_directory_base the base directory of the web based asset directory
      * @internal param string $key the assets key : module name or 0 for base template
+=======
+     * @param  string            $source_assets_directory   the full path to the source asstes directory
+     * @param  string            $web_assets_directory_base the base directory of the web based asset directory
+     * @throws \RuntimeException if something goes wrong.
+>>>>>>> cleanmaster
      */
     public function prepareAssets($sourceAssetsDirectory, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey);
 
     /**
      * Generates assets from $asset_path in $output_path, using $filters.
      *
+<<<<<<< HEAD
      * @param          $assetSource
      * @param          $assetDirectoryBase
      * @param          $webAssetsDirectoryBase
@@ -57,9 +65,25 @@ interface AssetManagerInterface {
      *
      * @internal param string $web_assets_directory_base the full disk path to the base assets output directory in the web space
      * @internal param string $output_url the URL to the base assets output directory in the web space
+=======
+     * @param string $asset_path the full path to the asset file (or file collection, e.g. *.less)
+     *
+     * @param string $web_assets_directory_base the full disk path to the base assets output directory in the web space
+     * @param string $output_url                the URL to the base assets output directory in the web space
+     *
+     * @param string $asset_type the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
+     * @param array  $filters    a list of filters, as defined below (see switch($filter_name) ...)
+     *
+     * @param boolean $debug the debug mode, true or false
+>>>>>>> cleanmaster
      *
      * @internal param string $asset_type the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
      * @return string                    The URL to the generated asset file.
      */
+<<<<<<< HEAD
     public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug);
 }
+=======
+    public function processAsset($asset_path, $web_assets_directory_base, $output_url, $asset_type, $filters, $debug);
+}
+>>>>>>> cleanmaster

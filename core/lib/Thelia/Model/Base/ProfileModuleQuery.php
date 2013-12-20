@@ -147,7 +147,7 @@ abstract class ProfileModuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT PROFILE_ID, MODULE_ID, ACCESS, CREATED_AT, UPDATED_AT FROM profile_module WHERE PROFILE_ID = :p0 AND MODULE_ID = :p1';
+        $sql = 'SELECT `PROFILE_ID`, `MODULE_ID`, `ACCESS`, `CREATED_AT`, `UPDATED_AT` FROM `profile_module` WHERE `PROFILE_ID` = :p0 AND `MODULE_ID` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);

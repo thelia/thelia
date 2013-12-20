@@ -147,7 +147,7 @@ abstract class ContentFolderQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT CONTENT_ID, FOLDER_ID, DEFAULT_FOLDER, CREATED_AT, UPDATED_AT FROM content_folder WHERE CONTENT_ID = :p0 AND FOLDER_ID = :p1';
+        $sql = 'SELECT `CONTENT_ID`, `FOLDER_ID`, `DEFAULT_FOLDER`, `CREATED_AT`, `UPDATED_AT` FROM `content_folder` WHERE `CONTENT_ID` = :p0 AND `FOLDER_ID` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);

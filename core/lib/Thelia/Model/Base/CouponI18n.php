@@ -817,23 +817,23 @@ abstract class CouponI18n implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(CouponI18nTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
+            $modifiedColumns[':p' . $index++]  = '`ID`';
         }
         if ($this->isColumnModified(CouponI18nTableMap::LOCALE)) {
-            $modifiedColumns[':p' . $index++]  = 'LOCALE';
+            $modifiedColumns[':p' . $index++]  = '`LOCALE`';
         }
         if ($this->isColumnModified(CouponI18nTableMap::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = 'TITLE';
+            $modifiedColumns[':p' . $index++]  = '`TITLE`';
         }
         if ($this->isColumnModified(CouponI18nTableMap::SHORT_DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = 'SHORT_DESCRIPTION';
+            $modifiedColumns[':p' . $index++]  = '`SHORT_DESCRIPTION`';
         }
         if ($this->isColumnModified(CouponI18nTableMap::DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = 'DESCRIPTION';
+            $modifiedColumns[':p' . $index++]  = '`DESCRIPTION`';
         }
 
         $sql = sprintf(
-            'INSERT INTO coupon_i18n (%s) VALUES (%s)',
+            'INSERT INTO `coupon_i18n` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -842,19 +842,19 @@ abstract class CouponI18n implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
+                    case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'LOCALE':
+                    case '`LOCALE`':
                         $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
-                    case 'TITLE':
+                    case '`TITLE`':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
                         break;
-                    case 'SHORT_DESCRIPTION':
+                    case '`SHORT_DESCRIPTION`':
                         $stmt->bindValue($identifier, $this->short_description, PDO::PARAM_STR);
                         break;
-                    case 'DESCRIPTION':
+                    case '`DESCRIPTION`':
                         $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
                 }

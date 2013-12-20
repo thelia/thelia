@@ -152,7 +152,7 @@ abstract class CustomerTitleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, BY_DEFAULT, POSITION, CREATED_AT, UPDATED_AT FROM customer_title WHERE ID = :p0';
+        $sql = 'SELECT `ID`, `BY_DEFAULT`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `customer_title` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

@@ -171,7 +171,8 @@ class Tlog Implements LoggerInterface
      *
      * @return array of directories
      */
-    public function getDestinationsDirectories() {
+    public function getDestinationsDirectories()
+    {
         return $this->dir_destinations;
     }
 

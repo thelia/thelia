@@ -23,7 +23,6 @@
 
 namespace Thelia\Controller\Admin;
 
-
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Form\SystemLogConfigurationForm;
@@ -43,7 +42,7 @@ class SystemLogController extends BaseAdminController
 
         $destination_directories = Tlog::getInstance()->getDestinationsDirectories();
 
-        foreach($destination_directories as $dir) {
+        foreach ($destination_directories as $dir) {
             $this->loadDefinedDestinations($dir, $destinations);
         }
 
@@ -58,8 +57,8 @@ class SystemLogController extends BaseAdminController
         );
     }
 
-    protected function loadDefinedDestinations($directory, &$destinations) {
-
+    protected function loadDefinedDestinations($directory, &$destinations)
+    {
         try {
             foreach (new \DirectoryIterator($directory) as $fileInfo) {
 
@@ -144,7 +143,7 @@ class SystemLogController extends BaseAdminController
 
             $active_destinations = array();
 
-            foreach($destinations as $classname => $destination) {
+            foreach ($destinations as $classname => $destination) {
 
                 if (isset($destination['active'])) {
                     $active_destinations[] = $destination['classname'];
@@ -153,7 +152,7 @@ class SystemLogController extends BaseAdminController
                 if (isset($configs[$classname])) {
 
                     // Update destinations configuration
-                    foreach($configs[$classname] as $var => $value) {
+                    foreach ($configs[$classname] as $var => $value) {
                         ConfigQuery::write($var, $value, true, true);
                     }
                 }

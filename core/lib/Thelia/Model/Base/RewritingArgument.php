@@ -837,23 +837,23 @@ abstract class RewritingArgument implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(RewritingArgumentTableMap::REWRITING_URL_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'REWRITING_URL_ID';
+            $modifiedColumns[':p' . $index++]  = '`REWRITING_URL_ID`';
         }
         if ($this->isColumnModified(RewritingArgumentTableMap::PARAMETER)) {
-            $modifiedColumns[':p' . $index++]  = 'PARAMETER';
+            $modifiedColumns[':p' . $index++]  = '`PARAMETER`';
         }
         if ($this->isColumnModified(RewritingArgumentTableMap::VALUE)) {
-            $modifiedColumns[':p' . $index++]  = 'VALUE';
+            $modifiedColumns[':p' . $index++]  = '`VALUE`';
         }
         if ($this->isColumnModified(RewritingArgumentTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
         if ($this->isColumnModified(RewritingArgumentTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
 
         $sql = sprintf(
-            'INSERT INTO rewriting_argument (%s) VALUES (%s)',
+            'INSERT INTO `rewriting_argument` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -862,19 +862,19 @@ abstract class RewritingArgument implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'REWRITING_URL_ID':
+                    case '`REWRITING_URL_ID`':
                         $stmt->bindValue($identifier, $this->rewriting_url_id, PDO::PARAM_INT);
                         break;
-                    case 'PARAMETER':
+                    case '`PARAMETER`':
                         $stmt->bindValue($identifier, $this->parameter, PDO::PARAM_STR);
                         break;
-                    case 'VALUE':
+                    case '`VALUE`':
                         $stmt->bindValue($identifier, $this->value, PDO::PARAM_STR);
                         break;
-                    case 'CREATED_AT':
+                    case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case 'UPDATED_AT':
+                    case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

@@ -45,7 +45,7 @@ class FolderTest extends TestCaseWithURLToolSetup
 
     public function getUpdateEvent(&$folder)
     {
-        if(!$folder instanceof \Thelia\Model\Folder) {
+        if (!$folder instanceof \Thelia\Model\Folder) {
             $folder = $this->getRandomFolder();
         }
 
@@ -65,7 +65,7 @@ class FolderTest extends TestCaseWithURLToolSetup
 
     public function getUpdateSeoEvent(&$folder)
     {
-        if(!$folder instanceof \Thelia\Model\Folder) {
+        if (!$folder instanceof \Thelia\Model\Folder) {
             $folder = $this->getRandomFolder();
         }
 
@@ -83,6 +83,7 @@ class FolderTest extends TestCaseWithURLToolSetup
     public function processUpdateSeoAction($event)
     {
         $contentAction = new Folder($this->getContainer());
+
         return $contentAction->updateSeo($event);
     }
 
@@ -223,7 +224,7 @@ class FolderTest extends TestCaseWithURLToolSetup
             ->findOne();
 
         if (null === $nextFolder) {
-            $this->fail('use fixtures before launching test, there is no folder in database');
+            $this->fail('use fixtures before launching test, there is not enough folder in database');
         }
 
         $folder = FolderQuery::create()

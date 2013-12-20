@@ -201,15 +201,12 @@ class CategoryController extends AbstractSeoCrudController
 
     protected function redirectToListTemplateWithId($category_id)
     {
-        if($category_id > 0)
-        {
+        if ($category_id > 0) {
             $this->redirectToRoute(
                 'admin.categories.default',
                 array('category_id' => $category_id)
             );
-        }
-        else
-        {
+        } else {
             $this->redirectToRoute(
                 'admin.catalog'
             );

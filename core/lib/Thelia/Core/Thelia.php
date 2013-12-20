@@ -49,7 +49,6 @@ use Thelia\Config\DefinePropel;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\TheliaContainerBuilder;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
-use Thelia\Model\ConfigQuery;
 use Symfony\Component\Config\FileLocator;
 
 use Propel\Runtime\Propel;
@@ -176,7 +175,7 @@ class Thelia extends Kernel
             ->depth(0)
             ->in(THELIA_ROOT . "/core/lib/Thelia/Config/Resources");
 
-        foreach($finder as $file) {
+        foreach ($finder as $file) {
             $loader->load($file->getBaseName());
         }
 
@@ -198,6 +197,11 @@ class Thelia extends Kernel
                         $definition
                     );
 
+<<<<<<< HEAD
+=======
+                    $code = ucfirst($module->getCode());
+
+>>>>>>> cleanmaster
                     $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
                     $loader->load("config.xml");
 

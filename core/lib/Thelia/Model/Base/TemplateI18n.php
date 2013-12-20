@@ -735,17 +735,17 @@ abstract class TemplateI18n implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(TemplateI18nTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
+            $modifiedColumns[':p' . $index++]  = '`ID`';
         }
         if ($this->isColumnModified(TemplateI18nTableMap::LOCALE)) {
-            $modifiedColumns[':p' . $index++]  = 'LOCALE';
+            $modifiedColumns[':p' . $index++]  = '`LOCALE`';
         }
         if ($this->isColumnModified(TemplateI18nTableMap::NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'NAME';
+            $modifiedColumns[':p' . $index++]  = '`NAME`';
         }
 
         $sql = sprintf(
-            'INSERT INTO template_i18n (%s) VALUES (%s)',
+            'INSERT INTO `template_i18n` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -754,13 +754,13 @@ abstract class TemplateI18n implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
+                    case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'LOCALE':
+                    case '`LOCALE`':
                         $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
-                    case 'NAME':
+                    case '`NAME`':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
                 }

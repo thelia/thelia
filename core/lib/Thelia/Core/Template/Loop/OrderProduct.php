@@ -72,7 +72,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
         $search->orderById(Criteria::ASC);
 
         return $search;
-        
+
     }
 
     public function parseResults(LoopResult $loopResult)
