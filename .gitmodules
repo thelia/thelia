@@ -1,0 +1,3 @@
+[submodule "local/modules/CouponGiveProduct"]
+	path = local/modules/CouponGiveProduct
+	url = https://github.com/gmorel/thelia2-coupon-give-free-product.git
