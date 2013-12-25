@@ -181,6 +181,8 @@
 
     {* -- CONTENT MANAGEMENT ---------------------------------------------------- *}
 
+    {* No content outsie a folder *}
+    {if $folder_id > 0}
     <div class="row">
         <div class="col-md-12">
             <div class="general-block-decorator">
@@ -323,6 +325,9 @@
             </div>
         </div>
     </div>
+    {else}
+        <div class="alert alert-info">{intl l="To create a new content, select an existing folder, or create a new one."}</div>
+    {/if}
 
     {module_include location='folders_bottom'}
 
@@ -627,4 +632,8 @@
 
         });
     </script>
+{/block}
+
+{block name="javascript-last-call"}
+    {module_include location='folders-js'}
 {/block}

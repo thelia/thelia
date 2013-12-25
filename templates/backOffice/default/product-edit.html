@@ -6,118 +6,120 @@
 {block name="page-title"}{intl l='Edit product'}{/block}
 
 {block name="main-content"}
-<div class="catalog edit-product">
 
-	<div id="wrapper" class="container">
+    <div class="catalog edit-product">
 
-        {include file="includes/catalog-breadcrumb.html" editing_category="false" editing_product="true"}
+        <div id="wrapper" class="container">
 
-        <div class="row">
-            {loop name="product_edit" type="product" visible="*" id=$product_id backend_context="1" lang=$edit_language_id}
-            <div class="col-md-12 general-block-decorator">
-                <div class="row">
-                    <div class="col-md-7 title">
-						{intl l='Edit product %title' title=$TITLE}
-		            </div>
+            {include file="includes/catalog-breadcrumb.html" editing_category="false" editing_product="true"}
 
-	                <div class="col-md-5 actions">
+            <div class="row">
+                {loop name="product_edit" type="product" visible="*" id=$product_id backend_context="1" lang=$edit_language_id}
 
-	                    {if $HAS_PREVIOUS != 0}
-			                <a href="{url path='/admin/products/update' product_id=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous product'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
-                        {else}
-                            <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
-		                {/if}
+                {* Define close url *}
+                {assign var='close_url' value="{url path='/admin/catalog' category_id=$DEFAULT_CATEGORY}"}
 
-		                <a  href="{$URL}" target="_blank" class="btn btn-default" title="{intl l='Preview product page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                <div class="col-md-12 general-block-decorator">
+                    <div class="row">
+                        <div class="col-md-7 title">
+                            {intl l='Edit product %title' title=$TITLE}
+                        </div>
 
-                        {if $HAS_NEXT != 0}
-                            <a href="{url path='/admin/products/update' product_id=$NEXT}" class="btn btn-default" title="{intl l='Edit next product'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
-                        {else}
-                            <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
-                         {/if}
-	                </div>
-                </div>
+                        <div class="col-md-5 actions">
+                            <a {if $HAS_PREVIOUS != 0}href="{url path='/admin/products/update' product_id=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous product'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                            <a href="{$URL}" target="_blank" class="btn btn-default" title="{intl l='Preview product page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                            <a {if $HAS_NEXT != 0}href="{url path='/admin/products/update' product_id=$NEXT}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next product'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                        </div>
+                    </div>
 
-	            <div class="row">
-	                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12">
 
-						<ul class="nav nav-tabs" id="tabbed-menu">
-		                    <li>
-		                          <a href="#general"
-		                             {* data-href="{url path='/admin/products/general/tab' product_id=$product_id}" *}
-		                             data-toggle="tab">{intl l="General"}</a>
-		                    </li>
+                            <ul class="nav nav-tabs" id="tabbed-menu">
+                                <li><a href="#general" data-toggle="tab">{intl l="General"}</a></li>
+                                <li><a href="#seo" data-toggle="tab">{intl l="SEO"}</a></li>
+                                <li><a href="#details" data-toggle="tab">{intl l="Details"}</a></li>
+                                <li>
+                                    <a href="#attributes"
+                                       data-href="{url path='/admin/products/attributes/tab' product_id=$ID}"
+                                       data-toggle="tab">{intl l="Attributes &amp; Features"}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#related"
+                                       data-href="{url path='/admin/products/related/tab' folder_id=$folder_id accessory_category_id=$accessory_category_id product_id=$ID}"
+                                       data-toggle="tab">{intl l="Associations"}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#images"
+                                       data-toggle="tab"
+                                       data-href="{url path="/admin/image/type/product/{$ID}/form-ajax"}"
+                                       data-callback="$.imageUploadManager.initImageDropZone">
+                                        {intl l="Images"}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#documents"
+                                       data-toggle="tab"
+                                       data-href="{url path="/admin/document/type/product/{$ID}/form-ajax"}"
+                                       data-callback="$.documentUploadManager.initDocumentDropZone">
+                                        {intl l="Documents"}
+                                    </a>
+                                </li>
+                                <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
+                            </ul>
 
-                            <li>
-                                <a href="#details" data-toggle="tab">{intl l="Details"}</a>
-                            </li>
+                            <div class="tab-content">
 
-                            <li><a href="#attributes"
-                                   data-href="{url path='/admin/products/attributes/tab' product_id=$product_id}"
-                                   data-toggle="tab">{intl l="Attributes &amp; Features"}</a>
-                            </li>
+                                <div class="tab-pane fade" id="general">
+                                    {include file="includes/product-general-tab.html"}
+                                </div>
 
-                            <li>
-                                <a href="#related"
-                                   data-href="{url path='/admin/products/related/tab' folder_id=$folder_id accessory_category_id=$accessory_category_id product_id=$product_id}"
-                                   data-toggle="tab">{intl l="Associations"}</a>
-                            </li>
+                                <div class="tab-pane fade" id="seo">
+                                    {form name="thelia.admin.seo"}
+                                        {include file="includes/seo-tab.html"
+                                            form = $form
+                                            formAction = "{url path='/admin/products/seo/save'}"
+                                            pageUrl = "{url path='/admin/products/update' product_id=$ID}"
+                                            closeUrl = $close_url
+                                            current_id = $product_id
+                                        }
+                                    {/form}
+                                </div>
 
-		                    <li>
-                                <a href="#images"
-                                   data-toggle="tab"
-                                   data-href="{url path="/admin/image/type/product/{$product_id}/form-ajax"}"
-                                   data-callback="$.imageUploadManager.initImageDropZone">
-                                    {intl l="Images"}
-                                </a>
-                            </li>
-		                    <li>
-                                <a href="#documents"
-                                   data-toggle="tab"
-                                   data-href="{url path="/admin/document/type/product/{$product_id}/form-ajax"}"
-                                   data-callback="$.documentUploadManager.initDocumentDropZone">
-                                    {intl l="Documents"}
-                                </a>
-		                    <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
-		 				</ul>
+                                <div class="tab-pane fade" id="details">
+                                    {include file="includes/product-details-tab.html"}
+                                </div>
 
-		                <div class="tab-content">
+                                <div class="tab-pane fade" id="attributes">
+                                    <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                </div>
 
-		                    <div class="tab-pane fade" id="general">
-                                {include file="includes/product-general-tab.html"}
-		                    </div>
+                                <div class="tab-pane fade" id="related">
+                                    <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                </div>
 
-                            <div class="tab-pane fade" id="details">
-                                {include file="includes/product-details-tab.html"}
-                            </div>
+                                <div class="tab-pane fade" id="images">
+                                    <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                </div>
 
-                            <div class="tab-pane fade" id="attributes">
-                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
-                            </div>
+                                <div class="tab-pane fade" id="documents">
+                                    <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                </div>
 
-		                    <div class="tab-pane fade" id="related">
-		                        <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
-		                    </div>
+                                <div class="tab-pane fade" id="modules">
+                                    {module_include location='product-edit'}
+                                </div>
 
-		                    <div class="tab-pane fade" id="images">
-		                        <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
-		                    </div>
-
-		                    <div class="tab-pane fade" id="documents">
-                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
-		                    </div>
-
-		                    <div class="tab-pane fade" id="modules">
-                                {module_include location='product-edit'}
-		                    </div>
-		                 </div>
+                             </div>
+                        </div>
                     </div>
                 </div>
-		    </div>
-            {/loop}
- 		</div>
-	</div>
-</div>
+                {/loop}
+            </div>
+        </div>
+    </div>
 
 {/block}
 
@@ -135,12 +137,13 @@
     {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
-
 	{javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
 	    <script src="{$asset_url}"></script>
 	{/javascripts}
-
     {javascripts file='assets/js/jquery.typewatch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/jquery-ui-1.10.3.custom.min.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
 
@@ -413,4 +416,8 @@ $(function() {
 </script>
 
 
+{/block}
+
+{block name="javascript-last-call"}
+    {module_include location='product-edit-js'}
 {/block}

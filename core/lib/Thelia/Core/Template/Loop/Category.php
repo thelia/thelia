@@ -96,7 +96,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface
         $search = CategoryQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $this->configureI18nProcessing($search, array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS'));
 
         $id = $this->getId();
 
@@ -213,25 +213,28 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($category);
 
             $loopResultRow
-                ->set("ID", $category->getId())
-                ->set("IS_TRANSLATED",$category->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("TITLE", $category->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $category->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("PARENT", $category->getParent())
-                ->set("URL", $category->getUrl($this->locale))
-                ->set("PRODUCT_COUNT", $category->countAllProducts())
-                ->set("CHILD_COUNT", $category->countChild())
-                ->set("VISIBLE", $category->getVisible() ? "1" : "0")
-                ->set("POSITION", $category->getPosition())
+                ->set("ID"                      , $category->getId())
+                ->set("IS_TRANSLATED"           ,$category->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE"                  ,$this->locale)
+                ->set("TITLE"                   , $category->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO"                   , $category->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION"             , $category->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM"            , $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("PARENT"                  , $category->getParent())
+                ->set("URL"                     , $category->getUrl($this->locale))
+                ->set("META_TITLE"              , $category->getVirtualColumn('i18n_META_TITLE'))
+                ->set("META_DESCRIPTION"        , $category->getVirtualColumn('i18n_META_DESCRIPTION'))
+                ->set("META_KEYWORDS"            , $category->getVirtualColumn('i18n_META_KEYWORDS'))
+                ->set("PRODUCT_COUNT"           , $category->countAllProducts())
+                ->set("CHILD_COUNT"             , $category->countChild())
+                ->set("VISIBLE"                 , $category->getVisible() ? "1" : "0")
+                ->set("POSITION"                , $category->getPosition())
 
-                ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
-                ->set("HAS_NEXT"    , $next != null ? 1 : 0)
+                ->set("HAS_PREVIOUS"            , $previous != null ? 1 : 0)
+                ->set("HAS_NEXT"                , $next != null ? 1 : 0)
 
-                ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                ->set("NEXT"    , $next != null ? $next->getId() : -1)
+                ->set("PREVIOUS"                , $previous != null ? $previous->getId() : -1)
+                ->set("NEXT"                    , $next != null ? $next->getId() : -1)
             ;
 
             $loopResult->addRow($loopResultRow);

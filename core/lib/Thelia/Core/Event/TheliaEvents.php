@@ -160,6 +160,7 @@ final class TheliaEvents
     const CATEGORY_DELETE            = "action.deleteCategory";
     const CATEGORY_TOGGLE_VISIBILITY = "action.toggleCategoryVisibility";
     const CATEGORY_UPDATE_POSITION   = "action.updateCategoryPosition";
+    const CATEGORY_UPDATE_SEO        = "action.updateCategorySeo";
 
     const CATEGORY_ADD_CONTENT      = "action.categoryAddContent";
     const CATEGORY_REMOVE_CONTENT   = "action.categoryRemoveContent";
@@ -180,6 +181,7 @@ final class TheliaEvents
     const FOLDER_DELETE            = "action.deleteFolder";
     const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
     const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
+    const FOLDER_UPDATE_SEO        = "action.updateFolderSeo";
 
     const BEFORE_CREATEFOLDER = "action.before_createFolder";
     const AFTER_CREATEFOLDER 	= "action.after_createFolder";
@@ -197,6 +199,7 @@ final class TheliaEvents
     const CONTENT_DELETE            = "action.deleteContent";
     const CONTENT_TOGGLE_VISIBILITY = "action.toggleContentVisibility";
     const CONTENT_UPDATE_POSITION   = "action.updateContentPosition";
+    const CONTENT_UPDATE_SEO        = "action.updateContentSeo";
 
     const CONTENT_ADD_FOLDER      = "action.contentAddFolder";
     const CONTENT_REMOVE_FOLDER   = "action.contentRemoveFolder";
@@ -269,6 +272,7 @@ final class TheliaEvents
     const PRODUCT_DELETE            = "action.deleteProduct";
     const PRODUCT_TOGGLE_VISIBILITY = "action.toggleProductVisibility";
     const PRODUCT_UPDATE_POSITION   = "action.updateProductPosition";
+    const PRODUCT_UPDATE_SEO        = "action.updateProductSeo";
 
     const PRODUCT_ADD_CONTENT             = "action.productAddContent";
     const PRODUCT_REMOVE_CONTENT          = "action.productRemoveContent";
@@ -404,6 +408,7 @@ final class TheliaEvents
      * Save given documents
      */
     const DOCUMENT_UPDATE = "action.updateDocument";
+    const DOCUMENT_UPDATE_POSITION = "action.updateDocumentPosition";
 
     /**
      * Delete given document
@@ -424,6 +429,7 @@ final class TheliaEvents
      * Save given images
      */
     const IMAGE_UPDATE = "action.updateImages";
+    const IMAGE_UPDATE_POSITION = "action.updateImagePosition";
 
     /**
      * Delete given image
@@ -686,8 +692,14 @@ final class TheliaEvents
     const MODULE_TOGGLE_ACTIVATION = 'thelia.module.toggleActivation';
 
     /**
+     * sent when module position is changed
+     */
+    const MODULE_UPDATE_POSITION = 'thelia.module.action.updatePosition';
+
+    /**
      * module
      */
+    const MODULE_CREATE = 'thelia.module.create';
     const MODULE_UPDATE = 'thelia.module.update';
     const MODULE_DELETE = 'thelia.module.delete';
 

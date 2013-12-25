@@ -36,8 +36,6 @@ class ContentUpdateEvent extends ContentCreateEvent
     protected $description;
     protected $postscriptum;
 
-    protected $url;
-
     public function __construct($content_id)
     {
         $this->content_id = $content_id;
@@ -121,26 +119,6 @@ class ContentUpdateEvent extends ContentCreateEvent
     public function getPostscriptum()
     {
         return $this->postscriptum;
-    }
-
-    /**
-     * @param mixed $url
-     *
-     * @return $this
-     */
-    public function setUrl($url)
-    {
-        $this->url = $url;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getUrl()
-    {
-        return $this->url;
     }
 
 }

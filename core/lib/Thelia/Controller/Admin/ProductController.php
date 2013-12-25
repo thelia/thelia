@@ -23,57 +23,62 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Product\ProductAddCategoryEvent;
-use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
-use Thelia\Core\Event\Product\ProductDeleteEvent;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Propel\Runtime\ActiveQuery\Criteria;
+
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
-use Thelia\Core\Security\AccessManager;
-use Thelia\Model\ProductQuery;
-use Thelia\Form\ProductModificationForm;
-use Thelia\Form\ProductCreationForm;
-use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Event\Product\ProductAddCategoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
 use Thelia\Core\Event\Product\ProductDeleteContentEvent;
 use Thelia\Core\Event\Product\ProductAddContentEvent;
-use Thelia\Model\FolderQuery;
-use Thelia\Model\ContentQuery;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Model\ProductAssociatedContentQuery;
-use Thelia\Model\AccessoryQuery;
-use Thelia\Model\CategoryQuery;
-
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
-use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
+use Thelia\Core\Event\Product\ProductSetTemplateEvent;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
+
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Security\AccessManager;
+
+use Thelia\Model\AccessoryQuery;
+use Thelia\Model\CategoryQuery;
+use Thelia\Model\FolderQuery;
+use Thelia\Model\ContentQuery;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeAvQuery;
-use Thelia\Form\ProductSaleElementUpdateForm;
+use Thelia\Model\ProductQuery;
+use Thelia\Model\ProductAssociatedContentQuery;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\ProductPriceQuery;
-use Thelia\Form\ProductDefaultSaleElementUpdateForm;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\Currency;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Thelia\TaxEngine\Calculator;
-use Thelia\Model\Country;
-use Thelia\Tools\NumberFormat;
-use Thelia\Model\Product;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Country;
+use Thelia\Model\Product;
+
+use Thelia\Form\ProductCreationForm;
+use Thelia\Form\ProductModificationForm;
+use Thelia\Form\ProductSaleElementUpdateForm;
+use Thelia\Form\ProductDefaultSaleElementUpdateForm;
 use Thelia\Form\ProductCombinationGenerationForm;
-use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
-use Thelia\Core\Event\Product\ProductSetTemplateEvent;
+
+use Thelia\TaxEngine\Calculator;
+use Thelia\Tools\NumberFormat;
+
 
 /**
  * Manages products
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class ProductController extends AbstractCrudController
+class ProductController extends AbstractSeoCrudController
 {
     public function __construct()
     {
@@ -89,7 +94,8 @@ class ProductController extends AbstractCrudController
             TheliaEvents::PRODUCT_DELETE,
 
             TheliaEvents::PRODUCT_TOGGLE_VISIBILITY,
-            TheliaEvents::PRODUCT_UPDATE_POSITION
+            TheliaEvents::PRODUCT_UPDATE_POSITION,
+            TheliaEvents::PRODUCT_UPDATE_SEO
         );
     }
 
@@ -153,9 +159,9 @@ class ProductController extends AbstractCrudController
 
     protected function getUpdateEvent($formData)
     {
+
         $changeEvent = new ProductUpdateEvent($formData['id']);
 
-        // Create and dispatch the change event
         $changeEvent
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
@@ -163,10 +169,10 @@ class ProductController extends AbstractCrudController
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
-            ->setUrl($formData['url'])
             ->setDefaultCategory($formData['default_category'])
-         ;
+        ;
 
+        // Create and dispatch the change event
         return $changeEvent;
     }
 
@@ -307,6 +313,9 @@ class ProductController extends AbstractCrudController
             $this->getParserContext()->addForm($combinationPseForm);
         }
 
+        // Hydrate the "SEO" tab form
+        $this->hydrateSeoForm($object);
+
         // The "General" tab form
         $data = array(
             'id'               => $object->getId(),
@@ -317,7 +326,6 @@ class ProductController extends AbstractCrudController
             'description'      => $object->getDescription(),
             'postscriptum'     => $object->getPostscriptum(),
             'visible'          => $object->getVisible(),
-            'url'              => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
             'default_category' => $object->getDefaultCategoryId()
         );
 
@@ -1110,7 +1118,7 @@ class ProductController extends AbstractCrudController
             $this->dispatch(TheliaEvents::PRODUCT_COMBINATION_GENERATION, $event);
 
             // Log object modification
-            $this->adminLogAppend(sprintf("Combination generation for product reference %s", $event->getProduct()->getRef()), 'ac', 'mes');
+            $this->adminLogAppend($this->resourceCode, AccessManager::CREATE, sprintf("Combination generation for product reference %s", $event->getProduct()->getRef()));
 
            // Redirect to the success URL
            $this->redirect($changeForm->getSuccessUrl());

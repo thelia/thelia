@@ -3651,6 +3651,78 @@ abstract class Category implements ActiveRecordInterface
         return $this;
     }
 
+
+        /**
+         * Get the [meta_title] column value.
+         *
+         * @return   string
+         */
+        public function getMetaTitle()
+        {
+        return $this->getCurrentTranslation()->getMetaTitle();
+    }
+
+
+        /**
+         * Set the value of [meta_title] column.
+         *
+         * @param      string $v new value
+         * @return   \Thelia\Model\CategoryI18n The current object (for fluent API support)
+         */
+        public function setMetaTitle($v)
+        {    $this->getCurrentTranslation()->setMetaTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [meta_description] column value.
+         *
+         * @return   string
+         */
+        public function getMetaDescription()
+        {
+        return $this->getCurrentTranslation()->getMetaDescription();
+    }
+
+
+        /**
+         * Set the value of [meta_description] column.
+         *
+         * @param      string $v new value
+         * @return   \Thelia\Model\CategoryI18n The current object (for fluent API support)
+         */
+        public function setMetaDescription($v)
+        {    $this->getCurrentTranslation()->setMetaDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [meta_keywords] column value.
+         *
+         * @return   string
+         */
+        public function getMetaKeywords()
+        {
+        return $this->getCurrentTranslation()->getMetaKeywords();
+    }
+
+
+        /**
+         * Set the value of [meta_keywords] column.
+         *
+         * @param      string $v new value
+         * @return   \Thelia\Model\CategoryI18n The current object (for fluent API support)
+         */
+        public function setMetaKeywords($v)
+        {    $this->getCurrentTranslation()->setMetaKeywords($v);
+
+        return $this;
+    }
+
     // versionable behavior
 
     /**

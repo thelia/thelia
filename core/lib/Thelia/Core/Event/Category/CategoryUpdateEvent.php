@@ -33,7 +33,6 @@ class CategoryUpdateEvent extends CategoryCreateEvent
     protected $description;
     protected $postscriptum;
 
-    protected $url;
     protected $parent;
 
     public function __construct($category_id)
@@ -85,18 +84,6 @@ class CategoryUpdateEvent extends CategoryCreateEvent
     public function setPostscriptum($postscriptum)
     {
         $this->postscriptum = $postscriptum;
-
-        return $this;
-    }
-
-    public function getUrl()
-    {
-        return $this->url;
-    }
-
-    public function setUrl($url)
-    {
-        $this->url = $url;
 
         return $this;
     }

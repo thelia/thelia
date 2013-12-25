@@ -71,7 +71,9 @@ class RewritingRetriever
         $this->rewrittenUrl = null;
         $this->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
         if($this->search !== null) {
-            $this->rewrittenUrl = $this->search->getUrl();
+            $this->rewrittenUrl = URL::getInstance()->absoluteUrl(
+                $this->search->getUrl()
+            );
         }
     }
 

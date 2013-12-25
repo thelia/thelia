@@ -40,6 +40,7 @@ use Thelia\Model\OrderQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Tools\ModelCriteriaTools;
+use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\DateTimeFormat;
 use Thelia\Cart\CartTrait;
 
@@ -181,10 +182,10 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     public function cartDataAccess($params, $smarty)
     {
         if (array_key_exists('currentCountry', self::$dataAccessCache)) {
-            $currentCountry = self::$dataAccessCache['currentCountry'];
+            $taxCountry = self::$dataAccessCache['currentCountry'];
         } else {
-            $currentCountry = CountryQuery::create()->findOneById(64); // @TODO : make it magic
-            self::$dataAccessCache['currentCountry'] = $currentCountry;
+            $taxCountry = TaxEngine::getInstance($this->request->getSession())->getDeliveryCountry();
+            self::$dataAccessCache['currentCountry'] = $taxCountry;
         }
 
         $cart = $this->getCart($this->request);
@@ -197,7 +198,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 $result = $cart->getTotalAmount();
                 break;
             case "total_taxed_price":
-                $result = $cart->getTaxedAmount($currentCountry);
+                $result = $cart->getTaxedAmount($taxCountry);
                 break;
         }
 

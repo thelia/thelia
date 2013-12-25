@@ -9,6 +9,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 
 class CategoryImage extends BaseCategoryImage
 {
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     /**
@@ -52,4 +53,13 @@ class CategoryImage extends BaseCategoryImage
         return $this->getCategoryId();
     }
 
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->reorderBeforeDelete(
+            array(
+                "category_id" => $this->getCategoryId(),
+            )
+        );
+        return true;
+    }
 }

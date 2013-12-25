@@ -35,6 +35,13 @@ class TemplateDefinition
     const PDF_SUBDIR = 'pdf/';
     const EMAIL_SUBDIR = 'email/';
 
+    protected static $standardTemplatesSubdirs = array(
+        self::FRONT_OFFICE => self::FRONT_OFFICE_SUBDIR,
+        self::BACK_OFFICE  => self::BACK_OFFICE_SUBDIR,
+        self::PDF          => self::PDF_SUBDIR,
+        self::EMAIL        => self::EMAIL_SUBDIR,
+    );
+
     /**
      * @var the template directory name (e.g. 'default')
      */
@@ -127,5 +134,12 @@ class TemplateDefinition
     {
         $this->type = $type;
         return $this;
+    }
+
+    /**
+     * Returns an iterator on the standard templates subdir names
+     */
+    public static function getStandardTemplatesSubdirsIterator() {
+        return new \ArrayIterator(self::$standardTemplatesSubdirs);
     }
 }

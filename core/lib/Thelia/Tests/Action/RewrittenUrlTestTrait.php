@@ -3,10 +3,10 @@ namespace Thelia\Tests\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Exception\UrlRewritingException;
-use Thelia\Model\Base\RewritingUrlQuery;
+use Thelia\Model\ProductQuery;
+use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Rewriting\RewritingResolver;
-use Thelia\Tools\URL;
 
 /**
  * Class RewrittenUrlTestTrait
@@ -17,7 +17,9 @@ use Thelia\Tools\URL;
 trait RewrittenUrlTestTrait
 {
     abstract public function getUpdateEvent(&$object);
+    abstract public function getUpdateSeoEvent(&$object);
     abstract public function processUpdateAction($event);
+    abstract public function processUpdateSeoAction($event);
 
     /**
      * @expectedException \Thelia\Form\Exception\FormValidationException
@@ -26,7 +28,7 @@ trait RewrittenUrlTestTrait
     public function testUpdateExistingUrl()
     {
         $object = null;
-        $event = $this->getUpdateEvent($object);
+        $event = $this->getUpdateSeoEvent($object);
 
         /* get an existing url */
         $existingUrl = RewritingUrlQuery::create()
@@ -41,13 +43,13 @@ trait RewrittenUrlTestTrait
 
         $event->setUrl($existingUrl->getUrl());
 
-        $this->processUpdateAction($event);
+        $this->processUpdateSeoAction($event);
     }
 
     public function testUpdateUrl()
     {
         $object = null;
-        $event = $this->getUpdateEvent($object);
+        $event = $this->getUpdateSeoEvent($object);
 
         $currentUrl = $object->getRewrittenUrl($object->getLocale());
 
@@ -69,7 +71,7 @@ trait RewrittenUrlTestTrait
 
         $event->setUrl($newUrl);
 
-        $updatedObject = $this->processUpdateAction($event);
+        $updatedObject = $this->processUpdateSeoAction($event);
 
         /* new URL is updated */
         $this->assertEquals($newUrl, $updatedObject->getRewrittenUrl($object->getLocale()));
@@ -81,6 +83,17 @@ trait RewrittenUrlTestTrait
         $this->assertEquals($oldUrlEntry->getRedirected(), $newUrlEntry->getId());
 
         /* we can reassign old Url to another object */
-        //@todo
+        $aRandomProduct = ProductQuery::create()
+            ->filterById($object->getId(), Criteria::NOT_EQUAL)
+            ->findOne();
+
+        $failReassign = true;
+        try {
+            $aRandomProduct->setRewrittenUrl($aRandomProduct->getLocale(), $currentUrl);
+            $failReassign = false;
+        } catch(\Exception $e) {
+        }
+
+        $this->assertFalse($failReassign);
     }
 }

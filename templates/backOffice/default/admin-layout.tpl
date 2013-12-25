@@ -222,8 +222,8 @@
         <div class="container">
             <p>{intl l='&copy; Thelia 2013'}
             - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
-            - <a href="http://forum.thelia.net/" target="_blank">{intl l='Thelia support forum'}</a>
-            - <a href="http://contrib.thelia.net/" target="_blank">{intl l='Thelia contributions'}</a>
+            - <a href="http://thelia.net/forum" target="_blank">{intl l='Thelia support forum'}</a>
+            - <a href="#" target="_blank">{intl l='Thelia contributions'}</a>
             </p>
 
             {module_include location='in_footer'}
@@ -267,6 +267,6 @@
 
 	{* Modules scripts are included now *}
 	{module_include location='footer_js'}
-
+    {block name="javascript-last-call"}{/block}
 </body>
 </html>

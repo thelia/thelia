@@ -3,13 +3,9 @@
     <div class="block-content">
         <nav class="nav-categories">
             <ul id="category" class="accordion">
-                    {loop name="current_article" type="content" current="yes"}
-                        {assign var="current_id"  value={$ID}}
-                    {/loop}
-                    {loop name="blog.article"  type="content" current_folder="yes" exclude="$current_id"}
-                        <li><a href="{$URL}">{$TITLE}</a></li>
-                    {/loop}
-
+                {loop name="blog.article"  type="content" current_folder="yes" exclude="{content attr="id"}"}
+                    <li><a href="{$URL}">{$TITLE}</a></li>
+                {/loop}
             </ul>
         </nav>
     </div>

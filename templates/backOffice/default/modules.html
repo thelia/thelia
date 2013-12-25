@@ -80,17 +80,32 @@
         <script src="{$asset_url}"></script>
     {/javascripts}
 
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
     <script>
         $(document).ready(function() {
            var url_management = "{url path="/admin/module/toggle-activation/"}";
            $(".module-activation").on("switch-change", function(e, data){
+
+        	   var module_id = $(this).data('id');
+        	   var is_checked = data.value;
+
                $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
                $.ajax({
                     url: url_management+$(this).data('id')
                }).done(function(){
                    $("#loading-event").remove();
                })
-                .fail(function(jqXHR, textStatus, errorThrown){
+               .success(function() {
+            	   if (is_checked)
+            		   $('#config-btn-' + module_id).removeClass('disabled');
+            	   else
+                       $('#config-btn-' + module_id).addClass('disabled');
+
+               })
+               .fail(function(jqXHR, textStatus, errorThrown){
                     $("#loading-event").remove();
                     $('#module-failed-body').html(jqXHR.responseJSON.error);
                     $("#module-failed").modal("show");
@@ -101,6 +116,32 @@
            $(".module-delete-action").click(function(){
                 $("#delete_module_id").val($(this).data("id"));
            });
+
+           {* Inline editing of object position using bootstrap-editable *}
+
+           $('.modulePositionChange').editable({
+               type        : 'text',
+               title       : '{intl l="Enter new module position"}',
+               mode        : 'popup',
+               inputclass  : 'input-mini',
+               placement   : 'left',
+               success     : function(response, newValue) {
+                   // The URL template
+                   var url = "{url noamp='1' path='/admin/modules/update-position' module_id='__ID__' position='__POS__'}";
+
+                   // Perform subtitutions
+                   url = url.replace('__ID__', $(this).data('id'))
+                   .replace('__POS__', newValue);
+
+                   // Reload the page
+                   location.href = url;
+               }
+           });
+
         });
     </script>
+{/block}
+
+{block name="javascript-last-call"}
+    {module_include location='modules-js'}
 {/block}

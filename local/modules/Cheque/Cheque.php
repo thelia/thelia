@@ -27,6 +27,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Model\ModuleImageQuery;
+use Thelia\Model\Order;
 use Thelia\Module\BaseModule;
 use Thelia\Module\PaymentModuleInterface;
 
@@ -55,7 +56,7 @@ class Cheque extends BaseModule implements PaymentModuleInterface
         return $this->dispatcher;
     }
 
-    public function pay()
+    public function pay(Order $order)
     {
         // no special process, waiting for the cheque.
     }

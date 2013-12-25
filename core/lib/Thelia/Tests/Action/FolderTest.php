@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Action;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Action\Folder;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
@@ -29,6 +30,7 @@ use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\FolderQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
@@ -59,6 +61,29 @@ class FolderTest extends TestCaseWithURLToolSetup
         ;
 
         return $event;
+    }
+
+    public function getUpdateSeoEvent(&$folder)
+    {
+        if(!$folder instanceof \Thelia\Model\Folder) {
+            $folder = $this->getRandomFolder();
+        }
+
+        $event = new UpdateSeoEvent($folder->getId());
+
+        $event
+            ->setLocale($folder->getLocale())
+            ->setMetaTitle($folder->getMetaTitle())
+            ->setMetaDescription($folder->getMetaDescription())
+            ->setMetaKeywords($folder->getMetaKeywords());
+
+        return $event;
+    }
+
+    public function processUpdateSeoAction($event)
+    {
+        $contentAction = new Folder($this->getContainer());
+        return $contentAction->updateSeo($event);
     }
 
     public function processUpdateAction($event)
@@ -113,7 +138,6 @@ class FolderTest extends TestCaseWithURLToolSetup
             ->setChapo('test folder update chapo')
             ->setDescription('update folder description')
             ->setPostscriptum('update folder postscriptum')
-            ->setUrl($folder->getRewrittenUrl('en_US'))
             ->setParent(0)
         ;
 
@@ -206,6 +230,10 @@ class FolderTest extends TestCaseWithURLToolSetup
             ->filterByPosition(1)
             ->filterByParent($nextFolder->getParent())
             ->findOne();
+
+        if (null === $folder) {
+            $this->fail('use fixtures before launching test, there is not enough folder in database');
+        }
 
         $newPosition = $folder->getPosition()+1;
 

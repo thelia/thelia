@@ -38,6 +38,7 @@ class TaxRuleQuery extends BaseTaxRuleQuery
                     ->find()
             )
             ->withColumn(TaxRuleCountryTableMap::POSITION, self::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION)
+            ->orderBy(self::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION, Criteria::ASC);
         ;
 
         return $search->find();

@@ -7,6 +7,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 
 class CategoryDocument extends BaseCategoryDocument
 {
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     /**
@@ -48,5 +49,15 @@ class CategoryDocument extends BaseCategoryDocument
     public function getParentId()
     {
         return $this->getCategoryId();
+    }
+
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->reorderBeforeDelete(
+            array(
+                "category_id" => $this->getCategoryId(),
+            )
+        );
+        return true;
     }
 }

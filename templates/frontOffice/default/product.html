@@ -3,6 +3,21 @@
 {* Body Class *}
 {block name="body-class"}page-product{/block}
 
+{* Page Title *}
+{block name='no-return-functions' append}
+    {loop name="product.seo.title" type="product" id="{product attr="id"}"}
+    {$page_title = {$META_TITLE}}
+    {/loop}
+{/block}
+
+{* Meta *}
+{block name="meta"}
+    {loop name="product.seo.meta" type="product" id="{product attr="id"}"}
+    {if $META_DESCRIPTION}<meta name="description" content="{$META_DESCRIPTION}">{/if}
+    {if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
+    {/loop}
+{/block}
+
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = []}
@@ -14,7 +29,7 @@
     {/loop}
 {/block}
 
-
+{* Content *}
 {block name="main-content"}
     <div class="main">
         {loop name="product.details" type="product" id="{product attr="id"}"}
@@ -27,7 +42,7 @@
                 {/loop}
             {/loop}
             {loop name="brand.feature" type="feature" product="{$ID}" title="isbn"}
-                {loop name="brand.value" type="feature_value" feature="{$ID}" product=$product_id}
+                {loop name="brand.value" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
                     <meta itemprop="productID" content="isbn:{$TITLE}">
                 {/loop}
             {/loop}
@@ -232,7 +247,7 @@
                     {/if}
                 </div>
             </section>
-        </article><!-- /product -->
+        </article><!-- /#product -->
 
         <ul class="pager">
             {if $HAS_PREVIOUS == 1}
@@ -247,9 +262,6 @@
             {/if}
         </ul>
        {/loop}
-        </div>
 
-    </div><!-- /.container -->
-
-
+    </div><!-- /.main -->
 {/block}

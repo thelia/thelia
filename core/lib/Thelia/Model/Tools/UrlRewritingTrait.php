@@ -163,7 +163,7 @@ trait UrlRewritingTrait {
     public function setRewrittenUrl($locale, $url)
     {
         $currentUrl = $this->getRewrittenUrl($locale);
-        if($currentUrl == $url) {
+        if($currentUrl == $url || null === $url) {
             /* no url update */
             return $this;
         }

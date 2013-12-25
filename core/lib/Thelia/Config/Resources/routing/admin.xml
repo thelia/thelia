@@ -59,6 +59,11 @@
         <requirement key="parentType">.*</requirement>
         <requirement key="parentId">\d+</requirement>
     </route>
+    <route id="admin.image.update-position" path="/admin/image/type/{parentType}/{parentId}/update-position">
+        <default key="_controller">Thelia\Controller\Admin\FileController::updateImagePositionAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="parentId">\d+</requirement>
+    </route>
     <route id="admin.image.update.view" path="/admin/image/type/{parentType}/{imageId}/update" methods="get">
         <default key="_controller">Thelia\Controller\Admin\FileController::viewImageAction</default>
         <requirement key="parentType">.*</requirement>
@@ -87,6 +92,11 @@
     </route>
     <route id="admin.document.list-ajax" path="/admin/document/type/{parentType}/{parentId}/list-ajax">
         <default key="_controller">Thelia\Controller\Admin\FileController::getDocumentListAjaxAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="parentId">\d+</requirement>
+    </route>
+    <route id="admin.document.update-position" path="/admin/document/type/{parentType}/{parentId}/update-position">
+        <default key="_controller">Thelia\Controller\Admin\FileController::updateDocumentPositionAction</default>
         <requirement key="parentType">.*</requirement>
         <requirement key="parentId">\d+</requirement>
     </route>
@@ -211,6 +221,10 @@
         <default key="_controller">Thelia\Controller\Admin\CategoryController::processUpdateAction</default>
     </route>
 
+    <route id="admin.categories.seo.save" path="/admin/categories/seo/save">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::processUpdateSeoAction</default>
+    </route>
+
     <route id="admin.categories.set-default" path="/admin/categories/toggle-online">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::setToggleVisibilityAction</default>
     </route>
@@ -227,7 +241,7 @@
         <default key="_controller">Thelia\Controller\Admin\CategoryController::addRelatedContentAction</default>
     </route>
 
-    <route id="admin.categories.related-content.add" path="/admin/categories/related-picture/add">
+    <route id="admin.categories.related-picture.add" path="/admin/categories/related-picture/add">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::addRelatedPictureAction</default>
     </route>
 
@@ -261,6 +275,10 @@
 
     <route id="admin.products.save" path="/admin/products/save">
         <default key="_controller">Thelia\Controller\Admin\ProductController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.products.seo.save" path="/admin/products/seo/save">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::processUpdateSeoAction</default>
     </route>
 
     <route id="admin.products.set-default" path="/admin/products/toggle-online">
@@ -414,6 +432,10 @@
         <default key="_controller">Thelia\Controller\Admin\FolderController::processUpdateAction</default>
     </route>
 
+    <route id="admin.folders.seo.save" path="/admin/folders/seo/save">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::processUpdateSeoAction</default>
+    </route>
+
     <route id="admin.folders.delete" path="/admin/folders/delete">
         <default key="_controller">Thelia\Controller\Admin\FolderController::deleteAction</default>
     </route>
@@ -434,6 +456,10 @@
 
     <route id="admin.content.save" path="/admin/content/save">
         <default key="_controller">Thelia\Controller\Admin\ContentController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.content.seo.save" path="/admin/content/seo/save">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::processUpdateSeoAction</default>
     </route>
 
     <route id="admin.content.update-position" path="/admin/content/update-position">
@@ -952,6 +978,10 @@
 
     <route id="admin.module.delete" path="/admin/module/delete">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::deleteAction</default>
+    </route>
+
+    <route id="admin.module.delete" path="/admin/module/update-position">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::updatePositionAction</default>
     </route>
 
     <!--

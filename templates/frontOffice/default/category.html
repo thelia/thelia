@@ -3,15 +3,30 @@
 {* Body Class *}
 {block name="body-class"}page-category{/block}
 
+{* Page Title *}
+{block name='no-return-functions' append}
+    {loop name="category.seo.title" type="category" id="{category attr="id"}"}
+    {$page_title = {$META_TITLE}}
+    {/loop}
+{/block}
+
+{* Meta *}
+{block name="meta"}
+    {loop name="category.seo.meta" type="category" id="{category attr="id"}"}
+    {if $META_DESCRIPTION}<meta name="description" content="{$META_DESCRIPTION}">{/if}
+    {if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
+    {/loop}
+{/block}
+
 {* Breadcrumb *}
 {block name='no-return-functions' append}
-    {$sBreadcrumb = []}
+    {$breadcrumbs = []}
     {loop name="category_path" type="category-path" category="{category attr="id"}"}
         {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
     {/loop}
 {/block}
 
-
+{* Content *}
 {block name="main-content"}
     <div class="main layout-col-2-left">
         {$limit={$smarty.get.limit|default:8}}
@@ -19,7 +34,7 @@
         {$product_order={$smarty.get.order|default:'alpha'}}
         <article class="col-main {$smarty.get.mode|default:"grid"}" role="main">
             {ifloop rel="product_list"}
-                {assign var="amount" value="{count type="product" category={category attr="id"}}"}
+                {assign var="amount" value="{count type="product" category="{category attr="id"}"}"}
                 {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order amount={$amount}}
                 <div id="category-products">
                     <div class="products-content">

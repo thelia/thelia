@@ -47,7 +47,7 @@ use Thelia\Model\CategoryAssociatedContentQuery;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class CategoryController extends AbstractCrudController
+class CategoryController extends AbstractSeoCrudController
 {
     public function __construct()
     {
@@ -62,7 +62,8 @@ class CategoryController extends AbstractCrudController
             TheliaEvents::CATEGORY_UPDATE,
             TheliaEvents::CATEGORY_DELETE,
             TheliaEvents::CATEGORY_TOGGLE_VISIBILITY,
-            TheliaEvents::CATEGORY_UPDATE_POSITION
+            TheliaEvents::CATEGORY_UPDATE_POSITION,
+            TheliaEvents::CATEGORY_UPDATE_SEO
         );
     }
 
@@ -102,7 +103,6 @@ class CategoryController extends AbstractCrudController
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
-            ->setUrl($formData['url'])
             ->setParent($formData['parent'])
         ;
 
@@ -130,7 +130,10 @@ class CategoryController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-        // Prepare the data that will hydrate the form
+        // Hydrate the "SEO" tab form
+        $this->hydrateSeoForm($object);
+
+        // The "General" tab form
         $data = array(
             'id'           => $object->getId(),
             'locale'       => $object->getLocale(),
@@ -139,7 +142,6 @@ class CategoryController extends AbstractCrudController
             'description'  => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum(),
             'visible'      => $object->getVisible(),
-            'url'          => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
             'parent'       => $object->getParent()
         );
 
@@ -193,10 +195,25 @@ class CategoryController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
+        $category_id = $this->getRequest()->get('category_id', 0);
+        $this->redirectToListTemplateWithId($category_id);
+    }
+
+    protected function redirectToListTemplateWithId($category_id)
+    {
+        if($category_id > 0)
+        {
+            $this->redirectToRoute(
                 'admin.categories.default',
-                array('category_id' => $this->getRequest()->get('category_id', 0))
-        );
+                array('category_id' => $category_id)
+            );
+        }
+        else
+        {
+            $this->redirectToRoute(
+                'admin.catalog'
+            );
+        }
     }
 
     protected function renderEditionTemplate()
@@ -233,21 +250,16 @@ class CategoryController extends AbstractCrudController
     protected function performAdditionalDeleteAction($deleteEvent)
     {
         // Redirect to parent category list
-        $this->redirectToRoute(
-                'admin.categories.default',
-                array('category_id' => $deleteEvent->getCategory()->getParent())
-        );
+        $category_id = $deleteEvent->getCategory()->getParent();
+        $this->redirectToListTemplateWithId($category_id);
     }
 
     protected function performAdditionalUpdateAction($updateEvent)
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
-
             // Redirect to parent category list
-            $this->redirectToRoute(
-                    'admin.categories.default',
-                    array('category_id' => $updateEvent->getCategory()->getParent())
-            );
+            $category_id = $updateEvent->getCategory()->getParent();
+            $this->redirectToListTemplateWithId($category_id);
         }
     }
 
@@ -258,10 +270,8 @@ class CategoryController extends AbstractCrudController
 
         if ($category != null) {
             // Redirect to parent category list
-            $this->redirectToRoute(
-                    'admin.categories.default',
-                    array('category_id' => $category->getParent())
-            );
+            $category_id = $category->getParent();
+            $this->redirectToListTemplateWithId($category_id);
         }
 
         return null;

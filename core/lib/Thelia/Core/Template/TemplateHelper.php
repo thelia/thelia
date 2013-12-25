@@ -86,36 +86,52 @@ class TemplateHelper
         );
     }
 
+    /**
+     * Returns an array which contains all standard template definitions
+     */
+    public function getStandardTemplateDefinitions() {
+        return array(
+                $this->getActiveFrontTemplate(),
+                $this->getActiveAdminTemplate(),
+                $this->getActivePdfTemplate(),
+                $this->getActiveMailTemplate(),
+        );
+    }
+
+    /**
+     * Return a list of existing templates for a given template type
+     *
+     * @param int $templateType the template type
+     * @return An array of \Thelia\Core\Template\TemplateDefinition
+     */
     public function getList($templateType) {
 
         $list = $exclude = array();
 
-        if ($templateType == TemplateDefinition::BACK_OFFICE) {
-            $baseDir = THELIA_TEMPLATE_DIR.TemplateDefinition::BACK_OFFICE_SUBDIR;
+        $tplIterator = TemplateDefinition::getStandardTemplatesSubdirsIterator();
+
+        foreach($tplIterator as $type => $subdir) {
+
+            if ($templateType == $type) {
+
+                $baseDir = THELIA_TEMPLATE_DIR.$subdir;
+
+                // Every subdir of the basedir is supposed to be a template.
+                $di = new \DirectoryIterator($baseDir);
+
+                foreach ($di as $file) {
+                // Ignore 'dot' elements
+                if ($file->isDot() || ! $file->isDir()) continue;
+
+                    // Ignore reserved directory names
+                    if (in_array($file->getFilename()."/", $exclude)) continue;
+
+                    $list[] = new TemplateDefinition($file->getFilename(), $templateType);
+                }
+
+                return $list;
+            }
         }
-        else if ($templateType == TemplateDefinition::PDF) {
-            $baseDir = THELIA_TEMPLATE_DIR.TemplateDefinition::PDF_SUBDIR;
-        }
-        else {
-            $baseDir = THELIA_TEMPLATE_DIR.TemplateDefinition::FRONT_OFFICE_SUBDIR;
-
-            $exclude = array(TemplateDefinition::BACK_OFFICE_SUBDIR, TemplateDefinition::PDF_SUBDIR);
-        }
-
-        // Every subdir of the basedir is supposed to be a template.
-        $di = new \DirectoryIterator($baseDir);
-
-        foreach ($di as $file) {
-            // Ignore 'dot' elements
-            if ($file->isDot() || ! $file->isDir()) continue;
-
-            // Ignore reserved directory names
-            if (in_array($file->getFilename()."/", $exclude)) continue;
-
-            $list[] = new TemplateDefinition($file->getFilename(), $templateType);
-        }
-
-        return $list;
     }
 
 

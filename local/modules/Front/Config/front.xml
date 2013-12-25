@@ -131,6 +131,10 @@
         <default key="_view">order-delivery</default>
     </route>
 
+    <route id="admin.delivery.ajax-module-list" path="/order/deliveryModuleList">
+        <default key="_controller">Front\Controller\OrderController::getDeliveryModuleListAjaxAction</default>
+    </route>
+
     <route id="order.invoice.process" path="/order/invoice" methods="post">
         <default key="_controller">Front\Controller\OrderController::invoice</default>
         <default key="_view">order-invoice</default>

@@ -1,10 +1,3 @@
-{* Declare assets directory, relative to template base directory *}
-{declare_assets directory='assets'}
-{block name="no-return-functions"}{/block}
-{assign var="store_name" value="{config key="store_name"}"}
-{if not $store_name}
-    {assign var="store_name" value="{intl l='Thelia V2'}"}
-{/if}
 <!doctype html>
 <!--
  ______   __  __     ______     __         __     ______
@@ -24,6 +17,12 @@ the Free Software Foundation; either version 3 of the
 GNU General Public License : http://www.gnu.org/licenses/
 -->
 
+{* Declare assets directory, relative to template base directory *}
+{declare_assets directory='assets'}
+{block name="no-return-functions"}{/block}
+{assign var="store_name" value="{config key="store_name"}"}
+{if not $store_name}{assign var="store_name" value="{intl l='Thelia V2'}"}{/if}
+
 {* paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither *}
 <!--[if lt IE 7 ]><html class="no-js oldie ie6" lang="{lang attr="code"}"> <![endif]-->
 <!--[if IE 7 ]><html class="no-js oldie ie7" lang="{lang attr="code"}"> <![endif]-->
@@ -37,14 +36,14 @@ GNU General Public License : http://www.gnu.org/licenses/
     <meta charset="utf-8">
 
     {* Page Title *}
-    <title>{block name="page-title"}{strip}{if $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title} - {/foreach}{/if}{$store_name}{/strip}{/block}</title>
+    <title>{block name="page-title"}{strip}{if $page_title}{$page_title}{elseif $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title} - {/foreach}{$store_name}{/if}{/strip}{/block}</title>
 
     {* Meta Tags *}
     <meta name="generator" content="{intl l='Thelia V2'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     {block name="meta"}
-        <meta name="description" content="{$store_name}">
+        <meta name="description" content="{if $page_description}{$page_description}{else}{$store_name}{/if}">
         <meta name="robots" content="noindex,nofollow">
     {/block}
 

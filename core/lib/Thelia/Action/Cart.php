@@ -66,12 +66,18 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 ->filterByProductSaleElementsId($productSaleElementsId)
                 ->findOne();
 
-            $this->doAddItem($cart, $productId, $productPrice->getProductSaleElements(), $quantity, $productPrice);
+            $event->setCartItem(
+                $this->doAddItem($cart, $productId, $productPrice->getProductSaleElements(), $quantity, $productPrice)
+            );
         }
 
         if ($append && $cartItem !== null) {
             $cartItem->addQuantity($quantity)
                 ->save();
+
+            $event->setCartItem(
+                $cartItem
+            );
         }
     }
 
@@ -123,7 +129,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 ->findOne();
 
             if ($cartItem) {
-                $this->updateQuantity($cartItem, $quantity);
+                $event->setCartItem(
+                    $this->updateQuantity($cartItem, $quantity)
+                );
             }
         }
     }
@@ -163,12 +171,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param CartItem $cartItem
      * @param float    $quantity
+     *
+     * @return CartItem
      */
     protected function updateQuantity(CartItem $cartItem, $quantity)
     {
         $cartItem->setDisptacher($this->getDispatcher());
         $cartItem->updateQuantity($quantity)
             ->save();
+
+        return $cartItem;
     }
 
     /**
@@ -176,9 +188,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param \Thelia\Model\Cart $cart
      * @param int                $productId
-     * @param int                $productSaleElementsId
+     * @param \Thelia\Model\ProductSaleElements $productSaleElements
      * @param float              $quantity
      * @param ProductPrice       $productPrice
+     *
+     * @return CartItem
      */
     protected function doAddItem(\Thelia\Model\Cart $cart, $productId, \Thelia\Model\ProductSaleElements $productSaleElements, $quantity, ProductPrice $productPrice)
     {
@@ -194,6 +208,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->setPromo($productSaleElements->getPromo())
             ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30))
             ->save();
+
+        return $cartItem;
     }
 
     /**

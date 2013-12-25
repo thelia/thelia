@@ -41,7 +41,7 @@ use Thelia\Model\ContentQuery;
  * @package Thelia\Controller\Admin
  * @author manuel raynaud <mraynaud@openstudio.fr>
  */
-class ContentController extends AbstractCrudController
+class ContentController extends AbstractSeoCrudController
 {
 
     public function __construct()
@@ -57,7 +57,8 @@ class ContentController extends AbstractCrudController
             TheliaEvents::CONTENT_UPDATE,
             TheliaEvents::CONTENT_DELETE,
             TheliaEvents::CONTENT_TOGGLE_VISIBILITY,
-            TheliaEvents::CONTENT_UPDATE_POSITION
+            TheliaEvents::CONTENT_UPDATE_POSITION,
+            TheliaEvents::CONTENT_UPDATE_SEO
         );
     }
 
@@ -140,6 +141,9 @@ class ContentController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
+        // Hydrate the "SEO" tab form
+        $this->hydrateSeoForm($object);
+
         // Prepare the data that will hydrate the form
         $data = array(
             'id'           => $object->getId(),
@@ -148,8 +152,7 @@ class ContentController extends AbstractCrudController
             'chapo'        => $object->getChapo(),
             'description'  => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum(),
-            'visible'      => $object->getVisible(),
-            'url'          => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
+            'visible'      => $object->getVisible()
         );
 
         // Setup the object form
@@ -191,7 +194,6 @@ class ContentController extends AbstractCrudController
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
-            ->setUrl($formData['url'])
             ->setDefaultFolder($formData['default_folder']);
 
         return $contentUpdateEvent;

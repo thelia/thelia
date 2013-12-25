@@ -25,38 +25,37 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Thelia\Exception\UrlRewritingException;
-use Thelia\Form\Exception\FormValidationException;
+use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Product as ProductModel;
-
-use Thelia\Core\Event\TheliaEvents;
-
-use Thelia\Core\Event\Product\ProductUpdateEvent;
-use Thelia\Core\Event\Product\ProductCreateEvent;
-use Thelia\Core\Event\Product\ProductDeleteEvent;
-use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
-use Thelia\Core\Event\Product\ProductAddContentEvent;
-use Thelia\Core\Event\Product\ProductDeleteContentEvent;
 use Thelia\Model\ProductAssociatedContent;
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\ProductCategory;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\Accessory;
-use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
 use Thelia\Model\FeatureProduct;
-use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\ProductCategoryQuery;
-use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Model\ProductSaleElementsQuery;
+
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\Product\ProductUpdateEvent;
+use Thelia\Core\Event\Product\ProductCreateEvent;
+use Thelia\Core\Event\Product\ProductDeleteEvent;
+use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
+use Thelia\Core\Event\Product\ProductAddContentEvent;
+use Thelia\Core\Event\Product\ProductDeleteContentEvent;
+use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
+use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
+use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
-use Thelia\Model\Map\ProductTableMap;
+
 use Propel\Runtime\Propel;
 
 class Product extends BaseAction implements EventSubscriberInterface
@@ -115,19 +114,23 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->save()
             ;
 
-            // Update the rewritten URL, if required
-            try {
-                $product->setRewrittenUrl($event->getLocale(), $event->getUrl());
-            } catch(UrlRewritingException $e) {
-                throw new FormValidationException($e->getMessage(), $e->getCode());
-            }
-
             // Update default category (ifd required)
             $product->updateDefaultCategory($event->getDefaultCategory());
 
             $event->setProduct($product);
         }
     }
+
+    /**
+     * Change a product SEO
+     *
+     * @param \Thelia\Core\Event\UpdateSeoEvent $event
+     */
+    public function updateSeo(UpdateSeoEvent $event)
+    {
+        return $this->genericUpdateSeo(ProductQuery::create(), $event);
+    }
+
 
     /**
      * Delete a product entry
@@ -389,12 +392,13 @@ class Product extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::PRODUCT_CREATE            => array("create", 128),
-            TheliaEvents::PRODUCT_UPDATE            => array("update", 128),
-            TheliaEvents::PRODUCT_DELETE            => array("delete", 128),
-            TheliaEvents::PRODUCT_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
+            TheliaEvents::PRODUCT_CREATE                    => array("create", 128),
+            TheliaEvents::PRODUCT_UPDATE                    => array("update", 128),
+            TheliaEvents::PRODUCT_DELETE                    => array("delete", 128),
+            TheliaEvents::PRODUCT_TOGGLE_VISIBILITY         => array("toggleVisibility", 128),
 
-            TheliaEvents::PRODUCT_UPDATE_POSITION => array("updatePosition", 128),
+            TheliaEvents::PRODUCT_UPDATE_POSITION           => array("updatePosition", 128),
+            TheliaEvents::PRODUCT_UPDATE_SEO                => array("updateSeo", 128),
 
             TheliaEvents::PRODUCT_ADD_CONTENT               => array("addContent", 128),
             TheliaEvents::PRODUCT_REMOVE_CONTENT            => array("removeContent", 128),
@@ -404,13 +408,13 @@ class Product extends BaseAction implements EventSubscriberInterface
             TheliaEvents::PRODUCT_REMOVE_ACCESSORY          => array("removeAccessory", 128),
             TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION => array("updateAccessoryPosition", 128),
 
-            TheliaEvents::PRODUCT_ADD_CATEGORY    => array("addCategory", 128),
-            TheliaEvents::PRODUCT_REMOVE_CATEGORY => array("removeCategory", 128),
+            TheliaEvents::PRODUCT_ADD_CATEGORY              => array("addCategory", 128),
+            TheliaEvents::PRODUCT_REMOVE_CATEGORY           => array("removeCategory", 128),
 
-            TheliaEvents::PRODUCT_SET_TEMPLATE => array("setProductTemplate", 128),
+            TheliaEvents::PRODUCT_SET_TEMPLATE              => array("setProductTemplate", 128),
 
-            TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE => array("updateFeatureProductValue", 128),
-            TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE => array("deleteFeatureProductValue", 128),
+            TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE      => array("updateFeatureProductValue", 128),
+            TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE      => array("deleteFeatureProductValue", 128),
         );
     }
 }

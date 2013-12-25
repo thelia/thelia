@@ -38,6 +38,7 @@ use Thelia\Model\ModuleQuery;
 
 use Thelia\Module\BaseModule;
 use Thelia\Type;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -75,6 +76,13 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                         BaseModule::PAYMENT_MODULE_TYPE,
                     ))
                 )
+            ),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new Type\EnumListType(array('id', 'id_reverse', 'code', 'code_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'enabled', 'enabled_reverse'))
+                ),
+                'manual'
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanOrBothTypeArgument('active', Type\BooleanOrBothType::ANY)
@@ -126,7 +134,42 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByActivate($active ? 1 : 0, Criteria::EQUAL);
         }
 
-        $search->orderByPosition();
+        $orders  = $this->getOrder();
+
+        foreach ($orders as $order) {
+            switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
+                case "alpha":
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
+                    break;
+                case "code":
+                    $search->orderByCode(Criteria::ASC);
+                    break;
+                case "code_reverse":
+                    $search->orderByCode(Criteria::DESC);
+                    break;
+                case "manual":
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "manual_reverse":
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+                case "enabled":
+                    $search->orderByActivate(Criteria::ASC);
+                    break;
+                case "enabled_reverse":
+                    $search->orderByActivate(Criteria::DESC);
+                    break;
+             }
+        }
 
         return $search;
 

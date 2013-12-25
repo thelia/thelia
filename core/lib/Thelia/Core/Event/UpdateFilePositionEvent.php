@@ -21,19 +21,40 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Security\Exception;
+namespace Thelia\Core\Event;
 
-class RessourceException extends \RuntimeException
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+
+class UpdateFilePositionEvent extends UpdatePositionEvent
 {
-    const UNKNOWN_EXCEPTION = 0;
+    protected $query;
 
-    const RESOURCE_NOT_FOUND = 404;
-
-    public function __construct($message, $code = null, $previous = null)
+    /**
+     * @param ModelCriteria $query
+     * @param               $object_id
+     * @param null          $mode
+     * @param null          $position
+     */
+    public function __construct(ModelCriteria $query, $object_id, $mode, $position = null)
     {
-        if ($code === null) {
-            $code = self::UNKNOWN_EXCEPTION;
-        }
-        parent::__construct($message, $code, $previous);
+        parent::__construct($object_id, $mode, $position);
+
+        $this->setQuery($query);
+    }
+
+    /**
+     * @param ModelCriteria $query
+     */
+    public function setQuery(ModelCriteria $query)
+    {
+        $this->query = $query;
+    }
+
+    /**
+     * @return ModelCriteria|null
+     */
+    public function getQuery()
+    {
+        return $this->query;
     }
 }

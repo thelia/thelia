@@ -24,8 +24,6 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\GreaterThan;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
 use Thelia\Form\StandardDescriptionFieldsTrait;
 
 /**
@@ -43,12 +41,6 @@ class ContentModificationForm extends ContentCreationForm
 
         $this->formBuilder
             ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
-
-            ->add("url", "text", array(
-                "label"       => Translator::getInstance()->trans("Rewritten URL *"),
-                "constraints" => array(new NotBlank()),
-                "label_attr" => array("for" => "rewritten_url")
-            ))
         ;
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class
