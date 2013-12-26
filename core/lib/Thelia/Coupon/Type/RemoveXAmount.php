@@ -100,7 +100,19 @@ class RemoveXAmount extends CouponAbstract
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Remove X amount to total cart', array(), 'constraint');
+            ->trans('Remove X amount to total cart', array(), 'coupon');
+    }
+
+    /**
+     * Get I18n amount input name
+     *
+     * @return string
+     */
+    public function getInputName()
+    {
+        return $this->facade
+            ->getTranslator()
+            ->trans('Amount removed from the cart', array(), 'coupon');
     }
 
     /**
@@ -115,7 +127,7 @@ class RemoveXAmount extends CouponAbstract
             ->trans(
                 'This coupon will remove the entered amount to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.',
                 array(),
-                'constraint'
+                'coupon'
             );
 
         return $toolTip;

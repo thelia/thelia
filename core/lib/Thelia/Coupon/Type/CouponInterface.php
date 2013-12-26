@@ -47,6 +47,13 @@ interface CouponInterface
     public function getName();
 
     /**
+     * Get I18n amount input name
+     *
+     * @return string
+     */
+    public function getInputName();
+
+    /**
      * Get I18n tooltip
      *
      * @return string
@@ -214,5 +221,13 @@ interface CouponInterface
      * @return bool
      */
     public function isMatching();
+
+    /**
+     * Draw the input displayed in the BackOffice
+     * allowing Admin to set its Coupon effect
+     *
+     * @return string HTML string
+     */
+    public function drawBackOfficeInputs();
 
 }

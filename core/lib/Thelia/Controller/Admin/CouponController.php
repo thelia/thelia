@@ -31,6 +31,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\Type\CouponInterface;
@@ -41,6 +42,7 @@ use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Lang;
 use Thelia\Tools\I18n;
+use Thelia\Tools\Rest\ResponseRest;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -152,6 +154,11 @@ class CouponController extends BaseAdminController
 
         $args['dateFormat'] = $this->getSession()->getLang()->getDateFormat();
         $args['availableCoupons'] = $this->getAvailableCoupons();
+        $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
+            'admin.coupon.draw.inputs',
+            array('couponServiceId' => 'couponServiceId'),
+            Router::ABSOLUTE_URL
+        );
         $args['formAction'] = 'admin/coupon/create';
 
         return $this->render(
@@ -181,6 +188,9 @@ class CouponController extends BaseAdminController
             return $this->pageNotFound();
 
         }
+        /** @var CouponFactory $couponFactory */
+        $couponFactory = $this->container->get('thelia.coupon.factory');
+        $couponManager = $couponFactory->buildCouponFromModel($coupon);
 
         // Parameters given to the template
         $args = array();
@@ -233,6 +243,7 @@ class CouponController extends BaseAdminController
                     'serviceId' => $condition->getServiceId(),
                     'name' => $condition->getName(),
                     'tooltip' => $condition->getToolTip(),
+                    'tooltip' => $condition->getToolTip(),
                     'validators' => $condition->getValidators()
                 );
             }
@@ -247,6 +258,12 @@ class CouponController extends BaseAdminController
         }
         $args['couponCode'] = $coupon->getCode();
         $args['availableCoupons'] = $this->getAvailableCoupons();
+        $args['couponInputsHtml'] = $couponManager->drawBackOfficeInputs();
+        $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
+            'admin.coupon.draw.inputs',
+            array('couponServiceId' => 'couponServiceId'),
+            Router::ABSOLUTE_URL
+        );
         $args['availableConditions'] = $this->getAvailableConditions();
         $args['urlAjaxGetConditionInput'] = $this->getRoute(
             'admin.coupon.condition.input',
@@ -461,6 +478,9 @@ class CouponController extends BaseAdminController
             $couponEvent = new CouponCreateOrUpdateEvent(
                 $data['code'], $data['title'], $data['amount'], $data['type'], $data['shortDescription'], $data['description'], $data['isEnabled'], \DateTime::createFromFormat('Y-m-d', $data['expirationDate']), $data['isAvailableOnSpecialOffers'], $data['isCumulative'], $data['isRemovingPostage'], $data['maxUsage'], $data['locale']
             );
+            $couponQuery = new CouponQuery();
+            $coupon = $couponQuery->findOneByCode($data['code']);
+            $couponEvent->setCouponModel($coupon);
 
             // Dispatch Event to the Action
             $this->dispatch(
@@ -524,7 +544,6 @@ class CouponController extends BaseAdminController
             $condition = array();
             $condition['serviceId'] = $availableCondition->getServiceId();
             $condition['name'] = $availableCondition->getName();
-           // $condition['toolTip'] = $availableCondition->getToolTip();
             $cleanedConditions[] = $condition;
         }
 
@@ -548,6 +567,7 @@ class CouponController extends BaseAdminController
             $condition['serviceId'] = $availableCoupon->getServiceId();
             $condition['name'] = $availableCoupon->getName();
             $condition['toolTip'] = $availableCoupon->getToolTip();
+            $condition['inputName'] = $availableCoupon->getInputName();
             $cleanedCoupons[] = $condition;
         }
 
@@ -570,6 +590,28 @@ class CouponController extends BaseAdminController
         }
 
         return $cleanedConditions;
+    }
+
+    /**
+     * Draw the input displayed in the BackOffice
+     * allowing Admin to set its Coupon effect
+     *
+     * @param string $couponServiceId Coupon service id
+     *
+     * @return ResponseRest
+     */
+    public function getBackOfficeInputsAction($couponServiceId)
+    {
+        /** @var CouponInterface $coupon */
+        $coupon = $this->container->get($couponServiceId);
+
+        if (!$coupon instanceof CouponInterface) {
+            $this->pageNotFound();
+        }
+
+        $response = new ResponseRest($coupon->drawBackOfficeInputs());
+
+        return $response;
     }
 
 }

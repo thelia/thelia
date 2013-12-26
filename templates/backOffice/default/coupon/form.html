@@ -99,32 +99,28 @@
             </div>
 
             <div class="col-md-8">
-                <div class="well clearfix">
+                <div id="coupon-type" class="well clearfix">
                     <div class="col-md-6">
                         {form_field form=$form field='type'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="type" class="control-label">{intl l='Type :'}</label>
                                 <select name="{$name}" id="type" class="col-md-12 form-control">
-                                    <option value="-1" data-description="">{intl l='Please select a coupon type'}</option>
+                                    <option value="-1" data-description="" data-inputName="">{intl l='Please select a coupon type'}</option>
                                     {foreach from=$availableCoupons item=availableCoupon}
-                                        <option value="{$availableCoupon.serviceId}" {if $value == $availableCoupon.serviceId}selected{/if}>
+                                        <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}" data-inputName="{$availableCoupon.inputName}" {if $value == $availableCoupon.serviceId}selected{/if}>
                                             {$availableCoupon.name}
                                         </option>
                                     {/foreach}
                                 </select>
                                 {if $error}{$message}{/if}
-                                <span id="typeToolTip" class="help-block">{$availableCoupons.0.toolTip}</span>
+                                <span class="help-block typeToolTip">{$availableCoupons.0.toolTip}</span>
                             </div>
                         {/form_field}
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-6 inputs">
                         {form_field form=$form field='amount'}
-                            <div class="form-group {if $error}has-error{/if}">
-                                <label for="amount" class="control-label">{intl l='Amount :'}</label>
-                                <input id="amount" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="{intl l='14.50'}">
-                                {if $error}{$message}{/if}
-                            </div>
+                            {$couponInputsHtml nofilter}
                         {/form_field}
                         {*<div class="form-group {if $error}has-error{/if}">*}
                             {*<label for="category">Category :</label>*}
@@ -208,7 +204,7 @@
                     <select name="categoryCondition" id="category-condition" class="form-control">
                         <option value="-1" >{intl l='Please select a condition category'}</option>
                         {foreach from=$availableConditions item=availableCondition}
-                            <option value="{$availableCondition.serviceId}" data-description="{$availableCondition.toolTip}">{$availableCondition.name}</option>
+                            <option value="{$availableCondition.serviceId}" >{$availableCondition.name}</option>
                         {/foreach}
                     </select>
                 </div>

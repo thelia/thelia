@@ -167,4 +167,11 @@ interface FacadeInterface
      */
     public function getAvailableCurrencies();
 
+    /**
+     * Return the event dispatcher,
+     *
+     * @return \Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    public function getDispatcher();
+
 }

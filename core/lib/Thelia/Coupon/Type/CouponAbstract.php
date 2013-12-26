@@ -307,4 +307,25 @@ abstract class CouponAbstract implements CouponInterface
         return $this->conditionEvaluator->isMatching($this->conditions);
     }
 
+    /**
+     * Draw the input displayed in the BackOffice
+     * allowing Admin to set its Coupon effect
+     *
+     * @return string HTML string
+     */
+    public function drawBackOfficeInputs()
+    {
+        $label = $this->getInputName();
+        $value = $this->amount;
+
+        $html = '
+                <div class="form-group input-amount ">
+                    <label for="amount" class="control-label">' . $label . '</label>
+                    <input id="amount" type="text" class="form-control" name="thelia_coupon_creation[amount]" value="' . $value . '" placeholder="14.50">
+                </div>
+            ';
+
+        return $html;
+    }
+
 }

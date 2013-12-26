@@ -122,7 +122,19 @@ class RemoveXPercent extends CouponAbstract
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Remove X percent to total cart', array(), 'constraint');
+            ->trans('Remove X percent to total cart', array(), 'coupon');
+    }
+
+    /**
+     * Get I18n amount input name
+     *
+     * @return string
+     */
+    public function getInputName()
+    {
+        return $this->facade
+            ->getTranslator()
+            ->trans('Percentage removed from the cart', array(), 'coupon');
     }
 
     /**
@@ -137,7 +149,7 @@ class RemoveXPercent extends CouponAbstract
             ->trans(
                 'This coupon will remove the entered percentage to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.',
                 array(),
-                'constraint'
+                'coupon'
             );
 
         return $toolTip;
