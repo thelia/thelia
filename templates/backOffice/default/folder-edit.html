@@ -88,9 +88,9 @@
 		                                                      <option value="0">{intl l="Top level"}</option>
 
                                                               {$myparent=$PARENT}
-		                                                      {* loop name="fold-parent" type="folder-tree" visible="*" folder="0"}
+		                                                      {loop name="fold-parent" type="folder-tree" visible="*" folder="0"}
 		                                                           <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if} {if $folder_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
-		                                                      {/loop *}
+		                                                      {/loop}
 
 		                                                </select>
 		                                             </div>
