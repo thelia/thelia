@@ -63,6 +63,10 @@
 			                                <input type="hidden" name="{$name}" value="{url path="/admin/folders/update/{$ID}"}" />
 			                            {/form_field}
 
+                                        {form_field form=$form field='locale'}
+                                            <input type="hidden" name="{$name}" value="{$value}" />
+                                        {/form_field}
+
                                         {* Display error message if exist *}
                                         {include file='includes/notifications.html' message=$form_error_message}
 
