@@ -444,7 +444,7 @@ abstract class AbstractCrudController extends BaseAdminController
         );
 
 
-        //return $this->renderEditionTemplate();
+        return $this->renderEditionTemplate();
     }
 
     /**
