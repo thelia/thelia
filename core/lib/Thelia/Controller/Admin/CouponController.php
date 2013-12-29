@@ -245,7 +245,6 @@ class CouponController extends BaseAdminController
                     'serviceId' => $condition->getServiceId(),
                     'name' => $condition->getName(),
                     'tooltip' => $condition->getToolTip(),
-                    'tooltip' => $condition->getToolTip(),
                     'validators' => $condition->getValidators()
                 );
             }
