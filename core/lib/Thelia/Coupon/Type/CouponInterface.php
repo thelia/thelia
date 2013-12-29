@@ -230,4 +230,11 @@ interface CouponInterface
      */
     public function drawBackOfficeInputs();
 
+    /**
+     * Get all extended inputs name to manage
+     *
+     * @return mixed
+     */
+    public function getExtendedInputs();
+
 }

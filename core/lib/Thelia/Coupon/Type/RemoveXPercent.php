@@ -46,6 +46,11 @@ class RemoveXPercent extends CouponAbstract
     /** @var float Percentage removed from the Cart */
     protected $percentage = 0;
 
+    /** @var array Extended Inputs to manage */
+    protected $extendedInputs = array(
+        self::INPUT_PERCENTAGE_NAME
+    );
+
     /**
      * Set Coupon
      *

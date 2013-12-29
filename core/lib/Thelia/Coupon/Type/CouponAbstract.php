@@ -48,6 +48,9 @@ abstract class CouponAbstract implements CouponInterface
 
     const INPUT_AMOUNT_NAME = 'amount';
 
+    /** @var array Extended Inputs to manage */
+    protected $extendedInputs = array();
+
     /** @var  FacadeInterface Provide necessary value from Thelia */
     protected $facade = null;
 
@@ -388,5 +391,16 @@ abstract class CouponAbstract implements CouponInterface
 
         return $html;
     }
+
+    /**
+     * Get all extended inputs name to manage
+     *
+     * @return mixed
+     */
+    public function getExtendedInputs()
+    {
+        return $this->extendedInputs;
+    }
+
 
 }

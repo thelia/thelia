@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 use Thelia\Condition\ConditionFactory;
@@ -461,20 +462,7 @@ class CouponController extends BaseAdminController
             // Check the form against conditions violations
             $form = $this->validateForm($creationForm, 'POST');
 
-
-            // Get the form field values
-            $data = $form->getData();
-            $effects = array('amount' => $data['amount']);
-            $effects = $this->addPercentageLogic($effects);
-
-            $couponEvent = new CouponCreateOrUpdateEvent(
-                $data['code'], $data['type'], $data['title'], $effects, $data['shortDescription'], $data['description'], $data['isEnabled'], \DateTime::createFromFormat('Y-m-d', $data['expirationDate']), $data['isAvailableOnSpecialOffers'], $data['isCumulative'], $data['isRemovingPostage'], $data['maxUsage'], $data['locale']
-            );
-            $couponQuery = new CouponQuery();
-            $coupon = $couponQuery->findOneByCode($data['code']);
-            if (isset($coupon)) {
-                $couponEvent->setCouponModel($coupon);
-            }
+            $couponEvent = $this->feedCouponCreateOrUpdateEvent($form);
 
             // Dispatch Event to the Action
             $this->dispatch(
@@ -611,25 +599,61 @@ class CouponController extends BaseAdminController
     /**
      * Add percentage logic if found in the Coupon post data
      *
-     * @param array $effects Effect to populate
+     * @param array $effects            Effect parameters to populate
+     * @param array $extendedInputNames Extended Inputs to manage
      *
      * @return array Populated effect with percentage
      */
-    protected function addPercentageLogic(array $effects)
+    protected function addExtendedLogic(array $effects, array $extendedInputNames)
     {
         /** @var Request $request */
         $request = $this->container->get('request');
         $postData = $request->request;
         // Validate quantity input
+
         if ($postData->has(RemoveXPercent::INPUT_EXTENDED__NAME)) {
             $extentedPostData = $postData->get(RemoveXPercent::INPUT_EXTENDED__NAME);
-            if (isset($extentedPostData[RemoveXPercent::INPUT_PERCENTAGE_NAME])) {
-                $percentage = $extentedPostData[RemoveXPercent::INPUT_PERCENTAGE_NAME];
-                $effects[RemoveXPercent::INPUT_PERCENTAGE_NAME] = floatval($percentage);
+
+            foreach ($extendedInputNames as $extendedInputName) {
+                if (isset($extentedPostData[$extendedInputName])) {
+                    $inputValue = $extentedPostData[$extendedInputName];
+                    $effects[$extendedInputName] = $inputValue;
+                }
             }
         }
 
         return $effects;
+    }
+
+    /**
+     * Feed the Coupon Create or Update event with the User inputs
+     *
+     * @param Form $form
+     *
+     * @return CouponCreateOrUpdateEvent
+     */
+    protected function feedCouponCreateOrUpdateEvent(Form $form)
+    {
+        // Get the form field values
+        $data = $form->getData();
+        $serviceId = $data['type'];
+        /** @var CouponInterface $couponManager */
+        $couponManager = $this->container->get($serviceId);
+        $effects = array('amount' => $data['amount']);
+        $effects = $this->addExtendedLogic($effects, $couponManager->getExtendedInputs());
+
+        $couponEvent = new CouponCreateOrUpdateEvent(
+            $data['code'], $serviceId, $data['title'], $effects, $data['shortDescription'], $data['description'], $data['isEnabled'], \DateTime::createFromFormat('Y-m-d', $data['expirationDate']), $data['isAvailableOnSpecialOffers'], $data['isCumulative'], $data['isRemovingPostage'], $data['maxUsage'], $data['locale']
+        );
+
+        // If Update mode
+        $couponQuery = new CouponQuery();
+        $coupon = $couponQuery->findOneByCode($data['code']);
+        if (isset($coupon)) {
+            $couponEvent->setCouponModel($coupon);
+        }
+
+        return $couponEvent;
     }
 
 }
