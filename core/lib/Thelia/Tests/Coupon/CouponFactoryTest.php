@@ -248,7 +248,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
 
-        $conditionFactory = new ConditionFactory($stubContainer);
         $stubFacade->expects($this->any())
             ->method('findOneCouponByCode')
             ->will($this->returnValue(null));
@@ -336,7 +335,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->will($this->returnValue(true));
 
         $factory = new CouponFactory($stubContainer);
-        $actual = $factory->buildCouponFromCode('XMAS');
+        $factory->buildCouponFromCode('XMAS');
 
     }
 
@@ -399,7 +398,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->will($this->returnValue(true));
 
         $factory = new CouponFactory($stubContainer);
-        $actual = $factory->buildCouponFromCode('XMAS');
+        $factory->buildCouponFromCode('XMAS');
 
     }
 }

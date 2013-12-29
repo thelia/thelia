@@ -666,7 +666,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $collection->add($condition1);
 
         $serialized = $conditionFactory->serializeConditionCollection($collection);
-        $unserialized = $conditionFactory->unserializeConditionCollection($serialized);
+        $conditionFactory->unserializeConditionCollection($serialized);
     }
 
     /**
@@ -733,7 +733,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $collection->add($condition1);
 
         $serialized = $conditionFactory->serializeConditionCollection($collection);
-        $unserialized = $conditionFactory->unserializeConditionCollection($serialized);
+        $conditionFactory->unserializeConditionCollection($serialized);
     }
 
     /**
@@ -800,7 +800,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $collection->add($condition1);
 
         $serialized = $conditionFactory->serializeConditionCollection($collection);
-        $unserialized = $conditionFactory->unserializeConditionCollection($serialized);
+        $conditionFactory->unserializeConditionCollection($serialized);
     }
 
     /**

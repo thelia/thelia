@@ -135,6 +135,22 @@ class Coupon extends BaseCoupon
     }
 
     /**
+     * Set Coupon amount
+     *
+     * @param float $amount Amount deduced from the Cart
+     *
+     * @return $this
+     */
+    public function setAmount($amount)
+    {
+        $effects = $this->unserializeEffects($this->getSerializedEffects());
+        $effects['amount'] = floatval($amount);
+        $this->setEffects($effects);
+
+        return $this;
+    }
+
+    /**
      * Get the amount removed from the coupon to the cart
      *
      * @return float
