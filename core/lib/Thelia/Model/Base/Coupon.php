@@ -79,10 +79,10 @@ abstract class Coupon implements ActiveRecordInterface
     protected $type;
 
     /**
-     * The value for the amount field.
-     * @var        double
+     * The value for the serialized_effects field.
+     * @var        string
      */
-    protected $amount;
+    protected $serialized_effects;
 
     /**
      * The value for the is_enabled field.
@@ -510,14 +510,14 @@ abstract class Coupon implements ActiveRecordInterface
     }
 
     /**
-     * Get the [amount] column value.
+     * Get the [serialized_effects] column value.
      *
-     * @return   double
+     * @return   string
      */
-    public function getAmount()
+    public function getSerializedEffects()
     {
 
-        return $this->amount;
+        return $this->serialized_effects;
     }
 
     /**
@@ -732,25 +732,25 @@ abstract class Coupon implements ActiveRecordInterface
     } // setType()
 
     /**
-     * Set the value of [amount] column.
+     * Set the value of [serialized_effects] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\Coupon The current object (for fluent API support)
      */
-    public function setAmount($v)
+    public function setSerializedEffects($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
-        if ($this->amount !== $v) {
-            $this->amount = $v;
-            $this->modifiedColumns[] = CouponTableMap::AMOUNT;
+        if ($this->serialized_effects !== $v) {
+            $this->serialized_effects = $v;
+            $this->modifiedColumns[] = CouponTableMap::SERIALIZED_EFFECTS;
         }
 
 
         return $this;
-    } // setAmount()
+    } // setSerializedEffects()
 
     /**
      * Sets the value of the [is_enabled] column.
@@ -1073,8 +1073,8 @@ abstract class Coupon implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CouponTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
             $this->type = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CouponTableMap::translateFieldName('Amount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->amount = (null !== $col) ? (double) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CouponTableMap::translateFieldName('SerializedEffects', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->serialized_effects = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CouponTableMap::translateFieldName('IsEnabled', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_enabled = (null !== $col) ? (boolean) $col : null;
@@ -1401,8 +1401,8 @@ abstract class Coupon implements ActiveRecordInterface
         if ($this->isColumnModified(CouponTableMap::TYPE)) {
             $modifiedColumns[':p' . $index++]  = 'TYPE';
         }
-        if ($this->isColumnModified(CouponTableMap::AMOUNT)) {
-            $modifiedColumns[':p' . $index++]  = 'AMOUNT';
+        if ($this->isColumnModified(CouponTableMap::SERIALIZED_EFFECTS)) {
+            $modifiedColumns[':p' . $index++]  = 'SERIALIZED_EFFECTS';
         }
         if ($this->isColumnModified(CouponTableMap::IS_ENABLED)) {
             $modifiedColumns[':p' . $index++]  = 'IS_ENABLED';
@@ -1457,8 +1457,8 @@ abstract class Coupon implements ActiveRecordInterface
                     case 'TYPE':
                         $stmt->bindValue($identifier, $this->type, PDO::PARAM_STR);
                         break;
-                    case 'AMOUNT':
-                        $stmt->bindValue($identifier, $this->amount, PDO::PARAM_STR);
+                    case 'SERIALIZED_EFFECTS':
+                        $stmt->bindValue($identifier, $this->serialized_effects, PDO::PARAM_STR);
                         break;
                     case 'IS_ENABLED':
                         $stmt->bindValue($identifier, (int) $this->is_enabled, PDO::PARAM_INT);
@@ -1565,7 +1565,7 @@ abstract class Coupon implements ActiveRecordInterface
                 return $this->getType();
                 break;
             case 3:
-                return $this->getAmount();
+                return $this->getSerializedEffects();
                 break;
             case 4:
                 return $this->getIsEnabled();
@@ -1632,7 +1632,7 @@ abstract class Coupon implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCode(),
             $keys[2] => $this->getType(),
-            $keys[3] => $this->getAmount(),
+            $keys[3] => $this->getSerializedEffects(),
             $keys[4] => $this->getIsEnabled(),
             $keys[5] => $this->getExpirationDate(),
             $keys[6] => $this->getMaxUsage(),
@@ -1701,7 +1701,7 @@ abstract class Coupon implements ActiveRecordInterface
                 $this->setType($value);
                 break;
             case 3:
-                $this->setAmount($value);
+                $this->setSerializedEffects($value);
                 break;
             case 4:
                 $this->setIsEnabled($value);
@@ -1763,7 +1763,7 @@ abstract class Coupon implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setType($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setAmount($arr[$keys[3]]);
+        if (array_key_exists($keys[3], $arr)) $this->setSerializedEffects($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setIsEnabled($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setExpirationDate($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setMaxUsage($arr[$keys[6]]);
@@ -1789,7 +1789,7 @@ abstract class Coupon implements ActiveRecordInterface
         if ($this->isColumnModified(CouponTableMap::ID)) $criteria->add(CouponTableMap::ID, $this->id);
         if ($this->isColumnModified(CouponTableMap::CODE)) $criteria->add(CouponTableMap::CODE, $this->code);
         if ($this->isColumnModified(CouponTableMap::TYPE)) $criteria->add(CouponTableMap::TYPE, $this->type);
-        if ($this->isColumnModified(CouponTableMap::AMOUNT)) $criteria->add(CouponTableMap::AMOUNT, $this->amount);
+        if ($this->isColumnModified(CouponTableMap::SERIALIZED_EFFECTS)) $criteria->add(CouponTableMap::SERIALIZED_EFFECTS, $this->serialized_effects);
         if ($this->isColumnModified(CouponTableMap::IS_ENABLED)) $criteria->add(CouponTableMap::IS_ENABLED, $this->is_enabled);
         if ($this->isColumnModified(CouponTableMap::EXPIRATION_DATE)) $criteria->add(CouponTableMap::EXPIRATION_DATE, $this->expiration_date);
         if ($this->isColumnModified(CouponTableMap::MAX_USAGE)) $criteria->add(CouponTableMap::MAX_USAGE, $this->max_usage);
@@ -1866,7 +1866,7 @@ abstract class Coupon implements ActiveRecordInterface
     {
         $copyObj->setCode($this->getCode());
         $copyObj->setType($this->getType());
-        $copyObj->setAmount($this->getAmount());
+        $copyObj->setSerializedEffects($this->getSerializedEffects());
         $copyObj->setIsEnabled($this->getIsEnabled());
         $copyObj->setExpirationDate($this->getExpirationDate());
         $copyObj->setMaxUsage($this->getMaxUsage());
@@ -2399,7 +2399,7 @@ abstract class Coupon implements ActiveRecordInterface
         $this->id = null;
         $this->code = null;
         $this->type = null;
-        $this->amount = null;
+        $this->serialized_effects = null;
         $this->is_enabled = null;
         $this->expiration_date = null;
         $this->max_usage = null;
@@ -2703,7 +2703,7 @@ abstract class Coupon implements ActiveRecordInterface
         $version->setId($this->getId());
         $version->setCode($this->getCode());
         $version->setType($this->getType());
-        $version->setAmount($this->getAmount());
+        $version->setSerializedEffects($this->getSerializedEffects());
         $version->setIsEnabled($this->getIsEnabled());
         $version->setExpirationDate($this->getExpirationDate());
         $version->setMaxUsage($this->getMaxUsage());
@@ -2755,7 +2755,7 @@ abstract class Coupon implements ActiveRecordInterface
         $this->setId($version->getId());
         $this->setCode($version->getCode());
         $this->setType($version->getType());
-        $this->setAmount($version->getAmount());
+        $this->setSerializedEffects($version->getSerializedEffects());
         $this->setIsEnabled($version->getIsEnabled());
         $this->setExpirationDate($version->getExpirationDate());
         $this->setMaxUsage($version->getMaxUsage());

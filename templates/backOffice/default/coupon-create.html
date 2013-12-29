@@ -60,10 +60,11 @@
             external_plugins: { "filemanager" : "{url file='/tinymce/plugins/filemanager/plugin.min.js'}"}
         });
 
-
-        // Url alowing to get coupon inputs
-        $.couponManager.urlAjaxAdminCouponDrawInputs = "{$urlAjaxAdminCouponDrawInputs}";
-        $.couponManager.intlPleaseRetry = '{intl l='Please retry'}';
+        $(function($){
+            // Url alowing to get coupon inputs
+            $.couponManager.urlAjaxAdminCouponDrawInputs = "{$urlAjaxAdminCouponDrawInputs}";
+            $.couponManager.intlPleaseRetry = '{intl l='Please retry'}';
+        });
     </script>
 
 {/block}

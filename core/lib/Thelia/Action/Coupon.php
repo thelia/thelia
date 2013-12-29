@@ -168,7 +168,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $coupon->createOrUpdate(
             $event->getCode(),
             $event->getTitle(),
-            $event->getAmount(),
+            $event->getEffects(),
             $event->getServiceId(),
             $event->isRemovingPostage(),
             $event->getShortDescription(),

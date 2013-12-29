@@ -75,7 +75,7 @@ interface CouponInterface
      * @param string          $title                      Coupon title (ex: Coupon for XMAS)
      * @param string          $shortDescription           Coupon short description
      * @param string          $description                Coupon description
-     * @param float           $effect                     Coupon amount/percentage to deduce
+     * @param array           $effects                    Coupon effects params
      * @param bool            $isCumulative               If Coupon is cumulative
      * @param bool            $isRemovingPostage          If Coupon is removing postage
      * @param bool            $isAvailableOnSpecialOffers If available on Product already
@@ -90,7 +90,7 @@ interface CouponInterface
         $title,
         $shortDescription,
         $description,
-        $effect,
+        array $effects,
         $isCumulative,
         $isRemovingPostage,
         $isAvailableOnSpecialOffers,

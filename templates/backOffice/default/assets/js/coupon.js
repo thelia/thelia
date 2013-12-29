@@ -134,8 +134,9 @@ $(function($){
         var inputsDiv = mainDiv.find('.inputs');
         inputsDiv.html('<div class="loading" ></div>');
         var url = $.couponManager.urlAjaxAdminCouponDrawInputs;
+        console.log(url);
         url = url.replace('couponServiceId', optionSelected.val());
-
+        console.log(url);
         $.ajax({
             type: "GET",
             url: url,

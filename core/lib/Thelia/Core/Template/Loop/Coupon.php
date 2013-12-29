@@ -111,7 +111,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 $coupon->getTitle(),
                 $coupon->getShortDescription(),
                 $coupon->getDescription(),
-                $coupon->getAmount(),
+                $coupon->getEffects(),
                 $coupon->getIsCumulative(),
                 $coupon->getIsRemovingPostage(),
                 $coupon->getIsAvailableOnSpecialOffers(),

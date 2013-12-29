@@ -38,10 +38,13 @@ use Thelia\Exception\MissingFacadeException;
  */
 class RemoveXPercent extends CouponAbstract
 {
+    const INPUT_PERCENTAGE_NAME = 'percentage';
+
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_x_percent';
 
-    protected $percent = 0;
+    /** @var float Percentage removed from the Cart */
+    protected $percentage = 0;
 
     /**
      * Set Coupon
@@ -51,7 +54,7 @@ class RemoveXPercent extends CouponAbstract
      * @param string          $title                      Coupon title (ex: Coupon for XMAS)
      * @param string          $shortDescription           Coupon short description
      * @param string          $description                Coupon description
-     * @param float           $percent                    Coupon percentage to deduce
+     * @param array           $effects                    Coupon effects params
      * @param bool            $isCumulative               If Coupon is cumulative
      * @param bool            $isRemovingPostage          If Coupon is removing postage
      * @param bool            $isAvailableOnSpecialOffers If available on Product already
@@ -59,6 +62,8 @@ class RemoveXPercent extends CouponAbstract
      * @param bool            $isEnabled                  False if Coupon is disabled by admin
      * @param int             $maxUsage                   How many usage left
      * @param \Datetime       $expirationDate             When the Code is expiring
+     *
+     * @return $this
      */
     public function set(
         FacadeInterface $facade,
@@ -66,29 +71,21 @@ class RemoveXPercent extends CouponAbstract
         $title,
         $shortDescription,
         $description,
-        $percent,
+        array $effects,
         $isCumulative,
         $isRemovingPostage,
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        \DateTime $expirationDate)
+        \DateTime $expirationDate
+    )
     {
-        $this->code = $code;
-        $this->title = $title;
-        $this->shortDescription = $shortDescription;
-        $this->description = $description;
+        parent::set(
+            $facade, $code, $title, $shortDescription, $description, $effects, $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate
+        );
+        $this->percentage = $effects[self::INPUT_PERCENTAGE_NAME];
 
-        $this->isCumulative = $isCumulative;
-        $this->isRemovingPostage = $isRemovingPostage;
-
-        $this->percent = $percent;
-
-        $this->isAvailableOnSpecialOffers = $isAvailableOnSpecialOffers;
-        $this->isEnabled = $isEnabled;
-        $this->maxUsage = $maxUsage;
-        $this->expirationDate = $expirationDate;
-        $this->facade = $facade;
+        return $this;
     }
 
     /**
@@ -101,7 +98,7 @@ class RemoveXPercent extends CouponAbstract
      */
     public function exec()
     {
-        if ($this->percent >= 100) {
+        if ($this->percentage >= 100) {
             throw new \InvalidArgumentException(
                 'Percentage must be inferior to 100'
             );
@@ -109,7 +106,7 @@ class RemoveXPercent extends CouponAbstract
 
         $basePrice = $this->facade->getCartTotalPrice();
 
-        return $basePrice * (( $this->percent ) / 100);
+        return $basePrice * (( $this->percentage ) / 100);
     }
 
 
@@ -153,6 +150,27 @@ class RemoveXPercent extends CouponAbstract
             );
 
         return $toolTip;
+    }
+
+    /**
+     * Draw the input displayed in the BackOffice
+     * allowing Admin to set its Coupon effect
+     *
+     * @return string HTML string
+     */
+    public function drawBackOfficeInputs()
+    {
+        $labelPercentage = $this->getInputName();
+
+        $html = '
+                <input type="hidden" name="thelia_coupon_creation[' . self::INPUT_AMOUNT_NAME . ']" value="0"/>
+                <div class="form-group input-' . self::INPUT_PERCENTAGE_NAME . '">
+                    <label for="' . self::INPUT_PERCENTAGE_NAME . '" class="control-label">' . $labelPercentage . '</label>
+                    <input id="' . self::INPUT_PERCENTAGE_NAME . '" class="form-control" name="' . self::INPUT_EXTENDED__NAME . '[' . self::INPUT_PERCENTAGE_NAME . ']' . '" type="text" value="' . $this->percentage . '"/>
+                </div>
+            ';
+
+        return $html;
     }
 
 }

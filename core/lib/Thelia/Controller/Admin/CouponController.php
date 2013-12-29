@@ -35,6 +35,7 @@ use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Coupon\Type\RemoveXPercent;
 use Thelia\Form\CouponCreationForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -348,19 +349,7 @@ class CouponController extends BaseAdminController
         }
 
         $couponEvent = new CouponCreateOrUpdateEvent(
-            $coupon->getCode(),
-            $coupon->getTitle(),
-            $coupon->getAmount(),
-            $coupon->getType(),
-            $coupon->getShortDescription(),
-            $coupon->getDescription(),
-            $coupon->getIsEnabled(),
-            $coupon->getExpirationDate(),
-            $coupon->getIsAvailableOnSpecialOffers(),
-            $coupon->getIsCumulative(),
-            $coupon->getIsRemovingPostage(),
-            $coupon->getMaxUsage(),
-            $coupon->getLocale()
+            $coupon->getCode(), $coupon->getType(), $coupon->getTitle(), array('quantity' => $coupon->getAmount()), $coupon->getShortDescription(), $coupon->getDescription(), $coupon->getIsEnabled(), $coupon->getExpirationDate(), $coupon->getIsAvailableOnSpecialOffers(), $coupon->getIsCumulative(), $coupon->getIsRemovingPostage(), $coupon->getMaxUsage(), $coupon->getLocale()
         );
         $couponEvent->setCouponModel($coupon);
         $couponEvent->setConditions($conditions);
@@ -472,15 +461,20 @@ class CouponController extends BaseAdminController
             // Check the form against conditions violations
             $form = $this->validateForm($creationForm, 'POST');
 
+
             // Get the form field values
             $data = $form->getData();
+            $effects = array('amount' => $data['amount']);
+            $effects = $this->addPercentageLogic($effects);
 
             $couponEvent = new CouponCreateOrUpdateEvent(
-                $data['code'], $data['title'], $data['amount'], $data['type'], $data['shortDescription'], $data['description'], $data['isEnabled'], \DateTime::createFromFormat('Y-m-d', $data['expirationDate']), $data['isAvailableOnSpecialOffers'], $data['isCumulative'], $data['isRemovingPostage'], $data['maxUsage'], $data['locale']
+                $data['code'], $data['type'], $data['title'], $effects, $data['shortDescription'], $data['description'], $data['isEnabled'], \DateTime::createFromFormat('Y-m-d', $data['expirationDate']), $data['isAvailableOnSpecialOffers'], $data['isCumulative'], $data['isRemovingPostage'], $data['maxUsage'], $data['locale']
             );
             $couponQuery = new CouponQuery();
             $coupon = $couponQuery->findOneByCode($data['code']);
-            $couponEvent->setCouponModel($coupon);
+            if (isset($coupon)) {
+                $couponEvent->setCouponModel($coupon);
+            }
 
             // Dispatch Event to the Action
             $this->dispatch(
@@ -612,6 +606,30 @@ class CouponController extends BaseAdminController
         $response = new ResponseRest($coupon->drawBackOfficeInputs());
 
         return $response;
+    }
+
+    /**
+     * Add percentage logic if found in the Coupon post data
+     *
+     * @param array $effects Effect to populate
+     *
+     * @return array Populated effect with percentage
+     */
+    protected function addPercentageLogic(array $effects)
+    {
+        /** @var Request $request */
+        $request = $this->container->get('request');
+        $postData = $request->request;
+        // Validate quantity input
+        if ($postData->has(RemoveXPercent::INPUT_EXTENDED__NAME)) {
+            $extentedPostData = $postData->get(RemoveXPercent::INPUT_EXTENDED__NAME);
+            if (isset($extentedPostData[RemoveXPercent::INPUT_PERCENTAGE_NAME])) {
+                $percentage = $extentedPostData[RemoveXPercent::INPUT_PERCENTAGE_NAME];
+                $effects[RemoveXPercent::INPUT_PERCENTAGE_NAME] = floatval($percentage);
+            }
+        }
+
+        return $effects;
     }
 
 }

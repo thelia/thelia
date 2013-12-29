@@ -25,6 +25,7 @@ namespace Thelia\Core\Event\Coupon;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Model\Coupon;
+use Thelia\Model\Exception\InvalidArgumentException;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -69,6 +70,9 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /** @var float Amount that will be removed from the Checkout (Coupon Effect)  */
     protected $amount = 0;
 
+    /** @var array Effects ready to be serialized */
+    protected $effects = array();
+
     /** @var int Max time a Coupon can be used (-1 = unlimited) */
     protected $maxUsage = -1;
 
@@ -88,9 +92,11 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * Constructor
      *
      * @param string    $code                       Coupon Code
-     * @param string    $title                      Coupon title
-     * @param float     $amount                     Amount removed from the Total Checkout
      * @param string    $serviceId                  Coupon Service id
+     * @param string    $title                      Coupon title
+     * @param array     $effects                    Coupon effects ready to be serialized
+     *                                              'amount' key is mandatory and reflects
+     *                                              the amount deduced from the cart
      * @param string    $shortDescription           Coupon short description
      * @param string    $description                Coupon description
      * @param bool      $isEnabled                  Enable/Disable
@@ -102,10 +108,9 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
      */
     public function __construct(
-        $code, $title, $amount, $serviceId, $shortDescription, $description, $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $isRemovingPostage, $maxUsage, $locale
+        $code, $serviceId, $title, array $effects, $shortDescription, $description, $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $isRemovingPostage, $maxUsage, $locale
     )
     {
-        $this->amount = $amount;
         $this->code = $code;
         $this->description = $description;
         $this->expirationDate = $expirationDate;
@@ -118,6 +123,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         $this->title = $title;
         $this->serviceId = $serviceId;
         $this->locale = $locale;
+        $this->setEffects($effects);
     }
 
     /**
@@ -189,7 +195,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      */
     public function getAmount()
     {
-        return $this->amount;
+        return $this->effects['amount'];
     }
 
     /**
@@ -251,6 +257,71 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     public function getLocale()
     {
         return $this->locale;
+    }
+
+    /**
+     * Set effects ready to be serialized
+     *
+     * @param array $effects Effect ready to be serialized
+     *                       Needs at least the key 'amount'
+     *                       with the amount removed from the cart
+     * @throws \Thelia\Model\Exception\InvalidArgumentException
+     */
+    public function setEffects(array $effects)
+    {
+        if (null === $effects['amount']) {
+            throw new InvalidArgumentException('Missing key \'amount\' in Coupon effect ready to be serialized array');
+        }
+        $this->amount = $effects['amount'];
+        $this->effects = $effects;
+    }
+
+    /**
+     * Get effects ready to be serialized
+     *
+     * @return array
+     */
+    public function getEffects()
+    {
+        return $this->effects;
+    }
+
+    /**
+     * Get if the Coupon will be available on special offers or not
+     *
+     * @return boolean
+     */
+    public function getIsAvailableOnSpecialOffers()
+    {
+        return $this->isAvailableOnSpecialOffers;
+    }
+
+    /**
+     * Get if the Coupon effect cancel other Coupon effects
+     *
+     * @return boolean
+     */
+    public function getIsCumulative()
+    {
+        return $this->isCumulative;
+    }
+
+    /**
+     * Get if Coupon is enabled or not
+     *
+     * @return boolean
+     */
+    public function getIsEnabled()
+    {
+        return $this->isEnabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getIsRemovingPostage()
+    {
+        return $this->isRemovingPostage;
     }
 
     /**

@@ -44,6 +44,10 @@ use Thelia\Exception\InvalidConditionException;
  */
 abstract class CouponAbstract implements CouponInterface
 {
+    const INPUT_EXTENDED__NAME = 'thelia_coupon_creation_extended';
+
+    const INPUT_AMOUNT_NAME = 'amount';
+
     /** @var  FacadeInterface Provide necessary value from Thelia */
     protected $facade = null;
 
@@ -65,6 +69,9 @@ abstract class CouponAbstract implements CouponInterface
 
     /** @var float Amount that will be removed from the Checkout (Coupon Effect)  */
     protected $amount = 0;
+
+    /** @var array Get the Coupon effects params */
+    protected $effects = array('amount' => 0);
 
     /** @var string Coupon code (ex: XMAS) */
     protected $code = null;
@@ -123,6 +130,60 @@ abstract class CouponAbstract implements CouponInterface
     public function setOrganizer($organizer)
     {
         $this->organizer = $organizer;
+
+        return $this;
+    }
+
+    /**
+     * Set Coupon
+     *
+     * @param FacadeInterface $facade                     Provides necessary value from Thelia
+     * @param string          $code                       Coupon code (ex: XMAS)
+     * @param string          $title                      Coupon title (ex: Coupon for XMAS)
+     * @param string          $shortDescription           Coupon short description
+     * @param string          $description                Coupon description
+     * @param array           $effects                    Coupon effects params
+     * @param bool            $isCumulative               If Coupon is cumulative
+     * @param bool            $isRemovingPostage          If Coupon is removing postage
+     * @param bool            $isAvailableOnSpecialOffers If available on Product already
+     *                                                    on special offer price
+     * @param bool            $isEnabled                  False if Coupon is disabled by admin
+     * @param int             $maxUsage                   How many usage left
+     * @param \Datetime       $expirationDate             When the Code is expiring
+     *
+     * @return $this
+     */
+    public function set(
+        FacadeInterface $facade,
+        $code,
+        $title,
+        $shortDescription,
+        $description,
+        array $effects,
+        $isCumulative,
+        $isRemovingPostage,
+        $isAvailableOnSpecialOffers,
+        $isEnabled,
+        $maxUsage,
+        \DateTime $expirationDate
+    )
+    {
+        $this->code = $code;
+        $this->title = $title;
+        $this->shortDescription = $shortDescription;
+        $this->description = $description;
+
+        $this->isCumulative = $isCumulative;
+        $this->isRemovingPostage = $isRemovingPostage;
+
+        $this->isAvailableOnSpecialOffers = $isAvailableOnSpecialOffers;
+        $this->isEnabled = $isEnabled;
+        $this->maxUsage = $maxUsage;
+        $this->expirationDate = $expirationDate;
+        $this->facade = $facade;
+
+        $this->effects = $effects;
+        $this->amount = $effects[self::INPUT_AMOUNT_NAME];
 
         return $this;
     }
@@ -319,9 +380,9 @@ abstract class CouponAbstract implements CouponInterface
         $value = $this->amount;
 
         $html = '
-                <div class="form-group input-amount ">
-                    <label for="amount" class="control-label">' . $label . '</label>
-                    <input id="amount" type="text" class="form-control" name="thelia_coupon_creation[amount]" value="' . $value . '" placeholder="14.50">
+                <div class="form-group input-' . self::INPUT_AMOUNT_NAME . ' ">
+                    <label for="' . self::INPUT_AMOUNT_NAME . '" class="control-label">' . $label . '</label>
+                    <input id="' . self::INPUT_AMOUNT_NAME . '" type="text" class="form-control" name="thelia_coupon_creation[' . self::INPUT_AMOUNT_NAME . ']" value="' . $value . '" placeholder="14.50">
                 </div>
             ';
 

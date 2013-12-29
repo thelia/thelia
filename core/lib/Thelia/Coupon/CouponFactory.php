@@ -116,7 +116,7 @@ class CouponFactory
             $model->getTitle(),
             $model->getShortDescription(),
             $model->getDescription(),
-            $model->getAmount(),
+            $model->getEffects(),
             $isCumulative,
             $isRemovingPostage,
             $model->getIsAvailableOnSpecialOffers(),
