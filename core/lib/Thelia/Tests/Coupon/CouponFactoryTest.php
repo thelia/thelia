@@ -401,4 +401,70 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $factory->buildCouponFromCode('XMAS');
 
     }
+
+    /**
+     * @covers Thelia\Coupon\CouponFactory::buildCouponFromModel
+     */
+    public function testBuildCouponFromModel()
+    {
+        $stubFacade = $this->generateFacadeStub();
+
+        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+
+        $conditionFactory = new ConditionFactory($stubContainer);
+        $couponModel = $this->generateCouponModel($stubFacade, $conditionFactory);
+        $stubFacade->expects($this->any())
+            ->method('findOneCouponByCode')
+            ->will($this->returnValue($couponModel));
+
+        $couponManager = new RemoveXAmount($stubFacade);
+
+
+        $condition1 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::INPUT1 => 40.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $condition2 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
+            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::INPUT1 => 400.00,
+            MatchForTotalAmount::INPUT2 => 'EUR'
+        );
+        $condition2->setValidatorsFromForm($operators, $values);
+
+        $conditions = new ConditionCollection();
+        $conditions->add($condition1);
+        $conditions->add($condition2);
+        $stubConditionFactory = $this->getMockBuilder('\Thelia\Condition\ConditionFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubConditionFactory->expects($this->any())
+            ->method('unserializeConditionCollection')
+            ->will($this->returnValue($conditions));
+
+
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->onConsecutiveCalls($stubFacade, $couponManager, $stubConditionFactory));
+
+        $stubContainer->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
+
+        $factory = new CouponFactory($stubContainer);
+        $expected = $couponManager;
+        $actual = $factory->buildCouponFromModel($couponModel);
+
+        $this->assertEquals($expected, $actual);
+    }
 }
