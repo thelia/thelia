@@ -47,10 +47,6 @@ use Thelia\Tools\I18n;
 use Thelia\Tools\Rest\ResponseRest;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Control View and Action (Model) via Events
  *
  * @package Coupon
@@ -349,7 +345,19 @@ class CouponController extends BaseAdminController
         }
 
         $couponEvent = new CouponCreateOrUpdateEvent(
-            $coupon->getCode(), $coupon->getType(), $coupon->getTitle(), array('quantity' => $coupon->getAmount()), $coupon->getShortDescription(), $coupon->getDescription(), $coupon->getIsEnabled(), $coupon->getExpirationDate(), $coupon->getIsAvailableOnSpecialOffers(), $coupon->getIsCumulative(), $coupon->getIsRemovingPostage(), $coupon->getMaxUsage(), $coupon->getLocale()
+            $coupon->getCode(),
+            $coupon->getType(),
+            $coupon->getTitle(),
+            array('quantity' => $coupon->getAmount()),
+            $coupon->getShortDescription(),
+            $coupon->getDescription(),
+            $coupon->getIsEnabled(),
+            $coupon->getExpirationDate(),
+            $coupon->getIsAvailableOnSpecialOffers(),
+            $coupon->getIsCumulative(),
+            $coupon->getIsRemovingPostage(),
+            $coupon->getMaxUsage(),
+            $coupon->getLocale()
         );
         $couponEvent->setCouponModel($coupon);
         $couponEvent->setConditions($conditions);

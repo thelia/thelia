@@ -33,10 +33,6 @@ use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Unit Test MatchForTotalAmount Class
  *
  * @package Condition

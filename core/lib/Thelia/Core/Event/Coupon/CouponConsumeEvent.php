@@ -25,10 +25,6 @@ namespace Thelia\Core\Event\Coupon;
 use Thelia\Core\Event\ActionEvent;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/29/13
- * Time: 3:45 PM
- *
  * Occurring when a Coupon is consumed
  *
  * @package Coupon

@@ -27,10 +27,6 @@ use Thelia\Coupon\FacadeInterface;
 use Thelia\Coupon\Type\CouponAbstract;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Allow to remove an amount from the checkout total
  *
  * @package Coupon

@@ -26,10 +26,6 @@ namespace Thelia\Exception;
 use Thelia\Log\Tlog;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Thrown when an Expired Coupon is tried
  *
  * @package Coupon

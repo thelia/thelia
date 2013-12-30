@@ -32,10 +32,6 @@ use Thelia\Condition\ConditionOrganizerInterface;
 use Thelia\Exception\InvalidConditionException;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Assist in writing a CouponInterface
  *
  * @package Coupon

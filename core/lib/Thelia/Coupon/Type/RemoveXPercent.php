@@ -28,10 +28,6 @@ use Thelia\Coupon\Type\CouponAbstract;
 use Thelia\Exception\MissingFacadeException;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *

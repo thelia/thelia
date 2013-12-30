@@ -38,10 +38,6 @@ use Thelia\Model\Coupon as CouponModel;
 use Thelia\Model\CouponQuery;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Process Coupon Events
  *
  * @package Coupon

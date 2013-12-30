@@ -24,10 +24,6 @@
 namespace Thelia\Condition;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * A condition ready to be serialized and stored in DataBase
  *
  * @package Condition

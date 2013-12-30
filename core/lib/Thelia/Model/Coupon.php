@@ -31,10 +31,6 @@ use Thelia\Model\Exception\InvalidArgumentException;
 use Thelia\Model\Map\CouponTableMap;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Used to provide an effect (mostly a discount)
  * at the end of the Customer checkout tunnel
  * It will be usable for a Customer only if it matches the Coupon criteria (Rules)

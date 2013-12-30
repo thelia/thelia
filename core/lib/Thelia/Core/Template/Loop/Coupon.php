@@ -40,10 +40,6 @@ use Thelia\Model\CouponQuery;
 use Thelia\Type;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Coupon Loop
  *
  * @package Thelia\Core\Template\Loop

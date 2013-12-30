@@ -26,10 +26,6 @@ namespace Thelia\Exception;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Thrown when an Abstract method has not been implemented
  *
  * @package Exception

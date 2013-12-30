@@ -27,10 +27,6 @@ use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Represents a Coupon ready to be processed in a Checkout process
  *
  * @package Coupon

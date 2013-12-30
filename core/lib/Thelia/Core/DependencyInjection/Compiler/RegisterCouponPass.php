@@ -28,10 +28,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 9/05/13
- * Time: 3:24 PM
- *
  * Class RegisterListenersPass
  * Source code come from Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass class
  *

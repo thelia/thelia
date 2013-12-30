@@ -28,10 +28,6 @@ use Thelia\Model\Coupon;
 use Thelia\Model\Exception\InvalidArgumentException;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/29/13
- * Time: 3:45 PM
- *
  * Occurring when a Coupon is created or updated
  *
  * @package Coupon
@@ -107,9 +103,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param int       $maxUsage                   Coupon quantity
      * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
      */
-    public function __construct(
-        $code, $serviceId, $title, array $effects, $shortDescription, $description, $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $isRemovingPostage, $maxUsage, $locale
-    )
+    public function __construct($code, $serviceId, $title, array $effects, $shortDescription, $description, $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $isRemovingPostage, $maxUsage, $locale)
     {
         $this->code = $code;
         $this->description = $description;

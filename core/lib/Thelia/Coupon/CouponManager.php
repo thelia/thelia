@@ -29,10 +29,6 @@ use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Manage how Coupons could interact with a Checkout
  *
  * @package Coupon

@@ -31,10 +31,6 @@ use Thelia\Condition\ConditionCollection;
 use Thelia\Model\CurrencyQuery;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Unit Test ConditionFactory Class
  *
  * @package Condition

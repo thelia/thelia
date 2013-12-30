@@ -24,10 +24,6 @@
 namespace Thelia\Condition;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Manage how Condition could interact with each others
  *
  * @package Condition
