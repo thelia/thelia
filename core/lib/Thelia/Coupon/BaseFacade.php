@@ -36,10 +36,6 @@ use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Allow to assist in getting relevant data on the current application state
  *
  * @package Coupon

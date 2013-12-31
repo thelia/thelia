@@ -27,10 +27,6 @@ use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Represents a Coupon ready to be processed in a Checkout process
  *
  * @package Coupon
@@ -45,6 +41,13 @@ interface CouponInterface
      * @return string
      */
     public function getName();
+
+    /**
+     * Get I18n amount input name
+     *
+     * @return string
+     */
+    public function getInputName();
 
     /**
      * Get I18n tooltip
@@ -68,7 +71,7 @@ interface CouponInterface
      * @param string          $title                      Coupon title (ex: Coupon for XMAS)
      * @param string          $shortDescription           Coupon short description
      * @param string          $description                Coupon description
-     * @param float           $effect                     Coupon amount/percentage to deduce
+     * @param array           $effects                    Coupon effects params
      * @param bool            $isCumulative               If Coupon is cumulative
      * @param bool            $isRemovingPostage          If Coupon is removing postage
      * @param bool            $isAvailableOnSpecialOffers If available on Product already
@@ -83,7 +86,7 @@ interface CouponInterface
         $title,
         $shortDescription,
         $description,
-        $effect,
+        array $effects,
         $isCumulative,
         $isRemovingPostage,
         $isAvailableOnSpecialOffers,
@@ -214,5 +217,20 @@ interface CouponInterface
      * @return bool
      */
     public function isMatching();
+
+    /**
+     * Draw the input displayed in the BackOffice
+     * allowing Admin to set its Coupon effect
+     *
+     * @return string HTML string
+     */
+    public function drawBackOfficeInputs();
+
+    /**
+     * Get all extended inputs name to manage
+     *
+     * @return mixed
+     */
+    public function getExtendedInputs();
 
 }

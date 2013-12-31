@@ -127,13 +127,43 @@ $(function($){
     };
     $.couponManager.onClickUpdateCondition();
 
+    $.couponManager.displayEfffect = function(optionSelected) {
+        var mainDiv = $('#coupon-type');
+        mainDiv.find('.typeToolTip').html(optionSelected.attr('data-description'));
+
+        var inputsDiv = mainDiv.find('.inputs');
+        inputsDiv.html('<div class="loading" ></div>');
+        var url = $.couponManager.urlAjaxAdminCouponDrawInputs;
+        console.log(url);
+        url = url.replace('couponServiceId', optionSelected.val());
+        console.log(url);
+        $.ajax({
+            type: "GET",
+            url: url,
+            data: '',
+            statusCode: {
+                404: function() {
+                    inputsDiv.html($.couponManager.intlPleaseRetry);
+                },
+                500: function() {
+                    inputsDiv.html($.couponManager.intlPleaseRetry);
+                }
+            }
+        }).done(function(data) {
+                inputsDiv.html(data);
+        });
+    };
+
     // Reload effect inputs when changing effect
     $.couponManager.onEffectChange = function() {
-        var optionSelected = $("option:selected", this);
-        $('#effectToolTip').html(optionSelected.attr("data-description"));
-        $('#effect').on('change', function () {
-            var optionSelected = $("option:selected", this);
-            $('#effectToolTip').html(optionSelected.attr("data-description"));
+        var mainDiv = $('#coupon-type');
+        var optionSelected = mainDiv.find('#type option:selected');
+        mainDiv.find('.typeToolTip').html(optionSelected.attr('data-description'));
+
+        mainDiv.find('#type').on('change', function () {
+            var optionSelected = $('option:selected', this);
+            $.couponManager.displayEfffect(optionSelected);
+
         });
     };
     $.couponManager.onEffectChange();

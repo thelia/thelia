@@ -40,10 +40,6 @@ use Thelia\Model\CouponQuery;
 use Thelia\Type;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Coupon Loop
  *
  * @package Thelia\Core\Template\Loop
@@ -111,7 +107,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 $coupon->getTitle(),
                 $coupon->getShortDescription(),
                 $coupon->getDescription(),
-                $coupon->getAmount(),
+                $coupon->getEffects(),
                 $coupon->getIsCumulative(),
                 $coupon->getIsRemovingPostage(),
                 $coupon->getIsAvailableOnSpecialOffers(),

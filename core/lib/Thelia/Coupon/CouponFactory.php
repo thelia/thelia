@@ -31,10 +31,6 @@ use Thelia\Exception\InvalidConditionException;
 use Thelia\Model\Coupon;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Generate a CouponInterface
  *
  * @package Coupon
@@ -116,7 +112,7 @@ class CouponFactory
             $model->getTitle(),
             $model->getShortDescription(),
             $model->getDescription(),
-            $model->getAmount(),
+            $model->getEffects(),
             $isCumulative,
             $isRemovingPostage,
             $model->getIsAvailableOnSpecialOffers(),

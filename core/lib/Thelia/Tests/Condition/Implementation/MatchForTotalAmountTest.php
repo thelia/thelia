@@ -33,10 +33,6 @@ use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Unit Test MatchForTotalAmount Class
  *
  * @package Condition
@@ -666,7 +662,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $collection->add($condition1);
 
         $serialized = $conditionFactory->serializeConditionCollection($collection);
-        $unserialized = $conditionFactory->unserializeConditionCollection($serialized);
+        $conditionFactory->unserializeConditionCollection($serialized);
     }
 
     /**
@@ -733,7 +729,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $collection->add($condition1);
 
         $serialized = $conditionFactory->serializeConditionCollection($collection);
-        $unserialized = $conditionFactory->unserializeConditionCollection($serialized);
+        $conditionFactory->unserializeConditionCollection($serialized);
     }
 
     /**
@@ -800,7 +796,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $collection->add($condition1);
 
         $serialized = $conditionFactory->serializeConditionCollection($collection);
-        $unserialized = $conditionFactory->unserializeConditionCollection($serialized);
+        $conditionFactory->unserializeConditionCollection($serialized);
     }
 
     /**

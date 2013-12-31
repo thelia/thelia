@@ -29,10 +29,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/29/13
- * Time: 3:45 PM
- *
  * Allow to build a form Coupon
  *
  * @package Coupon

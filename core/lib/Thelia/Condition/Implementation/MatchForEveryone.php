@@ -27,10 +27,6 @@ use InvalidArgumentException;
 use Thelia\Condition\Implementation\ConditionAbstract;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Allow every one, perform no check
  *
  * @package Condition

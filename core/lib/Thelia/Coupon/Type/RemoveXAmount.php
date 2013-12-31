@@ -27,10 +27,6 @@ use Thelia\Coupon\FacadeInterface;
 use Thelia\Coupon\Type\CouponAbstract;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Allow to remove an amount from the checkout total
  *
  * @package Coupon
@@ -43,55 +39,6 @@ class RemoveXAmount extends CouponAbstract
     protected $serviceId = 'thelia.coupon.type.remove_x_amount';
 
     /**
-     * Set Coupon
-     *
-     * @param FacadeInterface $facade                     Provides necessary value from Thelia
-     * @param string          $code                       Coupon code (ex: XMAS)
-     * @param string          $title                      Coupon title (ex: Coupon for XMAS)
-     * @param string          $shortDescription           Coupon short description
-     * @param string          $description                Coupon description
-     * @param float           $amount                     Coupon amount to deduce
-     * @param bool            $isCumulative               If Coupon is cumulative
-     * @param bool            $isRemovingPostage          If Coupon is removing postage
-     * @param bool            $isAvailableOnSpecialOffers If available on Product already
-     *                                                    on special offer price
-     * @param bool            $isEnabled                  False if Coupon is disabled by admin
-     * @param int             $maxUsage                   How many usage left
-     * @param \Datetime       $expirationDate             When the Code is expiring
-     */
-    public function set(
-        FacadeInterface $facade,
-        $code,
-        $title,
-        $shortDescription,
-        $description,
-        $amount,
-        $isCumulative,
-        $isRemovingPostage,
-        $isAvailableOnSpecialOffers,
-        $isEnabled,
-        $maxUsage,
-        \DateTime $expirationDate
-    )
-    {
-        $this->code = $code;
-        $this->title = $title;
-        $this->shortDescription = $shortDescription;
-        $this->description = $description;
-
-        $this->isCumulative = $isCumulative;
-        $this->isRemovingPostage = $isRemovingPostage;
-
-        $this->amount = $amount;
-
-        $this->isAvailableOnSpecialOffers = $isAvailableOnSpecialOffers;
-        $this->isEnabled = $isEnabled;
-        $this->maxUsage = $maxUsage;
-        $this->expirationDate = $expirationDate;
-        $this->facade = $facade;
-    }
-
-    /**
      * Get I18n name
      *
      * @return string
@@ -100,7 +47,19 @@ class RemoveXAmount extends CouponAbstract
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Remove X amount to total cart', array(), 'constraint');
+            ->trans('Remove X amount to total cart', array(), 'coupon');
+    }
+
+    /**
+     * Get I18n amount input name
+     *
+     * @return string
+     */
+    public function getInputName()
+    {
+        return $this->facade
+            ->getTranslator()
+            ->trans('Amount removed from the cart', array(), 'coupon');
     }
 
     /**
@@ -115,7 +74,7 @@ class RemoveXAmount extends CouponAbstract
             ->trans(
                 'This coupon will remove the entered amount to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.',
                 array(),
-                'constraint'
+                'coupon'
             );
 
         return $toolTip;

@@ -27,13 +27,10 @@ use Propel\Runtime\Propel;
 use Thelia\Constraint\Rule\CouponRuleInterface;
 use Thelia\Coupon\ConditionCollection;
 use Thelia\Model\Base\Coupon as BaseCoupon;
+use Thelia\Model\Exception\InvalidArgumentException;
 use Thelia\Model\Map\CouponTableMap;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Used to provide an effect (mostly a discount)
  * at the end of the Customer checkout tunnel
  * It will be usable for a Customer only if it matches the Coupon criteria (Rules)
@@ -53,7 +50,7 @@ class Coupon extends BaseCoupon
      *
      * @param string    $code                       Coupon Code
      * @param string    $title                      Coupon title
-     * @param float     $amount                     Amount removed from the Total Checkout
+     * @param array     $effects                    Ready to be serialized in JSON effect params
      * @param string    $type                       Coupon type
      * @param bool      $isRemovingPostage          Is removing Postage
      * @param string    $shortDescription           Coupon short description
@@ -68,20 +65,20 @@ class Coupon extends BaseCoupon
      *
      * @throws \Exception
      */
-    function createOrUpdate($code, $title, $amount, $type, $isRemovingPostage, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $defaultSerializedRule, $locale = null)
+    function createOrUpdate($code, $title, array $effects, $type, $isRemovingPostage, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $defaultSerializedRule, $locale = null)
     {
         $this->setCode($code)
-            ->setTitle($title)
-            ->setShortDescription($shortDescription)
-            ->setDescription($description)
             ->setType($type)
-            ->setAmount($amount)
+            ->setEffects($effects)
             ->setIsRemovingPostage($isRemovingPostage)
             ->setIsEnabled($isEnabled)
             ->setExpirationDate($expirationDate)
             ->setIsAvailableOnSpecialOffers($isAvailableOnSpecialOffers)
             ->setIsCumulative($isCumulative)
             ->setMaxUsage($maxUsage);
+        $this->setTitle($title)
+            ->setShortDescription($shortDescription)
+            ->setDescription($description);
 
         // If no rule given, set default rule
         if (null === $this->getSerializedConditions()) {
@@ -131,5 +128,99 @@ class Coupon extends BaseCoupon
             $con->rollback();
             throw $e;
         }
+    }
+
+    /**
+     * Set Coupon amount
+     *
+     * @param float $amount Amount deduced from the Cart
+     *
+     * @return $this
+     */
+    public function setAmount($amount)
+    {
+        $effects = $this->unserializeEffects($this->getSerializedEffects());
+        $effects['amount'] = floatval($amount);
+        $this->setEffects($effects);
+
+        return $this;
+    }
+
+    /**
+     * Get the amount removed from the coupon to the cart
+     *
+     * @return float
+     */
+    public function getAmount()
+    {
+        $amount = $this->getEffects()['amount'];
+
+        return floatval($amount);
+    }
+
+    /**
+     * Get the Coupon effects
+     *
+     * @return array
+     * @throws Exception\InvalidArgumentException
+     */
+    public function getEffects()
+    {
+        $effects = $this->unserializeEffects($this->getSerializedEffects());
+
+        if (null === $effects['amount']) {
+            throw new InvalidArgumentException('Missing key \'amount\' in Coupon effect coming from database');
+        }
+
+        return $effects;
+    }
+
+    /**
+     * Get the Coupon effects
+     *
+     * @param array $effects Effect ready to be serialized
+     *                       Needs at least the key 'amount'
+     *                       with the amount removed from the cart
+     *
+     * @throws Exception\InvalidArgumentException
+     * @return $this
+     */
+    public function setEffects(array $effects)
+    {
+        if (null === $effects['amount']) {
+            throw new InvalidArgumentException('Missing key \'amount\' in Coupon effect ready to be serialized array');
+        }
+
+        $this->setSerializedEffects($this->serializeEffects($effects));
+
+        return $this;
+    }
+
+    /**
+     * Return unserialized effects
+     *
+     * @param string $serializedEffects Serialized effect string to unserialize
+     *
+     * @return array
+     */
+    public function unserializeEffects($serializedEffects)
+    {
+        $effects = json_decode($serializedEffects, true);
+
+        return $effects;
+    }
+
+    /**
+     * Return serialized effects
+     *
+     * @param array $unserializedEffects Unserialized array string to serialize
+     *
+     * @return string
+     */
+    public function serializeEffects(array $unserializedEffects)
+    {
+        $effects = json_encode($unserializedEffects);
+
+        return $effects;
     }
 }

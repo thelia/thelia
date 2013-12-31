@@ -852,7 +852,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="code" required="true" size="45" type="VARCHAR" />
     <column name="type" required="true" size="255" type="VARCHAR" />
-    <column name="amount" required="true" type="FLOAT" />
+    <column name="serialized_effects" required="true" type="LONGVARCHAR" />
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="is_enabled" required="true" type="BOOLEAN" />
     <column name="short_description" required="true" type="LONGVARCHAR" />
@@ -875,9 +875,6 @@
     </index>
     <index name="idx_type">
       <index-column name="type" />
-    </index>
-    <index name="idx_amount">
-      <index-column name="amount" />
     </index>
     <index name="idx_expiration_date">
       <index-column name="expiration_date" />

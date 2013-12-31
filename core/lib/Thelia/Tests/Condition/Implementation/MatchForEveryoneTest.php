@@ -29,10 +29,6 @@ use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\Currency;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Unit Test MatchForEveryone Class
  *
  * @package Condition

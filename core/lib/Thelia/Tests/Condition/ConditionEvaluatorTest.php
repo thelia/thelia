@@ -28,10 +28,6 @@ use Thelia\Condition\Operators;
 use Thelia\Condition\ConditionCollection;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Unit Test ConditionEvaluator Class
  *
  * @package Constraint
@@ -50,7 +46,7 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test vatiable comparison
+     * Test variable comparison
      *
      * @covers Thelia\Condition\ConditionEvaluator::variableOpComparison
      */
@@ -91,7 +87,7 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test vatiable comparison
+     * Test variable comparison
      *
      * @covers Thelia\Condition\ConditionEvaluator::variableOpComparison
      */
@@ -126,7 +122,7 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test vatiable comparison
+     * Test variable comparison
      *
      * @expectedException \Exception
      * @covers Thelia\Condition\ConditionEvaluator::variableOpComparison
@@ -164,8 +160,8 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
         $collection->add($stubConditionTrue1);
         $collection->add($stubConditionTrue2);
 
-        $conitionEvaluator = new ConditionEvaluator();
-        $actual = $conitionEvaluator->isMatching($collection);
+        $conditionEvaluator = new ConditionEvaluator();
+        $actual = $conditionEvaluator->isMatching($collection);
 
         $this->assertTrue($actual);
     }
@@ -195,8 +191,8 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
         $collection->add($stubConditionTrue);
         $collection->add($stubConditionFalse);
 
-        $conitionEvaluator = new ConditionEvaluator();
-        $actual = $conitionEvaluator->isMatching($collection);
+        $conditionEvaluator = new ConditionEvaluator();
+        $actual = $conditionEvaluator->isMatching($collection);
 
         $this->assertFalse($actual);
     }

@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 use Thelia\Condition\ConditionFactory;
@@ -31,9 +32,11 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Coupon\Type\RemoveXPercent;
 use Thelia\Form\CouponCreationForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -41,12 +44,9 @@ use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Lang;
 use Thelia\Tools\I18n;
+use Thelia\Tools\Rest\ResponseRest;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Control View and Action (Model) via Events
  *
  * @package Coupon
@@ -152,6 +152,11 @@ class CouponController extends BaseAdminController
 
         $args['dateFormat'] = $this->getSession()->getLang()->getDateFormat();
         $args['availableCoupons'] = $this->getAvailableCoupons();
+        $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
+            'admin.coupon.draw.inputs',
+            array('couponServiceId' => 'couponServiceId'),
+            Router::ABSOLUTE_URL
+        );
         $args['formAction'] = 'admin/coupon/create';
 
         return $this->render(
@@ -181,6 +186,9 @@ class CouponController extends BaseAdminController
             return $this->pageNotFound();
 
         }
+        /** @var CouponFactory $couponFactory */
+        $couponFactory = $this->container->get('thelia.coupon.factory');
+        $couponManager = $couponFactory->buildCouponFromModel($coupon);
 
         // Parameters given to the template
         $args = array();
@@ -247,6 +255,12 @@ class CouponController extends BaseAdminController
         }
         $args['couponCode'] = $coupon->getCode();
         $args['availableCoupons'] = $this->getAvailableCoupons();
+        $args['couponInputsHtml'] = $couponManager->drawBackOfficeInputs();
+        $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
+            'admin.coupon.draw.inputs',
+            array('couponServiceId' => 'couponServiceId'),
+            Router::ABSOLUTE_URL
+        );
         $args['availableConditions'] = $this->getAvailableConditions();
         $args['urlAjaxGetConditionInput'] = $this->getRoute(
             'admin.coupon.condition.input',
@@ -332,9 +346,9 @@ class CouponController extends BaseAdminController
 
         $couponEvent = new CouponCreateOrUpdateEvent(
             $coupon->getCode(),
-            $coupon->getTitle(),
-            $coupon->getAmount(),
             $coupon->getType(),
+            $coupon->getTitle(),
+            array('quantity' => $coupon->getAmount()),
             $coupon->getShortDescription(),
             $coupon->getDescription(),
             $coupon->getIsEnabled(),
@@ -455,12 +469,7 @@ class CouponController extends BaseAdminController
             // Check the form against conditions violations
             $form = $this->validateForm($creationForm, 'POST');
 
-            // Get the form field values
-            $data = $form->getData();
-
-            $couponEvent = new CouponCreateOrUpdateEvent(
-                $data['code'], $data['title'], $data['amount'], $data['type'], $data['shortDescription'], $data['description'], $data['isEnabled'], \DateTime::createFromFormat('Y-m-d', $data['expirationDate']), $data['isAvailableOnSpecialOffers'], $data['isCumulative'], $data['isRemovingPostage'], $data['maxUsage'], $data['locale']
-            );
+            $couponEvent = $this->feedCouponCreateOrUpdateEvent($form);
 
             // Dispatch Event to the Action
             $this->dispatch(
@@ -524,7 +533,6 @@ class CouponController extends BaseAdminController
             $condition = array();
             $condition['serviceId'] = $availableCondition->getServiceId();
             $condition['name'] = $availableCondition->getName();
-           // $condition['toolTip'] = $availableCondition->getToolTip();
             $cleanedConditions[] = $condition;
         }
 
@@ -548,6 +556,7 @@ class CouponController extends BaseAdminController
             $condition['serviceId'] = $availableCoupon->getServiceId();
             $condition['name'] = $availableCoupon->getName();
             $condition['toolTip'] = $availableCoupon->getToolTip();
+            $condition['inputName'] = $availableCoupon->getInputName();
             $cleanedCoupons[] = $condition;
         }
 
@@ -570,6 +579,88 @@ class CouponController extends BaseAdminController
         }
 
         return $cleanedConditions;
+    }
+
+    /**
+     * Draw the input displayed in the BackOffice
+     * allowing Admin to set its Coupon effect
+     *
+     * @param string $couponServiceId Coupon service id
+     *
+     * @return ResponseRest
+     */
+    public function getBackOfficeInputsAction($couponServiceId)
+    {
+        /** @var CouponInterface $coupon */
+        $coupon = $this->container->get($couponServiceId);
+
+        if (!$coupon instanceof CouponInterface) {
+            $this->pageNotFound();
+        }
+
+        $response = new ResponseRest($coupon->drawBackOfficeInputs());
+
+        return $response;
+    }
+
+    /**
+     * Add percentage logic if found in the Coupon post data
+     *
+     * @param array $effects            Effect parameters to populate
+     * @param array $extendedInputNames Extended Inputs to manage
+     *
+     * @return array Populated effect with percentage
+     */
+    protected function addExtendedLogic(array $effects, array $extendedInputNames)
+    {
+        /** @var Request $request */
+        $request = $this->container->get('request');
+        $postData = $request->request;
+        // Validate quantity input
+
+        if ($postData->has(RemoveXPercent::INPUT_EXTENDED__NAME)) {
+            $extentedPostData = $postData->get(RemoveXPercent::INPUT_EXTENDED__NAME);
+
+            foreach ($extendedInputNames as $extendedInputName) {
+                if (isset($extentedPostData[$extendedInputName])) {
+                    $inputValue = $extentedPostData[$extendedInputName];
+                    $effects[$extendedInputName] = $inputValue;
+                }
+            }
+        }
+
+        return $effects;
+    }
+
+    /**
+     * Feed the Coupon Create or Update event with the User inputs
+     *
+     * @param Form $form
+     *
+     * @return CouponCreateOrUpdateEvent
+     */
+    protected function feedCouponCreateOrUpdateEvent(Form $form)
+    {
+        // Get the form field values
+        $data = $form->getData();
+        $serviceId = $data['type'];
+        /** @var CouponInterface $couponManager */
+        $couponManager = $this->container->get($serviceId);
+        $effects = array('amount' => $data['amount']);
+        $effects = $this->addExtendedLogic($effects, $couponManager->getExtendedInputs());
+
+        $couponEvent = new CouponCreateOrUpdateEvent(
+            $data['code'], $serviceId, $data['title'], $effects, $data['shortDescription'], $data['description'], $data['isEnabled'], \DateTime::createFromFormat('Y-m-d', $data['expirationDate']), $data['isAvailableOnSpecialOffers'], $data['isCumulative'], $data['isRemovingPostage'], $data['maxUsage'], $data['locale']
+        );
+
+        // If Update mode
+        $couponQuery = new CouponQuery();
+        $coupon = $couponQuery->findOneByCode($data['code']);
+        if (isset($coupon)) {
+            $couponEvent->setCouponModel($coupon);
+        }
+
+        return $couponEvent;
     }
 
 }

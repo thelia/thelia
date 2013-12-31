@@ -30,10 +30,6 @@ use Thelia\Condition\ConditionCollection;
 
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Validate Conditions
  *
  * @package Condition

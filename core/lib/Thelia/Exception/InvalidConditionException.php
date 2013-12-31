@@ -26,10 +26,6 @@ namespace Thelia\Exception;
 use Thelia\Log\Tlog;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Thrown when a Condition is badly implemented
  *
  * @package Condition

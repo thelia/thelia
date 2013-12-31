@@ -38,10 +38,6 @@ use Thelia\Model\Coupon as CouponModel;
 use Thelia\Model\CouponQuery;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Process Coupon Events
  *
  * @package Coupon
@@ -168,7 +164,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $coupon->createOrUpdate(
             $event->getCode(),
             $event->getTitle(),
-            $event->getAmount(),
+            $event->getEffects(),
             $event->getServiceId(),
             $event->isRemovingPostage(),
             $event->getShortDescription(),

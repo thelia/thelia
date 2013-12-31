@@ -59,6 +59,12 @@
             filemanager_title:"{intl l='Files manager'}" ,
             external_plugins: { "filemanager" : "{url file='/tinymce/plugins/filemanager/plugin.min.js'}"}
         });
+
+        $(function($){
+            // Url alowing to get coupon inputs
+            $.couponManager.urlAjaxAdminCouponDrawInputs = "{$urlAjaxAdminCouponDrawInputs}";
+            $.couponManager.intlPleaseRetry = '{intl l='Please retry'}';
+        });
     </script>
 
 {/block}

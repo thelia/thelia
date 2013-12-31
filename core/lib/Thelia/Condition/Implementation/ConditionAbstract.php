@@ -34,10 +34,6 @@ use Thelia\Model\Currency;
 use Thelia\Type\FloatType;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Assist in writing a condition of whether the Condition is applied or not
  *
  * @package Constraint

@@ -24,7 +24,7 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     ChildCouponVersionQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCouponVersionQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method     ChildCouponVersionQuery orderByType($order = Criteria::ASC) Order by the type column
- * @method     ChildCouponVersionQuery orderByAmount($order = Criteria::ASC) Order by the amount column
+ * @method     ChildCouponVersionQuery orderBySerializedEffects($order = Criteria::ASC) Order by the serialized_effects column
  * @method     ChildCouponVersionQuery orderByIsEnabled($order = Criteria::ASC) Order by the is_enabled column
  * @method     ChildCouponVersionQuery orderByExpirationDate($order = Criteria::ASC) Order by the expiration_date column
  * @method     ChildCouponVersionQuery orderByMaxUsage($order = Criteria::ASC) Order by the max_usage column
@@ -40,7 +40,7 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     ChildCouponVersionQuery groupById() Group by the id column
  * @method     ChildCouponVersionQuery groupByCode() Group by the code column
  * @method     ChildCouponVersionQuery groupByType() Group by the type column
- * @method     ChildCouponVersionQuery groupByAmount() Group by the amount column
+ * @method     ChildCouponVersionQuery groupBySerializedEffects() Group by the serialized_effects column
  * @method     ChildCouponVersionQuery groupByIsEnabled() Group by the is_enabled column
  * @method     ChildCouponVersionQuery groupByExpirationDate() Group by the expiration_date column
  * @method     ChildCouponVersionQuery groupByMaxUsage() Group by the max_usage column
@@ -67,7 +67,7 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     ChildCouponVersion findOneById(int $id) Return the first ChildCouponVersion filtered by the id column
  * @method     ChildCouponVersion findOneByCode(string $code) Return the first ChildCouponVersion filtered by the code column
  * @method     ChildCouponVersion findOneByType(string $type) Return the first ChildCouponVersion filtered by the type column
- * @method     ChildCouponVersion findOneByAmount(double $amount) Return the first ChildCouponVersion filtered by the amount column
+ * @method     ChildCouponVersion findOneBySerializedEffects(string $serialized_effects) Return the first ChildCouponVersion filtered by the serialized_effects column
  * @method     ChildCouponVersion findOneByIsEnabled(boolean $is_enabled) Return the first ChildCouponVersion filtered by the is_enabled column
  * @method     ChildCouponVersion findOneByExpirationDate(string $expiration_date) Return the first ChildCouponVersion filtered by the expiration_date column
  * @method     ChildCouponVersion findOneByMaxUsage(int $max_usage) Return the first ChildCouponVersion filtered by the max_usage column
@@ -83,7 +83,7 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     array findById(int $id) Return ChildCouponVersion objects filtered by the id column
  * @method     array findByCode(string $code) Return ChildCouponVersion objects filtered by the code column
  * @method     array findByType(string $type) Return ChildCouponVersion objects filtered by the type column
- * @method     array findByAmount(double $amount) Return ChildCouponVersion objects filtered by the amount column
+ * @method     array findBySerializedEffects(string $serialized_effects) Return ChildCouponVersion objects filtered by the serialized_effects column
  * @method     array findByIsEnabled(boolean $is_enabled) Return ChildCouponVersion objects filtered by the is_enabled column
  * @method     array findByExpirationDate(string $expiration_date) Return ChildCouponVersion objects filtered by the expiration_date column
  * @method     array findByMaxUsage(int $max_usage) Return ChildCouponVersion objects filtered by the max_usage column
@@ -183,7 +183,7 @@ abstract class CouponVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CODE, TYPE, AMOUNT, IS_ENABLED, EXPIRATION_DATE, MAX_USAGE, IS_CUMULATIVE, IS_REMOVING_POSTAGE, IS_AVAILABLE_ON_SPECIAL_OFFERS, IS_USED, SERIALIZED_CONDITIONS, CREATED_AT, UPDATED_AT, VERSION FROM coupon_version WHERE ID = :p0 AND VERSION = :p1';
+        $sql = 'SELECT ID, CODE, TYPE, SERIALIZED_EFFECTS, IS_ENABLED, EXPIRATION_DATE, MAX_USAGE, IS_CUMULATIVE, IS_REMOVING_POSTAGE, IS_AVAILABLE_ON_SPECIAL_OFFERS, IS_USED, SERIALIZED_CONDITIONS, CREATED_AT, UPDATED_AT, VERSION FROM coupon_version WHERE ID = :p0 AND VERSION = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -386,44 +386,32 @@ abstract class CouponVersionQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the amount column
+     * Filter the query on the serialized_effects column
      *
      * Example usage:
      * <code>
-     * $query->filterByAmount(1234); // WHERE amount = 1234
-     * $query->filterByAmount(array(12, 34)); // WHERE amount IN (12, 34)
-     * $query->filterByAmount(array('min' => 12)); // WHERE amount > 12
+     * $query->filterBySerializedEffects('fooValue');   // WHERE serialized_effects = 'fooValue'
+     * $query->filterBySerializedEffects('%fooValue%'); // WHERE serialized_effects LIKE '%fooValue%'
      * </code>
      *
-     * @param     mixed $amount The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $serializedEffects The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
-    public function filterByAmount($amount = null, $comparison = null)
+    public function filterBySerializedEffects($serializedEffects = null, $comparison = null)
     {
-        if (is_array($amount)) {
-            $useMinMax = false;
-            if (isset($amount['min'])) {
-                $this->addUsingAlias(CouponVersionTableMap::AMOUNT, $amount['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($amount['max'])) {
-                $this->addUsingAlias(CouponVersionTableMap::AMOUNT, $amount['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
+        if (null === $comparison) {
+            if (is_array($serializedEffects)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $serializedEffects)) {
+                $serializedEffects = str_replace('*', '%', $serializedEffects);
+                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(CouponVersionTableMap::AMOUNT, $amount, $comparison);
+        return $this->addUsingAlias(CouponVersionTableMap::SERIALIZED_EFFECTS, $serializedEffects, $comparison);
     }
 
     /**

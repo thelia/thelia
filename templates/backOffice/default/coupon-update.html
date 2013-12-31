@@ -36,6 +36,8 @@
         <script src="{$asset_url}"></script>
     {/javascripts}
 
+    <script>
+    </script>
     {javascripts file='assets/js/coupon.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
@@ -61,6 +63,10 @@
 
         $(function($){
 //            miniBrowser(0, '/test_to_remove/datas_coupon_edit.json');
+
+            // Url alowing to get coupon inputs
+            $.couponManager.urlAjaxAdminCouponDrawInputs = "{$urlAjaxAdminCouponDrawInputs}";
+            $.couponManager.intlPleaseRetry = '{intl l='Please retry'}';
 
             // Init Conditions
             $.couponManager.initConditions = function() {

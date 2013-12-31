@@ -499,6 +499,10 @@
         <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
         <requirement key="couponId">\d+</requirement>
     </route>
+    <route id="admin.coupon.draw.inputs" path="/admin/coupon/draw/inputs/{couponServiceId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::getBackOfficeInputsAction</default>
+        <requirement key="couponServiceId">.*</requirement>
+    </route>
     <route id="admin.coupon.condition.input" path="/admin/coupon/condition/{conditionId}">
         <default key="_controller">Thelia\Controller\Admin\CouponController::getConditionInputAction</default>
         <requirement key="conditionId">.*</requirement>

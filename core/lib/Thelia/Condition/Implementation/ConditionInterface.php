@@ -28,10 +28,6 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
  * Manage how the application checks its state in order to check if it matches the implemented condition
  *
  * @package Condition
