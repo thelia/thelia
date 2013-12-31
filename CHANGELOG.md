@@ -1,3 +1,6 @@
+#2.0.0-beta3
+- Coupon effect inputs are now more customisable (input text, select, ajax, etc.. are usable) and unlimited amount of input for coupon effect are now possible too
+
 #2.0.0-beta2
 
 - http://doc.thelia.net is available in beta.
@@ -25,8 +28,3 @@
 		- http://www.mnot.net/cache_docs/ (fr)
 		- http://tomayko.com/writings/things-caches-do (en)
 		- http://symfony.com/doc/current/book/http_cache.html#http-cache-introduction (en and fr)
-
-#2.0.0-beta3
-- Coupon effect inputs are now more customisable (input text, select, ajax, etc.. are usable) and unlimited amount of input for coupon effect are now possible too
-
-
