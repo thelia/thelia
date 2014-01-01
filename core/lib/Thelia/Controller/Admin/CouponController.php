@@ -35,6 +35,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Condition\ConditionCollection;
+use Thelia\Coupon\Type\CouponAbstract;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Coupon\Type\RemoveXPercent;
 use Thelia\Form\CouponCreationForm;
@@ -205,7 +206,8 @@ class CouponController extends BaseAdminController
                 $lang,
                 $eventToDispatch,
                 'updated',
-                'update'
+                'update',
+                $coupon
             );
         } else {
             // Display
@@ -348,7 +350,7 @@ class CouponController extends BaseAdminController
             $coupon->getCode(),
             $coupon->getType(),
             $coupon->getTitle(),
-            array('quantity' => $coupon->getAmount()),
+            $coupon->getEffects(),
             $coupon->getShortDescription(),
             $coupon->getDescription(),
             $coupon->getIsEnabled(),
@@ -456,10 +458,11 @@ class CouponController extends BaseAdminController
      * @param string $eventToDispatch Event which will activate actions
      * @param string $log             created|edited
      * @param string $action          creation|edition
+     * @param Coupon $model           Model if in update mode
      *
      * @return $this
      */
-    protected function validateCreateOrUpdateForm(I18n $i18n, Lang $lang, $eventToDispatch, $log, $action)
+    protected function validateCreateOrUpdateForm(I18n $i18n, Lang $lang, $eventToDispatch, $log, $action, Coupon $model = null)
     {
         // Create the form from the request
         $creationForm = new CouponCreationForm($this->getRequest());
@@ -469,7 +472,7 @@ class CouponController extends BaseAdminController
             // Check the form against conditions violations
             $form = $this->validateForm($creationForm, 'POST');
 
-            $couponEvent = $this->feedCouponCreateOrUpdateEvent($form);
+            $couponEvent = $this->feedCouponCreateOrUpdateEvent($form, $model);
 
             // Dispatch Event to the Action
             $this->dispatch(
@@ -635,29 +638,40 @@ class CouponController extends BaseAdminController
     /**
      * Feed the Coupon Create or Update event with the User inputs
      *
-     * @param Form $form
+     * @param Form   $form  Form containing user data
+     * @param Coupon $model Model if in update mode
      *
      * @return CouponCreateOrUpdateEvent
      */
-    protected function feedCouponCreateOrUpdateEvent(Form $form)
+    protected function feedCouponCreateOrUpdateEvent(Form $form, Coupon $model = null)
     {
         // Get the form field values
         $data = $form->getData();
         $serviceId = $data['type'];
         /** @var CouponInterface $couponManager */
         $couponManager = $this->container->get($serviceId);
-        $effects = array('amount' => $data['amount']);
+        $effects = array(CouponAbstract::INPUT_AMOUNT_NAME => $data[CouponAbstract::INPUT_AMOUNT_NAME]);
         $effects = $this->addExtendedLogic($effects, $couponManager->getExtendedInputs());
 
         $couponEvent = new CouponCreateOrUpdateEvent(
-            $data['code'], $serviceId, $data['title'], $effects, $data['shortDescription'], $data['description'], $data['isEnabled'], \DateTime::createFromFormat('Y-m-d', $data['expirationDate']), $data['isAvailableOnSpecialOffers'], $data['isCumulative'], $data['isRemovingPostage'], $data['maxUsage'], $data['locale']
+            $data['code'],
+            $serviceId,
+            $data['title'],
+            $effects,
+            $data['shortDescription'],
+            $data['description'],
+            $data['isEnabled'],
+            \DateTime::createFromFormat('Y-m-d', $data['expirationDate']),
+            $data['isAvailableOnSpecialOffers'],
+            $data['isCumulative'],
+            $data['isRemovingPostage'],
+            $data['maxUsage'],
+            $data['locale']
         );
 
         // If Update mode
-        $couponQuery = new CouponQuery();
-        $coupon = $couponQuery->findOneByCode($data['code']);
-        if (isset($coupon)) {
-            $couponEvent->setCouponModel($coupon);
+        if (isset($model)) {
+            $couponEvent->setCouponModel($model);
         }
 
         return $couponEvent;
