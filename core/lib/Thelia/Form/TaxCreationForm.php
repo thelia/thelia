@@ -40,7 +40,7 @@ class TaxCreationForm extends BaseForm
 
     protected function buildForm($change_mode = false)
     {
-        $types = TaxEngine::getInstance()->getTaxTypeList();
+        $types = TaxEngine::getInstance($this->getRequest()->getSession())->getTaxTypeList();
         $typeList = array();
         $requirementList = array();
         foreach ($types as $type) {
