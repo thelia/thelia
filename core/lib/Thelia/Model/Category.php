@@ -5,6 +5,7 @@ namespace Thelia\Model;
 use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Model\Base\Category as BaseCategory;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Model\ProductCategoryQuery;
 use Thelia\Tools\URL;
 use Thelia\Core\Event\TheliaEvents;
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -62,6 +63,22 @@ class Category extends BaseCategory
         $query->filterByParent($this->getParent());
     }
 
+    public function deleteProducts(ConnectionInterface $con = null)
+    {
+        $productsCategories = ProductCategoryQuery::create()
+            ->filterByCategoryId($this->getId())
+            ->filterByDefaultCategory(1)
+            ->find($con);
+
+        if($productsCategories) {
+            foreach ($productsCategories as $productCategory) {
+                $product = $productCategory->getProduct();
+
+                $product->delete($con);
+            }
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -111,6 +128,7 @@ class Category extends BaseCategory
                 "parent" => $this->getParent(),
             )
         );
+        $this->deleteProducts($con);
         return true;
     }
 
