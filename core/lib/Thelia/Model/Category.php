@@ -121,6 +121,15 @@ class Category extends BaseCategory
     {
         $this->markRewritenUrlObsolete();
 
+        //delete all subcategories
+        $subCategories = CategoryQuery::findAllChild($this->getId());
+
+        foreach($subCategories as $category) {
+            $category->setDispatcher($this->getDispatcher());
+
+            $category->delete();
+        }
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECATEGORY, new CategoryEvent($this));
     }
 }
