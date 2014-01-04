@@ -105,8 +105,7 @@ class ConditionCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Thelia\Condition\ConditionCollection::getConditions
-     * @covers Thelia\Condition\ConditionCollection::add
+     *
      */
     public function testGetConditions()
     {
@@ -123,23 +122,23 @@ class ConditionCollectionTest extends \PHPUnit_Framework_TestCase
         $condition1->setValidatorsFromForm($operators, $values);
 
         $collection = new ConditionCollection();
-        $collection->add($condition1);
+        $collection[] = $condition1;
 
         $expected = $condition1;
-        $actual = $collection->getConditions()[0];
+        $actual = $collection[0];
 
         $this->assertEquals($expected, $actual);
 
-        $this->assertFalse($collection->isEmpty());
+        $this->assertFalse($collection->count() == 0);
     }
 
     /**
-     * @covers Thelia\Condition\ConditionCollection::isEmpty
+     * @covers Thelia\Condition\ConditionCollection::count
      */
     public function testIsEmpty()
     {
         $collection = new ConditionCollection();
-        $this->assertTrue($collection->isEmpty());
+        $this->assertTrue($collection->count() == 0);
     }
 
     /**
@@ -170,8 +169,8 @@ class ConditionCollectionTest extends \PHPUnit_Framework_TestCase
         $condition2->setValidatorsFromForm($operators2, $values2);
 
         $collection = new ConditionCollection();
-        $collection->add($condition1);
-        $collection->add($condition2);
+        $collection[] = $condition1;
+        $collection[] = $condition2;
 
         $expected = '[{"conditionServiceId":"thelia.condition.match_for_total_amount","operators":{"price":">","currency":"=="},"values":{"price":400,"currency":"EUR"}},{"conditionServiceId":"thelia.condition.match_for_total_amount","operators":{"price":"<","currency":"=="},"values":{"price":600,"currency":"EUR"}}]';
         $actual = $collection->__toString();;

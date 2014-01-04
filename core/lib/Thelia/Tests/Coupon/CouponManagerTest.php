@@ -108,8 +108,8 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
-        $conditions->add($condition1);
-        $conditions->add($condition2);
+        $conditions[] = $condition1;
+        $conditions[] = $condition2;
 
         $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
         $coupon1->setSerializedConditions($serializedConditions);
@@ -372,8 +372,8 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
-        $conditions->add($condition1);
-        $conditions->add($condition2);
+        $conditions[] = $condition1;
+        $conditions[] = $condition2;
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
@@ -428,8 +428,8 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
-        $conditions->add($condition1);
-        $conditions->add($condition2);
+        $conditions[] = $condition1;
+        $conditions[] = $condition2;
         $coupon->setConditions($conditions);
 
         $stubFacade->expects($this->any())
@@ -495,8 +495,8 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
-        $conditions->add($condition1);
-        $conditions->add($condition2);
+        $conditions[] = $condition1;
+        $conditions[] = $condition2;
         $coupon->setConditions($conditions);
 
         $stubFacade->expects($this->any())

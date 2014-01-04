@@ -743,8 +743,6 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
                         '>=' => 'Price',
                         '>' => 'Price'
                     ),
-                    'type' => 'text',
-                    'class' => 'form-control',
                     'value' => '',
                     'selectedOperator' => ''
                 )

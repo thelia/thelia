@@ -23,7 +23,6 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Coupon\FacadeInterface;
 use Thelia\Coupon\Type\CouponAbstract;
 
 /**

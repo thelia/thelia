@@ -239,8 +239,8 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
-        $conditions->add($condition1);
-        $conditions->add($condition2);
+        $conditions[] = $condition1;
+        $conditions[] = $condition2;
 
         $conditionFactory = new ConditionFactory($stubContainer);
 
@@ -307,12 +307,12 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $condition1->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
-        $conditions->add($condition1);
+        $conditions[] = $condition1;
 
         $conditionFactory = new ConditionFactory($stubContainer);
 
         $expected = $condition1->getValidators();
-        $actual = $conditionFactory->getInputs('thelia.condition.match_for_x_articles');
+        $actual = $conditionFactory->getInputsFromServiceId('thelia.condition.match_for_x_articles');
 
         $this->assertEquals($expected, $actual);
 
@@ -372,12 +372,12 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $condition1->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
-        $conditions->add($condition1);
+        $conditions[] = $condition1;
 
         $conditionFactory = new ConditionFactory($stubContainer);
 
         $expected = false;
-        $actual = $conditionFactory->getInputs('thelia.condition.unknown');
+        $actual = $conditionFactory->getInputsFromServiceId('thelia.condition.unknown');
 
         $this->assertEquals($expected, $actual);
 
@@ -435,7 +435,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
 
         $conditionNone = new MatchForEveryone($stubFacade);
         $expectedCollection = new ConditionCollection();
-        $expectedCollection->add($conditionNone);
+        $expectedCollection[] = $conditionNone;
 
         $expected = $conditionFactory->serializeConditionCollection($expectedCollection);
         $actual = $conditionFactory->serializeConditionCollection($conditions);

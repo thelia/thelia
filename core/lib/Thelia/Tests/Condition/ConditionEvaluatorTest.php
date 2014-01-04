@@ -157,8 +157,8 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $collection = new ConditionCollection();
-        $collection->add($stubConditionTrue1);
-        $collection->add($stubConditionTrue2);
+        $collection[] = $stubConditionTrue1;
+        $collection[] = $stubConditionTrue2;
 
         $conditionEvaluator = new ConditionEvaluator();
         $actual = $conditionEvaluator->isMatching($collection);
@@ -188,8 +188,8 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
 
         $collection = new ConditionCollection();
-        $collection->add($stubConditionTrue);
-        $collection->add($stubConditionFalse);
+        $collection[] = $stubConditionTrue;
+        $collection[] = $stubConditionFalse;
 
         $conditionEvaluator = new ConditionEvaluator();
         $actual = $conditionEvaluator->isMatching($collection);

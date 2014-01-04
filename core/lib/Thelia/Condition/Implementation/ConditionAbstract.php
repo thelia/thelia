@@ -219,4 +219,101 @@ abstract class ConditionAbstract implements ConditionInterface
         return true;
     }
 
+    /**
+     * Draw the operator input displayed in the BackOffice
+     * allowing Admin to set its Coupon Conditions
+     *
+     * @param string $inputKey Input key (ex: self::INPUT1)
+     *
+     * @return string HTML string
+     */
+    protected function drawBackOfficeInputOperators($inputKey)
+    {
+        $selectHtml = '';
+        $optionHtml = '';
+        $inputs = $this->getValidators();
+        if(isset($inputs['inputs'][$inputKey])) {
+            $operators = $inputs['inputs'][$inputKey]['availableOperators'];
+            foreach ($operators as $key => $operator) {
+                $selected = '';
+                if (isset($this->operators) && isset($this->operators[$inputKey]) && $this->operators[$inputKey] == $key) {
+                    $selected = ' selected="selected"';
+                }
+                $optionHtml .= '<option value="' . $key . '" '. $selected . '>' . $operator . '</option>';
+            }
+
+            $selectHtml .= '
+            <select class="form-control" id="' . $inputKey . '-operator" name="' . $inputKey . '[operator]">
+                ' . $optionHtml . '
+            </select>
+        ';
+        }
+
+        return $selectHtml;
+    }
+
+    /**
+     * Draw the base input displayed in the BackOffice
+     * allowing Admin to set its Coupon Conditions
+     *
+     * @param string $label    I18n input label
+     * @param string $inputKey Input key (ex: self::INPUT1)
+     *
+     * @return string HTML string
+     */
+    protected function drawBackOfficeBaseInputsText($label, $inputKey)
+    {
+        $operatorSelectHtml = $this->drawBackOfficeInputOperators($inputKey);
+        $currentValue = '';
+        if (isset($this->values) && isset($this->values[$inputKey])) {
+            $currentValue = $this->values[$inputKey];
+        }
+
+        $html = '
+                <div id="condition-add-operators-values" class="form-group col-md-6">
+                    <label for="operator">' . $label . '</label>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            ' . $operatorSelectHtml . '
+                        </div>
+                        <div class="input-group col-lg-6">
+                                <input type="text" class="form-control" id="' . $inputKey . '-value" name="' . $inputKey . '[value]" value="' . $currentValue . '">
+                        </div>
+                    </div>
+                </div>
+            ';
+        return $html;
+    }
+
+    /**
+     * Draw the quantity input displayed in the BackOffice
+     * allowing Admin to set its Coupon Conditions
+     *
+     * @param string $inputKey Input key (ex: self::INPUT1)
+     * @param int    $max      Maximum selectable
+     * @param int    $min      Minimum selectable
+     *
+     * @return string HTML string
+     */
+    protected function drawBackOfficeInputQuantityValues($inputKey, $max = 10, $min = 0)
+    {
+        $selectHtml = '';
+        $optionHtml = '';
+        for ($i = $min; $i <= $max; $i++) {
+            $selected = '';
+            if (isset($this->values) && isset($this->values[$inputKey]) && $this->values[$inputKey] == $i) {
+                $selected = ' selected="selected"';
+            }
+            $optionHtml .= '<option value="' . $i . '" ' . $selected . '>' . $i . '</option>';
+        }
+
+        $selectHtml .= '
+            <select class="form-control" id="' . $inputKey . '-value" name="' . $inputKey . '[value]">
+                ' . $optionHtml . '
+            </select>
+        ';
+
+        return $selectHtml;
+    }
+
 }

@@ -67,20 +67,17 @@ class ConditionFactory
      */
     public function serializeConditionCollection(ConditionCollection $collection)
     {
-        if ($collection->isEmpty()) {
+        if ($collection->count() == 0) {
             /** @var ConditionInterface $conditionNone */
             $conditionNone = $this->container->get(
                 'thelia.condition.match_for_everyone'
             );
-            $collection->add($conditionNone);
+            $collection[] = $conditionNone;
         }
         $serializableConditions = array();
-        $conditions = $collection->getConditions();
-        if ($conditions !== null) {
-            /** @var $condition ConditionInterface */
-            foreach ($conditions as $condition) {
-                $serializableConditions[] = $condition->getSerializableCondition();
-            }
+        /** @var $condition ConditionInterface */
+        foreach ($collection as $condition) {
+            $serializableConditions[] = $condition->getSerializableCondition();
         }
 
         return base64_encode(json_encode($serializableConditions));
@@ -109,7 +106,7 @@ class ConditionFactory
                         (array) $condition->operators,
                         (array) $condition->values
                     );
-                    $collection->add(clone $conditionManager);
+                    $collection[] = clone $conditionManager;
                 }
             }
         }
@@ -138,7 +135,7 @@ class ConditionFactory
         $condition = $this->container->get($conditionServiceId);
         $condition->setValidatorsFromForm($operators, $values);
 
-        return $condition;
+        return clone $condition;
     }
 
     /**
@@ -148,7 +145,7 @@ class ConditionFactory
      *
      * @return array Ready to be drawn condition inputs
      */
-    public function getInputs($conditionServiceId)
+    public function getInputsFromServiceId($conditionServiceId)
     {
         if (!$this->container->has($conditionServiceId)) {
             return false;
@@ -156,6 +153,19 @@ class ConditionFactory
 
         /** @var ConditionInterface $condition */
         $condition = $this->container->get($conditionServiceId);
+
+        return $this->getInputsFromConditionInterface($condition);
+    }
+
+    /**
+     * Get Condition inputs from serviceId
+     *
+     * @param ConditionInterface $condition ConditionManager
+     *
+     * @return array Ready to be drawn condition inputs
+     */
+    public function getInputsFromConditionInterface(ConditionInterface $condition)
+    {
 
         return $condition->getValidators();
     }

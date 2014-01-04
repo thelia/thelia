@@ -85,10 +85,19 @@ interface ConditionInterface
 
     /**
      * Get I18n tooltip
+     * Explain in detail what the Condition checks
      *
      * @return string
      */
     public function getToolTip();
+
+    /**
+     * Get I18n summary
+     * Explain briefly the condition with given values
+     *
+     * @return string
+     */
+    public function getSummary();
 
     /**
      * Return all validators
@@ -103,5 +112,13 @@ interface ConditionInterface
      * @return SerializableCondition
      */
     public function getSerializableCondition();
+
+    /**
+     * Draw the input displayed in the BackOffice
+     * allowing Admin to set its Coupon Conditions
+     *
+     * @return string HTML string
+     */
+    public function drawBackOfficeInputs();
 
 }

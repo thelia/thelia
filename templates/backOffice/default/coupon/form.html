@@ -1,7 +1,8 @@
 {$thelia_page_css_file = "assets/bootstrap-editable/css/bootstrap-editable.css"}
 {include file='includes/notifications.html' message=$general_error}
-<form action="{$formAction}" {form_enctype form=$form} method="POST" >
-    <section class="row">
+
+<section class="row">
+    <form action="{$formAction}" {form_enctype form=$form} method="POST" >
         <div class="col-md-12 general-block-decorator">
 
             {form_hidden_fields form=$form}
@@ -122,17 +123,6 @@
                         {form_field form=$form field='amount'}
                             {$couponInputsHtml nofilter}
                         {/form_field}
-                        {*<div class="form-group {if $error}has-error{/if}">*}
-                            {*<label for="category">Category :</label>*}
-                            {*form_field form=$form field='category'*}
-                                {*<select name="{$name}" value="{$value}" id="category" class="form-control">*}
-                                    {*<option value="1">Category 1</option>*}
-                                    {*<option value="1">Category 2</option>*}
-                                    {*<option value="1">Category 3</option>*}
-                                {*</select>*}
-                                {*if $error}{$message}{/if}*}
-                            {*/form_field*}
-                        {*</div>*}
                     </div>
                 </div>
 
@@ -160,30 +150,33 @@
             </div>
 
         </div>
-    </section>
-    {if $noConditions}
-        {include file='includes/notifications.html' message={intl l='Please save your Coupon in oder to affect it some conditions'}}
-    {else}
-        <section class="row">
-            <div class="col-md-12 general-block-decorator">
-                <table class="table table-striped">
-                    <caption class="clearfix">
-                        {intl l='Conditions'}
-                    </caption>
-                    <thead>
-                    <tr>
-                        <th>{intl l='Conditions'}</th>
-                        <th>{intl l='Actions'}</th>
-                    </tr>
-                    </thead>
-                    <tbody id="condition-list">
-                        {include file='coupon/conditions.html' conditions=$conditions}
-                    </tbody>
-                </table>
-            </div>
-        </section>
+    </form>
+</section>
 
-        <section class="row">
+{if $noConditions}
+    {include file='includes/notifications.html' message={intl l='Please save your Coupon in oder to affect it some conditions'}}
+{else}
+    <section class="row">
+        <div class="col-md-12 general-block-decorator">
+            <table class="table table-striped">
+                <caption class="clearfix">
+                    {intl l='Conditions'}
+                </caption>
+                <thead>
+                <tr>
+                    <th>{intl l='Conditions'}</th>
+                    <th>{intl l='Actions'}</th>
+                </tr>
+                </thead>
+                <tbody id="condition-list">
+                    {include file='coupon/conditions.html' conditions=$conditions}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="row">
+        <form id="condition-form" action="{$urlAjaxSaveConditions}" {form_enctype form=$form} method="POST" >
             <div class="col-md-12 general-block-decorator clearfix">
                 <a id="condition-save-btn" title="{intl l='Save this condition'}" class="btn btn-default btn-primary pull-right" data-toggle="confirm" data-script="">
                     <span class="glyphicon glyphicon-plus-sign"></span> {intl l='Save this condition'}
@@ -209,74 +202,9 @@
                     </select>
                 </div>
 
-                <div id="condition-add-operators-values" class="form-group col-md-6">
-                    {*<label for="operator">{intl l='Operator :'}</label>*}
-                    {*<div class="row">*}
-                        {*<div class="col-lg-6">*}
-                            {*<select name="operator" id="operator" class="form-control">*}
-                                {*<option value="1">is superior to</option>*}
-                                {*<option value="2">equals to</option>*}
-                                {*<option value="3">is inferior to</option>*}
-                                {*<option value="4">is inferior or equals to</option>*}
-                                {*<option value="5">is superior or equals to</option>*}
-                            {*</select>*}
-                        {*</div>*}
-                        {*<div class="input-group col-lg-6">*}
-                            {*<input type="text" name="value" class="form-control">*}
-                            {*<span class="input-group-addon">&euro;</span>*}
-                        {*</div>*}
-                    {*</div>*}
-                    {**}
-
-                    {*<label for="operator">Operator :</label>*}
-                    {*<div class="row">*}
-                        {*<div class="col-lg-6">*}
-                            {*<select name="operator" id="operator" class="form-control">*}
-                                {*<option value="1">is superior to</option>*}
-                                {*<option value="2">equals to</option>*}
-                                {*<option value="3">is inferior to</option>*}
-                                {*<option value="4">is inferior or equals to</option>*}
-                                {*<option value="5">is superior or equals to</option>*}
-                            {*</select>*}
-                        {*</div>*}
-                        {*<div class="input-group col-lg-6 date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">*}
-                            {*<input type="text" name="value" class="form-control">*}
-                            {*<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>*}
-                        {*</div>*}
-                    {*</div>*}
-
-                    {*<label for="operator">Operator :</label>*}
-                    {*<div class="row">*}
-                        {*<div class="col-lg-6">*}
-                            {*<select name="operator" id="operator" class="form-control">*}
-                                {*<option value="1">is superior to</option>*}
-                                {*<option value="2">equals to</option>*}
-                                {*<option value="3">is inferior to</option>*}
-                                {*<option value="4">is inferior or equals to</option>*}
-                                {*<option value="5">is superior or equals to</option>*}
-                            {*</select>*}
-                        {*</div>*}
-                        {*<div class="col-lg-6">*}
-                            {*<input type="text" name="value" class="form-control">*}
-                        {*</div>*}
-                    {*</div>*}
-                    {*<div class="row">*}
-                        {*<div class="col-lg-12">*}
-                            {*<table class="table table-bordered">*}
-                                {*<tr>*}
-                                    {*<td id="minibrowser-breadcrumb"></td>*}
-                                {*</tr>*}
-                                {*<tr>*}
-                                    {*<th><span class="icon-th-list"></span> Categories list</th>*}
-                                {*</tr>*}
-                                {*<tr>*}
-                                    {*<td id="minibrowser-categories"></td>*}
-                                {*</tr>*}
-                            {*</table>*}
-                        {*</div>*}
-                    {*</div>*}
-                </div>
+                <div id="condition-add-operators-values" class="form-group col-md-6"></div>
             </div>
-        </section>
-    {/if}
-</form>
+        </form>
+    </section>
+{/if}
+

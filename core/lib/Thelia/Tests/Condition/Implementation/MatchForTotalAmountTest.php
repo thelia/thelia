@@ -659,7 +659,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $conditionFactory = new ConditionFactory($stubContainer);
 
         $collection = new ConditionCollection();
-        $collection->add($condition1);
+        $collection[] = $condition1;
 
         $serialized = $conditionFactory->serializeConditionCollection($collection);
         $conditionFactory->unserializeConditionCollection($serialized);
@@ -726,7 +726,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $conditionFactory = new ConditionFactory($stubContainer);
 
         $collection = new ConditionCollection();
-        $collection->add($condition1);
+        $collection[] = $condition1;
 
         $serialized = $conditionFactory->serializeConditionCollection($collection);
         $conditionFactory->unserializeConditionCollection($serialized);
@@ -793,7 +793,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $conditionFactory = new ConditionFactory($stubContainer);
 
         $collection = new ConditionCollection();
-        $collection->add($condition1);
+        $collection[] = $condition1;
 
         $serialized = $conditionFactory->serializeConditionCollection($collection);
         $conditionFactory->unserializeConditionCollection($serialized);
@@ -927,8 +927,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
                         '>' => 'Price'
                     ),
                     'availableValues' => '',
-                    'type' => 'text',
-                    'class' => 'form-control',
                     'value' => '',
                     'selectedOperator' => ''
                 ),
@@ -940,8 +938,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
                         'USD' => '$',
                         'GBP' => '£',
                     ),
-                    'type' => 'select',
-                    'class' => 'form-control',
                     'value' => '',
                     'selectedOperator' => Operators::EQUAL
                 )

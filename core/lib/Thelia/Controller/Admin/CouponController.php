@@ -25,6 +25,7 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
@@ -235,18 +236,6 @@ class CouponController extends BaseAdminController
                 'locale' => $coupon->getLocale(),
             );
 
-            $args['conditionsObject'] = array();
-
-            /** @var ConditionInterface $condition */
-            foreach ($conditions->getConditions() as $condition) {
-                $args['conditionsObject'][] = array(
-                    'serviceId' => $condition->getServiceId(),
-                    'name' => $condition->getName(),
-                    'tooltip' => $condition->getToolTip(),
-                    'validators' => $condition->getValidators()
-                );
-            }
-
             $args['conditions'] = $this->cleanConditionForTemplate($conditions);
 
             // Setup the object form
@@ -259,19 +248,40 @@ class CouponController extends BaseAdminController
         $args['availableCoupons'] = $this->getAvailableCoupons();
         $args['couponInputsHtml'] = $couponManager->drawBackOfficeInputs();
         $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
-            'admin.coupon.draw.inputs',
+            'admin.coupon.draw.inputs.ajax',
             array('couponServiceId' => 'couponServiceId'),
             Router::ABSOLUTE_URL
         );
         $args['availableConditions'] = $this->getAvailableConditions();
-        $args['urlAjaxGetConditionInput'] = $this->getRoute(
-            'admin.coupon.condition.input',
+        $args['urlAjaxGetConditionInputFromServiceId'] = $this->getRoute(
+            'admin.coupon.draw.condition.read.inputs.ajax',
             array('conditionId' => 'conditionId'),
             Router::ABSOLUTE_URL
         );
+        $args['urlAjaxGetConditionInputFromConditionInterface'] = $this->getRoute(
+            'admin.coupon.draw.condition.update.inputs.ajax',
+            array(
+                'couponId' => $couponId,
+                'conditionIndex' => 8888888
+            ),
+            Router::ABSOLUTE_URL
+        );
 
-        $args['urlAjaxUpdateConditions'] = $this->getRoute(
-            'admin.coupon.condition.update',
+        $args['urlAjaxSaveConditions'] = $this->getRoute(
+            'admin.coupon.condition.save',
+            array('couponId' => $couponId),
+            Router::ABSOLUTE_URL
+        );
+        $args['urlAjaxDeleteConditions'] = $this->getRoute(
+            'admin.coupon.condition.delete',
+            array(
+                'couponId' => $couponId,
+                'conditionIndex' => 8888888
+            ),
+            Router::ABSOLUTE_URL
+        );
+        $args['urlAjaxGetConditionSummaries'] = $this->getRoute(
+            'admin.coupon.draw.condition.summaries.ajax',
             array('couponId' => $couponId),
             Router::ABSOLUTE_URL
         );
@@ -288,7 +298,7 @@ class CouponController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function getConditionInputAction($conditionId)
+    public function getConditionEmptyInputAjaxAction($conditionId)
     {
         $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
 
@@ -296,7 +306,14 @@ class CouponController extends BaseAdminController
 
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->container->get('thelia.condition.factory');
-        $inputs = $conditionFactory->getInputs($conditionId);
+        $inputs = $conditionFactory->getInputsFromServiceId($conditionId);
+        if (!$this->container->has($conditionId)) {
+            return false;
+        }
+
+        /** @var ConditionInterface $condition */
+        $condition = $this->container->get($conditionId);
+
 
         if ($inputs === null) {
             return $this->pageNotFound();
@@ -305,8 +322,64 @@ class CouponController extends BaseAdminController
         return $this->render(
             'coupon/condition-input-ajax',
             array(
-                'conditionId' => $conditionId,
-                'inputs' => $inputs
+                'inputsDrawn' => $condition->drawBackOfficeInputs(),
+                'conditionServiceId' => $condition->getServiceId(),
+                'conditionIndex' => -1,
+            )
+        );
+    }
+
+    /**
+     * Manage Coupons read display
+     *
+     * @param int $couponId       Coupon id being updated
+     * @param int $conditionIndex Coupon Condition position in the collection
+     *
+     * @return \Thelia\Core\HttpFoundation\Response
+     */
+    public function getConditionToUpdateInputAjaxAction($couponId, $conditionIndex)
+    {
+        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
+
+        $this->checkXmlHttpRequest();
+
+        $search = CouponQuery::create();
+        /** @var Coupon $coupon */
+        $coupon = $search->findOneById($couponId);
+        if (!$coupon) {
+            return $this->pageNotFound();
+        }
+
+        /** @var CouponFactory $couponFactory */
+        $couponFactory = $this->container->get('thelia.coupon.factory');
+        $couponManager = $couponFactory->buildCouponFromModel($coupon);
+
+        if (!$couponManager instanceof CouponInterface) {
+            return $this->pageNotFound();
+        }
+
+        $conditions = $couponManager->getConditions();
+        if (!isset($conditions[$conditionIndex])) {
+            return $this->pageNotFound();
+        }
+        /** @var ConditionInterface $condition */
+        $condition = $conditions[$conditionIndex];
+
+        /** @var ConditionFactory $conditionFactory */
+        $conditionFactory = $this->container->get('thelia.condition.factory');
+        $inputs = $conditionFactory->getInputsFromConditionInterface($condition);
+
+        if ($inputs === null) {
+            return $this->pageNotFound();
+        }
+
+        return $this->render(
+            'coupon/condition-input-ajax',
+            array(
+                'inputsDrawn' => $condition->drawBackOfficeInputs(),
+                'conditionServiceId' => $condition->getServiceId(),
+                'conditionIndex' => $conditionIndex,
+
             )
         );
     }
@@ -318,7 +391,7 @@ class CouponController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function updateConditionsAction($couponId)
+    public function saveConditionsAction($couponId)
     {
         $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
 
@@ -327,70 +400,72 @@ class CouponController extends BaseAdminController
         $search = CouponQuery::create();
         /** @var Coupon $coupon */
         $coupon = $search->findOneById($couponId);
-
         if (!$coupon) {
             return $this->pageNotFound();
         }
 
-        $conditions = new ConditionCollection();
+        $conditionToSave = $this->buildConditionFromRequest();
 
-        /** @var ConditionFactory $conditionFactory */
-        $conditionFactory = $this->container->get('thelia.condition.factory');
-        $conditionsReceived = json_decode($this->getRequest()->get('conditions'));
-        foreach ($conditionsReceived as $conditionReceived) {
-            $condition = $conditionFactory->build(
-                $conditionReceived->serviceId,
-                (array) $conditionReceived->operators,
-                (array) $conditionReceived->values
-            );
-            $conditions->add(clone $condition);
+        /** @var CouponFactory $couponFactory */
+        $couponFactory = $this->container->get('thelia.coupon.factory');
+        $couponManager = $couponFactory->buildCouponFromModel($coupon);
+
+        if (!$couponManager instanceof CouponInterface) {
+            return $this->pageNotFound();
         }
 
-        $couponEvent = new CouponCreateOrUpdateEvent(
-            $coupon->getCode(),
-            $coupon->getType(),
-            $coupon->getTitle(),
-            $coupon->getEffects(),
-            $coupon->getShortDescription(),
-            $coupon->getDescription(),
-            $coupon->getIsEnabled(),
-            $coupon->getExpirationDate(),
-            $coupon->getIsAvailableOnSpecialOffers(),
-            $coupon->getIsCumulative(),
-            $coupon->getIsRemovingPostage(),
-            $coupon->getMaxUsage(),
-            $coupon->getLocale()
-        );
-        $couponEvent->setCouponModel($coupon);
-        $couponEvent->setConditions($conditions);
+        $conditions = $couponManager->getConditions();
+        $conditionIndex = $this->getRequest()->request->get('conditionIndex');
+        if ($conditionIndex >= 0) {
+            // Update mode
+            $conditions[$conditionIndex] = $conditionToSave;
+        } else {
+            // Insert mode
+            $conditions[] = $conditionToSave;
+        }
+        $couponManager->setConditions($conditions);
 
-        $eventToDispatch = TheliaEvents::COUPON_CONDITION_UPDATE;
-        // Dispatch Event to the Action
-        $this->dispatch(
-            $eventToDispatch,
-            $couponEvent
-        );
+        $this->manageConditionUpdate($coupon, $conditions);
 
-        $this->adminLogAppend(
-            AdminResources::COUPON, AccessManager::UPDATE,
-            sprintf(
-                'Coupon %s (ID %s) conditions updated',
-                $couponEvent->getCouponModel()->getTitle(),
-                $couponEvent->getCouponModel()->getType()
-            )
-        );
+        return new Response();
+    }
 
-        $cleanedConditions = $this->cleanConditionForTemplate($conditions);
+    /**
+     * Manage Coupons condition deleteion
+     *
+     * @param int $couponId       Coupon id
+     * @param int $conditionIndex Coupon condition index in the collection
+     *
+     * @return \Thelia\Core\HttpFoundation\Response
+     */
+    public function deleteConditionsAction($couponId, $conditionIndex)
+    {
+        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
 
-        return $this->render(
-            'coupon/conditions',
-            array(
-                'couponId' => $couponId,
-                'conditions' => $cleanedConditions,
-                'urlEdit' => $couponId,
-                'urlDelete' => $couponId
-            )
-        );
+        $this->checkXmlHttpRequest();
+
+        $search = CouponQuery::create();
+        /** @var Coupon $coupon */
+        $coupon = $search->findOneById($couponId);
+        if (!$coupon) {
+            return $this->pageNotFound();
+        }
+
+        /** @var CouponFactory $couponFactory */
+        $couponFactory = $this->container->get('thelia.coupon.factory');
+        $couponManager = $couponFactory->buildCouponFromModel($coupon);
+
+        if (!$couponManager instanceof CouponInterface) {
+            return $this->pageNotFound();
+        }
+
+        $conditions = $couponManager->getConditions();
+        unset($conditions[$conditionIndex]);
+        $couponManager->setConditions($conditions);
+
+        $this->manageConditionUpdate($coupon, $conditions);
+
+        return new Response();
     }
 
     /**
@@ -577,8 +652,16 @@ class CouponController extends BaseAdminController
     {
         $cleanedConditions = array();
         /** @var $condition ConditionInterface */
-        foreach ($conditions->getConditions() as $condition) {
-            $cleanedConditions[] = $condition->getToolTip();
+        foreach ($conditions as $index => $condition) {
+            $temp = array(
+                'serviceId' => $condition->getServiceId(),
+                'index' => $index,
+                'name' => $condition->getName(),
+                'toolTip' => $condition->getToolTip(),
+                'summary' => $condition->getSummary(),
+                'validators' => $condition->getValidators()
+            );
+            $cleanedConditions[] = $temp;
         }
 
         return $cleanedConditions;
@@ -592,18 +675,55 @@ class CouponController extends BaseAdminController
      *
      * @return ResponseRest
      */
-    public function getBackOfficeInputsAction($couponServiceId)
+    public function getBackOfficeInputsAjaxAction($couponServiceId)
     {
-        /** @var CouponInterface $coupon */
-        $coupon = $this->container->get($couponServiceId);
+        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
+        $this->checkXmlHttpRequest();
 
-        if (!$coupon instanceof CouponInterface) {
+        /** @var CouponInterface $coupon */
+        $couponManager = $this->container->get($couponServiceId);
+
+        if (!$couponManager instanceof CouponInterface) {
             $this->pageNotFound();
         }
 
-        $response = new ResponseRest($coupon->drawBackOfficeInputs());
+        $response = new ResponseRest($couponManager->drawBackOfficeInputs());
 
         return $response;
+    }
+
+    /**
+     * Draw the input displayed in the BackOffice
+     * allowing Admin to set its Coupon effect
+     *
+     * @param int $couponId Coupon id
+     *
+     * @return ResponseRest
+     */
+    public function getBackOfficeConditionSummariesAjaxAction($couponId)
+    {
+        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
+        $this->checkXmlHttpRequest();
+
+        /** @var Coupon $coupon */
+        $coupon = CouponQuery::create()->findPk($couponId);
+        if (null === $coupon) {
+            return $this->pageNotFound();
+
+        }
+
+        /** @var CouponFactory $couponFactory */
+        $couponFactory = $this->container->get('thelia.coupon.factory');
+        $couponManager = $couponFactory->buildCouponFromModel($coupon);
+
+        if (!$couponManager instanceof CouponInterface) {
+            return $this->pageNotFound();
+        }
+
+        $args = array();
+        $args['conditions'] = $this->cleanConditionForTemplate($couponManager->getConditions());
+        return $this->render('coupon/conditions', $args);
+
     }
 
     /**
@@ -675,6 +795,75 @@ class CouponController extends BaseAdminController
         }
 
         return $couponEvent;
+    }
+
+    /**
+     * Build ConditionInterface from request
+     *
+     * @return ConditionInterface
+     */
+    protected function buildConditionFromRequest()
+    {
+        $request = $this->getRequest();
+        $post = $request->request->getIterator();
+        $serviceId = $request->request->get('categoryCondition');
+        $operators = array();
+        $values = array();
+        foreach ($post as $key => $input) {
+            if (isset($input['operator']) && isset($input['value'])) {
+                $operators[$key] = $input['operator'];
+                $values[$key] = $input['value'];
+            }
+        }
+
+        /** @var ConditionFactory $conditionFactory */
+        $conditionFactory = $this->container->get('thelia.condition.factory');
+        $conditionToSave = $conditionFactory->build($serviceId, $operators, $values);
+
+        return $conditionToSave;
+    }
+
+    /**
+     * Manage how a Condition is updated
+     *
+     * @param Coupon              $coupon     Coupon Model
+     * @param ConditionCollection $conditions Condition collection
+     */
+    protected function manageConditionUpdate(Coupon $coupon, ConditionCollection $conditions)
+    {
+        $couponEvent = new CouponCreateOrUpdateEvent(
+            $coupon->getCode(),
+            $coupon->getType(),
+            $coupon->getTitle(),
+            $coupon->getEffects(),
+            $coupon->getShortDescription(),
+            $coupon->getDescription(),
+            $coupon->getIsEnabled(),
+            $coupon->getExpirationDate(),
+            $coupon->getIsAvailableOnSpecialOffers(),
+            $coupon->getIsCumulative(),
+            $coupon->getIsRemovingPostage(),
+            $coupon->getMaxUsage(),
+            $coupon->getLocale()
+        );
+        $couponEvent->setCouponModel($coupon);
+        $couponEvent->setConditions($conditions);
+
+        $eventToDispatch = TheliaEvents::COUPON_CONDITION_UPDATE;
+        // Dispatch Event to the Action
+        $this->dispatch(
+            $eventToDispatch,
+            $couponEvent
+        );
+
+        $this->adminLogAppend(
+            AdminResources::COUPON, AccessManager::UPDATE,
+            sprintf(
+                'Coupon %s (ID %s) conditions updated',
+                $couponEvent->getCouponModel()->getTitle(),
+                $couponEvent->getCouponModel()->getType()
+            )
+        );
     }
 
 }

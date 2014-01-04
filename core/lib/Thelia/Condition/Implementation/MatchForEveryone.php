@@ -97,10 +97,28 @@ class MatchForEveryone extends ConditionAbstract
 
     /**
      * Get I18n tooltip
+     * Explain in detail what the Condition checks
      *
      * @return string
      */
     public function getToolTip()
+    {
+        $toolTip = $this->translator->trans(
+            'Will return always true',
+            array(),
+            'condition'
+        );
+
+        return $toolTip;
+    }
+
+    /**
+     * Get I18n summary
+     * Explain briefly the condition with given values
+     *
+     * @return string
+     */
+    public function getSummary()
     {
         $toolTip = $this->translator->trans(
             'Will return always true',
@@ -119,6 +137,19 @@ class MatchForEveryone extends ConditionAbstract
     protected function generateInputs()
     {
         return array();
+    }
+
+    /**
+     * Draw the input displayed in the BackOffice
+     * allowing Admin to set its Coupon Conditions
+     *
+     * @return string HTML string
+     */
+    public function drawBackOfficeInputs()
+    {
+        // No input
+
+        return '';
     }
 
 }
