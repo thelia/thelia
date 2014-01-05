@@ -735,7 +735,6 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
         $validators = array(
             'inputs' => array(
                 MatchForXArticles::INPUT1 => array(
-                    'title' => 'Price',
                     'availableOperators' => array(
                         '<' => 'Price',
                         '<=' => 'Price',

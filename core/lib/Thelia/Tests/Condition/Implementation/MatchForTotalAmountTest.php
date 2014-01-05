@@ -918,7 +918,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $validators = array(
             'inputs' => array(
                 MatchForTotalAmount::INPUT1 => array(
-                    'title' => 'Price',
                     'availableOperators' => array(
                         '<' => 'Price',
                         '<=' => 'Price',
@@ -931,7 +930,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
                     'selectedOperator' => ''
                 ),
                 MatchForTotalAmount::INPUT2 => array(
-                    'title' => 'Price',
                     'availableOperators' => array('==' => 'Price'),
                     'availableValues' => array(
                         'EUR' => '€',
