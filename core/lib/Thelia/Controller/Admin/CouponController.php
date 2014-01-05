@@ -611,6 +611,7 @@ class CouponController extends BaseAdminController
             $condition = array();
             $condition['serviceId'] = $availableCondition->getServiceId();
             $condition['name'] = $availableCondition->getName();
+            $condition['toolTip'] = $availableCondition->getToolTip();
             $cleanedConditions[] = $condition;
         }
 

@@ -195,11 +195,12 @@
                 <div id="condition-add-type" class="form-group col-md-4">
                     <label for="categoryCondition">{intl l='Condition\'s category :'}</label>
                     <select name="categoryCondition" id="category-condition" class="form-control">
-                        <option value="-1" >{intl l='Please select a condition category'}</option>
+                        <option value="-1" data-description="">{intl l='Please select a condition category'}</option>
                         {foreach from=$availableConditions item=availableCondition}
-                            <option value="{$availableCondition.serviceId}" >{$availableCondition.name}</option>
+                            <option value="{$availableCondition.serviceId}" data-description="{$availableCondition.toolTip}">{$availableCondition.name}</option>
                         {/foreach}
                     </select>
+                    <span class="help-block typeToolTip"></span>
                 </div>
 
                 <div id="condition-add-operators-values" class="form-group col-md-6"></div>

@@ -133,6 +133,10 @@ $(function($){
     $.couponManager.onConditionChange = function() {
         $('#category-condition').on('change', function () {
             var $this = $(this);
+            var mainDiv = $('#condition-add-type');
+            var optionSelected = $('option:selected', this);
+            mainDiv.find('.typeToolTip').html(optionSelected.attr('data-description'));
+
             // Only if add mode
             if (false != $.couponManager.conditionToUpdateIndex) {
                 // Reload condition summaries ajax
