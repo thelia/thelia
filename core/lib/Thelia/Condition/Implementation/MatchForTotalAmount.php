@@ -229,27 +229,14 @@ class MatchForTotalAmount extends ConditionAbstract
             $cleanedCurrencies[$currency->getCode()] = $currency->getSymbol();
         }
 
-        $name1 = $this->translator->trans(
-            'Price',
-            array(),
-            'condition'
-        );
-        $name2 = $this->translator->trans(
-            'Currency',
-            array(),
-            'condition'
-        );
-
         return array(
             self::INPUT1 => array(
-                'title' => $name1,
                 'availableOperators' => $this->availableOperators[self::INPUT1],
                 'availableValues' => '',
                 'value' => '',
                 'selectedOperator' => ''
             ),
             self::INPUT2 => array(
-                'title' => $name2,
                 'availableOperators' => $this->availableOperators[self::INPUT2],
                 'availableValues' => $cleanedCurrencies,
                 'value' => '',
