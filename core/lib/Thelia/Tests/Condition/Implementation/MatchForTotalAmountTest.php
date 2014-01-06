@@ -659,7 +659,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $conditionFactory = new ConditionFactory($stubContainer);
 
         $collection = new ConditionCollection();
-        $collection->add($condition1);
+        $collection[] = $condition1;
 
         $serialized = $conditionFactory->serializeConditionCollection($collection);
         $conditionFactory->unserializeConditionCollection($serialized);
@@ -726,7 +726,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $conditionFactory = new ConditionFactory($stubContainer);
 
         $collection = new ConditionCollection();
-        $collection->add($condition1);
+        $collection[] = $condition1;
 
         $serialized = $conditionFactory->serializeConditionCollection($collection);
         $conditionFactory->unserializeConditionCollection($serialized);
@@ -793,7 +793,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $conditionFactory = new ConditionFactory($stubContainer);
 
         $collection = new ConditionCollection();
-        $collection->add($condition1);
+        $collection[] = $condition1;
 
         $serialized = $conditionFactory->serializeConditionCollection($collection);
         $conditionFactory->unserializeConditionCollection($serialized);
@@ -918,7 +918,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $validators = array(
             'inputs' => array(
                 MatchForTotalAmount::INPUT1 => array(
-                    'title' => 'Price',
                     'availableOperators' => array(
                         '<' => 'Price',
                         '<=' => 'Price',
@@ -927,21 +926,16 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
                         '>' => 'Price'
                     ),
                     'availableValues' => '',
-                    'type' => 'text',
-                    'class' => 'form-control',
                     'value' => '',
                     'selectedOperator' => ''
                 ),
                 MatchForTotalAmount::INPUT2 => array(
-                    'title' => 'Price',
                     'availableOperators' => array('==' => 'Price'),
                     'availableValues' => array(
                         'EUR' => '€',
                         'USD' => '$',
                         'GBP' => '£',
                     ),
-                    'type' => 'select',
-                    'class' => 'form-control',
                     'value' => '',
                     'selectedOperator' => Operators::EQUAL
                 )

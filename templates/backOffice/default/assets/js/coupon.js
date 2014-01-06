@@ -2,124 +2,126 @@ $(function($){
 
     // Manage how coupon and conditions are saved
     $.couponManager = {};
-    // Condition to be saved
-    $.couponManager.conditionToSave = {};
-    $.couponManager.conditionToSave.serviceId = false;
-    $.couponManager.conditionToSave.operators = {};
-    $.couponManager.conditionToSave.values = {};
-    // Conditions payload to save
-    $.couponManager.conditionsToSave = [];
-    // Condition being updated id
-    $.couponManager.conditionToUpdateId = false;
 
-    // Clean array from deleteValue (undefined) keys
-    Array.prototype.clean = function(deleteValue) {
-        for (var i = 0; i < this.length; i++) {
-            if (this[i] == deleteValue) {
-                this.splice(i, 1);
-                i--;
-            }
-        }
-        return this;
-    };
+    // Condition being updated category id
+    $.couponManager.conditionToUpdateServiceId = -1;
+    // Condition being updated index
+    $.couponManager.conditionToUpdateIndex = false;
 
-    // Remove 1 Condition then Save Conditions AJAX
-    $.couponManager.removeConditionAjax = function(id) {
-        // Delete condition in temporary array
-        delete $.couponManager.conditionsToSave[id];
-        $.couponManager.conditionsToSave.clean(undefined);
+    // AJAX urls
+    $.couponManager.urlAjaxSaveConditions = '';
+    $.couponManager.urlAjaxDeleteConditions = '';
+    $.couponManager.urlAjaxGetConditionSummaries = '';
+    $.couponManager.urlAjaxAdminCouponDrawInputs = '';
+    $.couponManager.urlAjaxGetConditionInputFromServiceId = '';
+    $.couponManager.urlAjaxGetConditionInputFromConditionInterface = '';
 
-        // Save
-        $.couponManager.saveConditionAjax();
-    };
+    // I18n messages
+    $.couponManager.intlPleaseRetry = '';
+    $.couponManager.intlPleaseSelectAnotherCondition = '';
+    $.couponManager.intlDoYouReallyWantToSetCouponAvailableForEveryOne = '';
 
-    // Add 1 Condition / or update the temporary Conditions array then Save Conditions via AJAX
-    $.couponManager.createOrUpdateConditionAjax = function() {
-        var id = $.couponManager.conditionToUpdateId;
-        // If create
-        if(!id) {
-            $.couponManager.conditionsToSave.push($.couponManager.conditionToSave);
-        } else { // else update
-            $.couponManager.conditionsToSave[id] = $.couponManager.conditionToSave;
-            // reset edit mode to off
-            $.couponManager.conditionToUpdateId = false;
-        }
-
-        // Save
-        $.couponManager.saveConditionAjax();
-    };
-
-    // Set condition inputs to allow editing
-    $.couponManager.updateConditionSelectAjax = function(id) {
-        $.couponManager.conditionToUpdateId = id;
-        $.couponManager.conditionToSave = $.couponManager.conditionsToSave[id];
-
-        // Set the condition selector
-        $("#category-condition option").filter(function() {
-            return $(this).val() == $.couponManager.conditionToSave.serviceId;
-        }).prop('selected', true);
-
-        // Force condition input refresh
-        $.couponManager.loadConditionInputs($.couponManager.conditionToSave.serviceId, function() {
-            $.couponManager.fillInConditionInputs();
-        });
-    };
-
-    // Fill in condition inputs
-    $.couponManager.fillInConditionInputs = function() {
-        var operatorId = null;
-        var valueId = null;
-        var idName = null;
-
-        var id = $.couponManager.conditionToUpdateId;
-        if(id) {
-            $.couponManager.conditionToSave = $.couponManager.conditionsToSave[id];
-        }
-
-        for (idName in $.couponManager.conditionToSave.operators) {
-            // Setting idName operator select
-            operatorId = idName + '-operator';
-            $('#' + operatorId).val($.couponManager.conditionToSave.operators[idName]);
-
-            // Setting idName value input
-            valueId = idName + '-value';
-            $('#' + valueId).val($.couponManager.conditionToSave.values[idName]);
-        }
-    };
-
-    // Save conditions on click
-    $.couponManager.onClickSaveCondition = function() {
-        $('#condition-save-btn').on('click', function () {
-            if($('#category-condition').val() == 'thelia.condition.match_for_everyone') {
-//                // @todo translate message + put it in modal
-                var r = confirm("Do you really want to set this coupon available to everyone ?");
-                if (r == true) {
-                    $.couponManager.createOrUpdateConditionAjax();
-                }
-            } else {
-                $.couponManager.createOrUpdateConditionAjax();
-            }
-
-        });
-    };
-    $.couponManager.onClickSaveCondition();
-
+    // *****************************************
+    // ****************** Delete ***************
+    // *****************************************
     // Remove condition on click
     $.couponManager.onClickDeleteCondition = function() {
         $('.condition-delete-btn').on('click', function (e) {
             e.preventDefault();
             var $this = $(this);
-            $.couponManager.removeConditionAjax($this.attr('data-int'));
+            var index = $this.attr('data-conditionIndex');
+            $.couponManager.conditionToUpdateServiceId = -1;
+            $.couponManager.conditionToUpdateIndex = false;
+            $.couponManager.removeConditionAjax(index);
         });
     };
     $.couponManager.onClickDeleteCondition();
+
+    // Remove 1 Condition
+    $.couponManager.removeConditionAjax = function(index) {
+        var url = $.couponManager.urlAjaxDeleteConditions;
+        url = url.replace('8888888', index);
+
+        $('#condition-list').html('<div class="loading" ></div>');
+        $.ajax({
+            url: url,
+            statusCode: {
+                404: function() {
+                    $('#condition-list').html($.couponManager.intlPleaseSelectAnotherCondition);
+                },
+                500: function() {
+                    $('#condition-list').html($.couponManager.intlPleaseSelectAnotherCondition);
+                }
+            }
+        }).done(function(data) {
+            // Reload condition summaries ajax
+            $.couponManager.displayConditionsSummary();
+        });
+    };
+
+    // *****************************************
+    // ****************** Save *****************
+    // *****************************************
+
+    // Save conditions on click
+    $.couponManager.onClickSaveCondition = function() {
+        $('#condition-save-btn').on('click', function () {
+            if ($('#category-condition').val() == 'thelia.condition.match_for_everyone') {
+                var r = confirm($.couponManager.intlDoYouReallyWantToSetCouponAvailableForEveryOne);
+                if (r == true) {
+                    $.couponManager.saveConditionAjax();
+                }
+            } else {
+                $.couponManager.saveConditionAjax();
+            }
+        });
+    };
+    $.couponManager.onClickSaveCondition();
+
+    // Save Conditions AJAX
+    $.couponManager.saveConditionAjax = function() {
+        var $form = $("#condition-form");
+        var data = $form.serialize();
+        var url = $form.attr('action');
+        url = url.replace('8888888', $.couponManager.conditionToUpdateIndex);
+        $('#condition-add-operators-values').html('<div class="loading" ></div>');
+
+        $.post(
+            url,
+            data
+        ).done(function() {
+            $.couponManager.displayConditionsSummary();
+            $('#condition-add-operators-values').html('');
+            // Set the condition selector to default
+            $("#category-condition option").filter(function() {
+                return $(this).val() == '-1';
+            }).prop('selected', true);
+        }).fail(function() {
+            $('#condition-add-operators-values').html(
+                $.couponManager.intlPleaseRetry
+            );
+        }).always(function() {
+            // Reload condition summaries ajax
+            $.couponManager.displayConditionsSummary();
+        });
+    };
+
+    // *****************************************
+    // ****************** Update****************
+    // *****************************************
 
     // Update condition on click
     $.couponManager.onClickUpdateCondition = function() {
         $('.condition-update-btn').on('click', function (e) {
             e.preventDefault();
             var $this = $(this);
-            $.couponManager.updateConditionSelectAjax($this.attr('data-int'));
+            $.couponManager.conditionToUpdateServiceId = $this.attr('data-serviceId');
+            $.couponManager.conditionToUpdateIndex = $this.attr('data-conditionIndex');
+
+            $.couponManager.updateConditionSelectFromConditionInterfaceAjax(
+                $.couponManager.conditionToUpdateIndex,
+                $.couponManager.conditionToUpdateServiceId
+            );
 
             // Hide row being updated
             $this.parent().parent().remove();
@@ -127,33 +129,86 @@ $(function($){
     };
     $.couponManager.onClickUpdateCondition();
 
-    $.couponManager.displayEfffect = function(optionSelected) {
-        var mainDiv = $('#coupon-type');
-        mainDiv.find('.typeToolTip').html(optionSelected.attr('data-description'));
+    // Reload condition inputs when changing Condition type
+    $.couponManager.onConditionChange = function() {
+        $('#category-condition').on('change', function () {
+            var $this = $(this);
+            var mainDiv = $('#condition-add-type');
+            var optionSelected = $('option:selected', this);
+            mainDiv.find('.typeToolTip').html(optionSelected.attr('data-description'));
 
-        var inputsDiv = mainDiv.find('.inputs');
-        inputsDiv.html('<div class="loading" ></div>');
-        var url = $.couponManager.urlAjaxAdminCouponDrawInputs;
-        console.log(url);
-        url = url.replace('couponServiceId', optionSelected.val());
-        console.log(url);
+            // Only if add mode
+            if (false != $.couponManager.conditionToUpdateIndex) {
+                // Reload condition summaries ajax
+                $.couponManager.displayConditionsSummary();
+            }
+            $.couponManager.conditionToUpdateServiceId = $this.val();
+            $.couponManager.conditionToUpdateIndex = false;
+            $.couponManager.loadConditionInputsFromServiceId($this.val());
+        });
+    };
+    $.couponManager.onConditionChange();
+
+    // Set condition inputs in order to allow editing
+    $.couponManager.updateConditionSelectFromConditionInterfaceAjax = function(conditionIndex, serviceId) {
+        // Force condition input refresh
+        $.couponManager.loadConditionInputsFromConditionInterface(conditionIndex);
+
+        // Set the condition selector
+        $("#category-condition option").filter(function() {
+            return $(this).val() == serviceId;
+        }).prop('selected', true);
+    };
+
+    // Reload condition inputs AJAX
+    $.couponManager.doAjaxloadConditionInputs = function(url) {
+        $('#condition-add-operators-values').html('<div class="loading" ></div>');
         $.ajax({
-            type: "GET",
             url: url,
-            data: '',
             statusCode: {
                 404: function() {
-                    inputsDiv.html($.couponManager.intlPleaseRetry);
+                    $('#condition-add-operators-values').html(
+                        $.couponManager.intlPleaseSelectAnotherCondition
+                    );
                 },
                 500: function() {
-                    inputsDiv.html($.couponManager.intlPleaseRetry);
+                    $('#condition-add-operators-values').html(
+                        $.couponManager.intlPleaseSelectAnotherCondition
+                    );
                 }
             }
         }).done(function(data) {
-                inputsDiv.html(data);
+            $('#condition-add-operators-values').html(data);
+            if ($.couponManager.conditionToUpdateServiceId == -1) {
+                // Placeholder can't be saved
+                $('#condition-save-btn').hide();
+            } else {
+                $('#condition-save-btn').show();
+            }
         });
     };
 
+    // Reload condition inputs from Condition ServiceId
+    $.couponManager.loadConditionInputsFromServiceId = function(conditionServiceId) {
+        var url = $.couponManager.urlAjaxGetConditionInputFromServiceId;
+        url = url.replace('conditionId', conditionServiceId);
+
+        return $.couponManager.doAjaxloadConditionInputs(url);
+    };
+    // Reload condition inputs from Condition index
+    $.couponManager.loadConditionInputsFromConditionInterface = function(conditionIndex) {
+        var url = $.couponManager.urlAjaxGetConditionInputFromConditionInterface;
+        url = url.replace('8888888', conditionIndex);
+
+        return $.couponManager.doAjaxloadConditionInputs(url);
+    };
+
+
+
+
+    // ***********************************************
+    // *************** Manager Coupon ****************
+    // ***********************************************
     // Reload effect inputs when changing effect
     $.couponManager.onEffectChange = function() {
         var mainDiv = $('#coupon-type');
@@ -168,28 +223,65 @@ $(function($){
     };
     $.couponManager.onEffectChange();
 
-    // Reload condition inputs when changing effect
-    $.couponManager.onConditionChange = function() {
-        $('#category-condition').on('change', function () {
-            $.couponManager.loadConditionInputs($(this).val(), function() {});
+    $.couponManager.displayEfffect = function(optionSelected) {
+        var mainDiv = $('#coupon-type');
+        mainDiv.find('.typeToolTip').html(optionSelected.attr('data-description'));
+
+        var inputsDiv = mainDiv.find('.inputs');
+        inputsDiv.html('<div class="loading" ></div>');
+        var url = $.couponManager.urlAjaxAdminCouponDrawInputs;
+        url = url.replace('couponServiceId', optionSelected.val());
+        $.ajax({
+            type: "GET",
+            url: url,
+            data: '',
+            statusCode: {
+                404: function() {
+                    inputsDiv.html($.couponManager.intlPleaseRetry);
+                },
+                500: function() {
+                    inputsDiv.html($.couponManager.intlPleaseRetry);
+                }
+            }
+        }).done(function(data) {
+            inputsDiv.html(data);
         });
     };
-    $.couponManager.onConditionChange();
 
-    // Fill in ready to be saved condition array
-    // var onInputsChange = function()
-    // In AJAX response
+    $.couponManager.displayConditionsSummary = function() {
+        var mainDiv = $('#condition-list');
+        mainDiv.html('<div class="loading" ></div>');
+        var url = $.couponManager.urlAjaxGetConditionSummaries;
+        $.ajax({
+            type: "GET",
+            url: url,
+            data: '',
+            statusCode: {
+                404: function() {
+                    mainDiv.html($.couponManager.intlPleaseRetry);
+                },
+                500: function() {
+                    mainDiv.html($.couponManager.intlPleaseRetry);
+                }
+            }
+        }).done(function(data) {
+            mainDiv.html(data);
+            $.couponManager.onClickUpdateCondition();
+            $.couponManager.onClickDeleteCondition();
+        });
+    };
 
     // Set max usage to unlimited or not
     $.couponManager.onUsageUnlimitedChange = function() {
         var $isUnlimited = $('#is-unlimited');
-        if ($('#max-usage').val() == -1) {
+        $maxUsage = $('#max-usage');
+        if ($maxUsage.val() == -1) {
             $isUnlimited.prop('checked', true);
-            $('#max-usage').hide();
+            $maxUsage.hide();
             $('#max-usage-label').hide();
         } else {
             $isUnlimited.prop('checked', false);
-            $('#max-usage').show();
+            $maxUsage.show();
             $('#max-usage-label').show();
         }
 
@@ -205,8 +297,4 @@ $(function($){
         });
     };
     $.couponManager.onUsageUnlimitedChange();
-
 });
-
-
-

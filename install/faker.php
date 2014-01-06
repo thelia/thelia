@@ -696,8 +696,8 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $condition2->setValidatorsFromForm($operators, $values);
 
     $conditions = new ConditionCollection();
-    $conditions->add($condition1);
-    $conditions->add($condition2);
+    $conditions[] = $condition1;
+    $conditions[] = $condition2;
     /** @var ConditionFactory $conditionFactory */
     $conditionFactory = $container->get('thelia.condition.factory');
 
@@ -743,7 +743,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     );
     $condition1->setValidatorsFromForm($operators, $values);
     $conditions = new ConditionCollection();
-    $conditions->add($condition1);
+    $conditions[] = $condition1;
 
     /** @var ConditionFactory $conditionFactory */
     $conditionFactory = $container->get('thelia.condition.factory');
@@ -786,7 +786,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $values = array();
     $condition1->setValidatorsFromForm($operators, $values);
     $conditions = new ConditionCollection();
-    $conditions->add($condition1);
+    $conditions[] = $condition1;
 
     /** @var ConditionFactory $constraintCondition */
     $constraintCondition = $container->get('thelia.condition.factory');

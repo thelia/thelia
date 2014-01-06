@@ -49,7 +49,7 @@ class ConditionEvaluator
     {
         $isMatching = true;
         /** @var ConditionInterface $condition */
-        foreach ($conditions->getConditions() as $condition) {
+        foreach ($conditions as $condition) {
             if (!$condition->isMatching()) {
                 $isMatching = false;
             }

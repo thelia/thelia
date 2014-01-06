@@ -140,8 +140,8 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
-        $conditions->add($condition1);
-        $conditions->add($condition2);
+        $conditions[] = $condition1;
+        $conditions[] = $condition2;
         $coupon->setConditions($conditions);
 
         $this->assertEquals('XMAS', $coupon->getCode());

@@ -156,7 +156,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->container->get('thelia.condition.factory');
         $couponRuleCollection = new ConditionCollection();
-        $couponRuleCollection->add($noConditionRule);
+        $couponRuleCollection[] = $noConditionRule;
         $defaultSerializedRule = $conditionFactory->serializeConditionCollection(
             $couponRuleCollection
         );

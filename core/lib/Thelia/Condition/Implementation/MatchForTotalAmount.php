@@ -167,7 +167,7 @@ class MatchForTotalAmount extends ConditionAbstract
     public function getName()
     {
         return $this->translator->trans(
-            'Cart total amount',
+            'By cart total amount',
             array(),
             'condition'
         );
@@ -175,10 +175,28 @@ class MatchForTotalAmount extends ConditionAbstract
 
     /**
      * Get I18n tooltip
+     * Explain in detail what the Condition checks
      *
      * @return string
      */
     public function getToolTip()
+    {
+        $toolTip = $this->translator->trans(
+            'Check the total Cart amount in the given currency',
+            array(),
+            'condition'
+        );
+
+        return $toolTip;
+    }
+
+    /**
+     * Get I18n summary
+     * Explain briefly the condition with given values
+     *
+     * @return string
+     */
+    public function getSummary()
     {
         $i18nOperator = Operators::getI18n(
             $this->translator, $this->operators[self::INPUT1]
@@ -211,37 +229,110 @@ class MatchForTotalAmount extends ConditionAbstract
             $cleanedCurrencies[$currency->getCode()] = $currency->getSymbol();
         }
 
-        $name1 = $this->translator->trans(
-            'Price',
-            array(),
-            'condition'
-        );
-        $name2 = $this->translator->trans(
-            'Currency',
-            array(),
-            'condition'
-        );
-
         return array(
             self::INPUT1 => array(
-                'title' => $name1,
                 'availableOperators' => $this->availableOperators[self::INPUT1],
                 'availableValues' => '',
-                'type' => 'text',
-                'class' => 'form-control',
                 'value' => '',
                 'selectedOperator' => ''
             ),
             self::INPUT2 => array(
-                'title' => $name2,
                 'availableOperators' => $this->availableOperators[self::INPUT2],
                 'availableValues' => $cleanedCurrencies,
-                'type' => 'select',
-                'class' => 'form-control',
                 'value' => '',
                 'selectedOperator' => Operators::EQUAL
             )
         );
+    }
+
+    /**
+     * Draw the input displayed in the BackOffice
+     * allowing Admin to set its Coupon Conditions
+     *
+     * @return string HTML string
+     */
+    public function drawBackOfficeInputs()
+    {
+        $labelPrice = $this->facade
+            ->getTranslator()
+            ->trans('Price', array(), 'condition');
+
+        $html = $this->drawBackOfficeBaseInputsText($labelPrice, self::INPUT1);
+
+        return $html;
+    }
+
+    /**
+     * Draw the base input displayed in the BackOffice
+     * allowing Admin to set its Coupon Conditions
+     *
+     * @param string $label    I18n input label
+     * @param string $inputKey Input key (ex: self::INPUT1)
+     *
+     * @return string HTML string
+     */
+    protected function drawBackOfficeBaseInputsText($label, $inputKey)
+    {
+        $operatorSelectHtml = $this->drawBackOfficeInputOperators(self::INPUT1);
+        $currencySelectHtml = $this->drawBackOfficeCurrencyInput(self::INPUT2);
+        $selectedAmount = '';
+        if (isset($this->values) && isset($this->values[$inputKey])) {
+            $selectedAmount = $this->values[$inputKey];
+        }
+
+        $html = '
+            <label for="operator">' . $label . '</label>
+            <div class="row">
+                <div class="col-lg-6">
+                    ' . $operatorSelectHtml . '
+                </div>
+                <div class="input-group col-lg-3">
+                    <input type="text" class="form-control" id="' . self::INPUT1 . '-value" name="' . self::INPUT1 . '[value]" value="' . $selectedAmount . '">
+                </div>
+                <div class="input-group col-lg-3">
+                    <input type="hidden" id="' . self::INPUT2 . '-operator" name="' . self::INPUT2 . '[operator]" value="==" />
+                    ' . $currencySelectHtml . '
+                </div>
+            </div>
+        ';
+
+        return $html;
+    }
+
+    /**
+     * Draw the currency input displayed in the BackOffice
+     * allowing Admin to set its Coupon Conditions
+     *
+     * @param string $inputKey Input key (ex: self::INPUT1)
+     *
+     * @return string HTML string
+     */
+    protected function drawBackOfficeCurrencyInput($inputKey)
+    {
+        $optionHtml = '';
+
+        $currencies = CurrencyQuery::create()->find();
+        $cleanedCurrencies = array();
+        /** @var Currency $currency */
+        foreach ($currencies as $currency) {
+            $cleanedCurrencies[$currency->getCode()] = $currency->getSymbol();
+        }
+
+        foreach ($cleanedCurrencies as $key => $cleanedCurrency) {
+            $selected = '';
+            if (isset($this->values) && isset($this->values[$inputKey]) && $this->values[$inputKey] == $key) {
+                $selected = ' selected="selected"';
+            }
+            $optionHtml .= '<option value="' . $key . '" ' . $selected . '>' . $cleanedCurrency . '</option>';
+        }
+
+        $selectHtml = '
+            <select class="form-control" id="' . $inputKey . '-value" name="' . $inputKey . '[value]">
+                ' . $optionHtml . '
+            </select>
+        ';
+
+        return $selectHtml;
     }
 
 }

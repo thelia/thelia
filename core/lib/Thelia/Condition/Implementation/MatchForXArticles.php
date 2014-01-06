@@ -140,7 +140,7 @@ class MatchForXArticles extends ConditionAbstract
     public function getName()
     {
         return $this->translator->trans(
-            'Number of articles in cart',
+            'By number of articles in cart',
             array(),
             'condition'
         );
@@ -148,10 +148,28 @@ class MatchForXArticles extends ConditionAbstract
 
     /**
      * Get I18n tooltip
+     * Explain in detail what the Condition checks
      *
      * @return string
      */
     public function getToolTip()
+    {
+        $toolTip = $this->translator->trans(
+            'Check the amount of product in the Cart',
+            array(),
+            'condition'
+        );
+
+        return $toolTip;
+    }
+
+    /**
+     * Get I18n summary
+     * Explain briefly the condition with given values
+     *
+     * @return string
+     */
+    public function getSummary()
     {
         $i18nOperator = Operators::getI18n(
             $this->translator, $this->operators[self::INPUT1]
@@ -176,21 +194,60 @@ class MatchForXArticles extends ConditionAbstract
      */
     protected function generateInputs()
     {
-        $name1 = $this->translator->trans(
-            'Quantity',
-            array(),
-            'condition'
-        );
-
         return array(
             self::INPUT1 => array(
-                'title' => $name1,
                 'availableOperators' => $this->availableOperators[self::INPUT1],
-                'type' => 'text',
-                'class' => 'form-control',
                 'value' => '',
                 'selectedOperator' => ''
             )
         );
     }
+
+    /**
+     * Draw the input displayed in the BackOffice
+     * allowing Admin to set its Coupon Conditions
+     *
+     * @return string HTML string
+     */
+    public function drawBackOfficeInputs()
+    {
+        $labelQuantity = $this->facade
+            ->getTranslator()
+            ->trans('Quantity', array(), 'condition');
+
+        $html = $this->drawBackOfficeBaseInputsText($labelQuantity, self::INPUT1);
+
+        return $html;
+    }
+
+    /**
+     * Draw the base input displayed in the BackOffice
+     * allowing Admin to set its Coupon Conditions
+     *
+     * @param string $label    I18n input label
+     * @param string $inputKey Input key (ex: self::INPUT1)
+     *
+     * @return string HTML string
+     */
+    protected function drawBackOfficeBaseInputsText($label, $inputKey)
+    {
+        $operatorSelectHtml = $this->drawBackOfficeInputOperators($inputKey);
+        $quantitySelectHtml = $this->drawBackOfficeInputQuantityValues($inputKey, 20, 1);
+
+        $html = '
+                <div id="condition-add-operators-values" class="form-group col-md-6">
+                    <label for="operator">' . $label . '</label>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            ' . $operatorSelectHtml . '
+                        </div>
+                        <div class="input-group col-lg-6">
+                            ' . $quantitySelectHtml . '
+                        </div>
+                    </div>
+                </div>
+            ';
+        return $html;
+    }
+
 }

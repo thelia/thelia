@@ -122,8 +122,12 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 
             $cleanedConditions = array();
             /** @var ConditionInterface $condition */
-            foreach ($conditions->getConditions() as $condition) {
-                $cleanedConditions[] = $condition->getToolTip();
+            foreach ($conditions as $condition) {
+                $temp = array(
+                    'toolTip' => $condition->getToolTip(),
+                    'summary' => $condition->getSummary()
+                );
+                $cleanedConditions[] = $temp;
             }
             $loopResultRow->set("ID", $coupon->getId())
                 ->set("IS_TRANSLATED", $coupon->getVirtualColumn('IS_TRANSLATED'))

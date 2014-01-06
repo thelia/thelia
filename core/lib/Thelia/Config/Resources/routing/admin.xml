@@ -499,17 +499,31 @@
         <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
         <requirement key="couponId">\d+</requirement>
     </route>
-    <route id="admin.coupon.draw.inputs" path="/admin/coupon/draw/inputs/{couponServiceId}">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::getBackOfficeInputsAction</default>
+    <route id="admin.coupon.draw.inputs.ajax" path="/admin/coupon/draw/inputs/{couponServiceId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::getBackOfficeInputsAjaxAction</default>
         <requirement key="couponServiceId">.*</requirement>
     </route>
-    <route id="admin.coupon.condition.input" path="/admin/coupon/condition/{conditionId}">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::getConditionInputAction</default>
+    <route id="admin.coupon.draw.condition.summaries.ajax" path="/admin/coupon/draw/conditionsSummaries/{couponId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::getBackOfficeConditionSummariesAjaxAction</default>
+        <requirement key="couponId">\d+</requirement>
+    </route>
+    <route id="admin.coupon.draw.condition.read.inputs.ajax" path="/admin/coupon/draw/read/conditionInputs/{conditionId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::getConditionEmptyInputAjaxAction</default>
         <requirement key="conditionId">.*</requirement>
     </route>
-    <route id="admin.coupon.condition.update" path="/admin/coupon/{couponId}/condition/update">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::updateConditionsAction</default>
+    <route id="admin.coupon.draw.condition.update.inputs.ajax" path="/admin/coupon/draw/update/conditionInputs/{couponId}/{conditionIndex}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::getConditionToUpdateInputAjaxAction</default>
         <requirement key="couponId">\d+</requirement>
+        <requirement key="conditionIndex">\d+</requirement>
+    </route>
+    <route id="admin.coupon.condition.save" path="/admin/coupon/{couponId}/condition/save" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::saveConditionsAction</default>
+        <requirement key="couponId">\d+</requirement>
+    </route>
+    <route id="admin.coupon.condition.delete" path="/admin/coupon/{couponId}/condition/delete/{conditionIndex}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::deleteConditionsAction</default>
+        <requirement key="couponId">\d+</requirement>
+        <requirement key="conditionIndex">\d+</requirement>
     </route>
     <route id="admin.coupon.consume" path="/admin/coupon/consume/{couponCode}">
         <default key="_controller">Thelia\Controller\Admin\CouponController::consumeAction</default>
