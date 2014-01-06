@@ -90,7 +90,6 @@ class TemplateHelper
         );
     }
 
-<<<<<<< HEAD
     /**
      * Returns an array which contains all standard template definitions
      */
@@ -114,18 +113,6 @@ class TemplateHelper
         $list = $exclude = array();
 
         $tplIterator = TemplateDefinition::getStandardTemplatesSubdirsIterator();
-=======
-    public function getList($templateType)
-    {
-        $list = $exclude = array();
-
-        if ($templateType == TemplateDefinition::BACK_OFFICE) {
-            $baseDir = THELIA_TEMPLATE_DIR.TemplateDefinition::BACK_OFFICE_SUBDIR;
-        } elseif ($templateType == TemplateDefinition::PDF) {
-            $baseDir = THELIA_TEMPLATE_DIR.TemplateDefinition::PDF_SUBDIR;
-        } else {
-            $baseDir = THELIA_TEMPLATE_DIR.TemplateDefinition::FRONT_OFFICE_SUBDIR;
->>>>>>> cleanmaster
 
         foreach($tplIterator as $type => $subdir) {
 
