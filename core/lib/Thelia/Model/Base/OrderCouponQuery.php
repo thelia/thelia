@@ -183,7 +183,7 @@ abstract class OrderCouponQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, ORDER_ID, CODE, TYPE, AMOUNT, TITLE, SHORT_DESCRIPTION, DESCRIPTION, EXPIRATION_DATE, IS_CUMULATIVE, IS_REMOVING_POSTAGE, IS_AVAILABLE_ON_SPECIAL_OFFERS, SERIALIZED_CONDITIONS, CREATED_AT, UPDATED_AT FROM order_coupon WHERE ID = :p0';
+        $sql = 'SELECT `ID`, `ORDER_ID`, `CODE`, `TYPE`, `AMOUNT`, `TITLE`, `SHORT_DESCRIPTION`, `DESCRIPTION`, `EXPIRATION_DATE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `SERIALIZED_CONDITIONS`, `CREATED_AT`, `UPDATED_AT` FROM `order_coupon` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
