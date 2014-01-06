@@ -140,9 +140,6 @@ abstract class ProductQuery extends ModelCriteria
      */
     static $isVersioningEnabled = true;
 
-    // query_cache behavior
-    protected $queryKey = '';
-
     /**
      * Initializes internal state of \Thelia\Model\Base\ProductQuery object.
      *
@@ -1996,128 +1993,6 @@ abstract class ProductQuery extends ModelCriteria
     static public function disableVersioning()
     {
         self::$isVersioningEnabled = false;
-    }
-
-    // query_cache behavior
-
-    public function setQueryKey($key)
-    {
-        $this->queryKey = $key;
-
-        return $this;
-    }
-
-    public function getQueryKey()
-    {
-        return $this->queryKey;
-    }
-
-    public function cacheContains($key)
-    {
-
-        return apc_fetch($key);
-    }
-
-    public function cacheFetch($key)
-    {
-
-        return apc_fetch($key);
-    }
-
-    public function cacheStore($key, $value, $lifetime = 3600)
-    {
-        apc_store($key, $value, $lifetime);
-    }
-
-    protected function doSelect($con)
-    {
-        // check that the columns of the main class are already added (if this is the primary ModelCriteria)
-        if (!$this->hasSelectClause() && !$this->getPrimaryCriteria()) {
-            $this->addSelfSelectColumns();
-        }
-        $this->configureSelectColumns();
-
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProductTableMap::DATABASE_NAME);
-        $db = Propel::getServiceContainer()->getAdapter(ProductTableMap::DATABASE_NAME);
-
-        $key = $this->getQueryKey();
-        if ($key && $this->cacheContains($key)) {
-            $params = $this->getParams();
-            $sql = $this->cacheFetch($key);
-        } else {
-            $params = array();
-            $sql = $this->createSelectSql($params);
-            if ($key) {
-                $this->cacheStore($key, $sql);
-            }
-        }
-
-        try {
-            $stmt = $con->prepare($sql);
-            $db->bindValues($stmt, $params, $dbMap);
-            $stmt->execute();
-            } catch (Exception $e) {
-                Propel::log($e->getMessage(), Propel::LOG_ERR);
-                throw new PropelException(sprintf('Unable to execute SELECT statement [%s]', $sql), 0, $e);
-            }
-
-        return $stmt;
-    }
-
-    protected function doCount($con)
-    {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap($this->getDbName());
-        $db = Propel::getServiceContainer()->getAdapter($this->getDbName());
-
-        $key = $this->getQueryKey();
-        if ($key && $this->cacheContains($key)) {
-            $params = $this->getParams();
-            $sql = $this->cacheFetch($key);
-        } else {
-            // check that the columns of the main class are already added (if this is the primary ModelCriteria)
-            if (!$this->hasSelectClause() && !$this->getPrimaryCriteria()) {
-                $this->addSelfSelectColumns();
-            }
-
-            $this->configureSelectColumns();
-
-            $needsComplexCount = $this->getGroupByColumns()
-                || $this->getOffset()
-                || $this->getLimit()
-                || $this->getHaving()
-                || in_array(Criteria::DISTINCT, $this->getSelectModifiers());
-
-            $params = array();
-            if ($needsComplexCount) {
-                if ($this->needsSelectAliases()) {
-                    if ($this->getHaving()) {
-                        throw new PropelException('Propel cannot create a COUNT query when using HAVING and  duplicate column names in the SELECT part');
-                    }
-                    $db->turnSelectColumnsToAliases($this);
-                }
-                $selectSql = $this->createSelectSql($params);
-                $sql = 'SELECT COUNT(*) FROM (' . $selectSql . ') propelmatch4cnt';
-            } else {
-                // Replace SELECT columns with COUNT(*)
-                $this->clearSelectColumns()->addSelectColumn('COUNT(*)');
-                $sql = $this->createSelectSql($params);
-            }
-
-            if ($key) {
-                $this->cacheStore($key, $sql);
-            }
-        }
-
-        try {
-            $stmt = $con->prepare($sql);
-            $db->bindValues($stmt, $params, $dbMap);
-            $stmt->execute();
-        } catch (Exception $e) {
-            Propel::log($e->getMessage(), Propel::LOG_ERR);
-            throw new PropelException(sprintf('Unable to execute COUNT statement [%s]', $sql), 0, $e);
-        }
-
-        return $stmt;
     }
 
 } // ProductQuery

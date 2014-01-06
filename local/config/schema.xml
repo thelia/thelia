@@ -58,7 +58,6 @@
       <parameter name="log_created_at" value="true" />
       <parameter name="log_created_by" value="true" />
     </behavior>
-    <behavior name="query_cache" />
   </table>
   <table isCrossRef="true" name="product_category" namespace="Thelia\Model">
     <column name="product_id" primaryKey="true" required="true" type="INTEGER" />
@@ -854,7 +853,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="code" required="true" size="45" type="VARCHAR" />
     <column name="type" required="true" size="255" type="VARCHAR" />
-    <column name="serialized_effects" required="true" type="LONGVARCHAR" />
+    <column name="serialized_effects" required="true" type="LONG VARCHAR" />
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="is_enabled" required="true" type="BOOLEAN" />
     <column name="short_description" required="true" type="LONGVARCHAR" />
