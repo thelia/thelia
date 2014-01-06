@@ -147,7 +147,7 @@ abstract class ProductCategoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT PRODUCT_ID, CATEGORY_ID, DEFAULT_CATEGORY, CREATED_AT, UPDATED_AT FROM product_category WHERE PRODUCT_ID = :p0 AND CATEGORY_ID = :p1';
+        $sql = 'SELECT `PRODUCT_ID`, `CATEGORY_ID`, `DEFAULT_CATEGORY`, `CREATED_AT`, `UPDATED_AT` FROM `product_category` WHERE `PRODUCT_ID` = :p0 AND `CATEGORY_ID` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);

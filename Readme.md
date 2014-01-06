@@ -63,6 +63,7 @@ Thelia documentation is available at http://doc.thelia.net
 
 The documentation is also in beta version and some part can be obsolete cause to some refactor.
 
+
 Contribute
 ----------
 

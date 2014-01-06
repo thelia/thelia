@@ -179,7 +179,7 @@ abstract class ProductSaleElementsQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PRODUCT_ID, REF, QUANTITY, PROMO, NEWNESS, WEIGHT, IS_DEFAULT, EAN_CODE, CREATED_AT, UPDATED_AT FROM product_sale_elements WHERE ID = :p0';
+        $sql = 'SELECT `ID`, `PRODUCT_ID`, `REF`, `QUANTITY`, `PROMO`, `NEWNESS`, `WEIGHT`, `IS_DEFAULT`, `EAN_CODE`, `CREATED_AT`, `UPDATED_AT` FROM `product_sale_elements` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

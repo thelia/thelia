@@ -629,7 +629,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
             ->method('getAvailableCurrencies')
             ->will($this->returnValue($currencies));
 
-
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
             MatchForTotalAmount::INPUT1 => Operators::EQUAL,
@@ -639,7 +638,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
             MatchForTotalAmount::INPUT1 => 400.00,
             MatchForTotalAmount::INPUT2 => 'UNK');
         $condition1->setValidatorsFromForm($operators, $values);
-
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
             ->disableOriginalConstructor()
@@ -696,7 +694,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
             ->method('getAvailableCurrencies')
             ->will($this->returnValue($currencies));
 
-
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
             MatchForTotalAmount::INPUT1 => Operators::EQUAL,
@@ -706,7 +703,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
             MatchForTotalAmount::INPUT1 => 'notfloat',
             MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
-
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
             ->disableOriginalConstructor()
@@ -763,7 +759,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
             ->method('getAvailableCurrencies')
             ->will($this->returnValue($currencies));
 
-
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
             MatchForTotalAmount::INPUT1 => Operators::EQUAL,
@@ -773,7 +768,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
             MatchForTotalAmount::INPUT1 => 0.00,
             MatchForTotalAmount::INPUT2 => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
-
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
             ->disableOriginalConstructor()

@@ -223,7 +223,7 @@ abstract class ProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, TAX_RULE_ID, REF, VISIBLE, POSITION, TEMPLATE_ID, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM product WHERE ID = :p0';
+        $sql = 'SELECT `ID`, `TAX_RULE_ID`, `REF`, `VISIBLE`, `POSITION`, `TEMPLATE_ID`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `product` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

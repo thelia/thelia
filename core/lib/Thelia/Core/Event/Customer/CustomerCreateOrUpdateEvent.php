@@ -23,7 +23,6 @@
 namespace Thelia\Core\Event\Customer;
 
 use Symfony\Component\EventDispatcher\Event;
-use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Customer;
 
 /**

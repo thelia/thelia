@@ -125,9 +125,9 @@ class CategoryPath extends BaseI18nLoop  implements ArraySearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
-        foreach($loopResult->getResultDataCollection() as $result) {
+        foreach ($loopResult->getResultDataCollection() as $result) {
             $loopResultRow = new LoopResultRow($result);
-            foreach($result as $output => $outputValue) {
+            foreach ($result as $output => $outputValue) {
                 $loopResultRow->set($output, $outputValue);
             }
             $loopResult->addRow($loopResultRow);

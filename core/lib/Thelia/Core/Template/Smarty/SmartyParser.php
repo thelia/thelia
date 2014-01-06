@@ -14,9 +14,6 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Model\ConfigQuery;
-use Thelia\Core\Template\TemplateHelper;
-use Imagine\Exception\InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -35,12 +32,7 @@ class SmartyParser extends Smarty implements ParserInterface
     protected $backOfficeTemplateDirectories = array();
     protected $frontOfficeTemplateDirectories = array();
 
-    protected $templateDirectories = array();
-
-    /**
-     * @var TemplateDefinition
-     */
-    protected $templateDefinition = "";
+    protected $template = "";
 
     protected $status = 200;
 
@@ -52,8 +44,8 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param bool                     $debug
      */
     public function __construct(
-            Request $request, EventDispatcherInterface $dispatcher, ParserContext $parserContext,
-            $env = "prod", $debug = false)
+        Request $request, EventDispatcherInterface $dispatcher, ParserContext $parserContext,
+        $env = "prod", $debug = false)
     {
         parent::__construct();
 
@@ -72,7 +64,6 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
 
-
         $this->debugging = $debug;
 
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
@@ -80,7 +71,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
         // Si on n'est pas en mode debug, activer le cache, avec une lifetime de 15mn, et en vérifiant que les templates sources n'ont pas été modifiés.
 
-        if($debug) {
+        if ($debug) {
             $this->setCaching(Smarty::CACHING_OFF);
             $this->setForceCompile(true);
         } else {
@@ -89,52 +80,11 @@ class SmartyParser extends Smarty implements ParserInterface
 
         //$this->enableSecurity();
 
-
         // The default HTTP status
         $this->status = 200;
 
         $this->registerFilter('output', array($this, "removeBlankLines"));
         $this->registerFilter('variable', array(__CLASS__, "theliaEscape"));
-    }
-
-    /**
-     * Add a template directory to the current template list
-     *
-     * @param unknown $templateType the template type (a TemplateDefinition type constant)
-     * @param string $templateName the template name
-     * @param string $templateDirectory path to the template dirtectory
-     * @param unknown $key ???
-     * @param string $unshift ??? Etienne ?
-     */
-    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false) {
-
-        if(true === $unshift && isset($this->templateDirectories[$templateType][$templateName])) {
-
-            $this->templateDirectories[$templateType][$templateName] = array_merge(
-                    array(
-                        $key => $templateDirectory,
-                    ),
-                    $this->templateDirectories[$templateType][$templateName]
-            );
-        } else {
-            $this->templateDirectories[$templateType][$templateName][$key] = $templateDirectory;
-        }
-    }
-
-    /**
-     * Return the registeted template directories for a givent template type
-     *
-     * @param unknown $templateType
-     * @throws InvalidArgumentException
-     * @return multitype:
-     */
-    public function getTemplateDirectories($templateType)
-    {
-        if (! isset($this->templateDirectories[$templateType])) {
-            throw new InvalidArgumentException("Failed to get template type %", $templateType);
-        }
-
-        return $this->templateDirectories[$templateType];
     }
 
     public function removeBlankLines($tpl_source, \Smarty_Internal_Template $template)
@@ -151,52 +101,72 @@ class SmartyParser extends Smarty implements ParserInterface
         }
     }
 
+    public function addBackOfficeTemplateDirectory($templateName, $templateDirectory, $key)
+    {
+        $this->backOfficeTemplateDirectories[$templateName][$key] = $templateDirectory;
+    }
+
+    public function addFrontOfficeTemplateDirectory($templateName, $templateDirectory, $key)
+    {
+        $this->frontOfficeTemplateDirectories[$templateName][$key] = $templateDirectory;
+    }
+
     /**
      * @param TemplateDefinition $templateDefinition
      */
-    public function setTemplateDefinition(TemplateDefinition $templateDefinition)
+    public function setTemplate(TemplateDefinition $templateDefinition)
     {
-        $this->templateDefinition = $templateDefinition;
+        $this->template = $templateDefinition->getPath();
 
         /* init template directories */
         $this->setTemplateDir(array());
 
+        /* add main template directory */
+        $this->addTemplateDir($templateDefinition->getAbsolutePath(), 0);
+
         /* define config directory */
-        $configDirectory = THELIA_TEMPLATE_DIR . $this->getTemplate() . '/configs';
+        $configDirectory = $templateDefinition->getAbsoluteConfigPath();
         $this->setConfigDir($configDirectory);
 
         /* add modules template directories */
-        $this->addTemplateDirectory(
-                $templateDefinition->getType(),
-                $templateDefinition->getName(),
-                THELIA_TEMPLATE_DIR . $this->getTemplate(),
-                '0',
-                true
-        );
+        switch ($templateDefinition->getType()) {
+            case TemplateDefinition::FRONT_OFFICE:
+                /* do not pass array directly to addTemplateDir since we cant control on keys */
+                if (isset($this->frontOfficeTemplateDirectories[$templateDefinition->getName()])) {
+                    foreach ($this->frontOfficeTemplateDirectories[$templateDefinition->getName()] as $key => $directory) {
+                        $this->addTemplateDir($directory, $key);
+                    }
+                }
+                break;
 
-        /* do not pass array directly to addTemplateDir since we cant control on keys */
-        if (isset($this->templateDirectories[$templateDefinition->getType()][$templateDefinition->getName()])) {
-            foreach($this->templateDirectories[$templateDefinition->getType()][$templateDefinition->getName()] as $key => $directory) {
-                $this->addTemplateDir($directory, $key);
-            }
+            case TemplateDefinition::BACK_OFFICE:
+                /* do not pass array directly to addTemplateDir since we cant control on keys */
+                if (isset($this->backOfficeTemplateDirectories[$templateDefinition->getName()])) {
+                    foreach ($this->backOfficeTemplateDirectories[$templateDefinition->getName()] as $key => $directory) {
+                        $this->addTemplateDir($directory, $key);
+                    }
+                }
+                break;
+
+            case TemplateDefinition::PDF:
+                break;
+
+            default:
+                break;
         }
-    }
-
-    public function getTemplateDefinition()
-    {
-        return $this->templateDefinition;
     }
 
     public function getTemplate()
     {
-        return $this->templateDefinition->getPath();
+        return $this->template;
     }
+
     /**
      * Return a rendered template, either from file or ftom a string
      *
-     * @param string $resourceType either 'string' (rendering from a string) or 'file' (rendering a file)
+     * @param string $resourceType    either 'string' (rendering from a string) or 'file' (rendering a file)
      * @param string $resourceContent the resource content (a text, or a template file name)
-     * @param array $parameters an associative array of names / value pairs
+     * @param array  $parameters      an associative array of names / value pairs
      *
      * @return string the rendered template text
      */
@@ -215,8 +185,8 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Return a rendered template file
      *
-     * @param string $realTemplateName the template name (from the template directory)
-     * @param array $parameters an associative array of names / value pairs
+     * @param  string $realTemplateName the template name (from the template directory)
+     * @param  array  $parameters       an associative array of names / value pairs
      * @return string the rendered template text
      */
     public function render($realTemplateName, array $parameters = array())
@@ -231,8 +201,8 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Return a rendered template text
      *
-     * @param string $templateText the template text
-     * @param array $parameters an associative array of names / value pairs
+     * @param  string $templateText the template text
+     * @param  array  $parameters   an associative array of names / value pairs
      * @return string the rendered template text
      */
     public function renderString($templateText, array $parameters = array())
@@ -287,12 +257,12 @@ class SmartyParser extends Smarty implements ParserInterface
 
             foreach ($plugins as $plugin) {
                 $this->registerPlugin(
-                        $plugin->getType(),
-                        $plugin->getName(),
-                        array(
-                            $plugin->getClass(),
-                            $plugin->getMethod()
-                        )
+                    $plugin->getType(),
+                    $plugin->getName(),
+                    array(
+                        $plugin->getClass(),
+                        $plugin->getMethod()
+                    )
                 );
             }
         }

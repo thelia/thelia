@@ -1028,32 +1028,32 @@ abstract class RewritingUrl implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(RewritingUrlTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
+            $modifiedColumns[':p' . $index++]  = '`ID`';
         }
         if ($this->isColumnModified(RewritingUrlTableMap::URL)) {
-            $modifiedColumns[':p' . $index++]  = 'URL';
+            $modifiedColumns[':p' . $index++]  = '`URL`';
         }
         if ($this->isColumnModified(RewritingUrlTableMap::VIEW)) {
-            $modifiedColumns[':p' . $index++]  = 'VIEW';
+            $modifiedColumns[':p' . $index++]  = '`VIEW`';
         }
         if ($this->isColumnModified(RewritingUrlTableMap::VIEW_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'VIEW_ID';
+            $modifiedColumns[':p' . $index++]  = '`VIEW_ID`';
         }
         if ($this->isColumnModified(RewritingUrlTableMap::VIEW_LOCALE)) {
-            $modifiedColumns[':p' . $index++]  = 'VIEW_LOCALE';
+            $modifiedColumns[':p' . $index++]  = '`VIEW_LOCALE`';
         }
         if ($this->isColumnModified(RewritingUrlTableMap::REDIRECTED)) {
-            $modifiedColumns[':p' . $index++]  = 'REDIRECTED';
+            $modifiedColumns[':p' . $index++]  = '`REDIRECTED`';
         }
         if ($this->isColumnModified(RewritingUrlTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
         if ($this->isColumnModified(RewritingUrlTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
 
         $sql = sprintf(
-            'INSERT INTO rewriting_url (%s) VALUES (%s)',
+            'INSERT INTO `rewriting_url` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1062,28 +1062,28 @@ abstract class RewritingUrl implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
+                    case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'URL':
+                    case '`URL`':
                         $stmt->bindValue($identifier, $this->url, PDO::PARAM_STR);
                         break;
-                    case 'VIEW':
+                    case '`VIEW`':
                         $stmt->bindValue($identifier, $this->view, PDO::PARAM_STR);
                         break;
-                    case 'VIEW_ID':
+                    case '`VIEW_ID`':
                         $stmt->bindValue($identifier, $this->view_id, PDO::PARAM_STR);
                         break;
-                    case 'VIEW_LOCALE':
+                    case '`VIEW_LOCALE`':
                         $stmt->bindValue($identifier, $this->view_locale, PDO::PARAM_STR);
                         break;
-                    case 'REDIRECTED':
+                    case '`REDIRECTED`':
                         $stmt->bindValue($identifier, $this->redirected, PDO::PARAM_INT);
                         break;
-                    case 'CREATED_AT':
+                    case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case 'UPDATED_AT':
+                    case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }

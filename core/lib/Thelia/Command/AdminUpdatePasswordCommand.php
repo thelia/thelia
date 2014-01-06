@@ -32,7 +32,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\AdminQuery;
 use Thelia\Tools\Password;
 
-
 /**
  * command line for updating admin password
  *
@@ -72,17 +71,14 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
     {
         $login = $input->getArgument('login');
 
-
         if (null === $admin = AdminQuery::create()->filterByLogin($login)->findOne()) {
             throw new \RuntimeException(sprintf('Admin with login %s does not exists', $login));
         }
-
 
         $password = $input->getOption('password') ?: Password::generateRandom();
 
         $event = new AdministratorUpdatePasswordEvent($admin);
         $event->setPassword($password);
-
 
         $this->
             getContainer()
@@ -99,4 +95,3 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
     }
 
 }
-

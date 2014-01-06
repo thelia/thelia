@@ -152,7 +152,7 @@ abstract class ModuleImageQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, MODULE_ID, FILE, POSITION, CREATED_AT, UPDATED_AT FROM module_image WHERE ID = :p0';
+        $sql = 'SELECT `ID`, `MODULE_ID`, `FILE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `module_image` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

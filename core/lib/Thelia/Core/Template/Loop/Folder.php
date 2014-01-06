@@ -126,7 +126,6 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
 
-
         $orders  = $this->getOrder();
 
         foreach ($orders as $order) {

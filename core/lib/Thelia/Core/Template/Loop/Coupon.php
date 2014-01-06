@@ -24,7 +24,6 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Util\PropelModelPager;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\HttpFoundation\Request;

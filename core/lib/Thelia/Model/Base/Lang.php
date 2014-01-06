@@ -1258,53 +1258,53 @@ abstract class Lang implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(LangTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
+            $modifiedColumns[':p' . $index++]  = '`ID`';
         }
         if ($this->isColumnModified(LangTableMap::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = 'TITLE';
+            $modifiedColumns[':p' . $index++]  = '`TITLE`';
         }
         if ($this->isColumnModified(LangTableMap::CODE)) {
-            $modifiedColumns[':p' . $index++]  = 'CODE';
+            $modifiedColumns[':p' . $index++]  = '`CODE`';
         }
         if ($this->isColumnModified(LangTableMap::LOCALE)) {
-            $modifiedColumns[':p' . $index++]  = 'LOCALE';
+            $modifiedColumns[':p' . $index++]  = '`LOCALE`';
         }
         if ($this->isColumnModified(LangTableMap::URL)) {
-            $modifiedColumns[':p' . $index++]  = 'URL';
+            $modifiedColumns[':p' . $index++]  = '`URL`';
         }
         if ($this->isColumnModified(LangTableMap::DATE_FORMAT)) {
-            $modifiedColumns[':p' . $index++]  = 'DATE_FORMAT';
+            $modifiedColumns[':p' . $index++]  = '`DATE_FORMAT`';
         }
         if ($this->isColumnModified(LangTableMap::TIME_FORMAT)) {
-            $modifiedColumns[':p' . $index++]  = 'TIME_FORMAT';
+            $modifiedColumns[':p' . $index++]  = '`TIME_FORMAT`';
         }
         if ($this->isColumnModified(LangTableMap::DATETIME_FORMAT)) {
-            $modifiedColumns[':p' . $index++]  = 'DATETIME_FORMAT';
+            $modifiedColumns[':p' . $index++]  = '`DATETIME_FORMAT`';
         }
         if ($this->isColumnModified(LangTableMap::DECIMAL_SEPARATOR)) {
-            $modifiedColumns[':p' . $index++]  = 'DECIMAL_SEPARATOR';
+            $modifiedColumns[':p' . $index++]  = '`DECIMAL_SEPARATOR`';
         }
         if ($this->isColumnModified(LangTableMap::THOUSANDS_SEPARATOR)) {
-            $modifiedColumns[':p' . $index++]  = 'THOUSANDS_SEPARATOR';
+            $modifiedColumns[':p' . $index++]  = '`THOUSANDS_SEPARATOR`';
         }
         if ($this->isColumnModified(LangTableMap::DECIMALS)) {
-            $modifiedColumns[':p' . $index++]  = 'DECIMALS';
+            $modifiedColumns[':p' . $index++]  = '`DECIMALS`';
         }
         if ($this->isColumnModified(LangTableMap::BY_DEFAULT)) {
-            $modifiedColumns[':p' . $index++]  = 'BY_DEFAULT';
+            $modifiedColumns[':p' . $index++]  = '`BY_DEFAULT`';
         }
         if ($this->isColumnModified(LangTableMap::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = 'POSITION';
+            $modifiedColumns[':p' . $index++]  = '`POSITION`';
         }
         if ($this->isColumnModified(LangTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
         if ($this->isColumnModified(LangTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
+            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
 
         $sql = sprintf(
-            'INSERT INTO lang (%s) VALUES (%s)',
+            'INSERT INTO `lang` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1313,49 +1313,49 @@ abstract class Lang implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
+                    case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'TITLE':
+                    case '`TITLE`':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
                         break;
-                    case 'CODE':
+                    case '`CODE`':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case 'LOCALE':
+                    case '`LOCALE`':
                         $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
-                    case 'URL':
+                    case '`URL`':
                         $stmt->bindValue($identifier, $this->url, PDO::PARAM_STR);
                         break;
-                    case 'DATE_FORMAT':
+                    case '`DATE_FORMAT`':
                         $stmt->bindValue($identifier, $this->date_format, PDO::PARAM_STR);
                         break;
-                    case 'TIME_FORMAT':
+                    case '`TIME_FORMAT`':
                         $stmt->bindValue($identifier, $this->time_format, PDO::PARAM_STR);
                         break;
-                    case 'DATETIME_FORMAT':
+                    case '`DATETIME_FORMAT`':
                         $stmt->bindValue($identifier, $this->datetime_format, PDO::PARAM_STR);
                         break;
-                    case 'DECIMAL_SEPARATOR':
+                    case '`DECIMAL_SEPARATOR`':
                         $stmt->bindValue($identifier, $this->decimal_separator, PDO::PARAM_STR);
                         break;
-                    case 'THOUSANDS_SEPARATOR':
+                    case '`THOUSANDS_SEPARATOR`':
                         $stmt->bindValue($identifier, $this->thousands_separator, PDO::PARAM_STR);
                         break;
-                    case 'DECIMALS':
+                    case '`DECIMALS`':
                         $stmt->bindValue($identifier, $this->decimals, PDO::PARAM_STR);
                         break;
-                    case 'BY_DEFAULT':
+                    case '`BY_DEFAULT`':
                         $stmt->bindValue($identifier, $this->by_default, PDO::PARAM_INT);
                         break;
-                    case 'POSITION':
+                    case '`POSITION`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case 'CREATED_AT':
+                    case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case 'UPDATED_AT':
+                    case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
