@@ -1123,7 +1123,7 @@
     </route>
 
     <!-- update routing -->
-    <route id="update.index" path="/admin/update">
+    <route id="update.index" path="/admin/configuration/update">
         <default key="_controller">Thelia\Controller\Admin\UpdateController::indexAction</default>
     </route>
 

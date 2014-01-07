@@ -104,5 +104,5 @@ final class AdminResources
 
     const TRANSLATIONS = "admin.configuration.translations";
 
-    const UPDATE = "admin.update";
+    const UPDATE = "admin.configuration.update";
 }
