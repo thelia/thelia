@@ -8,7 +8,7 @@
             {if $breadcrumb@last}
                 <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{$breadcrumb.title|unescape}</span></li>
             {else}
-                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{$breadcrumb.url|default:'#' nofilter}"  title="{$breadcrumb.title|unescape}" itemprop="url"><span itemprop="title">{$breadcrumb.title}</span></a></li>
+                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{$breadcrumb.url|default:'#' nofilter}"  title="{$breadcrumb.title|unescape}" itemprop="url"><span itemprop="title">{$breadcrumb.title|unescape}</span></a></li>
             {/if}
         {/if}
         {/foreach}
