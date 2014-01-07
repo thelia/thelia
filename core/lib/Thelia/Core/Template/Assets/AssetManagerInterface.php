@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia                                                                             */
+/*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,38 +17,51 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*            along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Assets;
 
-interface AssetManagerInterface
-{
+interface AssetManagerInterface {
     /**
-     * Prepare an asset directory.
+     * Prepare an asset directory by checking that no changes occured in
+     * the source directory. If any change is detected, the whole asset directory
+     * is copied in the web space.
      *
-     * @param  string            $source_assets_directory   the full path to the source asstes directory
-     * @param  string            $web_assets_directory_base the base directory of the web based asset directory
+     * @param string $sourceAssetsDirectory  the full path to the source asstes directory
+     * @param string $webAssetsDirectoryBase the base directory of the web based asset directory
+     * @param        $webAssetsTemplate
+     * @param string $webAssetsKey           the assets key : module name or 0 for base template
+     *
      * @throws \RuntimeException if something goes wrong.
+     *
+     * @internal param string $source_assets_directory the full path to the source asstes directory
+     * @internal param string $web_assets_directory_base the base directory of the web based asset directory
+     * @internal param string $key the assets key : module name or 0 for base template
      */
-    public function prepareAssets($source_assets_directory, $web_assets_directory_base);
+    public function prepareAssets($sourceAssetsDirectory, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey);
 
     /**
      * Generates assets from $asset_path in $output_path, using $filters.
      *
-     * @param string $asset_path the full path to the asset file (or file collection, e.g. *.less)
+     * @param          $assetSource
+     * @param          $assetDirectoryBase
+     * @param  string  $webAssetsDirectoryBase the full path to the asset file (or file collection, e.g. *.less)
      *
-     * @param string $web_assets_directory_base the full disk path to the base assets output directory in the web space
-     * @param string $output_url                the URL to the base assets output directory in the web space
+     * @param  string  $webAssetsTemplate      the full disk path to the base assets output directory in the web space
+     * @param          $webAssetsKey
+     * @param  string  $outputUrl              the URL to the base assets output directory in the web space
      *
-     * @param string $asset_type the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
-     * @param array  $filters    a list of filters, as defined below (see switch($filter_name) ...)
+     * @param  string  $assetType              the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
+     * @param  array   $filters                a list of filters, as defined below (see switch($filter_name) ...)
      *
-     * @param boolean $debug the debug mode, true or false
+     * @param  boolean $debug                  true / false
      *
-     * @throws \InvalidArgumentException if an invalid filter name is found
-     * @return string                    The URL to the generated asset file.
+     * @internal param string $web_assets_directory_base the full disk path to the base assets output directory in the web space
+     * @internal param string $output_url the URL to the base assets output directory in the web space
+     *
+     * @return string                          The URL to the generated asset file.
      */
-    public function processAsset($asset_path, $web_assets_directory_base, $output_url, $asset_type, $filters, $debug);
+    public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug);
 }
