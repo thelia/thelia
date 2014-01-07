@@ -1122,6 +1122,11 @@
         <default key="_controller">Thelia\Controller\Admin\TranslationsController::updateAction</default>
     </route>
 
+    <!-- update routing -->
+    <route id="update.index" path="/admin/update">
+        <default key="_controller">Thelia\Controller\Admin\UpdateController::indexAction</default>
+    </route>
+
     <!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">

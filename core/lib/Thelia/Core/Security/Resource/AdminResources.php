@@ -103,4 +103,6 @@ final class AdminResources
     const STORE = "admin.configuration.store";
 
     const TRANSLATIONS = "admin.configuration.translations";
+
+    const UPDATE = "admin.update";
 }
