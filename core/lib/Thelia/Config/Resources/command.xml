@@ -16,6 +16,7 @@
         <command class="Thelia\Command\ReloadDatabaseCommand"/>
         <command class="Thelia\Command\GenerateResources"/>
         <command class="Thelia\Command\AdminUpdatePasswordCommand"/>
+        <command class="Thelia\Command\UpdateCommand"/>
     </commands>
 
 </config>

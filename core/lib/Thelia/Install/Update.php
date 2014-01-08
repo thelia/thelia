@@ -21,28 +21,21 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
-
+namespace Thelia\Install;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Thelia\Controller\Admin\BaseAdminController;
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Install\Database;
+use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Map\ProductTableMap;
 
 
 /**
- * Class UpdateController
- * @package Thelia\Controller\Update
+ * Class Update
+ * @package Thelia\Install
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class UpdateController extends BaseAdminController
+class Update 
 {
-
     protected static $version = array(
         '0' => '2.0.0-beta1',
         '1' => '2.0.0-beta2',
@@ -55,7 +48,7 @@ class UpdateController extends BaseAdminController
 
         return $lastEntry == $version;
     }
-
+/*
     public function indexAction()
     {
         // Check current user authorization
@@ -73,14 +66,10 @@ class UpdateController extends BaseAdminController
                 'latest_version'    => end(self::$version)
             ));
         }
-    }
+    }*/
 
-    public function updateAction()
+    public function process()
     {
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::UPDATE, array(), AccessManager::UPDATE)) {
-            return $response;
-        }
 
         $logger = Tlog::getInstance();
         $logger->setLevel(Tlog::DEBUG);
@@ -92,7 +81,7 @@ class UpdateController extends BaseAdminController
         $logger->debug("start update process");
         if(true === $this->isLatestVersion($currentVersion)) {
             $logger->debug("You already have the latest version. No update available");
-            return $this->render('update-notneeded');
+            throw new UpToDateException('You already have the latest version. No update available');
         }
 
         $index = array_search($currentVersion, self::$version);
@@ -109,21 +98,13 @@ class UpdateController extends BaseAdminController
             $logger->debug('update successfully');
         } catch(PropelException $e) {
             $con->rollBack();
-            $success = false;
-            $errorMsg = $e->getMessage();
             $logger->error(sprintf('error during update process with message : %s', $e->getMessage()));
+            throw $e;
         }
 
         $logger->debug('end of update processing');
-        if ($success) {
-            return $this->render('update-success', array(
-                "updated_versions" => $updatedVersions
-            ));
-        } else {
-            return $this->render('update-fail', array(
-                "error_message" => $errorMsg
-            ));
-        }
+
+        return $updatedVersions;
     }
 
     protected function updateToVersion($version, Database $database,Tlog $logger)
@@ -136,4 +117,4 @@ class UpdateController extends BaseAdminController
 
         ConfigQuery::write('thelia_version', $version);
     }
-}
+} 
