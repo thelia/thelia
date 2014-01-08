@@ -46,5 +46,8 @@ CREATE TABLE `order_coupon`
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+UPDATE `config` SET `value`='2.0.0-beta3' WHERE `name`='thelia_version';
+UPDATE `config` SET `value`='beta3' WHERE `name`='thelia_extra_version';
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;
