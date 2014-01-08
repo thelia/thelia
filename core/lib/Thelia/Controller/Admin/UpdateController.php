@@ -30,6 +30,7 @@ use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Install\Database;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductTableMap;
 
@@ -45,6 +46,7 @@ class UpdateController extends BaseAdminController
     protected static $version = array(
         '0' => '2.0.0-beta1',
         '1' => '2.0.0-beta2',
+        '2' => '2.0.0-beta3'
     );
 
     protected function isLatestVersion($version)
@@ -80,31 +82,39 @@ class UpdateController extends BaseAdminController
             return $response;
         }
 
+        $logger = Tlog::getInstance();
+        $logger->setLevel(Tlog::DEBUG);
+
         $success = true;
         $updatedVersions = array();
 
         $currentVersion = ConfigQuery::read('thelia_version');
-
+        $logger->debug("start update process");
         if(true === $this->isLatestVersion($currentVersion)) {
+            $logger->debug("You already have the latest version. No update available");
             return $this->render('update-notneeded');
         }
 
         $index = array_search($currentVersion, self::$version);
         $con = Propel::getServiceContainer()->getWriteConnection(ProductTableMap::DATABASE_NAME);
         $con->beginTransaction();
+        $logger->debug("begin transaction");
         $database = new Database($con->getWrappedConnection());
         try {
             for ($i = ++$index; $i < count(self::$version); $i++) {
-                $this->updateToVersion(self::$version[$i], $database);
+                $this->updateToVersion(self::$version[$i], $database, $logger);
                 $updatedVersions[] = self::$version[$i];
             }
             $con->commit();
+            $logger->debug('update successfully');
         } catch(PropelException $e) {
             $con->rollBack();
             $success = false;
             $errorMsg = $e->getMessage();
+            $logger->error(sprintf('error during update process with message : %s', $e->getMessage()));
         }
 
+        $logger->debug('end of update processing');
         if ($success) {
             return $this->render('update-success', array(
                 "updated_versions" => $updatedVersions
@@ -116,10 +126,12 @@ class UpdateController extends BaseAdminController
         }
     }
 
-    protected function updateToVersion($version, Database $database)
+    protected function updateToVersion($version, Database $database,Tlog $logger)
     {
         if (file_exists(THELIA_ROOT . '/install/update/'.$version.'.sql')) {
+            $logger->debug(sprintf('inserting file %s', $version.'$sql'));
             $database->insertSql(null, array(THELIA_ROOT . '/install/update/'.$version.'.sql'));
+            $logger->debug(sprintf('end inserting file %s', $version.'$sql'));
         }
 
         ConfigQuery::write('thelia_version', $version);
