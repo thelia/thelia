@@ -49,25 +49,6 @@ class Update
 
         return $lastEntry == $version;
     }
-/*
-    public function indexAction()
-    {
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::UPDATE, array(), AccessManager::VIEW)) {
-            return $response;
-        }
-
-        $currentVersion = ConfigQuery::read('thelia_version');
-
-        if(true === $this->isLatestVersion($currentVersion)) {
-            return $this->render('update-notneeded');
-        } else {
-            return $this->render('update', array(
-                'current_version'   => $currentVersion,
-                'latest_version'    => end(self::$version)
-            ));
-        }
-    }*/
 
     public function process()
     {
