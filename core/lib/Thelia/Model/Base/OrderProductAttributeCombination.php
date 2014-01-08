@@ -155,7 +155,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -166,7 +166,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -175,7 +175,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -228,8 +228,8 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -563,7 +563,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::ID;
+            $this->modifiedColumns[OrderProductAttributeCombinationTableMap::ID] = true;
         }
 
 
@@ -584,7 +584,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
 
         if ($this->order_product_id !== $v) {
             $this->order_product_id = $v;
-            $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::ORDER_PRODUCT_ID;
+            $this->modifiedColumns[OrderProductAttributeCombinationTableMap::ORDER_PRODUCT_ID] = true;
         }
 
         if ($this->aOrderProduct !== null && $this->aOrderProduct->getId() !== $v) {
@@ -609,7 +609,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
 
         if ($this->attribute_title !== $v) {
             $this->attribute_title = $v;
-            $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::ATTRIBUTE_TITLE;
+            $this->modifiedColumns[OrderProductAttributeCombinationTableMap::ATTRIBUTE_TITLE] = true;
         }
 
 
@@ -630,7 +630,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
 
         if ($this->attribute_chapo !== $v) {
             $this->attribute_chapo = $v;
-            $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::ATTRIBUTE_CHAPO;
+            $this->modifiedColumns[OrderProductAttributeCombinationTableMap::ATTRIBUTE_CHAPO] = true;
         }
 
 
@@ -651,7 +651,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
 
         if ($this->attribute_description !== $v) {
             $this->attribute_description = $v;
-            $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION;
+            $this->modifiedColumns[OrderProductAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION] = true;
         }
 
 
@@ -672,7 +672,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
 
         if ($this->attribute_postscriptum !== $v) {
             $this->attribute_postscriptum = $v;
-            $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUM;
+            $this->modifiedColumns[OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUM] = true;
         }
 
 
@@ -693,7 +693,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
 
         if ($this->attribute_av_title !== $v) {
             $this->attribute_av_title = $v;
-            $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE;
+            $this->modifiedColumns[OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE] = true;
         }
 
 
@@ -714,7 +714,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
 
         if ($this->attribute_av_chapo !== $v) {
             $this->attribute_av_chapo = $v;
-            $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_CHAPO;
+            $this->modifiedColumns[OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_CHAPO] = true;
         }
 
 
@@ -735,7 +735,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
 
         if ($this->attribute_av_description !== $v) {
             $this->attribute_av_description = $v;
-            $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_DESCRIPTION;
+            $this->modifiedColumns[OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_DESCRIPTION] = true;
         }
 
 
@@ -756,7 +756,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
 
         if ($this->attribute_av_postscriptum !== $v) {
             $this->attribute_av_postscriptum = $v;
-            $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_POSTSCRIPTUM;
+            $this->modifiedColumns[OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_POSTSCRIPTUM] = true;
         }
 
 
@@ -776,7 +776,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::CREATED_AT;
+                $this->modifiedColumns[OrderProductAttributeCombinationTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -797,7 +797,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::UPDATED_AT;
+                $this->modifiedColumns[OrderProductAttributeCombinationTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1121,7 +1121,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::ID;
+        $this->modifiedColumns[OrderProductAttributeCombinationTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . OrderProductAttributeCombinationTableMap::ID . ')');
         }
@@ -1701,7 +1701,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::UPDATED_AT;
+        $this->modifiedColumns[OrderProductAttributeCombinationTableMap::UPDATED_AT] = true;
 
         return $this;
     }

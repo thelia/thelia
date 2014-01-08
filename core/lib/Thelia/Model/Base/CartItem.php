@@ -177,7 +177,7 @@ abstract class CartItem implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -188,7 +188,7 @@ abstract class CartItem implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -197,7 +197,7 @@ abstract class CartItem implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -250,8 +250,8 @@ abstract class CartItem implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -583,7 +583,7 @@ abstract class CartItem implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CartItemTableMap::ID;
+            $this->modifiedColumns[CartItemTableMap::ID] = true;
         }
 
 
@@ -604,7 +604,7 @@ abstract class CartItem implements ActiveRecordInterface
 
         if ($this->cart_id !== $v) {
             $this->cart_id = $v;
-            $this->modifiedColumns[] = CartItemTableMap::CART_ID;
+            $this->modifiedColumns[CartItemTableMap::CART_ID] = true;
         }
 
         if ($this->aCart !== null && $this->aCart->getId() !== $v) {
@@ -629,7 +629,7 @@ abstract class CartItem implements ActiveRecordInterface
 
         if ($this->product_id !== $v) {
             $this->product_id = $v;
-            $this->modifiedColumns[] = CartItemTableMap::PRODUCT_ID;
+            $this->modifiedColumns[CartItemTableMap::PRODUCT_ID] = true;
         }
 
         if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
@@ -654,7 +654,7 @@ abstract class CartItem implements ActiveRecordInterface
 
         if ($this->quantity !== $v) {
             $this->quantity = $v;
-            $this->modifiedColumns[] = CartItemTableMap::QUANTITY;
+            $this->modifiedColumns[CartItemTableMap::QUANTITY] = true;
         }
 
 
@@ -675,7 +675,7 @@ abstract class CartItem implements ActiveRecordInterface
 
         if ($this->product_sale_elements_id !== $v) {
             $this->product_sale_elements_id = $v;
-            $this->modifiedColumns[] = CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID;
+            $this->modifiedColumns[CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID] = true;
         }
 
         if ($this->aProductSaleElements !== null && $this->aProductSaleElements->getId() !== $v) {
@@ -700,7 +700,7 @@ abstract class CartItem implements ActiveRecordInterface
 
         if ($this->price !== $v) {
             $this->price = $v;
-            $this->modifiedColumns[] = CartItemTableMap::PRICE;
+            $this->modifiedColumns[CartItemTableMap::PRICE] = true;
         }
 
 
@@ -721,7 +721,7 @@ abstract class CartItem implements ActiveRecordInterface
 
         if ($this->promo_price !== $v) {
             $this->promo_price = $v;
-            $this->modifiedColumns[] = CartItemTableMap::PROMO_PRICE;
+            $this->modifiedColumns[CartItemTableMap::PROMO_PRICE] = true;
         }
 
 
@@ -741,7 +741,7 @@ abstract class CartItem implements ActiveRecordInterface
         if ($this->price_end_of_life !== null || $dt !== null) {
             if ($dt !== $this->price_end_of_life) {
                 $this->price_end_of_life = $dt;
-                $this->modifiedColumns[] = CartItemTableMap::PRICE_END_OF_LIFE;
+                $this->modifiedColumns[CartItemTableMap::PRICE_END_OF_LIFE] = true;
             }
         } // if either are not null
 
@@ -763,7 +763,7 @@ abstract class CartItem implements ActiveRecordInterface
 
         if ($this->promo !== $v) {
             $this->promo = $v;
-            $this->modifiedColumns[] = CartItemTableMap::PROMO;
+            $this->modifiedColumns[CartItemTableMap::PROMO] = true;
         }
 
 
@@ -783,7 +783,7 @@ abstract class CartItem implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = CartItemTableMap::CREATED_AT;
+                $this->modifiedColumns[CartItemTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -804,7 +804,7 @@ abstract class CartItem implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = CartItemTableMap::UPDATED_AT;
+                $this->modifiedColumns[CartItemTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1154,7 +1154,7 @@ abstract class CartItem implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = CartItemTableMap::ID;
+        $this->modifiedColumns[CartItemTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . CartItemTableMap::ID . ')');
         }
@@ -1828,7 +1828,7 @@ abstract class CartItem implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = CartItemTableMap::UPDATED_AT;
+        $this->modifiedColumns[CartItemTableMap::UPDATED_AT] = true;
 
         return $this;
     }

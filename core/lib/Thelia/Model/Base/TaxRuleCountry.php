@@ -133,7 +133,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -144,7 +144,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -153,7 +153,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -206,8 +206,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -475,7 +475,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
 
         if ($this->tax_rule_id !== $v) {
             $this->tax_rule_id = $v;
-            $this->modifiedColumns[] = TaxRuleCountryTableMap::TAX_RULE_ID;
+            $this->modifiedColumns[TaxRuleCountryTableMap::TAX_RULE_ID] = true;
         }
 
         if ($this->aTaxRule !== null && $this->aTaxRule->getId() !== $v) {
@@ -500,7 +500,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
 
         if ($this->country_id !== $v) {
             $this->country_id = $v;
-            $this->modifiedColumns[] = TaxRuleCountryTableMap::COUNTRY_ID;
+            $this->modifiedColumns[TaxRuleCountryTableMap::COUNTRY_ID] = true;
         }
 
         if ($this->aCountry !== null && $this->aCountry->getId() !== $v) {
@@ -525,7 +525,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
 
         if ($this->tax_id !== $v) {
             $this->tax_id = $v;
-            $this->modifiedColumns[] = TaxRuleCountryTableMap::TAX_ID;
+            $this->modifiedColumns[TaxRuleCountryTableMap::TAX_ID] = true;
         }
 
         if ($this->aTax !== null && $this->aTax->getId() !== $v) {
@@ -550,7 +550,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = TaxRuleCountryTableMap::POSITION;
+            $this->modifiedColumns[TaxRuleCountryTableMap::POSITION] = true;
         }
 
 
@@ -570,7 +570,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = TaxRuleCountryTableMap::CREATED_AT;
+                $this->modifiedColumns[TaxRuleCountryTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -591,7 +591,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = TaxRuleCountryTableMap::UPDATED_AT;
+                $this->modifiedColumns[TaxRuleCountryTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1506,7 +1506,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = TaxRuleCountryTableMap::UPDATED_AT;
+        $this->modifiedColumns[TaxRuleCountryTableMap::UPDATED_AT] = true;
 
         return $this;
     }

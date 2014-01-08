@@ -126,7 +126,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -137,7 +137,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -146,7 +146,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -199,8 +199,8 @@ abstract class FeatureTemplate implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -468,7 +468,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = FeatureTemplateTableMap::ID;
+            $this->modifiedColumns[FeatureTemplateTableMap::ID] = true;
         }
 
 
@@ -489,7 +489,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
 
         if ($this->feature_id !== $v) {
             $this->feature_id = $v;
-            $this->modifiedColumns[] = FeatureTemplateTableMap::FEATURE_ID;
+            $this->modifiedColumns[FeatureTemplateTableMap::FEATURE_ID] = true;
         }
 
         if ($this->aFeature !== null && $this->aFeature->getId() !== $v) {
@@ -514,7 +514,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
 
         if ($this->template_id !== $v) {
             $this->template_id = $v;
-            $this->modifiedColumns[] = FeatureTemplateTableMap::TEMPLATE_ID;
+            $this->modifiedColumns[FeatureTemplateTableMap::TEMPLATE_ID] = true;
         }
 
         if ($this->aTemplate !== null && $this->aTemplate->getId() !== $v) {
@@ -539,7 +539,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = FeatureTemplateTableMap::POSITION;
+            $this->modifiedColumns[FeatureTemplateTableMap::POSITION] = true;
         }
 
 
@@ -559,7 +559,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = FeatureTemplateTableMap::CREATED_AT;
+                $this->modifiedColumns[FeatureTemplateTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -580,7 +580,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = FeatureTemplateTableMap::UPDATED_AT;
+                $this->modifiedColumns[FeatureTemplateTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -897,7 +897,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = FeatureTemplateTableMap::ID;
+        $this->modifiedColumns[FeatureTemplateTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . FeatureTemplateTableMap::ID . ')');
         }
@@ -1430,7 +1430,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = FeatureTemplateTableMap::UPDATED_AT;
+        $this->modifiedColumns[FeatureTemplateTableMap::UPDATED_AT] = true;
 
         return $this;
     }

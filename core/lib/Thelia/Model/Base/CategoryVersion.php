@@ -150,7 +150,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -161,7 +161,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -170,7 +170,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -223,8 +223,8 @@ abstract class CategoryVersion implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -534,7 +534,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CategoryVersionTableMap::ID;
+            $this->modifiedColumns[CategoryVersionTableMap::ID] = true;
         }
 
         if ($this->aCategory !== null && $this->aCategory->getId() !== $v) {
@@ -559,7 +559,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
 
         if ($this->parent !== $v) {
             $this->parent = $v;
-            $this->modifiedColumns[] = CategoryVersionTableMap::PARENT;
+            $this->modifiedColumns[CategoryVersionTableMap::PARENT] = true;
         }
 
 
@@ -580,7 +580,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
 
         if ($this->visible !== $v) {
             $this->visible = $v;
-            $this->modifiedColumns[] = CategoryVersionTableMap::VISIBLE;
+            $this->modifiedColumns[CategoryVersionTableMap::VISIBLE] = true;
         }
 
 
@@ -601,7 +601,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = CategoryVersionTableMap::POSITION;
+            $this->modifiedColumns[CategoryVersionTableMap::POSITION] = true;
         }
 
 
@@ -621,7 +621,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = CategoryVersionTableMap::CREATED_AT;
+                $this->modifiedColumns[CategoryVersionTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -642,7 +642,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = CategoryVersionTableMap::UPDATED_AT;
+                $this->modifiedColumns[CategoryVersionTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -664,7 +664,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
 
         if ($this->version !== $v) {
             $this->version = $v;
-            $this->modifiedColumns[] = CategoryVersionTableMap::VERSION;
+            $this->modifiedColumns[CategoryVersionTableMap::VERSION] = true;
         }
 
 
@@ -684,7 +684,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
         if ($this->version_created_at !== null || $dt !== null) {
             if ($dt !== $this->version_created_at) {
                 $this->version_created_at = $dt;
-                $this->modifiedColumns[] = CategoryVersionTableMap::VERSION_CREATED_AT;
+                $this->modifiedColumns[CategoryVersionTableMap::VERSION_CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -706,7 +706,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
 
         if ($this->version_created_by !== $v) {
             $this->version_created_by = $v;
-            $this->modifiedColumns[] = CategoryVersionTableMap::VERSION_CREATED_BY;
+            $this->modifiedColumns[CategoryVersionTableMap::VERSION_CREATED_BY] = true;
         }
 
 

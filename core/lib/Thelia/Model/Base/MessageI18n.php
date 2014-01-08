@@ -130,7 +130,7 @@ abstract class MessageI18n implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -141,7 +141,7 @@ abstract class MessageI18n implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -150,7 +150,7 @@ abstract class MessageI18n implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -203,8 +203,8 @@ abstract class MessageI18n implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -454,7 +454,7 @@ abstract class MessageI18n implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = MessageI18nTableMap::ID;
+            $this->modifiedColumns[MessageI18nTableMap::ID] = true;
         }
 
         if ($this->aMessage !== null && $this->aMessage->getId() !== $v) {
@@ -479,7 +479,7 @@ abstract class MessageI18n implements ActiveRecordInterface
 
         if ($this->locale !== $v) {
             $this->locale = $v;
-            $this->modifiedColumns[] = MessageI18nTableMap::LOCALE;
+            $this->modifiedColumns[MessageI18nTableMap::LOCALE] = true;
         }
 
 
@@ -500,7 +500,7 @@ abstract class MessageI18n implements ActiveRecordInterface
 
         if ($this->title !== $v) {
             $this->title = $v;
-            $this->modifiedColumns[] = MessageI18nTableMap::TITLE;
+            $this->modifiedColumns[MessageI18nTableMap::TITLE] = true;
         }
 
 
@@ -521,7 +521,7 @@ abstract class MessageI18n implements ActiveRecordInterface
 
         if ($this->subject !== $v) {
             $this->subject = $v;
-            $this->modifiedColumns[] = MessageI18nTableMap::SUBJECT;
+            $this->modifiedColumns[MessageI18nTableMap::SUBJECT] = true;
         }
 
 
@@ -542,7 +542,7 @@ abstract class MessageI18n implements ActiveRecordInterface
 
         if ($this->text_message !== $v) {
             $this->text_message = $v;
-            $this->modifiedColumns[] = MessageI18nTableMap::TEXT_MESSAGE;
+            $this->modifiedColumns[MessageI18nTableMap::TEXT_MESSAGE] = true;
         }
 
 
@@ -563,7 +563,7 @@ abstract class MessageI18n implements ActiveRecordInterface
 
         if ($this->html_message !== $v) {
             $this->html_message = $v;
-            $this->modifiedColumns[] = MessageI18nTableMap::HTML_MESSAGE;
+            $this->modifiedColumns[MessageI18nTableMap::HTML_MESSAGE] = true;
         }
 
 

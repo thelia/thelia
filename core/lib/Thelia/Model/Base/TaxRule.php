@@ -171,7 +171,7 @@ abstract class TaxRule implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -182,7 +182,7 @@ abstract class TaxRule implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -191,7 +191,7 @@ abstract class TaxRule implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -244,8 +244,8 @@ abstract class TaxRule implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -491,7 +491,7 @@ abstract class TaxRule implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = TaxRuleTableMap::ID;
+            $this->modifiedColumns[TaxRuleTableMap::ID] = true;
         }
 
 
@@ -520,7 +520,7 @@ abstract class TaxRule implements ActiveRecordInterface
 
         if ($this->is_default !== $v) {
             $this->is_default = $v;
-            $this->modifiedColumns[] = TaxRuleTableMap::IS_DEFAULT;
+            $this->modifiedColumns[TaxRuleTableMap::IS_DEFAULT] = true;
         }
 
 
@@ -540,7 +540,7 @@ abstract class TaxRule implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = TaxRuleTableMap::CREATED_AT;
+                $this->modifiedColumns[TaxRuleTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -561,7 +561,7 @@ abstract class TaxRule implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = TaxRuleTableMap::UPDATED_AT;
+                $this->modifiedColumns[TaxRuleTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -907,7 +907,7 @@ abstract class TaxRule implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = TaxRuleTableMap::ID;
+        $this->modifiedColumns[TaxRuleTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . TaxRuleTableMap::ID . ')');
         }
@@ -1384,7 +1384,7 @@ abstract class TaxRule implements ActiveRecordInterface
                         $this->collProductsPartial = true;
                     }
 
-                    $collProducts->getInternalIterator()->rewind();
+                    reset($collProducts);
 
                     return $collProducts;
                 }
@@ -1627,7 +1627,7 @@ abstract class TaxRule implements ActiveRecordInterface
                         $this->collTaxRuleCountriesPartial = true;
                     }
 
-                    $collTaxRuleCountries->getInternalIterator()->rewind();
+                    reset($collTaxRuleCountries);
 
                     return $collTaxRuleCountries;
                 }
@@ -1898,7 +1898,7 @@ abstract class TaxRule implements ActiveRecordInterface
                         $this->collTaxRuleI18nsPartial = true;
                     }
 
-                    $collTaxRuleI18ns->getInternalIterator()->rewind();
+                    reset($collTaxRuleI18ns);
 
                     return $collTaxRuleI18ns;
                 }
@@ -2091,17 +2091,8 @@ abstract class TaxRule implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collProducts instanceof Collection) {
-            $this->collProducts->clearIterator();
-        }
         $this->collProducts = null;
-        if ($this->collTaxRuleCountries instanceof Collection) {
-            $this->collTaxRuleCountries->clearIterator();
-        }
         $this->collTaxRuleCountries = null;
-        if ($this->collTaxRuleI18ns instanceof Collection) {
-            $this->collTaxRuleI18ns->clearIterator();
-        }
         $this->collTaxRuleI18ns = null;
     }
 
@@ -2124,7 +2115,7 @@ abstract class TaxRule implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = TaxRuleTableMap::UPDATED_AT;
+        $this->modifiedColumns[TaxRuleTableMap::UPDATED_AT] = true;
 
         return $this;
     }

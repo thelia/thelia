@@ -156,7 +156,7 @@ abstract class Resource implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -167,7 +167,7 @@ abstract class Resource implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -176,7 +176,7 @@ abstract class Resource implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -229,8 +229,8 @@ abstract class Resource implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -476,7 +476,7 @@ abstract class Resource implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = ResourceTableMap::ID;
+            $this->modifiedColumns[ResourceTableMap::ID] = true;
         }
 
 
@@ -497,7 +497,7 @@ abstract class Resource implements ActiveRecordInterface
 
         if ($this->code !== $v) {
             $this->code = $v;
-            $this->modifiedColumns[] = ResourceTableMap::CODE;
+            $this->modifiedColumns[ResourceTableMap::CODE] = true;
         }
 
 
@@ -517,7 +517,7 @@ abstract class Resource implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ResourceTableMap::CREATED_AT;
+                $this->modifiedColumns[ResourceTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -538,7 +538,7 @@ abstract class Resource implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ResourceTableMap::UPDATED_AT;
+                $this->modifiedColumns[ResourceTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -888,7 +888,7 @@ abstract class Resource implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ResourceTableMap::ID;
+        $this->modifiedColumns[ResourceTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . ResourceTableMap::ID . ')');
         }
@@ -1353,7 +1353,7 @@ abstract class Resource implements ActiveRecordInterface
                         $this->collProfileResourcesPartial = true;
                     }
 
-                    $collProfileResources->getInternalIterator()->rewind();
+                    reset($collProfileResources);
 
                     return $collProfileResources;
                 }
@@ -1599,7 +1599,7 @@ abstract class Resource implements ActiveRecordInterface
                         $this->collResourceI18nsPartial = true;
                     }
 
-                    $collResourceI18ns->getInternalIterator()->rewind();
+                    reset($collResourceI18ns);
 
                     return $collResourceI18ns;
                 }
@@ -1974,17 +1974,8 @@ abstract class Resource implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collProfileResources instanceof Collection) {
-            $this->collProfileResources->clearIterator();
-        }
         $this->collProfileResources = null;
-        if ($this->collResourceI18ns instanceof Collection) {
-            $this->collResourceI18ns->clearIterator();
-        }
         $this->collResourceI18ns = null;
-        if ($this->collProfiles instanceof Collection) {
-            $this->collProfiles->clearIterator();
-        }
         $this->collProfiles = null;
     }
 
@@ -2007,7 +1998,7 @@ abstract class Resource implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ResourceTableMap::UPDATED_AT;
+        $this->modifiedColumns[ResourceTableMap::UPDATED_AT] = true;
 
         return $this;
     }

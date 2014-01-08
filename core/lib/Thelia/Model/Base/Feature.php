@@ -204,7 +204,7 @@ abstract class Feature implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -215,7 +215,7 @@ abstract class Feature implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -224,7 +224,7 @@ abstract class Feature implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -277,8 +277,8 @@ abstract class Feature implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -535,7 +535,7 @@ abstract class Feature implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = FeatureTableMap::ID;
+            $this->modifiedColumns[FeatureTableMap::ID] = true;
         }
 
 
@@ -556,7 +556,7 @@ abstract class Feature implements ActiveRecordInterface
 
         if ($this->visible !== $v) {
             $this->visible = $v;
-            $this->modifiedColumns[] = FeatureTableMap::VISIBLE;
+            $this->modifiedColumns[FeatureTableMap::VISIBLE] = true;
         }
 
 
@@ -577,7 +577,7 @@ abstract class Feature implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = FeatureTableMap::POSITION;
+            $this->modifiedColumns[FeatureTableMap::POSITION] = true;
         }
 
 
@@ -597,7 +597,7 @@ abstract class Feature implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = FeatureTableMap::CREATED_AT;
+                $this->modifiedColumns[FeatureTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -618,7 +618,7 @@ abstract class Feature implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = FeatureTableMap::UPDATED_AT;
+                $this->modifiedColumns[FeatureTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1013,7 +1013,7 @@ abstract class Feature implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = FeatureTableMap::ID;
+        $this->modifiedColumns[FeatureTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . FeatureTableMap::ID . ')');
         }
@@ -1518,7 +1518,7 @@ abstract class Feature implements ActiveRecordInterface
                         $this->collFeatureAvsPartial = true;
                     }
 
-                    $collFeatureAvs->getInternalIterator()->rewind();
+                    reset($collFeatureAvs);
 
                     return $collFeatureAvs;
                 }
@@ -1736,7 +1736,7 @@ abstract class Feature implements ActiveRecordInterface
                         $this->collFeatureProductsPartial = true;
                     }
 
-                    $collFeatureProducts->getInternalIterator()->rewind();
+                    reset($collFeatureProducts);
 
                     return $collFeatureProducts;
                 }
@@ -2004,7 +2004,7 @@ abstract class Feature implements ActiveRecordInterface
                         $this->collFeatureTemplatesPartial = true;
                     }
 
-                    $collFeatureTemplates->getInternalIterator()->rewind();
+                    reset($collFeatureTemplates);
 
                     return $collFeatureTemplates;
                 }
@@ -2247,7 +2247,7 @@ abstract class Feature implements ActiveRecordInterface
                         $this->collFeatureI18nsPartial = true;
                     }
 
-                    $collFeatureI18ns->getInternalIterator()->rewind();
+                    reset($collFeatureI18ns);
 
                     return $collFeatureI18ns;
                 }
@@ -2634,25 +2634,10 @@ abstract class Feature implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collFeatureAvs instanceof Collection) {
-            $this->collFeatureAvs->clearIterator();
-        }
         $this->collFeatureAvs = null;
-        if ($this->collFeatureProducts instanceof Collection) {
-            $this->collFeatureProducts->clearIterator();
-        }
         $this->collFeatureProducts = null;
-        if ($this->collFeatureTemplates instanceof Collection) {
-            $this->collFeatureTemplates->clearIterator();
-        }
         $this->collFeatureTemplates = null;
-        if ($this->collFeatureI18ns instanceof Collection) {
-            $this->collFeatureI18ns->clearIterator();
-        }
         $this->collFeatureI18ns = null;
-        if ($this->collTemplates instanceof Collection) {
-            $this->collTemplates->clearIterator();
-        }
         $this->collTemplates = null;
     }
 
@@ -2675,7 +2660,7 @@ abstract class Feature implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = FeatureTableMap::UPDATED_AT;
+        $this->modifiedColumns[FeatureTableMap::UPDATED_AT] = true;
 
         return $this;
     }

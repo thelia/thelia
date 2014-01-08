@@ -136,7 +136,7 @@ abstract class AdminLog implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -147,7 +147,7 @@ abstract class AdminLog implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -156,7 +156,7 @@ abstract class AdminLog implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -209,8 +209,8 @@ abstract class AdminLog implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -522,7 +522,7 @@ abstract class AdminLog implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = AdminLogTableMap::ID;
+            $this->modifiedColumns[AdminLogTableMap::ID] = true;
         }
 
 
@@ -543,7 +543,7 @@ abstract class AdminLog implements ActiveRecordInterface
 
         if ($this->admin_login !== $v) {
             $this->admin_login = $v;
-            $this->modifiedColumns[] = AdminLogTableMap::ADMIN_LOGIN;
+            $this->modifiedColumns[AdminLogTableMap::ADMIN_LOGIN] = true;
         }
 
 
@@ -564,7 +564,7 @@ abstract class AdminLog implements ActiveRecordInterface
 
         if ($this->admin_firstname !== $v) {
             $this->admin_firstname = $v;
-            $this->modifiedColumns[] = AdminLogTableMap::ADMIN_FIRSTNAME;
+            $this->modifiedColumns[AdminLogTableMap::ADMIN_FIRSTNAME] = true;
         }
 
 
@@ -585,7 +585,7 @@ abstract class AdminLog implements ActiveRecordInterface
 
         if ($this->admin_lastname !== $v) {
             $this->admin_lastname = $v;
-            $this->modifiedColumns[] = AdminLogTableMap::ADMIN_LASTNAME;
+            $this->modifiedColumns[AdminLogTableMap::ADMIN_LASTNAME] = true;
         }
 
 
@@ -606,7 +606,7 @@ abstract class AdminLog implements ActiveRecordInterface
 
         if ($this->resource !== $v) {
             $this->resource = $v;
-            $this->modifiedColumns[] = AdminLogTableMap::RESOURCE;
+            $this->modifiedColumns[AdminLogTableMap::RESOURCE] = true;
         }
 
 
@@ -627,7 +627,7 @@ abstract class AdminLog implements ActiveRecordInterface
 
         if ($this->action !== $v) {
             $this->action = $v;
-            $this->modifiedColumns[] = AdminLogTableMap::ACTION;
+            $this->modifiedColumns[AdminLogTableMap::ACTION] = true;
         }
 
 
@@ -648,7 +648,7 @@ abstract class AdminLog implements ActiveRecordInterface
 
         if ($this->message !== $v) {
             $this->message = $v;
-            $this->modifiedColumns[] = AdminLogTableMap::MESSAGE;
+            $this->modifiedColumns[AdminLogTableMap::MESSAGE] = true;
         }
 
 
@@ -669,7 +669,7 @@ abstract class AdminLog implements ActiveRecordInterface
 
         if ($this->request !== $v) {
             $this->request = $v;
-            $this->modifiedColumns[] = AdminLogTableMap::REQUEST;
+            $this->modifiedColumns[AdminLogTableMap::REQUEST] = true;
         }
 
 
@@ -689,7 +689,7 @@ abstract class AdminLog implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = AdminLogTableMap::CREATED_AT;
+                $this->modifiedColumns[AdminLogTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -710,7 +710,7 @@ abstract class AdminLog implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = AdminLogTableMap::UPDATED_AT;
+                $this->modifiedColumns[AdminLogTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1012,7 +1012,7 @@ abstract class AdminLog implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = AdminLogTableMap::ID;
+        $this->modifiedColumns[AdminLogTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . AdminLogTableMap::ID . ')');
         }
@@ -1500,7 +1500,7 @@ abstract class AdminLog implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = AdminLogTableMap::UPDATED_AT;
+        $this->modifiedColumns[AdminLogTableMap::UPDATED_AT] = true;
 
         return $this;
     }

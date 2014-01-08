@@ -164,7 +164,7 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -175,7 +175,7 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -184,7 +184,7 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -237,8 +237,8 @@ abstract class ProductVersion implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -570,7 +570,7 @@ abstract class ProductVersion implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::ID;
+            $this->modifiedColumns[ProductVersionTableMap::ID] = true;
         }
 
         if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
@@ -595,7 +595,7 @@ abstract class ProductVersion implements ActiveRecordInterface
 
         if ($this->tax_rule_id !== $v) {
             $this->tax_rule_id = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::TAX_RULE_ID;
+            $this->modifiedColumns[ProductVersionTableMap::TAX_RULE_ID] = true;
         }
 
 
@@ -616,7 +616,7 @@ abstract class ProductVersion implements ActiveRecordInterface
 
         if ($this->ref !== $v) {
             $this->ref = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::REF;
+            $this->modifiedColumns[ProductVersionTableMap::REF] = true;
         }
 
 
@@ -637,7 +637,7 @@ abstract class ProductVersion implements ActiveRecordInterface
 
         if ($this->visible !== $v) {
             $this->visible = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::VISIBLE;
+            $this->modifiedColumns[ProductVersionTableMap::VISIBLE] = true;
         }
 
 
@@ -658,7 +658,7 @@ abstract class ProductVersion implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::POSITION;
+            $this->modifiedColumns[ProductVersionTableMap::POSITION] = true;
         }
 
 
@@ -679,7 +679,7 @@ abstract class ProductVersion implements ActiveRecordInterface
 
         if ($this->template_id !== $v) {
             $this->template_id = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::TEMPLATE_ID;
+            $this->modifiedColumns[ProductVersionTableMap::TEMPLATE_ID] = true;
         }
 
 
@@ -699,7 +699,7 @@ abstract class ProductVersion implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ProductVersionTableMap::CREATED_AT;
+                $this->modifiedColumns[ProductVersionTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -720,7 +720,7 @@ abstract class ProductVersion implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ProductVersionTableMap::UPDATED_AT;
+                $this->modifiedColumns[ProductVersionTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -742,7 +742,7 @@ abstract class ProductVersion implements ActiveRecordInterface
 
         if ($this->version !== $v) {
             $this->version = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::VERSION;
+            $this->modifiedColumns[ProductVersionTableMap::VERSION] = true;
         }
 
 
@@ -762,7 +762,7 @@ abstract class ProductVersion implements ActiveRecordInterface
         if ($this->version_created_at !== null || $dt !== null) {
             if ($dt !== $this->version_created_at) {
                 $this->version_created_at = $dt;
-                $this->modifiedColumns[] = ProductVersionTableMap::VERSION_CREATED_AT;
+                $this->modifiedColumns[ProductVersionTableMap::VERSION_CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -784,7 +784,7 @@ abstract class ProductVersion implements ActiveRecordInterface
 
         if ($this->version_created_by !== $v) {
             $this->version_created_by = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::VERSION_CREATED_BY;
+            $this->modifiedColumns[ProductVersionTableMap::VERSION_CREATED_BY] = true;
         }
 
 

@@ -191,7 +191,7 @@ abstract class Template implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -202,7 +202,7 @@ abstract class Template implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -211,7 +211,7 @@ abstract class Template implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -264,8 +264,8 @@ abstract class Template implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -500,7 +500,7 @@ abstract class Template implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = TemplateTableMap::ID;
+            $this->modifiedColumns[TemplateTableMap::ID] = true;
         }
 
 
@@ -520,7 +520,7 @@ abstract class Template implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = TemplateTableMap::CREATED_AT;
+                $this->modifiedColumns[TemplateTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -541,7 +541,7 @@ abstract class Template implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = TemplateTableMap::UPDATED_AT;
+                $this->modifiedColumns[TemplateTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -955,7 +955,7 @@ abstract class Template implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = TemplateTableMap::ID;
+        $this->modifiedColumns[TemplateTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . TemplateTableMap::ID . ')');
         }
@@ -1428,7 +1428,7 @@ abstract class Template implements ActiveRecordInterface
                         $this->collProductsPartial = true;
                     }
 
-                    $collProducts->getInternalIterator()->rewind();
+                    reset($collProducts);
 
                     return $collProducts;
                 }
@@ -1671,7 +1671,7 @@ abstract class Template implements ActiveRecordInterface
                         $this->collFeatureTemplatesPartial = true;
                     }
 
-                    $collFeatureTemplates->getInternalIterator()->rewind();
+                    reset($collFeatureTemplates);
 
                     return $collFeatureTemplates;
                 }
@@ -1914,7 +1914,7 @@ abstract class Template implements ActiveRecordInterface
                         $this->collAttributeTemplatesPartial = true;
                     }
 
-                    $collAttributeTemplates->getInternalIterator()->rewind();
+                    reset($collAttributeTemplates);
 
                     return $collAttributeTemplates;
                 }
@@ -2157,7 +2157,7 @@ abstract class Template implements ActiveRecordInterface
                         $this->collTemplateI18nsPartial = true;
                     }
 
-                    $collTemplateI18ns->getInternalIterator()->rewind();
+                    reset($collTemplateI18ns);
 
                     return $collTemplateI18ns;
                 }
@@ -2729,29 +2729,11 @@ abstract class Template implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collProducts instanceof Collection) {
-            $this->collProducts->clearIterator();
-        }
         $this->collProducts = null;
-        if ($this->collFeatureTemplates instanceof Collection) {
-            $this->collFeatureTemplates->clearIterator();
-        }
         $this->collFeatureTemplates = null;
-        if ($this->collAttributeTemplates instanceof Collection) {
-            $this->collAttributeTemplates->clearIterator();
-        }
         $this->collAttributeTemplates = null;
-        if ($this->collTemplateI18ns instanceof Collection) {
-            $this->collTemplateI18ns->clearIterator();
-        }
         $this->collTemplateI18ns = null;
-        if ($this->collFeatures instanceof Collection) {
-            $this->collFeatures->clearIterator();
-        }
         $this->collFeatures = null;
-        if ($this->collAttributes instanceof Collection) {
-            $this->collAttributes->clearIterator();
-        }
         $this->collAttributes = null;
     }
 
@@ -2897,7 +2879,7 @@ abstract class Template implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = TemplateTableMap::UPDATED_AT;
+        $this->modifiedColumns[TemplateTableMap::UPDATED_AT] = true;
 
         return $this;
     }

@@ -232,7 +232,7 @@ abstract class OrderProduct implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -243,7 +243,7 @@ abstract class OrderProduct implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -252,7 +252,7 @@ abstract class OrderProduct implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -305,8 +305,8 @@ abstract class OrderProduct implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -728,7 +728,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::ID;
+            $this->modifiedColumns[OrderProductTableMap::ID] = true;
         }
 
 
@@ -749,7 +749,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->order_id !== $v) {
             $this->order_id = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::ORDER_ID;
+            $this->modifiedColumns[OrderProductTableMap::ORDER_ID] = true;
         }
 
         if ($this->aOrder !== null && $this->aOrder->getId() !== $v) {
@@ -774,7 +774,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->product_ref !== $v) {
             $this->product_ref = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::PRODUCT_REF;
+            $this->modifiedColumns[OrderProductTableMap::PRODUCT_REF] = true;
         }
 
 
@@ -795,7 +795,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->product_sale_elements_ref !== $v) {
             $this->product_sale_elements_ref = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF;
+            $this->modifiedColumns[OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF] = true;
         }
 
 
@@ -816,7 +816,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->title !== $v) {
             $this->title = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::TITLE;
+            $this->modifiedColumns[OrderProductTableMap::TITLE] = true;
         }
 
 
@@ -837,7 +837,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->chapo !== $v) {
             $this->chapo = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::CHAPO;
+            $this->modifiedColumns[OrderProductTableMap::CHAPO] = true;
         }
 
 
@@ -858,7 +858,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->description !== $v) {
             $this->description = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::DESCRIPTION;
+            $this->modifiedColumns[OrderProductTableMap::DESCRIPTION] = true;
         }
 
 
@@ -879,7 +879,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->postscriptum !== $v) {
             $this->postscriptum = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::POSTSCRIPTUM;
+            $this->modifiedColumns[OrderProductTableMap::POSTSCRIPTUM] = true;
         }
 
 
@@ -900,7 +900,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->quantity !== $v) {
             $this->quantity = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::QUANTITY;
+            $this->modifiedColumns[OrderProductTableMap::QUANTITY] = true;
         }
 
 
@@ -921,7 +921,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->price !== $v) {
             $this->price = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::PRICE;
+            $this->modifiedColumns[OrderProductTableMap::PRICE] = true;
         }
 
 
@@ -942,7 +942,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->promo_price !== $v) {
             $this->promo_price = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::PROMO_PRICE;
+            $this->modifiedColumns[OrderProductTableMap::PROMO_PRICE] = true;
         }
 
 
@@ -963,7 +963,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->was_new !== $v) {
             $this->was_new = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::WAS_NEW;
+            $this->modifiedColumns[OrderProductTableMap::WAS_NEW] = true;
         }
 
 
@@ -984,7 +984,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->was_in_promo !== $v) {
             $this->was_in_promo = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::WAS_IN_PROMO;
+            $this->modifiedColumns[OrderProductTableMap::WAS_IN_PROMO] = true;
         }
 
 
@@ -1005,7 +1005,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->weight !== $v) {
             $this->weight = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::WEIGHT;
+            $this->modifiedColumns[OrderProductTableMap::WEIGHT] = true;
         }
 
 
@@ -1026,7 +1026,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->ean_code !== $v) {
             $this->ean_code = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::EAN_CODE;
+            $this->modifiedColumns[OrderProductTableMap::EAN_CODE] = true;
         }
 
 
@@ -1047,7 +1047,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->tax_rule_title !== $v) {
             $this->tax_rule_title = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::TAX_RULE_TITLE;
+            $this->modifiedColumns[OrderProductTableMap::TAX_RULE_TITLE] = true;
         }
 
 
@@ -1068,7 +1068,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->tax_rule_description !== $v) {
             $this->tax_rule_description = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::TAX_RULE_DESCRIPTION;
+            $this->modifiedColumns[OrderProductTableMap::TAX_RULE_DESCRIPTION] = true;
         }
 
 
@@ -1089,7 +1089,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         if ($this->parent !== $v) {
             $this->parent = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::PARENT;
+            $this->modifiedColumns[OrderProductTableMap::PARENT] = true;
         }
 
 
@@ -1109,7 +1109,7 @@ abstract class OrderProduct implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = OrderProductTableMap::CREATED_AT;
+                $this->modifiedColumns[OrderProductTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -1130,7 +1130,7 @@ abstract class OrderProduct implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = OrderProductTableMap::UPDATED_AT;
+                $this->modifiedColumns[OrderProductTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1516,7 +1516,7 @@ abstract class OrderProduct implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = OrderProductTableMap::ID;
+        $this->modifiedColumns[OrderProductTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . OrderProductTableMap::ID . ')');
         }
@@ -2291,7 +2291,7 @@ abstract class OrderProduct implements ActiveRecordInterface
                         $this->collOrderProductAttributeCombinationsPartial = true;
                     }
 
-                    $collOrderProductAttributeCombinations->getInternalIterator()->rewind();
+                    reset($collOrderProductAttributeCombinations);
 
                     return $collOrderProductAttributeCombinations;
                 }
@@ -2509,7 +2509,7 @@ abstract class OrderProduct implements ActiveRecordInterface
                         $this->collOrderProductTaxesPartial = true;
                     }
 
-                    $collOrderProductTaxes->getInternalIterator()->rewind();
+                    reset($collOrderProductTaxes);
 
                     return $collOrderProductTaxes;
                 }
@@ -2701,13 +2701,7 @@ abstract class OrderProduct implements ActiveRecordInterface
             }
         } // if ($deep)
 
-        if ($this->collOrderProductAttributeCombinations instanceof Collection) {
-            $this->collOrderProductAttributeCombinations->clearIterator();
-        }
         $this->collOrderProductAttributeCombinations = null;
-        if ($this->collOrderProductTaxes instanceof Collection) {
-            $this->collOrderProductTaxes->clearIterator();
-        }
         $this->collOrderProductTaxes = null;
         $this->aOrder = null;
     }
@@ -2731,7 +2725,7 @@ abstract class OrderProduct implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = OrderProductTableMap::UPDATED_AT;
+        $this->modifiedColumns[OrderProductTableMap::UPDATED_AT] = true;
 
         return $this;
     }

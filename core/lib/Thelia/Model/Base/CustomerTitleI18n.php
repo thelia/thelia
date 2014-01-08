@@ -118,7 +118,7 @@ abstract class CustomerTitleI18n implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -129,7 +129,7 @@ abstract class CustomerTitleI18n implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -138,7 +138,7 @@ abstract class CustomerTitleI18n implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -191,8 +191,8 @@ abstract class CustomerTitleI18n implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -420,7 +420,7 @@ abstract class CustomerTitleI18n implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CustomerTitleI18nTableMap::ID;
+            $this->modifiedColumns[CustomerTitleI18nTableMap::ID] = true;
         }
 
         if ($this->aCustomerTitle !== null && $this->aCustomerTitle->getId() !== $v) {
@@ -445,7 +445,7 @@ abstract class CustomerTitleI18n implements ActiveRecordInterface
 
         if ($this->locale !== $v) {
             $this->locale = $v;
-            $this->modifiedColumns[] = CustomerTitleI18nTableMap::LOCALE;
+            $this->modifiedColumns[CustomerTitleI18nTableMap::LOCALE] = true;
         }
 
 
@@ -466,7 +466,7 @@ abstract class CustomerTitleI18n implements ActiveRecordInterface
 
         if ($this->short !== $v) {
             $this->short = $v;
-            $this->modifiedColumns[] = CustomerTitleI18nTableMap::SHORT;
+            $this->modifiedColumns[CustomerTitleI18nTableMap::SHORT] = true;
         }
 
 
@@ -487,7 +487,7 @@ abstract class CustomerTitleI18n implements ActiveRecordInterface
 
         if ($this->long !== $v) {
             $this->long = $v;
-            $this->modifiedColumns[] = CustomerTitleI18nTableMap::LONG;
+            $this->modifiedColumns[CustomerTitleI18nTableMap::LONG] = true;
         }
 
 

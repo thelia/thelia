@@ -184,7 +184,7 @@ abstract class Attribute implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -195,7 +195,7 @@ abstract class Attribute implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -204,7 +204,7 @@ abstract class Attribute implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -257,8 +257,8 @@ abstract class Attribute implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -504,7 +504,7 @@ abstract class Attribute implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = AttributeTableMap::ID;
+            $this->modifiedColumns[AttributeTableMap::ID] = true;
         }
 
 
@@ -525,7 +525,7 @@ abstract class Attribute implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = AttributeTableMap::POSITION;
+            $this->modifiedColumns[AttributeTableMap::POSITION] = true;
         }
 
 
@@ -545,7 +545,7 @@ abstract class Attribute implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = AttributeTableMap::CREATED_AT;
+                $this->modifiedColumns[AttributeTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -566,7 +566,7 @@ abstract class Attribute implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = AttributeTableMap::UPDATED_AT;
+                $this->modifiedColumns[AttributeTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -954,7 +954,7 @@ abstract class Attribute implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = AttributeTableMap::ID;
+        $this->modifiedColumns[AttributeTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . AttributeTableMap::ID . ')');
         }
@@ -1443,7 +1443,7 @@ abstract class Attribute implements ActiveRecordInterface
                         $this->collAttributeAvsPartial = true;
                     }
 
-                    $collAttributeAvs->getInternalIterator()->rewind();
+                    reset($collAttributeAvs);
 
                     return $collAttributeAvs;
                 }
@@ -1661,7 +1661,7 @@ abstract class Attribute implements ActiveRecordInterface
                         $this->collAttributeCombinationsPartial = true;
                     }
 
-                    $collAttributeCombinations->getInternalIterator()->rewind();
+                    reset($collAttributeCombinations);
 
                     return $collAttributeCombinations;
                 }
@@ -1932,7 +1932,7 @@ abstract class Attribute implements ActiveRecordInterface
                         $this->collAttributeTemplatesPartial = true;
                     }
 
-                    $collAttributeTemplates->getInternalIterator()->rewind();
+                    reset($collAttributeTemplates);
 
                     return $collAttributeTemplates;
                 }
@@ -2175,7 +2175,7 @@ abstract class Attribute implements ActiveRecordInterface
                         $this->collAttributeI18nsPartial = true;
                     }
 
-                    $collAttributeI18ns->getInternalIterator()->rewind();
+                    reset($collAttributeI18ns);
 
                     return $collAttributeI18ns;
                 }
@@ -2560,25 +2560,10 @@ abstract class Attribute implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collAttributeAvs instanceof Collection) {
-            $this->collAttributeAvs->clearIterator();
-        }
         $this->collAttributeAvs = null;
-        if ($this->collAttributeCombinations instanceof Collection) {
-            $this->collAttributeCombinations->clearIterator();
-        }
         $this->collAttributeCombinations = null;
-        if ($this->collAttributeTemplates instanceof Collection) {
-            $this->collAttributeTemplates->clearIterator();
-        }
         $this->collAttributeTemplates = null;
-        if ($this->collAttributeI18ns instanceof Collection) {
-            $this->collAttributeI18ns->clearIterator();
-        }
         $this->collAttributeI18ns = null;
-        if ($this->collTemplates instanceof Collection) {
-            $this->collTemplates->clearIterator();
-        }
         $this->collTemplates = null;
     }
 
@@ -2601,7 +2586,7 @@ abstract class Attribute implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = AttributeTableMap::UPDATED_AT;
+        $this->modifiedColumns[AttributeTableMap::UPDATED_AT] = true;
 
         return $this;
     }

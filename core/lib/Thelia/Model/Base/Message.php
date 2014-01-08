@@ -214,7 +214,7 @@ abstract class Message implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -225,7 +225,7 @@ abstract class Message implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -234,7 +234,7 @@ abstract class Message implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -287,8 +287,8 @@ abstract class Message implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -631,7 +631,7 @@ abstract class Message implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = MessageTableMap::ID;
+            $this->modifiedColumns[MessageTableMap::ID] = true;
         }
 
 
@@ -652,7 +652,7 @@ abstract class Message implements ActiveRecordInterface
 
         if ($this->name !== $v) {
             $this->name = $v;
-            $this->modifiedColumns[] = MessageTableMap::NAME;
+            $this->modifiedColumns[MessageTableMap::NAME] = true;
         }
 
 
@@ -673,7 +673,7 @@ abstract class Message implements ActiveRecordInterface
 
         if ($this->secured !== $v) {
             $this->secured = $v;
-            $this->modifiedColumns[] = MessageTableMap::SECURED;
+            $this->modifiedColumns[MessageTableMap::SECURED] = true;
         }
 
 
@@ -694,7 +694,7 @@ abstract class Message implements ActiveRecordInterface
 
         if ($this->text_layout_file_name !== $v) {
             $this->text_layout_file_name = $v;
-            $this->modifiedColumns[] = MessageTableMap::TEXT_LAYOUT_FILE_NAME;
+            $this->modifiedColumns[MessageTableMap::TEXT_LAYOUT_FILE_NAME] = true;
         }
 
 
@@ -715,7 +715,7 @@ abstract class Message implements ActiveRecordInterface
 
         if ($this->text_template_file_name !== $v) {
             $this->text_template_file_name = $v;
-            $this->modifiedColumns[] = MessageTableMap::TEXT_TEMPLATE_FILE_NAME;
+            $this->modifiedColumns[MessageTableMap::TEXT_TEMPLATE_FILE_NAME] = true;
         }
 
 
@@ -736,7 +736,7 @@ abstract class Message implements ActiveRecordInterface
 
         if ($this->html_layout_file_name !== $v) {
             $this->html_layout_file_name = $v;
-            $this->modifiedColumns[] = MessageTableMap::HTML_LAYOUT_FILE_NAME;
+            $this->modifiedColumns[MessageTableMap::HTML_LAYOUT_FILE_NAME] = true;
         }
 
 
@@ -757,7 +757,7 @@ abstract class Message implements ActiveRecordInterface
 
         if ($this->html_template_file_name !== $v) {
             $this->html_template_file_name = $v;
-            $this->modifiedColumns[] = MessageTableMap::HTML_TEMPLATE_FILE_NAME;
+            $this->modifiedColumns[MessageTableMap::HTML_TEMPLATE_FILE_NAME] = true;
         }
 
 
@@ -777,7 +777,7 @@ abstract class Message implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = MessageTableMap::CREATED_AT;
+                $this->modifiedColumns[MessageTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -798,7 +798,7 @@ abstract class Message implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = MessageTableMap::UPDATED_AT;
+                $this->modifiedColumns[MessageTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -820,7 +820,7 @@ abstract class Message implements ActiveRecordInterface
 
         if ($this->version !== $v) {
             $this->version = $v;
-            $this->modifiedColumns[] = MessageTableMap::VERSION;
+            $this->modifiedColumns[MessageTableMap::VERSION] = true;
         }
 
 
@@ -840,7 +840,7 @@ abstract class Message implements ActiveRecordInterface
         if ($this->version_created_at !== null || $dt !== null) {
             if ($dt !== $this->version_created_at) {
                 $this->version_created_at = $dt;
-                $this->modifiedColumns[] = MessageTableMap::VERSION_CREATED_AT;
+                $this->modifiedColumns[MessageTableMap::VERSION_CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -862,7 +862,7 @@ abstract class Message implements ActiveRecordInterface
 
         if ($this->version_created_by !== $v) {
             $this->version_created_by = $v;
-            $this->modifiedColumns[] = MessageTableMap::VERSION_CREATED_BY;
+            $this->modifiedColumns[MessageTableMap::VERSION_CREATED_BY] = true;
         }
 
 
@@ -1226,7 +1226,7 @@ abstract class Message implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = MessageTableMap::ID;
+        $this->modifiedColumns[MessageTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . MessageTableMap::ID . ')');
         }
@@ -1819,7 +1819,7 @@ abstract class Message implements ActiveRecordInterface
                         $this->collMessageI18nsPartial = true;
                     }
 
-                    $collMessageI18ns->getInternalIterator()->rewind();
+                    reset($collMessageI18ns);
 
                     return $collMessageI18ns;
                 }
@@ -2044,7 +2044,7 @@ abstract class Message implements ActiveRecordInterface
                         $this->collMessageVersionsPartial = true;
                     }
 
-                    $collMessageVersions->getInternalIterator()->rewind();
+                    reset($collMessageVersions);
 
                     return $collMessageVersions;
                 }
@@ -2236,13 +2236,7 @@ abstract class Message implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collMessageI18ns instanceof Collection) {
-            $this->collMessageI18ns->clearIterator();
-        }
         $this->collMessageI18ns = null;
-        if ($this->collMessageVersions instanceof Collection) {
-            $this->collMessageVersions->clearIterator();
-        }
         $this->collMessageVersions = null;
     }
 
@@ -2265,7 +2259,7 @@ abstract class Message implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = MessageTableMap::UPDATED_AT;
+        $this->modifiedColumns[MessageTableMap::UPDATED_AT] = true;
 
         return $this;
     }

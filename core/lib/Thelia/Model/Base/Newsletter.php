@@ -118,7 +118,7 @@ abstract class Newsletter implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -129,7 +129,7 @@ abstract class Newsletter implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -138,7 +138,7 @@ abstract class Newsletter implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -191,8 +191,8 @@ abstract class Newsletter implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -471,7 +471,7 @@ abstract class Newsletter implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = NewsletterTableMap::ID;
+            $this->modifiedColumns[NewsletterTableMap::ID] = true;
         }
 
 
@@ -492,7 +492,7 @@ abstract class Newsletter implements ActiveRecordInterface
 
         if ($this->email !== $v) {
             $this->email = $v;
-            $this->modifiedColumns[] = NewsletterTableMap::EMAIL;
+            $this->modifiedColumns[NewsletterTableMap::EMAIL] = true;
         }
 
 
@@ -513,7 +513,7 @@ abstract class Newsletter implements ActiveRecordInterface
 
         if ($this->firstname !== $v) {
             $this->firstname = $v;
-            $this->modifiedColumns[] = NewsletterTableMap::FIRSTNAME;
+            $this->modifiedColumns[NewsletterTableMap::FIRSTNAME] = true;
         }
 
 
@@ -534,7 +534,7 @@ abstract class Newsletter implements ActiveRecordInterface
 
         if ($this->lastname !== $v) {
             $this->lastname = $v;
-            $this->modifiedColumns[] = NewsletterTableMap::LASTNAME;
+            $this->modifiedColumns[NewsletterTableMap::LASTNAME] = true;
         }
 
 
@@ -555,7 +555,7 @@ abstract class Newsletter implements ActiveRecordInterface
 
         if ($this->locale !== $v) {
             $this->locale = $v;
-            $this->modifiedColumns[] = NewsletterTableMap::LOCALE;
+            $this->modifiedColumns[NewsletterTableMap::LOCALE] = true;
         }
 
 
@@ -575,7 +575,7 @@ abstract class Newsletter implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = NewsletterTableMap::CREATED_AT;
+                $this->modifiedColumns[NewsletterTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -596,7 +596,7 @@ abstract class Newsletter implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = NewsletterTableMap::UPDATED_AT;
+                $this->modifiedColumns[NewsletterTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -889,7 +889,7 @@ abstract class Newsletter implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = NewsletterTableMap::ID;
+        $this->modifiedColumns[NewsletterTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . NewsletterTableMap::ID . ')');
         }
@@ -1326,7 +1326,7 @@ abstract class Newsletter implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = NewsletterTableMap::UPDATED_AT;
+        $this->modifiedColumns[NewsletterTableMap::UPDATED_AT] = true;
 
         return $this;
     }

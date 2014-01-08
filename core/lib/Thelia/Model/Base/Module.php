@@ -221,7 +221,7 @@ abstract class Module implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -232,7 +232,7 @@ abstract class Module implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -241,7 +241,7 @@ abstract class Module implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -294,8 +294,8 @@ abstract class Module implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -585,7 +585,7 @@ abstract class Module implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = ModuleTableMap::ID;
+            $this->modifiedColumns[ModuleTableMap::ID] = true;
         }
 
 
@@ -606,7 +606,7 @@ abstract class Module implements ActiveRecordInterface
 
         if ($this->code !== $v) {
             $this->code = $v;
-            $this->modifiedColumns[] = ModuleTableMap::CODE;
+            $this->modifiedColumns[ModuleTableMap::CODE] = true;
         }
 
 
@@ -627,7 +627,7 @@ abstract class Module implements ActiveRecordInterface
 
         if ($this->type !== $v) {
             $this->type = $v;
-            $this->modifiedColumns[] = ModuleTableMap::TYPE;
+            $this->modifiedColumns[ModuleTableMap::TYPE] = true;
         }
 
 
@@ -648,7 +648,7 @@ abstract class Module implements ActiveRecordInterface
 
         if ($this->activate !== $v) {
             $this->activate = $v;
-            $this->modifiedColumns[] = ModuleTableMap::ACTIVATE;
+            $this->modifiedColumns[ModuleTableMap::ACTIVATE] = true;
         }
 
 
@@ -669,7 +669,7 @@ abstract class Module implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = ModuleTableMap::POSITION;
+            $this->modifiedColumns[ModuleTableMap::POSITION] = true;
         }
 
 
@@ -690,7 +690,7 @@ abstract class Module implements ActiveRecordInterface
 
         if ($this->full_namespace !== $v) {
             $this->full_namespace = $v;
-            $this->modifiedColumns[] = ModuleTableMap::FULL_NAMESPACE;
+            $this->modifiedColumns[ModuleTableMap::FULL_NAMESPACE] = true;
         }
 
 
@@ -710,7 +710,7 @@ abstract class Module implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ModuleTableMap::CREATED_AT;
+                $this->modifiedColumns[ModuleTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -731,7 +731,7 @@ abstract class Module implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ModuleTableMap::UPDATED_AT;
+                $this->modifiedColumns[ModuleTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1141,7 +1141,7 @@ abstract class Module implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ModuleTableMap::ID;
+        $this->modifiedColumns[ModuleTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . ModuleTableMap::ID . ')');
         }
@@ -1718,7 +1718,7 @@ abstract class Module implements ActiveRecordInterface
                         $this->collOrdersRelatedByPaymentModuleIdPartial = true;
                     }
 
-                    $collOrdersRelatedByPaymentModuleId->getInternalIterator()->rewind();
+                    reset($collOrdersRelatedByPaymentModuleId);
 
                     return $collOrdersRelatedByPaymentModuleId;
                 }
@@ -2086,7 +2086,7 @@ abstract class Module implements ActiveRecordInterface
                         $this->collOrdersRelatedByDeliveryModuleIdPartial = true;
                     }
 
-                    $collOrdersRelatedByDeliveryModuleId->getInternalIterator()->rewind();
+                    reset($collOrdersRelatedByDeliveryModuleId);
 
                     return $collOrdersRelatedByDeliveryModuleId;
                 }
@@ -2454,7 +2454,7 @@ abstract class Module implements ActiveRecordInterface
                         $this->collAreaDeliveryModulesPartial = true;
                     }
 
-                    $collAreaDeliveryModules->getInternalIterator()->rewind();
+                    reset($collAreaDeliveryModules);
 
                     return $collAreaDeliveryModules;
                 }
@@ -2697,7 +2697,7 @@ abstract class Module implements ActiveRecordInterface
                         $this->collProfileModulesPartial = true;
                     }
 
-                    $collProfileModules->getInternalIterator()->rewind();
+                    reset($collProfileModules);
 
                     return $collProfileModules;
                 }
@@ -2943,7 +2943,7 @@ abstract class Module implements ActiveRecordInterface
                         $this->collModuleImagesPartial = true;
                     }
 
-                    $collModuleImages->getInternalIterator()->rewind();
+                    reset($collModuleImages);
 
                     return $collModuleImages;
                 }
@@ -3161,7 +3161,7 @@ abstract class Module implements ActiveRecordInterface
                         $this->collModuleI18nsPartial = true;
                     }
 
-                    $collModuleI18ns->getInternalIterator()->rewind();
+                    reset($collModuleI18ns);
 
                     return $collModuleI18ns;
                 }
@@ -3372,29 +3372,11 @@ abstract class Module implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collOrdersRelatedByPaymentModuleId instanceof Collection) {
-            $this->collOrdersRelatedByPaymentModuleId->clearIterator();
-        }
         $this->collOrdersRelatedByPaymentModuleId = null;
-        if ($this->collOrdersRelatedByDeliveryModuleId instanceof Collection) {
-            $this->collOrdersRelatedByDeliveryModuleId->clearIterator();
-        }
         $this->collOrdersRelatedByDeliveryModuleId = null;
-        if ($this->collAreaDeliveryModules instanceof Collection) {
-            $this->collAreaDeliveryModules->clearIterator();
-        }
         $this->collAreaDeliveryModules = null;
-        if ($this->collProfileModules instanceof Collection) {
-            $this->collProfileModules->clearIterator();
-        }
         $this->collProfileModules = null;
-        if ($this->collModuleImages instanceof Collection) {
-            $this->collModuleImages->clearIterator();
-        }
         $this->collModuleImages = null;
-        if ($this->collModuleI18ns instanceof Collection) {
-            $this->collModuleI18ns->clearIterator();
-        }
         $this->collModuleI18ns = null;
     }
 
@@ -3417,7 +3399,7 @@ abstract class Module implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ModuleTableMap::UPDATED_AT;
+        $this->modifiedColumns[ModuleTableMap::UPDATED_AT] = true;
 
         return $this;
     }

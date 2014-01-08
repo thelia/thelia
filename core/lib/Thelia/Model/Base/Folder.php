@@ -251,7 +251,7 @@ abstract class Folder implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -262,7 +262,7 @@ abstract class Folder implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -271,7 +271,7 @@ abstract class Folder implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -324,8 +324,8 @@ abstract class Folder implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -635,7 +635,7 @@ abstract class Folder implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = FolderTableMap::ID;
+            $this->modifiedColumns[FolderTableMap::ID] = true;
         }
 
 
@@ -656,7 +656,7 @@ abstract class Folder implements ActiveRecordInterface
 
         if ($this->parent !== $v) {
             $this->parent = $v;
-            $this->modifiedColumns[] = FolderTableMap::PARENT;
+            $this->modifiedColumns[FolderTableMap::PARENT] = true;
         }
 
 
@@ -677,7 +677,7 @@ abstract class Folder implements ActiveRecordInterface
 
         if ($this->visible !== $v) {
             $this->visible = $v;
-            $this->modifiedColumns[] = FolderTableMap::VISIBLE;
+            $this->modifiedColumns[FolderTableMap::VISIBLE] = true;
         }
 
 
@@ -698,7 +698,7 @@ abstract class Folder implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = FolderTableMap::POSITION;
+            $this->modifiedColumns[FolderTableMap::POSITION] = true;
         }
 
 
@@ -718,7 +718,7 @@ abstract class Folder implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = FolderTableMap::CREATED_AT;
+                $this->modifiedColumns[FolderTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -739,7 +739,7 @@ abstract class Folder implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = FolderTableMap::UPDATED_AT;
+                $this->modifiedColumns[FolderTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -761,7 +761,7 @@ abstract class Folder implements ActiveRecordInterface
 
         if ($this->version !== $v) {
             $this->version = $v;
-            $this->modifiedColumns[] = FolderTableMap::VERSION;
+            $this->modifiedColumns[FolderTableMap::VERSION] = true;
         }
 
 
@@ -781,7 +781,7 @@ abstract class Folder implements ActiveRecordInterface
         if ($this->version_created_at !== null || $dt !== null) {
             if ($dt !== $this->version_created_at) {
                 $this->version_created_at = $dt;
-                $this->modifiedColumns[] = FolderTableMap::VERSION_CREATED_AT;
+                $this->modifiedColumns[FolderTableMap::VERSION_CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -803,7 +803,7 @@ abstract class Folder implements ActiveRecordInterface
 
         if ($this->version_created_by !== $v) {
             $this->version_created_by = $v;
-            $this->modifiedColumns[] = FolderTableMap::VERSION_CREATED_BY;
+            $this->modifiedColumns[FolderTableMap::VERSION_CREATED_BY] = true;
         }
 
 
@@ -1243,7 +1243,7 @@ abstract class Folder implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = FolderTableMap::ID;
+        $this->modifiedColumns[FolderTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . FolderTableMap::ID . ')');
         }
@@ -1824,7 +1824,7 @@ abstract class Folder implements ActiveRecordInterface
                         $this->collContentFoldersPartial = true;
                     }
 
-                    $collContentFolders->getInternalIterator()->rewind();
+                    reset($collContentFolders);
 
                     return $collContentFolders;
                 }
@@ -2070,7 +2070,7 @@ abstract class Folder implements ActiveRecordInterface
                         $this->collFolderImagesPartial = true;
                     }
 
-                    $collFolderImages->getInternalIterator()->rewind();
+                    reset($collFolderImages);
 
                     return $collFolderImages;
                 }
@@ -2288,7 +2288,7 @@ abstract class Folder implements ActiveRecordInterface
                         $this->collFolderDocumentsPartial = true;
                     }
 
-                    $collFolderDocuments->getInternalIterator()->rewind();
+                    reset($collFolderDocuments);
 
                     return $collFolderDocuments;
                 }
@@ -2506,7 +2506,7 @@ abstract class Folder implements ActiveRecordInterface
                         $this->collFolderI18nsPartial = true;
                     }
 
-                    $collFolderI18ns->getInternalIterator()->rewind();
+                    reset($collFolderI18ns);
 
                     return $collFolderI18ns;
                 }
@@ -2731,7 +2731,7 @@ abstract class Folder implements ActiveRecordInterface
                         $this->collFolderVersionsPartial = true;
                     }
 
-                    $collFolderVersions->getInternalIterator()->rewind();
+                    reset($collFolderVersions);
 
                     return $collFolderVersions;
                 }
@@ -3123,29 +3123,11 @@ abstract class Folder implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collContentFolders instanceof Collection) {
-            $this->collContentFolders->clearIterator();
-        }
         $this->collContentFolders = null;
-        if ($this->collFolderImages instanceof Collection) {
-            $this->collFolderImages->clearIterator();
-        }
         $this->collFolderImages = null;
-        if ($this->collFolderDocuments instanceof Collection) {
-            $this->collFolderDocuments->clearIterator();
-        }
         $this->collFolderDocuments = null;
-        if ($this->collFolderI18ns instanceof Collection) {
-            $this->collFolderI18ns->clearIterator();
-        }
         $this->collFolderI18ns = null;
-        if ($this->collFolderVersions instanceof Collection) {
-            $this->collFolderVersions->clearIterator();
-        }
         $this->collFolderVersions = null;
-        if ($this->collContents instanceof Collection) {
-            $this->collContents->clearIterator();
-        }
         $this->collContents = null;
     }
 
@@ -3168,7 +3150,7 @@ abstract class Folder implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = FolderTableMap::UPDATED_AT;
+        $this->modifiedColumns[FolderTableMap::UPDATED_AT] = true;
 
         return $this;
     }

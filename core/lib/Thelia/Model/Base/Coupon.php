@@ -232,7 +232,7 @@ abstract class Coupon implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -243,7 +243,7 @@ abstract class Coupon implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -252,7 +252,7 @@ abstract class Coupon implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -305,8 +305,8 @@ abstract class Coupon implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -682,7 +682,7 @@ abstract class Coupon implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CouponTableMap::ID;
+            $this->modifiedColumns[CouponTableMap::ID] = true;
         }
 
 
@@ -703,7 +703,7 @@ abstract class Coupon implements ActiveRecordInterface
 
         if ($this->code !== $v) {
             $this->code = $v;
-            $this->modifiedColumns[] = CouponTableMap::CODE;
+            $this->modifiedColumns[CouponTableMap::CODE] = true;
         }
 
 
@@ -724,7 +724,7 @@ abstract class Coupon implements ActiveRecordInterface
 
         if ($this->type !== $v) {
             $this->type = $v;
-            $this->modifiedColumns[] = CouponTableMap::TYPE;
+            $this->modifiedColumns[CouponTableMap::TYPE] = true;
         }
 
 
@@ -745,7 +745,7 @@ abstract class Coupon implements ActiveRecordInterface
 
         if ($this->serialized_effects !== $v) {
             $this->serialized_effects = $v;
-            $this->modifiedColumns[] = CouponTableMap::SERIALIZED_EFFECTS;
+            $this->modifiedColumns[CouponTableMap::SERIALIZED_EFFECTS] = true;
         }
 
 
@@ -774,7 +774,7 @@ abstract class Coupon implements ActiveRecordInterface
 
         if ($this->is_enabled !== $v) {
             $this->is_enabled = $v;
-            $this->modifiedColumns[] = CouponTableMap::IS_ENABLED;
+            $this->modifiedColumns[CouponTableMap::IS_ENABLED] = true;
         }
 
 
@@ -794,7 +794,7 @@ abstract class Coupon implements ActiveRecordInterface
         if ($this->expiration_date !== null || $dt !== null) {
             if ($dt !== $this->expiration_date) {
                 $this->expiration_date = $dt;
-                $this->modifiedColumns[] = CouponTableMap::EXPIRATION_DATE;
+                $this->modifiedColumns[CouponTableMap::EXPIRATION_DATE] = true;
             }
         } // if either are not null
 
@@ -816,7 +816,7 @@ abstract class Coupon implements ActiveRecordInterface
 
         if ($this->max_usage !== $v) {
             $this->max_usage = $v;
-            $this->modifiedColumns[] = CouponTableMap::MAX_USAGE;
+            $this->modifiedColumns[CouponTableMap::MAX_USAGE] = true;
         }
 
 
@@ -845,7 +845,7 @@ abstract class Coupon implements ActiveRecordInterface
 
         if ($this->is_cumulative !== $v) {
             $this->is_cumulative = $v;
-            $this->modifiedColumns[] = CouponTableMap::IS_CUMULATIVE;
+            $this->modifiedColumns[CouponTableMap::IS_CUMULATIVE] = true;
         }
 
 
@@ -874,7 +874,7 @@ abstract class Coupon implements ActiveRecordInterface
 
         if ($this->is_removing_postage !== $v) {
             $this->is_removing_postage = $v;
-            $this->modifiedColumns[] = CouponTableMap::IS_REMOVING_POSTAGE;
+            $this->modifiedColumns[CouponTableMap::IS_REMOVING_POSTAGE] = true;
         }
 
 
@@ -903,7 +903,7 @@ abstract class Coupon implements ActiveRecordInterface
 
         if ($this->is_available_on_special_offers !== $v) {
             $this->is_available_on_special_offers = $v;
-            $this->modifiedColumns[] = CouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS;
+            $this->modifiedColumns[CouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS] = true;
         }
 
 
@@ -932,7 +932,7 @@ abstract class Coupon implements ActiveRecordInterface
 
         if ($this->is_used !== $v) {
             $this->is_used = $v;
-            $this->modifiedColumns[] = CouponTableMap::IS_USED;
+            $this->modifiedColumns[CouponTableMap::IS_USED] = true;
         }
 
 
@@ -953,7 +953,7 @@ abstract class Coupon implements ActiveRecordInterface
 
         if ($this->serialized_conditions !== $v) {
             $this->serialized_conditions = $v;
-            $this->modifiedColumns[] = CouponTableMap::SERIALIZED_CONDITIONS;
+            $this->modifiedColumns[CouponTableMap::SERIALIZED_CONDITIONS] = true;
         }
 
 
@@ -973,7 +973,7 @@ abstract class Coupon implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = CouponTableMap::CREATED_AT;
+                $this->modifiedColumns[CouponTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -994,7 +994,7 @@ abstract class Coupon implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = CouponTableMap::UPDATED_AT;
+                $this->modifiedColumns[CouponTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1016,7 +1016,7 @@ abstract class Coupon implements ActiveRecordInterface
 
         if ($this->version !== $v) {
             $this->version = $v;
-            $this->modifiedColumns[] = CouponTableMap::VERSION;
+            $this->modifiedColumns[CouponTableMap::VERSION] = true;
         }
 
 
@@ -1386,7 +1386,7 @@ abstract class Coupon implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = CouponTableMap::ID;
+        $this->modifiedColumns[CouponTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . CouponTableMap::ID . ')');
         }
@@ -2027,7 +2027,7 @@ abstract class Coupon implements ActiveRecordInterface
                         $this->collCouponI18nsPartial = true;
                     }
 
-                    $collCouponI18ns->getInternalIterator()->rewind();
+                    reset($collCouponI18ns);
 
                     return $collCouponI18ns;
                 }
@@ -2252,7 +2252,7 @@ abstract class Coupon implements ActiveRecordInterface
                         $this->collCouponVersionsPartial = true;
                     }
 
-                    $collCouponVersions->getInternalIterator()->rewind();
+                    reset($collCouponVersions);
 
                     return $collCouponVersions;
                 }
@@ -2447,13 +2447,7 @@ abstract class Coupon implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collCouponI18ns instanceof Collection) {
-            $this->collCouponI18ns->clearIterator();
-        }
         $this->collCouponI18ns = null;
-        if ($this->collCouponVersions instanceof Collection) {
-            $this->collCouponVersions->clearIterator();
-        }
         $this->collCouponVersions = null;
     }
 
@@ -2476,7 +2470,7 @@ abstract class Coupon implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = CouponTableMap::UPDATED_AT;
+        $this->modifiedColumns[CouponTableMap::UPDATED_AT] = true;
 
         return $this;
     }

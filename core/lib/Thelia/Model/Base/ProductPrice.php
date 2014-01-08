@@ -150,7 +150,7 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -161,7 +161,7 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -170,7 +170,7 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -223,8 +223,8 @@ abstract class ProductPrice implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -503,7 +503,7 @@ abstract class ProductPrice implements ActiveRecordInterface
 
         if ($this->product_sale_elements_id !== $v) {
             $this->product_sale_elements_id = $v;
-            $this->modifiedColumns[] = ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID;
+            $this->modifiedColumns[ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID] = true;
         }
 
         if ($this->aProductSaleElements !== null && $this->aProductSaleElements->getId() !== $v) {
@@ -528,7 +528,7 @@ abstract class ProductPrice implements ActiveRecordInterface
 
         if ($this->currency_id !== $v) {
             $this->currency_id = $v;
-            $this->modifiedColumns[] = ProductPriceTableMap::CURRENCY_ID;
+            $this->modifiedColumns[ProductPriceTableMap::CURRENCY_ID] = true;
         }
 
         if ($this->aCurrency !== null && $this->aCurrency->getId() !== $v) {
@@ -553,7 +553,7 @@ abstract class ProductPrice implements ActiveRecordInterface
 
         if ($this->price !== $v) {
             $this->price = $v;
-            $this->modifiedColumns[] = ProductPriceTableMap::PRICE;
+            $this->modifiedColumns[ProductPriceTableMap::PRICE] = true;
         }
 
 
@@ -574,7 +574,7 @@ abstract class ProductPrice implements ActiveRecordInterface
 
         if ($this->promo_price !== $v) {
             $this->promo_price = $v;
-            $this->modifiedColumns[] = ProductPriceTableMap::PROMO_PRICE;
+            $this->modifiedColumns[ProductPriceTableMap::PROMO_PRICE] = true;
         }
 
 
@@ -603,7 +603,7 @@ abstract class ProductPrice implements ActiveRecordInterface
 
         if ($this->from_default_currency !== $v) {
             $this->from_default_currency = $v;
-            $this->modifiedColumns[] = ProductPriceTableMap::FROM_DEFAULT_CURRENCY;
+            $this->modifiedColumns[ProductPriceTableMap::FROM_DEFAULT_CURRENCY] = true;
         }
 
 
@@ -623,7 +623,7 @@ abstract class ProductPrice implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ProductPriceTableMap::CREATED_AT;
+                $this->modifiedColumns[ProductPriceTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -644,7 +644,7 @@ abstract class ProductPrice implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ProductPriceTableMap::UPDATED_AT;
+                $this->modifiedColumns[ProductPriceTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1523,7 +1523,7 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ProductPriceTableMap::UPDATED_AT;
+        $this->modifiedColumns[ProductPriceTableMap::UPDATED_AT] = true;
 
         return $this;
     }

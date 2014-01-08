@@ -383,7 +383,7 @@ abstract class Product implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -394,7 +394,7 @@ abstract class Product implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -403,7 +403,7 @@ abstract class Product implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -456,8 +456,8 @@ abstract class Product implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -789,7 +789,7 @@ abstract class Product implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = ProductTableMap::ID;
+            $this->modifiedColumns[ProductTableMap::ID] = true;
         }
 
 
@@ -810,7 +810,7 @@ abstract class Product implements ActiveRecordInterface
 
         if ($this->tax_rule_id !== $v) {
             $this->tax_rule_id = $v;
-            $this->modifiedColumns[] = ProductTableMap::TAX_RULE_ID;
+            $this->modifiedColumns[ProductTableMap::TAX_RULE_ID] = true;
         }
 
         if ($this->aTaxRule !== null && $this->aTaxRule->getId() !== $v) {
@@ -835,7 +835,7 @@ abstract class Product implements ActiveRecordInterface
 
         if ($this->ref !== $v) {
             $this->ref = $v;
-            $this->modifiedColumns[] = ProductTableMap::REF;
+            $this->modifiedColumns[ProductTableMap::REF] = true;
         }
 
 
@@ -856,7 +856,7 @@ abstract class Product implements ActiveRecordInterface
 
         if ($this->visible !== $v) {
             $this->visible = $v;
-            $this->modifiedColumns[] = ProductTableMap::VISIBLE;
+            $this->modifiedColumns[ProductTableMap::VISIBLE] = true;
         }
 
 
@@ -877,7 +877,7 @@ abstract class Product implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = ProductTableMap::POSITION;
+            $this->modifiedColumns[ProductTableMap::POSITION] = true;
         }
 
 
@@ -898,7 +898,7 @@ abstract class Product implements ActiveRecordInterface
 
         if ($this->template_id !== $v) {
             $this->template_id = $v;
-            $this->modifiedColumns[] = ProductTableMap::TEMPLATE_ID;
+            $this->modifiedColumns[ProductTableMap::TEMPLATE_ID] = true;
         }
 
         if ($this->aTemplate !== null && $this->aTemplate->getId() !== $v) {
@@ -922,7 +922,7 @@ abstract class Product implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ProductTableMap::CREATED_AT;
+                $this->modifiedColumns[ProductTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -943,7 +943,7 @@ abstract class Product implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ProductTableMap::UPDATED_AT;
+                $this->modifiedColumns[ProductTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -965,7 +965,7 @@ abstract class Product implements ActiveRecordInterface
 
         if ($this->version !== $v) {
             $this->version = $v;
-            $this->modifiedColumns[] = ProductTableMap::VERSION;
+            $this->modifiedColumns[ProductTableMap::VERSION] = true;
         }
 
 
@@ -985,7 +985,7 @@ abstract class Product implements ActiveRecordInterface
         if ($this->version_created_at !== null || $dt !== null) {
             if ($dt !== $this->version_created_at) {
                 $this->version_created_at = $dt;
-                $this->modifiedColumns[] = ProductTableMap::VERSION_CREATED_AT;
+                $this->modifiedColumns[ProductTableMap::VERSION_CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -1007,7 +1007,7 @@ abstract class Product implements ActiveRecordInterface
 
         if ($this->version_created_by !== $v) {
             $this->version_created_by = $v;
-            $this->modifiedColumns[] = ProductTableMap::VERSION_CREATED_BY;
+            $this->modifiedColumns[ProductTableMap::VERSION_CREATED_BY] = true;
         }
 
 
@@ -1654,7 +1654,7 @@ abstract class Product implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ProductTableMap::ID;
+        $this->modifiedColumns[ProductTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProductTableMap::ID . ')');
         }
@@ -2447,7 +2447,7 @@ abstract class Product implements ActiveRecordInterface
                         $this->collProductCategoriesPartial = true;
                     }
 
-                    $collProductCategories->getInternalIterator()->rewind();
+                    reset($collProductCategories);
 
                     return $collProductCategories;
                 }
@@ -2693,7 +2693,7 @@ abstract class Product implements ActiveRecordInterface
                         $this->collFeatureProductsPartial = true;
                     }
 
-                    $collFeatureProducts->getInternalIterator()->rewind();
+                    reset($collFeatureProducts);
 
                     return $collFeatureProducts;
                 }
@@ -2961,7 +2961,7 @@ abstract class Product implements ActiveRecordInterface
                         $this->collProductSaleElementssPartial = true;
                     }
 
-                    $collProductSaleElementss->getInternalIterator()->rewind();
+                    reset($collProductSaleElementss);
 
                     return $collProductSaleElementss;
                 }
@@ -3179,7 +3179,7 @@ abstract class Product implements ActiveRecordInterface
                         $this->collProductImagesPartial = true;
                     }
 
-                    $collProductImages->getInternalIterator()->rewind();
+                    reset($collProductImages);
 
                     return $collProductImages;
                 }
@@ -3397,7 +3397,7 @@ abstract class Product implements ActiveRecordInterface
                         $this->collProductDocumentsPartial = true;
                     }
 
-                    $collProductDocuments->getInternalIterator()->rewind();
+                    reset($collProductDocuments);
 
                     return $collProductDocuments;
                 }
@@ -3615,7 +3615,7 @@ abstract class Product implements ActiveRecordInterface
                         $this->collAccessoriesRelatedByProductIdPartial = true;
                     }
 
-                    $collAccessoriesRelatedByProductId->getInternalIterator()->rewind();
+                    reset($collAccessoriesRelatedByProductId);
 
                     return $collAccessoriesRelatedByProductId;
                 }
@@ -3833,7 +3833,7 @@ abstract class Product implements ActiveRecordInterface
                         $this->collAccessoriesRelatedByAccessoryPartial = true;
                     }
 
-                    $collAccessoriesRelatedByAccessory->getInternalIterator()->rewind();
+                    reset($collAccessoriesRelatedByAccessory);
 
                     return $collAccessoriesRelatedByAccessory;
                 }
@@ -4051,7 +4051,7 @@ abstract class Product implements ActiveRecordInterface
                         $this->collCartItemsPartial = true;
                     }
 
-                    $collCartItems->getInternalIterator()->rewind();
+                    reset($collCartItems);
 
                     return $collCartItems;
                 }
@@ -4319,7 +4319,7 @@ abstract class Product implements ActiveRecordInterface
                         $this->collProductAssociatedContentsPartial = true;
                     }
 
-                    $collProductAssociatedContents->getInternalIterator()->rewind();
+                    reset($collProductAssociatedContents);
 
                     return $collProductAssociatedContents;
                 }
@@ -4562,7 +4562,7 @@ abstract class Product implements ActiveRecordInterface
                         $this->collProductI18nsPartial = true;
                     }
 
-                    $collProductI18ns->getInternalIterator()->rewind();
+                    reset($collProductI18ns);
 
                     return $collProductI18ns;
                 }
@@ -4787,7 +4787,7 @@ abstract class Product implements ActiveRecordInterface
                         $this->collProductVersionsPartial = true;
                     }
 
-                    $collProductVersions->getInternalIterator()->rewind();
+                    reset($collProductVersions);
 
                     return $collProductVersions;
                 }
@@ -5587,61 +5587,19 @@ abstract class Product implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collProductCategories instanceof Collection) {
-            $this->collProductCategories->clearIterator();
-        }
         $this->collProductCategories = null;
-        if ($this->collFeatureProducts instanceof Collection) {
-            $this->collFeatureProducts->clearIterator();
-        }
         $this->collFeatureProducts = null;
-        if ($this->collProductSaleElementss instanceof Collection) {
-            $this->collProductSaleElementss->clearIterator();
-        }
         $this->collProductSaleElementss = null;
-        if ($this->collProductImages instanceof Collection) {
-            $this->collProductImages->clearIterator();
-        }
         $this->collProductImages = null;
-        if ($this->collProductDocuments instanceof Collection) {
-            $this->collProductDocuments->clearIterator();
-        }
         $this->collProductDocuments = null;
-        if ($this->collAccessoriesRelatedByProductId instanceof Collection) {
-            $this->collAccessoriesRelatedByProductId->clearIterator();
-        }
         $this->collAccessoriesRelatedByProductId = null;
-        if ($this->collAccessoriesRelatedByAccessory instanceof Collection) {
-            $this->collAccessoriesRelatedByAccessory->clearIterator();
-        }
         $this->collAccessoriesRelatedByAccessory = null;
-        if ($this->collCartItems instanceof Collection) {
-            $this->collCartItems->clearIterator();
-        }
         $this->collCartItems = null;
-        if ($this->collProductAssociatedContents instanceof Collection) {
-            $this->collProductAssociatedContents->clearIterator();
-        }
         $this->collProductAssociatedContents = null;
-        if ($this->collProductI18ns instanceof Collection) {
-            $this->collProductI18ns->clearIterator();
-        }
         $this->collProductI18ns = null;
-        if ($this->collProductVersions instanceof Collection) {
-            $this->collProductVersions->clearIterator();
-        }
         $this->collProductVersions = null;
-        if ($this->collCategories instanceof Collection) {
-            $this->collCategories->clearIterator();
-        }
         $this->collCategories = null;
-        if ($this->collProductsRelatedByAccessory instanceof Collection) {
-            $this->collProductsRelatedByAccessory->clearIterator();
-        }
         $this->collProductsRelatedByAccessory = null;
-        if ($this->collProductsRelatedByProductId instanceof Collection) {
-            $this->collProductsRelatedByProductId->clearIterator();
-        }
         $this->collProductsRelatedByProductId = null;
         $this->aTaxRule = null;
         $this->aTemplate = null;
@@ -5666,7 +5624,7 @@ abstract class Product implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ProductTableMap::UPDATED_AT;
+        $this->modifiedColumns[ProductTableMap::UPDATED_AT] = true;
 
         return $this;
     }

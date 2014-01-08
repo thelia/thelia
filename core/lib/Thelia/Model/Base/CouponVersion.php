@@ -186,7 +186,7 @@ abstract class CouponVersion implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -197,7 +197,7 @@ abstract class CouponVersion implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -206,7 +206,7 @@ abstract class CouponVersion implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -259,8 +259,8 @@ abstract class CouponVersion implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -636,7 +636,7 @@ abstract class CouponVersion implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CouponVersionTableMap::ID;
+            $this->modifiedColumns[CouponVersionTableMap::ID] = true;
         }
 
         if ($this->aCoupon !== null && $this->aCoupon->getId() !== $v) {
@@ -661,7 +661,7 @@ abstract class CouponVersion implements ActiveRecordInterface
 
         if ($this->code !== $v) {
             $this->code = $v;
-            $this->modifiedColumns[] = CouponVersionTableMap::CODE;
+            $this->modifiedColumns[CouponVersionTableMap::CODE] = true;
         }
 
 
@@ -682,7 +682,7 @@ abstract class CouponVersion implements ActiveRecordInterface
 
         if ($this->type !== $v) {
             $this->type = $v;
-            $this->modifiedColumns[] = CouponVersionTableMap::TYPE;
+            $this->modifiedColumns[CouponVersionTableMap::TYPE] = true;
         }
 
 
@@ -703,7 +703,7 @@ abstract class CouponVersion implements ActiveRecordInterface
 
         if ($this->serialized_effects !== $v) {
             $this->serialized_effects = $v;
-            $this->modifiedColumns[] = CouponVersionTableMap::SERIALIZED_EFFECTS;
+            $this->modifiedColumns[CouponVersionTableMap::SERIALIZED_EFFECTS] = true;
         }
 
 
@@ -732,7 +732,7 @@ abstract class CouponVersion implements ActiveRecordInterface
 
         if ($this->is_enabled !== $v) {
             $this->is_enabled = $v;
-            $this->modifiedColumns[] = CouponVersionTableMap::IS_ENABLED;
+            $this->modifiedColumns[CouponVersionTableMap::IS_ENABLED] = true;
         }
 
 
@@ -752,7 +752,7 @@ abstract class CouponVersion implements ActiveRecordInterface
         if ($this->expiration_date !== null || $dt !== null) {
             if ($dt !== $this->expiration_date) {
                 $this->expiration_date = $dt;
-                $this->modifiedColumns[] = CouponVersionTableMap::EXPIRATION_DATE;
+                $this->modifiedColumns[CouponVersionTableMap::EXPIRATION_DATE] = true;
             }
         } // if either are not null
 
@@ -774,7 +774,7 @@ abstract class CouponVersion implements ActiveRecordInterface
 
         if ($this->max_usage !== $v) {
             $this->max_usage = $v;
-            $this->modifiedColumns[] = CouponVersionTableMap::MAX_USAGE;
+            $this->modifiedColumns[CouponVersionTableMap::MAX_USAGE] = true;
         }
 
 
@@ -803,7 +803,7 @@ abstract class CouponVersion implements ActiveRecordInterface
 
         if ($this->is_cumulative !== $v) {
             $this->is_cumulative = $v;
-            $this->modifiedColumns[] = CouponVersionTableMap::IS_CUMULATIVE;
+            $this->modifiedColumns[CouponVersionTableMap::IS_CUMULATIVE] = true;
         }
 
 
@@ -832,7 +832,7 @@ abstract class CouponVersion implements ActiveRecordInterface
 
         if ($this->is_removing_postage !== $v) {
             $this->is_removing_postage = $v;
-            $this->modifiedColumns[] = CouponVersionTableMap::IS_REMOVING_POSTAGE;
+            $this->modifiedColumns[CouponVersionTableMap::IS_REMOVING_POSTAGE] = true;
         }
 
 
@@ -861,7 +861,7 @@ abstract class CouponVersion implements ActiveRecordInterface
 
         if ($this->is_available_on_special_offers !== $v) {
             $this->is_available_on_special_offers = $v;
-            $this->modifiedColumns[] = CouponVersionTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS;
+            $this->modifiedColumns[CouponVersionTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS] = true;
         }
 
 
@@ -890,7 +890,7 @@ abstract class CouponVersion implements ActiveRecordInterface
 
         if ($this->is_used !== $v) {
             $this->is_used = $v;
-            $this->modifiedColumns[] = CouponVersionTableMap::IS_USED;
+            $this->modifiedColumns[CouponVersionTableMap::IS_USED] = true;
         }
 
 
@@ -911,7 +911,7 @@ abstract class CouponVersion implements ActiveRecordInterface
 
         if ($this->serialized_conditions !== $v) {
             $this->serialized_conditions = $v;
-            $this->modifiedColumns[] = CouponVersionTableMap::SERIALIZED_CONDITIONS;
+            $this->modifiedColumns[CouponVersionTableMap::SERIALIZED_CONDITIONS] = true;
         }
 
 
@@ -931,7 +931,7 @@ abstract class CouponVersion implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = CouponVersionTableMap::CREATED_AT;
+                $this->modifiedColumns[CouponVersionTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -952,7 +952,7 @@ abstract class CouponVersion implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = CouponVersionTableMap::UPDATED_AT;
+                $this->modifiedColumns[CouponVersionTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -974,7 +974,7 @@ abstract class CouponVersion implements ActiveRecordInterface
 
         if ($this->version !== $v) {
             $this->version = $v;
-            $this->modifiedColumns[] = CouponVersionTableMap::VERSION;
+            $this->modifiedColumns[CouponVersionTableMap::VERSION] = true;
         }
 
 

@@ -120,7 +120,7 @@ abstract class AreaDeliveryModule implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -131,7 +131,7 @@ abstract class AreaDeliveryModule implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -140,7 +140,7 @@ abstract class AreaDeliveryModule implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -193,8 +193,8 @@ abstract class AreaDeliveryModule implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -451,7 +451,7 @@ abstract class AreaDeliveryModule implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = AreaDeliveryModuleTableMap::ID;
+            $this->modifiedColumns[AreaDeliveryModuleTableMap::ID] = true;
         }
 
 
@@ -472,7 +472,7 @@ abstract class AreaDeliveryModule implements ActiveRecordInterface
 
         if ($this->area_id !== $v) {
             $this->area_id = $v;
-            $this->modifiedColumns[] = AreaDeliveryModuleTableMap::AREA_ID;
+            $this->modifiedColumns[AreaDeliveryModuleTableMap::AREA_ID] = true;
         }
 
         if ($this->aArea !== null && $this->aArea->getId() !== $v) {
@@ -497,7 +497,7 @@ abstract class AreaDeliveryModule implements ActiveRecordInterface
 
         if ($this->delivery_module_id !== $v) {
             $this->delivery_module_id = $v;
-            $this->modifiedColumns[] = AreaDeliveryModuleTableMap::DELIVERY_MODULE_ID;
+            $this->modifiedColumns[AreaDeliveryModuleTableMap::DELIVERY_MODULE_ID] = true;
         }
 
         if ($this->aModule !== null && $this->aModule->getId() !== $v) {
@@ -521,7 +521,7 @@ abstract class AreaDeliveryModule implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = AreaDeliveryModuleTableMap::CREATED_AT;
+                $this->modifiedColumns[AreaDeliveryModuleTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -542,7 +542,7 @@ abstract class AreaDeliveryModule implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = AreaDeliveryModuleTableMap::UPDATED_AT;
+                $this->modifiedColumns[AreaDeliveryModuleTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -856,7 +856,7 @@ abstract class AreaDeliveryModule implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = AreaDeliveryModuleTableMap::ID;
+        $this->modifiedColumns[AreaDeliveryModuleTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . AreaDeliveryModuleTableMap::ID . ')');
         }
@@ -1372,7 +1372,7 @@ abstract class AreaDeliveryModule implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = AreaDeliveryModuleTableMap::UPDATED_AT;
+        $this->modifiedColumns[AreaDeliveryModuleTableMap::UPDATED_AT] = true;
 
         return $this;
     }

@@ -181,7 +181,7 @@ abstract class Lang implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -192,7 +192,7 @@ abstract class Lang implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -201,7 +201,7 @@ abstract class Lang implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -254,8 +254,8 @@ abstract class Lang implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -622,7 +622,7 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = LangTableMap::ID;
+            $this->modifiedColumns[LangTableMap::ID] = true;
         }
 
 
@@ -643,7 +643,7 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($this->title !== $v) {
             $this->title = $v;
-            $this->modifiedColumns[] = LangTableMap::TITLE;
+            $this->modifiedColumns[LangTableMap::TITLE] = true;
         }
 
 
@@ -664,7 +664,7 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($this->code !== $v) {
             $this->code = $v;
-            $this->modifiedColumns[] = LangTableMap::CODE;
+            $this->modifiedColumns[LangTableMap::CODE] = true;
         }
 
 
@@ -685,7 +685,7 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($this->locale !== $v) {
             $this->locale = $v;
-            $this->modifiedColumns[] = LangTableMap::LOCALE;
+            $this->modifiedColumns[LangTableMap::LOCALE] = true;
         }
 
 
@@ -706,7 +706,7 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($this->url !== $v) {
             $this->url = $v;
-            $this->modifiedColumns[] = LangTableMap::URL;
+            $this->modifiedColumns[LangTableMap::URL] = true;
         }
 
 
@@ -727,7 +727,7 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($this->date_format !== $v) {
             $this->date_format = $v;
-            $this->modifiedColumns[] = LangTableMap::DATE_FORMAT;
+            $this->modifiedColumns[LangTableMap::DATE_FORMAT] = true;
         }
 
 
@@ -748,7 +748,7 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($this->time_format !== $v) {
             $this->time_format = $v;
-            $this->modifiedColumns[] = LangTableMap::TIME_FORMAT;
+            $this->modifiedColumns[LangTableMap::TIME_FORMAT] = true;
         }
 
 
@@ -769,7 +769,7 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($this->datetime_format !== $v) {
             $this->datetime_format = $v;
-            $this->modifiedColumns[] = LangTableMap::DATETIME_FORMAT;
+            $this->modifiedColumns[LangTableMap::DATETIME_FORMAT] = true;
         }
 
 
@@ -790,7 +790,7 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($this->decimal_separator !== $v) {
             $this->decimal_separator = $v;
-            $this->modifiedColumns[] = LangTableMap::DECIMAL_SEPARATOR;
+            $this->modifiedColumns[LangTableMap::DECIMAL_SEPARATOR] = true;
         }
 
 
@@ -811,7 +811,7 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($this->thousands_separator !== $v) {
             $this->thousands_separator = $v;
-            $this->modifiedColumns[] = LangTableMap::THOUSANDS_SEPARATOR;
+            $this->modifiedColumns[LangTableMap::THOUSANDS_SEPARATOR] = true;
         }
 
 
@@ -832,7 +832,7 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($this->decimals !== $v) {
             $this->decimals = $v;
-            $this->modifiedColumns[] = LangTableMap::DECIMALS;
+            $this->modifiedColumns[LangTableMap::DECIMALS] = true;
         }
 
 
@@ -853,7 +853,7 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($this->by_default !== $v) {
             $this->by_default = $v;
-            $this->modifiedColumns[] = LangTableMap::BY_DEFAULT;
+            $this->modifiedColumns[LangTableMap::BY_DEFAULT] = true;
         }
 
 
@@ -874,7 +874,7 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = LangTableMap::POSITION;
+            $this->modifiedColumns[LangTableMap::POSITION] = true;
         }
 
 
@@ -894,7 +894,7 @@ abstract class Lang implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = LangTableMap::CREATED_AT;
+                $this->modifiedColumns[LangTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -915,7 +915,7 @@ abstract class Lang implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = LangTableMap::UPDATED_AT;
+                $this->modifiedColumns[LangTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1251,7 +1251,7 @@ abstract class Lang implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = LangTableMap::ID;
+        $this->modifiedColumns[LangTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . LangTableMap::ID . ')');
         }
@@ -1880,7 +1880,7 @@ abstract class Lang implements ActiveRecordInterface
                         $this->collOrdersPartial = true;
                     }
 
-                    $collOrders->getInternalIterator()->rewind();
+                    reset($collOrders);
 
                     return $collOrders;
                 }
@@ -2237,9 +2237,6 @@ abstract class Lang implements ActiveRecordInterface
             }
         } // if ($deep)
 
-        if ($this->collOrders instanceof Collection) {
-            $this->collOrders->clearIterator();
-        }
         $this->collOrders = null;
     }
 
@@ -2262,7 +2259,7 @@ abstract class Lang implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = LangTableMap::UPDATED_AT;
+        $this->modifiedColumns[LangTableMap::UPDATED_AT] = true;
 
         return $this;
     }

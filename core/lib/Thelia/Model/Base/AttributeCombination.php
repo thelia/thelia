@@ -127,7 +127,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -138,7 +138,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -147,7 +147,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -200,8 +200,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -458,7 +458,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
 
         if ($this->attribute_id !== $v) {
             $this->attribute_id = $v;
-            $this->modifiedColumns[] = AttributeCombinationTableMap::ATTRIBUTE_ID;
+            $this->modifiedColumns[AttributeCombinationTableMap::ATTRIBUTE_ID] = true;
         }
 
         if ($this->aAttribute !== null && $this->aAttribute->getId() !== $v) {
@@ -483,7 +483,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
 
         if ($this->attribute_av_id !== $v) {
             $this->attribute_av_id = $v;
-            $this->modifiedColumns[] = AttributeCombinationTableMap::ATTRIBUTE_AV_ID;
+            $this->modifiedColumns[AttributeCombinationTableMap::ATTRIBUTE_AV_ID] = true;
         }
 
         if ($this->aAttributeAv !== null && $this->aAttributeAv->getId() !== $v) {
@@ -508,7 +508,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
 
         if ($this->product_sale_elements_id !== $v) {
             $this->product_sale_elements_id = $v;
-            $this->modifiedColumns[] = AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID;
+            $this->modifiedColumns[AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID] = true;
         }
 
         if ($this->aProductSaleElements !== null && $this->aProductSaleElements->getId() !== $v) {
@@ -532,7 +532,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = AttributeCombinationTableMap::CREATED_AT;
+                $this->modifiedColumns[AttributeCombinationTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -553,7 +553,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = AttributeCombinationTableMap::UPDATED_AT;
+                $this->modifiedColumns[AttributeCombinationTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1448,7 +1448,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = AttributeCombinationTableMap::UPDATED_AT;
+        $this->modifiedColumns[AttributeCombinationTableMap::UPDATED_AT] = true;
 
         return $this;
     }

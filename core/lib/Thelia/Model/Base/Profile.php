@@ -184,7 +184,7 @@ abstract class Profile implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -195,7 +195,7 @@ abstract class Profile implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -204,7 +204,7 @@ abstract class Profile implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -257,8 +257,8 @@ abstract class Profile implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -504,7 +504,7 @@ abstract class Profile implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = ProfileTableMap::ID;
+            $this->modifiedColumns[ProfileTableMap::ID] = true;
         }
 
 
@@ -525,7 +525,7 @@ abstract class Profile implements ActiveRecordInterface
 
         if ($this->code !== $v) {
             $this->code = $v;
-            $this->modifiedColumns[] = ProfileTableMap::CODE;
+            $this->modifiedColumns[ProfileTableMap::CODE] = true;
         }
 
 
@@ -545,7 +545,7 @@ abstract class Profile implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ProfileTableMap::CREATED_AT;
+                $this->modifiedColumns[ProfileTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -566,7 +566,7 @@ abstract class Profile implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ProfileTableMap::UPDATED_AT;
+                $this->modifiedColumns[ProfileTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -955,7 +955,7 @@ abstract class Profile implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ProfileTableMap::ID;
+        $this->modifiedColumns[ProfileTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProfileTableMap::ID . ')');
         }
@@ -1444,7 +1444,7 @@ abstract class Profile implements ActiveRecordInterface
                         $this->collAdminsPartial = true;
                     }
 
-                    $collAdmins->getInternalIterator()->rewind();
+                    reset($collAdmins);
 
                     return $collAdmins;
                 }
@@ -1662,7 +1662,7 @@ abstract class Profile implements ActiveRecordInterface
                         $this->collProfileResourcesPartial = true;
                     }
 
-                    $collProfileResources->getInternalIterator()->rewind();
+                    reset($collProfileResources);
 
                     return $collProfileResources;
                 }
@@ -1908,7 +1908,7 @@ abstract class Profile implements ActiveRecordInterface
                         $this->collProfileModulesPartial = true;
                     }
 
-                    $collProfileModules->getInternalIterator()->rewind();
+                    reset($collProfileModules);
 
                     return $collProfileModules;
                 }
@@ -2154,7 +2154,7 @@ abstract class Profile implements ActiveRecordInterface
                         $this->collProfileI18nsPartial = true;
                     }
 
-                    $collProfileI18ns->getInternalIterator()->rewind();
+                    reset($collProfileI18ns);
 
                     return $collProfileI18ns;
                 }
@@ -2539,25 +2539,10 @@ abstract class Profile implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collAdmins instanceof Collection) {
-            $this->collAdmins->clearIterator();
-        }
         $this->collAdmins = null;
-        if ($this->collProfileResources instanceof Collection) {
-            $this->collProfileResources->clearIterator();
-        }
         $this->collProfileResources = null;
-        if ($this->collProfileModules instanceof Collection) {
-            $this->collProfileModules->clearIterator();
-        }
         $this->collProfileModules = null;
-        if ($this->collProfileI18ns instanceof Collection) {
-            $this->collProfileI18ns->clearIterator();
-        }
         $this->collProfileI18ns = null;
-        if ($this->collResources instanceof Collection) {
-            $this->collResources->clearIterator();
-        }
         $this->collResources = null;
     }
 
@@ -2580,7 +2565,7 @@ abstract class Profile implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ProfileTableMap::UPDATED_AT;
+        $this->modifiedColumns[ProfileTableMap::UPDATED_AT] = true;
 
         return $this;
     }

@@ -177,7 +177,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -188,7 +188,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -197,7 +197,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -250,8 +250,8 @@ abstract class CustomerTitle implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -508,7 +508,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CustomerTitleTableMap::ID;
+            $this->modifiedColumns[CustomerTitleTableMap::ID] = true;
         }
 
 
@@ -529,7 +529,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
 
         if ($this->by_default !== $v) {
             $this->by_default = $v;
-            $this->modifiedColumns[] = CustomerTitleTableMap::BY_DEFAULT;
+            $this->modifiedColumns[CustomerTitleTableMap::BY_DEFAULT] = true;
         }
 
 
@@ -550,7 +550,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = CustomerTitleTableMap::POSITION;
+            $this->modifiedColumns[CustomerTitleTableMap::POSITION] = true;
         }
 
 
@@ -570,7 +570,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = CustomerTitleTableMap::CREATED_AT;
+                $this->modifiedColumns[CustomerTitleTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -591,7 +591,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = CustomerTitleTableMap::UPDATED_AT;
+                $this->modifiedColumns[CustomerTitleTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -939,7 +939,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = CustomerTitleTableMap::ID;
+        $this->modifiedColumns[CustomerTitleTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . CustomerTitleTableMap::ID . ')');
         }
@@ -1432,7 +1432,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
                         $this->collCustomersPartial = true;
                     }
 
-                    $collCustomers->getInternalIterator()->rewind();
+                    reset($collCustomers);
 
                     return $collCustomers;
                 }
@@ -1650,7 +1650,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
                         $this->collAddressesPartial = true;
                     }
 
-                    $collAddresses->getInternalIterator()->rewind();
+                    reset($collAddresses);
 
                     return $collAddresses;
                 }
@@ -1918,7 +1918,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
                         $this->collCustomerTitleI18nsPartial = true;
                     }
 
-                    $collCustomerTitleI18ns->getInternalIterator()->rewind();
+                    reset($collCustomerTitleI18ns);
 
                     return $collCustomerTitleI18ns;
                 }
@@ -2112,17 +2112,8 @@ abstract class CustomerTitle implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collCustomers instanceof Collection) {
-            $this->collCustomers->clearIterator();
-        }
         $this->collCustomers = null;
-        if ($this->collAddresses instanceof Collection) {
-            $this->collAddresses->clearIterator();
-        }
         $this->collAddresses = null;
-        if ($this->collCustomerTitleI18ns instanceof Collection) {
-            $this->collCustomerTitleI18ns->clearIterator();
-        }
         $this->collCustomerTitleI18ns = null;
     }
 
@@ -2145,7 +2136,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = CustomerTitleTableMap::UPDATED_AT;
+        $this->modifiedColumns[CustomerTitleTableMap::UPDATED_AT] = true;
 
         return $this;
     }

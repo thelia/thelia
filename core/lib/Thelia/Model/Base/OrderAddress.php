@@ -187,7 +187,7 @@ abstract class OrderAddress implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -198,7 +198,7 @@ abstract class OrderAddress implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -207,7 +207,7 @@ abstract class OrderAddress implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -260,8 +260,8 @@ abstract class OrderAddress implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -617,7 +617,7 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = OrderAddressTableMap::ID;
+            $this->modifiedColumns[OrderAddressTableMap::ID] = true;
         }
 
 
@@ -638,7 +638,7 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($this->customer_title_id !== $v) {
             $this->customer_title_id = $v;
-            $this->modifiedColumns[] = OrderAddressTableMap::CUSTOMER_TITLE_ID;
+            $this->modifiedColumns[OrderAddressTableMap::CUSTOMER_TITLE_ID] = true;
         }
 
 
@@ -659,7 +659,7 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($this->company !== $v) {
             $this->company = $v;
-            $this->modifiedColumns[] = OrderAddressTableMap::COMPANY;
+            $this->modifiedColumns[OrderAddressTableMap::COMPANY] = true;
         }
 
 
@@ -680,7 +680,7 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($this->firstname !== $v) {
             $this->firstname = $v;
-            $this->modifiedColumns[] = OrderAddressTableMap::FIRSTNAME;
+            $this->modifiedColumns[OrderAddressTableMap::FIRSTNAME] = true;
         }
 
 
@@ -701,7 +701,7 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($this->lastname !== $v) {
             $this->lastname = $v;
-            $this->modifiedColumns[] = OrderAddressTableMap::LASTNAME;
+            $this->modifiedColumns[OrderAddressTableMap::LASTNAME] = true;
         }
 
 
@@ -722,7 +722,7 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($this->address1 !== $v) {
             $this->address1 = $v;
-            $this->modifiedColumns[] = OrderAddressTableMap::ADDRESS1;
+            $this->modifiedColumns[OrderAddressTableMap::ADDRESS1] = true;
         }
 
 
@@ -743,7 +743,7 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($this->address2 !== $v) {
             $this->address2 = $v;
-            $this->modifiedColumns[] = OrderAddressTableMap::ADDRESS2;
+            $this->modifiedColumns[OrderAddressTableMap::ADDRESS2] = true;
         }
 
 
@@ -764,7 +764,7 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($this->address3 !== $v) {
             $this->address3 = $v;
-            $this->modifiedColumns[] = OrderAddressTableMap::ADDRESS3;
+            $this->modifiedColumns[OrderAddressTableMap::ADDRESS3] = true;
         }
 
 
@@ -785,7 +785,7 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($this->zipcode !== $v) {
             $this->zipcode = $v;
-            $this->modifiedColumns[] = OrderAddressTableMap::ZIPCODE;
+            $this->modifiedColumns[OrderAddressTableMap::ZIPCODE] = true;
         }
 
 
@@ -806,7 +806,7 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($this->city !== $v) {
             $this->city = $v;
-            $this->modifiedColumns[] = OrderAddressTableMap::CITY;
+            $this->modifiedColumns[OrderAddressTableMap::CITY] = true;
         }
 
 
@@ -827,7 +827,7 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($this->phone !== $v) {
             $this->phone = $v;
-            $this->modifiedColumns[] = OrderAddressTableMap::PHONE;
+            $this->modifiedColumns[OrderAddressTableMap::PHONE] = true;
         }
 
 
@@ -848,7 +848,7 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($this->country_id !== $v) {
             $this->country_id = $v;
-            $this->modifiedColumns[] = OrderAddressTableMap::COUNTRY_ID;
+            $this->modifiedColumns[OrderAddressTableMap::COUNTRY_ID] = true;
         }
 
 
@@ -868,7 +868,7 @@ abstract class OrderAddress implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = OrderAddressTableMap::CREATED_AT;
+                $this->modifiedColumns[OrderAddressTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -889,7 +889,7 @@ abstract class OrderAddress implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = OrderAddressTableMap::UPDATED_AT;
+                $this->modifiedColumns[OrderAddressTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1241,7 +1241,7 @@ abstract class OrderAddress implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = OrderAddressTableMap::ID;
+        $this->modifiedColumns[OrderAddressTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . OrderAddressTableMap::ID . ')');
         }
@@ -1866,7 +1866,7 @@ abstract class OrderAddress implements ActiveRecordInterface
                         $this->collOrdersRelatedByInvoiceOrderAddressIdPartial = true;
                     }
 
-                    $collOrdersRelatedByInvoiceOrderAddressId->getInternalIterator()->rewind();
+                    reset($collOrdersRelatedByInvoiceOrderAddressId);
 
                     return $collOrdersRelatedByInvoiceOrderAddressId;
                 }
@@ -2234,7 +2234,7 @@ abstract class OrderAddress implements ActiveRecordInterface
                         $this->collOrdersRelatedByDeliveryOrderAddressIdPartial = true;
                     }
 
-                    $collOrdersRelatedByDeliveryOrderAddressId->getInternalIterator()->rewind();
+                    reset($collOrdersRelatedByDeliveryOrderAddressId);
 
                     return $collOrdersRelatedByDeliveryOrderAddressId;
                 }
@@ -2570,13 +2570,7 @@ abstract class OrderAddress implements ActiveRecordInterface
             }
         } // if ($deep)
 
-        if ($this->collOrdersRelatedByInvoiceOrderAddressId instanceof Collection) {
-            $this->collOrdersRelatedByInvoiceOrderAddressId->clearIterator();
-        }
         $this->collOrdersRelatedByInvoiceOrderAddressId = null;
-        if ($this->collOrdersRelatedByDeliveryOrderAddressId instanceof Collection) {
-            $this->collOrdersRelatedByDeliveryOrderAddressId->clearIterator();
-        }
         $this->collOrdersRelatedByDeliveryOrderAddressId = null;
     }
 
@@ -2599,7 +2593,7 @@ abstract class OrderAddress implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = OrderAddressTableMap::UPDATED_AT;
+        $this->modifiedColumns[OrderAddressTableMap::UPDATED_AT] = true;
 
         return $this;
     }

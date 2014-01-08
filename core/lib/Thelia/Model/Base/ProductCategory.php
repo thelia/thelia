@@ -120,7 +120,7 @@ abstract class ProductCategory implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -131,7 +131,7 @@ abstract class ProductCategory implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -140,7 +140,7 @@ abstract class ProductCategory implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -193,8 +193,8 @@ abstract class ProductCategory implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -451,7 +451,7 @@ abstract class ProductCategory implements ActiveRecordInterface
 
         if ($this->product_id !== $v) {
             $this->product_id = $v;
-            $this->modifiedColumns[] = ProductCategoryTableMap::PRODUCT_ID;
+            $this->modifiedColumns[ProductCategoryTableMap::PRODUCT_ID] = true;
         }
 
         if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
@@ -476,7 +476,7 @@ abstract class ProductCategory implements ActiveRecordInterface
 
         if ($this->category_id !== $v) {
             $this->category_id = $v;
-            $this->modifiedColumns[] = ProductCategoryTableMap::CATEGORY_ID;
+            $this->modifiedColumns[ProductCategoryTableMap::CATEGORY_ID] = true;
         }
 
         if ($this->aCategory !== null && $this->aCategory->getId() !== $v) {
@@ -509,7 +509,7 @@ abstract class ProductCategory implements ActiveRecordInterface
 
         if ($this->default_category !== $v) {
             $this->default_category = $v;
-            $this->modifiedColumns[] = ProductCategoryTableMap::DEFAULT_CATEGORY;
+            $this->modifiedColumns[ProductCategoryTableMap::DEFAULT_CATEGORY] = true;
         }
 
 
@@ -529,7 +529,7 @@ abstract class ProductCategory implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ProductCategoryTableMap::CREATED_AT;
+                $this->modifiedColumns[ProductCategoryTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -550,7 +550,7 @@ abstract class ProductCategory implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ProductCategoryTableMap::UPDATED_AT;
+                $this->modifiedColumns[ProductCategoryTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1376,7 +1376,7 @@ abstract class ProductCategory implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ProductCategoryTableMap::UPDATED_AT;
+        $this->modifiedColumns[ProductCategoryTableMap::UPDATED_AT] = true;
 
         return $this;
     }

@@ -156,7 +156,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -167,7 +167,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -176,7 +176,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -229,8 +229,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -520,7 +520,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = RewritingUrlTableMap::ID;
+            $this->modifiedColumns[RewritingUrlTableMap::ID] = true;
         }
 
 
@@ -541,7 +541,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
 
         if ($this->url !== $v) {
             $this->url = $v;
-            $this->modifiedColumns[] = RewritingUrlTableMap::URL;
+            $this->modifiedColumns[RewritingUrlTableMap::URL] = true;
         }
 
 
@@ -562,7 +562,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
 
         if ($this->view !== $v) {
             $this->view = $v;
-            $this->modifiedColumns[] = RewritingUrlTableMap::VIEW;
+            $this->modifiedColumns[RewritingUrlTableMap::VIEW] = true;
         }
 
 
@@ -583,7 +583,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
 
         if ($this->view_id !== $v) {
             $this->view_id = $v;
-            $this->modifiedColumns[] = RewritingUrlTableMap::VIEW_ID;
+            $this->modifiedColumns[RewritingUrlTableMap::VIEW_ID] = true;
         }
 
 
@@ -604,7 +604,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
 
         if ($this->view_locale !== $v) {
             $this->view_locale = $v;
-            $this->modifiedColumns[] = RewritingUrlTableMap::VIEW_LOCALE;
+            $this->modifiedColumns[RewritingUrlTableMap::VIEW_LOCALE] = true;
         }
 
 
@@ -625,7 +625,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
 
         if ($this->redirected !== $v) {
             $this->redirected = $v;
-            $this->modifiedColumns[] = RewritingUrlTableMap::REDIRECTED;
+            $this->modifiedColumns[RewritingUrlTableMap::REDIRECTED] = true;
         }
 
         if ($this->aRewritingUrlRelatedByRedirected !== null && $this->aRewritingUrlRelatedByRedirected->getId() !== $v) {
@@ -649,7 +649,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = RewritingUrlTableMap::CREATED_AT;
+                $this->modifiedColumns[RewritingUrlTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -670,7 +670,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = RewritingUrlTableMap::UPDATED_AT;
+                $this->modifiedColumns[RewritingUrlTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1021,7 +1021,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = RewritingUrlTableMap::ID;
+        $this->modifiedColumns[RewritingUrlTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . RewritingUrlTableMap::ID . ')');
         }
@@ -1604,7 +1604,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
                         $this->collRewritingUrlsRelatedByIdPartial = true;
                     }
 
-                    $collRewritingUrlsRelatedById->getInternalIterator()->rewind();
+                    reset($collRewritingUrlsRelatedById);
 
                     return $collRewritingUrlsRelatedById;
                 }
@@ -1822,7 +1822,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
                         $this->collRewritingArgumentsPartial = true;
                     }
 
-                    $collRewritingArguments->getInternalIterator()->rewind();
+                    reset($collRewritingArguments);
 
                     return $collRewritingArguments;
                 }
@@ -2005,13 +2005,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
             }
         } // if ($deep)
 
-        if ($this->collRewritingUrlsRelatedById instanceof Collection) {
-            $this->collRewritingUrlsRelatedById->clearIterator();
-        }
         $this->collRewritingUrlsRelatedById = null;
-        if ($this->collRewritingArguments instanceof Collection) {
-            $this->collRewritingArguments->clearIterator();
-        }
         $this->collRewritingArguments = null;
         $this->aRewritingUrlRelatedByRedirected = null;
     }
@@ -2035,7 +2029,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = RewritingUrlTableMap::UPDATED_AT;
+        $this->modifiedColumns[RewritingUrlTableMap::UPDATED_AT] = true;
 
         return $this;
     }

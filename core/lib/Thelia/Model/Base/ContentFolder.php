@@ -120,7 +120,7 @@ abstract class ContentFolder implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -131,7 +131,7 @@ abstract class ContentFolder implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -140,7 +140,7 @@ abstract class ContentFolder implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -193,8 +193,8 @@ abstract class ContentFolder implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -451,7 +451,7 @@ abstract class ContentFolder implements ActiveRecordInterface
 
         if ($this->content_id !== $v) {
             $this->content_id = $v;
-            $this->modifiedColumns[] = ContentFolderTableMap::CONTENT_ID;
+            $this->modifiedColumns[ContentFolderTableMap::CONTENT_ID] = true;
         }
 
         if ($this->aContent !== null && $this->aContent->getId() !== $v) {
@@ -476,7 +476,7 @@ abstract class ContentFolder implements ActiveRecordInterface
 
         if ($this->folder_id !== $v) {
             $this->folder_id = $v;
-            $this->modifiedColumns[] = ContentFolderTableMap::FOLDER_ID;
+            $this->modifiedColumns[ContentFolderTableMap::FOLDER_ID] = true;
         }
 
         if ($this->aFolder !== null && $this->aFolder->getId() !== $v) {
@@ -509,7 +509,7 @@ abstract class ContentFolder implements ActiveRecordInterface
 
         if ($this->default_folder !== $v) {
             $this->default_folder = $v;
-            $this->modifiedColumns[] = ContentFolderTableMap::DEFAULT_FOLDER;
+            $this->modifiedColumns[ContentFolderTableMap::DEFAULT_FOLDER] = true;
         }
 
 
@@ -529,7 +529,7 @@ abstract class ContentFolder implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ContentFolderTableMap::CREATED_AT;
+                $this->modifiedColumns[ContentFolderTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -550,7 +550,7 @@ abstract class ContentFolder implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ContentFolderTableMap::UPDATED_AT;
+                $this->modifiedColumns[ContentFolderTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1376,7 +1376,7 @@ abstract class ContentFolder implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ContentFolderTableMap::UPDATED_AT;
+        $this->modifiedColumns[ContentFolderTableMap::UPDATED_AT] = true;
 
         return $this;
     }

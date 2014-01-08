@@ -155,7 +155,7 @@ abstract class Admin implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -166,7 +166,7 @@ abstract class Admin implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -175,7 +175,7 @@ abstract class Admin implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -228,8 +228,8 @@ abstract class Admin implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -563,7 +563,7 @@ abstract class Admin implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = AdminTableMap::ID;
+            $this->modifiedColumns[AdminTableMap::ID] = true;
         }
 
 
@@ -584,7 +584,7 @@ abstract class Admin implements ActiveRecordInterface
 
         if ($this->profile_id !== $v) {
             $this->profile_id = $v;
-            $this->modifiedColumns[] = AdminTableMap::PROFILE_ID;
+            $this->modifiedColumns[AdminTableMap::PROFILE_ID] = true;
         }
 
         if ($this->aProfile !== null && $this->aProfile->getId() !== $v) {
@@ -609,7 +609,7 @@ abstract class Admin implements ActiveRecordInterface
 
         if ($this->firstname !== $v) {
             $this->firstname = $v;
-            $this->modifiedColumns[] = AdminTableMap::FIRSTNAME;
+            $this->modifiedColumns[AdminTableMap::FIRSTNAME] = true;
         }
 
 
@@ -630,7 +630,7 @@ abstract class Admin implements ActiveRecordInterface
 
         if ($this->lastname !== $v) {
             $this->lastname = $v;
-            $this->modifiedColumns[] = AdminTableMap::LASTNAME;
+            $this->modifiedColumns[AdminTableMap::LASTNAME] = true;
         }
 
 
@@ -651,7 +651,7 @@ abstract class Admin implements ActiveRecordInterface
 
         if ($this->login !== $v) {
             $this->login = $v;
-            $this->modifiedColumns[] = AdminTableMap::LOGIN;
+            $this->modifiedColumns[AdminTableMap::LOGIN] = true;
         }
 
 
@@ -672,7 +672,7 @@ abstract class Admin implements ActiveRecordInterface
 
         if ($this->password !== $v) {
             $this->password = $v;
-            $this->modifiedColumns[] = AdminTableMap::PASSWORD;
+            $this->modifiedColumns[AdminTableMap::PASSWORD] = true;
         }
 
 
@@ -693,7 +693,7 @@ abstract class Admin implements ActiveRecordInterface
 
         if ($this->algo !== $v) {
             $this->algo = $v;
-            $this->modifiedColumns[] = AdminTableMap::ALGO;
+            $this->modifiedColumns[AdminTableMap::ALGO] = true;
         }
 
 
@@ -714,7 +714,7 @@ abstract class Admin implements ActiveRecordInterface
 
         if ($this->salt !== $v) {
             $this->salt = $v;
-            $this->modifiedColumns[] = AdminTableMap::SALT;
+            $this->modifiedColumns[AdminTableMap::SALT] = true;
         }
 
 
@@ -735,7 +735,7 @@ abstract class Admin implements ActiveRecordInterface
 
         if ($this->remember_me_token !== $v) {
             $this->remember_me_token = $v;
-            $this->modifiedColumns[] = AdminTableMap::REMEMBER_ME_TOKEN;
+            $this->modifiedColumns[AdminTableMap::REMEMBER_ME_TOKEN] = true;
         }
 
 
@@ -756,7 +756,7 @@ abstract class Admin implements ActiveRecordInterface
 
         if ($this->remember_me_serial !== $v) {
             $this->remember_me_serial = $v;
-            $this->modifiedColumns[] = AdminTableMap::REMEMBER_ME_SERIAL;
+            $this->modifiedColumns[AdminTableMap::REMEMBER_ME_SERIAL] = true;
         }
 
 
@@ -776,7 +776,7 @@ abstract class Admin implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = AdminTableMap::CREATED_AT;
+                $this->modifiedColumns[AdminTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -797,7 +797,7 @@ abstract class Admin implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = AdminTableMap::UPDATED_AT;
+                $this->modifiedColumns[AdminTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1121,7 +1121,7 @@ abstract class Admin implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = AdminTableMap::ID;
+        $this->modifiedColumns[AdminTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . AdminTableMap::ID . ')');
         }
@@ -1701,7 +1701,7 @@ abstract class Admin implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = AdminTableMap::UPDATED_AT;
+        $this->modifiedColumns[AdminTableMap::UPDATED_AT] = true;
 
         return $this;
     }

@@ -118,7 +118,7 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -129,7 +129,7 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -138,7 +138,7 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -191,8 +191,8 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -420,7 +420,7 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = TaxRuleI18nTableMap::ID;
+            $this->modifiedColumns[TaxRuleI18nTableMap::ID] = true;
         }
 
         if ($this->aTaxRule !== null && $this->aTaxRule->getId() !== $v) {
@@ -445,7 +445,7 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
 
         if ($this->locale !== $v) {
             $this->locale = $v;
-            $this->modifiedColumns[] = TaxRuleI18nTableMap::LOCALE;
+            $this->modifiedColumns[TaxRuleI18nTableMap::LOCALE] = true;
         }
 
 
@@ -466,7 +466,7 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
 
         if ($this->title !== $v) {
             $this->title = $v;
-            $this->modifiedColumns[] = TaxRuleI18nTableMap::TITLE;
+            $this->modifiedColumns[TaxRuleI18nTableMap::TITLE] = true;
         }
 
 
@@ -487,7 +487,7 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
 
         if ($this->description !== $v) {
             $this->description = $v;
-            $this->modifiedColumns[] = TaxRuleI18nTableMap::DESCRIPTION;
+            $this->modifiedColumns[TaxRuleI18nTableMap::DESCRIPTION] = true;
         }
 
 

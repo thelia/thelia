@@ -265,7 +265,7 @@ abstract class Category implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -276,7 +276,7 @@ abstract class Category implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -285,7 +285,7 @@ abstract class Category implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -338,8 +338,8 @@ abstract class Category implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -649,7 +649,7 @@ abstract class Category implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CategoryTableMap::ID;
+            $this->modifiedColumns[CategoryTableMap::ID] = true;
         }
 
 
@@ -670,7 +670,7 @@ abstract class Category implements ActiveRecordInterface
 
         if ($this->parent !== $v) {
             $this->parent = $v;
-            $this->modifiedColumns[] = CategoryTableMap::PARENT;
+            $this->modifiedColumns[CategoryTableMap::PARENT] = true;
         }
 
 
@@ -691,7 +691,7 @@ abstract class Category implements ActiveRecordInterface
 
         if ($this->visible !== $v) {
             $this->visible = $v;
-            $this->modifiedColumns[] = CategoryTableMap::VISIBLE;
+            $this->modifiedColumns[CategoryTableMap::VISIBLE] = true;
         }
 
 
@@ -712,7 +712,7 @@ abstract class Category implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = CategoryTableMap::POSITION;
+            $this->modifiedColumns[CategoryTableMap::POSITION] = true;
         }
 
 
@@ -732,7 +732,7 @@ abstract class Category implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = CategoryTableMap::CREATED_AT;
+                $this->modifiedColumns[CategoryTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -753,7 +753,7 @@ abstract class Category implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = CategoryTableMap::UPDATED_AT;
+                $this->modifiedColumns[CategoryTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -775,7 +775,7 @@ abstract class Category implements ActiveRecordInterface
 
         if ($this->version !== $v) {
             $this->version = $v;
-            $this->modifiedColumns[] = CategoryTableMap::VERSION;
+            $this->modifiedColumns[CategoryTableMap::VERSION] = true;
         }
 
 
@@ -795,7 +795,7 @@ abstract class Category implements ActiveRecordInterface
         if ($this->version_created_at !== null || $dt !== null) {
             if ($dt !== $this->version_created_at) {
                 $this->version_created_at = $dt;
-                $this->modifiedColumns[] = CategoryTableMap::VERSION_CREATED_AT;
+                $this->modifiedColumns[CategoryTableMap::VERSION_CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -817,7 +817,7 @@ abstract class Category implements ActiveRecordInterface
 
         if ($this->version_created_by !== $v) {
             $this->version_created_by = $v;
-            $this->modifiedColumns[] = CategoryTableMap::VERSION_CREATED_BY;
+            $this->modifiedColumns[CategoryTableMap::VERSION_CREATED_BY] = true;
         }
 
 
@@ -1276,7 +1276,7 @@ abstract class Category implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = CategoryTableMap::ID;
+        $this->modifiedColumns[CategoryTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . CategoryTableMap::ID . ')');
         }
@@ -1869,7 +1869,7 @@ abstract class Category implements ActiveRecordInterface
                         $this->collProductCategoriesPartial = true;
                     }
 
-                    $collProductCategories->getInternalIterator()->rewind();
+                    reset($collProductCategories);
 
                     return $collProductCategories;
                 }
@@ -2115,7 +2115,7 @@ abstract class Category implements ActiveRecordInterface
                         $this->collCategoryImagesPartial = true;
                     }
 
-                    $collCategoryImages->getInternalIterator()->rewind();
+                    reset($collCategoryImages);
 
                     return $collCategoryImages;
                 }
@@ -2333,7 +2333,7 @@ abstract class Category implements ActiveRecordInterface
                         $this->collCategoryDocumentsPartial = true;
                     }
 
-                    $collCategoryDocuments->getInternalIterator()->rewind();
+                    reset($collCategoryDocuments);
 
                     return $collCategoryDocuments;
                 }
@@ -2551,7 +2551,7 @@ abstract class Category implements ActiveRecordInterface
                         $this->collCategoryAssociatedContentsPartial = true;
                     }
 
-                    $collCategoryAssociatedContents->getInternalIterator()->rewind();
+                    reset($collCategoryAssociatedContents);
 
                     return $collCategoryAssociatedContents;
                 }
@@ -2794,7 +2794,7 @@ abstract class Category implements ActiveRecordInterface
                         $this->collCategoryI18nsPartial = true;
                     }
 
-                    $collCategoryI18ns->getInternalIterator()->rewind();
+                    reset($collCategoryI18ns);
 
                     return $collCategoryI18ns;
                 }
@@ -3019,7 +3019,7 @@ abstract class Category implements ActiveRecordInterface
                         $this->collCategoryVersionsPartial = true;
                     }
 
-                    $collCategoryVersions->getInternalIterator()->rewind();
+                    reset($collCategoryVersions);
 
                     return $collCategoryVersions;
                 }
@@ -3416,33 +3416,12 @@ abstract class Category implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collProductCategories instanceof Collection) {
-            $this->collProductCategories->clearIterator();
-        }
         $this->collProductCategories = null;
-        if ($this->collCategoryImages instanceof Collection) {
-            $this->collCategoryImages->clearIterator();
-        }
         $this->collCategoryImages = null;
-        if ($this->collCategoryDocuments instanceof Collection) {
-            $this->collCategoryDocuments->clearIterator();
-        }
         $this->collCategoryDocuments = null;
-        if ($this->collCategoryAssociatedContents instanceof Collection) {
-            $this->collCategoryAssociatedContents->clearIterator();
-        }
         $this->collCategoryAssociatedContents = null;
-        if ($this->collCategoryI18ns instanceof Collection) {
-            $this->collCategoryI18ns->clearIterator();
-        }
         $this->collCategoryI18ns = null;
-        if ($this->collCategoryVersions instanceof Collection) {
-            $this->collCategoryVersions->clearIterator();
-        }
         $this->collCategoryVersions = null;
-        if ($this->collProducts instanceof Collection) {
-            $this->collProducts->clearIterator();
-        }
         $this->collProducts = null;
     }
 
@@ -4016,7 +3995,7 @@ abstract class Category implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = CategoryTableMap::UPDATED_AT;
+        $this->modifiedColumns[CategoryTableMap::UPDATED_AT] = true;
 
         return $this;
     }

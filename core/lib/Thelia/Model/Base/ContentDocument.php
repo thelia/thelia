@@ -148,7 +148,7 @@ abstract class ContentDocument implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -159,7 +159,7 @@ abstract class ContentDocument implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -168,7 +168,7 @@ abstract class ContentDocument implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -221,8 +221,8 @@ abstract class ContentDocument implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -490,7 +490,7 @@ abstract class ContentDocument implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = ContentDocumentTableMap::ID;
+            $this->modifiedColumns[ContentDocumentTableMap::ID] = true;
         }
 
 
@@ -511,7 +511,7 @@ abstract class ContentDocument implements ActiveRecordInterface
 
         if ($this->content_id !== $v) {
             $this->content_id = $v;
-            $this->modifiedColumns[] = ContentDocumentTableMap::CONTENT_ID;
+            $this->modifiedColumns[ContentDocumentTableMap::CONTENT_ID] = true;
         }
 
         if ($this->aContent !== null && $this->aContent->getId() !== $v) {
@@ -536,7 +536,7 @@ abstract class ContentDocument implements ActiveRecordInterface
 
         if ($this->file !== $v) {
             $this->file = $v;
-            $this->modifiedColumns[] = ContentDocumentTableMap::FILE;
+            $this->modifiedColumns[ContentDocumentTableMap::FILE] = true;
         }
 
 
@@ -557,7 +557,7 @@ abstract class ContentDocument implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = ContentDocumentTableMap::POSITION;
+            $this->modifiedColumns[ContentDocumentTableMap::POSITION] = true;
         }
 
 
@@ -577,7 +577,7 @@ abstract class ContentDocument implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ContentDocumentTableMap::CREATED_AT;
+                $this->modifiedColumns[ContentDocumentTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -598,7 +598,7 @@ abstract class ContentDocument implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ContentDocumentTableMap::UPDATED_AT;
+                $this->modifiedColumns[ContentDocumentTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -923,7 +923,7 @@ abstract class ContentDocument implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ContentDocumentTableMap::ID;
+        $this->modifiedColumns[ContentDocumentTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . ContentDocumentTableMap::ID . ')');
         }
@@ -1462,7 +1462,7 @@ abstract class ContentDocument implements ActiveRecordInterface
                         $this->collContentDocumentI18nsPartial = true;
                     }
 
-                    $collContentDocumentI18ns->getInternalIterator()->rewind();
+                    reset($collContentDocumentI18ns);
 
                     return $collContentDocumentI18ns;
                 }
@@ -1646,9 +1646,6 @@ abstract class ContentDocument implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collContentDocumentI18ns instanceof Collection) {
-            $this->collContentDocumentI18ns->clearIterator();
-        }
         $this->collContentDocumentI18ns = null;
         $this->aContent = null;
     }
@@ -1672,7 +1669,7 @@ abstract class ContentDocument implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ContentDocumentTableMap::UPDATED_AT;
+        $this->modifiedColumns[ContentDocumentTableMap::UPDATED_AT] = true;
 
         return $this;
     }

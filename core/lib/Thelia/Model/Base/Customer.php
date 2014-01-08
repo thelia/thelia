@@ -222,7 +222,7 @@ abstract class Customer implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -233,7 +233,7 @@ abstract class Customer implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -242,7 +242,7 @@ abstract class Customer implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -295,8 +295,8 @@ abstract class Customer implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -674,7 +674,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CustomerTableMap::ID;
+            $this->modifiedColumns[CustomerTableMap::ID] = true;
         }
 
 
@@ -695,7 +695,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->ref !== $v) {
             $this->ref = $v;
-            $this->modifiedColumns[] = CustomerTableMap::REF;
+            $this->modifiedColumns[CustomerTableMap::REF] = true;
         }
 
 
@@ -716,7 +716,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->title_id !== $v) {
             $this->title_id = $v;
-            $this->modifiedColumns[] = CustomerTableMap::TITLE_ID;
+            $this->modifiedColumns[CustomerTableMap::TITLE_ID] = true;
         }
 
         if ($this->aCustomerTitle !== null && $this->aCustomerTitle->getId() !== $v) {
@@ -741,7 +741,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->firstname !== $v) {
             $this->firstname = $v;
-            $this->modifiedColumns[] = CustomerTableMap::FIRSTNAME;
+            $this->modifiedColumns[CustomerTableMap::FIRSTNAME] = true;
         }
 
 
@@ -762,7 +762,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->lastname !== $v) {
             $this->lastname = $v;
-            $this->modifiedColumns[] = CustomerTableMap::LASTNAME;
+            $this->modifiedColumns[CustomerTableMap::LASTNAME] = true;
         }
 
 
@@ -783,7 +783,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->email !== $v) {
             $this->email = $v;
-            $this->modifiedColumns[] = CustomerTableMap::EMAIL;
+            $this->modifiedColumns[CustomerTableMap::EMAIL] = true;
         }
 
 
@@ -804,7 +804,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->password !== $v) {
             $this->password = $v;
-            $this->modifiedColumns[] = CustomerTableMap::PASSWORD;
+            $this->modifiedColumns[CustomerTableMap::PASSWORD] = true;
         }
 
 
@@ -825,7 +825,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->algo !== $v) {
             $this->algo = $v;
-            $this->modifiedColumns[] = CustomerTableMap::ALGO;
+            $this->modifiedColumns[CustomerTableMap::ALGO] = true;
         }
 
 
@@ -846,7 +846,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->reseller !== $v) {
             $this->reseller = $v;
-            $this->modifiedColumns[] = CustomerTableMap::RESELLER;
+            $this->modifiedColumns[CustomerTableMap::RESELLER] = true;
         }
 
 
@@ -867,7 +867,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->lang !== $v) {
             $this->lang = $v;
-            $this->modifiedColumns[] = CustomerTableMap::LANG;
+            $this->modifiedColumns[CustomerTableMap::LANG] = true;
         }
 
 
@@ -888,7 +888,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->sponsor !== $v) {
             $this->sponsor = $v;
-            $this->modifiedColumns[] = CustomerTableMap::SPONSOR;
+            $this->modifiedColumns[CustomerTableMap::SPONSOR] = true;
         }
 
 
@@ -909,7 +909,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->discount !== $v) {
             $this->discount = $v;
-            $this->modifiedColumns[] = CustomerTableMap::DISCOUNT;
+            $this->modifiedColumns[CustomerTableMap::DISCOUNT] = true;
         }
 
 
@@ -930,7 +930,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->remember_me_token !== $v) {
             $this->remember_me_token = $v;
-            $this->modifiedColumns[] = CustomerTableMap::REMEMBER_ME_TOKEN;
+            $this->modifiedColumns[CustomerTableMap::REMEMBER_ME_TOKEN] = true;
         }
 
 
@@ -951,7 +951,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->remember_me_serial !== $v) {
             $this->remember_me_serial = $v;
-            $this->modifiedColumns[] = CustomerTableMap::REMEMBER_ME_SERIAL;
+            $this->modifiedColumns[CustomerTableMap::REMEMBER_ME_SERIAL] = true;
         }
 
 
@@ -971,7 +971,7 @@ abstract class Customer implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = CustomerTableMap::CREATED_AT;
+                $this->modifiedColumns[CustomerTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -992,7 +992,7 @@ abstract class Customer implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = CustomerTableMap::UPDATED_AT;
+                $this->modifiedColumns[CustomerTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1385,7 +1385,7 @@ abstract class Customer implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = CustomerTableMap::ID;
+        $this->modifiedColumns[CustomerTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . CustomerTableMap::ID . ')');
         }
@@ -2108,7 +2108,7 @@ abstract class Customer implements ActiveRecordInterface
                         $this->collAddressesPartial = true;
                     }
 
-                    $collAddresses->getInternalIterator()->rewind();
+                    reset($collAddresses);
 
                     return $collAddresses;
                 }
@@ -2376,7 +2376,7 @@ abstract class Customer implements ActiveRecordInterface
                         $this->collOrdersPartial = true;
                     }
 
-                    $collOrders->getInternalIterator()->rewind();
+                    reset($collOrders);
 
                     return $collOrders;
                 }
@@ -2769,7 +2769,7 @@ abstract class Customer implements ActiveRecordInterface
                         $this->collCartsPartial = true;
                     }
 
-                    $collCarts->getInternalIterator()->rewind();
+                    reset($collCarts);
 
                     return $collCarts;
                 }
@@ -3037,17 +3037,8 @@ abstract class Customer implements ActiveRecordInterface
             }
         } // if ($deep)
 
-        if ($this->collAddresses instanceof Collection) {
-            $this->collAddresses->clearIterator();
-        }
         $this->collAddresses = null;
-        if ($this->collOrders instanceof Collection) {
-            $this->collOrders->clearIterator();
-        }
         $this->collOrders = null;
-        if ($this->collCarts instanceof Collection) {
-            $this->collCarts->clearIterator();
-        }
         $this->collCarts = null;
         $this->aCustomerTitle = null;
     }
@@ -3071,7 +3062,7 @@ abstract class Customer implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = CustomerTableMap::UPDATED_AT;
+        $this->modifiedColumns[CustomerTableMap::UPDATED_AT] = true;
 
         return $this;
     }

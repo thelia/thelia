@@ -212,7 +212,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -223,7 +223,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -232,7 +232,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -285,8 +285,8 @@ abstract class ProductSaleElements implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -609,7 +609,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = ProductSaleElementsTableMap::ID;
+            $this->modifiedColumns[ProductSaleElementsTableMap::ID] = true;
         }
 
 
@@ -630,7 +630,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
         if ($this->product_id !== $v) {
             $this->product_id = $v;
-            $this->modifiedColumns[] = ProductSaleElementsTableMap::PRODUCT_ID;
+            $this->modifiedColumns[ProductSaleElementsTableMap::PRODUCT_ID] = true;
         }
 
         if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
@@ -655,7 +655,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
         if ($this->ref !== $v) {
             $this->ref = $v;
-            $this->modifiedColumns[] = ProductSaleElementsTableMap::REF;
+            $this->modifiedColumns[ProductSaleElementsTableMap::REF] = true;
         }
 
 
@@ -676,7 +676,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
         if ($this->quantity !== $v) {
             $this->quantity = $v;
-            $this->modifiedColumns[] = ProductSaleElementsTableMap::QUANTITY;
+            $this->modifiedColumns[ProductSaleElementsTableMap::QUANTITY] = true;
         }
 
 
@@ -697,7 +697,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
         if ($this->promo !== $v) {
             $this->promo = $v;
-            $this->modifiedColumns[] = ProductSaleElementsTableMap::PROMO;
+            $this->modifiedColumns[ProductSaleElementsTableMap::PROMO] = true;
         }
 
 
@@ -718,7 +718,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
         if ($this->newness !== $v) {
             $this->newness = $v;
-            $this->modifiedColumns[] = ProductSaleElementsTableMap::NEWNESS;
+            $this->modifiedColumns[ProductSaleElementsTableMap::NEWNESS] = true;
         }
 
 
@@ -739,7 +739,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
         if ($this->weight !== $v) {
             $this->weight = $v;
-            $this->modifiedColumns[] = ProductSaleElementsTableMap::WEIGHT;
+            $this->modifiedColumns[ProductSaleElementsTableMap::WEIGHT] = true;
         }
 
 
@@ -768,7 +768,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
         if ($this->is_default !== $v) {
             $this->is_default = $v;
-            $this->modifiedColumns[] = ProductSaleElementsTableMap::IS_DEFAULT;
+            $this->modifiedColumns[ProductSaleElementsTableMap::IS_DEFAULT] = true;
         }
 
 
@@ -789,7 +789,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
         if ($this->ean_code !== $v) {
             $this->ean_code = $v;
-            $this->modifiedColumns[] = ProductSaleElementsTableMap::EAN_CODE;
+            $this->modifiedColumns[ProductSaleElementsTableMap::EAN_CODE] = true;
         }
 
 
@@ -809,7 +809,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ProductSaleElementsTableMap::CREATED_AT;
+                $this->modifiedColumns[ProductSaleElementsTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -830,7 +830,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ProductSaleElementsTableMap::UPDATED_AT;
+                $this->modifiedColumns[ProductSaleElementsTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1224,7 +1224,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ProductSaleElementsTableMap::ID;
+        $this->modifiedColumns[ProductSaleElementsTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProductSaleElementsTableMap::ID . ')');
         }
@@ -1867,7 +1867,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                         $this->collAttributeCombinationsPartial = true;
                     }
 
-                    $collAttributeCombinations->getInternalIterator()->rewind();
+                    reset($collAttributeCombinations);
 
                     return $collAttributeCombinations;
                 }
@@ -2138,7 +2138,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                         $this->collCartItemsPartial = true;
                     }
 
-                    $collCartItems->getInternalIterator()->rewind();
+                    reset($collCartItems);
 
                     return $collCartItems;
                 }
@@ -2406,7 +2406,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                         $this->collProductPricesPartial = true;
                     }
 
-                    $collProductPrices->getInternalIterator()->rewind();
+                    reset($collProductPrices);
 
                     return $collProductPrices;
                 }
@@ -2623,17 +2623,8 @@ abstract class ProductSaleElements implements ActiveRecordInterface
             }
         } // if ($deep)
 
-        if ($this->collAttributeCombinations instanceof Collection) {
-            $this->collAttributeCombinations->clearIterator();
-        }
         $this->collAttributeCombinations = null;
-        if ($this->collCartItems instanceof Collection) {
-            $this->collCartItems->clearIterator();
-        }
         $this->collCartItems = null;
-        if ($this->collProductPrices instanceof Collection) {
-            $this->collProductPrices->clearIterator();
-        }
         $this->collProductPrices = null;
         $this->aProduct = null;
     }
@@ -2657,7 +2648,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ProductSaleElementsTableMap::UPDATED_AT;
+        $this->modifiedColumns[ProductSaleElementsTableMap::UPDATED_AT] = true;
 
         return $this;
     }

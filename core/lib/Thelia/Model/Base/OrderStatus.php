@@ -143,7 +143,7 @@ abstract class OrderStatus implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -154,7 +154,7 @@ abstract class OrderStatus implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -163,7 +163,7 @@ abstract class OrderStatus implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -216,8 +216,8 @@ abstract class OrderStatus implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -463,7 +463,7 @@ abstract class OrderStatus implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = OrderStatusTableMap::ID;
+            $this->modifiedColumns[OrderStatusTableMap::ID] = true;
         }
 
 
@@ -484,7 +484,7 @@ abstract class OrderStatus implements ActiveRecordInterface
 
         if ($this->code !== $v) {
             $this->code = $v;
-            $this->modifiedColumns[] = OrderStatusTableMap::CODE;
+            $this->modifiedColumns[OrderStatusTableMap::CODE] = true;
         }
 
 
@@ -504,7 +504,7 @@ abstract class OrderStatus implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = OrderStatusTableMap::CREATED_AT;
+                $this->modifiedColumns[OrderStatusTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -525,7 +525,7 @@ abstract class OrderStatus implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = OrderStatusTableMap::UPDATED_AT;
+                $this->modifiedColumns[OrderStatusTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -847,7 +847,7 @@ abstract class OrderStatus implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = OrderStatusTableMap::ID;
+        $this->modifiedColumns[OrderStatusTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . OrderStatusTableMap::ID . ')');
         }
@@ -1312,7 +1312,7 @@ abstract class OrderStatus implements ActiveRecordInterface
                         $this->collOrdersPartial = true;
                     }
 
-                    $collOrders->getInternalIterator()->rewind();
+                    reset($collOrders);
 
                     return $collOrders;
                 }
@@ -1705,7 +1705,7 @@ abstract class OrderStatus implements ActiveRecordInterface
                         $this->collOrderStatusI18nsPartial = true;
                     }
 
-                    $collOrderStatusI18ns->getInternalIterator()->rewind();
+                    reset($collOrderStatusI18ns);
 
                     return $collOrderStatusI18ns;
                 }
@@ -1892,13 +1892,7 @@ abstract class OrderStatus implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collOrders instanceof Collection) {
-            $this->collOrders->clearIterator();
-        }
         $this->collOrders = null;
-        if ($this->collOrderStatusI18ns instanceof Collection) {
-            $this->collOrderStatusI18ns->clearIterator();
-        }
         $this->collOrderStatusI18ns = null;
     }
 
@@ -1921,7 +1915,7 @@ abstract class OrderStatus implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = OrderStatusTableMap::UPDATED_AT;
+        $this->modifiedColumns[OrderStatusTableMap::UPDATED_AT] = true;
 
         return $this;
     }

@@ -273,7 +273,7 @@ abstract class Content implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -284,7 +284,7 @@ abstract class Content implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -293,7 +293,7 @@ abstract class Content implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -346,8 +346,8 @@ abstract class Content implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -646,7 +646,7 @@ abstract class Content implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = ContentTableMap::ID;
+            $this->modifiedColumns[ContentTableMap::ID] = true;
         }
 
 
@@ -667,7 +667,7 @@ abstract class Content implements ActiveRecordInterface
 
         if ($this->visible !== $v) {
             $this->visible = $v;
-            $this->modifiedColumns[] = ContentTableMap::VISIBLE;
+            $this->modifiedColumns[ContentTableMap::VISIBLE] = true;
         }
 
 
@@ -688,7 +688,7 @@ abstract class Content implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = ContentTableMap::POSITION;
+            $this->modifiedColumns[ContentTableMap::POSITION] = true;
         }
 
 
@@ -708,7 +708,7 @@ abstract class Content implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ContentTableMap::CREATED_AT;
+                $this->modifiedColumns[ContentTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -729,7 +729,7 @@ abstract class Content implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ContentTableMap::UPDATED_AT;
+                $this->modifiedColumns[ContentTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -751,7 +751,7 @@ abstract class Content implements ActiveRecordInterface
 
         if ($this->version !== $v) {
             $this->version = $v;
-            $this->modifiedColumns[] = ContentTableMap::VERSION;
+            $this->modifiedColumns[ContentTableMap::VERSION] = true;
         }
 
 
@@ -771,7 +771,7 @@ abstract class Content implements ActiveRecordInterface
         if ($this->version_created_at !== null || $dt !== null) {
             if ($dt !== $this->version_created_at) {
                 $this->version_created_at = $dt;
-                $this->modifiedColumns[] = ContentTableMap::VERSION_CREATED_AT;
+                $this->modifiedColumns[ContentTableMap::VERSION_CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -793,7 +793,7 @@ abstract class Content implements ActiveRecordInterface
 
         if ($this->version_created_by !== $v) {
             $this->version_created_by = $v;
-            $this->modifiedColumns[] = ContentTableMap::VERSION_CREATED_BY;
+            $this->modifiedColumns[ContentTableMap::VERSION_CREATED_BY] = true;
         }
 
 
@@ -1268,7 +1268,7 @@ abstract class Content implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ContentTableMap::ID;
+        $this->modifiedColumns[ContentTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . ContentTableMap::ID . ')');
         }
@@ -1857,7 +1857,7 @@ abstract class Content implements ActiveRecordInterface
                         $this->collContentFoldersPartial = true;
                     }
 
-                    $collContentFolders->getInternalIterator()->rewind();
+                    reset($collContentFolders);
 
                     return $collContentFolders;
                 }
@@ -2103,7 +2103,7 @@ abstract class Content implements ActiveRecordInterface
                         $this->collContentImagesPartial = true;
                     }
 
-                    $collContentImages->getInternalIterator()->rewind();
+                    reset($collContentImages);
 
                     return $collContentImages;
                 }
@@ -2321,7 +2321,7 @@ abstract class Content implements ActiveRecordInterface
                         $this->collContentDocumentsPartial = true;
                     }
 
-                    $collContentDocuments->getInternalIterator()->rewind();
+                    reset($collContentDocuments);
 
                     return $collContentDocuments;
                 }
@@ -2539,7 +2539,7 @@ abstract class Content implements ActiveRecordInterface
                         $this->collProductAssociatedContentsPartial = true;
                     }
 
-                    $collProductAssociatedContents->getInternalIterator()->rewind();
+                    reset($collProductAssociatedContents);
 
                     return $collProductAssociatedContents;
                 }
@@ -2782,7 +2782,7 @@ abstract class Content implements ActiveRecordInterface
                         $this->collCategoryAssociatedContentsPartial = true;
                     }
 
-                    $collCategoryAssociatedContents->getInternalIterator()->rewind();
+                    reset($collCategoryAssociatedContents);
 
                     return $collCategoryAssociatedContents;
                 }
@@ -3025,7 +3025,7 @@ abstract class Content implements ActiveRecordInterface
                         $this->collContentI18nsPartial = true;
                     }
 
-                    $collContentI18ns->getInternalIterator()->rewind();
+                    reset($collContentI18ns);
 
                     return $collContentI18ns;
                 }
@@ -3250,7 +3250,7 @@ abstract class Content implements ActiveRecordInterface
                         $this->collContentVersionsPartial = true;
                     }
 
-                    $collContentVersions->getInternalIterator()->rewind();
+                    reset($collContentVersions);
 
                     return $collContentVersions;
                 }
@@ -3651,37 +3651,13 @@ abstract class Content implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collContentFolders instanceof Collection) {
-            $this->collContentFolders->clearIterator();
-        }
         $this->collContentFolders = null;
-        if ($this->collContentImages instanceof Collection) {
-            $this->collContentImages->clearIterator();
-        }
         $this->collContentImages = null;
-        if ($this->collContentDocuments instanceof Collection) {
-            $this->collContentDocuments->clearIterator();
-        }
         $this->collContentDocuments = null;
-        if ($this->collProductAssociatedContents instanceof Collection) {
-            $this->collProductAssociatedContents->clearIterator();
-        }
         $this->collProductAssociatedContents = null;
-        if ($this->collCategoryAssociatedContents instanceof Collection) {
-            $this->collCategoryAssociatedContents->clearIterator();
-        }
         $this->collCategoryAssociatedContents = null;
-        if ($this->collContentI18ns instanceof Collection) {
-            $this->collContentI18ns->clearIterator();
-        }
         $this->collContentI18ns = null;
-        if ($this->collContentVersions instanceof Collection) {
-            $this->collContentVersions->clearIterator();
-        }
         $this->collContentVersions = null;
-        if ($this->collFolders instanceof Collection) {
-            $this->collFolders->clearIterator();
-        }
         $this->collFolders = null;
     }
 
@@ -3704,7 +3680,7 @@ abstract class Content implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ContentTableMap::UPDATED_AT;
+        $this->modifiedColumns[ContentTableMap::UPDATED_AT] = true;
 
         return $this;
     }

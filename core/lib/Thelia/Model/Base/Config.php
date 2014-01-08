@@ -163,7 +163,7 @@ abstract class Config implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -174,7 +174,7 @@ abstract class Config implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -183,7 +183,7 @@ abstract class Config implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -236,8 +236,8 @@ abstract class Config implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -516,7 +516,7 @@ abstract class Config implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = ConfigTableMap::ID;
+            $this->modifiedColumns[ConfigTableMap::ID] = true;
         }
 
 
@@ -537,7 +537,7 @@ abstract class Config implements ActiveRecordInterface
 
         if ($this->name !== $v) {
             $this->name = $v;
-            $this->modifiedColumns[] = ConfigTableMap::NAME;
+            $this->modifiedColumns[ConfigTableMap::NAME] = true;
         }
 
 
@@ -558,7 +558,7 @@ abstract class Config implements ActiveRecordInterface
 
         if ($this->value !== $v) {
             $this->value = $v;
-            $this->modifiedColumns[] = ConfigTableMap::VALUE;
+            $this->modifiedColumns[ConfigTableMap::VALUE] = true;
         }
 
 
@@ -579,7 +579,7 @@ abstract class Config implements ActiveRecordInterface
 
         if ($this->secured !== $v) {
             $this->secured = $v;
-            $this->modifiedColumns[] = ConfigTableMap::SECURED;
+            $this->modifiedColumns[ConfigTableMap::SECURED] = true;
         }
 
 
@@ -600,7 +600,7 @@ abstract class Config implements ActiveRecordInterface
 
         if ($this->hidden !== $v) {
             $this->hidden = $v;
-            $this->modifiedColumns[] = ConfigTableMap::HIDDEN;
+            $this->modifiedColumns[ConfigTableMap::HIDDEN] = true;
         }
 
 
@@ -620,7 +620,7 @@ abstract class Config implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ConfigTableMap::CREATED_AT;
+                $this->modifiedColumns[ConfigTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -641,7 +641,7 @@ abstract class Config implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ConfigTableMap::UPDATED_AT;
+                $this->modifiedColumns[ConfigTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -961,7 +961,7 @@ abstract class Config implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ConfigTableMap::ID;
+        $this->modifiedColumns[ConfigTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . ConfigTableMap::ID . ')');
         }
@@ -1462,7 +1462,7 @@ abstract class Config implements ActiveRecordInterface
                         $this->collConfigI18nsPartial = true;
                     }
 
-                    $collConfigI18ns->getInternalIterator()->rewind();
+                    reset($collConfigI18ns);
 
                     return $collConfigI18ns;
                 }
@@ -1648,9 +1648,6 @@ abstract class Config implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collConfigI18ns instanceof Collection) {
-            $this->collConfigI18ns->clearIterator();
-        }
         $this->collConfigI18ns = null;
     }
 
@@ -1673,7 +1670,7 @@ abstract class Config implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ConfigTableMap::UPDATED_AT;
+        $this->modifiedColumns[ConfigTableMap::UPDATED_AT] = true;
 
         return $this;
     }

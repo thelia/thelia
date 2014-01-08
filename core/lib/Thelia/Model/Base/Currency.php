@@ -195,7 +195,7 @@ abstract class Currency implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -206,7 +206,7 @@ abstract class Currency implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -215,7 +215,7 @@ abstract class Currency implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -268,8 +268,8 @@ abstract class Currency implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -559,7 +559,7 @@ abstract class Currency implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CurrencyTableMap::ID;
+            $this->modifiedColumns[CurrencyTableMap::ID] = true;
         }
 
 
@@ -580,7 +580,7 @@ abstract class Currency implements ActiveRecordInterface
 
         if ($this->code !== $v) {
             $this->code = $v;
-            $this->modifiedColumns[] = CurrencyTableMap::CODE;
+            $this->modifiedColumns[CurrencyTableMap::CODE] = true;
         }
 
 
@@ -601,7 +601,7 @@ abstract class Currency implements ActiveRecordInterface
 
         if ($this->symbol !== $v) {
             $this->symbol = $v;
-            $this->modifiedColumns[] = CurrencyTableMap::SYMBOL;
+            $this->modifiedColumns[CurrencyTableMap::SYMBOL] = true;
         }
 
 
@@ -622,7 +622,7 @@ abstract class Currency implements ActiveRecordInterface
 
         if ($this->rate !== $v) {
             $this->rate = $v;
-            $this->modifiedColumns[] = CurrencyTableMap::RATE;
+            $this->modifiedColumns[CurrencyTableMap::RATE] = true;
         }
 
 
@@ -643,7 +643,7 @@ abstract class Currency implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = CurrencyTableMap::POSITION;
+            $this->modifiedColumns[CurrencyTableMap::POSITION] = true;
         }
 
 
@@ -664,7 +664,7 @@ abstract class Currency implements ActiveRecordInterface
 
         if ($this->by_default !== $v) {
             $this->by_default = $v;
-            $this->modifiedColumns[] = CurrencyTableMap::BY_DEFAULT;
+            $this->modifiedColumns[CurrencyTableMap::BY_DEFAULT] = true;
         }
 
 
@@ -684,7 +684,7 @@ abstract class Currency implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = CurrencyTableMap::CREATED_AT;
+                $this->modifiedColumns[CurrencyTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -705,7 +705,7 @@ abstract class Currency implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = CurrencyTableMap::UPDATED_AT;
+                $this->modifiedColumns[CurrencyTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1077,7 +1077,7 @@ abstract class Currency implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = CurrencyTableMap::ID;
+        $this->modifiedColumns[CurrencyTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . CurrencyTableMap::ID . ')');
         }
@@ -1630,7 +1630,7 @@ abstract class Currency implements ActiveRecordInterface
                         $this->collOrdersPartial = true;
                     }
 
-                    $collOrders->getInternalIterator()->rewind();
+                    reset($collOrders);
 
                     return $collOrders;
                 }
@@ -2023,7 +2023,7 @@ abstract class Currency implements ActiveRecordInterface
                         $this->collCartsPartial = true;
                     }
 
-                    $collCarts->getInternalIterator()->rewind();
+                    reset($collCarts);
 
                     return $collCarts;
                 }
@@ -2316,7 +2316,7 @@ abstract class Currency implements ActiveRecordInterface
                         $this->collProductPricesPartial = true;
                     }
 
-                    $collProductPrices->getInternalIterator()->rewind();
+                    reset($collProductPrices);
 
                     return $collProductPrices;
                 }
@@ -2562,7 +2562,7 @@ abstract class Currency implements ActiveRecordInterface
                         $this->collCurrencyI18nsPartial = true;
                     }
 
-                    $collCurrencyI18ns->getInternalIterator()->rewind();
+                    reset($collCurrencyI18ns);
 
                     return $collCurrencyI18ns;
                 }
@@ -2763,21 +2763,9 @@ abstract class Currency implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collOrders instanceof Collection) {
-            $this->collOrders->clearIterator();
-        }
         $this->collOrders = null;
-        if ($this->collCarts instanceof Collection) {
-            $this->collCarts->clearIterator();
-        }
         $this->collCarts = null;
-        if ($this->collProductPrices instanceof Collection) {
-            $this->collProductPrices->clearIterator();
-        }
         $this->collProductPrices = null;
-        if ($this->collCurrencyI18ns instanceof Collection) {
-            $this->collCurrencyI18ns->clearIterator();
-        }
         $this->collCurrencyI18ns = null;
     }
 
@@ -2800,7 +2788,7 @@ abstract class Currency implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = CurrencyTableMap::UPDATED_AT;
+        $this->modifiedColumns[CurrencyTableMap::UPDATED_AT] = true;
 
         return $this;
     }

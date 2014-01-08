@@ -210,7 +210,7 @@ abstract class Country implements ActiveRecordInterface
      */
     public function isModified()
     {
-        return !empty($this->modifiedColumns);
+        return !!$this->modifiedColumns;
     }
 
     /**
@@ -221,7 +221,7 @@ abstract class Country implements ActiveRecordInterface
      */
     public function isColumnModified($col)
     {
-        return in_array($col, $this->modifiedColumns);
+        return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
 
     /**
@@ -230,7 +230,7 @@ abstract class Country implements ActiveRecordInterface
      */
     public function getModifiedColumns()
     {
-        return array_unique($this->modifiedColumns);
+        return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
 
     /**
@@ -283,8 +283,8 @@ abstract class Country implements ActiveRecordInterface
     public function resetModified($col = null)
     {
         if (null !== $col) {
-            while (false !== ($offset = array_search($col, $this->modifiedColumns))) {
-                array_splice($this->modifiedColumns, $offset, 1);
+            if (isset($this->modifiedColumns[$col])) {
+                unset($this->modifiedColumns[$col]);
             }
         } else {
             $this->modifiedColumns = array();
@@ -585,7 +585,7 @@ abstract class Country implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CountryTableMap::ID;
+            $this->modifiedColumns[CountryTableMap::ID] = true;
         }
 
 
@@ -606,7 +606,7 @@ abstract class Country implements ActiveRecordInterface
 
         if ($this->area_id !== $v) {
             $this->area_id = $v;
-            $this->modifiedColumns[] = CountryTableMap::AREA_ID;
+            $this->modifiedColumns[CountryTableMap::AREA_ID] = true;
         }
 
         if ($this->aArea !== null && $this->aArea->getId() !== $v) {
@@ -631,7 +631,7 @@ abstract class Country implements ActiveRecordInterface
 
         if ($this->isocode !== $v) {
             $this->isocode = $v;
-            $this->modifiedColumns[] = CountryTableMap::ISOCODE;
+            $this->modifiedColumns[CountryTableMap::ISOCODE] = true;
         }
 
 
@@ -652,7 +652,7 @@ abstract class Country implements ActiveRecordInterface
 
         if ($this->isoalpha2 !== $v) {
             $this->isoalpha2 = $v;
-            $this->modifiedColumns[] = CountryTableMap::ISOALPHA2;
+            $this->modifiedColumns[CountryTableMap::ISOALPHA2] = true;
         }
 
 
@@ -673,7 +673,7 @@ abstract class Country implements ActiveRecordInterface
 
         if ($this->isoalpha3 !== $v) {
             $this->isoalpha3 = $v;
-            $this->modifiedColumns[] = CountryTableMap::ISOALPHA3;
+            $this->modifiedColumns[CountryTableMap::ISOALPHA3] = true;
         }
 
 
@@ -694,7 +694,7 @@ abstract class Country implements ActiveRecordInterface
 
         if ($this->by_default !== $v) {
             $this->by_default = $v;
-            $this->modifiedColumns[] = CountryTableMap::BY_DEFAULT;
+            $this->modifiedColumns[CountryTableMap::BY_DEFAULT] = true;
         }
 
 
@@ -723,7 +723,7 @@ abstract class Country implements ActiveRecordInterface
 
         if ($this->shop_country !== $v) {
             $this->shop_country = $v;
-            $this->modifiedColumns[] = CountryTableMap::SHOP_COUNTRY;
+            $this->modifiedColumns[CountryTableMap::SHOP_COUNTRY] = true;
         }
 
 
@@ -743,7 +743,7 @@ abstract class Country implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = CountryTableMap::CREATED_AT;
+                $this->modifiedColumns[CountryTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -764,7 +764,7 @@ abstract class Country implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = CountryTableMap::UPDATED_AT;
+                $this->modifiedColumns[CountryTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1144,7 +1144,7 @@ abstract class Country implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = CountryTableMap::ID;
+        $this->modifiedColumns[CountryTableMap::ID] = true;
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . CountryTableMap::ID . ')');
         }
@@ -1755,7 +1755,7 @@ abstract class Country implements ActiveRecordInterface
                         $this->collTaxRuleCountriesPartial = true;
                     }
 
-                    $collTaxRuleCountries->getInternalIterator()->rewind();
+                    reset($collTaxRuleCountries);
 
                     return $collTaxRuleCountries;
                 }
@@ -2026,7 +2026,7 @@ abstract class Country implements ActiveRecordInterface
                         $this->collAddressesPartial = true;
                     }
 
-                    $collAddresses->getInternalIterator()->rewind();
+                    reset($collAddresses);
 
                     return $collAddresses;
                 }
@@ -2294,7 +2294,7 @@ abstract class Country implements ActiveRecordInterface
                         $this->collCountryI18nsPartial = true;
                     }
 
-                    $collCountryI18ns->getInternalIterator()->rewind();
+                    reset($collCountryI18ns);
 
                     return $collCountryI18ns;
                 }
@@ -2492,17 +2492,8 @@ abstract class Country implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collTaxRuleCountries instanceof Collection) {
-            $this->collTaxRuleCountries->clearIterator();
-        }
         $this->collTaxRuleCountries = null;
-        if ($this->collAddresses instanceof Collection) {
-            $this->collAddresses->clearIterator();
-        }
         $this->collAddresses = null;
-        if ($this->collCountryI18ns instanceof Collection) {
-            $this->collCountryI18ns->clearIterator();
-        }
         $this->collCountryI18ns = null;
         $this->aArea = null;
     }
@@ -2526,7 +2517,7 @@ abstract class Country implements ActiveRecordInterface
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = CountryTableMap::UPDATED_AT;
+        $this->modifiedColumns[CountryTableMap::UPDATED_AT] = true;
 
         return $this;
     }
