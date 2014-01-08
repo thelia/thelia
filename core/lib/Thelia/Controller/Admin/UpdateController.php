@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -40,8 +41,6 @@ use Thelia\Model\Map\ProductTableMap;
  */
 class UpdateController extends BaseAdminController
 {
-
-    const UPDATE_RESOURCE = 'update';
 
     protected static $version = array(
         '0' => '2.0.0-beta1',
