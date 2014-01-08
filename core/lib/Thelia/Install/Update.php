@@ -27,6 +27,7 @@ use Propel\Runtime\Propel;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Map\ProductTableMap;
 
 
 /**
