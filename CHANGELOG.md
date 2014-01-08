@@ -2,6 +2,7 @@
 - Coupon effect inputs are now more customisable (input text, select, ajax, etc.. are usable) and unlimited amount of input for coupon effect are now possible too
 - when a category is deleted, all subcategories are deleted
 - delete products when categories are removed. Works only when the category is the default one for this product
+- Manager update exists now.
 
 #2.0.0-beta2
 
