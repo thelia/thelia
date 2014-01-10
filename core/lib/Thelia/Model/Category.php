@@ -73,8 +73,9 @@ class Category extends BaseCategory
         if($productsCategories) {
             foreach ($productsCategories as $productCategory) {
                 $product = $productCategory->getProduct();
-
-                $product->delete($con);
+                if($product) {
+                    $product->delete($con);
+                }
             }
         }
     }
@@ -143,7 +144,9 @@ class Category extends BaseCategory
         $subCategories = CategoryQuery::findAllChild($this->getId());
 
         foreach($subCategories as $category) {
-            $category->setDispatcher($this->getDispatcher());
+            if (!is_null($this->dispatcher)) {
+                $category->setDispatcher($this->getDispatcher());
+            }
 
             $category->delete();
         }
