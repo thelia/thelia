@@ -23,7 +23,6 @@
 
 namespace Thelia\Install;
 
-
 /**
  * Class Database
  * @package Thelia\Install

@@ -36,7 +36,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\CategoryQuery;
-use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;

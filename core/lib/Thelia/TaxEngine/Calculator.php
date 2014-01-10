@@ -61,10 +61,10 @@ class Calculator
         $this->country = null;
         $this->taxRulesCollection = null;
 
-        if($product->getId() === null) {
+        if ($product->getId() === null) {
             throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
         }
-        if($country->getId() === null) {
+        if ($country->getId() === null) {
             throw new TaxEngineException('Country id is empty in Calculator::load', TaxEngineException::UNDEFINED_COUNTRY);
         }
 
@@ -82,13 +82,13 @@ class Calculator
         $this->country = null;
         $this->taxRulesCollection = null;
 
-        if($taxRule->getId() === null) {
+        if ($taxRule->getId() === null) {
             throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
         }
-        if($country->getId() === null) {
+        if ($country->getId() === null) {
             throw new TaxEngineException('Country id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_COUNTRY);
         }
-        if($product->getId() === null) {
+        if ($product->getId() === null) {
             throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
         }
 
@@ -120,15 +120,15 @@ class Calculator
      */
     public function getTaxedPrice($untaxedPrice, &$taxCollection = null, $askedLocale = null)
     {
-        if(null === $this->taxRulesCollection) {
+        if (null === $this->taxRulesCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxedPrice', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
         }
 
-        if(null === $this->product) {
+        if (null === $this->product) {
             throw new TaxEngineException('Product is empty in Calculator::getTaxedPrice', TaxEngineException::UNDEFINED_PRODUCT);
         }
 
-        if(false === filter_var($untaxedPrice, FILTER_VALIDATE_FLOAT)) {
+        if (false === filter_var($untaxedPrice, FILTER_VALIDATE_FLOAT)) {
             throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
         }
 
@@ -136,16 +136,16 @@ class Calculator
         $currentPosition = 1;
         $currentTax = 0;
 
-        if(null !== $taxCollection) {
+        if (null !== $taxCollection) {
             $taxCollection = new OrderProductTaxCollection();
         }
-        foreach($this->taxRulesCollection as $taxRule) {
-            $position = (int)$taxRule->getTaxRuleCountryPosition();
+        foreach ($this->taxRulesCollection as $taxRule) {
+            $position = (int) $taxRule->getTaxRuleCountryPosition();
 
             $taxType = $taxRule->getTypeInstance();
             $taxType->loadRequirements( $taxRule->getRequirements() );
 
-            if($currentPosition !== $position) {
+            if ($currentPosition !== $position) {
                 $taxedPrice += $currentTax;
                 $currentTax = 0;
                 $currentPosition = $position;
@@ -154,7 +154,7 @@ class Calculator
             $taxAmount = round($taxType->calculate($this->product, $taxedPrice), 2);
             $currentTax += $taxAmount;
 
-            if(null !== $taxCollection) {
+            if (null !== $taxCollection) {
                 $taxI18n = I18n::forceI18nRetrieving($askedLocale, 'Tax', $taxRule->getId());
                 $orderProductTax = new OrderProductTax();
                 $orderProductTax->setTitle($taxI18n->getTitle());
@@ -171,36 +171,36 @@ class Calculator
 
     public function getUntaxedPrice($taxedPrice)
     {
-        if(null === $this->taxRulesCollection) {
+        if (null === $this->taxRulesCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxAmount', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
         }
 
-        if(null === $this->product) {
+        if (null === $this->product) {
             throw new TaxEngineException('Product is empty in Calculator::getTaxedPrice', TaxEngineException::UNDEFINED_PRODUCT);
         }
 
-        if(false === filter_var($taxedPrice, FILTER_VALIDATE_FLOAT)) {
+        if (false === filter_var($taxedPrice, FILTER_VALIDATE_FLOAT)) {
             throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
         }
 
         $taxRule = $this->taxRulesCollection->getLast();
 
-        if(null === $taxRule) {
+        if (null === $taxRule) {
             throw new TaxEngineException('Tax rules collection got no tax ', TaxEngineException::NO_TAX_IN_TAX_RULES_COLLECTION);
         }
 
         $untaxedPrice = $taxedPrice;
-        $currentPosition = (int)$taxRule->getTaxRuleCountryPosition();
+        $currentPosition = (int) $taxRule->getTaxRuleCountryPosition();
         $currentFixTax = 0;
         $currentTaxFactor = 0;
 
         do {
-            $position = (int)$taxRule->getTaxRuleCountryPosition();
+            $position = (int) $taxRule->getTaxRuleCountryPosition();
 
             $taxType = $taxRule->getTypeInstance();
             $taxType->loadRequirements( $taxRule->getRequirements() );
 
-            if($currentPosition !== $position) {
+            if ($currentPosition !== $position) {
                 $untaxedPrice -= $currentFixTax;
                 $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);
                 $currentFixTax = 0;
@@ -211,8 +211,7 @@ class Calculator
             $currentFixTax += $taxType->fixAmountRetriever($this->product);
             $currentTaxFactor += $taxType->pricePercentRetriever();
 
-
-        } while($taxRule = $this->taxRulesCollection->getPrevious());
+        } while ($taxRule = $this->taxRulesCollection->getPrevious());
 
         $untaxedPrice -= $currentFixTax;
         $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);
@@ -224,7 +223,7 @@ class Calculator
 
             $untaxedPrice -= $taxType->fixAmountRetriever();
 
-        } while($taxRule = $this->taxRulesCollection->getPrevious());
+        } while ($taxRule = $this->taxRulesCollection->getPrevious());
 
         $taxRule = $this->taxRulesCollection->getLast();
 
@@ -238,7 +237,7 @@ class Calculator
 
             $toto = true;
 
-        } while($taxRule = $this->taxRulesCollection->getPrevious());
+        } while ($taxRule = $this->taxRulesCollection->getPrevious());
 
         $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);*/
 

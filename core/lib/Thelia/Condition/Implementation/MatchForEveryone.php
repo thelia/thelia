@@ -148,7 +148,6 @@ class MatchForEveryone extends ConditionAbstract
     public function drawBackOfficeInputs()
     {
         // No input
-
         return '';
     }
 

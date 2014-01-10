@@ -87,10 +87,10 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Constructor
      *
-     * @param string    $code                       Coupon Code
-     * @param string    $serviceId                  Coupon Service id
-     * @param string    $title                      Coupon title
-     * @param array     $effects                    Coupon effects ready to be serialized
+     * @param string $code      Coupon Code
+     * @param string $serviceId Coupon Service id
+     * @param string $title     Coupon title
+     * @param array  $effects   Coupon effects ready to be serialized
      *                                              'amount' key is mandatory and reflects
      *                                              the amount deduced from the cart
      * @param string    $shortDescription           Coupon short description

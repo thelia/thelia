@@ -28,7 +28,6 @@ use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Condition\ConditionCollection;
 
-
 /**
  * Manage how Condition could interact with the current application state (Thelia)
  *
@@ -114,7 +113,6 @@ class ConditionFactory
         return $collection;
     }
 
-
     /**
      * Build a Condition from form
      *
@@ -123,7 +121,7 @@ class ConditionFactory
      * @param array  $values             Values setting this Condition
      *
      * @throws \InvalidArgumentException
-     * @return ConditionInterface Ready to use Condition or false
+     * @return ConditionInterface        Ready to use Condition or false
      */
     public function build($conditionServiceId, array $operators, array $values)
     {
@@ -166,7 +164,6 @@ class ConditionFactory
      */
     public function getInputsFromConditionInterface(ConditionInterface $condition)
     {
-
         return $condition->getValidators();
     }
 }

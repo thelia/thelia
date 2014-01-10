@@ -406,7 +406,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $couponManager = new RemoveXAmount($stubFacade);
 
-
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
             MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
@@ -438,7 +437,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $stubConditionFactory->expects($this->any())
             ->method('unserializeConditionCollection')
             ->will($this->returnValue($conditions));
-
 
         $stubContainer->expects($this->any())
             ->method('get')

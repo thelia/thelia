@@ -23,7 +23,6 @@
 
 namespace Thelia\Install\Exception;
 
-
 /**
  * Class UpToDateException
  * @package Thelia\Install\Exception
@@ -32,4 +31,4 @@ namespace Thelia\Install\Exception;
 class UpToDateException extends InstallException
 {
 
-} 
+}

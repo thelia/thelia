@@ -23,7 +23,6 @@
 
 namespace Thelia\Condition\Implementation;
 
-use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Condition\Implementation\ConditionAbstract;
 use Thelia\Condition\Operators;
 use Thelia\Exception\InvalidConditionOperatorException;
@@ -119,9 +118,7 @@ class MatchForTotalAmount extends ConditionAbstract
 
         $this->isPriceValid($priceValue);
 
-
         $this->isCurrencyValid($currencyValue);
-
 
         $this->operators = array(
             self::INPUT1 => $priceOperator,

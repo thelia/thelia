@@ -24,12 +24,8 @@
 namespace Thelia\Install;
 
 use PDO;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Install\Exception\InstallException;
-
 
 /**
  * Class CheckDatabaseConnection

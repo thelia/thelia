@@ -43,9 +43,9 @@ interface FacadeInterface
     /**
      * Constructor
      *
-     * @param ContainerInterface $container  Service container
+     * @param ContainerInterface $container Service container
      */
-    function __construct(ContainerInterface $container);
+    public function __construct(ContainerInterface $container);
 
     /**
      * Return a Cart a CouponManager can process

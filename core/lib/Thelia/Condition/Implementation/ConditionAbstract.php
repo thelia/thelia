@@ -171,7 +171,6 @@ abstract class ConditionAbstract implements ConditionInterface
         return $serializableCondition;
     }
 
-
     /**
      * Check if currency if valid or not
      *
@@ -232,7 +231,7 @@ abstract class ConditionAbstract implements ConditionInterface
         $selectHtml = '';
         $optionHtml = '';
         $inputs = $this->getValidators();
-        if(isset($inputs['inputs'][$inputKey])) {
+        if (isset($inputs['inputs'][$inputKey])) {
             $operators = $inputs['inputs'][$inputKey]['availableOperators'];
             foreach ($operators as $key => $operator) {
                 $selected = '';
@@ -282,6 +281,7 @@ abstract class ConditionAbstract implements ConditionInterface
                     </div>
                 </div>
             ';
+
         return $html;
     }
 

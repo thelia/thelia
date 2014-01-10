@@ -22,9 +22,7 @@
 /*************************************************************************************/
 namespace Thelia\Rewriting;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\RewritingUrlQuery;
-use Thelia\Model\Map\RewritingUrlTableMap;
 use Thelia\Tools\URL;
 
 /**
@@ -46,7 +44,7 @@ class RewritingRetriever
     {
         $this->rewritingUrlQuery = new RewritingUrlQuery();
 
-        if($view !== null && $viewLocale !== null) {
+        if ($view !== null && $viewLocale !== null) {
             $this->load($view, $viewLocale, $viewId);
         }
     }
@@ -61,16 +59,16 @@ class RewritingRetriever
         $this->search = $this->rewritingUrlQuery->getViewUrlQuery($view, $viewLocale, $viewId);
 
         $allParametersWithoutView = array();
-        if(null !== $viewId) {
+        if (null !== $viewId) {
             $allParametersWithoutView['locale'] = $viewLocale;
         }
-        if(null !== $viewId) {
+        if (null !== $viewId) {
             $allParametersWithoutView[$view . '_id'] = $viewId;
         }
 
         $this->rewrittenUrl = null;
         $this->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
-        if($this->search !== null) {
+        if ($this->search !== null) {
             $this->rewrittenUrl = URL::getInstance()->absoluteUrl(
                 $this->search->getUrl()
             );
@@ -85,8 +83,9 @@ class RewritingRetriever
      */
     public function loadSpecificUrl($view, $viewLocale, $viewId = null, $viewOtherParameters = array())
     {
-        if(empty($viewOtherParameters)) {
+        if (empty($viewOtherParameters)) {
             $this->loadViewUrl($view, $viewLocale, $viewId);
+
             return;
         }
 
@@ -94,13 +93,13 @@ class RewritingRetriever
 
         $allParametersWithoutView = $viewOtherParameters;
         $allParametersWithoutView['locale'] = $viewLocale;
-        if(null !== $viewId) {
+        if (null !== $viewId) {
             $allParametersWithoutView[$view . '_id'] = $viewId;
         }
 
         $this->rewrittenUrl = null;
         $this->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
-        if($this->search !== null) {
+        if ($this->search !== null) {
             $this->rewrittenUrl = $this->search->getUrl();
         }
     }

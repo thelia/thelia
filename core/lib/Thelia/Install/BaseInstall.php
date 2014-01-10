@@ -53,7 +53,6 @@ abstract class BaseInstall
             throw new AlreadyInstallException("Thelia is already installed");
         }
 
-
         $this->exec();
     }
 

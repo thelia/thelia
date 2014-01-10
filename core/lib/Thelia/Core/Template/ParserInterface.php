@@ -43,20 +43,19 @@ interface ParserInterface
      *
      * @param unknown $templateType the template type (
      *
-     * @param string $templateName the template name
-     * @param string $templateDirectory path to the template dirtectory
-     * @param unknown $key ???
-     * @param string $unshift ??? Etienne ?
+     * @param string  $templateName      the template name
+     * @param string  $templateDirectory path to the template dirtectory
+     * @param unknown $key               ???
+     * @param string  $unshift           ??? Etienne ?
      */
     public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false);
-
 
     /**
      * Return the registeted template directories for a givent template type
      *
-     * @param unknown $templateType
+     * @param  unknown                  $templateType
      * @throws InvalidArgumentException if the tempmateType is not defined
-     * @return array: an array of defined templates directories for the given template type
+     * @return array:                   an array of defined templates directories for the given template type
      */
     public function getTemplateDirectories($templateType);
 }

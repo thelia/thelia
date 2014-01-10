@@ -42,13 +42,13 @@ class TaxEngine
      */
     protected $session = null;
 
-    static public function getInstance(Session $session = null)
+    public static function getInstance(Session $session = null)
     {
-        if(null === self::$instance) {
+        if (null === self::$instance) {
             self::$instance = new TaxEngine();
         }
 
-        if(null !== self::$instance) {
+        if (null !== self::$instance) {
             self::$instance->setSession($session);
         }
 
@@ -85,7 +85,7 @@ class TaxEngine
             $fileName = $directoryContent->getFilename();
             $className = substr($fileName, 0, (1+strlen($directoryContent->getExtension())) * -1);
 
-            if($className == "BaseTaxType") {
+            if ($className == "BaseTaxType") {
                 continue;
             }
 
@@ -101,14 +101,14 @@ class TaxEngine
      * Then look at the current customer default address country
      * Else look at the default website country
      *
-     * @param bool $force result is static cached ; even if a below parameter change between 2 calls, we need to keep coherent results. but you can force it.
+     * @param  bool           $force result is static cached ; even if a below parameter change between 2 calls, we need to keep coherent results. but you can force it.
      * @return null|TaxEngine
      */
     public function getDeliveryCountry($force = false)
     {
-        if(false === $force || null === self::$taxCountry) {
+        if (false === $force || null === self::$taxCountry) {
             /* is there a logged in customer ? */
-            if(null !== $customer = $this->session->getCustomerUser()) {
+            if (null !== $customer = $this->session->getCustomerUser()) {
                 if (null !== $this->session->getOrder()
                         && null !== $this->session->getOrder()->chosenDeliveryAddress
                         && null !== $currentDeliveryAddress = AddressQuery::create()->findPk($this->session->getOrder()->chosenDeliveryAddress)) {

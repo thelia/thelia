@@ -15,7 +15,6 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Model\CountryQuery;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\Type;
 

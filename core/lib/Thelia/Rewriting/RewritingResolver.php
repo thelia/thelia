@@ -22,12 +22,8 @@
 /*************************************************************************************/
 namespace Thelia\Rewriting;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
-use Thelia\Exception\RewritingUrlException;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\RewritingUrlQuery;
-use Thelia\Model\Map\RewritingUrlTableMap;
 
 /**
  * Class RewritingResolver
@@ -51,7 +47,7 @@ class RewritingResolver
     {
         $this->rewritingUrlQuery = new RewritingUrlQuery();
 
-        if($url !== null) {
+        if ($url !== null) {
             $this->load($url);
         }
     }
@@ -62,7 +58,7 @@ class RewritingResolver
         $rewrittenUrl = urldecode($rewrittenUrl);
         $this->search = $this->rewritingUrlQuery->getResolverSearch($rewrittenUrl);
 
-        if($this->search->count() == 0) {
+        if ($this->search->count() == 0) {
             throw new UrlRewritingException('URL NOT FOUND', UrlRewritingException::URL_NOT_FOUND);
         }
 
@@ -76,22 +72,21 @@ class RewritingResolver
 
     protected function getOtherParameters()
     {
-        if($this->search === null) {
+        if ($this->search === null) {
             throw new UrlRewritingException('RESOLVER NULL SEARCH', UrlRewritingException::RESOLVER_NULL_SEARCH);
         }
 
         $otherParameters = array();
-        foreach($this->search as $result) {
+        foreach ($this->search as $result) {
             $parameter = $result->getParameter();
             $value = $result->getValue();
 
-            if(null !== $parameter) {
+            if (null !== $parameter) {
                 $otherParameters[$parameter] = $value;
             }
         }
 
         return $otherParameters;
     }
-
 
 }

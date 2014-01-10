@@ -314,7 +314,6 @@ class CouponController extends BaseAdminController
         /** @var ConditionInterface $condition */
         $condition = $this->container->get($conditionId);
 
-
         if ($inputs === null) {
             return $this->pageNotFound();
         }
@@ -723,6 +722,7 @@ class CouponController extends BaseAdminController
 
         $args = array();
         $args['conditions'] = $this->cleanConditionForTemplate($couponManager->getConditions());
+
         return $this->render('coupon/conditions', $args);
 
     }

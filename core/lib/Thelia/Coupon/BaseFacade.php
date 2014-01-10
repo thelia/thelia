@@ -57,9 +57,9 @@ class BaseFacade implements FacadeInterface
     /**
      * Constructor
      *
-     * @param ContainerInterface $container  Service container
+     * @param ContainerInterface $container Service container
      */
-    function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
@@ -135,7 +135,6 @@ class BaseFacade implements FacadeInterface
         return $this->getRequest()->getSession()->getCurrency()->getCode();
     }
 
-
     /**
      * Return the number of Products in the Cart
      *
@@ -202,7 +201,6 @@ class BaseFacade implements FacadeInterface
         return $this->container->get('thelia.translator');
     }
 
-
     /**
      * Return the main currency
      * THe one used to set prices in BackOffice
@@ -233,7 +231,6 @@ class BaseFacade implements FacadeInterface
     {
         return $this->container->get('thelia.condition.validator');
     }
-
 
     /**
      * Return all available currencies

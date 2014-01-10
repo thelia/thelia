@@ -23,7 +23,6 @@
 
 namespace Thelia\Install\Exception;
 
-
 /**
  * Class AlreadyInstallException
  * @package Thelia\Install\Exception

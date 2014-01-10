@@ -60,9 +60,9 @@ class RemoveXPercent extends CouponAbstract
      * @param bool            $isRemovingPostage          If Coupon is removing postage
      * @param bool            $isAvailableOnSpecialOffers If available on Product already
      *                                                    on special offer price
-     * @param bool            $isEnabled                  False if Coupon is disabled by admin
-     * @param int             $maxUsage                   How many usage left
-     * @param \Datetime       $expirationDate             When the Code is expiring
+     * @param bool      $isEnabled      False if Coupon is disabled by admin
+     * @param int       $maxUsage       How many usage left
+     * @param \Datetime $expirationDate When the Code is expiring
      *
      * @return $this
      */
@@ -109,7 +109,6 @@ class RemoveXPercent extends CouponAbstract
 
         return $basePrice * (( $this->percentage ) / 100);
     }
-
 
     /**
      * Get I18n name

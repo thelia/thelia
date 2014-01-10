@@ -43,9 +43,6 @@ class CouponManager
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
-    /** @var array CouponInterface to process*/
-    protected $coupons = array();
-
     /** @var array Available Coupons (Services) */
     protected $availableCoupons = array();
 
@@ -61,9 +58,7 @@ class CouponManager
     {
         $this->container = $container;
         $this->facade = $container->get('thelia.facade');
-        $this->coupons = $this->facade->getCurrentCoupons();
     }
-
 
     /**
      * Get Discount for the given Coupons
@@ -74,9 +69,9 @@ class CouponManager
     public function getDiscount()
     {
         $discount = 0.00;
-
-        if (count($this->coupons) > 0) {
-            $couponsKept = $this->sortCoupons($this->coupons);
+        $coupons = $this->facade->getCurrentCoupons();
+        if (count($coupons) > 0) {
+            $couponsKept = $this->sortCoupons($coupons);
 
             $discount = $this->getEffect($couponsKept);
 
@@ -96,11 +91,12 @@ class CouponManager
      */
     public function isCouponRemovingPostage()
     {
-        if (count($this->coupons) == 0) {
+        $coupons = $this->facade->getCurrentCoupons();
+        if (count($coupons) == 0) {
             return false;
         }
 
-        $couponsKept = $this->sortCoupons($this->coupons);
+        $couponsKept = $this->sortCoupons($coupons);
 
         /** @var CouponInterface $coupon */
         foreach ($couponsKept as $coupon) {
@@ -244,7 +240,7 @@ class CouponManager
             $ret = $usageLeft;
         }
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $ret = false;
         }
 
