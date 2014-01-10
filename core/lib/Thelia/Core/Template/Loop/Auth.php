@@ -88,10 +88,6 @@ class Auth extends BaseLoop implements ArraySearchLoopInterface
         $module = $this->getModule();
         $access = $this->getAccess();
 
-        if (null !== $module) {
-            $in = true;
-        }
-
         try {
             if (true === $this->securityContext->isGranted(
                     $roles,
