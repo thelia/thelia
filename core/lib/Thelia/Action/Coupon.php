@@ -211,7 +211,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         /** @var CouponManager $couponManager */
         $couponManager = $this->container->get('thelia.coupon.manager');
 
-        if($couponManager->isCouponRemovingPostage()) {
+        if ($couponManager->isCouponRemovingPostage()) {
             $order = $event->getOrder();
 
             $order->setPostage(0);
@@ -235,7 +235,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $consumedCoupons = $request->getSession()->getConsumedCoupons();
 
         if (is_array($consumedCoupons)) {
-            foreach($consumedCoupons as $couponCode) {
+            foreach ($consumedCoupons as $couponCode) {
                 $couponQuery = CouponQuery::create();
                 $couponModel = $couponQuery->findOneByCode($couponCode);
                 $couponModel->setLocale($request->getSession()->getLang()->getLocale());

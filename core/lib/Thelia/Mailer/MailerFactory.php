@@ -27,13 +27,13 @@ use Thelia\Core\Event\MailTransporterEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ConfigQuery;
 
-
 /**
  * Class MailerFactory
  * @package Thelia\Mailer
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class MailerFactory {
+class MailerFactory
+{
     /**
      * @var \Swift_Mailer
      */
@@ -49,7 +49,7 @@ class MailerFactory {
         $transporterEvent = new MailTransporterEvent();
         $this->dispatcher->dispatch(TheliaEvents::MAILTRANSPORTER_CONFIG, $transporterEvent);
 
-        if($transporterEvent->hasTransporter()) {
+        if ($transporterEvent->hasTransporter()) {
             $transporter = $transporterEvent->getTransporter();
         } else {
             if (ConfigQuery::isSmtpEnable()) {
@@ -74,6 +74,7 @@ class MailerFactory {
             ->setTimeout(ConfigQuery::getSmtpTimeout())
             ->setSourceIp(ConfigQuery::getSmtpSourceIp())
         ;
+
         return $smtpTransporter;
     }
 
@@ -86,6 +87,5 @@ class MailerFactory {
     {
         return $this->swiftMailer;
     }
-
 
 }

@@ -52,7 +52,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
         $taxAmount = $query->getFreeTextValue();
 
         $testInt = new FloatType();
-        if(!$testInt->isValid($taxAmount)) {
+        if (!$testInt->isValid($taxAmount)) {
             throw new TaxEngineException('Feature value does not match FLOAT format', TaxEngineException::FEATURE_BAD_EXPECTED_VALUE);
         }
 

@@ -60,7 +60,6 @@ class CouponManager
         $this->facade = $container->get('thelia.facade');
     }
 
-
     /**
      * Get Discount for the given Coupons
      *
@@ -241,7 +240,7 @@ class CouponManager
             $ret = $usageLeft;
         }
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $ret = false;
         }
 

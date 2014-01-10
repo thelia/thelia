@@ -30,7 +30,6 @@ use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Coupon\CouponManager;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;

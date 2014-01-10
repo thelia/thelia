@@ -49,7 +49,6 @@ use Thelia\Config\DefinePropel;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\TheliaContainerBuilder;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
-use Thelia\Model\ConfigQuery;
 use Symfony\Component\Config\FileLocator;
 
 use Propel\Runtime\Propel;
@@ -110,12 +109,13 @@ class Thelia extends Kernel
      * Add all module's standard templates to the parser environment
      *
      * @param TheliaParser $parser the parser
-     * @param Module $module the Module.
+     * @param Module       $module the Module.
      */
-    protected function addStandardModuleTemplatesToParserEnvironment($parser, $module) {
+    protected function addStandardModuleTemplatesToParserEnvironment($parser, $module)
+    {
         $stdTpls = TemplateDefinition::getStandardTemplatesSubdirsIterator();
 
-        foreach($stdTpls as $templateType => $templateSubdirName) {
+        foreach ($stdTpls as $templateType => $templateSubdirName) {
             $this->addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName);
         }
     }
@@ -123,13 +123,13 @@ class Thelia extends Kernel
     /**
      * Add a module template directory to the parser environment
      *
-     * @param TheliaParser $parser the parser
-     * @param Module $module the Module.
-     * @param string $templateType the template type (one of the TemplateDefinition type constants)
-     * @param string $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
+     * @param TheliaParser $parser             the parser
+     * @param Module       $module             the Module.
+     * @param string       $templateType       the template type (one of the TemplateDefinition type constants)
+     * @param string       $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
      */
-    protected function addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName) {
-
+    protected function addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName)
+    {
         // Get template path
         $templateDirectory = $module->getAbsoluteTemplateDirectoryPath($templateSubdirName);
 
@@ -155,8 +155,7 @@ class Thelia extends Kernel
                     );
                 }
             }
-        }
-        catch (\UnexpectedValueException $ex) {
+        } catch (\UnexpectedValueException $ex) {
             // The directory does not exists, ignore it.
         }
     }
@@ -176,7 +175,7 @@ class Thelia extends Kernel
             ->depth(0)
             ->in(THELIA_ROOT . "/core/lib/Thelia/Config/Resources");
 
-        foreach($finder as $file) {
+        foreach ($finder as $file) {
             $loader->load($file->getBaseName());
         }
 
@@ -219,7 +218,7 @@ class Thelia extends Kernel
             // Standard templates (front, back, pdf, mail)
             $th = TemplateHelper::getInstance();
 
-            foreach($th->getStandardTemplateDefinitions() as $templateDefinition) {
+            foreach ($th->getStandardTemplateDefinitions() as $templateDefinition) {
                 if (is_dir($dir = $templateDefinition->getAbsoluteI18nPath())) {
                     $translationDirs[] = $dir;
                 }

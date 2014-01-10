@@ -23,11 +23,9 @@
 
 namespace Thelia\Condition;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Condition\Operators;
 use Thelia\Condition\ConditionCollection;
-
 
 /**
  * Validate Conditions

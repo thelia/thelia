@@ -23,7 +23,8 @@
 
 namespace Thelia\Core\Template\Assets;
 
-interface AssetManagerInterface {
+interface AssetManagerInterface
+{
     /**
      * Prepare an asset directory by checking that no changes occured in
      * the source directory. If any change is detected, the whole asset directory
@@ -45,23 +46,23 @@ interface AssetManagerInterface {
     /**
      * Generates assets from $asset_path in $output_path, using $filters.
      *
-     * @param          $assetSource
-     * @param          $assetDirectoryBase
-     * @param  string  $webAssetsDirectoryBase the full path to the asset file (or file collection, e.g. *.less)
+     * @param        $assetSource
+     * @param        $assetDirectoryBase
+     * @param string $webAssetsDirectoryBase the full path to the asset file (or file collection, e.g. *.less)
      *
-     * @param  string  $webAssetsTemplate      the full disk path to the base assets output directory in the web space
-     * @param          $webAssetsKey
-     * @param  string  $outputUrl              the URL to the base assets output directory in the web space
+     * @param string $webAssetsTemplate the full disk path to the base assets output directory in the web space
+     * @param        $webAssetsKey
+     * @param string $outputUrl         the URL to the base assets output directory in the web space
      *
-     * @param  string  $assetType              the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
-     * @param  array   $filters                a list of filters, as defined below (see switch($filter_name) ...)
+     * @param string $assetType the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
+     * @param array  $filters   a list of filters, as defined below (see switch($filter_name) ...)
      *
-     * @param  boolean $debug                  true / false
+     * @param boolean $debug true / false
      *
      * @internal param string $web_assets_directory_base the full disk path to the base assets output directory in the web space
      * @internal param string $output_url the URL to the base assets output directory in the web space
      *
-     * @return string                          The URL to the generated asset file.
+     * @return string The URL to the generated asset file.
      */
     public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug);
 }

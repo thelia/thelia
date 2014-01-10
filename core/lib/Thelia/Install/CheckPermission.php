@@ -28,7 +28,6 @@ use RecursiveIteratorIterator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Core\Translation\Translator;
 
-
 /**
  * Class CheckPermission
  *
@@ -164,9 +163,6 @@ class CheckPermission extends BaseInstall
             }
         }
 
-
-
-
         return $this->isValid;
     }
 
@@ -199,7 +195,6 @@ class CheckPermission extends BaseInstall
 
         return (is_writable(THELIA_ROOT . $directory) === true);
     }
-
 
     /**
      * Get Translated text about the directory state
@@ -268,7 +263,6 @@ class CheckPermission extends BaseInstall
 
         return $translatedText;
     }
-
 
     /**
      * Get Translated text about the directory state
@@ -382,7 +376,7 @@ class CheckPermission extends BaseInstall
     {
         $serverValueInBytes = $this->returnBytes(ini_get($key));
 
-        if($serverValueInBytes == -1) {
+        if ($serverValueInBytes == -1) {
             return true;
         }
 
@@ -400,7 +394,7 @@ class CheckPermission extends BaseInstall
     {
         $val = trim($val);
         $last = strtolower($val[strlen($val)-1]);
-        switch($last) {
+        switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
                 $val *= 1024;

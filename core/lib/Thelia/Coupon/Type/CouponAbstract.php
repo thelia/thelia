@@ -23,7 +23,6 @@
 
 namespace Thelia\Coupon\Type;
 
-use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
@@ -62,7 +61,6 @@ abstract class CouponAbstract implements CouponInterface
     /** @var ConditionEvaluator Condition validator */
     protected $conditionEvaluator = null;
 
-
     /** @var string Service Id  */
     protected $serviceId = null;
 
@@ -75,8 +73,6 @@ abstract class CouponAbstract implements CouponInterface
     /** @var string Coupon code (ex: XMAS) */
     protected $code = null;
 
-
-
     /** @var string Coupon title (ex: Coupon for XMAS) */
     protected $title = null;
 
@@ -85,8 +81,6 @@ abstract class CouponAbstract implements CouponInterface
 
     /** @var string Coupon description */
     protected $description = null;
-
-
 
     /** @var bool if Coupon is enabled */
     protected $isEnabled = false;
@@ -105,7 +99,6 @@ abstract class CouponAbstract implements CouponInterface
 
     /** @var bool if Coupon is available for Products already on special offers */
     protected $isAvailableOnSpecialOffers = false;
-
 
     /**
      * Constructor
@@ -146,9 +139,9 @@ abstract class CouponAbstract implements CouponInterface
      * @param bool            $isRemovingPostage          If Coupon is removing postage
      * @param bool            $isAvailableOnSpecialOffers If available on Product already
      *                                                    on special offer price
-     * @param bool            $isEnabled                  False if Coupon is disabled by admin
-     * @param int             $maxUsage                   How many usage left
-     * @param \Datetime       $expirationDate             When the Code is expiring
+     * @param bool      $isEnabled      False if Coupon is disabled by admin
+     * @param int       $maxUsage       How many usage left
+     * @param \Datetime $expirationDate When the Code is expiring
      *
      * @return $this
      */
@@ -355,7 +348,6 @@ abstract class CouponAbstract implements CouponInterface
         return $this->serviceId;
     }
 
-
     /**
      * Check if the current state of the application is matching this Coupon conditions
      * Thelia variables are given by the FacadeInterface
@@ -397,6 +389,5 @@ abstract class CouponAbstract implements CouponInterface
     {
         return $this->extendedInputs;
     }
-
 
 }

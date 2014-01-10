@@ -93,7 +93,8 @@ class TemplateHelper
     /**
      * Returns an array which contains all standard template definitions
      */
-    public function getStandardTemplateDefinitions() {
+    public function getStandardTemplateDefinitions()
+    {
         return array(
                 $this->getActiveFrontTemplate(),
                 $this->getActiveAdminTemplate(),
@@ -105,16 +106,16 @@ class TemplateHelper
     /**
      * Return a list of existing templates for a given template type
      *
-     * @param int $templateType the template type
-     * @return An array of \Thelia\Core\Template\TemplateDefinition
+     * @param  int $templateType the template type
+     * @return An  array of \Thelia\Core\Template\TemplateDefinition
      */
-    public function getList($templateType) {
-
+    public function getList($templateType)
+    {
         $list = $exclude = array();
 
         $tplIterator = TemplateDefinition::getStandardTemplatesSubdirsIterator();
 
-        foreach($tplIterator as $type => $subdir) {
+        foreach ($tplIterator as $type => $subdir) {
 
             if ($templateType == $type) {
 

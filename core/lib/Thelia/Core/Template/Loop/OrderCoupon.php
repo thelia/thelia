@@ -25,8 +25,6 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Condition\ConditionFactory;
-use Thelia\Condition\Implementation\ConditionInterface;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -35,7 +33,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\OrderCouponQuery;
 use Thelia\Model\OrderQuery;
-use Thelia\Type;
 
 /**
  *

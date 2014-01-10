@@ -27,8 +27,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Install\Update;
-use Thelia\Model\ConfigQuery;
-
 
 /**
  * Class UpdateCommand
@@ -65,7 +63,7 @@ class UpdateCommand extends ContainerAwareCommand
                 '<info>Your database is updated successfully !</info>',
                 ''
             ));
-        } catch(PropelException $e) {
+        } catch (PropelException $e) {
             $errorMsg = $e->getMessage();
 
             $output->writeln(array(
@@ -81,4 +79,4 @@ class UpdateCommand extends ContainerAwareCommand
             ));
         }
     }
-} 
+}

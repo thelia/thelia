@@ -29,13 +29,12 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductTableMap;
 
-
 /**
  * Class Update
  * @package Thelia\Install
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Update 
+class Update
 {
     protected static $version = array(
         '0' => '2.0.0-beta1',
@@ -61,7 +60,7 @@ class Update
 
         $currentVersion = ConfigQuery::read('thelia_version');
         $logger->debug("start update process");
-        if(true === $this->isLatestVersion($currentVersion)) {
+        if (true === $this->isLatestVersion($currentVersion)) {
             $logger->debug("You already have the latest version. No update available");
             throw new UpToDateException('You already have the latest version. No update available');
         }
@@ -78,7 +77,7 @@ class Update
             }
             $con->commit();
             $logger->debug('update successfully');
-        } catch(PropelException $e) {
+        } catch (PropelException $e) {
             $con->rollBack();
             $logger->error(sprintf('error during update process with message : %s', $e->getMessage()));
             throw $e;
@@ -99,4 +98,4 @@ class Update
 
         ConfigQuery::write('thelia_version', $version);
     }
-} 
+}

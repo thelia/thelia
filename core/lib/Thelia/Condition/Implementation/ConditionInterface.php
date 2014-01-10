@@ -24,7 +24,6 @@
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\SerializableCondition;
-use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 
 /**
@@ -41,7 +40,7 @@ interface ConditionInterface
      *
      * @param FacadeInterface $adapter Service adapter
      */
-    function __construct(FacadeInterface $adapter);
+    public function __construct(FacadeInterface $adapter);
 
     /**
      * Get Condition Service id
@@ -74,7 +73,6 @@ interface ConditionInterface
      * @return array Operators::CONST
      */
     public function getAvailableOperators();
-
 
     /**
      * Get I18n name

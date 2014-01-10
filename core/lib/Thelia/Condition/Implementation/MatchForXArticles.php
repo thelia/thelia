@@ -247,6 +247,7 @@ class MatchForXArticles extends ConditionAbstract
                     </div>
                 </div>
             ';
+
         return $html;
     }
 

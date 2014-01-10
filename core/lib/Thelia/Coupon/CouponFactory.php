@@ -63,7 +63,7 @@ class CouponFactory
      *
      * @throws \Thelia\Exception\CouponExpiredException
      * @throws \Thelia\Exception\InvalidConditionException
-     * @return CouponInterface ready to be processed
+     * @return CouponInterface                             ready to be processed
      */
     public function buildCouponFromCode($couponCode)
     {
@@ -131,7 +131,5 @@ class CouponFactory
 
         return clone $couponManager;
     }
-
-
 
 }

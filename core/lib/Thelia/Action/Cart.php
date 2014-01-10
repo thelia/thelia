@@ -186,11 +186,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * try to attach a new item to an existing cart
      *
-     * @param \Thelia\Model\Cart $cart
-     * @param int                $productId
+     * @param \Thelia\Model\Cart                $cart
+     * @param int                               $productId
      * @param \Thelia\Model\ProductSaleElements $productSaleElements
-     * @param float              $quantity
-     * @param ProductPrice       $productPrice
+     * @param float                             $quantity
+     * @param ProductPrice                      $productPrice
      *
      * @return CartItem
      */

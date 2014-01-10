@@ -51,7 +51,7 @@ class AsseticAssetManager implements AssetManagerInterface
     /**
      * Create a stamp form the modification time of the content of the given directory and all of its subdirectories
      *
-     * @param string $directory ther directory name
+     * @param  string $directory ther directory name
      * @return string the stamp of this directory
      */
     protected function getStamp($directory)
@@ -76,7 +76,8 @@ class AsseticAssetManager implements AssetManagerInterface
      *
      * @return bool
      */
-    protected function isSourceFile(\SplFileInfo $fileInfo) {
+    protected function isSourceFile(\SplFileInfo $fileInfo)
+    {
         return in_array($fileInfo->getExtension(), $this->source_file_extensions);
     }
 
@@ -84,9 +85,9 @@ class AsseticAssetManager implements AssetManagerInterface
      * Recursively copy assets from the source directory to the destination
      * directory in the web space, omitting source files.
      *
-     * @param Filesystem $fs
-     * @param string $from_directory the source
-     * @param string $to_directory the destination
+     * @param  Filesystem        $fs
+     * @param  string            $from_directory the source
+     * @param  string            $to_directory   the destination
      * @throws \RuntimeException if a problem occurs.
      */
     protected function copyAssets(Filesystem $fs, $from_directory, $to_directory)
@@ -205,8 +206,7 @@ class AsseticAssetManager implements AssetManagerInterface
                 throw new \RuntimeException(
                     "Failed to create asset stamp file $stamp_file_path. Please check that your web server has the proper access rights to do that.");
             }
-            /*            }
-                        else {
+            /*            } else {
                             @fclose($fp);
                         }
             */
@@ -216,13 +216,13 @@ class AsseticAssetManager implements AssetManagerInterface
     /**
      * Decode the filters names, and initialize the Assetic FilterManager
      *
-     * @param FilterManager $filterManager the Assetic filter manager
-     * @param string $filters a comma separated list of filter names
+     * @param  FilterManager             $filterManager the Assetic filter manager
+     * @param  string                    $filters       a comma separated list of filter names
      * @throws \InvalidArgumentException if a wrong filter is passed
-     * @return an array of filter names
+     * @return an                        array of filter names
      */
-    protected function decodeAsseticFilters(FilterManager $filterManager, $filters) {
-
+    protected function decodeAsseticFilters(FilterManager $filterManager, $filters)
+    {
         if (!empty($filters)) {
 
             $filter_list = explode(',', $filters);
@@ -261,8 +261,7 @@ class AsseticAssetManager implements AssetManagerInterface
                         break;
                 }
             }
-        }
-        else {
+        } else {
             $filter_list = array();
         }
 
@@ -272,20 +271,20 @@ class AsseticAssetManager implements AssetManagerInterface
     /**
      * Generates assets from $asset_path in $output_path, using $filters.
      *
-     * @param          $assetSource
-     * @param          $assetDirectoryBase
-     * @param  string  $webAssetsDirectoryBase the full path to the asset file (or file collection, e.g. *.less)
+     * @param        $assetSource
+     * @param        $assetDirectoryBase
+     * @param string $webAssetsDirectoryBase the full path to the asset file (or file collection, e.g. *.less)
      *
-     * @param  string  $webAssetsTemplate      the full disk path to the base assets output directory in the web space
-     * @param          $webAssetsKey
-     * @param  string  $outputUrl              the URL to the base assets output directory in the web space
+     * @param string $webAssetsTemplate the full disk path to the base assets output directory in the web space
+     * @param        $webAssetsKey
+     * @param string $outputUrl         the URL to the base assets output directory in the web space
      *
-     * @param  string  $assetType              the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
-     * @param  array   $filters                a list of filters, as defined below (see switch($filter_name) ...)
+     * @param string $assetType the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
+     * @param array  $filters   a list of filters, as defined below (see switch($filter_name) ...)
      *
-     * @param  boolean $debug                  true / false
+     * @param boolean $debug true / false
      *
-     * @return string                          The URL to the generated asset file.
+     * @return string The URL to the generated asset file.
      */
     public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug)
     {

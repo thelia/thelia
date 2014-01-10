@@ -26,7 +26,6 @@ namespace Thelia\Condition;
 use ArrayAccess;
 use Countable;
 use Iterator;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 
 /**
