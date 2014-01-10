@@ -130,7 +130,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                     ->getSession()
                     ->getOrder()
                     ->setDiscount($totalDiscount)
-                    ->save();
+                    // ->save()
+                ;
             }
         }
 
