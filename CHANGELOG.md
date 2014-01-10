@@ -3,6 +3,7 @@
 - when a category is deleted, all subcategories are deleted
 - delete products when categories are removed. Works only when the category is the default one for this product
 - Manager update exists now.
+- Coupon works now
 
 #2.0.0-beta2
 
