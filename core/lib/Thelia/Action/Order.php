@@ -287,7 +287,8 @@ class Order extends BaseAction implements EventSubscriberInterface
         $sessionOrder = new \Thelia\Model\Order();
         $event->setOrder($sessionOrder);
         $event->setPlacedOrder($placedOrder);
-        $this->getSession()->setOrder($placedOrder);
+        $this->getSession()->setProcessedOrder($placedOrder);
+        $this->getSession()->setOrder(new \Thelia\Model\Order());
 
         /* empty cart */
         $this->getDispatcher()->dispatch(TheliaEvents::CART_CLEAR, new CartEvent($this->getCart($this->getRequest())));

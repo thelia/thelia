@@ -263,6 +263,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 $orderCoupon->save();
             }
         }
+
+        $request->getSession()->setConsumedCoupons(array());
     }
 
     /**
