@@ -26,6 +26,8 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Propel\Runtime\ActiveQuery\Criteria;
 
+use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
+use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
@@ -49,6 +51,8 @@ use Thelia\Core\Security\AccessManager;
 
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\FeatureQuery;
+use Thelia\Model\FeatureTemplateQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\AttributeQuery;
