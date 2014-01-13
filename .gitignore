@@ -18,6 +18,7 @@ local/media/documents/*
 local/media/images/*
 web/assets/*
 web/cache/*
+web/tinymce
 phpdoc*.log
 php-cs
 xhprof/
