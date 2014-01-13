@@ -2,7 +2,7 @@
 - Coupon effect inputs are now more customisable (input text, select, ajax, etc.. are usable) and unlimited amount of input for coupon effect are now possible too
 - when a category is deleted, all subcategories are deleted
 - delete products when categories are removed. Works only when the category is the default one for this product
-- Manager update exists now. Rune php Thelia thelia:update
+- Manager update exists now. Run ```php Thelia thelia:update```
 - Coupon works now
 - Improved tax rule configuration
 

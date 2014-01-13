@@ -88,9 +88,10 @@ class CreateAdminUser extends ContainerAwareCommand
             ));
     }
 
-    protected function enterData($dialog, $output, $label, $error_message)
+    protected function enterData($dialog, $output, $label, $error_message, $hidden = false)
     {
-        return $dialog->askAndValidate(
+        $command = $hidden ? 'askHiddenResponse' : 'askAndValidate';
+        return $dialog->$command(
             $output,
             $this->decorateInfo($label),
             function ($answer) {
@@ -122,8 +123,8 @@ class CreateAdminUser extends ContainerAwareCommand
         $admin->setLastname($input->getOption("last_name") ?: $this->enterData($dialog, $output, "User last name : ", "Please enter user last name."));
 
         do {
-            $password = $input->getOption("password") ?: $this->enterData($dialog, $output, "Password : ", "Please enter a password.");
-            $password_again = $input->getOption("password") ?: $this->enterData($dialog, $output, "Password (again): ", "Please enter the password again.");
+            $password = $input->getOption("password") ?: $this->enterData($dialog, $output, "Password : ", "Please enter a password.", true);
+            $password_again = $input->getOption("password") ?: $this->enterData($dialog, $output, "Password (again): ", "Please enter the password again.", true);
 
             if (! empty($password) && $password == $password_again) {
 
