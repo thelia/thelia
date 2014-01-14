@@ -141,7 +141,7 @@ return array(
     'products' => 'products',
     'Qty' => 'Qty',
     'Quantity' => 'Quantity',
-    'Questions ? See or F.A.Q.' => 'Questions ? See or F.A.Q.',
+    'Questions ? See our F.A.Q.' => 'Questions ? See our F.A.Q.',
     'Rating' => 'Rating',
     'Ref.' => 'Ref.',
     'Register!' => 'Register!',
