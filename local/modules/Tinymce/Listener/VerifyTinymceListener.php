@@ -22,10 +22,12 @@
 /*************************************************************************************/
 
 namespace Tinymce\Listener;
+
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Thelia;
 
 
@@ -42,8 +44,17 @@ class VerifyTinymceListener implements EventSubscriberInterface
         if(false === file_exists(THELIA_WEB_DIR . '/tinymce')) {
             $fs = new Filesystem();
 
-            $fs->mirror(__DIR__ . '/../Config/tinymce', THELIA_WEB_DIR . '/tinymce');
+            $fs->mirror(__DIR__ . '/../Resources/js/tinymce', THELIA_WEB_DIR . '/tinymce');
         }
+    }
+
+    public function clearCache(CacheEvent $event)
+    {
+        $fs = new Filesystem();
+
+        $directory = new \DirectoryIterator(THELIA_WEB_DIR . '/tinymce');
+
+        $fs->remove($directory);
     }
 
     /**
@@ -69,7 +80,8 @@ class VerifyTinymceListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::BOOT => array('verifyTinymce', 128)
+            TheliaEvents::BOOT => array('verifyTinymce', 128),
+            TheliaEvents::CACHE_CLEAR => array("clearCache", 128)
         );
     }
 }

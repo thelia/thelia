@@ -1,5 +1,45 @@
 <?php
-session_start();
+use Thelia\Core\HttpKernel\HttpCache\HttpCache;
+use Thelia\Core\Thelia;
+use Thelia\Core\HttpFoundation\Request;
+
+//use Symfony\Component\DependencyInjection;
+
+$env = 'prod';
+require __DIR__ . '/../../../../../core/bootstrap.php';
+
+$request = Request::createFromGlobals();
+
+$thelia = new Thelia("prod", false);
+$thelia->boot();
+
+$httpKernel = $thelia->getContainer()->get('http_kernel');
+
+$httpKernel->getContainer()->enterScope('request');
+$httpKernel->getContainer()->set('request', $request, 'request');
+$httpKernel->initSession($request);
+/** @var \Thelia\Core\Security\SecurityContext $securityContext */
+$securityContext = $httpKernel->getContainer()->get('thelia.securityContext');
+
+$isGranted = $securityContext->isGranted(
+    array('ADMIN'),
+    array(
+        \Thelia\Core\Security\Resource\AdminResources::PRODUCT,
+        \Thelia\Core\Security\Resource\AdminResources::CATEGORY,
+        \Thelia\Core\Security\Resource\AdminResources::FOLDER,
+        \Thelia\Core\Security\Resource\AdminResources::CONTENT,
+    ),
+    array(),
+    array(
+        \Thelia\Core\Security\AccessManager::UPDATE,
+        \Thelia\Core\Security\AccessManager::CREATE,
+    )
+);
+
+if (false === $isGranted) {
+    exit;
+}
+
 
 //------------------------------------------------------------------------------
 // DON'T COPY THIS VARIABLES IN FOLDERS config.php FILES
@@ -19,8 +59,8 @@ session_start();
 //    |   |   |   |- responsivefilemanager
 //    |   |   |   |   |- plugin.min.js
 
-$base_url="http://www.site.com";  // base url (only domain) of site (without final /). If you prefer relative urls leave empty
-$upload_dir = '/source/'; // path from base_url to base of upload folder (with start and final /)
+$base_url=rtrim(\Thelia\Model\ConfigQuery::read('url_site'), '/');  // base url (only domain) of site (without final /). If you prefer relative urls leave empty
+$upload_dir = '/media/'; // path from base_url to base of upload folder (with start and final /)
 $current_path = '../source/'; // relative path from filemanager folder to upload folder (with final /)
 //thumbs folder can't put inside upload folder
 $thumbs_base_path = '../thumbs/'; // relative path from filemanager folder to thumbs folder (with final /)
@@ -93,7 +133,7 @@ $ext=array_merge($ext_img, $ext_file, $ext_misc, $ext_video,$ext_music); //allow
 
 /******************
  * AVIARY config
-*******************/
+ *******************/
 $aviary_key="dvh8qudbp6yx2bnp";
 $aviary_secret="m6xaym5q42rpw433";
 $aviary_version=3;
@@ -114,7 +154,7 @@ $hidden_folders = array();
 $hidden_files = array('config.php');
 
 /*******************
- * JAVA upload 
+ * JAVA upload
  *******************/
 $java_upload=true;
 $JAVAMaxSizeUpload=200; //Gb

@@ -213,7 +213,7 @@ class TheliaHttpKernel extends HttpKernel
         }
     }
 
-    protected function initSession(Request $request)
+    public function initSession(Request $request)
     {
         if (null === self::$session) {
             $storage = new Session\Storage\NativeSessionStorage();

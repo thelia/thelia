@@ -37,6 +37,6 @@ class Tinymce extends BaseModule
     {
         $fs = new Filesystem();
 
-        $fs->mirror(__DIR__ . '/Config/tinymce', THELIA_WEB_DIR . '/tinymce');
+        $fs->mirror(__DIR__ . '/Resources/js/tinymce', THELIA_WEB_DIR . '/tinymce');
     }
 }
