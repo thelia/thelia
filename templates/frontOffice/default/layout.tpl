@@ -212,7 +212,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                 </div>
                 <div class="col">
                     <span class="icon-info"></span>
-                    {intl l="Need help ?"} <small>{intl l="Questions ? See or F.A.Q."}</small>
+                    {intl l="Need help ?"} <small>{intl l="Questions ? See our F.A.Q."}</small>
                 </div>
             </div>
         </div>
