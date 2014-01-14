@@ -61,9 +61,9 @@ if (false === $isGranted) {
 
 $base_url=rtrim(\Thelia\Model\ConfigQuery::read('url_site'), '/');  // base url (only domain) of site (without final /). If you prefer relative urls leave empty
 $upload_dir = '/media/'; // path from base_url to base of upload folder (with start and final /)
-$current_path = '../source/'; // relative path from filemanager folder to upload folder (with final /)
+$current_path = '../../../media/'; // relative path from filemanager folder to upload folder (with final /)
 //thumbs folder can't put inside upload folder
-$thumbs_base_path = '../thumbs/'; // relative path from filemanager folder to thumbs folder (with final /)
+$thumbs_base_path = '../../../media/'; // relative path from filemanager folder to thumbs folder (with final /)
 
 //------------------------------------------------------------------------------
 // YOU CAN COPY AND CHANGE THESE VARIABLES IN FOLDERS config.php FILES

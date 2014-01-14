@@ -41,20 +41,26 @@ class VerifyTinymceListener implements EventSubscriberInterface
 
     public function verifyTinymce(Event $event)
     {
-        if(false === file_exists(THELIA_WEB_DIR . '/tinymce')) {
-            $fs = new Filesystem();
-
+        $fs = new Filesystem();
+        if (false === file_exists(THELIA_WEB_DIR . '/tinymce')) {
             $fs->mirror(__DIR__ . '/../Resources/js/tinymce', THELIA_WEB_DIR . '/tinymce');
+        }
+
+        if (false === file_exists(THELIA_WEB_DIR . '/media')) {
+            $fs->symlink(__DIR__ . '/../Resources/media', THELIA_WEB_DIR . '/media');
         }
     }
 
     public function clearCache(CacheEvent $event)
     {
-        $fs = new Filesystem();
+        if (true === file_exists(THELIA_WEB_DIR . '/tinymce')) {
+            echo "toto";
+            $fs = new Filesystem();
 
-        $directory = new \DirectoryIterator(THELIA_WEB_DIR . '/tinymce');
+            $directory = new \DirectoryIterator(THELIA_WEB_DIR . '/tinymce');
 
-        $fs->remove($directory);
+            $fs->remove($directory);
+        }
     }
 
     /**
@@ -81,7 +87,7 @@ class VerifyTinymceListener implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::BOOT => array('verifyTinymce', 128),
-            TheliaEvents::CACHE_CLEAR => array("clearCache", 128)
+            TheliaEvents::CACHE_CLEAR => array("clearCache", 0)
         );
     }
 }
