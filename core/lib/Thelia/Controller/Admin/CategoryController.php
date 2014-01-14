@@ -156,9 +156,14 @@ class CategoryController extends AbstractSeoCrudController
 
     protected function getExistingObject()
     {
-        return CategoryQuery::create()
-        ->joinWithI18n($this->getCurrentEditionLocale())
-        ->findOneById($this->getRequest()->get('category_id', 0));
+        $category = CategoryQuery::create()
+            ->findOneById($this->getRequest()->get('category_id', 0));
+
+        if (null !== $category) {
+            $category->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $category;
     }
 
     protected function getObjectLabel($object)

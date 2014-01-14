@@ -236,9 +236,13 @@ class ContentController extends AbstractSeoCrudController
      */
     protected function getExistingObject()
     {
-        return ContentQuery::create()
-            ->joinWithI18n($this->getCurrentEditionLocale())
+        $content = ContentQuery::create()
             ->findOneById($this->getRequest()->get('content_id', 0));
+
+        if (null !== $content) {
+            $content->setLocale($this->getCurrentEditionLocale());
+        }
+        return $content;
     }
 
     /**

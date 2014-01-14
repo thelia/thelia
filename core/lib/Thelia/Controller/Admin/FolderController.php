@@ -199,9 +199,13 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function getExistingObject()
     {
-        return FolderQuery::create()
-            ->joinWithI18n($this->getCurrentEditionLocale())
+        $folder = FolderQuery::create()
             ->findOneById($this->getRequest()->get('folder_id', 0));
+
+        if (null !== $folder) {
+            $folder->setLocale($this->getCurrentEditionLocale());
+        }
+        return $folder;
     }
 
     /**

@@ -343,9 +343,14 @@ class ProductController extends AbstractSeoCrudController
 
     protected function getExistingObject()
     {
-        return ProductQuery::create()
-        ->joinWithI18n($this->getCurrentEditionLocale())
-        ->findOneById($this->getRequest()->get('product_id', 0));
+        $product = ProductQuery::create()
+            ->findOneById($this->getRequest()->get('product_id', 0));
+
+        if (null !== $product) {
+            $product->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $product;
     }
 
     protected function getObjectLabel($object)
