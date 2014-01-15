@@ -178,10 +178,12 @@ abstract class BaseLoop
             if ($value === null && $argument->mandatory) {
                 $faultActor[] = $argument->name;
                 $faultDetails[] = sprintf('"%s" parameter is missing in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
-            } else  if ($value === '' && !$argument->empty) {
-                   /* check if empty */
-                $faultActor[] = $argument->name;
-                $faultDetails[] = sprintf('"%s" parameter cannot be empty in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
+            } else  if ($value === '') {
+                if(!$argument->empty) {
+                    /* check if empty */
+                    $faultActor[] = $argument->name;
+                    $faultDetails[] = sprintf('"%s" parameter cannot be empty in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
+                }
             } elseif ($value !== null && !$argument->type->isValid($value)) {
                 /* check type */
                 $faultActor[] = $argument->name;
