@@ -44,6 +44,20 @@
 
 {capture "delete_module_dialog"}
     <input type="hidden" name="module_id" id="delete_module_id" value="" />
+
+    <div class="row">
+        <div class="col-md-12">
+		    <div class="form-group">
+		        <div class="checkbox">
+		            <label>
+		                <input type="checkbox" name="delete-module-data" value="1">
+		                {intl l="Delete also module data"}
+		            </label>
+		        </div>
+		    </div>
+		</div>
+	</div>
+
 {/capture}
 
 {include
