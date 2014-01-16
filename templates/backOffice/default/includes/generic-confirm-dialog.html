@@ -25,13 +25,14 @@ Parameters:
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3>{$dialog_title}</h3>
             </div>
-            <div class="modal-body">
-                {$dialog_message nofilter}
-            </div>
 
             <form method="{$form_method|default:POST}" action="{$form_action}" id="{$form_id|default:"{$dialog_id}_form"}">
 
-                {$form_content nofilter}
+	            <div class="modal-body">
+	                {$dialog_message nofilter}
+
+                    {$form_content nofilter}
+                </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> {$dialog_cancel_label|default:{intl l="No"}}</button>
