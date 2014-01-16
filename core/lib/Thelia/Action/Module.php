@@ -73,7 +73,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
             try {
                 if (null === $module->getFullNamespace()) {
-                    throw new \LogicException('can not instanciante this module if namespace is null. Maybe the model is not loaded ?');
+                    throw new \LogicException('can not instanciante this module: the namespace is null. Maybe the model is not loaded ?');
                 }
 
                 $reflected = new \ReflectionClass($module->getFullNamespace());
@@ -82,7 +82,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
                 $path = dirname($reflected->getFileName());
 
-                $instance->destroy($con);
+                $instance->destroy($con, $event->getDeleteData());
 
                 $fs = new Filesystem();
                 $fs->remove($path);
