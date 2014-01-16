@@ -273,6 +273,8 @@ class ModuleController extends AbstractCrudController
 
             $deleteEvent = new ModuleDeleteEvent($module_id);
 
+            $deleteEvent->setDeleteData('1' == $this->getRequest('delete-module-data', '0'));
+
             $this->dispatch(TheliaEvents::MODULE_DELETE, $deleteEvent);
 
             if ($deleteEvent->hasModule() === false) {
