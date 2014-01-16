@@ -34,6 +34,7 @@ class ModuleDeleteEvent extends ModuleEvent
      * @var int module id
      */
     protected $module_id;
+    protected $delete_data;
 
     public function __construct($module_id)
     {
@@ -56,4 +57,14 @@ class ModuleDeleteEvent extends ModuleEvent
         return $this->module_id;
     }
 
+    public function getDeleteData()
+    {
+        return $this->delete_data;
+    }
+
+    public function setDeleteData($delete_data)
+    {
+        $this->delete_data = $delete_data;
+        return $this;
+    }
 }
