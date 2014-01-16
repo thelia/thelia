@@ -34,6 +34,7 @@ use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Log\Tlog;
 
 /**
  * Class Module
@@ -76,16 +77,24 @@ class Module extends BaseAction implements EventSubscriberInterface
                     throw new \LogicException('can not instanciante this module: the namespace is null. Maybe the model is not loaded ?');
                 }
 
-                $reflected = new \ReflectionClass($module->getFullNamespace());
-                $instance = $reflected->newInstance();
-                $instance->setContainer($this->container);
+                try {
+                    $reflected = new \ReflectionClass($module->getFullNamespace());
 
-                $path = dirname($reflected->getFileName());
+                    $instance = $reflected->newInstance();
+                    $instance->setContainer($this->container);
 
-                $instance->destroy($con, $event->getDeleteData());
+                    $path = dirname($reflected->getFileName());
 
-                $fs = new Filesystem();
-                $fs->remove($path);
+                    $instance->destroy($con, $event->getDeleteData());
+
+                    $fs = new Filesystem();
+                    $fs->remove($path);
+                }
+                catch (\ReflectionException $ex) {
+                    // Happens mostly because the module directory has been deleted.
+                    // Log a warning, and delete the database entry.
+                    Tlog::getInstance()->addWarning("Failed to create instance of module ", $module->getCode());
+                }
 
                 $module->delete($con);
 
