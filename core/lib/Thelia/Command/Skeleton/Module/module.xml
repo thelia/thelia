@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module>
-    <fullnamespace></fullnamespace>
+    <fullnamespace>%%NAMESPACE%%\%%CLASSNAME%%</fullnamespace>
     <descriptive locale="en_US">
-        <title></title>
+        <title>Automatically generated module - please update module.xml file</title>
     </descriptive>
     <descriptive locale="fr_FR">
-        <title></title>
+        <title>Module généré autromatiquement - editez le fichier module.xml</title>
     </descriptive>
     <version></version>
     <author>
         <name></name>
         <email></email>
     </author>
-    <type></type>
-    <thelia></thelia>
-    <stability></stability>
+    <type>classic</type>
+    <thelia>2.0.0</thelia>
+    <stability>other</stability>
 </module>

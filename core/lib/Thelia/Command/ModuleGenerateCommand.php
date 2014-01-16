@@ -84,23 +84,38 @@ class ModuleGenerateCommand extends BaseModuleGenerate
     private function createFiles()
     {
         $fs = new Filesystem();
-        $skeletonDir = str_replace("/", DIRECTORY_SEPARATOR, THELIA_ROOT . "/core/lib/Thelia/Command/Skeleton/Module/");
-        $fs->copy($skeletonDir . "config.xml", $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "config.xml");
-        $fs->copy($skeletonDir . "module.xml", $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "module.xml");
 
-        $classContent = file_get_contents($skeletonDir . "Class.php");
+        try {
+            $skeletonDir = str_replace("/", DIRECTORY_SEPARATOR, THELIA_ROOT . "/core/lib/Thelia/Command/Skeleton/Module/");
 
-        $classContent = str_replace("%%CLASSNAME%%", $this->module, $classContent);
-        $classContent = str_replace("%%NAMESPACE%%", $this->module, $classContent);
+            $fs->copy($skeletonDir . "config.xml", $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "config.xml");
 
-        file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . $this->module.".php", $classContent);
+            $moduleContent = file_get_contents($skeletonDir . "module.xml");
 
-        $schemaContent = file_get_contents($skeletonDir . "schema.xml");
+            $moduleContent = str_replace("%%CLASSNAME%%", $this->module, $moduleContent);
+            $moduleContent = str_replace("%%NAMESPACE%%", $this->module, $moduleContent);
 
-        $schemaContent = str_replace("%%CONFIG_DIR%%", THELIA_CONF_DIR, $schemaContent);
-        $schemaContent = str_replace("%%NAMESPACE%%", $this->module, $schemaContent);
+            file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "module.xml", $moduleContent);
 
-        file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "schema.xml", $schemaContent);
+            $classContent = file_get_contents($skeletonDir . "Class.php");
+
+            $classContent = str_replace("%%CLASSNAME%%", $this->module, $classContent);
+            $classContent = str_replace("%%NAMESPACE%%", $this->module, $classContent);
+
+            file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . $this->module.".php", $classContent);
+
+            $schemaContent = file_get_contents($skeletonDir . "schema.xml");
+
+            $schemaContent = str_replace("%%CONFIG_DIR%%", THELIA_CONF_DIR, $schemaContent);
+            $schemaContent = str_replace("%%NAMESPACE%%", $this->module, $schemaContent);
+
+            file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "schema.xml", $schemaContent);
+        }
+        catch (\Exception $ex) {
+            $fs->remove($this->moduleDirectory);
+
+            throw $ex;
+        }
     }
 
 }
