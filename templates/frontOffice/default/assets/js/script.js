@@ -319,11 +319,7 @@
         return false;
         });
 
-        $('#limit-top').change(function (e) {
-            window.location = $(this).val()
-        });
-
-        $('#sortby-top').change(function (e) {
+        $('#content').on('change', '#limit-top, #sortby-top', function () {
             window.location = $(this).val()
         });
 
