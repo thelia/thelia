@@ -998,7 +998,7 @@
         <default key="_controller">Thelia\Controller\Admin\ModuleController::deleteAction</default>
     </route>
 
-    <route id="admin.module.delete" path="/admin/module/update-position">
+    <route id="admin.module.update-position" path="/admin/module/update-position">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::updatePositionAction</default>
     </route>
 
