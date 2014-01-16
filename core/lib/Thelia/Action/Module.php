@@ -35,6 +35,7 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Log\Tlog;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Class Module
@@ -74,7 +75,11 @@ class Module extends BaseAction implements EventSubscriberInterface
 
             try {
                 if (null === $module->getFullNamespace()) {
-                    throw new \LogicException('can not instanciante this module: the namespace is null. Maybe the model is not loaded ?');
+                    throw new \LogicException(
+                        Translator::getInstance()->trans(
+                                'Cannot instanciante module "%name%": the namespace is null. Maybe the model is not loaded ?',
+                                array('%name%' => $module->getCode())
+                          ));
                 }
 
                 try {
@@ -91,9 +96,12 @@ class Module extends BaseAction implements EventSubscriberInterface
                     $fs->remove($path);
                 }
                 catch (\ReflectionException $ex) {
-                    // Happens mostly because the module directory has been deleted.
+                    // Happens probably because the module directory has been deleted.
                     // Log a warning, and delete the database entry.
-                    Tlog::getInstance()->addWarning("Failed to create instance of module ", $module->getCode());
+                    Tlog::getInstance()->addWarning(
+                        Translator::getInstance()->trans(
+                            'Failed to create instance of module "%name%" when trying to delete module. Module directory has probably been deleted', array('%name%' => $module->getCode())
+                    ));
                 }
 
                 $module->delete($con);
