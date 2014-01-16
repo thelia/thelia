@@ -27,9 +27,10 @@ use Thelia\Module\BaseModule;
 
 class %%CLASSNAME%% extends BaseModule
 {
-    /**
-     * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
-     * Like install and destroy
+    /*
+     * You may now override BaseModuleInterface methods, such as:
+     * install, destroy, preActivation, postActivation, preDeactivation, postDeactivation
+     *
+     * Have fun !
      */
-
 }
