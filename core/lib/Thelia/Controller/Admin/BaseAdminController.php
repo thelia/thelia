@@ -50,6 +50,21 @@ class BaseAdminController extends BaseController
     const TEMPLATE_404 = "404";
 
     /**
+     * The current router identifier. The default is router.admin. Modules may use
+     * setCurrentRouter() method to pass their own router, and use the route related
+     * methods of this class.
+     */
+    private $currentRouter = "router.admin";
+
+    protected function getCurrentRouter() {
+        return $this->currentRouter;
+    }
+
+    protected function setCurrentRouter($routerId) {
+        $this->currentRouter = $routerId;
+    }
+
+    /**
      * Helper to append a message to the admin log.
      *
      * @param string $resource
@@ -242,7 +257,7 @@ class BaseAdminController extends BaseController
     protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_URL)
     {
         return $this->getRouteFromRouter(
-            'router.admin',
+            $this->currentRouter,
             $routeId,
             $parameters,
             $referenceType
