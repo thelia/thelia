@@ -8,7 +8,7 @@ use Propel\Runtime\Propel;
 use Thelia\Core\Event\Lang\LangEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Lang as BaseLang;
-use Thelia\Model\Base\LangQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Model\Map\LangTableMap;
 
 class Lang extends BaseLang {
