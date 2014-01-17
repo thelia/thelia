@@ -5,13 +5,20 @@ REM v0.1
 echo [WARN] This script will reset this Thelia2 install
 
 if exist local\config\database.yml (
+
+    echo [INFO] Clearing caches
+    php Thelia cache:clear
+
+    echo [INFO] Self-updating Composer
+    composer self-update
+
     echo [INFO] Downloading vendors
-    composer install --prefer-dist
+    composer install --prefer-dist --optimize-autoloader
 
     cd local\config\
 
     echo [INFO] Building Models file
-    ..\..\bin\propel build -v --output-dir=../../core/lib/
+    ..\..\bin\propel build -v --output-dir=../../core/lib/ --enable-identifier-quoting
 
     echo [INFO] Building SQL CREATE file
     ..\..\bin\propel sql:build -v --output-dir=..\..\install
@@ -25,8 +32,19 @@ if exist local\config\database.yml (
     echo [INFO] Installing fixtures
     php install\faker.php
 
+    echo [INFO] Clearing caches
+    php Thelia cache:clear
+
     echo [INFO] Adding admin
-    php Thelia admin:create
+    php Thelia admin:create --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2
+
+    echo [INFO] Admin user thelia2 with password thelia2 successfully created.
+
+    echo [INFO] Activating Delivery Module(s)
+    php Thelia module:activate Colissimo
+
+    echo "[INFO] Activating Payment Module(s)"
+    php Thelia module:activate Cheque
 
     echo [SUCCESS] Reset done
 )
