@@ -43,11 +43,11 @@ class VerifyTinymceListener implements EventSubscriberInterface
     {
         $fs = new Filesystem();
         if (false === file_exists(THELIA_WEB_DIR . '/tinymce')) {
-            $fs->mirror(__DIR__ . '/../Resources/js/tinymce', THELIA_WEB_DIR . '/tinymce');
+            $fs->mirror(__DIR__ . DS .'..'. DS .'Resources'.DS.'js'.DS.'tinymce', THELIA_WEB_DIR . 'tinymce');
         }
 
         if (false === file_exists(THELIA_WEB_DIR . '/media')) {
-            $fs->symlink(__DIR__ . '/../Resources/media', THELIA_WEB_DIR . '/media');
+            $fs->symlink(__DIR__ . DS .'..'.DS.'Resources'.DS.'media', THELIA_WEB_DIR . 'media');
         }
     }
 
