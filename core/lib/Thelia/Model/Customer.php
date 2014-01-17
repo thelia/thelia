@@ -54,7 +54,7 @@ class Customer extends BaseCustomer implements UserInterface
      * @param int $discount
      * @throws \Exception|\Symfony\Component\Config\Definition\Exception\Exception
      */
-    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email = null, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0, $company = null)
+    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email = null, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0, $company = null, $ref = null)
     {
         $this
         	->setTitleId($titleId)
@@ -65,6 +65,7 @@ class Customer extends BaseCustomer implements UserInterface
             ->setReseller($reseller)
             ->setSponsor($sponsor)
             ->setDiscount($discount)
+            ->setRef($ref)
         ;
 
         if(!is_null($lang)) {
@@ -162,6 +163,17 @@ class Customer extends BaseCustomer implements UserInterface
         return $this;
     }
 
+    public function setRef($ref)
+    {
+        if(null === $ref && null === $this->ref) {
+            parent::setRef($this->generateRef());
+        } else if(null !== $ref) {
+            parent::setRef($ref);
+        }
+
+        return $this;
+    }
+
     public function setEmail($email, $force = false)
     {
         $email = trim($email);
@@ -242,7 +254,9 @@ class Customer extends BaseCustomer implements UserInterface
         // Set the serial number (for auto-login)
         $this->setRememberMeSerial(uniqid());
 
-        $this->setRef($this->generateRef());
+        if (null === $this->ref) {
+            $this->setRef($this->generateRef());
+        }
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECUSTOMER, new CustomerEvent($this));
         return true;

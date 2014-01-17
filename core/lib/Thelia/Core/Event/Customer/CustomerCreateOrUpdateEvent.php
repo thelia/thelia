@@ -51,6 +51,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     protected $sponsor;
     protected $discount;
     protected $company;
+    protected $ref;
 
     /**
      * @param int    $title     the title customer id
@@ -71,8 +72,9 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
      * @param int    $sponsor  customer's id sponsor
      * @param float  $discount
      * @param string $company
+     * @param string $ref
      */
-    public function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $country, $email, $password, $lang, $reseller, $sponsor, $discount, $company)
+    public function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $country, $email, $password, $lang, $reseller, $sponsor, $discount, $company, $ref)
     {
         $this->address1 = $address1;
         $this->address2 = $address2;
@@ -92,6 +94,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         $this->sponsor = $sponsor;
         $this->discount = $discount;
         $this->company = $company;
+        $this->ref = $ref;
     }
     /**
      * @return mixed
@@ -236,4 +239,14 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     {
         return $this->sponsor;
     }
+
+    /**
+     * @return string
+     */
+    public function getRef()
+    {
+        return $this->ref;
+    }
+
+
 }
