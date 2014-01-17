@@ -58,7 +58,7 @@ class UrlGenerator extends AbstractSmartyPlugin
         } elseif ($path !== null) {
             $mode = URL::WITH_INDEX_PAGE;
         } else {
-            throw \InvalidArgumentException(Translator::getInstance()->trans("Please specify either 'path' or 'file' parameter in {url} function."));
+            throw new \InvalidArgumentException(Translator::getInstance()->trans("Please specify either 'path' or 'file' parameter in {url} function."));
         }
 
         $target = $this->getParam($params, 'target', null);
