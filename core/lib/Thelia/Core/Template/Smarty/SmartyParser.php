@@ -218,7 +218,7 @@ class SmartyParser extends Smarty implements ParserInterface
     public function render($realTemplateName, array $parameters = array())
     {
         if (false === $this->templateExists($realTemplateName)) {
-            throw new ResourceNotFoundException(Translator::getInstance()->trans("Template file %file cannot be found.", array('%file', $realTemplateName)));
+            throw new ResourceNotFoundException(Translator::getInstance()->trans("Template file %file cannot be found.", array('%file' => $realTemplateName)));
         }
 
         return $this->internalRenderer('file', $realTemplateName, $parameters);
