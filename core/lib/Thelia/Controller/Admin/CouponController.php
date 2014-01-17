@@ -155,7 +155,7 @@ class CouponController extends BaseAdminController
         $args['dateFormat'] = $this->getSession()->getLang()->getDateFormat();
         $args['availableCoupons'] = $this->getAvailableCoupons();
         $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
-            'admin.coupon.draw.inputs',
+            'admin.coupon.draw.inputs.ajax',
             array('couponServiceId' => 'couponServiceId'),
             Router::ABSOLUTE_URL
         );
