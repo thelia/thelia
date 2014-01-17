@@ -233,7 +233,7 @@ abstract class BaseController extends ContainerAware
             array(
                 'order_id' => $order_id
             ),
-            TemplateHelper::getInstance()->getActivePdfTemplate()->getPath()
+            TemplateHelper::getInstance()->getActivePdfTemplate()
         );
 
         $order = OrderQuery::create()->findPk($order_id);
