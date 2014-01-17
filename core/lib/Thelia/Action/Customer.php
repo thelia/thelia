@@ -111,7 +111,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $event->getReseller(),
             $event->getSponsor(),
             $event->getDiscount(),
-            $event->getCompany()
+            $event->getCompany(),
+            $event->getRef()
         );
 
         $event->setCustomer($customer);

@@ -149,7 +149,8 @@ class CustomerController extends AbstractCrudController
                 isset($data["reseller"])?$data["reseller"]:null,
                 isset($data["sponsor"])?$data["sponsor"]:null,
                 isset($data["discount"])?$data["discount"]:null,
-                isset($data["company"])?$data["company"]:null
+                isset($data["company"])?$data["company"]:null,
+                null
         );
 
         return $customerCreateEvent;
