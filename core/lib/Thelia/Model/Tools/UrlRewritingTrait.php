@@ -225,8 +225,9 @@ trait UrlRewritingTrait {
         }
 
         /* deprecate the old one if needed */
-        $oldRewritingUrl = RewritingUrlQuery::create()->findOneByUrl($currentUrl);
-        $oldRewritingUrl->setRedirected($rewritingUrl->getId())->save();
+        if (null !== $oldRewritingUrl = RewritingUrlQuery::create()->findOneByUrl($currentUrl)) {
+            $oldRewritingUrl->setRedirected($rewritingUrl->getId())->save();
+        }
 
         return $this;
     }
