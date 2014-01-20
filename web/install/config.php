@@ -81,32 +81,32 @@ $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
 <form action="end.php" method="POST" >
     <div class="well">
         <div class="form-group">
-            <label for="admin_login">Administrator login :</label>
+            <label for="admin_login"><?php echo $trans->trans('Administrator login :'); ?></label>
             <input id="admin_login" class="form-control" type="text" name="admin_login" placeholder="admin" value="" required>
         </div>
         <div class="form-group">
-            <label for="admin_password">Administrator password :</label>
+            <label for="admin_password"><?php echo $trans->trans('Administrator password :'); ?></label>
             <input id="admin_password" class="form-control" type="password" name="admin_password" value="" required>
         </div>
         <div class="form-group">
-            <label for="admin_password_verif">Administrator password verification :</label>
+            <label for="admin_password_verif"><?php echo $trans->trans('Administrator password verification :'); ?></label>
             <input id="admin_password_verif" class="form-control" type="password" name="admin_password_verif" value="" required>
         </div>
         <div class="form-group">
-            <label for="email_contact">Contact email :</label>
+            <label for="email_contact"><?php echo $trans->trans('Contact email :'); ?></label>
             <input id="email_contact" class="form-control" type="text" name="store_email" placeholder="foo@bar.com" value="" required>
         </div>
         <div class="form-group">
-            <label for="site_name">Company name :</label>
+            <label for="site_name"><?php echo $trans->trans('Company name :'); ?></label>
             <input id="site_name" class="form-control" type="text" name="store_name" placeholder="" value="" required>
         </div>
         <div class="form-group">
-            <label for="site_name">website url :</label>
+            <label for="site_name"><?php echo $trans->trans('website url :'); ?></label>
             <input id="site_name" class="form-control" type="text" name="url_site" placeholder="" value="http://<?php echo $_SERVER['SERVER_NAME'].$website_url; ?>" required>
         </div>
         <div class="clearfix">
             <div class="control-btn">
-                <button type="submit" class="pull-right btn btn-default btn-primary">Continue</button>
+                <button type="submit" class="pull-right btn btn-default btn-primary"><?php echo $trans->trans('Continue'); ?></button>
             </div>
 
         </div>

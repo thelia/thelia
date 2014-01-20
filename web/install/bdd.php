@@ -53,10 +53,10 @@ $databases = $connection->query('show databases');
     <div class="well">
         <form action="config.php" method="post">
             <fieldset>
-                <legend>Choose your database</legend>
+                <legend><?php echo $trans->trans('Choose your database'); ?></legend>
                 <p>
-                    The SQL server contains multiple databases.<br/>
-                    Select below the one you want to use.
+                    <?php echo $trans->trans('The SQL server contains multiple databases.'); ?><br/>
+                    <?php echo $trans->trans('Select below the one you want to use.'); ?>
                 </p>
                 <?php foreach($databases as $database): ?>
                     <?php if ($database['Database'] == 'information_schema') continue; ?>
@@ -93,12 +93,12 @@ $databases = $connection->query('show databases');
                 if($permissions->fetchColumn(0) > 0) {
                 ?>
                 <p>
-                    or
+                    <?php echo $trans->trans('or'); ?>
                 </p>
 
                 <div class="radio">
                     <label>
-                        Create an other database
+                        <?php echo $trans->trans('Create an other database'); ?>
                     </label>
                 </div>
 
@@ -109,7 +109,7 @@ $databases = $connection->query('show databases');
             </fieldset>
             <div class="clearfix">
                 <div class="control-btn">
-                    <button type="submit" class="pull-right btn btn-default btn-primary">Continue</button>
+                    <button type="submit" class="pull-right btn btn-default btn-primary"><?php echo $trans->trans('Continue'); ?></button>
                 </div>
 
             </div>
