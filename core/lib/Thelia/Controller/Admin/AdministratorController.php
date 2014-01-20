@@ -114,26 +114,6 @@ class AdministratorController extends AbstractCrudController
         return new AdministratorModificationForm($this->getRequest(), "form", $data);
     }
 
-    protected function hydrateResourceUpdateForm($object)
-    {
-        $data = array(
-            'id'           => $object->getId(),
-        );
-
-        // Setup the object form
-        return new AdministratorUpdateResourceAccessForm($this->getRequest(), "form", $data);
-    }
-
-    protected function hydrateModuleUpdateForm($object)
-    {
-        $data = array(
-            'id'           => $object->getId(),
-        );
-
-        // Setup the object form
-        return new AdministratorUpdateModuleAccessForm($this->getRequest(), "form", $data);
-    }
-
     protected function getObjectFromEvent($event)
     {
         return $event->hasAdministrator() ? $event->getAdministrator() : null;
@@ -142,7 +122,6 @@ class AdministratorController extends AbstractCrudController
     protected function getExistingObject()
     {
         return AdminQuery::create()
-            ->joinWithI18n($this->getCurrentEditionLocale())
             ->findOneById($this->getRequest()->get('administrator_id'));
     }
 
