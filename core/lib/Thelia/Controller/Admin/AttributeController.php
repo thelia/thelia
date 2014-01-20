@@ -167,9 +167,14 @@ class AttributeController extends AbstractCrudController
 
     protected function getExistingObject()
     {
-        return AttributeQuery::create()
-        ->joinWithI18n($this->getCurrentEditionLocale())
-        ->findOneById($this->getRequest()->get('attribute_id'));
+        $attribute = AttributeQuery::create()
+        ->findOneById($this->getRequest()->get('attribute_id', 0));
+
+        if (null !== $attribute) {
+            $attribute->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $attribute;
     }
 
     protected function getObjectLabel($object)

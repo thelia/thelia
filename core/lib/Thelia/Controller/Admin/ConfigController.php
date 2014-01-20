@@ -140,9 +140,14 @@ class ConfigController extends AbstractCrudController
 
     protected function getExistingObject()
     {
-        return ConfigQuery::create()
-        ->joinWithI18n($this->getCurrentEditionLocale())
+        $config = ConfigQuery::create()
         ->findOneById($this->getRequest()->get('variable_id'));
+
+        if (null !== $config) {
+            $config->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $config;
     }
 
     protected function getObjectLabel($object)

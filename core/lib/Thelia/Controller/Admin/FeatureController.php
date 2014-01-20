@@ -167,9 +167,14 @@ class FeatureController extends AbstractCrudController
 
     protected function getExistingObject()
     {
-        return FeatureQuery::create()
-        ->joinWithI18n($this->getCurrentEditionLocale())
-        ->findOneById($this->getRequest()->get('feature_id'));
+        $feature = FeatureQuery::create()
+        ->findOneById($this->getRequest()->get('feature_id', 0));
+
+        if (null !== $feature) {
+            $feature->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $feature;
     }
 
     protected function getObjectLabel($object)

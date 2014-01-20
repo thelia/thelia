@@ -145,9 +145,14 @@ class ProfileController extends AbstractCrudController
 
     protected function getExistingObject()
     {
-        return ProfileQuery::create()
-            ->joinWithI18n($this->getCurrentEditionLocale())
-            ->findOneById($this->getRequest()->get('profile_id'));
+        $profile = ProfileQuery::create()
+            ->findOneById($this->getRequest()->get('profile_id', 0));
+
+        if (null !== $profile) {
+            $profile->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $profile;
     }
 
     protected function getObjectLabel($object)

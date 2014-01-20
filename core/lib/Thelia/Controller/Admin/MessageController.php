@@ -143,9 +143,14 @@ class MessageController extends AbstractCrudController
 
     protected function getExistingObject()
     {
-        return MessageQuery::create()
-        ->joinWithI18n($this->getCurrentEditionLocale())
-        ->findOneById($this->getRequest()->get('message_id'));
+        $message = MessageQuery::create()
+        ->findOneById($this->getRequest()->get('message_id', 0));
+
+        if (null !== $message) {
+            $message->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $message;
     }
 
     protected function getObjectLabel($object)

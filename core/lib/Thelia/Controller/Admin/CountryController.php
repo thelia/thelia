@@ -120,8 +120,6 @@ class CountryController extends AbstractCrudController
         $event
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
-            ->setChapo($formData['chapo'])
-            ->setDescription($formData['description'])
             ->setIsocode($formData['isocode'])
             ->setIsoAlpha2($formData['isoalpha2'])
             ->setIsoAlpha3($formData['isoalpha3'])
@@ -164,9 +162,14 @@ class CountryController extends AbstractCrudController
      */
     protected function getExistingObject()
     {
-        return CountryQuery::create()
-            ->joinWithI18n($this->getCurrentEditionLocale())
+        $country = CountryQuery::create()
             ->findPk($this->getRequest()->get('country_id', 0));
+
+        if (null !== $country) {
+            $country->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $country;
     }
 
     /**

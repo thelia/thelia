@@ -129,9 +129,14 @@ class TemplateController extends AbstractCrudController
 
     protected function getExistingObject()
     {
-        return TemplateQuery::create()
-            ->joinWithI18n($this->getCurrentEditionLocale())
-            ->findOneById($this->getRequest()->get('template_id'));
+        $template = TemplateQuery::create()
+            ->findOneById($this->getRequest()->get('template_id', 0));
+
+        if (null !== $template) {
+            $template->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $template;
     }
 
     protected function getObjectLabel($object)

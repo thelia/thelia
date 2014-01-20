@@ -144,9 +144,14 @@ class ModuleController extends AbstractCrudController
 
     protected function getExistingObject()
     {
-        return ModuleQuery::create()
-            ->joinWithI18n($this->getCurrentEditionLocale())
-            ->findOneById($this->getRequest()->get('module_id'));
+        $module = ModuleQuery::create()
+            ->findOneById($this->getRequest()->get('module_id', 0));
+
+        if (null !== $module) {
+            $module->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $module;
     }
 
     protected function getObjectLabel($object)
