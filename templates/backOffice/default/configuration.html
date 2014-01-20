@@ -178,14 +178,6 @@
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/system-logs'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
-
-                                {loop type="auth" name="pcc9" role="ADMIN" resource="admin.configuration.update" access="VIEW"}
-                                    <tr>
-                                        <td><a href="{url path='/admin/configuration/update'}">{intl l='Update your Thelia'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/update'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-                                    </tr>
-                                {/loop}
-
                                 {module_include location='system_configuration_bottom'}
                             </table>
                         </div>

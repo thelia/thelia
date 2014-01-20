@@ -32,6 +32,9 @@
 	 						<form method="POST" action="{url path='/admin/configuration/store/save'}">
                                 {form_hidden_fields form=$form}
 
+                                {form_field form=$form field='success_url'}
+                                    <input type="hidden" name="{$name}" value="{url path='/admin/configuration'}">
+                                {/form_field}
                                 {include
                                     file = "includes/inner-form-toolbar.html"
                                     hide_flags = true

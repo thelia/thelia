@@ -121,9 +121,14 @@ class TaxController extends AbstractCrudController
 
     protected function getExistingObject()
     {
-        return TaxQuery::create()
-            ->joinWithI18n($this->getCurrentEditionLocale())
-            ->findOneById($this->getRequest()->get('tax_id'));
+        $tax = TaxQuery::create()
+            ->findOneById($this->getRequest()->get('tax_id', 0));
+
+        if (null !== $tax) {
+            $tax->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $tax;
     }
 
     protected function getObjectLabel($object)

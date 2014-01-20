@@ -62,7 +62,8 @@ class CustomerUpdateForm extends BaseForm
                 "label" => Translator::getInstance()->trans("Company"),
                 "label_attr" => array(
                     "for" => "company"
-                )
+                ),
+                "required" => false
             ))
             ->add("firstname", "text", array(
                 "constraints" => array(

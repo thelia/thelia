@@ -1,6 +1,7 @@
 #2.0.0-beta4
 - Tinymce is now a dedicated module. You need to activate it.
 - Fix PDF creation. Bug #180
+- Fix many translation issues.
 
 #2.0.0-beta3
 - Coupon effect inputs are now more customisable (input text, select, ajax, etc.. are usable) and unlimited amount of input for coupon effect are now possible too

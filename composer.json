@@ -57,5 +57,10 @@
             "": "local/modules/",
             "Thelia" : "core/lib/"
         }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.0-dev"
+        }
     }
 }

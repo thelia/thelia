@@ -137,9 +137,14 @@ class AttributeAvController extends AbstractCrudController
 
     protected function getExistingObject()
     {
-        return AttributeAvQuery::create()
-        ->joinWithI18n($this->getCurrentEditionLocale())
-        ->findOneById($this->getRequest()->get('attributeav_id'));
+        $attributeAv =  AttributeAvQuery::create()
+        ->findOneById($this->getRequest()->get('attributeav_id', 0));
+
+        if (null !== $attributeAv) {
+            $attribute->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $attributeAv;
     }
 
     protected function getObjectLabel($object)

@@ -141,9 +141,14 @@ class CurrencyController extends AbstractCrudController
 
     protected function getExistingObject()
     {
-        return CurrencyQuery::create()
-        ->joinWithI18n($this->getCurrentEditionLocale())
+        $currency =  CurrencyQuery::create()
         ->findOneById($this->getRequest()->get('currency_id'));
+
+        if (null !== $currency) {
+            $currency->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $currency;
     }
 
     protected function getObjectLabel($object)

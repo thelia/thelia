@@ -137,9 +137,14 @@ class FeatureAvController extends AbstractCrudController
 
     protected function getExistingObject()
     {
-        return FeatureAvQuery::create()
-        ->joinWithI18n($this->getCurrentEditionLocale())
-        ->findOneById($this->getRequest()->get('featureav_id'));
+        $featureAv = FeatureAvQuery::create()
+        ->findOneById($this->getRequest()->get('featureav_id', 0));
+
+        if (null !== $featureAv) {
+            $featureAv->setLocale($this->getCurrentEditionLocale());
+        }
+
+        return $featureAv;
     }
 
     protected function getObjectLabel($object)
