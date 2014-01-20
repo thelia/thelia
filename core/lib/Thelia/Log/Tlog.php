@@ -164,6 +164,8 @@ class Tlog Implements LoggerInterface
 
             $this->loadDestinations($this->destinations, $classes_destinations);
         }
+
+        return $this;
     }
 
     /**
@@ -184,48 +186,60 @@ class Tlog Implements LoggerInterface
      */
     public function setLevel($level)
     {
-            $this->level = $level;
+        $this->level = $level;
+
+        return $this;
     }
 
     public function setPrefix($prefixe)
     {
-            $this->prefixe = $prefixe;
+        $this->prefixe = $prefixe;
+
+        return $this;
     }
 
     public function setFiles($files)
     {
-            $this->files = explode(";", $files);
+        $this->files = explode(";", $files);
 
-            $this->all_files = in_array('*', $this->files);
+        $this->all_files = in_array('*', $this->files);
+
+        return $this;
     }
 
     public function setIp($ips)
     {
-            // isset($_SERVER['REMOTE_ADDR']) if we are in cli mode
-            if (! empty($ips) && isset($_SERVER['REMOTE_ADDR']) && ! in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) $this->level = self::MUET;
+        // isset($_SERVER['REMOTE_ADDR']) if we are in cli mode
+        if (! empty($ips) && isset($_SERVER['REMOTE_ADDR']) && ! in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) $this->level = self::MUET;
+
+        return $this;
     }
 
     public function setShowRedirect($bool)
     {
-            $this->show_redirect = $bool;
+        $this->show_redirect = $bool;
+
+        return $this;
     }
 
     // Configuration d'une destination
     public function setConfig($destination, $param, $valeur)
     {
-            if (isset($this->destinations[$destination])) {
-                    $this->destinations[$destination]->setConfig($param, $valeur);
-            }
+        if (isset($this->destinations[$destination])) {
+                $this->destinations[$destination]->setConfig($param, $valeur);
+        }
+
+        return $this;
     }
 
     // Configuration d'une destination
     public function getConfig($destination, $param)
     {
-            if (isset($this->destinations[$destination])) {
-                    return $this->destinations[$destination]->getConfig($param);
-            }
+        if (isset($this->destinations[$destination])) {
+                return $this->destinations[$destination]->getConfig($param);
+        }
 
-            return false;
+        return false;
     }
 
     // Methodes d'accès aux traces
@@ -510,14 +524,14 @@ class Tlog Implements LoggerInterface
      */
     public function write(&$res)
     {
-            $this->done = true;
+        $this->done = true;
 
-            // Muet ? On ne fait rien
-            if ($this->level == self::MUET) return;
+        // Muet ? On ne fait rien
+        if ($this->level == self::MUET) return;
 
-            foreach ($this->destinations as $dest) {
-                    $dest->write($res);
-            }
+        foreach ($this->destinations as $dest) {
+                $dest->write($res);
+        }
     }
 
     /**
@@ -650,11 +664,7 @@ class Tlog Implements LoggerInterface
     {
         $text = '';
 
-        /*if (is_array($message)) {
-            foreach ($message as $arg) {
-                $text .= is_scalar($arg) ? $arg : print_r($arg, true);
-            }
-        } else */ if (is_scalar($message) === false) {
+        if (is_scalar($message) === false) {
             $text = print_r($message, true);
         } else {
             $text = $message;
