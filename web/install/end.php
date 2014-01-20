@@ -67,14 +67,14 @@ $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
 
     <div class="well">
         <p class="lead text-center">
-            Thanks, you have installed Thelia
+            <?php echo $trans->trans('Thanks, you have installed Thelia'); ?>
         </p>
         <p class="lead text-center">
-            Don't forget to delete the web/install directory.
+            <?php echo $trans->trans('Don\'t forget to delete the web/install directory.'); ?>
         </p>
 
         <p class="lead text-center">
-            <a href="<?php echo $request->getSchemeAndHttpHost().$website_url; ?>/admin">Go to back office</a>
+            <a href="<?php echo $request->getSchemeAndHttpHost().$website_url; ?>/admin"><?php echo $trans->trans('Go to back office'); ?></a>
         </p>
 
     </div>

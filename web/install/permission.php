@@ -35,7 +35,7 @@ $_SESSION['install']['current_step'] = 'permission.php';
 $_SESSION['install']['step'] = 2;
 ?>
     <div class="well">
-        <p>Checking permissions</p>
+        <p><?php echo $trans->trans('Checking permissions'); ?></p>
         <ul class="list-unstyled list-group">
             <?php foreach($validationMessage as $item => $data): ?>
             <li class="list-group-item <?php if ($data['status']) {echo 'text-success';} else { echo 'text-danger';} ?>">
@@ -48,7 +48,7 @@ $_SESSION['install']['step'] = 2;
     </div>
     <div class="clearfix">
         <?php if($isValid){ ?>
-            <a href="connection.php" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> Continue</a>
+            <a href="connection.php" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('Continue'); ?></a>
         <?php } else { ?>
             <a href="permission.php" class="pull-right btn btn-default btn-danger"><span class="glyphicon glyphicon-refresh"></span> refresh</a>
         <?php } ?>
