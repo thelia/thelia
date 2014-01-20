@@ -85,7 +85,12 @@ class ConfigStoreController extends BaseAdminController
 
             $this->adminLogAppend(AdminResources::STORE, AccessManager::UPDATE, "Store configuration changed");
 
-            $this->redirectToRoute('admin.configuration.store.default');
+            if ($this->getRequest()->get('save_mode') == 'stay') {
+                $this->redirectToRoute('admin.configuration.store.default');
+            }
+
+            // Redirect to the success URL
+            $this->redirect($configStoreForm->getSuccessUrl());
 
         } catch (\Exception $ex) {
             $error_msg = $ex->getMessage();
