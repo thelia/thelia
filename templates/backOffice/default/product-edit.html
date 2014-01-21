@@ -154,7 +154,9 @@ $(function() {
     $('.nav-tabs a[data-href]').on('shown.bs.tab', function(ev) {
         var $this = $(this);
         $($this.attr('href')).load($this.data('href'), function(ev) {
-            eval($this.data('callback') + '();');
+            if($this.data('callback')) {
+                eval($this.data('callback') + '();');
+            }
         });
     });
 

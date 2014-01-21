@@ -159,7 +159,7 @@ abstract class BaseCachedFile extends BaseAction
         // Create directory (recursively) if it does not exists.
         if ($create_if_not_exists && !is_dir($path)) {
             if (!@mkdir($path, 0777, true)) {
-                throw new \RuntimeException(sprintf("Failed to create %s/%s file in cache directory",  $cache_base));
+                throw new \RuntimeException(sprintf("Failed to create %s file in cache directory",  $path));
             }
         }
 
