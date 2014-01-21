@@ -61,6 +61,8 @@ class TaxRuleEvent extends ActionEvent
     public function setDescription($description)
     {
         $this->description = $description;
+
+        return $this;
     }
 
     public function getDescription()
@@ -71,6 +73,8 @@ class TaxRuleEvent extends ActionEvent
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
     }
 
     public function getId()
@@ -81,6 +85,8 @@ class TaxRuleEvent extends ActionEvent
     public function setTitle($title)
     {
         $this->title = $title;
+
+        return $this;
     }
 
     public function getTitle()
@@ -91,6 +97,8 @@ class TaxRuleEvent extends ActionEvent
     public function setLocale($locale)
     {
         $this->locale = $locale;
+
+        return $this;
     }
 
     public function getLocale()
@@ -101,6 +109,8 @@ class TaxRuleEvent extends ActionEvent
     public function setCountryList($countryList)
     {
         $this->countryList = $countryList;
+
+        return $this;
     }
 
     public function getCountryList()
@@ -111,11 +121,12 @@ class TaxRuleEvent extends ActionEvent
     public function setTaxList($taxList)
     {
         $this->taxList = $taxList;
+
+        return $this;
     }
 
     public function getTaxList()
     {
         return $this->taxList;
     }
-
 }

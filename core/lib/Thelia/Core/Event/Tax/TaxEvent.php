@@ -61,6 +61,8 @@ class TaxEvent extends ActionEvent
     public function setDescription($description)
     {
         $this->description = $description;
+
+        return $this;
     }
 
     public function getDescription()
@@ -71,6 +73,8 @@ class TaxEvent extends ActionEvent
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
     }
 
     public function getId()
@@ -81,6 +85,8 @@ class TaxEvent extends ActionEvent
     public function setTitle($title)
     {
         $this->title = $title;
+
+        return $this;
     }
 
     public function getTitle()
@@ -91,6 +97,8 @@ class TaxEvent extends ActionEvent
     public function setLocale($locale)
     {
         $this->locale = $locale;
+
+        return $this;
     }
 
     public function getLocale()
@@ -101,6 +109,8 @@ class TaxEvent extends ActionEvent
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
     }
 
     public function getType()
@@ -111,6 +121,8 @@ class TaxEvent extends ActionEvent
     public function setRequirements($requirements)
     {
         $this->requirements = $requirements;
+
+        return $this;
     }
 
     public function getRequirements()
