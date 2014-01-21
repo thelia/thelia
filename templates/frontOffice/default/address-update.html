@@ -81,7 +81,7 @@
                         <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
                         <div class="control-input">
-                            <input type="text" name="{$name}" value="{$value|default:{$FIRSTNAME}}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder firstname"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            <input type="text" name="{$name}" value="{$value|default:{$FIRSTNAME} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder firstname"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
                                 {assign var="error_focus" value="true"}
@@ -97,7 +97,7 @@
                         <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
                         <div class="control-input">
-                            <input type="text" name="{$name}" value="{$value|default:{$LASTNAME}}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder lastname"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            <input type="text" name="{$name}" value="{$value|default:{$LASTNAME} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder lastname"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
                                 {assign var="error_focus" value="true"}
@@ -112,7 +112,7 @@
                         <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
                         <div class="control-input">
-                            <input type="text" name="{$name}" value="{$value|default:{$ADDRESS1}}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder address1"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            <input type="text" name="{$name}" value="{$value|default:{$ADDRESS1} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder address1"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
                                 {assign var="error_focus" value="true"}
@@ -127,7 +127,7 @@
                         <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if} </label>
 
                         <div class="control-input">
-                            <input type="text" name="{$name}" value="{$value|default:{$ADDRESS2}}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder address2"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            <input type="text" name="{$name}" value="{$value|default:{$ADDRESS2} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder address2"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
                                 {assign var="error_focus" value="true"}
@@ -157,7 +157,7 @@
                         <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
                         <div class="control-input">
-                            <input type="text" name="{$name}" value="{$value|default:{$CITY}}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder city"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            <input type="text" name="{$name}" value="{$value|default:{$CITY} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder city"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
                                 {assign var="error_focus" value="true"}
@@ -191,7 +191,7 @@
                         <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
                         <div class="control-input">
-                            <input type="text" name="{$name}" value="{$value|default:{$PHONE}}" id="{$label_attr.for}" class="form-control" maxlength="20" placeholder="{intl l="Placeholder phone"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            <input type="text" name="{$name}" value="{$value|default:{$PHONE} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="20" placeholder="{intl l="Placeholder phone"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
                                 {assign var="error_focus" value="true"}
@@ -206,7 +206,7 @@
                         <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
                         <div class="control-input">
-                            <input type="text" name="{$name}" value="{$value|default:{$CELLPHONE}}" id="{$label_attr.for}" class="form-control" maxlength="20" placeholder="{intl l="Placeholder cellphone"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            <input type="text" name="{$name}" value="{$value|default:{$CELLPHONE} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="20" placeholder="{intl l="Placeholder cellphone"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
                                 {assign var="error_focus" value="true"}
