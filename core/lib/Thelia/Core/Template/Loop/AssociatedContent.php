@@ -163,8 +163,9 @@ class AssociatedContent extends Content
             $relatedContentId = $loopResultRow->get('ID');
 
             $loopResultRow
-                ->set("ID"      , $this->contentId[$relatedContentId])
-                ->set("POSITION", $this->contentPosition[$relatedContentId])
+                ->set("ID"        , $this->contentId[$relatedContentId])
+                ->set("CONTENT_ID", $relatedContentId)
+                ->set("POSITION"  , $this->contentPosition[$relatedContentId])
             ;
         }
 
