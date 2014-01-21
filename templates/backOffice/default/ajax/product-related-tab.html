@@ -82,10 +82,10 @@
 		                <tbody>
 		                    {loop name="assigned_contents" type="associated_content" product="$product_id" backend_context="1" lang="$edit_language_id"}
 		                    <tr>
-		                        <td>{$ID}</td>
+		                        <td>{$CONTENT_ID}</td>
 
 		                        <td>
-		                            {$TITLE}
+		                            <a href="{url path="/admin/content/update/{$CONTENT_ID}"}">{$TITLE}</a>
 		                        </td>
 
 		                         <td class="text-center">
