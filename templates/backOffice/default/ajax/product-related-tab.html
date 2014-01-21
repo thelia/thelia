@@ -226,7 +226,7 @@
 		                        <td class="actions">
 		                            <div class="btn-group">
 		                                {loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
-		                                   <a class="btn btn-default btn-xs delete-accessory" title="{intl l='Delete this accessory'}" href="#delete_accessory_dialog" data-id="{$ID}" data-toggle="modal">
+		                                   <a class="btn btn-default btn-xs delete-accessory" title="{intl l='Delete this accessory'}" href="#delete_accessory_dialog" data-id="{$ACCESSORY_ID}" data-toggle="modal">
 		                                    <span class="glyphicon glyphicon-trash"></span>
 		                                   </a>
 		                                {/loop}
@@ -523,7 +523,7 @@ $(function() {
 
     $('.accessoryPositionChange').editable({
         type        : 'text',
-        title       : '{intl l="Enter new accessory position"}',
+        title       : "{intl l="Enter new accessory position"}",
         mode        : 'popup',
         inputclass  : 'input-mini',
         placement   : 'left',
@@ -541,7 +541,7 @@ $(function() {
 
     $('.contentPositionChange').editable({
         type        : 'text',
-        title       : '{intl l="Enter new content position"}',
+        title       : "{intl l="Enter new content position"}",
         mode        : 'popup',
         inputclass  : 'input-mini',
         placement   : 'left',
