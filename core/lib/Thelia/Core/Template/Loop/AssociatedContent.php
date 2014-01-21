@@ -166,6 +166,7 @@ class AssociatedContent extends Content
                 ->set("ID"        , $this->contentId[$relatedContentId])
                 ->set("CONTENT_ID", $relatedContentId)
                 ->set("POSITION"  , $this->contentPosition[$relatedContentId])
+
             ;
         }
 
