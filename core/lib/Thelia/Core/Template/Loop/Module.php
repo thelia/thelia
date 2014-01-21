@@ -194,21 +194,33 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
             $hasConfigurationInterface = false;
 
-            /* first test if module defines it's own config route */
-            $routerId = "router." . $module->getBaseDir();
-            if ($this->container->has($routerId)) {
-                try {
-                    if ($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
+
+            /* first test if module defines it's own config route  */
+            if ($module->getActivate()) {
+                // Works only fo activated modules - see Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass
+                $routerId = "router." . $module->getBaseDir();
+                if ($this->container->has($routerId)) {
+                    try {
+                        if ($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
+                            $hasConfigurationInterface = true;
+                        }
+                    } catch (ResourceNotFoundException $e) {
+                        /* $hasConfigurationInterface stays false */
+                    }
+                }
+
+                /* if not ; test if it uses admin inclusion : module_configuration.html */
+                if (false === $hasConfigurationInterface) {
+                    if (file_exists( sprintf("%s/AdminIncludes/%s.html", $module->getAbsoluteBaseDir(), "module_configuration"))) {
                         $hasConfigurationInterface = true;
                     }
-                } catch (ResourceNotFoundException $e) {
-                    /* $hasConfigurationInterface stays false */
                 }
             }
+            else {
+                // Make a quick and dirty test on the module's routing.xml file
+                $routing = @file_get_contents($module->getAbsoluteBaseDir() . DS . "Config" . DS . "routing.xml");
 
-            /* if not ; test if it uses admin inclusion : module_configuration.html */
-            if (false === $hasConfigurationInterface) {
-                if (file_exists( sprintf("%s/AdminIncludes/%s.html", $module->getAbsoluteBaseDir(), "module_configuration"))) {
+                if ($routing && strpos($routing, '/admin/module/') !== false) {
                     $hasConfigurationInterface = true;
                 }
             }
