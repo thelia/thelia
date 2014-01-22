@@ -20,40 +20,50 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\TaxEngine\TaxType;
+namespace Thelia\TaxEngine;
 
-use Thelia\Type\FloatType;
-use Thelia\Core\Translation\Translator;
-use Thelia\TaxEngine\BaseTaxType;
-use Thelia\TaxEngine\TaxTypeRequirementDefinition;
+use Thelia\Type\TypeInterface;
 
 /**
+ * This class defines a Tax type requirement
  *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
+ * @author Franck Allimant <franck@cqfdev.fr>
  */
-class FixAmountTaxType extends BaseTaxType
+class TaxTypeRequirementDefinition
 {
-    public function setAmount($amount) {
-        $this->setRequirement('amount', $amount);
+    /**
+     * @var string The requirement name
+     */
+    protected $name;
 
-        return $this;
+    /**
+     * @var TypeInterface The requirement type
+     */
+    protected $type;
+
+    /**
+     * Create a new Tax type requirement
+     *
+     * @param string $name the name of the requirement
+     * @param TypeInterface $type the type of the data
+     */
+    public function __construct($name, TypeInterface $type)
+    {
+        $this->name = $name;
+        $this->type = $type;
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
+    public function getName()
     {
-        return $this->getRequirement("amount");
+        return $this->name;
     }
 
-    public function getRequirementsDefinition()
+    public function getType()
     {
-        return array(
-            new TaxTypeRequirementDefinition('amount', new FloatType())
-        );
+        return $this->type;
     }
 
-    public function getTitle()
-    {
-        return Translator::getInstance()->trans("Constant amount");
+    public function isValueValid($value) {
+        return $this->type->isValid($value);
     }
 }

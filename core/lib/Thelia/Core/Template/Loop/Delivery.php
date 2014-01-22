@@ -60,7 +60,7 @@ class Delivery extends BaseSpecificModule
                 throw new \InvalidArgumentException('Cannot found country id: `' . $countryId . '` in delivery loop');
             }
         } else {
-            $country = TaxEngine::getInstance($this->request->getSession())->getDeliveryCountry();
+            $country = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
         }
 
         foreach ($loopResult->getResultDataCollection() as $deliveryModule) {

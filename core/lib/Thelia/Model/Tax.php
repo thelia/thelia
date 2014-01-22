@@ -5,11 +5,22 @@ namespace Thelia\Model;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Base\Tax as BaseTax;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
-use Thelia\TaxEngine\TaxType\BaseTaxType;
+use Thelia\TaxEngine\BaseTaxType;
 
 class Tax extends BaseTax
 {
     use ModelEventDispatcherTrait;
+
+    /**
+     * Provides a form-and-javascript-safe version of the type, which is a fully qualified classname, with \
+     */
+    public static function escapeTypeName($name) {
+        return str_replace('\\', '-', $name);
+    }
+
+    public static function unescapeTypeName($name) {
+        return str_replace('-', '\\', $name);
+    }
 
     public function calculateTax($amount)
     {
@@ -39,7 +50,7 @@ class Tax extends BaseTax
 
     public function getTypeInstance()
     {
-        $class = '\\Thelia\\TaxEngine\\TaxType\\' . $this->getType();
+        $class = $this->getType();
 
         /* test type */
         if(!class_exists($class)) {

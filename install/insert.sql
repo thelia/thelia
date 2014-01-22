@@ -1193,8 +1193,8 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 
 INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `updated_at`)
   VALUES
-  (1, 'PricePercentTaxType', 'eyJwZXJjZW50IjoiMjAifQ==', NOW(), NOW()),
-  (2, 'PricePercentTaxType', 'eyJwZXJjZW50IjoiMTAifQ==', NOW(), NOW());
+  (1, 'Thelia\\TaxEngine\\TaxType\\PricePercentTaxType', 'eyJwZXJjZW50IjoiMjAifQ==', NOW(), NOW()),
+  (2, 'Thelia\\TaxEngine\\TaxType\\PricePercentTaxType', 'eyJwZXJjZW50IjoiMTAifQ==', NOW(), NOW());
 
 INSERT INTO `tax_i18n` (`id`, `locale`, `title`)
   VALUES

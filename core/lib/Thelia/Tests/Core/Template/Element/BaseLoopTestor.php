@@ -30,6 +30,7 @@ use Thelia\Core\Security\SecurityContext;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Tools\URL;
+use Thelia\TaxEngine\TaxEngine;
 
 /**
  *
@@ -108,6 +109,7 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
         $this->container->set('thelia.securityContext', new SecurityContext($request));
         $this->container->set('router.admin', $stubRouterAdmin);
         $this->container->set('thelia.url.manager', new URL($this->container));
+        $this->container->set('thelia.taxEngine', new TaxEngine($request));
 
         $this->instance = $this->getTestedInstance();
         $this->instance->initializeArgs($this->getMandatoryArguments());

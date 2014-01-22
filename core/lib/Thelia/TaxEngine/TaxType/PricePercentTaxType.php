@@ -23,6 +23,9 @@
 namespace Thelia\TaxEngine\TaxType;
 
 use Thelia\Type\FloatType;
+use Thelia\Core\Translation\Translator;
+use Thelia\TaxEngine\TaxTypeRequirementDefinition;
+use Thelia\TaxEngine\BaseTaxType;
 
 /**
  *
@@ -31,25 +34,26 @@ use Thelia\Type\FloatType;
  */
 class PricePercentTaxType extends BaseTaxType
 {
+    public function setPercentage($percent) {
+        $this->setRequirement('percent', $percent);
+
+        return $this;
+    }
+
     public function pricePercentRetriever()
     {
         return ($this->getRequirement("percent") * 0.01);
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
-    {
-        return 0;
-    }
-
-    public function getRequirementsList()
+    public function getRequirementsDefinition()
     {
         return array(
-            'percent' => new FloatType(),
+            new TaxTypeRequirementDefinition('percent', new FloatType())
         );
     }
 
     public function getTitle()
     {
-        return "Price % Tax";
+        return Translator::getInstance()->trans("Percentage of the product price");
     }
 }

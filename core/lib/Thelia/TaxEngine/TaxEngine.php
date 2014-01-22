@@ -25,74 +25,94 @@ namespace Thelia\TaxEngine;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CountryQuery;
+use Thelia\Core\HttpFoundation\Request;
 
 /**
  * Class TaxEngine
+ *
  * @package Thelia\TaxEngine
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class TaxEngine
 {
-    protected static $instance = null;
+    protected $taxCountry = null;
+    protected $typeList = null;
 
-    protected static $taxCountry = null;
+    protected $taxTypesDirectories = array();
 
     /**
      * @var Session $session
      */
     protected $session = null;
 
-    public static function getInstance(Session $session = null)
+    public function __construct(Request $request)
     {
-        if (null === self::$instance) {
-            self::$instance = new TaxEngine();
-        }
+        $this->session = $request->getSession();
 
-        if (null !== self::$instance) {
-            self::$instance->setSession($session);
-        }
-
-        return self::$instance;
+        // Intialize the defaults Tax Types
+        $this->taxTypesDirectories['Thelia\\TaxEngine\\TaxType'] = __DIR__ . DS . "TaxType";
     }
 
-    protected function setSession(Session $session)
-    {
-        $this->session = $session;
+    /**
+     * Add a directroy which contains tax types classes. The tax engine
+     * will scan this directory, and add all the tax type classes.
+     *
+     * @param unknown $namespace the namespace of the classes in the directory
+     * @param unknown $path_to_tax_type_classes the path to the directory
+     */
+    public function addTaxTypeDirectory($namespace, $path_to_tax_type_classes) {
+        $this->taxTypesDirectories[$namespace] = $path_to_tax_type_classes;
     }
 
-    private function getTaxTypeDirectory()
-    {
-        return __DIR__ . "/TaxType";
+    /**
+     * Add a tax type to the current list.
+     *
+     * @param unknown $fullyQualifiedclassName the fully qualified classname, su chas MyTaxes\Taxes\MyTaxType
+     *
+     */
+    public function addTaxType($fullyQualifiedclassName) {
+        $this->typeList[] = $fullyQualifiedclassName;
     }
 
     public function getTaxTypeList()
     {
-        $typeList = array();
+        if ($this->typeList === null) {
 
-        try {
-            $directoryBrowser = new \DirectoryIterator($this->getTaxTypeDirectory($this->getTaxTypeDirectory()));
-        } catch (\UnexpectedValueException $e) {
-            return $typeList;
+            $this->typeList = array();
+
+            foreach($this->taxTypesDirectories as $namespace => $directory) {
+
+                try {
+                    $directoryIterator = new \DirectoryIterator($directory);
+
+                    foreach ($directoryIterator as $fileinfo) {
+
+                        if ($fileinfo->isFile()) {
+
+                            $fileName  = $fileinfo->getFilename();
+                            $className = substr($fileName, 0, (1+strlen($fileinfo->getExtension())) * -1);
+
+                            try {
+                                $fullyQualifiedClassName = "$namespace\\$className";
+
+                                $instance = new $fullyQualifiedClassName;
+
+                                if ($instance instanceof BaseTaxType) {
+                                    $this->addTaxType(get_class($instance));
+                                }
+                            }
+                            catch (\Exception $ex) {
+                                // Nothing special to do
+                            }
+                        }
+                    }
+                } catch (\UnexpectedValueException $e) {
+                    // Nothing special to do
+                }
+            }
         }
 
-        /* browse the directory */
-        foreach ($directoryBrowser as $directoryContent) {
-            /* is it a file ? */
-            if (!$directoryContent->isFile()) {
-                continue;
-            }
-
-            $fileName = $directoryContent->getFilename();
-            $className = substr($fileName, 0, (1+strlen($directoryContent->getExtension())) * -1);
-
-            if ($className == "BaseTaxType") {
-                continue;
-            }
-
-            $typeList[] = $className;
-        }
-
-        return $typeList;
+        return $this->typeList;
     }
 
     /**
@@ -100,30 +120,30 @@ class TaxEngine
      * First look for a picked delivery address country
      * Then look at the current customer default address country
      * Else look at the default website country
-     *
-     * @param  bool           $force result is static cached ; even if a below parameter change between 2 calls, we need to keep coherent results. but you can force it.
+
      * @return null|TaxEngine
      */
-    public function getDeliveryCountry($force = false)
+    public function getDeliveryCountry()
     {
-        if (false === $force || null === self::$taxCountry) {
+        if (null === $this->taxCountry) {
+
             /* is there a logged in customer ? */
             if (null !== $customer = $this->session->getCustomerUser()) {
                 if (null !== $this->session->getOrder()
                         && null !== $this->session->getOrder()->chosenDeliveryAddress
                         && null !== $currentDeliveryAddress = AddressQuery::create()->findPk($this->session->getOrder()->chosenDeliveryAddress)) {
-                    $taxCountry = $currentDeliveryAddress->getCountry();
+                    $this->taxCountry = $currentDeliveryAddress->getCountry();
                 } else {
                     $customerDefaultAddress = $customer->getDefaultAddress();
-                    $taxCountry = $customerDefaultAddress->getCountry();
+                    $this->taxCountry = $customerDefaultAddress->getCountry();
                 }
-            } else {
-                $taxCountry = CountryQuery::create()->findOneByByDefault(1);
             }
 
-            self::$taxCountry = $taxCountry;
+            if (null == $this->taxCountry) {
+                $this->taxCountry = CountryQuery::create()->findOneByByDefault(1);
+            }
         }
 
-        return self::$taxCountry;
+        return $this->taxCountry;
     }
 }

@@ -12,6 +12,7 @@
     </parameters>
 
     <services>
+
         <!--  URL maganement -->
         <service id="thelia.url.manager" class="Thelia\Tools\URL">
             <argument type="service" id="service_container" />
@@ -35,6 +36,13 @@
             <argument type="service" id="esi" />
             <argument type="service" id="fragment.renderer.inline" />
         </service>
+
+        <!-- Tax engine -->
+
+        <service id="thelia.taxEngine" class="Thelia\TaxEngine\TaxEngine" scope="request">
+            <argument type="service" id="request" />
+        </service>
+
 		<!--
 		A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
 		thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)

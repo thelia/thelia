@@ -28,6 +28,8 @@ use Thelia\Core\Form\Type\TheliaType;
 use Thelia\Core\Translation\Translator;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\TaxEngine\TaxType;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Model\Tax;
 
 /**
  * Class TaxCreationForm
@@ -40,14 +42,21 @@ class TaxCreationForm extends BaseForm
 
     protected function buildForm($change_mode = false)
     {
-        $types = TaxEngine::getInstance($this->getRequest()->getSession())->getTaxTypeList();
+        // FIXME : SHOULD be extracted from the container
+        $taxEngine = new TaxEngine($this->getRequest());
+
+        $types = $taxEngine->getTaxTypeList();
+
         $typeList = array();
         $requirementList = array();
-        foreach ($types as $type) {
-            $classPath = "\\Thelia\\TaxEngine\\TaxType\\$type";
-            $instance = new $classPath();
-            $typeList[$type] = $instance->getTitle();
-            $requirementList[$type] = $instance->getRequirementsList();
+
+        foreach ($types as $classname) {
+
+            $instance = new $classname();
+
+            $typeList[Tax::escapeTypeName($classname)] = $instance->getTitle();
+
+            $requirementList[$classname] = $instance->getRequirementsDefinition();
         }
 
         $this->formBuilder
@@ -65,27 +74,29 @@ class TaxCreationForm extends BaseForm
             ))
         ;
 
-        foreach ($requirementList as $type => $requirements) {
-            foreach ($requirements as $name => $requirementType) {
+        foreach ($requirementList as $name => $requirements) {
+            foreach ($requirements as $requirement) {
                 $this->formBuilder
-                    ->add($type . ':' . $name, new TheliaType(), array(
-                        //"instance" => $requirementType,
+                    // Replace the '\' in the class name by hyphens
+                    // See TaxController::getRequirements if some changes are made about this.
+                    ->add(Tax::escapeTypeName($name) . ':' . $requirement->getName(), new TheliaType(), array(
+                        //"instance" => $requirement->getType(),
                         "constraints" => array(
                             new Constraints\Callback(
                                 array(
                                     "methods" => array(
-                                        array($requirementType, "verifyForm"),
+                                        array($requirement->getType(), "verifyForm"),
                                     ),
                                 )
                             ),
                         ),
                         "attr" => array(
                             "tag" => "requirements",
-                            "tax_type" => $type,
+                            "tax_type" => Tax::escapeTypeName($name),
                         ),
-                        "label" => Translator::getInstance()->trans($name),
-                        "type" => $requirementType->getFormType(),
-                        "options" => $requirementType->getFormOptions(),
+                        "label" => Translator::getInstance()->trans($requirement->getName()),
+                        "type" => $requirement->getType()->getFormType(),
+                        "options" => $requirement->getType()->getFormOptions(),
                     ))
                 ;
             }

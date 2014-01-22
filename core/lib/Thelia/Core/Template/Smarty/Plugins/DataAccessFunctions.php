@@ -58,15 +58,17 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     protected $parserContext;
     protected $request;
     protected $dispatcher;
+    protected $taxEngine;
 
     private static $dataAccessCache = array();
 
-    public function __construct(Request $request, SecurityContext $securityContext, ParserContext $parserContext, ContainerAwareEventDispatcher $dispatcher)
+    public function __construct(Request $request, SecurityContext $securityContext, TaxEngine $taxEngine, ParserContext $parserContext, ContainerAwareEventDispatcher $dispatcher)
     {
         $this->securityContext = $securityContext;
         $this->parserContext = $parserContext;
         $this->request = $request;
         $this->dispatcher = $dispatcher;
+        $this->taxEngine = $taxEngine;
     }
 
     /**
@@ -184,7 +186,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         if (array_key_exists('currentCountry', self::$dataAccessCache)) {
             $taxCountry = self::$dataAccessCache['currentCountry'];
         } else {
-            $taxCountry = TaxEngine::getInstance($this->request->getSession())->getDeliveryCountry();
+            $taxCountry = $this->taxEngine->getDeliveryCountry();
             self::$dataAccessCache['currentCountry'] = $taxCountry;
         }
 
@@ -378,12 +380,17 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             self::$dataAccessCache['data_' . $objectLabel] = $data;
         }
 
-        $noGetterData = array();
-        foreach ($columns as $column) {
-            $noGetterData[$column] = $data->getVirtualColumn('i18n_' . $column);
+        if ($data !== null) {
+            $noGetterData = array();
+
+            foreach ($columns as $column) {
+                $noGetterData[$column] = $data->getVirtualColumn('i18n_' . $column);
+            }
+
+            return $this->dataAccess($objectLabel, $params, $data, $noGetterData);
         }
 
-        return $this->dataAccess($objectLabel, $params, $data, $noGetterData);
+        return '';
     }
 
     /**

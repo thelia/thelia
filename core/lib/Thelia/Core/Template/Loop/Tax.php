@@ -150,6 +150,7 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow
                 ->set("ID"                      , $tax->getId())
                 ->set("TYPE"                    , $tax->getType())
+                ->set("ESCAPED_TYPE"            , \Thelia\Model\Tax::escapeTypeName($tax->getType()))
                 ->set("REQUIREMENTS"            , $tax->getRequirements())
                 ->set("IS_TRANSLATED"           , $tax->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE"                  , $this->locale)

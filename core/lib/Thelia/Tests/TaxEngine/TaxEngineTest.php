@@ -1,4 +1,5 @@
 <?php
+use Thelia\TaxEngine\TaxEngine;
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
@@ -20,40 +21,41 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\TaxEngine\TaxType;
 
-use Thelia\Type\FloatType;
-use Thelia\Core\Translation\Translator;
-use Thelia\TaxEngine\BaseTaxType;
-use Thelia\TaxEngine\TaxTypeRequirementDefinition;
+namespace Thelia\Tests\TaxEngine;
+
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\TaxEngine\TaxEngine;
+
 
 /**
  *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * @author Franck Allimant <franck@cqfdev.fr>
  *
  */
-class FixAmountTaxType extends BaseTaxType
+class TaxEngineTest extends \PHPUnit_Framework_TestCase
 {
-    public function setAmount($amount) {
-        $this->setRequirement('amount', $amount);
+    protected $request;
 
-        return $this;
+    public function setUp()
+    {
+        $this->request = new Request();
+
+        $this->request->setSession(new Session(new MockArraySessionStorage()));
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
+    /**
+      */
+    public function testGetTaxTypeList()
     {
-        return $this->getRequirement("amount");
-    }
+        $taxEngine = new TaxEngine($this->request);
 
-    public function getRequirementsDefinition()
-    {
-        return array(
-            new TaxTypeRequirementDefinition('amount', new FloatType())
-        );
-    }
+        $list = $taxEngine->getTaxTypeList();
 
-    public function getTitle()
-    {
-        return Translator::getInstance()->trans("Constant amount");
+        $this->assertEquals($list[0], "Thelia\TaxEngine\TaxType\FeatureFixAmountTaxType");
+        $this->assertEquals($list[1], "Thelia\TaxEngine\TaxType\FixAmountTaxType");
+        $this->assertEquals($list[2], "Thelia\TaxEngine\TaxType\PricePercentTaxType");
     }
 }

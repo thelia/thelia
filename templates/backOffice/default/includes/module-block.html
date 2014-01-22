@@ -9,6 +9,16 @@
                 <th>
                 {admin_sortable_header
                    current_order=$module_order
+                   order='id'
+                   reverse_order='id_reverse'
+                   path={url path='/admin/modules'}
+                   request_parameter_name='module_order'
+                   label="{intl l='ID'}"
+                }
+                </th>
+                <th>
+                {admin_sortable_header
+                   current_order=$module_order
                    order='alpha'
                    reverse_order='alpha_reverse'
                    path={url path='/admin/modules'}
@@ -70,6 +80,7 @@
             <tbody>
             {loop type="module" name="module.{$module_type}" module_type={$module_type|default:1} order=$module_order backend_context=1}
                 <tr>
+                    <td>{$ID}</td>
                     <td>{$TITLE}</td>
                     <td>{$CODE}</td>
                     <td>{$CHAPO}</td>
@@ -103,7 +114,7 @@
 
                     <td class="text-right">
                         <div class="btn-group">
-                            {if $CONFIGURABLE == 1}
+                            C:{if $CONFIGURABLE == 1}1
                                 {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
                                     <a class="{if ! $ACTIVE}disabled {/if} btn btn-primary btn-xs" id="config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/$CODE"}">{intl l="Configure"}</a>
                                 {/loop}

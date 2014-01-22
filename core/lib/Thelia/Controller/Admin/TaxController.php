@@ -29,6 +29,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\TaxCreationForm;
 use Thelia\Form\TaxModificationForm;
 use Thelia\Model\TaxQuery;
+use Thelia\Model\Tax;
 
 class TaxController extends AbstractCrudController
 {
@@ -49,7 +50,9 @@ class TaxController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new TaxCreationForm($this->getRequest());
+        $form = new TaxCreationForm($this->getRequest());
+
+        return $form;
     }
 
     protected function getUpdateForm()
@@ -64,7 +67,7 @@ class TaxController extends AbstractCrudController
         $event->setLocale($formData['locale']);
         $event->setTitle($formData['title']);
         $event->setDescription($formData['description']);
-        $event->setType($formData['type']);
+        $event->setType(Tax::unescapeTypeName($formData['type']));
         $event->setRequirements($this->getRequirements($formData['type'], $formData));
 
         return $event;
@@ -78,7 +81,7 @@ class TaxController extends AbstractCrudController
         $event->setId($formData['id']);
         $event->setTitle($formData['title']);
         $event->setDescription($formData['description']);
-        $event->setType($formData['type']);
+        $event->setType(Tax::unescapeTypeName($formData['type']));
         $event->setRequirements($this->getRequirements($formData['type'], $formData));
 
         return $event;
@@ -107,7 +110,7 @@ class TaxController extends AbstractCrudController
             'locale'       => $object->getLocale(),
             'title'        => $object->getTitle(),
             'description'  => $object->getDescription(),
-            'type'         => $object->getType(),
+            'type'         => Tax::escapeTypeName($object->getType()),
         );
 
         // Setup the object form
@@ -200,27 +203,20 @@ class TaxController extends AbstractCrudController
         );
     }
 
-    protected function checkRequirements($formData)
-    {
-        $type = $formData['type'];
-
-    }
-
     protected function getRequirements($type, $formData)
     {
         $requirements = array();
         foreach ($formData as $data => $value) {
+
             if (!strstr($data, ':')) {
                 continue;
             }
 
             $couple = explode(':', $data);
 
-            if (count($couple) != 2 || $couple[0] != $type) {
-                continue;
+            if (count($couple) == 2 && $couple[0] == $type) {
+                $requirements[$couple[1]] = $value;
             }
-
-            $requirements[$couple[1]] = $value;
         }
 
         return $requirements;

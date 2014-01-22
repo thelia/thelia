@@ -79,7 +79,7 @@
                             <div class="form-group">
                                 <select name="{$name}" class="js-change-tax-type" data-toggle="selectpicker">
                                     {foreach $choices as $choice}
-                                        <option value="{$choice->value}" {if !$form_error && $choice->value == $TYPE || $form_error && $choice->value == $value}selected="selected" {/if}>{$choice->label}</option>
+                                        <option value="{$choice->value}" {if !$form_error && $choice->value == $ESCAPED_TYPE || $form_error && $choice->value == $value}selected="selected" {/if}>{$choice->label}</option>
                                     {/foreach}
                                 </select>
                             </div>
@@ -89,19 +89,19 @@
                     {/form_field}
 
                     {form_tagged_fields form=$form tag='requirements'}
-                        <div class="form-group {if $error}has-error{/if} js-tax-requirements" data-tax-type="{$attr_list.tax_type}" {if !$form_error && $attr_list.tax_type != $TYPE || $form_error && $attr_list.tax_type != $typeValue}style="display: none"{/if}>
+                        <div class="form-group {if $error}has-error{/if} js-tax-requirements" data-tax-type="{$attr_list.tax_type}" {if !$form_error && $attr_list.tax_type != $ESCAPED_TYPE || $form_error && $attr_list.tax_type != $typeValue}style="display: none"{/if}>
                             <label for="{$label_attr.for}" class="control-label">
                                 {intl l=$label}
                             </label>
                             {if $formType == 'choice'}
-                                <select name="{$name}" data-toggle="selectpicker" {if !$form_error && $attr_list.tax_type != $TYPE || $form_error && $attr_list.tax_type != $typeValue}disabled="disabled"{/if}>
+                                <select name="{$name}" data-toggle="selectpicker" {if !$form_error && $attr_list.tax_type != $ESCAPED_TYPE || $form_error && $attr_list.tax_type != $typeValue}disabled="disabled"{/if}>
                                     {foreach $choices as $choice}
                                         <option value="{$choice->value}" {if !$form_error && $REQUIREMENTS.$label == $choice->value || $form_error && $value == $choice->value}selected="selected" {/if}>{$choice->label}</option>
                                     {/foreach}
                                 </select>
                             {/if}
                             {if $formType == 'text'}
-                                <input type="text" {if !$form_error && $attr_list.tax_type != $TYPE || $form_error && $attr_list.tax_type != $typeValue}disabled="disabled"{/if} id="{$label_attr.for}" name="{$name}" required="required" class="form-control" value="{if $form_error}{$value}{else}{$REQUIREMENTS.$label}{/if}">
+                                <input type="text" {if !$form_error && $attr_list.tax_type != $ESCAPED_TYPE || $form_error && $attr_list.tax_type != $typeValue}disabled="disabled"{/if} id="{$label_attr.for}" name="{$name}" required="required" class="form-control" value="{if $form_error}{$value}{else}{$REQUIREMENTS.$label}{/if}">
                             {/if}
                         </div>
                     {/form_tagged_fields}

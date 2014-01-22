@@ -27,6 +27,9 @@ use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\Product;
 use Thelia\Type\FloatType;
 use Thelia\Type\ModelValidIdType;
+use Thelia\Core\Translation\Translator;
+use Thelia\TaxEngine\BaseTaxType;
+use Thelia\TaxEngine\TaxTypeRequirementDefinition;
 
 /**
  *
@@ -35,9 +38,10 @@ use Thelia\Type\ModelValidIdType;
  */
 class FeatureFixAmountTaxType extends BaseTaxType
 {
-    public function pricePercentRetriever()
-    {
-        return 0;
+    public function setFeature($featureId) {
+        $this->setRequirement('feature', $featureId);
+
+        return $this;
     }
 
     public function fixAmountRetriever(Product $product)
@@ -53,21 +57,24 @@ class FeatureFixAmountTaxType extends BaseTaxType
 
         $testInt = new FloatType();
         if (!$testInt->isValid($taxAmount)) {
-            throw new TaxEngineException('Feature value does not match FLOAT format', TaxEngineException::FEATURE_BAD_EXPECTED_VALUE);
+            throw new TaxEngineException(
+                    Translator::getInstance()->trans('Feature value does not match FLOAT format'),
+                    TaxEngineException::FEATURE_BAD_EXPECTED_VALUE
+            );
         }
 
         return $taxAmount;
     }
 
-    public function getRequirementsList()
+    public function getRequirementsDefinition()
     {
         return array(
-            'feature' => new ModelValidIdType('Feature'),
+            new TaxTypeRequirementDefinition('feature', new ModelValidIdType('Feature'))
         );
     }
 
     public function getTitle()
     {
-        return "Fix amount Tax depending on a feature";
+        return Translator::getInstance()->trans("Constant amount found in one of the product's feature");
     }
 }
