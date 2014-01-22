@@ -23,8 +23,8 @@
 
 namespace Thelia\Core\Event\ProductSaleElement;
 
-use Thelia\Model\ProductSaleElement;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\ProductSaleElements;
 
 class ProductSaleElementEvent extends ActionEvent
 {
@@ -45,7 +45,7 @@ class ProductSaleElementEvent extends ActionEvent
         return $this->product_sale_element;
     }
 
-    public function setProductSaleElement(ProductSaleElement $product_sale_element)
+    public function setProductSaleElement(ProductSaleElements $product_sale_element)
     {
         $this->product_sale_element = $product_sale_element;
 

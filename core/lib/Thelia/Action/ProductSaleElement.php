@@ -94,6 +94,8 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 }
             }
 
+            $event->setProductSaleElement($salesElement);
+
             // Store all the stuff !
             $con->commit();
         } catch (\Exception $ex) {
