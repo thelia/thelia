@@ -74,7 +74,6 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      */
     public function update(AttributeUpdateEvent $event)
     {
-        $search = AttributeQuery::create();
 
         if (null !== $attribute = AttributeQuery::create()->findPk($event->getAttributeId())) {
 

@@ -38,8 +38,6 @@ class TranslationsController extends BaseAdminController
 {
     protected function renderTemplate()
     {
-        // Find modules
-        $modules = ModuleQuery::create()->joinI18n($this->getCurrentEditionLocale())->orderByPosition()->find();
 
         // Get related strings, if all input data are here
         $item_to_translate = $this->getRequest()->get('item_to_translate');

@@ -66,7 +66,6 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
      */
     public function update(FeatureAvUpdateEvent $event)
     {
-        $search = FeatureAvQuery::create();
 
         if (null !== $feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId())) {
 

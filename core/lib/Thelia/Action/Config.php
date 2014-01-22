@@ -58,7 +58,6 @@ class Config extends BaseAction implements EventSubscriberInterface
      */
     public function setValue(ConfigUpdateEvent $event)
     {
-        $search = ConfigQuery::create();
 
         if (null !== $config = $search->findPk($event->getConfigId())) {
 
@@ -78,7 +77,6 @@ class Config extends BaseAction implements EventSubscriberInterface
      */
     public function modify(ConfigUpdateEvent $event)
     {
-        $search = ConfigQuery::create();
 
         if (null !== $config = ConfigQuery::create()->findPk($event->getConfigId())) {
 

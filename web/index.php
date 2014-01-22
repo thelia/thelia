@@ -1,5 +1,5 @@
 <?php
-use Thelia\Core\HttpKernel\HttpCache\HttpCache;
+//use Thelia\Core\HttpKernel\HttpCache\HttpCache;
 use Thelia\Core\Thelia;
 use Thelia\Core\HttpFoundation\Request;
 

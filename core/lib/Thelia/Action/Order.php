@@ -334,7 +334,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             // Build subject and body
             $message->build($parser, $instance);
 
-            $mail = $this->getMailer()->send($instance);
+            $this->getMailer()->send($instance);
         }
     }
 

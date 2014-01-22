@@ -56,7 +56,7 @@ class UpdateCommand extends ContainerAwareCommand
         $update = new Update();
 
         try {
-            $updatedVersions = $update->process();
+            $update->process();
 
             $output->writeln(array(
                 '',
@@ -64,8 +64,6 @@ class UpdateCommand extends ContainerAwareCommand
                 ''
             ));
         } catch (PropelException $e) {
-            $errorMsg = $e->getMessage();
-
             $output->writeln(array(
                 '',
                 sprintf('<error>Error during update process with message : %s</error>', $e->getMessage()),

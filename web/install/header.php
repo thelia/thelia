@@ -31,8 +31,7 @@ if($_REQUEST['lang']){
 	$_SESSION['install']['lang'] = $_REQUEST['lang'];
 }
 
-$trans = new Translator();
-$trans->setLocale($_SESSION['install']['lang']);
+$trans = new Translator($_SESSION['install']['lang']);
 $trans->addLoader("php",  new Symfony\Component\Translation\Loader\PhpFileLoader());
 $trans->addResource('php', __DIR__.'/I18n/'.$_SESSION['install']['lang'].'.php', $_SESSION['install']['lang']);
 

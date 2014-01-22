@@ -74,7 +74,6 @@ class Template extends BaseAction implements EventSubscriberInterface
      */
     public function update(TemplateUpdateEvent $event)
     {
-        $search = TemplateQuery::create();
 
         if (null !== $template = TemplateQuery::create()->findPk($event->getTemplateId())) {
 

@@ -62,12 +62,8 @@ class ProductTemplate extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         $search = TemplateQuery::create();
 
-        $backendContext = $this->getBackend_context();
-
-        $lang = $this->getLang();
-
         /* manage translations */
-        $this->configureI18nProcessing($search, $columns = array('NAME'));
+        $this->configureI18nProcessing($search, array('NAME'));
 
         $id = $this->getId();
 

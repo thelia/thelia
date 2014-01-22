@@ -355,7 +355,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
             $delta_x = $delta_y = $border_width = $border_height = 0;
 
-            if ($width_diff > 1 AND $height_diff > 1) {
+            if ($width_diff > 1 && $height_diff > 1) {
 
                 $next_width = $width_orig;
                 $next_height = $height_orig;

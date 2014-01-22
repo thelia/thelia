@@ -61,7 +61,6 @@ class Order extends BaseOrder
         $tax = 0;
 
         /* browse all products */
-        $orderProductIds = array();
         foreach($this->getOrderProducts() as $orderProduct) {
             $taxAmountQuery = OrderProductTaxQuery::create();
 

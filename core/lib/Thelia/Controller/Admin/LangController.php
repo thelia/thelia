@@ -278,7 +278,6 @@ class LangController extends BaseAdminController
             $data = $form->getData();
             $event = new LangUrlEvent();
             foreach ($data as $key => $value) {
-                $pos= strpos($key, LangUrlForm::LANG_PREFIX);
                 if (false !== strpos($key, LangUrlForm::LANG_PREFIX)) {
                     $event->addUrl(substr($key,strlen(LangUrlForm::LANG_PREFIX)), $value);
                 }
@@ -315,8 +314,6 @@ class LangController extends BaseAdminController
     private function domainActivation($activate)
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
-
-        $error_msg = false;
 
         ConfigQuery::create()
             ->filterByName('one_domain_foreach_lang')

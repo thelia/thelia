@@ -1,7 +1,4 @@
 <?php
-use Thelia\Condition\Implementation\MatchForTotalAmount;
-use Thelia\Condition\Implementation\MatchForXArticles;
-use Imagine\Image\Point;
 
 require __DIR__ . '/../core/bootstrap.php';
 
@@ -93,7 +90,7 @@ try {
         ->setPosition(3)
         ->save();
 
-    foreach(\Thelia\Model\ProductQuery::create()->find() as $productActiveRecord) {
+    foreach (\Thelia\Model\ProductQuery::create()->find() as $productActiveRecord) {
         $productActiveRecord->setTaxRule($taxRule)
             ->save();
     }

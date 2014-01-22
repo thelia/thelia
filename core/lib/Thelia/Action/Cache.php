@@ -42,7 +42,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
         $directoryBrowser = new \DirectoryIterator($dir);
 
         $fs = new Filesystem();
-        $fs->remove($dir);
+        $fs->remove($directoryBrowser);
 
     }
 

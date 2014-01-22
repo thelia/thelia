@@ -44,7 +44,7 @@ class TheliaConsoleOutput extends ConsoleOutput
         foreach ($messages as $message) {
             $length = ($strlen($message) > $length) ? $strlen($message) : $length;
         }
-        $ouput = array();
+        $output = array();
         foreach ($messages as $message) {
             $output[] = "<" . $style . ">" . "  " . $message . str_repeat(' ', $length - $strlen($message)) . "  </" . $style . ">";
         }

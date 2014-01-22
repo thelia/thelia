@@ -378,7 +378,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function deleteFeatureProductValue(FeatureProductDeleteEvent $event)
     {
-        $featureProduct = FeatureProductQuery::create()
+        FeatureProductQuery::create()
             ->filterByProductId($event->getProductId())
             ->filterByFeatureId($event->getFeatureId())
             ->delete()

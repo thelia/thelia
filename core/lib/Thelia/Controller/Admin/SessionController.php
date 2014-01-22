@@ -25,6 +25,7 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Form\AdminLogin;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AdminLog;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Tools\URL;
@@ -53,7 +54,7 @@ class SessionController extends BaseAdminController
                 $this->adminLogAppend("admin", "LOGIN", "Successful token authentication");
 
                 // Update the cookie
-                $cookie = $this->createAdminRememberMeCookie($user);
+                $this->createAdminRememberMeCookie($user);
 
                 // Render the home page
                 return $this->render("home");

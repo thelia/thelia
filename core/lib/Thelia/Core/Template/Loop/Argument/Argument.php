@@ -58,8 +58,6 @@ class Argument
 
     public function setValue($value)
     {
-        $x = $value === null;
-
         if ($value === null) {
             $this->value = null;
         } else {
@@ -70,7 +68,6 @@ class Argument
                 $this->value = (string) $value;
             }
         }
-        //$this->value = $value === null ? null : (string) $value;
     }
 
     public static function createAnyTypeArgument($name, $default=null, $mandatory=false, $empty=true)
