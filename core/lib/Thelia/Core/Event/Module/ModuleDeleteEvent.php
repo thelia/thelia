@@ -65,6 +65,7 @@ class ModuleDeleteEvent extends ModuleEvent
     public function setDeleteData($delete_data)
     {
         $this->delete_data = $delete_data;
+
         return $this;
     }
 }

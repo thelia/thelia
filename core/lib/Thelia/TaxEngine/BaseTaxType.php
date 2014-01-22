@@ -24,7 +24,6 @@ namespace Thelia\TaxEngine;
 
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Product;
-use Thelia\Type\TypeInterface;
 
 /**
  *
@@ -48,7 +47,8 @@ abstract class BaseTaxType
      *
      * @return number
      */
-    public function pricePercentRetriever() {
+    public function pricePercentRetriever()
+    {
         return 0;
     }
 
@@ -59,7 +59,8 @@ abstract class BaseTaxType
      *
      * @return number
      */
-    public function fixAmountRetriever(Product $product) {
+    public function fixAmountRetriever(Product $product)
+    {
         return 0;
     }
 
@@ -74,7 +75,8 @@ abstract class BaseTaxType
      *
      * @return array of TaxTypeRequirementDefinition
      */
-    public function getRequirementsDefinition() {
+    public function getRequirementsDefinition()
+    {
         return array();
     }
 
@@ -90,9 +92,10 @@ abstract class BaseTaxType
 
     /**
      * @throws TaxEngineException
-     * @return array Return the requirements array.
+     * @return array              Return the requirements array.
      */
-    public function getRequirements() {
+    public function getRequirements()
+    {
         return $this->requirements;
     }
 
@@ -120,7 +123,8 @@ abstract class BaseTaxType
         }
     }
 
-    public function setRequirement($key, $value) {
+    public function setRequirement($key, $value)
+    {
         $this->requirements[$key] = $value;
 
         return $this;

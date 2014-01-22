@@ -151,7 +151,6 @@ class ProductCombinationGenerationEvent extends ProductEvent
         $this->ean_code = $ean_code;
 
         return $this;
-        return $this;
     }
 
     public function getCombinations()

@@ -205,6 +205,7 @@ class FolderController extends AbstractSeoCrudController
         if (null !== $folder) {
             $folder->setLocale($this->getCurrentEditionLocale());
         }
+
         return $folder;
     }
 

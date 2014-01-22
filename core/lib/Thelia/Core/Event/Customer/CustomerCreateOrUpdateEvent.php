@@ -248,5 +248,4 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         return $this->ref;
     }
 
-
 }

@@ -38,7 +38,8 @@ use Thelia\TaxEngine\TaxTypeRequirementDefinition;
  */
 class FeatureFixAmountTaxType extends BaseTaxType
 {
-    public function setFeature($featureId) {
+    public function setFeature($featureId)
+    {
         $this->setRequirement('feature', $featureId);
 
         return $this;

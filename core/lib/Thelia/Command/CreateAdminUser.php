@@ -91,6 +91,7 @@ class CreateAdminUser extends ContainerAwareCommand
     protected function enterData($dialog, $output, $label, $error_message, $hidden = false)
     {
         $command = $hidden ? 'askHiddenResponse' : 'askAndValidate';
+
         return $dialog->$command(
             $output,
             $this->decorateInfo($label),

@@ -110,8 +110,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             $schemaContent = str_replace("%%NAMESPACE%%", $this->module, $schemaContent);
 
             file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "schema.xml", $schemaContent);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             $fs->remove($this->moduleDirectory);
 
             throw $ex;

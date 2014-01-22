@@ -57,10 +57,11 @@ class TaxEngine
      * Add a directroy which contains tax types classes. The tax engine
      * will scan this directory, and add all the tax type classes.
      *
-     * @param unknown $namespace the namespace of the classes in the directory
+     * @param unknown $namespace                the namespace of the classes in the directory
      * @param unknown $path_to_tax_type_classes the path to the directory
      */
-    public function addTaxTypeDirectory($namespace, $path_to_tax_type_classes) {
+    public function addTaxTypeDirectory($namespace, $path_to_tax_type_classes)
+    {
         $this->taxTypesDirectories[$namespace] = $path_to_tax_type_classes;
     }
 
@@ -70,7 +71,8 @@ class TaxEngine
      * @param unknown $fullyQualifiedclassName the fully qualified classname, su chas MyTaxes\Taxes\MyTaxType
      *
      */
-    public function addTaxType($fullyQualifiedclassName) {
+    public function addTaxType($fullyQualifiedclassName)
+    {
         $this->typeList[] = $fullyQualifiedclassName;
     }
 
@@ -80,7 +82,7 @@ class TaxEngine
 
             $this->typeList = array();
 
-            foreach($this->taxTypesDirectories as $namespace => $directory) {
+            foreach ($this->taxTypesDirectories as $namespace => $directory) {
 
                 try {
                     $directoryIterator = new \DirectoryIterator($directory);
@@ -100,8 +102,7 @@ class TaxEngine
                                 if ($instance instanceof BaseTaxType) {
                                     $this->addTaxType(get_class($instance));
                                 }
-                            }
-                            catch (\Exception $ex) {
+                            } catch (\Exception $ex) {
                                 // Nothing special to do
                             }
                         }

@@ -94,8 +94,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
                     $fs = new Filesystem();
                     $fs->remove($path);
-                }
-                catch (\ReflectionException $ex) {
+                } catch (\ReflectionException $ex) {
                     // Happens probably because the module directory has been deleted.
                     // Log a warning, and delete the database entry.
                     Tlog::getInstance()->addWarning(

@@ -56,11 +56,13 @@ class BaseAdminController extends BaseController
      */
     private $currentRouter = "router.admin";
 
-    protected function getCurrentRouter() {
+    protected function getCurrentRouter()
+    {
         return $this->currentRouter;
     }
 
-    protected function setCurrentRouter($routerId) {
+    protected function setCurrentRouter($routerId)
+    {
         $this->currentRouter = $routerId;
     }
 

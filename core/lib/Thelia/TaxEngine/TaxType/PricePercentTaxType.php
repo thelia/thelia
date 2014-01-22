@@ -34,7 +34,8 @@ use Thelia\TaxEngine\BaseTaxType;
  */
 class PricePercentTaxType extends BaseTaxType
 {
-    public function setPercentage($percent) {
+    public function setPercentage($percent)
+    {
         $this->setRequirement('percent', $percent);
 
         return $this;

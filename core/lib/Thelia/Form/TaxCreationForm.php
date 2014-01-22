@@ -27,8 +27,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Form\Type\TheliaType;
 use Thelia\Core\Translation\Translator;
 use Thelia\TaxEngine\TaxEngine;
-use Thelia\TaxEngine\TaxType;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\Tax;
 
 /**
