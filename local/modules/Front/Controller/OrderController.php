@@ -266,7 +266,7 @@ class OrderController extends BaseFrontController
     {
         $country = $this->getRequest()->get(
             'country_id',
-            TaxEngine::getInstance($this->getRequest()->getSession())->getDeliveryCountry()->getId()
+            $this->container->get('thelia.taxEngine')->getDeliveryCountry()->getId()
         );
 
         $this->checkXmlHttpRequest();
