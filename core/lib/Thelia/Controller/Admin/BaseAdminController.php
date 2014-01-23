@@ -56,11 +56,13 @@ class BaseAdminController extends BaseController
      */
     private $currentRouter = "router.admin";
 
-    protected function getCurrentRouter() {
+    protected function getCurrentRouter()
+    {
         return $this->currentRouter;
     }
 
-    protected function setCurrentRouter($routerId) {
+    protected function setCurrentRouter($routerId)
+    {
         $this->currentRouter = $routerId;
     }
 
@@ -151,9 +153,6 @@ class BaseAdminController extends BaseController
 
          // Log the problem
          $this->adminLogAppend(implode(",", $resources), implode(",", $accesses), "User is not granted for resources %s with accesses %s", implode(", ", $resources), implode(", ", $accesses));
-
-         // Generate the proper response
-         $response = new Response();
 
          return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"), 403);
     }

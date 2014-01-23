@@ -21,10 +21,6 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-use Thelia\Condition\Implementation\MatchForTotalAmount;
-use Thelia\Condition\Implementation\MatchForXArticles;
-
-
 require __DIR__ . '/../core/bootstrap.php';
 
 $thelia = new Thelia\Core\Thelia("dev", true);
@@ -44,7 +40,6 @@ try {
     clearTables($con);
     $stmt = $con->prepare("SET foreign_key_checks = 1");
     $stmt->execute();
-
 
     $categories = createCategories($con);
     $color = createColors($con);
@@ -76,8 +71,6 @@ try {
 
     createProduct($faker, $categories, $template, $color, $brand, $con);
 
-
-
     $con->commit();
 } catch (Exception $e) {
     echo "error : ".$e->getMessage()."\n";
@@ -101,14 +94,13 @@ function createProduct($faker, $categories, $template, $attribute, $feature, $co
                 ->setTaxRuleId(1)
                 ->setTemplate($template)
             ;
-            foreach($productCategories as $productCategory) {
+            foreach ($productCategories as $productCategory) {
 
                 $productCategory = trim($productCategory);
-                if(array_key_exists($productCategory, $categories)) {
+                if (array_key_exists($productCategory, $categories)) {
                     $product->addCategory($categories[$productCategory]);
                 }
             }
-
 
             $product
                 ->setLocale('en_US')
@@ -145,14 +137,13 @@ function createProduct($faker, $categories, $template, $attribute, $feature, $co
 
             $pses = explode(";", $data[12]);
 
-
             foreach ($pses as $pse) {
                 if(empty($pse)) continue;
                 $stock = new \Thelia\Model\ProductSaleElements();
                 $stock->setProduct($product);
                 $stock->setRef($product->getId() . '_' . uniqid('', true));
                 $stock->setQuantity($faker->randomNumber(1,50));
-                if(!empty($data[9])) {
+                if (!empty($data[9])) {
                     $stock->setPromo(1);
                 } else {
                     $stock->setPromo(0);
@@ -197,8 +188,6 @@ function createProduct($faker, $categories, $template, $attribute, $feature, $co
                 ->setFeatureAvId($featurAv->getId())
                 ->save($con)
             ;
-
-
 
         }
     }
@@ -261,6 +250,7 @@ function createCategories($con)
         fclose($handle);
     }
     echo "categories created successfully\n";
+
     return $categories;
 }
 
@@ -293,6 +283,7 @@ function createColors($con)
         fclose($handle);
     }
     echo "colors attributes created with success\n";
+
     return $attribute;
 }
 
@@ -361,7 +352,6 @@ function clearTables($con)
     $product = Thelia\Model\ProductI18nQuery::create()
         ->find($con);
     $product->delete($con);
-
 
     $accessory = Thelia\Model\AccessoryQuery::create()
         ->find($con);

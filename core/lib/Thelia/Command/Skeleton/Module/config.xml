@@ -22,12 +22,6 @@
         -->
     </commands>
 
-    <templateDirectives>
-        <!-- Sample definition
-        <templateDirectives class="MyModule\Directive\MyTemplateDirective" name="my_filter"/>
-        -->
-    </templateDirectives>
-
     <!--
     <services>
 

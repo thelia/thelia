@@ -242,7 +242,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         return $this->dataAccess("Lang", $params, $this->request->getSession()->getLang());
     }
 
-    public function ConfigDataAccess($params, $smarty)
+    public function configDataAccess($params, $smarty)
     {
         $key = $this->getParam($params, 'key', false);
 
@@ -253,7 +253,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         return ConfigQuery::read($key, $default);
     }
 
-    public function StatsAccess($params, $smarty)
+    public function statsAccess($params, $smarty)
     {
         if (false === array_key_exists("key", $params)) {
             throw new \InvalidArgumentException(sprintf("missing key attribute in stats access function"));
@@ -459,8 +459,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'lang', $this, 'langDataAccess'),
             new SmartyPluginDescriptor('function', 'cart', $this, 'cartDataAccess'),
             new SmartyPluginDescriptor('function', 'order', $this, 'orderDataAccess'),
-            new SmartyPluginDescriptor('function', 'config', $this, 'ConfigDataAccess'),
-            new SmartyPluginDescriptor('function', 'stats', $this, 'StatsAccess'),
+            new SmartyPluginDescriptor('function', 'config', $this, 'configDataAccess'),
+            new SmartyPluginDescriptor('function', 'stats', $this, 'statsAccess'),
         );
     }
 

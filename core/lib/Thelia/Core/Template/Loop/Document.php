@@ -219,9 +219,6 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         if (!is_null($exclude))
             $search->filterById($exclude, Criteria::NOT_IN);
 
-        // Create document processing event
-        $event = new DocumentEvent($this->request);
-
         return $search;
 
     }

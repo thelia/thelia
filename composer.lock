@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "f779af80bcfc2ed1deefba9350bdcf66",
+    "hash": "92d99dbb21763697accf7050ded155b6",
     "packages": [
         {
             "name": "ensepar/html2pdf",
@@ -111,7 +111,7 @@
         },
         {
             "name": "imagine/imagine",
-            "version": "dev-master",
+            "version": "v0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/avalanche123/Imagine.git",
@@ -163,16 +163,16 @@
         },
         {
             "name": "ircmaxell/password-compat",
-            "version": "dev-master",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ircmaxell/password_compat.git",
-                "reference": "5d44eec3b571b4a6daae45794b0a31fbbf63c74c"
+                "reference": "1fc1521b5e9794ea77e4eca30717be9635f1d4f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ircmaxell/password_compat/zipball/5d44eec3b571b4a6daae45794b0a31fbbf63c74c",
-                "reference": "5d44eec3b571b4a6daae45794b0a31fbbf63c74c",
+                "url": "https://api.github.com/repos/ircmaxell/password_compat/zipball/1fc1521b5e9794ea77e4eca30717be9635f1d4f4",
+                "reference": "1fc1521b5e9794ea77e4eca30717be9635f1d4f4",
                 "shasum": ""
             },
             "type": "library",
@@ -198,7 +198,7 @@
                 "hashing",
                 "password"
             ],
-            "time": "2013-06-24 12:01:11"
+            "time": "2013-04-30 19:58:08"
         },
         {
             "name": "kriswallsmith/assetic",
@@ -273,7 +273,7 @@
         },
         {
             "name": "leafo/lessphp",
-            "version": "dev-master",
+            "version": "v0.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/leafo/lessphp.git",
@@ -417,7 +417,7 @@
         },
         {
             "name": "ptachoire/cssembed",
-            "version": "dev-master",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/krichprollsch/phpCssEmbed.git",
@@ -512,47 +512,24 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v3.1.14",
+            "version": "3.1.14",
             "source": {
                 "type": "svn",
-                "url": "http://smarty-php.googlecode.com/svn",
-                "reference": "/tags/v3.1.14/@4752"
+                "url": "http://smarty-php.googlecode.com/svn/",
+                "reference": "tags/Smarty_3_1_14/distribution/"
             },
-            "require": {
-                "php": ">=5.2"
+            "dist": {
+                "type": "zip",
+                "url": "http://www.smarty.net/files/Smarty-3.1.14.zip",
+                "reference": null,
+                "shasum": null
             },
             "type": "library",
             "autoload": {
                 "classmap": [
-                    "distribution/libs/Smarty.class.php",
-                    "distribution/libs/SmartyBC.class.php",
-                    "distribution/libs/sysplugins/smarty_security.php"
+                    "libs/"
                 ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-3.0"
-            ],
-            "authors": [
-                {
-                    "name": "Monte Ohrt",
-                    "email": "monte@ohrt.com"
-                },
-                {
-                    "name": "Uwe Tews",
-                    "email": "uwe.tews@googlemail.com"
-                },
-                {
-                    "name": "Rodney Rehm",
-                    "email": "rodney.rehm@medialize.de"
-                }
-            ],
-            "description": "Smarty - the compiling PHP template engine",
-            "homepage": "http://www.smarty.net",
-            "keywords": [
-                "templating"
-            ],
-            "time": "2013-07-02 16:38:47"
+            }
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -2279,13 +2256,9 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "ircmaxell/password-compat": 20,
         "propel/propel": 20,
         "kriswallsmith/assetic": 20,
-        "leafo/lessphp": 20,
-        "ptachoire/cssembed": 20,
         "simplepie/simplepie": 20,
-        "imagine/imagine": 20,
         "fzaninotto/faker": 20,
         "maximebf/debugbar": 20
     },

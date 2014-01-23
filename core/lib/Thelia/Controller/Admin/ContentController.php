@@ -242,6 +242,7 @@ class ContentController extends AbstractSeoCrudController
         if (null !== $content) {
             $content->setLocale($this->getCurrentEditionLocale());
         }
+
         return $content;
     }
 

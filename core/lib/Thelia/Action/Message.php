@@ -68,7 +68,6 @@ class Message extends BaseAction implements EventSubscriberInterface
      */
     public function modify(MessageUpdateEvent $event)
     {
-        $search = MessageQuery::create();
 
         if (null !== $message = MessageQuery::create()->findPk($event->getMessageId())) {
 

@@ -74,7 +74,6 @@ class Feature extends BaseAction implements EventSubscriberInterface
      */
     public function update(FeatureUpdateEvent $event)
     {
-        $search = FeatureQuery::create();
 
         if (null !== $feature = FeatureQuery::create()->findPk($event->getFeatureId())) {
 

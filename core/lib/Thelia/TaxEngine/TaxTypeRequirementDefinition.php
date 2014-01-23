@@ -44,7 +44,7 @@ class TaxTypeRequirementDefinition
     /**
      * Create a new Tax type requirement
      *
-     * @param string $name the name of the requirement
+     * @param string        $name the name of the requirement
      * @param TypeInterface $type the type of the data
      */
     public function __construct($name, TypeInterface $type)
@@ -63,7 +63,8 @@ class TaxTypeRequirementDefinition
         return $this->type;
     }
 
-    public function isValueValid($value) {
+    public function isValueValid($value)
+    {
         return $this->type->isValid($value);
     }
 }

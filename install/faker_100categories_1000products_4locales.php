@@ -1,10 +1,4 @@
 <?php
-use Thelia\Model\ProductImage;
-use Thelia\Model\CategoryImage;
-use Thelia\Model\FolderImage;
-use Thelia\Model\ContentImage;
-use Imagine\Image\Color;
-use Imagine\Image\Point;
 
 require __DIR__ . '/../core/bootstrap.php';
 
@@ -129,7 +123,7 @@ try {
     $stmt->execute();
 
     //categories and products
-    for($i=0; $i<100; $i++) {
+    for ($i=0; $i<100; $i++) {
         $category = new Thelia\Model\Category();
         $category->setParent(0);
         $category->setVisible(1);
@@ -138,7 +132,7 @@ try {
 
         $category->save();
 
-        for($j=0; $j<10; $j++) {
+        for ($j=0; $j<10; $j++) {
             $product = new Thelia\Model\Product();
             $product->setRef($category->getId() . '_' . $j . '_' . $faker->randomNumber(8));
             $product->addCategory($category);
@@ -160,14 +154,13 @@ function setI18n($faker, &$object, $fields = array('Title' => 20, 'Description' 
 {
     $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
 
-    foreach($localeList as $locale) {
+    foreach ($localeList as $locale) {
         $object->setLocale($locale);
 
-        foreach($fields as $name => $length) {
+        foreach ($fields as $name => $length) {
             $func = "set$name";
 
             $object->$func($locale . ' : ' . $faker->text($length));
         }
     }
 }
-

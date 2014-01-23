@@ -179,7 +179,7 @@ abstract class BaseLoop
                 $faultActor[] = $argument->name;
                 $faultDetails[] = sprintf('"%s" parameter is missing in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
             } else  if ($value === '') {
-                if(!$argument->empty) {
+                if (!$argument->empty) {
                     /* check if empty */
                     $faultActor[] = $argument->name;
                     $faultDetails[] = sprintf('"%s" parameter cannot be empty in loop type: %s, name: %s', $argument->name, $loopType, $loopName);

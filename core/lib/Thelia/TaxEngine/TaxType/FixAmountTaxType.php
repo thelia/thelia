@@ -34,7 +34,8 @@ use Thelia\TaxEngine\TaxTypeRequirementDefinition;
  */
 class FixAmountTaxType extends BaseTaxType
 {
-    public function setAmount($amount) {
+    public function setAmount($amount)
+    {
         $this->setRequirement('amount', $amount);
 
         return $this;

@@ -68,7 +68,7 @@ class Cart extends BaseCart
 
     public function getLastCartItemAdded()
     {
-        $items = CartItemQuery::create()
+        return CartItemQuery::create()
             ->filterByCartId($this->getId())
             ->orderByCreatedAt(Criteria::DESC)
             ->findOne()

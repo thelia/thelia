@@ -79,10 +79,6 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         $search = AttributeQuery::create();
 
-        $backendContext = $this->getBackend_context();
-
-        $lang = $this->getLang();
-
         /* manage translations */
         $this->configureI18nProcessing($search);
 

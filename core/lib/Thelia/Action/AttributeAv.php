@@ -66,7 +66,6 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      */
     public function update(AttributeAvUpdateEvent $event)
     {
-        $search = AttributeAvQuery::create();
 
         if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId())) {
 

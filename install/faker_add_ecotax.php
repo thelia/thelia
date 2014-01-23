@@ -1,9 +1,4 @@
 <?php
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Condition\Implementation\MatchForTotalAmount;
-use Thelia\Condition\Implementation\MatchForXArticles;
-use Thelia\Condition\Operators;
-
 
 require __DIR__ . '/../core/bootstrap.php';
 
@@ -23,24 +18,24 @@ try {
     $options = getopt('f::e::');
 
     $forceEcotaxFeatureId = $options['f'];
-    if(null !== $forceEcotaxFeatureId && !filter_var($forceEcotaxFeatureId, FILTER_VALIDATE_INT)) {
+    if (null !== $forceEcotaxFeatureId && !filter_var($forceEcotaxFeatureId, FILTER_VALIDATE_INT)) {
         exit('[ERROR] bad value for f option\n');
     }
 
     $forceEcotaxId = $options['e'];
-    if(null !== $forceEcotaxId && !filter_var($forceEcotaxId, FILTER_VALIDATE_INT)) {
+    if (null !== $forceEcotaxId && !filter_var($forceEcotaxId, FILTER_VALIDATE_INT)) {
         exit('[ERROR] bad value for e option\n');
     }
 
     echo "Adding Ecotax feature\n";
     $feature = null;
-    if(null !== $forceEcotaxFeatureId) {
+    if (null !== $forceEcotaxFeatureId) {
         $feature = \Thelia\Model\FeatureQuery::create()->findPk($forceEcotaxFeatureId);
-        if(null === $feature) {
+        if (null === $feature) {
             echo "Feature `$forceEcotaxFeatureId` not found\n";
         }
     }
-    if(null === $feature) {
+    if (null === $feature) {
         $feature = new \Thelia\Model\Feature();
         $feature->setVisible(1);
         $feature->save();
@@ -51,7 +46,7 @@ try {
         ->filterByLocale('fr_FR')
         ->filterByFeature($feature)
         ->findOne();
-    if(null === $fr) {
+    if (null === $fr) {
         $fr = new \Thelia\Model\FeatureI18n();
         $fr->setLocale('fr_FR')
             ->setFeature($feature);
@@ -63,7 +58,7 @@ try {
         ->filterByLocale('en_US')
         ->filterByFeature($feature)
         ->findOne();
-    if(null === $us) {
+    if (null === $us) {
         $us = new \Thelia\Model\FeatureI18n();
         $us->setLocale('en_US')
             ->setFeature($feature);
@@ -74,13 +69,13 @@ try {
     echo "Adding ecotax\n";
 
     $tax = null;
-    if(null !== $forceEcotaxId) {
+    if (null !== $forceEcotaxId) {
         $tax = \Thelia\Model\TaxQuery::create()->findPk($forceEcotaxId);
-        if(null === $tax) {
+        if (null === $tax) {
             echo "Tax `$forceEcotaxId` not found\n";
         }
     }
-    if(null === $tax) {
+    if (null === $tax) {
         $tax = new \Thelia\Model\Tax();
         $tax->setType('FeatureFixAmountTaxType')
             ->setSerializedRequirements(
@@ -94,7 +89,7 @@ try {
         ->filterByLocale('fr_FR')
         ->filterByTax($tax)
         ->findOne();
-    if(null === $fr) {
+    if (null === $fr) {
         $fr = new \Thelia\Model\TaxI18n();
         $fr->setLocale('fr_FR')
             ->setTax($tax);
@@ -106,7 +101,7 @@ try {
         ->filterByLocale('en_US')
         ->filterByTax($tax)
         ->findOne();
-    if(null === $us) {
+    if (null === $us) {
         $us = new \Thelia\Model\TaxI18n();
         $us->setLocale('en_US')
             ->setTax($tax);

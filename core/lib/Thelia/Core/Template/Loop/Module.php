@@ -194,7 +194,6 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
             $hasConfigurationInterface = false;
 
-
             /* first test if module defines it's own config route  */
             if ($module->getActivate()) {
                 // Works only fo activated modules - see Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass
@@ -215,8 +214,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                         $hasConfigurationInterface = true;
                     }
                 }
-            }
-            else {
+            } else {
                 // Make a quick and dirty test on the module's routing.xml file
                 $routing = @file_get_contents($module->getAbsoluteBaseDir() . DS . "Config" . DS . "routing.xml");
 

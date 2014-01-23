@@ -211,7 +211,6 @@ class Tlog Implements LoggerInterface
     {
         // isset($_SERVER['REMOTE_ADDR']) if we are in cli mode
         if (! empty($ips) && isset($_SERVER['REMOTE_ADDR']) && ! in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) $this->level = self::MUET;
-
         return $this;
     }
 

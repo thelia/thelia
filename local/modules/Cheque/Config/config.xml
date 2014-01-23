@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>string
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <config xmlns="http://thelia.net/schema/dic/config"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -21,12 +21,6 @@
         <command class="MyModule\Command\MySuperCommand" />
         -->
     </commands>
-
-    <templateDirectives>
-        <!-- Sample definition
-        <templateDirectives class="MyModule\Directive\MyTemplateDirective" name="my_filter"/>
-        -->
-    </templateDirectives>
 
     <!--
     <services>

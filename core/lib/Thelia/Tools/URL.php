@@ -284,31 +284,4 @@ class URL
              strtolower($clean) :
              $clean;
      }
-
-    /**
-      * Genenerate the file part of a rewritten URL from a given baseString, using a view, a view id and a locale
-      *
-      * @param $view
-      * @param $viewId
-      * @param $viewLocale
-      * @param $baseString the string to be converted in a valid URL
-      *
-      * @return A valid file part URL.
-      */
-     public function generateRewritenUrl($view, $viewId, $viewLocale, $baseString)
-     {
-         // Borrowed from http://stackoverflow.com/questions/2668854/sanitizing-strings-to-make-them-url-and-filename-safe
-
-         // Replace all weird characters with dashes
-         $string = preg_replace('/[^\w\-~_\.]+/u', '-', $baseString);
-
-         // Only allow one dash separator at a time (and make string lowercase)
-         $cleanString = mb_strtolower(preg_replace('/--+/u', '-', $string), 'UTF-8');
-
-         $urlFilePart = $cleanString . ".html";
-
-         // TODO :
-         // check if URL url already exists, and add a numeric suffix, or the like
-         // insert the URL in the rewriting table
-     }
 }

@@ -9,7 +9,7 @@
     },
     "require":{
         "php": ">=5.4",
-        "ircmaxell/password-compat": "dev-master",
+        "ircmaxell/password-compat": "1.0.*",
         "propel/propel": "dev-master",
         "psr/log" : "1.0",
         "symfony/class-loader": "2.2.*",
@@ -30,12 +30,12 @@
 
         "smarty/smarty": "v3.1.14",
         "kriswallsmith/assetic": "1.2.*@dev",
-        "leafo/lessphp": "0.3.*@dev",
-        "ptachoire/cssembed": "dev-master",
+        "leafo/lessphp": "0.4.*",
+        "ptachoire/cssembed": "1.0.*",
 
         "simplepie/simplepie": "dev-master",
 
-        "imagine/imagine": "dev-master",
+        "imagine/imagine": "0.*",
         "symfony/icu": "1.0",
         "swiftmailer/swiftmailer": "5.0.*",
         "symfony/serializer": "2.3.*",
@@ -62,5 +62,26 @@
         "branch-alias": {
             "dev-master": "2.0.0-dev"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "smarty/smarty",
+                "version": "3.1.14",
+                "dist": {
+                    "url": "http://www.smarty.net/files/Smarty-3.1.14.zip",
+                    "type": "zip"
+                },
+                "source": {
+                    "url": "http://smarty-php.googlecode.com/svn/",
+                    "type": "svn",
+                    "reference": "tags/Smarty_3_1_14/distribution/"
+                },
+                "autoload": {
+                    "classmap": ["libs/"]
+                }
+            }
+        }
+    ]
 }

@@ -10,7 +10,6 @@ use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\Type\RemoveXAmount;
 use Thelia\Coupon\Type\RemoveXPercent;
 
-
 require __DIR__ . '/../core/bootstrap.php';
 
 $thelia = new Thelia\Core\Thelia("dev", true);
@@ -184,7 +183,7 @@ try {
         ;
     }
 
-    for($i = 0; $i < 50; $i++) {
+    for ($i = 0; $i < 50; $i++) {
         $customer = new Thelia\Model\Customer();
         $customer->createOrUpdate(
             rand(1,3),
@@ -227,7 +226,7 @@ try {
 
     //features and features_av
     $featureList = array();
-    for($i=0; $i<4; $i++) {
+    for ($i=0; $i<4; $i++) {
         $feature = new Thelia\Model\Feature();
         $feature->setVisible(1);
         $feature->setPosition($i);
@@ -237,7 +236,7 @@ try {
         $featureId = $feature->getId();
         $featureList[$featureId] = array();
 
-        for($j=0; $j<rand(-2, 5); $j++) { //let a chance for no av
+        for ($j=0; $j<rand(-2, 5); $j++) { //let a chance for no av
             $featureAv = new Thelia\Model\FeatureAv();
             $featureAv->setFeature($feature);
             $featureAv->setPosition($j);
@@ -252,7 +251,7 @@ try {
 
     //attributes and attributes_av
     $attributeList = array();
-    for($i=0; $i<4; $i++) {
+    for ($i=0; $i<4; $i++) {
         $attribute = new Thelia\Model\Attribute();
         $attribute->setPosition($i);
         setI18n($faker, $attribute);
@@ -261,7 +260,7 @@ try {
         $attributeId = $attribute->getId();
         $attributeList[$attributeId] = array();
 
-        for($j=0; $j<rand(1, 5); $j++) {
+        for ($j=0; $j<rand(1, 5); $j++) {
             $attributeAv = new Thelia\Model\AttributeAv();
             $attributeAv->setAttribute($attribute);
             $attributeAv->setPosition($j);
@@ -278,7 +277,7 @@ try {
     setI18n($faker, $template, array("Name" => 20));
     $template->save();
 
-    foreach($attributeList as $attributeId => $attributeAvId) {
+    foreach ($attributeList as $attributeId => $attributeAvId) {
         $at = new Thelia\Model\AttributeTemplate();
 
         $at
@@ -287,7 +286,7 @@ try {
             ->save();
     }
 
-    foreach($featureList as $featureId => $featureAvId) {
+    foreach ($featureList as $featureId => $featureAvId) {
         $ft = new Thelia\Model\FeatureTemplate();
 
         $ft
@@ -300,7 +299,7 @@ try {
 
     //folders and contents
     $contentIdList = array();
-    for($i=0; $i<4; $i++) {
+    for ($i=0; $i<4; $i++) {
         $folder = new Thelia\Model\Folder();
         $folder->setParent(0);
         $folder->setVisible(1);
@@ -311,13 +310,13 @@ try {
 
         $image = new \Thelia\Model\FolderImage();
         $image->setFolderId($folder->getId());
-        generate_image($image, 1, 'folder', $folder->getId());
+        generate_image($image, 'folder', $folder->getId());
 
         $document = new \Thelia\Model\FolderDocument();
         $document->setFolderId($folder->getId());
-        generate_document($document, 1, 'folder', $folder->getId());
+        generate_document($document, 'folder', $folder->getId());
 
-        for($j=0; $j<3; $j++) {
+        for ($j=0; $j<3; $j++) {
             $subfolder = new Thelia\Model\Folder();
             $subfolder->setParent($folder->getId());
             $subfolder->setVisible(1);
@@ -328,13 +327,13 @@ try {
 
             $image = new \Thelia\Model\FolderImage();
             $image->setFolderId($subfolder->getId());
-            generate_image($image, 1, 'folder', $subfolder->getId());
+            generate_image($image, 'folder', $subfolder->getId());
 
             $document = new \Thelia\Model\FolderDocument();
             $document->setFolderId($folder->getId());
-            generate_document($document, 1, 'folder', $subfolder->getId());
+            generate_document($document, 'folder', $subfolder->getId());
 
-            for($k=0; $k<4; $k++) {
+            for ($k=0; $k<4; $k++) {
                 $content = new Thelia\Model\Content();
                 $content->addFolder($subfolder);
 
@@ -353,11 +352,11 @@ try {
 
                 $image = new \Thelia\Model\ContentImage();
                 $image->setContentId($contentId);
-                generate_image($image, 1, 'content', $contentId);
+                generate_image($image, 'content', $contentId);
 
                 $document = new \Thelia\Model\ContentDocument();
                 $document->setContentId($contentId);
-                generate_document($document, 1, 'content', $contentId);
+                generate_document($document, 'content', $contentId);
 
             }
         }
@@ -368,30 +367,30 @@ try {
     //categories and products
     $productIdList = array();
     $categoryIdList = array();
-    for($i=1; $i<5; $i++) {
+    for ($i=1; $i<5; $i++) {
         $category = createCategory($faker, 0, $i, $categoryIdList, $contentIdList);
 
-        for($j=1; $j<rand(0, 5); $j++) {
+        for ($j=1; $j<rand(0, 5); $j++) {
             $subcategory = createCategory($faker, $category->getId(), $j, $categoryIdList, $contentIdList);
 
-            for($k=0; $k<rand(0, 5); $k++) {
+            for ($k=0; $k<rand(0, 5); $k++) {
                 createProduct($faker, $subcategory, $k, $template, $productIdList);
             }
         }
 
-        for($k=1; $k<rand(1, 6); $k++) {
+        for ($k=1; $k<rand(1, 6); $k++) {
             createProduct($faker, $category, $k, $template, $productIdList);
         }
     }
 
-    foreach($productIdList as $productId) {
+    foreach ($productIdList as $productId) {
         //add random accessories - or not
         $alreadyPicked = array();
-        for($i=1; $i<rand(0, 4); $i++) {
+        for ($i=1; $i<rand(0, 4); $i++) {
             $accessory = new Thelia\Model\Accessory();
             do {
                 $pick = array_rand($productIdList, 1);
-            } while(in_array($pick, $alreadyPicked));
+            } while (in_array($pick, $alreadyPicked));
 
             $alreadyPicked[] = $pick;
 
@@ -403,12 +402,12 @@ try {
 
         //add random associated content
         $alreadyPicked = array();
-        for($i=1; $i<rand(0, 3); $i++) {
+        for ($i=1; $i<rand(0, 3); $i++) {
             $productAssociatedContent = new Thelia\Model\ProductAssociatedContent();
             do {
                 $pick = array_rand($contentIdList, 1);
                 \Thelia\Log\Tlog::getInstance()->debug("pick : $pick");
-            } while(in_array($pick, $alreadyPicked));
+            } while (in_array($pick, $alreadyPicked));
 
             $alreadyPicked[] = $pick;
 
@@ -419,7 +418,7 @@ try {
         }
 
         //associate PSE and stocks to products
-        for($i=0; $i<rand(1,7); $i++) {
+        for ($i=0; $i<rand(1,7); $i++) {
             $stock = new \Thelia\Model\ProductSaleElements();
             $stock->setProductId($productId);
             $stock->setRef($productId . '_' . $i . '_' . $faker->randomNumber(8));
@@ -441,11 +440,11 @@ try {
             //associate attributes - or not - to PSE
 
             $alreadyPicked = array();
-            for($i=0; $i<rand(-2,count($attributeList)); $i++) {
+            for ($i=0; $i<rand(-2,count($attributeList)); $i++) {
                 $featureProduct = new Thelia\Model\AttributeCombination();
                 do {
                     $pick = array_rand($attributeList, 1);
-                } while(in_array($pick, $alreadyPicked));
+                } while (in_array($pick, $alreadyPicked));
 
                 $alreadyPicked[] = $pick;
 
@@ -457,12 +456,12 @@ try {
         }
 
         //associate features to products
-        foreach($featureList as $featureId => $featureAvId) {
+        foreach ($featureList as $featureId => $featureAvId) {
             $featureProduct = new Thelia\Model\FeatureProduct();
             $featureProduct->setProductId($productId)
                 ->setFeatureId($featureId);
 
-            if(count($featureAvId) > 0) { //got some av
+            if (count($featureAvId) > 0) { //got some av
                 $featureProduct->setFeatureAvId(
                     $featureAvId[array_rand($featureAvId, 1)]
                 );
@@ -537,7 +536,7 @@ function createCategory($faker, $parent, $position, &$categoryIdList, $contentId
         $categoryAssociatedContent = new Thelia\Model\CategoryAssociatedContent();
         do {
             $pick = array_rand($contentIdList, 1);
-        } while(in_array($pick, $alreadyPicked));
+        } while (in_array($pick, $alreadyPicked));
 
         $alreadyPicked[] = $pick;
 
@@ -549,17 +548,17 @@ function createCategory($faker, $parent, $position, &$categoryIdList, $contentId
 
     $image = new \Thelia\Model\CategoryImage();
     $image->setCategoryId($categoryId);
-    generate_image($image, 1, 'category', $categoryId);
+    generate_image($image, 'category', $categoryId);
 
     $document = new \Thelia\Model\CategoryDocument();
     $document->setCategoryId($categoryId);
-    generate_document($document, 1, 'category', $categoryId);
+    generate_document($document, 'category', $categoryId);
 
     return $category;
 }
 
-function generate_image($image, $position, $typeobj, $id) {
-
+function generate_image($image, $typeobj, $id)
+{
     global $faker;
 
     $image
@@ -606,8 +605,8 @@ function generate_image($image, $position, $typeobj, $id) {
     $image->save($image_file);
 }
 
-function generate_document($document, $position, $typeobj, $id) {
-
+function generate_document($document, $typeobj, $id)
+{
     global $faker;
 
     $document
@@ -630,10 +629,10 @@ function setI18n($faker, &$object, $fields = array('Title' => 20, 'Description' 
 {
     $localeList = $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
 
-    foreach($localeList as $locale) {
+    foreach ($localeList as $locale) {
         $object->setLocale($locale);
 
-        foreach($fields as $name => $length) {
+        foreach ($fields as $name => $length) {
             $func = "set".ucfirst(strtolower($name));
 
             $object->$func($locale . ' : ' . $faker->text($length));
@@ -709,7 +708,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $coupon1->setIsAvailableOnSpecialOffers(true);
     $coupon1->save();
 
-
     // Coupons
     $coupon2 = new Thelia\Model\Coupon();
     $coupon2->setCode('SPRINGBREAK');
@@ -755,7 +753,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $coupon2->setIsRemovingPostage(true);
     $coupon2->setIsAvailableOnSpecialOffers(true);
     $coupon2->save();
-
 
     // Coupons
     $coupon3 = new Thelia\Model\Coupon();

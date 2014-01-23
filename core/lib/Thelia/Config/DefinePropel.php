@@ -40,7 +40,7 @@ class DefinePropel
     {
         $connection = $this->processorConfig["connection"];
 
-        return $conf = array(
+        return array(
             "dsn" => $connection["dsn"],
             "user" => $connection["user"],
             "password" => $connection["password"],

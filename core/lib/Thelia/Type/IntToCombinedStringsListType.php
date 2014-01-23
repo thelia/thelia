@@ -50,7 +50,6 @@ class IntToCombinedStringsListType extends BaseType
 
                 return false;
         }
-        $x = 3;
 
         return true;
     }

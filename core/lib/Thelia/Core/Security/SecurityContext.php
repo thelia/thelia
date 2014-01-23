@@ -104,12 +104,8 @@ class SecurityContext
             // Check if user's roles matches required roles
             $userRoles = $user->getRoles();
 
-            $roleFound = false;
-
             foreach ($userRoles as $role) {
                 if (in_array($role, $roles)) {
-                    $roleFound = true;
-
                     return true;
                 }
             }
