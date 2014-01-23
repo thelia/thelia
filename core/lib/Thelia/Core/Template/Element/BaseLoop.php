@@ -333,6 +333,28 @@ abstract class BaseLoop
         }
     }
 
+    public function count()
+    {
+        $count = 0;
+        if ($this instanceof PropelSearchLoopInterface) {
+            $searchModelCriteria = $this->buildModelCriteria();
+            if (null === $searchModelCriteria) {
+                $count = 0;
+            } else {
+                $count = $searchModelCriteria->count();
+            }
+        } elseif ($this instanceof ArraySearchLoopInterface) {
+            $searchArray = $this->buildArray();
+            if (null === $searchArray) {
+                $count = 0;
+            } else {
+                $count = count($searchArray);
+            }
+        }
+
+        return $count;
+    }
+
     /**
      * @param $pagination
      * @return LoopResult
