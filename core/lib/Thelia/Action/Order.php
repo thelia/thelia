@@ -52,6 +52,8 @@ use Thelia\Model\OrderProductAttributeCombination;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Tools\I18n;
+use Thelia\Model\Country;
+
 
 /**
  *
@@ -149,6 +151,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     protected function createOrder(EventDispatcherInterface $dispatcher, ModelOrder $sessionOrder, Currency $currency, Lang $lang, CartModel $cart, CustomerModel $customer)
+
     {
         $con = \Propel\Runtime\Propel::getConnection(
                 OrderTableMap::DATABASE_NAME
@@ -156,7 +159,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $con->beginTransaction();
 
-        /* use a copy to avoid errored record in session */
+
         $placedOrder = $sessionOrder->copy();
         $placedOrder->setDispatcher($dispatcher);
 
@@ -337,6 +340,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         );
 
         $event->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
+
 
         /* clear session */
         $session
