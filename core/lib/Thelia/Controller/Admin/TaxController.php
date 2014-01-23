@@ -50,14 +50,14 @@ class TaxController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        $form = new TaxCreationForm($this->getRequest());
+        $form = new TaxCreationForm($this->getRequest(), 'form', array(), array(), $this->container->get('thelia.taxEngine'));
 
         return $form;
     }
 
     protected function getUpdateForm()
     {
-        return new TaxModificationForm($this->getRequest());
+        return new TaxModificationForm($this->getRequest(), 'form', array(), array(), $this->container->get('thelia.taxEngine'));
     }
 
     protected function getCreationEvent($formData)
@@ -114,7 +114,7 @@ class TaxController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new TaxModificationForm($this->getRequest(), "form", $data);
+        return new TaxModificationForm($this->getRequest(), "form", $data, array(), $this->container->get('thelia.taxEngine'));
     }
 
     protected function getObjectFromEvent($event)
@@ -158,7 +158,6 @@ class TaxController extends AbstractCrudController
 
     protected function renderListTemplate($currentOrder)
     {
-        // We always return to the feature edition form
         return $this->render(
             'taxes-rules',
             array()

@@ -40,12 +40,22 @@ class TaxCreationForm extends BaseForm
 {
     use StandardDescriptionFieldsTrait;
 
+    protected $taxEngine = null;
+
+    public function __construct(Request $request, $type= "form", $data = array(), $options = array(), TaxEngine $taxEngine = null) {
+
+        $this->taxEngine = $taxEngine;
+
+        parent::__construct($request, $type, $data, $options);
+    }
+
     protected function buildForm($change_mode = false)
     {
-        // FIXME : SHOULD be extracted from the container
-        $taxEngine = new TaxEngine($this->getRequest());
+        if ($this->taxEngine == null) {
+            throw new \LogicException("The TaxEngine should be passed to this form before using it.");
+        }
 
-        $types = $taxEngine->getTaxTypeList();
+        $types = $this->taxEngine->getTaxTypeList();
 
         $typeList = array();
         $requirementList = array();

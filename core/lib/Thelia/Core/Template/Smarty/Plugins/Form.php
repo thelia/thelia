@@ -97,14 +97,24 @@ class Form extends AbstractSmartyPlugin
                 throw new \InvalidArgumentException("Missing 'name' parameter in form arguments");
             }
 
-            $instance = $this->createInstance($name);
+            if (!isset($this->formDefinition[$name])) {
+                throw new ElementNotFoundException(sprintf("%s form does not exists", $name));
+            }
+
+            $formClass = $this->formDefinition[$name];
 
             // Check if parser context contains our form
-            $form = $this->parserContext->getForm($instance->getName());
+            $form = $this->parserContext->getForm($formClass);
 
             if (null != $form) {
                 // Re-use the form
                 $instance = $form;
+            }
+            else {
+                // Create a new one
+                $class = new \ReflectionClass($formClass);
+
+                $instance = $class->newInstance($this->request, "form");
             }
 
             $instance->createView();
@@ -404,17 +414,6 @@ class Form extends AbstractSmartyPlugin
         }
 
         return $instance;
-    }
-
-    protected function createInstance($name)
-    {
-        if (!isset($this->formDefinition[$name])) {
-            throw new ElementNotFoundException(sprintf("%s form does not exists", $name));
-        }
-
-        $class = new \ReflectionClass($this->formDefinition[$name]);
-
-        return $class->newInstance($this->request, "form");
     }
 
     /**

@@ -32,6 +32,7 @@ use Thelia\Form\TaxRuleModificationForm;
 use Thelia\Form\TaxRuleTaxListUpdateForm;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\TaxRuleQuery;
+use Thelia\Form\TaxCreationForm;
 
 class TaxRuleController extends AbstractCrudController
 {
@@ -48,6 +49,22 @@ class TaxRuleController extends AbstractCrudController
             TheliaEvents::TAX_RULE_UPDATE,
             TheliaEvents::TAX_RULE_DELETE
         );
+    }
+
+    public function defaultAction() {
+
+        // In the tax rule template we use the TaxCreationForm.
+        //
+        // The TaxCreationForm require the TaxEngine, but we cannot pass it from the Parser Form plugin,
+        // as the container is not passed to forms by this plugin.
+        //
+        // So we create an instance of TaxCreationForm here (we have the container), and put it in the ParserContext.
+        // This way, the Form plugin will use this instance, instead on creating it.
+        $taxCreationForm = new TaxCreationForm($this->getRequest(), 'form', array(), array(), $this->container->get('thelia.taxEngine'));
+
+        $this->getParserContext()->addForm($taxCreationForm);
+
+        return parent::defaultAction();
     }
 
     protected function getCreationForm()

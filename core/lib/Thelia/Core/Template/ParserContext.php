@@ -50,7 +50,7 @@ class ParserContext implements \IteratorAggregate
      */
     public function addForm(BaseForm $form)
     {
-        $this->set($form->getName(), $form);
+        $this->set(get_class($form)/*$form->getName()*/, $form);
 
         return $this;
     }
