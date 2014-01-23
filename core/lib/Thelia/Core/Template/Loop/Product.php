@@ -40,6 +40,7 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\Type\TypeCollection;
