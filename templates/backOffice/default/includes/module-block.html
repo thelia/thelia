@@ -114,7 +114,7 @@
 
                     <td class="text-right">
                         <div class="btn-group">
-                            C:{if $CONFIGURABLE == 1}1
+                            {if $CONFIGURABLE == 1}
                                 {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
                                     <a class="{if ! $ACTIVE}disabled {/if} btn btn-primary btn-xs" id="config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/$CODE"}">{intl l="Configure"}</a>
                                 {/loop}
