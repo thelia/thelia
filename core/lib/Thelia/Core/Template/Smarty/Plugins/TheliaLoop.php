@@ -91,9 +91,7 @@ class TheliaLoop extends AbstractSmartyPlugin
 
         $dummy = null;
 
-        $loopResults = $loop->exec($dummy);
-
-        return $loopResults->valid() ? $loopResults->getCount() : 0;
+        return $loop->exec($dummy, true);
     }
 
     /**
