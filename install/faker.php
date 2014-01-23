@@ -367,18 +367,18 @@ try {
     //categories and products
     $productIdList = array();
     $categoryIdList = array();
-    for ($i=1; $i<5; $i++) {
+    for ($i=1; $i<20; $i++) {
         $category = createCategory($faker, 0, $i, $categoryIdList, $contentIdList);
 
-        for ($j=1; $j<rand(0, 5); $j++) {
+        for ($j=1; $j<rand(0, 20); $j++) {
             $subcategory = createCategory($faker, $category->getId(), $j, $categoryIdList, $contentIdList);
 
-            for ($k=0; $k<rand(0, 5); $k++) {
+            for ($k=0; $k<rand(0, 20); $k++) {
                 createProduct($faker, $subcategory, $k, $template, $productIdList);
             }
         }
 
-        for ($k=1; $k<rand(1, 6); $k++) {
+        for ($k=1; $k<rand(1, 50); $k++) {
             createProduct($faker, $category, $k, $template, $productIdList);
         }
     }

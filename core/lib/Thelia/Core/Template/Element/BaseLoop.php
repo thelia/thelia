@@ -337,7 +337,7 @@ abstract class BaseLoop
      * @param $pagination
      * @return LoopResult
      */
-    public function exec(&$pagination)
+    public function exec(&$pagination, $count = false)
     {
         if ($this instanceof PropelSearchLoopInterface) {
             $searchModelCriteria = $this->buildModelCriteria();
@@ -359,6 +359,10 @@ abstract class BaseLoop
                     $pagination
                 );
             }
+        }
+
+        if ($count) {
+            return $results ? count($results) : 0;
         }
 
         $loopResult = new LoopResult($results);
