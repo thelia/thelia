@@ -67,6 +67,8 @@ abstract class BaseLoop
     protected $timestampable = false;
     protected $versionable = false;
 
+    private static $cache = array();
+
     /**
      * Create a new Loop
      *
@@ -361,45 +363,52 @@ abstract class BaseLoop
      */
     public function exec(&$pagination, $count = false)
     {
-        if ($this instanceof PropelSearchLoopInterface) {
-            $searchModelCriteria = $this->buildModelCriteria();
-            if (null === $searchModelCriteria) {
-                $results = array();
-            } else {
-                $results = $this->search(
-                    $searchModelCriteria,
-                    $pagination
-                );
+        $hash = $this->args->getHash();
+        if(false === array_key_exists($hash, self::$cache))
+        {
+            if ($this instanceof PropelSearchLoopInterface) {
+                $searchModelCriteria = $this->buildModelCriteria();
+                if (null === $searchModelCriteria) {
+                    $results = array();
+                } else {
+                    $results = $this->search(
+                        $searchModelCriteria,
+                        $pagination
+                    );
+                }
+            } elseif ($this instanceof ArraySearchLoopInterface) {
+                $searchArray = $this->buildArray();
+                if (null === $searchArray) {
+                    $results = array();
+                } else {
+                    $results = $this->searchArray(
+                        $searchArray,
+                        $pagination
+                    );
+                }
             }
-        } elseif ($this instanceof ArraySearchLoopInterface) {
-            $searchArray = $this->buildArray();
-            if (null === $searchArray) {
-                $results = array();
-            } else {
-                $results = $this->searchArray(
-                    $searchArray,
-                    $pagination
-                );
+
+            if ($count) {
+                return $results ? count($results) : 0;
             }
+
+            $loopResult = new LoopResult($results);
+
+            if (true === $this->countable) {
+                $loopResult->setCountable();
+            }
+            if (true === $this->timestampable) {
+                $loopResult->setTimestamped();
+            }
+            if (true === $this->versionable) {
+                $loopResult->setVersioned();
+            }
+
+            self::$cache[$hash] = $this->parseResults($loopResult);
         }
 
-        if ($count) {
-            return $results ? count($results) : 0;
-        }
+        return self::$cache[$hash];
 
-        $loopResult = new LoopResult($results);
-
-        if (true === $this->countable) {
-            $loopResult->setCountable();
-        }
-        if (true === $this->timestampable) {
-            $loopResult->setTimestamped();
-        }
-        if (true === $this->versionable) {
-            $loopResult->setVersioned();
-        }
-
-        return $this->parseResults($loopResult);
     }
 
     protected function checkInterface()
