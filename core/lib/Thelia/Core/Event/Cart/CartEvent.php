@@ -48,6 +48,7 @@ class CartEvent extends ActionEvent
     public function setAppend($append)
     {
         $this->append = $append;
+        return $this;
     }
 
     /**
@@ -64,6 +65,7 @@ class CartEvent extends ActionEvent
     public function setCartItem($cartItem)
     {
         $this->cartItem = $cartItem;
+        return $this;
     }
 
     /**
@@ -80,6 +82,7 @@ class CartEvent extends ActionEvent
     public function setNewness($newness)
     {
         $this->newness = $newness;
+        return $this;
     }
 
     /**
@@ -96,6 +99,7 @@ class CartEvent extends ActionEvent
     public function setProduct($product)
     {
         $this->product = $product;
+        return $this;
     }
 
     /**
@@ -112,6 +116,7 @@ class CartEvent extends ActionEvent
     public function setProductSaleElementsId($productSaleElementsId)
     {
         $this->productSaleElementsId = $productSaleElementsId;
+        return $this;
     }
 
     /**
@@ -128,6 +133,7 @@ class CartEvent extends ActionEvent
     public function setQuantity($quantity)
     {
         $this->quantity = $quantity;
+        return $this;
     }
 
     /**
@@ -145,5 +151,4 @@ class CartEvent extends ActionEvent
     {
         return $this->cart;
     }
-
 }

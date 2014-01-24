@@ -28,6 +28,7 @@ use Thelia\Core\Form\Type\TheliaType;
 use Thelia\Core\Translation\Translator;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\Model\Tax;
+use Thelia\Core\HttpFoundation\Request;
 
 /**
  * Class TaxCreationForm
