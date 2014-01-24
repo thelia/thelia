@@ -376,7 +376,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                 {/if}
                                 {if {config key="store_email"} }
                                 <li class="contact-email">
-                                    {mailto address="{config key="store_email"}" encode="hex" extra='class="email" itemprop="email"'}
+                                    {mailto address={config key="store_email"} encode="hex" extra='class="email" itemprop="email"'}
                                 </li>
                                 {/if}
                             </ul>
