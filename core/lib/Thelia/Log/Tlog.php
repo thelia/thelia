@@ -69,7 +69,7 @@ class Tlog Implements LoggerInterface
 
     // default values
     const DEFAULT_LEVEL     	= self::DEBUG;
-    const DEFAUT_DESTINATIONS   = "Thelia\Log\Destination\TlogDestinationFile";
+    const DEFAUT_DESTINATIONS   = "Thelia\Log\Destination\TlogDestinationRotatingFile";
     const DEFAUT_PREFIXE 	= "#INDEX: #LEVEL [#FILE:#FUNCTION()] {#LINE} #DATE #HOUR: ";
     const DEFAUT_FILES 		= "*";
     const DEFAUT_IP 		= "";

@@ -27,96 +27,75 @@ use Thelia\Log\AbstractTlogDestination;
 use Thelia\Log\TlogDestinationConfig;
 use Thelia\Core\Translation\Translator;
 
-class TlogDestinationFile extends AbstractTlogDestination
+class TlogDestinationRotatingFile extends TlogDestinationFile
 {
     // Nom des variables de configuration
     // ----------------------------------
-    const VAR_PATH_FILE = "tlog_destinationfile_path";
-    const TLOG_DEFAULT_NAME = "log-thelia.txt";
 
-    const VAR_MODE = "tlog_destinationfile_mode";
-    const VALEUR_MODE_DEFAULT = "A";
+    const VAR_MAX_FILE_SIZE_KB = "tlog_destinationfile_max_file_size";
+    const MAX_FILE_SIZE_KB_DEFAULT = 1024; // 1 Mb
 
-    protected $path_defaut = false;
-    protected $fh = false;
-
-    public function __construct()
+    public function __construct($maxFileSize = self::MAX_FILE_SIZE_KB_DEFAULT)
     {
         $this->path_defaut = THELIA_ROOT . "log" . DS . self::TLOG_DEFAULT_NAME;
+
+        $this->setConfig(self::VAR_MAX_FILE_SIZE_KB, $maxFileSize, false);
+
         parent::__construct();
-    }
-
-    protected function getFilePath() {
-        return $this->getConfig(self::VAR_PATH_FILE);
-    }
-
-    protected function getOpenMode() {
-        return strtolower($this->getConfig(self::VAR_MODE, self::VALEUR_MODE_DEFAULT)) == 'a' ? 'a' : 'w';
     }
 
     public function configure()
     {
+        parent::configure();
+
         $file_path = $this->getFilePath();
         $mode = $this->getOpenMode();
 
-        if (! empty($file_path)) {
-            if (! is_file($file_path)) {
-                $dir = dirname($file_path);
-                if (! is_dir($dir)) {
-                    mkdir($dir, 0777, true);
-                }
+        if ($this->fh) @fclose($this->fh);
 
-                touch($file_path);
-                chmod($file_path, 0666);
-            }
+        if (filesize($file_path) > 1024 * $this->getConfig(self::VAR_MAX_FILE_SIZE_KB, self::MAX_FILE_SIZE_KB_DEFAULT)) {
 
-            if ($this->fh) @fclose($this->fh);
+            $idx = 1;
 
-            $this->fh = fopen($file_path, $mode);
+            do {
+                $file_path_bk = "$file_path.$idx";
+
+                $idx++;
+
+            } while (file_exists($file_path_bk));
+
+            @rename($file_path, $file_path_bk);
+
+            @touch($file_path);
+            @chmod($file_path, 0666);
         }
+
+        $this->fh = fopen($file_path, $mode);
     }
 
     public function getTitle()
     {
-            return Translator::getInstance()->trans('Text File');
+            return Translator::getInstance()->trans('Rotated Text File');
     }
 
     public function getDescription()
     {
-            return Translator::getInstance()->trans('Store logs into text file');
+            return Translator::getInstance()->trans('Store logs into text file, up to a certian size, then a new file is created');
     }
 
     public function getConfigs()
     {
-        return array(
-            new TlogDestinationConfig(
-                self::VAR_PATH_FILE,
-                'Absolute file path',
-                'You should enter an abolute file path. The base directory of your Thelia installation is '.THELIA_ROOT,
-                $this->path_defaut,
+        $arr = parent::getConfigs();
+
+        $arr[] =
+             new TlogDestinationConfig(
+                self::VAR_MAX_FILE_SIZE_KB,
+                'Maximum log file size, in Kb',
+                'When this size if exeeded, a backup copy of the file is made, and a new log file is opened. As the file size check is performed only at the beginning of a request, the file size may be bigger thant this limit. Note: 1 Mb = 1024 Kb',
+                self::MAX_FILE_SIZE_KB_DEFAULT,
                 TlogDestinationConfig::TYPE_TEXTFIELD
-            ),
-            new TlogDestinationConfig(
-                self::VAR_MODE,
-                'File opening mode (A or E)',
-                'Enter E to empty this file for each request, or A to always append logs. Consider resetting the file from time to time',
-                self::VALEUR_MODE_DEFAULT,
-                TlogDestinationConfig::TYPE_TEXTFIELD
-            )
         );
-    }
 
-    public function add($texte)
-    {
-        if ($this->fh) {
-            fwrite($this->fh, $texte."\n");
-        }
-    }
-
-    public function write(&$res)
-    {
-        if ($this->fh) @fclose($this->fh);
-
-        $this->fh = false;
+        return $arr;
     }
 }
