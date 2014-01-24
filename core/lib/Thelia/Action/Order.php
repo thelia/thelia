@@ -316,7 +316,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         /* but memorize placed order */
         $event->setOrder(new \Thelia\Model\Order());
         $event->setPlacedOrder($placedOrder);
-var_dump($placedOrder);
+
         /* empty cart */
         $this->getDispatcher()->dispatch(TheliaEvents::CART_CLEAR, new CartEvent($this->getCart($this->getRequest())));
 
