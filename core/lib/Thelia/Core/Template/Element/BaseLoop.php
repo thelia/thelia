@@ -361,7 +361,7 @@ abstract class BaseLoop
      * @param $pagination
      * @return LoopResult
      */
-    public function exec(&$pagination, $count = false)
+    public function exec(&$pagination)
     {
         $hash = $this->args->getHash();
         if(false === array_key_exists($hash, self::$cache))
@@ -386,10 +386,6 @@ abstract class BaseLoop
                         $pagination
                     );
                 }
-            }
-
-            if ($count) {
-                return $results ? count($results) : 0;
             }
 
             $loopResult = new LoopResult($results);
