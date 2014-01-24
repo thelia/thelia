@@ -67,7 +67,8 @@ abstract class BaseLoop
     protected $timestampable = false;
     protected $versionable = false;
 
-    private static $cache = array();
+    private static $cacheLoopResult = array();
+    private static $cacheCount = array();
 
     /**
      * Create a new Loop
@@ -337,24 +338,29 @@ abstract class BaseLoop
 
     public function count()
     {
-        $count = 0;
-        if ($this instanceof PropelSearchLoopInterface) {
-            $searchModelCriteria = $this->buildModelCriteria();
-            if (null === $searchModelCriteria) {
-                $count = 0;
-            } else {
-                $count = $searchModelCriteria->count();
+        $hash = $this->args->getHash();
+        if(false === array_key_exists($hash, self::$cacheCount))
+        {
+            $count = 0;
+            if ($this instanceof PropelSearchLoopInterface) {
+                $searchModelCriteria = $this->buildModelCriteria();
+                if (null === $searchModelCriteria) {
+                    $count = 0;
+                } else {
+                    $count = $searchModelCriteria->count();
+                }
+            } elseif ($this instanceof ArraySearchLoopInterface) {
+                $searchArray = $this->buildArray();
+                if (null === $searchArray) {
+                    $count = 0;
+                } else {
+                    $count = count($searchArray);
+                }
             }
-        } elseif ($this instanceof ArraySearchLoopInterface) {
-            $searchArray = $this->buildArray();
-            if (null === $searchArray) {
-                $count = 0;
-            } else {
-                $count = count($searchArray);
-            }
+            self::$cacheCount[$hash] = $count;
         }
 
-        return $count;
+        return self::$cacheCount[$hash];
     }
 
     /**
@@ -364,7 +370,7 @@ abstract class BaseLoop
     public function exec(&$pagination)
     {
         $hash = $this->args->getHash();
-        if(false === array_key_exists($hash, self::$cache))
+        if(false === array_key_exists($hash, self::$cacheLoopResult))
         {
             if ($this instanceof PropelSearchLoopInterface) {
                 $searchModelCriteria = $this->buildModelCriteria();
@@ -400,10 +406,10 @@ abstract class BaseLoop
                 $loopResult->setVersioned();
             }
 
-            self::$cache[$hash] = $this->parseResults($loopResult);
+            self::$cacheLoopResult[$hash] = $this->parseResults($loopResult);
         }
 
-        return self::$cache[$hash];
+        return self::$cacheLoopResult[$hash];
 
     }
 
