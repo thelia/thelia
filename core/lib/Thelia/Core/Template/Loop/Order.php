@@ -26,17 +26,20 @@ namespace Thelia\Core\Template\Loop;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
-
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\Base\Customer;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\Map\CustomerTableMap;
+use Thelia\Model\Map\OrderAddressTableMap;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
-use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use Thelia\Type\TypeCollection;
+
 /**
  *
  * @package Thelia\Core\Template\Loop
@@ -72,7 +75,14 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('create-date', 'create-date-reverse'))
+                    new Type\EnumListType(array(
+                        'id', 'id-reverse',
+                        'reference', 'reference-reverse',
+                        'create-date', 'create-date-reverse',
+                        'company', 'company-reverse',
+                        'customer-name', 'customer-name-reverse',
+                        'status', 'status-reverse'
+                    ))
                 ),
                 'create-date-reverse'
             )
@@ -165,11 +175,66 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
 
         foreach ($orderers as $orderer) {
             switch ($orderer) {
+                case 'id':
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case 'id_reverse':
+                    $search->orderById(Criteria::DESC);
+                    break;
+
+                case 'reference':
+                    $search->orderByRef(Criteria::ASC);
+                    break;
+                case 'reference_reverse':
+                    $search->orderByRef(Criteria::DESC);
+                    break;
+
                 case "create-date":
                     $search->orderByCreatedAt(Criteria::ASC);
                     break;
                 case "create-date-reverse":
                     $search->orderByCreatedAt(Criteria::DESC);
+                    break;
+
+                case "status":
+                    $search->orderByStatusId(Criteria::ASC);
+                    break;
+                case "status":
+                    $search->orderByStatusId(Criteria::DESC);
+                    break;
+
+                case 'company' :
+                    $search
+                        ->joinOrderAddressRelatedByDeliveryOrderAddressId()
+                        ->withColumn(OrderAddressTableMap::COMPANY, 'company')
+                        ->orderBy('company', Criteria::ASC)
+                    ;
+                    break;
+                case 'companyreverse' :
+                    $search
+                        ->joinOrderAddressRelatedByDeliveryOrderAddressId()
+                        ->withColumn(OrderAddressTableMap::COMPANY, 'company')
+                        ->orderBy('company', Criteria::DESC)
+                    ;
+                    break;
+
+                case 'customer-name' :
+                    $search
+                        ->joinCustomer()
+                        ->withColumn(CustomerTableMap::FIRSTNAME, 'firstname')
+                        ->withColumn(CustomerTableMap::LASTNAME, 'lastname')
+                        ->orderBy('lastname', Criteria::ASC)
+                        ->orderBy('firstname', Criteria::ASC)
+                        ;
+                    break;
+                case 'customer-name-reverse' :
+                    $search
+                        ->joinCustomer()
+                        ->withColumn(CustomerTableMap::FIRSTNAME, 'firstname')
+                        ->withColumn(CustomerTableMap::LASTNAME, 'lastname')
+                        ->orderBy('lastname', Criteria::DESC)
+                        ->orderBy('firstname', Criteria::DESC)
+                    ;
                     break;
             }
         }

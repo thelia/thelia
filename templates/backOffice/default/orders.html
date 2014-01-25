@@ -32,12 +32,57 @@
 
 	                        <thead>
 		                        <tr>
-		                           <th>{intl l="Order n°"}</th>
-	                               <th>{intl l="Date & Hour"}</th>
-	                               <th>{intl l="Company"}</th>
-	                               <th>{intl l="Name"}</th>
-	                               <th>{intl l="Amount"}</th>
-	                               <th>{intl l="Status"}</th>
+                                    <th class="object-title">
+                                    {admin_sortable_header
+                                        current_order=$orders_order
+                                        order='reference'
+                                        reverse_order='reference-reverse'
+                                        path={url path='/admin/orders'}
+                                        request_parameter_name='orders_order'
+                                        label="{intl l='Order #'}"
+                                    } </th>
+
+                                    <th class="object-title">
+                                    {admin_sortable_header
+                                        current_order=$orders_order
+                                        order='create-date'
+                                        reverse_order='create-date-reverse'
+                                        path={url path='/admin/orders'}
+                                        request_parameter_name='orders_order'
+                                        label="{intl l='Date & Hour'}"
+                                    } </th>
+
+                                    <th class="object-title">
+                                    {admin_sortable_header
+                                        current_order=$orders_order
+                                        order='company'
+                                        reverse_order='company-reverse'
+                                        path={url path='/admin/orders'}
+                                        request_parameter_name='orders_order'
+                                        label="{intl l='Company'}"
+                                    } </th>
+
+                                    <th class="object-title">
+                                    {admin_sortable_header
+                                        current_order=$orders_order
+                                        order='customer-name'
+                                        reverse_order='customer-name-reverse'
+                                        path={url path='/admin/orders'}
+                                        request_parameter_name='orders_order'
+                                        label="{intl l='Cutomer Name'}"
+                                     } </th>
+
+                                    <th class="object-title text-right">{intl l='Amount'}</th>
+
+                                    <th class="object-title text-center">
+                                    {admin_sortable_header
+                                        current_order=$orders_order
+                                        order='status'
+                                        reverse_order='status-reverse'
+                                        path={url path='/admin/orders'}
+                                        request_parameter_name='orders_order'
+                                        label="{intl l='Status'}"
+                                    } </th>
 
 	                               {module_include location='orders_table_header'}
 
@@ -47,7 +92,11 @@
 
 	                        <tbody>
 
-                                {loop type="order" name="order-list" customer="*" backend_context="1" page={$order_page} limit={#max_displayed_orders#} status=$status_filter|default:'*'}
+                                {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page={$order_page} limit={#max_displayed_orders#} status=$status_filter|default:'*'}
+
+                                    {loop type="currency" name="order-currency" id=$CURRENCY}
+                                        {$orderCurrency=$SYMBOL}
+                                    {/loop}
 
                                     {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                         {assign "orderInvoiceFirstName" $FIRSTNAME}
@@ -66,8 +115,8 @@
 		                               	<td>{format_date date=$CREATE_DATE}</td>
 		                               	<td>{$orderInvoiceCompany}</td>
 		                               	<td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
-		                               	<td>{$TOTAL_TAXED_AMOUNT}</td>
-		                               	<td><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
+		                               	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</td>
+		                               	<td class="text-center"><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
 
 		                                {module_include location='orders_table_row'}
 
@@ -94,14 +143,14 @@
                                         <div class="text-center">
                                             <ul class="pagination pagination-centered">
                                                 {if $order_page != 1}
-                                                    <li><a href="{url path="/admin/orders" page="1"}">&laquo;</a></li>
+                                                    <li><a href="{url path="/admin/orders" page=1 orders_order=$orders_order}">&laquo;</a></li>
                                                 {else}
                                                     <li class="disabled"><a href="#">&laquo;</a></li>
                                                 {/if}
 
                                                 {pageloop rel="order-list"}
                                                 {if $PAGE != $CURRENT}
-                                                    <li><a href="{url path="/admin/orders" page=$PAGE}">{$PAGE}</a></li>
+                                                    <li><a href="{url path="/admin/orders" page=$PAGE orders_order=$orders_order}">{$PAGE}</a></li>
 
                                                 {else}
                                                     <li class="active"><a href="#">{$PAGE}</a></li>
@@ -110,7 +159,7 @@
 
                                                 {/pageloop}
                                                 {if $PAGE == $LAST && $LAST != $CURRENT}
-                                                    <li><a href="{url path="/admin/orders" page="$PAGE"}">&raquo;</a></li>
+                                                    <li><a href="{url path="/admin/orders" page=$PAGE orders_order=$orders_order}">&raquo;</a></li>
                                                 {else}
                                                     <li class="disabled"><a href="#">&raquo;</a></li>
                                                 {/if}

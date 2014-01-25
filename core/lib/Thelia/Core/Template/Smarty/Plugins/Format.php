@@ -28,6 +28,7 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\Exception\SmartyPluginException;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Tools\DateTimeFormat;
+use Thelia\Tools\MoneyFormat;
 use Thelia\Tools\NumberFormat;
 
 /**
@@ -135,6 +136,40 @@ class Format extends AbstractSmartyPlugin
                 $this->getParam($params, "thousands_sep", null)
         );
     }
+    /**
+     *
+     * display a amount in expected format
+     *
+     * available parameters :
+     *  number => int or float number
+     *  decimals => how many decimals format expected
+     *  dec_point => separator for the decimal point
+     *  thousands_sep => thousands separator
+     *  symbol => Currency symbol
+     *
+     *  ex : {format_money number="1246.12" decimals="1" dec_point="," thousands_sep=" " symbol="€"} will output "1 246,1 €"
+     *
+     * @param $params
+     * @param  null                                                         $template
+     * @throws \Thelia\Core\Template\Smarty\Exception\SmartyPluginException
+     * @return string                                                       the expected number formatted
+     */
+    public function formatMoney($params, $template = null)
+    {
+        $number = $this->getParam($params, "number", false);
+
+        if ($number ===  false || $number == '') {
+            return "";
+        }
+
+        return MoneyFormat::getInstance($this->request)->format(
+            $number,
+            $this->getParam($params, "decimals", null),
+            $this->getParam($params, "dec_point", null),
+            $this->getParam($params, "thousands_sep", null),
+            $this->getParam($params, "symbol", null)
+        );
+    }
 
     /**
      * @return an array of SmartyPluginDescriptor
@@ -143,7 +178,8 @@ class Format extends AbstractSmartyPlugin
     {
         return array(
             new SmartyPluginDescriptor("function", "format_date", $this, "formatDate"),
-            new SmartyPluginDescriptor("function", "format_number", $this, "formatNumber")
-        );
+            new SmartyPluginDescriptor("function", "format_number", $this, "formatNumber"),
+            new SmartyPluginDescriptor("function", "format_money", $this, "formatMoney")
+       );
     }
 }
