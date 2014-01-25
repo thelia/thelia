@@ -87,7 +87,7 @@ class Thelia extends Kernel
         $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
         if ($this->isDebug()) {
             $serviceContainer->setLogger('defaultLogger', \Thelia\Log\Tlog::getInstance());
-            //$con->useDebug(true);
+            $con->useDebug(true);
         }
 
     }
