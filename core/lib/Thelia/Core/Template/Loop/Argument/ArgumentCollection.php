@@ -144,4 +144,15 @@ class ArgumentCollection implements \Iterator
     {
         reset($this->arguments);
     }
+
+    public function getHash()
+    {
+        $arguments = $this->arguments;
+
+        if (array_key_exists('name', $arguments)) {
+            unset($arguments['name']);
+        }
+
+        return sha1(serialize($arguments));
+    }
 }
