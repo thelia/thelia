@@ -198,6 +198,7 @@
 
 								                     {elseloop rel="product-features-av"}
 								                         {* Get the free text value *}
+                                                        {$feature_value=''}
 
 								                         {loop name="free-text-value" exclude_feature_availability="1" type="feature_value" product=$product_id feature=$ID  backend_context="1" lang="$edit_language_id"}
 								                            {$feature_value=$FREE_TEXT_VALUE}
