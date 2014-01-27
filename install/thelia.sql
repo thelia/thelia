@@ -20,7 +20,9 @@ CREATE TABLE `category`
     `version` INTEGER DEFAULT 0,
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    INDEX `idx_parent` (`parent`),
+    INDEX `idx_parent_position` (`parent`, `position`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

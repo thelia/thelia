@@ -12,6 +12,13 @@
     <column name="meta_title" size="255" type="VARCHAR" />
     <column name="meta_description" type="LONGVARCHAR" />
     <column name="meta_keywords" type="LONGVARCHAR" />
+    <index name="idx_parent">
+      <index-column name="parent" />
+    </index>
+    <index name="idx_parent_position">
+      <index-column name="parent" />
+      <index-column name="position" />
+    </index>
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum, meta_title, meta_description, meta_keywords" />
     </behavior>
