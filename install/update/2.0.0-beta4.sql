@@ -12,4 +12,6 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 UPDATE `config` SET `value`='2.0.0-beta4' WHERE `name`='thelia_version';
 UPDATE `config` SET `value`='beta4' WHERE `name`='thelia_extra_version';
 
+UPDATE `admin` SET `locale`='en_US';
+
 SET FOREIGN_KEY_CHECKS = 1;
