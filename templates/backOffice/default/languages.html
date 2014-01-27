@@ -18,12 +18,20 @@
 
         {module_include location='languages_top'}
 
+        {if $error_message}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-danger">
+                        {$error_message}
+                    </div>
+                </div>
+             </div>
+        {/if}
+
         <div class="row">
             <div class="col-md-12">
                 <div class="general-block-decorator">
-
                     <form action="" method="">
-
                         <table class="table table-striped table-condensed table-left-aligned">
                             <caption>
                                {intl l="Languages management"}
@@ -36,7 +44,7 @@
                             </caption>
                             <thead>
                                 <tr>
-                                    <th>{intl l="Language name"}</th>
+                                    <th colspan="2">{intl l="Language name"}</th>
                                     <th>{intl l="ISO 639 Code"}</th>
                                     <th>{intl l="Locale"}</th>
                                     <th>{intl l="date form"}</th>
@@ -48,6 +56,7 @@
                             <tbody>
                                 {loop type="lang" name="lang.list" backend_context="1"}
                                 <tr>
+                                    <td class="text-center"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$CODE}" /></td>
                                     <td>{$TITLE}</td>
                                     <td>{$CODE}</td>
                                     <td>{$LOCALE}</td>
@@ -98,7 +107,7 @@
                         <div class="form-group {if $error}has-error{/if}" >
                             <label for="{$label_attr.for}" class="label-control">{intl l="If a translation is missing or incomplete :"}</label>
                             <div class="input-group">
-                                <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker" class="form-control">
+                                <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
                                     {foreach $choices as $choice}
                                         <option value="{$choice->value}" {if $lang_without_translation == $choice->value}selected="selected"{/if}>{$choice->label}</option>
                                     {/foreach}

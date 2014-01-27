@@ -38,6 +38,7 @@ use Thelia\Form\Lang\LangDefaultBehaviorForm;
 use Thelia\Form\Lang\LangUpdateForm;
 use Thelia\Form\Lang\LangUrlEvent;
 use Thelia\Form\Lang\LangUrlForm;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 
@@ -118,11 +119,13 @@ class LangController extends BaseAdminController
             $changedObject = $event->getLang();
             $this->adminLogAppend(AdminResources::LANGUAGE, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
             $this->redirectToRoute('admin.configuration.languages');
-        } catch (\Exception $e) {
-            $error_msg = $e->getMessage();
+        } catch (\Exception $ex) {
+            $error_msg = $this->getTranslator()->trans("Failed to update language definition: %ex", array("%ex" => $ex->getMessage()));
+            Tlog::getInstance()->addError("Failed to update language definition", $ex->getMessage());
         }
+echo "err=".$error_msg;
 
-        return $this->renderDefault();
+        return $this->renderDefault(array('error_message' => $error_msg));
     }
 
     protected function hydrateEvent($event,Form $form)
@@ -156,7 +159,7 @@ class LangController extends BaseAdminController
             $this->adminLogAppend(AdminResources::LANGUAGE, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
 
         } catch (\Exception $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("Error on changing default languages with message : %s", $e->getMessage()));
+            Tlog::getInstance()->error(sprintf("Error on changing default languages with message : %s", $e->getMessage()));
             $error = $e->getMessage();
         }
 
@@ -223,7 +226,7 @@ class LangController extends BaseAdminController
 
             $this->redirectToRoute('admin.configuration.languages');
         } catch (\Exception $ex) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("error during language removal with message : %s", $ex->getMessage()));
+            Tlog::getInstance()->error(sprintf("error during language removal with message : %s", $ex->getMessage()));
             $error_msg = $ex->getMessage();
         }
 
