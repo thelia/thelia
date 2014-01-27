@@ -5,8 +5,11 @@ namespace Thelia\Model;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Lang\LangEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Template\TemplateHelper;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\Base\Lang as BaseLang;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Map\LangTableMap;
@@ -53,6 +56,33 @@ class Lang extends BaseLang {
 
     }
 
+    protected function fixMissingFlag() {
+        // Be sure that a lang have a flag, otherwise copy the
+        // "unknown" flag
+        $adminTemplate = TemplateHelper::getInstance()->getActiveAdminTemplate();
+        $unknownFlag = ConfigQuery::getUnknownFlagPath();
+
+        $unknownFlagPath = $adminTemplate->getAbsolutePath().DS.$unknownFlag;
+
+        if (! file_exists($unknownFlagPath)) {
+            throw new \RuntimeException(
+                Translator::getInstance()->trans(
+                    "The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.",
+                    array("%file" => $unknownFlag)
+                )
+            );
+        }
+
+        // Check if the country flag exists
+        $countryFlag = rtrim(dirname($unknownFlagPath), DS).DS.$this->getCode().'.png';
+
+        if (! file_exists($countryFlag)) {
+            $fs = new Filesystem();
+
+            $fs->copy($unknownFlagPath, $countryFlag);
+        }
+    }
+
     public function preInsert(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATELANG, new LangEvent($this));
@@ -63,6 +93,8 @@ class Lang extends BaseLang {
     public function postInsert(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::AFTER_CREATELANG, new LangEvent($this));
+
+        $this->fixMissingFlag();
     }
 
     public function preUpdate(ConnectionInterface $con = null)
@@ -75,6 +107,8 @@ class Lang extends BaseLang {
     public function postUpdate(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATELANG, new LangEvent($this));
+
+        $this->fixMissingFlag();
     }
 
     public function preDelete(ConnectionInterface $con = null)

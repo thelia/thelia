@@ -84,7 +84,7 @@
                                 <div class="btn-group">
                                     {loop type="lang" name="ui-lang" id="{lang attr='id'}"}
                                     <button class="btn btn-default">
-                                        <img src="{image file="assets/img/flags/{$CODE}.gif"}" alt="$TITLE" /> {$CODE|ucfirst}</a>
+                                        <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a>
                                     </button>
                                     {/loop}
 
@@ -93,7 +93,7 @@
                                     </button>
                                     <ul class="dropdown-menu">
                                         {loop type="lang" name="ui-lang"}
-                                        <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.gif"}" alt="$TITLE" /> {$CODE|ucfirst}</a></li>
+                                        <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
                                         {/loop}
                                      </ul>
                                 </div>

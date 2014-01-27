@@ -12,6 +12,12 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 UPDATE `config` SET `value`='2.0.0-beta4' WHERE `name`='thelia_version';
 UPDATE `config` SET `value`='beta4' WHERE `name`='thelia_extra_version';
 
+-- Preferred locale for admin users
+ALTER TABLE `admin` ADD `locale` VARCHAR(45) NOT NULL;
 UPDATE `admin` SET `locale`='en_US';
+
+-- Unknown flag image path
+INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+('unknown-flag-path','assets/img/flags/unknown.png', 1, 1, NOW(), NOW());
 
 SET FOREIGN_KEY_CHECKS = 1;

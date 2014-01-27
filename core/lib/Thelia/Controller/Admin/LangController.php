@@ -123,7 +123,6 @@ class LangController extends BaseAdminController
             $error_msg = $this->getTranslator()->trans("Failed to update language definition: %ex", array("%ex" => $ex->getMessage()));
             Tlog::getInstance()->addError("Failed to update language definition", $ex->getMessage());
         }
-echo "err=".$error_msg;
 
         return $this->renderDefault(array('error_message' => $error_msg));
     }
@@ -231,7 +230,7 @@ echo "err=".$error_msg;
         }
 
         return $this->renderDefault(array(
-           'error_delete_message' => $error_msg
+           'error_message' => $error_msg
         ));
 
     }
