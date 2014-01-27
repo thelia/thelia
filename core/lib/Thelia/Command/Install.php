@@ -227,6 +227,7 @@ class Install extends ContainerAwareCommand
                 $connectionInfo["username"],
                 $connectionInfo["password"]
             );
+            $connection->query('SET NAMES \'UTF8\'');
         } catch (\PDOException $e) {
             $output->writeln(array(
                 "<error>Wrong connection information</error>"
