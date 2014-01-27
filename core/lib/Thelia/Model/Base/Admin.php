@@ -93,6 +93,12 @@ abstract class Admin implements ActiveRecordInterface
     protected $password;
 
     /**
+     * The value for the locale field.
+     * @var        string
+     */
+    protected $locale;
+
+    /**
      * The value for the algo field.
      * @var        string
      */
@@ -466,6 +472,17 @@ abstract class Admin implements ActiveRecordInterface
     }
 
     /**
+     * Get the [locale] column value.
+     *
+     * @return   string
+     */
+    public function getLocale()
+    {
+
+        return $this->locale;
+    }
+
+    /**
      * Get the [algo] column value.
      *
      * @return   string
@@ -680,6 +697,27 @@ abstract class Admin implements ActiveRecordInterface
     } // setPassword()
 
     /**
+     * Set the value of [locale] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Admin The current object (for fluent API support)
+     */
+    public function setLocale($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->locale !== $v) {
+            $this->locale = $v;
+            $this->modifiedColumns[AdminTableMap::LOCALE] = true;
+        }
+
+
+        return $this;
+    } // setLocale()
+
+    /**
      * Set the value of [algo] column.
      *
      * @param      string $v new value
@@ -860,25 +898,28 @@ abstract class Admin implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AdminTableMap::translateFieldName('Password', TableMap::TYPE_PHPNAME, $indexType)];
             $this->password = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AdminTableMap::translateFieldName('Algo', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AdminTableMap::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->locale = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AdminTableMap::translateFieldName('Algo', TableMap::TYPE_PHPNAME, $indexType)];
             $this->algo = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AdminTableMap::translateFieldName('Salt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : AdminTableMap::translateFieldName('Salt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->salt = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : AdminTableMap::translateFieldName('RememberMeToken', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : AdminTableMap::translateFieldName('RememberMeToken', TableMap::TYPE_PHPNAME, $indexType)];
             $this->remember_me_token = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : AdminTableMap::translateFieldName('RememberMeSerial', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : AdminTableMap::translateFieldName('RememberMeSerial', TableMap::TYPE_PHPNAME, $indexType)];
             $this->remember_me_serial = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : AdminTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : AdminTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : AdminTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : AdminTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -891,7 +932,7 @@ abstract class Admin implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 12; // 12 = AdminTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 13; // 13 = AdminTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Admin object", 0, $e);
@@ -1145,6 +1186,9 @@ abstract class Admin implements ActiveRecordInterface
         if ($this->isColumnModified(AdminTableMap::PASSWORD)) {
             $modifiedColumns[':p' . $index++]  = '`PASSWORD`';
         }
+        if ($this->isColumnModified(AdminTableMap::LOCALE)) {
+            $modifiedColumns[':p' . $index++]  = '`LOCALE`';
+        }
         if ($this->isColumnModified(AdminTableMap::ALGO)) {
             $modifiedColumns[':p' . $index++]  = '`ALGO`';
         }
@@ -1191,6 +1235,9 @@ abstract class Admin implements ActiveRecordInterface
                         break;
                     case '`PASSWORD`':
                         $stmt->bindValue($identifier, $this->password, PDO::PARAM_STR);
+                        break;
+                    case '`LOCALE`':
+                        $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
                     case '`ALGO`':
                         $stmt->bindValue($identifier, $this->algo, PDO::PARAM_STR);
@@ -1291,21 +1338,24 @@ abstract class Admin implements ActiveRecordInterface
                 return $this->getPassword();
                 break;
             case 6:
-                return $this->getAlgo();
+                return $this->getLocale();
                 break;
             case 7:
-                return $this->getSalt();
+                return $this->getAlgo();
                 break;
             case 8:
-                return $this->getRememberMeToken();
+                return $this->getSalt();
                 break;
             case 9:
-                return $this->getRememberMeSerial();
+                return $this->getRememberMeToken();
                 break;
             case 10:
-                return $this->getCreatedAt();
+                return $this->getRememberMeSerial();
                 break;
             case 11:
+                return $this->getCreatedAt();
+                break;
+            case 12:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1343,12 +1393,13 @@ abstract class Admin implements ActiveRecordInterface
             $keys[3] => $this->getLastname(),
             $keys[4] => $this->getLogin(),
             $keys[5] => $this->getPassword(),
-            $keys[6] => $this->getAlgo(),
-            $keys[7] => $this->getSalt(),
-            $keys[8] => $this->getRememberMeToken(),
-            $keys[9] => $this->getRememberMeSerial(),
-            $keys[10] => $this->getCreatedAt(),
-            $keys[11] => $this->getUpdatedAt(),
+            $keys[6] => $this->getLocale(),
+            $keys[7] => $this->getAlgo(),
+            $keys[8] => $this->getSalt(),
+            $keys[9] => $this->getRememberMeToken(),
+            $keys[10] => $this->getRememberMeSerial(),
+            $keys[11] => $this->getCreatedAt(),
+            $keys[12] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1412,21 +1463,24 @@ abstract class Admin implements ActiveRecordInterface
                 $this->setPassword($value);
                 break;
             case 6:
-                $this->setAlgo($value);
+                $this->setLocale($value);
                 break;
             case 7:
-                $this->setSalt($value);
+                $this->setAlgo($value);
                 break;
             case 8:
-                $this->setRememberMeToken($value);
+                $this->setSalt($value);
                 break;
             case 9:
-                $this->setRememberMeSerial($value);
+                $this->setRememberMeToken($value);
                 break;
             case 10:
-                $this->setCreatedAt($value);
+                $this->setRememberMeSerial($value);
                 break;
             case 11:
+                $this->setCreatedAt($value);
+                break;
+            case 12:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1459,12 +1513,13 @@ abstract class Admin implements ActiveRecordInterface
         if (array_key_exists($keys[3], $arr)) $this->setLastname($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setLogin($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setPassword($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setAlgo($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setSalt($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setRememberMeToken($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setRememberMeSerial($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
+        if (array_key_exists($keys[6], $arr)) $this->setLocale($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setAlgo($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setSalt($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setRememberMeToken($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setRememberMeSerial($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
     }
 
     /**
@@ -1482,6 +1537,7 @@ abstract class Admin implements ActiveRecordInterface
         if ($this->isColumnModified(AdminTableMap::LASTNAME)) $criteria->add(AdminTableMap::LASTNAME, $this->lastname);
         if ($this->isColumnModified(AdminTableMap::LOGIN)) $criteria->add(AdminTableMap::LOGIN, $this->login);
         if ($this->isColumnModified(AdminTableMap::PASSWORD)) $criteria->add(AdminTableMap::PASSWORD, $this->password);
+        if ($this->isColumnModified(AdminTableMap::LOCALE)) $criteria->add(AdminTableMap::LOCALE, $this->locale);
         if ($this->isColumnModified(AdminTableMap::ALGO)) $criteria->add(AdminTableMap::ALGO, $this->algo);
         if ($this->isColumnModified(AdminTableMap::SALT)) $criteria->add(AdminTableMap::SALT, $this->salt);
         if ($this->isColumnModified(AdminTableMap::REMEMBER_ME_TOKEN)) $criteria->add(AdminTableMap::REMEMBER_ME_TOKEN, $this->remember_me_token);
@@ -1556,6 +1612,7 @@ abstract class Admin implements ActiveRecordInterface
         $copyObj->setLastname($this->getLastname());
         $copyObj->setLogin($this->getLogin());
         $copyObj->setPassword($this->getPassword());
+        $copyObj->setLocale($this->getLocale());
         $copyObj->setAlgo($this->getAlgo());
         $copyObj->setSalt($this->getSalt());
         $copyObj->setRememberMeToken($this->getRememberMeToken());
@@ -1652,6 +1709,7 @@ abstract class Admin implements ActiveRecordInterface
         $this->lastname = null;
         $this->login = null;
         $this->password = null;
+        $this->locale = null;
         $this->algo = null;
         $this->salt = null;
         $this->remember_me_token = null;

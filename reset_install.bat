@@ -43,7 +43,7 @@ if exist local\config\database.yml (
     echo [INFO] Activating Delivery Module(s)
     php Thelia module:activate Colissimo
 
-    echo "[INFO] Activating Payment Module(s)"
+    echo [INFO] Activating Payment Module(s)
     php Thelia module:activate Cheque
 
     echo [SUCCESS] Reset done

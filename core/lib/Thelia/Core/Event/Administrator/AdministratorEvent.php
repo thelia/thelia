@@ -35,6 +35,7 @@ class AdministratorEvent extends ActionEvent
     protected $login = null;
     protected $password = null;
     protected $profile = null;
+    protected $locale = null;
 
     public function __construct(Admin $administrator = null)
     {
@@ -116,5 +117,16 @@ class AdministratorEvent extends ActionEvent
     public function getProfile()
     {
         return $this->profile;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+        return $this;
+    }
+
+    public function getLocale()
+    {
+        return $this->locale;
     }
 }

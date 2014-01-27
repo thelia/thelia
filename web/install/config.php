@@ -93,6 +93,10 @@ $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
             <input id="admin_password_verif" class="form-control" type="password" name="admin_password_verif" value="" required>
         </div>
         <div class="form-group">
+            <label for="admin_locale"><?php echo $trans->trans('Administrator preferred locale :'); ?></label>
+            <input id="admin_locale" class="form-control" type="password" name="admin_locale" value="" required>
+        </div>
+        <div class="form-group">
             <label for="email_contact"><?php echo $trans->trans('Contact email :'); ?></label>
             <input id="email_contact" class="form-control" type="text" name="store_email" placeholder="foo@bar.com" value="" required>
         </div>

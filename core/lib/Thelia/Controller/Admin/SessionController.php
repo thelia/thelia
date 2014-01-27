@@ -26,8 +26,11 @@ namespace Thelia\Controller\Admin;
 use Thelia\Form\AdminLogin;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Model\Admin;
 use Thelia\Model\AdminLog;
 use Thelia\Core\Security\Exception\AuthenticationException;
+use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Event\TheliaEvents;
@@ -56,8 +59,11 @@ class SessionController extends BaseAdminController
                 // Update the cookie
                 $this->createAdminRememberMeCookie($user);
 
+                $this->applyUserLocale($user);
+
                 // Render the home page
                 return $this->render("home");
+
             } catch (TokenAuthenticationException $ex) {
                 $this->adminLogAppend("admin", "LOGIN", "Token based authentication failed.");
 
@@ -67,6 +73,18 @@ class SessionController extends BaseAdminController
         }
 
         return $this->render("login");
+    }
+
+    protected function applyUserLocale(Admin $user) {
+
+        // Set the current language according to Admin locale preference
+        $locale = $user->getLocale();
+
+        if (null === $lang = LangQuery::create()->findOneByLocale($locale)) {
+            $lang = Lang::getDefaultLanguage();
+        }
+
+        $this->getSession()->setLang($lang);
     }
 
     public function checkLogoutAction()
@@ -101,6 +119,8 @@ class SessionController extends BaseAdminController
 
             // Log authentication success
             AdminLog::append("admin", "LOGIN", "Authentication successful", $request, $user, false);
+
+            $this->applyUserLocale($user);
 
             /**
              * FIXME: we have tou find a way to send cookie

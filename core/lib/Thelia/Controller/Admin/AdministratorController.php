@@ -66,6 +66,7 @@ class AdministratorController extends AbstractCrudController
         $event->setLastname($formData['lastname']);
         $event->setPassword($formData['password']);
         $event->setProfile($formData['profile'] ? : null);
+        $event->setLocale($formData['locale']);
 
         return $event;
     }
@@ -80,6 +81,7 @@ class AdministratorController extends AbstractCrudController
         $event->setLastname($formData['lastname']);
         $event->setPassword($formData['password']);
         $event->setProfile($formData['profile'] ? : null);
+        $event->setLocale($formData['locale']);
 
         return $event;
     }
@@ -108,6 +110,7 @@ class AdministratorController extends AbstractCrudController
             'lastname'          => $object->getLastname(),
             'login'             => $object->getLogin(),
             'profile'           => $object->getProfileId(),
+            'locale'            => $object->getLocale()
         );
 
         // Setup the object form

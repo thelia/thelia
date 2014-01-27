@@ -33,6 +33,7 @@ if($_SESSION['install']['step'] == 5) {
         ->setPassword($_POST['admin_password'])
         ->setFirstname('admin')
         ->setLastname('admin')
+        ->setLocale(empty($_POST['admin_locale']) ? 'en_US' : $_POST['admin_locale'])
         ->save();
 
 
