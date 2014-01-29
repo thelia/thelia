@@ -339,7 +339,7 @@ abstract class BaseLoop
     public function count()
     {
         $hash = $this->args->getHash();
-        if(false === array_key_exists($hash, self::$cacheCount))
+        if(false === isset(self::$cacheCount[$hash]))
         {
             $count = 0;
             if ($this instanceof PropelSearchLoopInterface) {
@@ -370,7 +370,7 @@ abstract class BaseLoop
     public function exec(&$pagination)
     {
         $hash = $this->args->getHash();
-        if(false === array_key_exists($hash, self::$cacheLoopResult))
+        if(false === isset(self::$cacheLoopResult[$hash]))
         {
             if ($this instanceof PropelSearchLoopInterface) {
                 $searchModelCriteria = $this->buildModelCriteria();
