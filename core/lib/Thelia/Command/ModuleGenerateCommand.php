@@ -106,7 +106,6 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
             $schemaContent = file_get_contents($skeletonDir . "schema.xml");
 
-            $schemaContent = str_replace("%%CONFIG_DIR%%", THELIA_CONF_DIR, $schemaContent);
             $schemaContent = str_replace("%%NAMESPACE%%", $this->module, $schemaContent);
 
             file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "schema.xml", $schemaContent);
