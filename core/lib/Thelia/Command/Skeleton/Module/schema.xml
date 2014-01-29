@@ -3,5 +3,5 @@
     <!--
     See propel documentation on http://propelorm.org for all information about schema file
     -->
-    <external-schema filename="%%CONFIG_DIR%%schema.xml" referenceOnly="true" />
+    <external-schema filename="local/config/schema.xml" referenceOnly="true" />
 </database>
