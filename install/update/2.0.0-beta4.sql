@@ -13,7 +13,7 @@ UPDATE `config` SET `value`='2.0.0-beta4' WHERE `name`='thelia_version';
 UPDATE `config` SET `value`='beta4' WHERE `name`='thelia_extra_version';
 
 -- Preferred locale for admin users
-ALTER TABLE `admin` ADD `locale` VARCHAR(45) NOT NULL;
+ALTER TABLE `admin` ADD `locale` VARCHAR(45) NOT NULL AFTER `password`;
 UPDATE `admin` SET `locale`='en_US';
 
 -- Unknown flag image path
