@@ -25,6 +25,7 @@ namespace Thelia\Tests\Action;
 
 use Thelia\Action\Administrator;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
+use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Model\AdminQuery;
 use Thelia\Model\LangQuery;
 
@@ -97,6 +98,44 @@ class AdministratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($adminEvent->getLogin(), $updatedAdmin->getLogin());
         $this->assertEquals($adminEvent->getLocale(), $updatedAdmin->getLocale());
         $this->assertEquals($adminEvent->getProfile(), $updatedAdmin->getProfileId());
+        $this->assertTrue(password_verify($adminEvent->getPassword(), $updatedAdmin->getPassword()));
+    }
+
+    public function testDelete()
+    {
+        $admin = AdminQuery::create()->findOne();
+
+        $adminEvent = new AdministratorEvent();
+
+        $adminEvent
+            ->setId($admin->getId())
+            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"))
+        ;
+
+        $actionAdmin = new Administrator();
+        $actionAdmin->delete($adminEvent);
+
+        $deletedAdmin = $adminEvent->getAdministrator();
+
+        $this->assertInstanceOf("Thelia\Model\Admin", $deletedAdmin);
+        $this->assertTrue($deletedAdmin->isDeleted());
+    }
+
+    public function testUpdatePassword()
+    {
+        $admin = AdminQuery::create()->findOne();
+
+        $adminEvent = new AdministratorUpdatePasswordEvent($admin);
+        $adminEvent
+            ->setPassword('toto')
+            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+
+        $actionAdmin = new Administrator();
+        $actionAdmin->updatePassword($adminEvent);
+
+        $updatedAdmin = $adminEvent->getAdmin();
+
+        $this->assertInstanceOf("Thelia\Model\Admin", $updatedAdmin);
         $this->assertTrue(password_verify($adminEvent->getPassword(), $updatedAdmin->getPassword()));
     }
 
