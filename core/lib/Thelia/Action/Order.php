@@ -342,6 +342,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
 
 
+
         /* clear session */
         $session
             ->setProcessedOrder($placedOrder)
