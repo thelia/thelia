@@ -25,6 +25,7 @@ namespace Thelia\Tests\Action;
 
 use Thelia\Action\Administrator;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
+use Thelia\Model\AdminQuery;
 use Thelia\Model\LangQuery;
 
 
@@ -64,6 +65,39 @@ class AdministratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($adminEvent->getLocale(), $createdAdmin->getLocale());
         $this->assertEquals($adminEvent->getProfile(), $createdAdmin->getProfileId());
         $this->assertTrue(password_verify($adminEvent->getPassword(), $createdAdmin->getPassword()));
+    }
+
+    public function testUpdate()
+    {
+        $admin = AdminQuery::create()->findOne();
+
+        $login = 'thelia'.uniqid();
+        $locale = LangQuery::create()->findOne()->getLocale();
+        $adminEvent = new AdministratorEvent();
+        $adminEvent
+            ->setId($admin->getId())
+            ->setFirstname('thelia_update')
+            ->setLastname('thelia_update')
+            ->setLogin($login)
+            ->setPassword('azertyuiop')
+            ->setLocale($locale)
+            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"))
+        ;
+
+        $actionAdmin = new Administrator();
+        $actionAdmin->update($adminEvent);
+
+        $updatedAdmin = $adminEvent->getAdministrator();
+
+        $this->assertInstanceOf("Thelia\Model\Admin", $updatedAdmin);
+        $this->assertFalse($updatedAdmin->isNew());
+
+        $this->assertEquals($adminEvent->getFirstname(), $updatedAdmin->getFirstname());
+        $this->assertEquals($adminEvent->getLastname(), $updatedAdmin->getLastname());
+        $this->assertEquals($adminEvent->getLogin(), $updatedAdmin->getLogin());
+        $this->assertEquals($adminEvent->getLocale(), $updatedAdmin->getLocale());
+        $this->assertEquals($adminEvent->getProfile(), $updatedAdmin->getProfileId());
+        $this->assertTrue(password_verify($adminEvent->getPassword(), $updatedAdmin->getPassword()));
     }
 
 
