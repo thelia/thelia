@@ -35,7 +35,7 @@ use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
-use Thelia\Model\Customer;
+use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\Lang;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\MessageQuery;
@@ -118,7 +118,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    protected function createOrder(ModelOrder $sessionOrder, Currency $currency, Lang $lang, CartModel $cart, Customer $customer)
+    protected function createOrder(ModelOrder $sessionOrder, Currency $currency, Lang $lang, CartModel $cart, CustomerModel $customer)
     {
         $con = \Propel\Runtime\Propel::getConnection(
                 OrderTableMap::DATABASE_NAME
@@ -304,7 +304,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $this->getSecurityContext()->getCustomerUser()
         );
 
-        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
+        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
 
         /* clear session */
         $session
@@ -317,7 +317,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setPlacedOrder($placedOrder);
 
         /* empty cart */
-        $event->getDispatcher()->dispatch(TheliaEvents::CART_CLEAR, new CartEvent($this->getCart($this->getRequest())));
+        $this->getDispatcher()->dispatch(TheliaEvents::CART_CLEAR, new CartEvent($this->getCart($this->getRequest())));
 
         /* call pay method */
 
