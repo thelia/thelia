@@ -81,23 +81,6 @@ class FileManager
     CONST FILE_TYPE_IMAGES   = 'images';
     CONST FILE_TYPE_DOCUMENTS   = 'documents';
 
-    /** @var ContainerInterface Service Container */
-    protected $container = null;
-
-    /** @var Translator Service Translator */
-    protected $translator = null;
-
-    /**
-     * Constructor
-     *
-     * @param ContainerInterface $container Service container
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-        $this->translator = $this->container->get('thelia.translator');
-    }
-
     /**
      * Copy UploadedFile into the server storage directory
      *

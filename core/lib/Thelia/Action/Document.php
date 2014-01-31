@@ -144,7 +144,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      */
     public function saveDocument(DocumentCreateOrUpdateEvent $event)
     {
-        $fileManager = new FileManager($this->container);
+        $fileManager = new FileManager();
         $model = $event->getModelDocument();
 
         $nbModifiedLines = $model->save();
@@ -180,7 +180,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
             $event->getModelDocument()->setTitle($event->getUploadedFile()->getClientOriginalName());
         }
 
-        $fileManager = new FileManager($this->container);
+        $fileManager = new FileManager();
         // Copy and save file
         if ($event->getUploadedFile()) {
             // Remove old picture file from file storage
@@ -211,7 +211,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      */
     public function deleteDocument(DocumentDeleteEvent $event)
     {
-        $fileManager = new FileManager($this->container);
+        $fileManager = new FileManager();
 
         $fileManager->deleteFile($event->getDocumentToDelete(), $event->getDocumentType(), FileManager::FILE_TYPE_DOCUMENTS);
     }

@@ -202,7 +202,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getFile')
             ->will($this->returnValue('file'));
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $event = new ImageCreateOrUpdateEvent(FileManager::TYPE_PRODUCT, 24);
 
@@ -231,7 +231,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getFile')
             ->will($this->returnValue('file'));
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $event = new DocumentCreateOrUpdateEvent(FileManager::TYPE_PRODUCT, 24);
 
@@ -260,7 +260,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getFile')
             ->will($this->returnValue('file'));
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $event = new ImageCreateOrUpdateEvent(FileManager::TYPE_CATEGORY, 24);
 
@@ -289,7 +289,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getFile')
             ->will($this->returnValue('file'));
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $event = new DocumentCreateOrUpdateEvent(FileManager::TYPE_CATEGORY, 24);
 
@@ -318,7 +318,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getFile')
             ->will($this->returnValue('file'));
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $event = new ImageCreateOrUpdateEvent(FileManager::TYPE_FOLDER, 24);
 
@@ -347,7 +347,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getFile')
             ->will($this->returnValue('file'));
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $event = new DocumentCreateOrUpdateEvent(FileManager::TYPE_FOLDER, 24);
 
@@ -376,7 +376,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getFile')
             ->will($this->returnValue('file'));
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $event = new ImageCreateOrUpdateEvent(FileManager::TYPE_CONTENT, 24);
 
@@ -405,7 +405,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getFile')
             ->will($this->returnValue('file'));
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $event = new DocumentCreateOrUpdateEvent(FileManager::TYPE_CONTENT, 24);
 
@@ -424,7 +424,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\ContainerInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $stubProductImage = $this->getMockBuilder('\Thelia\Model\ProductImage')
             ->disableOriginalConstructor()
@@ -450,7 +450,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\ContainerInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $stubProductDocument = $this->getMockBuilder('\Thelia\Model\ProductDocument')
             ->disableOriginalConstructor()
@@ -476,7 +476,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\ContainerInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $stubProductImage = $this->getMockBuilder('\Thelia\Model\ProductImage')
             ->disableOriginalConstructor()
@@ -502,7 +502,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\ContainerInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $stubProductDocument = $this->getMockBuilder('\Thelia\Model\ProductDocument')
             ->disableOriginalConstructor()
@@ -528,7 +528,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
         $badFileName = 'a/ze\érà~çè§^"$*+-_°)(&é<>@#ty2/[\/:*?"<>|]/fi?.fUPPERile.exel../e*';
 
         $expected = 'azer-_ty2fi.fupperile.exel..e';
@@ -546,7 +546,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
         $actual = $fileManager->getImageModel(FileManager::TYPE_PRODUCT);
         $this->assertInstanceOf('\Thelia\Model\ProductImage', $actual);
         $actual = $fileManager->getImageModel(FileManager::TYPE_CATEGORY);
@@ -568,7 +568,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
         $actual = $fileManager->getDocumentModel(FileManager::TYPE_PRODUCT);
         $this->assertInstanceOf('\Thelia\Model\ProductDocument', $actual);
         $actual = $fileManager->getDocumentModel(FileManager::TYPE_CATEGORY);
@@ -590,7 +590,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
         $actual = $fileManager->getImageModelQuery(FileManager::TYPE_PRODUCT);
         $this->assertInstanceOf('\Thelia\Model\ProductImageQuery', $actual);
         $actual = $fileManager->getImageModelQuery(FileManager::TYPE_CATEGORY);
@@ -612,7 +612,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
         $actual = $fileManager->getDocumentModelQuery(FileManager::TYPE_PRODUCT);
         $this->assertInstanceOf('\Thelia\Model\ProductDocumentQuery', $actual);
         $actual = $fileManager->getDocumentModelQuery(FileManager::TYPE_CATEGORY);
@@ -634,7 +634,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
         $actual = $fileManager->getParentFileModel(FileManager::TYPE_PRODUCT, ProductQuery::create()->findOne()->getId());
         $this->assertInstanceOf('\Thelia\Model\Product', $actual);
         $actual = $fileManager->getParentFileModel(FileManager::TYPE_CATEGORY, CategoryQuery::create()->findOne()->getId());
@@ -677,7 +677,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $actual = $fileManager->getUploadDir(FileManager::TYPE_PRODUCT, FileManager::FILE_TYPE_IMAGES);
         $this->assertEquals(THELIA_LOCAL_DIR . 'media/images/product', $actual);
@@ -714,7 +714,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_PRODUCT, 1, FileManager::FILE_TYPE_IMAGES);
         $this->assertEquals('/admin/products/update?product_id=1&current_tab=images', $actual);
@@ -751,7 +751,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $actual = $fileManager->getFormId(FileManager::TYPE_PRODUCT, FileManager::FILE_TYPE_IMAGES);
         $this->assertEquals('thelia.admin.product.image.modification', $actual);
@@ -795,7 +795,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getClientOriginalName')
             ->will($this->returnValue('or1-g_n?al*/&é"filen@me#'));
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $expected = 'or1-g_nalfilenme-1.yml';
         $actual = $fileManager->renameFile(1, $stubUploadedFile);
@@ -822,7 +822,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getClientOriginalName')
             ->will($this->returnValue('or1-g_n?al*/&é"filen@me#'));
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $expected = 'or1-g_nalfilenme-1';
         $actual = $fileManager->renameFile(1, $stubUploadedFile);
@@ -839,7 +839,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fileManager = new FileManager($stubContainer);
+        $fileManager = new FileManager();
 
         $actual = $fileManager->isImage('image/jpeg');
         $this->assertTrue($actual);

@@ -81,7 +81,7 @@ class FileController extends BaseAdminController
                 /** @var UploadedFile $fileBeingUploaded */
                 $fileBeingUploaded = $this->getRequest()->files->get('file');
 
-                $fileManager = new FileManager($this->container);
+                $fileManager = new FileManager();
 
                 // Validate if file is too big
                 if ($fileBeingUploaded->getError() == 1) {
@@ -171,7 +171,7 @@ class FileController extends BaseAdminController
                 /** @var UploadedFile $fileBeingUploaded */
                 $fileBeingUploaded = $this->getRequest()->files->get('file');
 
-                $fileManager = new FileManager($this->container);
+                $fileManager = new FileManager();
 
                 // Validate if file is too big
                 if ($fileBeingUploaded->getError() == 1) {
@@ -312,7 +312,7 @@ class FileController extends BaseAdminController
             return $response;
         }
         try {
-            $fileManager = new FileManager($this->container);
+            $fileManager = new FileManager();
             $image = $fileManager->getImageModelQuery($parentType)->findPk($imageId);
             $redirectUrl = $fileManager->getRedirectionUrl($parentType, $image->getParentId(), FileManager::FILE_TYPE_IMAGES);
 
@@ -341,7 +341,7 @@ class FileController extends BaseAdminController
             return $response;
         }
         try {
-            $fileManager = new FileManager($this->container);
+            $fileManager = new FileManager();
             $document = $fileManager->getDocumentModelQuery($parentType)->findPk($documentId);
             $redirectUrl = $fileManager->getRedirectionUrl($parentType, $document->getParentId(), FileManager::FILE_TYPE_DOCUMENTS);
 
@@ -372,7 +372,7 @@ class FileController extends BaseAdminController
 
         $message = false;
 
-        $fileManager = new FileManager($this->container);
+        $fileManager = new FileManager();
         $imageModification = $fileManager->getImageForm($parentType, $this->getRequest());
 
         try {
@@ -449,7 +449,7 @@ class FileController extends BaseAdminController
 
         $message = false;
 
-        $fileManager = new FileManager($this->container);
+        $fileManager = new FileManager();
         $documentModification = $fileManager->getDocumentForm($parentType, $this->getRequest());
 
         try {
@@ -525,7 +525,7 @@ class FileController extends BaseAdminController
         $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
-        $fileManager = new FileManager($this->container);
+        $fileManager = new FileManager();
         $imageModelQuery = $fileManager->getImageModelQuery($parentType);
         $model = $imageModelQuery->findPk($imageId);
 
@@ -606,7 +606,7 @@ class FileController extends BaseAdminController
         $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
-        $fileManager = new FileManager($this->container);
+        $fileManager = new FileManager();
         $imageModelQuery = $fileManager->getImageModelQuery($parentType);
         $model = $imageModelQuery->findPk($imageId);
 
@@ -660,7 +660,7 @@ class FileController extends BaseAdminController
         $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
-        $fileManager = new FileManager($this->container);
+        $fileManager = new FileManager();
         $documentModelQuery = $fileManager->getDocumentModelQuery($parentType);
         $model = $documentModelQuery->findPk($documentId);
 
@@ -717,7 +717,7 @@ class FileController extends BaseAdminController
         $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
-        $fileManager = new FileManager($this->container);
+        $fileManager = new FileManager();
         $documentModelQuery = $fileManager->getDocumentModelQuery($parentType);
         $model = $documentModelQuery->findPk($documentId);
 
