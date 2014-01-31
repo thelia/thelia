@@ -55,6 +55,8 @@ class Product extends BaseProduct
 
     /**
      * Return the default PSE for this product.
+     *
+     * @return ProductSaleElements
      */
     public function getDefaultSaleElements() {
         return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->find();

@@ -26,31 +26,29 @@ namespace Thelia\Log;
 abstract class AbstractTlogDestination
 {
     //Tableau de TlogDestinationConfig paramétrant la destination
-    protected $_configs;
+    protected $_configs = array();
 
     //Tableau des lignes de logs stockés avant utilisation par ecrire()
-    protected $_logs;
+    protected $_logs = array();
 
     public function __construct()
     {
-        $this->_configs = array();
-        $this->_logs = array();
-
         // Initialiser les variables de configuration
-         $this->_configs = $this->getConfigs();
+        $this->_configs = $this->getConfigs();
 
          // Appliquer la configuration
          $this->configure();
     }
 
     //Affecte une valeur à une configuration de la destination
-    public function setConfig($name, $value)
+    public function setConfig($name, $value, $apply_changes = true)
     {
         foreach ($this->_configs as $config) {
             if ($config->getName() == $name) {
                 $config->setValue($value);
+
                 // Appliquer les changements
-                $this->configure();
+                if ($apply_changes) $this->configure();
 
                 return true;
             }

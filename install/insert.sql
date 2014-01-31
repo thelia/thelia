@@ -32,16 +32,19 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('url_site','', 0, 0, NOW(), NOW()),
 ('pdf_invoice_file', 'invoice', 0, 0, NOW(), NOW()),
 ('pdf_delivery_file', 'delivery', 0, 0, NOW(), NOW()),
+('unknown-flag-path','assets/img/flags/unknown.png', 0, 0, NOW(), NOW()),
+
 ('session_config.default', '1', 1, 1, NOW(), NOW()),
 ('default_lang_without_translation', '1', 1, 1, NOW(), NOW()),
 ('store_name','', 0, 1, NOW(), NOW()),
 ('store_email','', 0, 1, NOW(), NOW()),
 ('one_domain_foreach_lang','0', 1, 1, NOW(), NOW()),
-('thelia_version','2.0.0-beta3', 1, 1, NOW(), NOW()),
+('thelia_version','2.0.0-beta4', 1, 1, NOW(), NOW()),
 ('thelia_major_version','2', 1, 1, NOW(), NOW()),
 ('thelia_minus_version','0', 1, 1, NOW(), NOW()),
 ('thelia_release_version','0', 1, 1, NOW(), NOW()),
-('thelia_extra_version','beta3', 1, 1, NOW(), NOW());
+('thelia_extra_version','beta4', 1, 1, NOW(), NOW());
+
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (1, 'en_US', 'Class name of the session handler', NULL, NULL, NULL),
@@ -70,7 +73,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (24, 'en_US', '"Remember me" cookie expiration time, in seconds, for customer users', NULL, NULL, NULL),
 (25, 'en_US', 'Base URL of the shop (e.g. http://www.yourshopdomain.com)', NULL, NULL, NULL),
 (26, 'en_US', 'Name of the invoice view in the current PDF template (without extension)', NULL, NULL, NULL),
-(27, 'en_US', 'Name of the delivery view in the current PDF template (without extension)', NULL, NULL, NULL);
+(27, 'en_US', 'Name of the delivery view in the current PDF template (without extension)', NULL, NULL, NULL),
+(28, 'en_US', 'The path (relative to the default back-office template) to the image used when no flag image can be found for a country', NULL, NULL, NULL);
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
 (1, 'TheliaDebugBar', 1, 1, 1, 'TheliaDebugBar\\TheliaDebugBar', NOW(), NOW()),

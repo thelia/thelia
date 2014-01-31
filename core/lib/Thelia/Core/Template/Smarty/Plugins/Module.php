@@ -82,8 +82,9 @@ class Module extends AbstractSmartyPlugin
             }
         }
 
-        if (! empty($content))
+        if (! empty($content)) {
             return $template->fetch(sprintf("string:%s", $content));
+        }
 
         return "";
     }

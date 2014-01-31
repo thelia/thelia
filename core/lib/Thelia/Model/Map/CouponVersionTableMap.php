@@ -199,7 +199,7 @@ class CouponVersionTableMap extends TableMap
         $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'coupon', 'ID', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
         $this->addColumn('TYPE', 'Type', 'VARCHAR', true, 255, null);
-        $this->addColumn('SERIALIZED_EFFECTS', 'SerializedEffects', 'LONGVARCHAR', true, null, null);
+        $this->addColumn('SERIALIZED_EFFECTS', 'SerializedEffects', 'CLOB', true, null, null);
         $this->addColumn('IS_ENABLED', 'IsEnabled', 'BOOLEAN', true, 1, null);
         $this->addColumn('EXPIRATION_DATE', 'ExpirationDate', 'TIMESTAMP', true, null, null);
         $this->addColumn('MAX_USAGE', 'MaxUsage', 'INTEGER', true, null, null);

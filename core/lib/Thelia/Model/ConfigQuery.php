@@ -92,6 +92,9 @@ class ConfigQuery extends BaseConfigQuery {
         return self::read('check-available-stock', 1) != 0;
     }
 
+    public static function getUnknownFlagPath() {
+        return self::read('unknown-flag-path', '/assets/img/flags/unknown.png');
+    }
     /* smtp config */
     public static function isSmtpEnable()
     {

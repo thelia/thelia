@@ -16,13 +16,12 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.customer" class="Thelia\Action\Customer">
-            <argument type="service" id="service_container"/>
+        <service id="thelia.action.customer" class="Thelia\Action\Customer" scope="request">
+            <argument type="service" id="thelia.securityContext"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.address" class="Thelia\Action\Address">
-            <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -156,7 +155,6 @@
         </service>
 
         <service id="thelia.action.administrator" class="Thelia\Action\Administrator">
-            <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 

@@ -67,7 +67,8 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
                     new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
-            )
+            ),
+            Argument::createBooleanTypeArgument('force_return', true)
         );
     }
 

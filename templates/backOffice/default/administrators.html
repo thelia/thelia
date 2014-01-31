@@ -39,6 +39,7 @@
                                     <th>{intl l="Login"}</th>
                                     <th>{intl l="First Name"}</th>
                                     <th>{intl l="Last Name"}</th>
+                                    <th>{intl l="Locale"}</th>
                                     <th>{intl l="Profile"}</th>
                                     <th class="col-md-1">{intl l="Actions"}</th>
                                 </tr>
@@ -51,6 +52,7 @@
                                     <td data-field-class="js-login">{$LOGIN}</td>
                                     <td data-field-class="js-firstname">{$FIRSTNAME}</td>
                                     <td data-field-class="js-lastname">{$LASTNAME}</td>
+                                    <td data-field-class="js-locale">{$LOCALE}</td>
                                     <td data-field-class="js-profile" data-value="{$PROFILE}">
                                         {if $PROFILE}
                                             {loop type="profile" name="admin-profile" id=$PROFILE}
@@ -149,6 +151,19 @@
         </div>
     {/form_field}
 
+    {form_field form=$form field='locale'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+
+            <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker">
+                {loop name='lang-admin' type="lang"}
+                    <option value="{$LOCALE}">{$LOCALE}: {$TITLE}</option>
+                {/loop}
+            </select>
+
+        </div>
+    {/form_field}
+
     {form_field form=$form field='profile'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
@@ -240,6 +255,19 @@
         </div>
     {/form_field}
 
+    {form_field form=$form field='locale'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label}: </label>
+
+            <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker">
+                {loop name='lang-admin' type="lang"}
+                    <option value="{$LOCALE}" {if $LOCALE == $value}selected="selected"{/if}>{$LOCALE}: {$TITLE}</option>
+                {/loop}
+            </select>
+
+        </div>
+    {/form_field}
+
     {form_field form=$form field='profile'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
@@ -265,7 +293,7 @@
         file = "includes/generic-create-dialog.html"
 
         dialog_id    = "administrator_update_dialog"
-        dialog_title = {intl l="Update a new administrator"}
+        dialog_title = {intl l="Update an administrator"}
         dialog_body  = {$smarty.capture.administrator_update_dialog nofilter}
 
         dialog_ok_label     = {intl l="Update"}

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
+  <vendor type="mysql">
+      <parameter name="Engine" value="InnoDB"/>
+      <parameter name="Charset" value="utf8"/>
+  </vendor>
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="parent" type="INTEGER" />
@@ -12,6 +16,13 @@
     <column name="meta_title" size="255" type="VARCHAR" />
     <column name="meta_description" type="LONGVARCHAR" />
     <column name="meta_keywords" type="LONGVARCHAR" />
+    <index name="idx_parent">
+      <index-column name="parent" />
+    </index>
+    <index name="idx_parent_position">
+      <index-column name="parent" />
+      <index-column name="position" />
+    </index>
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum, meta_title, meta_description, meta_keywords" />
     </behavior>
@@ -774,6 +785,7 @@
     <column name="lastname" required="true" size="100" type="VARCHAR" />
     <column name="login" required="true" size="100" type="VARCHAR" />
     <column name="password" required="true" size="128" type="VARCHAR" />
+    <column name="locale" required="true" size="45" type="VARCHAR" />
     <column name="algo" size="128" type="VARCHAR" />
     <column name="salt" size="128" type="VARCHAR" />
     <column name="remember_me_token" size="255" type="VARCHAR" />
@@ -853,7 +865,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="code" required="true" size="45" type="VARCHAR" />
     <column name="type" required="true" size="255" type="VARCHAR" />
-    <column name="serialized_effects" required="true" type="LONGVARCHAR" />
+    <column name="serialized_effects" required="true" type="CLOB" />
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="is_enabled" required="true" type="BOOLEAN" />
     <column name="short_description" required="true" type="LONGVARCHAR" />

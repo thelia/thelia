@@ -23,15 +23,12 @@
 
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Thelia\Model\ConfigQuery;
-use Thelia\Model\Config as ConfigModel;
-
-use Thelia\Core\Event\TheliaEvents;
-
-use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
 use Thelia\Core\Event\Config\ConfigDeleteEvent;
+use Thelia\Core\Event\Config\ConfigUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Config as ConfigModel;
+use Thelia\Model\ConfigQuery;
 
 class Config extends BaseAction implements EventSubscriberInterface
 {
@@ -44,9 +41,14 @@ class Config extends BaseAction implements EventSubscriberInterface
     {
         $config = new ConfigModel();
 
-        $config->setDispatcher($this->getDispatcher())->setName($event->getEventName())->setValue($event->getValue())
-                ->setLocale($event->getLocale())->setTitle($event->getTitle())->setHidden($event->getHidden())
-                ->setSecured($event->getSecured())->save();
+        $config->setDispatcher($this->getDispatcher())
+            ->setName($event->getEventName())
+            ->setValue($event->getValue())
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setHidden($event->getHidden())
+            ->setSecured($event->getSecured())
+        ->save();
 
         $event->setConfig($config);
     }
@@ -59,7 +61,7 @@ class Config extends BaseAction implements EventSubscriberInterface
     public function setValue(ConfigUpdateEvent $event)
     {
 
-        if (null !== $config = $search->findPk($event->getConfigId())) {
+        if (null !== $config = ConfigQuery::create()->findPk($event->getConfigId())) {
 
             if ($event->getValue() !== $config->getValue()) {
 
@@ -80,10 +82,17 @@ class Config extends BaseAction implements EventSubscriberInterface
 
         if (null !== $config = ConfigQuery::create()->findPk($event->getConfigId())) {
 
-            $config->setDispatcher($this->getDispatcher())->setName($event->getEventName())->setValue($event->getValue())
-                    ->setHidden($event->getHidden())->setSecured($event->getSecured())->setLocale($event->getLocale())
-                    ->setTitle($event->getTitle())->setDescription($event->getDescription())->setChapo($event->getChapo())
-                    ->setPostscriptum($event->getPostscriptum())->save();
+            $config->setDispatcher($this->getDispatcher())
+                ->setName($event->getEventName())
+                ->setValue($event->getValue())
+                ->setHidden($event->getHidden())
+                ->setSecured($event->getSecured())
+                ->setLocale($event->getLocale())
+                ->setTitle($event->getTitle())
+                ->setDescription($event->getDescription())
+                ->setChapo($event->getChapo())
+                ->setPostscriptum($event->getPostscriptum())
+            ->save();
 
             $event->setConfig($config);
         }

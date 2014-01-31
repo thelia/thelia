@@ -70,7 +70,7 @@ class LangCreateForm extends BaseForm
                 'constraints' => array(
                     new NotBlank()
                 ),
-                'label' => Translator::getInstance()->trans('ISO 639 Code'),
+                'label' => Translator::getInstance()->trans('ISO 639-1 Code'),
                 'label_attr' => array(
                     'for' => 'code_lang'
                 )

@@ -23,33 +23,30 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Cart\CartTrait;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\Order\OrderManualEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\MessageQuery;
-use Thelia\Model\OrderProductAttributeCombination;
-use Thelia\Model\ModuleQuery;
-use Thelia\Model\OrderProduct;
-use Thelia\Model\OrderStatus;
+use Thelia\Model\Currency;
+use Thelia\Model\Customer;
+use Thelia\Model\Lang;
 use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\MessageQuery;
+use Thelia\Model\ModuleQuery;
+use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\OrderAddress;
+use Thelia\Model\OrderProduct;
+use Thelia\Model\OrderProductAttributeCombination;
+use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Tools\I18n;
-use Thelia\Model\Currency;
-use Thelia\Model\Lang;
-use Thelia\Model\Country;
-use Thelia\Model\Customer;
-use Thelia\Core\Event\Order\OrderManualEvent;
-
-use Thelia\Model\Cart as CartModel;
-use Thelia\Model\Order as ModelOrder;
 
 /**
  *
@@ -129,7 +126,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $con->beginTransaction();
 
-        /* use a copy to avoid errored reccord in session */
+        /* use a copy to avoid errored record in session */
         $placedOrder = $sessionOrder->copy();
         $placedOrder->setDispatcher($this->getDispatcher());
 
@@ -307,9 +304,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $this->getSecurityContext()->getCustomerUser()
         );
 
-
-        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
-
+        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
 
         /* clear session */
         $session
@@ -322,7 +317,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setPlacedOrder($placedOrder);
 
         /* empty cart */
-        $this->getDispatcher()->dispatch(TheliaEvents::CART_CLEAR, new CartEvent($this->getCart($this->getRequest())));
+        $event->getDispatcher()->dispatch(TheliaEvents::CART_CLEAR, new CartEvent($this->getCart($this->getRequest())));
 
         /* call pay method */
 

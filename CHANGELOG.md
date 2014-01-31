@@ -2,6 +2,13 @@
 - Tinymce is now a dedicated module. You need to activate it.
 - Fix PDF creation. Bug #180
 - Fix many translation issues.
+- The TaxManager is now a service
+- Loop output is now put in cache for better performance
+- loop count is refactored. It used now count propel method instead of classic loop method
+- UTF-8 is used during install process, no more encoding problem in database now
+- an admin can now choose a prefered locale and switch language in admin panel
+- module repository is available on github : https://github.com/thelia-modules
+- import module from Thelia 1 is available. It works from Thelia 1.4.2 : https://github.com/thelia-modules/importT1
 
 #2.0.0-beta3
 - Coupon effect inputs are now more customisable (input text, select, ajax, etc.. are usable) and unlimited amount of input for coupon effect are now possible too

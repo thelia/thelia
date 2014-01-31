@@ -27,6 +27,7 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     ChildAdminQuery orderByLastname($order = Criteria::ASC) Order by the lastname column
  * @method     ChildAdminQuery orderByLogin($order = Criteria::ASC) Order by the login column
  * @method     ChildAdminQuery orderByPassword($order = Criteria::ASC) Order by the password column
+ * @method     ChildAdminQuery orderByLocale($order = Criteria::ASC) Order by the locale column
  * @method     ChildAdminQuery orderByAlgo($order = Criteria::ASC) Order by the algo column
  * @method     ChildAdminQuery orderBySalt($order = Criteria::ASC) Order by the salt column
  * @method     ChildAdminQuery orderByRememberMeToken($order = Criteria::ASC) Order by the remember_me_token column
@@ -40,6 +41,7 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     ChildAdminQuery groupByLastname() Group by the lastname column
  * @method     ChildAdminQuery groupByLogin() Group by the login column
  * @method     ChildAdminQuery groupByPassword() Group by the password column
+ * @method     ChildAdminQuery groupByLocale() Group by the locale column
  * @method     ChildAdminQuery groupByAlgo() Group by the algo column
  * @method     ChildAdminQuery groupBySalt() Group by the salt column
  * @method     ChildAdminQuery groupByRememberMeToken() Group by the remember_me_token column
@@ -64,6 +66,7 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     ChildAdmin findOneByLastname(string $lastname) Return the first ChildAdmin filtered by the lastname column
  * @method     ChildAdmin findOneByLogin(string $login) Return the first ChildAdmin filtered by the login column
  * @method     ChildAdmin findOneByPassword(string $password) Return the first ChildAdmin filtered by the password column
+ * @method     ChildAdmin findOneByLocale(string $locale) Return the first ChildAdmin filtered by the locale column
  * @method     ChildAdmin findOneByAlgo(string $algo) Return the first ChildAdmin filtered by the algo column
  * @method     ChildAdmin findOneBySalt(string $salt) Return the first ChildAdmin filtered by the salt column
  * @method     ChildAdmin findOneByRememberMeToken(string $remember_me_token) Return the first ChildAdmin filtered by the remember_me_token column
@@ -77,6 +80,7 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     array findByLastname(string $lastname) Return ChildAdmin objects filtered by the lastname column
  * @method     array findByLogin(string $login) Return ChildAdmin objects filtered by the login column
  * @method     array findByPassword(string $password) Return ChildAdmin objects filtered by the password column
+ * @method     array findByLocale(string $locale) Return ChildAdmin objects filtered by the locale column
  * @method     array findByAlgo(string $algo) Return ChildAdmin objects filtered by the algo column
  * @method     array findBySalt(string $salt) Return ChildAdmin objects filtered by the salt column
  * @method     array findByRememberMeToken(string $remember_me_token) Return ChildAdmin objects filtered by the remember_me_token column
@@ -171,7 +175,7 @@ abstract class AdminQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PROFILE_ID`, `FIRSTNAME`, `LASTNAME`, `LOGIN`, `PASSWORD`, `ALGO`, `SALT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT` FROM `admin` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `PROFILE_ID`, `FIRSTNAME`, `LASTNAME`, `LOGIN`, `PASSWORD`, `LOCALE`, `ALGO`, `SALT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT` FROM `admin` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -458,6 +462,35 @@ abstract class AdminQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AdminTableMap::PASSWORD, $password, $comparison);
+    }
+
+    /**
+     * Filter the query on the locale column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLocale('fooValue');   // WHERE locale = 'fooValue'
+     * $query->filterByLocale('%fooValue%'); // WHERE locale LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $locale The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAdminQuery The current query, for fluid interface
+     */
+    public function filterByLocale($locale = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($locale)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $locale)) {
+                $locale = str_replace('*', '%', $locale);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(AdminTableMap::LOCALE, $locale, $comparison);
     }
 
     /**

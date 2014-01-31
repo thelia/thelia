@@ -30,7 +30,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Admin as AdminModel;
 use Thelia\Model\AdminQuery;
 
-class Administrator extends BaseAction implements EventSubscriberInterface
+class Administrator implements EventSubscriberInterface
 {
     /**
      * @param AdministratorEvent $event
@@ -40,12 +40,13 @@ class Administrator extends BaseAction implements EventSubscriberInterface
         $administrator = new AdminModel();
 
         $administrator
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
             ->setFirstname($event->getFirstname())
             ->setLastname($event->getLastname())
             ->setLogin($event->getLogin())
             ->setPassword($event->getPassword())
             ->setProfileId($event->getProfile())
+            ->setLocale($event->getLocale())
         ;
 
         $administrator->save();
@@ -61,11 +62,12 @@ class Administrator extends BaseAction implements EventSubscriberInterface
         if (null !== $administrator = AdminQuery::create()->findPk($event->getId())) {
 
             $administrator
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->setFirstname($event->getFirstname())
                 ->setLastname($event->getLastname())
                 ->setLogin($event->getLogin())
                 ->setProfileId($event->getProfile())
+                ->setLocale($event->getLocale())
             ;
 
             if ('' !== $event->getPassword()) {

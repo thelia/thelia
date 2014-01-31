@@ -31,9 +31,6 @@ use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\Element\Exception\InvalidElementException;
 
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Core\Security\SecurityContext;
-
 class TheliaLoop extends AbstractSmartyPlugin
 {
     protected static $pagination = null;

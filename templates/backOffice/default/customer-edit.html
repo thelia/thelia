@@ -160,6 +160,7 @@
                                                     </span>
                                                 </p>
 
+                                                {ifloop rel="address"}
                                                 <div class="table-responsive">
                                                     <table class="table table-bordered table-striped">
                                                         <thead>
@@ -212,6 +213,13 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
+                                                {/ifloop}
+
+                                                {elseloop rel="address"}
+                                                    <div class="alert alert-info">
+                                                    {intl l="This customer has not defined any delivery address"}
+                                                </div>
+                                                {/elseloop}
                                             </div>
 
                                         </form>

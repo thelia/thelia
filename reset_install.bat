@@ -2,7 +2,8 @@ echo off
 REM @author Guillaume MOREL
 REM v0.1
 
-echo [WARN] This script will reset this Thelia2 install
+echo [WARN] This script will reset this Thelia2 install, all data will be cleared.
+pause
 
 if exist local\config\database.yml (
 
@@ -40,10 +41,10 @@ if exist local\config\database.yml (
 
     echo [INFO] Admin user thelia2 with password thelia2 successfully created.
 
-    echo [INFO] Activating Delivery Module(s)
+    echo [INFO] Activating Delivery Module
     php Thelia module:activate Colissimo
 
-    echo "[INFO] Activating Payment Module(s)"
+    echo [INFO] Activating Payment Module
     php Thelia module:activate Cheque
 
     echo [SUCCESS] Reset done

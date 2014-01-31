@@ -39,7 +39,8 @@ class Update
     protected static $version = array(
         '0' => '2.0.0-beta1',
         '1' => '2.0.0-beta2',
-        '2' => '2.0.0-beta3'
+        '2' => '2.0.0-beta3',
+        '3' => '2.0.0-beta4'
     );
 
     protected function isLatestVersion($version)

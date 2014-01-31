@@ -38,7 +38,7 @@
                             <ul class="nav nav-tabs" id="tabbed-menu">
                                 <li><a href="#general" data-toggle="tab">{intl l="General"}</a></li>
                                 <li><a href="#seo" data-toggle="tab">{intl l="SEO"}</a></li>
-                                <li><a href="#details" data-toggle="tab">{intl l="Details"}</a></li>
+                                <li><a href="#prices" data-toggle="tab">{intl l="Price"}</a></li>
                                 <li>
                                     <a href="#attributes"
                                        data-href="{url path='/admin/products/attributes/tab' product_id=$ID}"
@@ -88,8 +88,8 @@
                                     {/form}
                                 </div>
 
-                                <div class="tab-pane fade" id="details">
-                                    {include file="includes/product-details-tab.html"}
+                                <div class="tab-pane fade" id="prices">
+                                    {include file="includes/product-prices-tab.html"}
                                 </div>
 
                                 <div class="tab-pane fade" id="attributes">
@@ -163,7 +163,7 @@ $(function() {
     // Load active tab
     $('.nav-tabs a[href="#{$current_tab}"]').trigger("click");
 
-    // -- Product details management tab ---------------------------------------
+    // -- Product prices management tab ---------------------------------------
 
 	// Load value on attribute selection
 	$('#attribute_id').change(function(event) {
@@ -258,7 +258,7 @@ $(function() {
     	$('#combination_attributes option').prop('selected', 'selected');
     });
 
-    // In details tab, process exchange rate usage checkbox changes
+    // In proces tab, process exchange rate usage checkbox changes
     $('.use_exchange_rate_box').change(function(ev) {
 
     	if ($(this).is(':checked')) {

@@ -27,6 +27,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\AdminQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Model\ProfileQuery;
 
 class AdministratorCreationForm extends BaseForm
@@ -100,7 +101,33 @@ class AdministratorCreationForm extends BaseForm
                     ),
                 )
             )
+            ->add(
+                'locale',
+                "choice",
+                array(
+                    "choices" => $this->getLocaleList(),
+                    "constraints" => array(
+                        new Constraints\NotBlank(),
+                    ),
+                    "label" => Translator::getInstance()->trans('Preferred locale'),
+                    "label_attr" => array(
+                        "for" => "locale"
+                    ),
+                )
+            )
         ;
+    }
+
+    protected function getLocaleList() {
+        $locales = array();
+
+        $list = LangQuery::create()->find();
+
+        foreach($list as $item) {
+            $locales[$item->getLocale()] = $item->getLocale();
+        }
+
+        return $locales;
     }
 
     public function verifyPasswordField($value, ExecutionContextInterface $context)

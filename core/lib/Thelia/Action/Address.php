@@ -36,7 +36,7 @@ use Thelia\Model\Map\AddressTableMap;
  * @package Thelia\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Address extends BaseAction implements EventSubscriberInterface
+class Address implements EventSubscriberInterface
 {
 
     public function create(AddressCreateOrUpdateEvent $event)
@@ -69,7 +69,7 @@ class Address extends BaseAction implements EventSubscriberInterface
 
     protected function createOrUpdate(AddressModel $addressModel, AddressCreateOrUpdateEvent $event)
     {
-        $addressModel->setDispatcher($this->getDispatcher());
+        $addressModel->setDispatcher($event->getDispatcher());
         $con = Propel::getWriteConnection(AddressTableMap::DATABASE_NAME);
         $con->beginTransaction();
         try {

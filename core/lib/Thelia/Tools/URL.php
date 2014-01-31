@@ -154,7 +154,8 @@ class URL
         $sepChar = strstr($base, '?') === false ? '?' : '&';
 
         if ('' !== $queryString = rtrim($queryString, "&")) $queryString = $sepChar . $queryString;
-        return $base . $queryString;
+        
+        return rtrim($base, '&') . $queryString;
     }
 
     /**

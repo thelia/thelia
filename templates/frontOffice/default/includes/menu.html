@@ -20,19 +20,12 @@
 
                     {loop name="cat-parent-$level" type="category" parent=$parent}
 
-                        {assign var="product_count" value="0"}
-                        {loop name="product_count" type="product" category="{$ID}"}
-                            {if $LOOP_COUNT == 1}
-                                {assign var="product_count" value="{$LOOP_TOTAL}"}
-                            {/if}
-                        {/loop}
-
                             {if $CHILD_COUNT> 0}
                                 <li><a href="{$URL}#collapse{$ID}" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#collapse{$ID}">{$TITLE} ({$PRODUCT_COUNT})</a>
                                 {menu parent=$ID level=$level+1}
                                 </li>
                             {else}
-                                <li><a href="{$URL}">{$TITLE} ({$product_count})</a></li>
+                                <li><a href="{$URL}">{$TITLE} ({count type="product" category="{$ID}"})</a></li>
                             {/if}
                     {/loop}
 

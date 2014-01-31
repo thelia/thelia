@@ -59,7 +59,7 @@ use Thelia\Log\Tlog;
 class Thelia extends Kernel
 {
 
-    const THELIA_VERSION = '2.0.0-beta3';
+    const THELIA_VERSION = '2.0.0-beta4';
 
     public function init()
     {
@@ -87,7 +87,7 @@ class Thelia extends Kernel
         $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
         if ($this->isDebug()) {
             $serviceContainer->setLogger('defaultLogger', \Thelia\Log\Tlog::getInstance());
-            //$con->useDebug(true);
+            $con->useDebug(true);
         }
 
     }

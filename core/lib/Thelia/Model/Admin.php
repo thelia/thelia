@@ -31,7 +31,7 @@ class Admin extends BaseAdmin implements UserInterface
     {
         $profileId = $this->getProfileId();
 
-        if( null === $profileId ) {
+        if( null === $profileId || 0 === $profileId ) {
             return AdminResources::SUPERADMINISTRATOR;
         }
 

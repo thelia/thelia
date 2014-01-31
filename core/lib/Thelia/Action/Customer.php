@@ -28,6 +28,7 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 
@@ -39,8 +40,14 @@ use Thelia\Core\Event\Customer\CustomerLoginEvent;
  * @package Thelia\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Customer extends BaseAction implements EventSubscriberInterface
+class Customer implements EventSubscriberInterface
 {
+    protected $securityContext;
+
+    public function __construct(SecurityContext $securityContext)
+    {
+        $this->securityContext = $securityContext;
+    }
 
     public function create(CustomerCreateOrUpdateEvent $event)
     {
@@ -65,7 +72,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         $customer = $event->getCustomer();
 
-        $customer->setDispatcher($this->getDispatcher());
+        $customer->setDispatcher($event->getDispatcher());
 
         $customer
             ->setTitleId($event->getTitle())
@@ -91,7 +98,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event)
     {
-        $customer->setDispatcher($this->getDispatcher());
+        $customer->setDispatcher($event->getDispatcher());
 
         $customer->createOrUpdate(
             $event->getTitle(),
@@ -140,7 +147,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     protected function getSecurityContext()
     {
-        return $this->container->get('thelia.securityContext');
+        return $this->securityContext;
     }
 
     /**
