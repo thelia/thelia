@@ -15,7 +15,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\TaxEngine\TaxEngine;
+
 use Thelia\Type;
 
 class Cart extends BaseLoop implements ArraySearchLoopInterface
@@ -55,7 +55,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
 
     public function buildArray()
     {
-        $cart = $this->getCart($this->request);
+        $cart = $this->getCart($this->getDispatcher(), $this->request);
 
         if (null === $cart) {
             return array();

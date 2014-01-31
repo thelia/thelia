@@ -31,11 +31,11 @@ use Thelia\Model\AdminLog;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
-use Thelia\Tools\URL;
-use Thelia\Tools\Redirect;
+
+
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
-use Symfony\Component\HttpFoundation\Cookie;
+
 use Thelia\Core\Security\Exception\TokenAuthenticationException;
 
 class SessionController extends BaseAdminController

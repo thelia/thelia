@@ -97,7 +97,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
             file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "module.xml", $moduleContent);
 
-            $classContent = file_get_contents($skeletonDir . "Class.php");
+            $classContent = file_get_contents($skeletonDir . "Class.php.template");
 
             $classContent = str_replace("%%CLASSNAME%%", $this->module, $classContent);
             $classContent = str_replace("%%NAMESPACE%%", $this->module, $classContent);

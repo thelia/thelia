@@ -24,12 +24,11 @@
 namespace TheliaDebugBar\Listeners;
 
 use DebugBar\DataCollector\MemoryCollector;
-use DebugBar\DataCollector\MessagesCollector;
 use DebugBar\DataCollector\PhpInfoCollector;
+use DebugBar\DebugBar;
 use TheliaDebugBar\DataCollector\PropelCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Action\BaseAction;
 use Thelia\Core\Event\TheliaEvents;
 
@@ -41,21 +40,28 @@ use Thelia\Core\Event\TheliaEvents;
  */
 class DebugBarListeners extends BaseAction implements EventSubscriberInterface {
 
+    protected $debugBar;
+    protected $debugMode;
+
+    public function __construct(DebugBar $debugbar, $debugMode)
+    {
+        $this->debugBar = $debugbar;
+        $this->debugMode = $debugMode;
+    }
+
     public function initDebugBar()
     {
-        $debugBar = $this->container->get("debugBar");
-
         $alternativelogger = null;
-        if($this->container->getParameter('kernel.debug')) {
+        if($this->debugMode) {
             $alternativelogger = \Thelia\Log\Tlog::getInstance();
         }
 
-        $debugBar->addCollector(new PhpInfoCollector());
-        //$debugBar->addCollector(new MessagesCollector());
-        //$debugBar->addCollector(new RequestDataCollector());
-        $debugBar->addCollector(new TimeDataCollector());
-        $debugBar->addCollector(new MemoryCollector());
-        $debugBar->addCollector(new PropelCollector($alternativelogger));
+        $this->debugBar->addCollector(new PhpInfoCollector());
+        //$this->debugBar->addCollector(new MessagesCollector());
+        //$this->debugBar->addCollector(new RequestDataCollector());
+        $this->debugBar->addCollector(new TimeDataCollector());
+        $this->debugBar->addCollector(new MemoryCollector());
+        $this->debugBar->addCollector(new PropelCollector($alternativelogger));
     }
 
     /**

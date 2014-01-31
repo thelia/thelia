@@ -68,7 +68,7 @@ class Content extends BaseAction implements EventSubscriberInterface
     public function update(ContentUpdateEvent $event)
     {
         if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
-            $content->setDispatcher($this->getDispatcher());
+            $content->setDispatcher($event->getDispatcher());
 
             $content
                 ->setVisible($event->getVisible())
@@ -100,21 +100,7 @@ class Content extends BaseAction implements EventSubscriberInterface
 
     public function updatePosition(UpdatePositionEvent $event)
     {
-        if (null !== $content = ContentQuery::create()->findPk($event->getObjectId())) {
-            $content->setDispatcher($this->getDispatcher());
-
-            switch ($event->getMode()) {
-                case UpdatePositionEvent::POSITION_ABSOLUTE:
-                    $content->changeAbsolutePosition($event->getPosition());
-                    break;
-                case UpdatePositionEvent::POSITION_DOWN:
-                    $content->movePositionDown();
-                    break;
-                case UpdatePositionEvent::POSITION_UP:
-                    $content->movePositionUp();
-                    break;
-            }
-        }
+        $this->genericUpdatePosition(ContentQuery::create(), $event);
     }
 
     public function toggleVisibility(ContentToggleVisibilityEvent $event)
@@ -122,7 +108,7 @@ class Content extends BaseAction implements EventSubscriberInterface
         $content = $event->getContent();
 
         $content
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
             ->setVisible(!$content->getVisible())
             ->save();
 
@@ -135,7 +121,7 @@ class Content extends BaseAction implements EventSubscriberInterface
         if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
             $defaultFolderId = $content->getDefaultFolderId();
 
-            $content->setDispatcher($this->getDispatcher())
+            $content->setDispatcher($event->getDispatcher())
                 ->delete();
 
             $event->setDefaultFolderId($defaultFolderId);

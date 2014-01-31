@@ -121,7 +121,7 @@ class CartController extends BaseFrontController
      */
     protected function getCartEvent()
     {
-        $cart = $this->getCart($this->getRequest());
+        $cart = $this->getCart($this->getDispatcher(), $this->getRequest());
 
         return new CartEvent($cart);
     }

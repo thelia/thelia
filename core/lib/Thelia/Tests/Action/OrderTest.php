@@ -30,11 +30,14 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Template\Smarty\SmartyParser;
+use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\OrderAddressQuery;
 use Thelia\Model\Base\OrderProductQuery;
 use Thelia\Model\Base\OrderQuery;
-use Thelia\Model\OrderAddress;
+
 use Thelia\Model\OrderStatus;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Cart;
@@ -85,25 +88,42 @@ class OrderTest extends \PHPUnit_Framework_TestCase
      */
     protected $cartItems;
 
+    /**
+     * @var SecurityContext
+     */
+    protected $securityContext;
+
+    protected $request;
+
     public function setUp()
     {
-        $container = new ContainerBuilder();
 
         $session = new Session(new MockArraySessionStorage());
-        $request = new Request();
+
         $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
-        $request->setSession($session);
+        $this->request = new Request();
+        $this->request->setSession($session);
 
-        $container->set("event_dispatcher", $dispatcher);
-        $container->set('request', $request);
-        $container->set('thelia.securityContext', new SecurityContext($request));
+        $this->securityContext = new SecurityContext($this->request);
 
-        $this->container = $container;
+        $this->container = new ContainerBuilder();
+
+        $this->container->set("event_dispatcher", $dispatcher);
+        $this->container->set('request', $this->request);
 
         $this->orderEvent = new OrderEvent(new OrderModel());
 
-        $this->orderAction = new Order($this->container);
+        $this->orderEvent->setDispatcher($dispatcher);
+
+        // public function __construct(Request $this->request, ParserInterface $parser, MailerFactory $mailer, SecurityContext $securityContext)
+
+        $this->orderAction = new Order(
+            $this->request,
+            new SmartyParser($this->request, $dispatcher, new ParserContext($this->request)),
+            new MailerFactory($dispatcher),
+            $this->securityContext
+        );
 
         /* load customer */
         $this->customer = $this->loadCustomer();
@@ -123,7 +143,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             return null;
         }
 
-        $this->container->get('thelia.securityContext')->setCustomerUser($customer);
+        $this->securityContext->setCustomerUser($customer);
 
         return $customer;
     }
@@ -172,7 +192,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             $this->cartItems[] = $cartItem;
         }
 
-        $this->container->get('request')->getSession()->setCart($cart->getId());
+        $this->request->getSession()->setCart($cart->getId());
 
         return $cart;
     }
@@ -319,7 +339,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(OrderStatus::CODE_NOT_PAID, $placedOrder->getOrderStatus()->getCode(), 'status does not  match');
 
         /* check lang */
-        $this->assertEquals($this->container->get('request')->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
+        $this->assertEquals($this->request->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
 
         /* check ordered product */
         foreach ($this->cartItems as $index => $cartItem) {

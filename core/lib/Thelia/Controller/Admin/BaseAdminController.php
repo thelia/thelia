@@ -34,7 +34,7 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Model\AdminLog;
-use Thelia\Model\Lang;
+
 use Thelia\Model\LangQuery;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;

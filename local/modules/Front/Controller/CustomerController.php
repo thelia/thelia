@@ -125,7 +125,7 @@ class CustomerController extends BaseFrontController
 
                 $this->processLogin($customerCreateEvent->getCustomer());
 
-                $cart = $this->getCart($this->getRequest());
+                $cart = $this->getCart($this->getDispatcher(), $this->getRequest());
                 if ($cart->getCartItems()->count() > 0) {
                     $this->redirectToRoute('cart.view');
                 } else {

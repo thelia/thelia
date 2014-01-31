@@ -39,7 +39,9 @@
         </service>
 
         <service id="debugBar.listener" class="TheliaDebugBar\Listeners\DebugBarListeners">
-            <argument type="service" id="service_container"/>
+            <argument type="service" id="debugBar"/>
+            <argument >%kernel.debug%</argument>
+
             <tag name="kernel.event_subscriber"/>
         </service>
     </services>

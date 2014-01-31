@@ -6,7 +6,7 @@ use Thelia\Model\Base\AttributeAv as BaseAttributeAv;
 use Thelia\Core\Event\Attribute\AttributeAvEvent;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
-use Propel\Runtime\ActiveQuery\Criteria;
+
 
 class AttributeAv extends BaseAttributeAv {
 

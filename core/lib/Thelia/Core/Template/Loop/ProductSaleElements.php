@@ -36,7 +36,7 @@ use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
-use Thelia\TaxEngine\TaxEngine;
+
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 

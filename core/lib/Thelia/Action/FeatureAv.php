@@ -47,7 +47,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
         $feature = new FeatureAvModel();
 
         $feature
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
 
             ->setFeatureId($event->getFeatureId())
             ->setLocale($event->getLocale())
@@ -70,7 +70,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
         if (null !== $feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId())) {
 
             $feature
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
 
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
@@ -95,7 +95,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
         if (null !== ($feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId()))) {
 
             $feature
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->delete()
             ;
 
@@ -106,11 +106,11 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param CategoryChangePositionEvent $event
+     * @param UpdatePositionEvent $event
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        return $this->genericUpdatePosition(FeatureAvQuery::create(), $event);
+        $this->genericUpdatePosition(FeatureAvQuery::create(), $event);
     }
 
     /**

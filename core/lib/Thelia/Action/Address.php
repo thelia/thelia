@@ -36,7 +36,7 @@ use Thelia\Model\Map\AddressTableMap;
  * @package Thelia\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Address implements EventSubscriberInterface
+class Address extends BaseAction implements EventSubscriberInterface
 {
 
     public function create(AddressCreateOrUpdateEvent $event)

@@ -70,7 +70,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         $product = new ProductModel();
 
         $product
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
 
             ->setRef($event->getRef())
             ->setTitle($event->getTitle())
@@ -102,7 +102,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         if (null !== $product = ProductQuery::create()->findPk($event->getProductId())) {
 
             $product
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
 
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
@@ -141,7 +141,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         if (null !== $product = ProductQuery::create()->findPk($event->getProductId())) {
 
             $product
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->delete()
             ;
 
@@ -159,7 +159,7 @@ class Product extends BaseAction implements EventSubscriberInterface
          $product = $event->getProduct();
 
          $product
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
             ->setVisible($product->getVisible() ? false : true)
             ->save()
             ;
@@ -172,7 +172,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        return $this->genericUpdatePosition(ProductQuery::create(), $event);
+        $this->genericUpdatePosition(ProductQuery::create(), $event);
     }
 
     public function addContent(ProductAddContentEvent $event)
@@ -184,7 +184,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $content = new ProductAssociatedContent();
 
             $content
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->setProduct($event->getProduct())
                 ->setContentId($event->getContentId())
                 ->save()
@@ -201,7 +201,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
         if ($content !== null)
             $content
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->delete()
             ;
     }
@@ -243,7 +243,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $accessory = new Accessory();
 
             $accessory
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->setProductId($event->getProduct()->getId())
                 ->setAccessory($event->getAccessoryId())
             ->save()
@@ -260,7 +260,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
         if ($accessory !== null)
             $accessory
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->delete()
             ;
     }
@@ -353,7 +353,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $featureProduct = new FeatureProduct();
 
             $featureProduct
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
 
                 ->setProductId($event->getProductId())
                 ->setFeatureId($event->getFeatureId())

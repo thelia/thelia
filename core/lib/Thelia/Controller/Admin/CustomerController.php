@@ -30,8 +30,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\CustomerCreateForm;
 use Thelia\Form\CustomerUpdateForm;
 use Thelia\Model\CustomerQuery;
-use Thelia\Tools\Password;
-use Thelia\Model\Address;
+
 
 /**
  * Class CustomerController

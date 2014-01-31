@@ -304,7 +304,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
     public function updatePosition(UpdateFilePositionEvent $event)
     {
-        return $this->genericUpdatePosition($event->getQuery(), $event);
+        $this->genericUpdatePosition($event->getQuery(), $event);
     }
 
     /**
@@ -416,7 +416,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     /**
      * Create a new Imagine object using current driver configuration
      *
-     * @return \Imagine\ImagineInterface
+     * @return ImagineInterface
      */
     protected function createImagineInstance()
     {

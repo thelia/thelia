@@ -23,12 +23,15 @@
 
 namespace Thelia\Action;
 use Propel\Runtime\Propel;
+use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
+use Thelia\Core\Event\Module\OrderPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
@@ -44,6 +47,15 @@ use Thelia\Core\Translation\Translator;
  */
 class Module extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * @var \Propel\Runtime\ServiceContainer\ServiceContainerInterface
+     */
+    protected $container;
+
+    public function __construct(ServiceContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     public function toggleActivation(ModuleToggleActivationEvent $event)
     {
@@ -53,7 +65,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             $moduleInstance = $moduleClass->newInstance();
 
             if ( method_exists($moduleInstance, 'setContainer')) {
-                $moduleInstance->setContainer($this->container);
+                $moduleInstance->setContainer($this->getContainer());
                 if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
                     $moduleInstance->deActivate($module);
                 } else {
@@ -63,7 +75,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
             $event->setModule($module);
 
-            $this->cacheClear();
+            $this->cacheClear($event->getDispatcher());
         }
     }
 
@@ -86,7 +98,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                     $reflected = new \ReflectionClass($module->getFullNamespace());
 
                     $instance = $reflected->newInstance();
-                    $instance->setContainer($this->container);
+                    $instance->setContainer($this->getContainer());
 
                     $path = dirname($reflected->getFileName());
 
@@ -108,7 +120,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 $con->commit();
 
                 $event->setModule($module);
-                $this->cacheClear();
+                $this->cacheClear($event->getDispatcher());
 
             } catch (\Exception $e) {
                 $con->rollBack();
@@ -125,7 +137,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         if (null !== $module = ModuleQuery::create()->findPk($event->getId())) {
 
             $module
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setChapo($event->getChapo())
@@ -140,20 +152,50 @@ class Module extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Call the payment method of the payment module of the given order
+     *
+     * @param OrderPaymentEvent $event
+     * @throws \RuntimeException if no payment module can be found.
+     */
+    public function pay(OrderPaymentEvent $event) {
+
+        $order = $event->getOrder();
+
+        /* call pay method */
+        if (null === $paymentModule = ModuleQuery::create()->findPk($order->getPaymentModuleId())) {
+            throw new \RuntimeException(
+                Translator::getInstance()->trans(
+                    "Failed to find a payment Module with ID=%mid for order ID=%oid",
+                    array(
+                        "%mid" => $order->getPaymentModuleId(),
+                        "%oid" => $order->getId()
+                ))
+            );
+        }
+
+        $paymentModuleInstance = $this->container->get(sprintf('module.%s', $paymentModule->getCode()));
+
+        $paymentModuleInstance->pay($order);
+    }
+
+    /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param CategoryChangePositionEvent $event
+     * @param UpdatePositionEvent $event
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        return $this->genericUpdatePosition(ModuleQuery::create(), $event);
+        $this->genericUpdatePosition(ModuleQuery::create(), $event);
     }
 
-    protected function cacheClear()
+    protected function cacheClear(EventDispatcherInterface $dispatcher)
     {
-        $cacheEvent = new CacheEvent($this->container->getParameter('kernel.cache_dir'));
+        $cacheEvent = new CacheEvent(
+            $dispatcher,
+            $this->getContainer()->getParameter('kernel.cache_dir')
+        );
 
-        $this->getDispatcher()->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
+        $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
     }
 
     /**
@@ -183,6 +225,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             TheliaEvents::MODULE_UPDATE_POSITION => array('updatePosition', 128),
             TheliaEvents::MODULE_DELETE => array('delete', 128),
             TheliaEvents::MODULE_UPDATE => array('update', 128),
+            TheliaEvents::MODULE_PAY => array('pay', 128),
         );
     }
 }

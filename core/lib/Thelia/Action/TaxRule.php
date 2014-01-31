@@ -42,7 +42,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         $taxRule = new TaxRuleModel();
 
         $taxRule
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->setDescription($event->getDescription())
@@ -61,7 +61,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
 
             $taxRule
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())

@@ -23,7 +23,7 @@
 
 namespace Thelia\Form\Area;
 use Symfony\Component\Validator\Constraints\GreaterThan;
-use Thelia\Form\Area\AreaCreateForm;
+
 
 /**
  * Class AreaModificationForm

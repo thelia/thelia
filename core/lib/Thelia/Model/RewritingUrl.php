@@ -5,7 +5,7 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\RewritingUrl as BaseRewritingUrl;
-use Thelia\Model\RewritingUrlQuery;
+
 
 class RewritingUrl extends BaseRewritingUrl {
 

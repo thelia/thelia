@@ -22,9 +22,9 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\ExecutionContextInterface;
+
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\ProfileQuery;
+
 
 /**
  * Class MailingSystemModificationForm

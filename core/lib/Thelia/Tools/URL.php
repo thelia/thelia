@@ -29,7 +29,7 @@ use Thelia\Rewriting\RewritingRetriever;
 
 use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\RequestContext;
+
 
 class URL
 {

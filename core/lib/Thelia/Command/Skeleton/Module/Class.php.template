@@ -23,7 +23,6 @@
 
 namespace %%NAMESPACE%%;
 
-use Thelia\Module\BaseModule;
 
 class %%CLASSNAME%% extends BaseModule
 {

@@ -23,7 +23,7 @@
 
 namespace Thelia\Core\Template\Smarty\Assets;
 
-use Thelia\Core\Template\TemplateDefinition;
+
 use Thelia\Tools\URL;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
 

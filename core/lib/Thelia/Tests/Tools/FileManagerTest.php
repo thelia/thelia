@@ -11,9 +11,8 @@ namespace Thelia\Tests\Tools;
 
 use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
 use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
-use Thelia\Core\Translation\Translator;
-use Thelia\Exception\ImageException;
-use Thelia\Model\Admin;
+
+
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;

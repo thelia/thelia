@@ -23,7 +23,8 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\HttpFoundation\Request;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -67,7 +68,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 ->findOne();
 
             $event->setCartItem(
-                $this->doAddItem($cart, $productId, $productPrice->getProductSaleElements(), $quantity, $productPrice)
+                $this->doAddItem($event->getDispatcher(), $cart, $productId, $productPrice->getProductSaleElements(), $quantity, $productPrice)
             );
         }
 
@@ -130,7 +131,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
             if ($cartItem) {
                 $event->setCartItem(
-                    $this->updateQuantity($cartItem, $quantity)
+                    $this->updateQuantity($event->getDispatcher(), $cartItem, $quantity)
                 );
             }
         }
@@ -174,9 +175,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @return CartItem
      */
-    protected function updateQuantity(CartItem $cartItem, $quantity)
+    protected function updateQuantity(EventDispatcherInterface $dispatcher, CartItem $cartItem, $quantity)
     {
-        $cartItem->setDisptacher($this->getDispatcher());
+        $cartItem->setDisptacher($dispatcher);
         $cartItem->updateQuantity($quantity)
             ->save();
 
@@ -194,10 +195,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @return CartItem
      */
-    protected function doAddItem(\Thelia\Model\Cart $cart, $productId, \Thelia\Model\ProductSaleElements $productSaleElements, $quantity, ProductPrice $productPrice)
+    protected function doAddItem(EventDispatcherInterface $dispatcher, \Thelia\Model\Cart $cart, $productId, \Thelia\Model\ProductSaleElements $productSaleElements, $quantity, ProductPrice $productPrice)
     {
         $cartItem = new CartItem();
-        $cartItem->setDisptacher($this->getDispatcher());
+        $cartItem->setDisptacher($dispatcher);
         $cartItem
             ->setCart($cart)
             ->setProductId($productId)

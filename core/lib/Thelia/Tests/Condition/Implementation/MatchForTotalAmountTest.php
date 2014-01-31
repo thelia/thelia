@@ -28,7 +28,7 @@ use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Operators;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Exception\InvalidConditionValueException;
+
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 

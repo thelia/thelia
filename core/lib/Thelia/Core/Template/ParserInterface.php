@@ -58,4 +58,12 @@ interface ParserInterface
      * @return array:                   an array of defined templates directories for the given template type
      */
     public function getTemplateDirectories($templateType);
+
+    /**
+     * Create a variable that will be available in the templates
+     *
+     * @param $variable the vatiable name
+     * @param $value the value of the variable
+     */
+    public function assign($variable, $value);
 }

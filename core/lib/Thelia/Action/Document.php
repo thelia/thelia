@@ -34,7 +34,6 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Tools\FileManager;
 use Thelia\Tools\URL;
 
-use Imagine\Document\Color;
 use Thelia\Exception\DocumentException;
 use Thelia\Core\Event\TheliaEvents;
 
@@ -52,19 +51,6 @@ use Thelia\Core\Event\TheliaEvents;
  *
  * A copy (or symbolic link, by default) of the original document is always created in the cache, so that the full
  * resolution document is always available.
- *
- * Various document processing options are available :
- *
- * - resizing, with border, crop, or by keeping document aspect ratio
- * - rotation, in degrees, positive or negative
- * - background color, applyed to empty background when creating borders or rotating
- * - effects. The effects are applied in the specified order. The following effects are available:
- *    - gamma:value : change the document Gamma to the specified value. Example: gamma:0.7
- *    - grayscale or greyscale: switch document to grayscale
- *    - colorize:color : apply a color mask to the document. Exemple: colorize:#ff2244
- *    - negative : transform the document in its negative equivalent
- *    - vflip or vertical_flip : vertical flip
- *    - hflip or horizontal_flip : horizontal flip
  *
  * If a problem occurs, an DocumentException may be thrown.
  *
@@ -198,7 +184,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
 
     public function updatePosition(UpdateFilePositionEvent $event)
     {
-        return $this->genericUpdatePosition($event->getQuery(), $event);
+        $this->genericUpdatePosition($event->getQuery(), $event);
     }
 
     /**

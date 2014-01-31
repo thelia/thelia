@@ -40,7 +40,7 @@ use Thelia\Core\Event\Customer\CustomerLoginEvent;
  * @package Thelia\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Customer implements EventSubscriberInterface
+class Customer extends BaseAction implements EventSubscriberInterface
 {
     protected $securityContext;
 
@@ -143,7 +143,7 @@ class Customer implements EventSubscriberInterface
     /**
      * Return the security context
      *
-     * @return Thelia\Core\Security\SecurityContext
+     * @return \Thelia\Core\Security\SecurityContext
      */
     protected function getSecurityContext()
     {

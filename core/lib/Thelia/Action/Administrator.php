@@ -30,7 +30,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Admin as AdminModel;
 use Thelia\Model\AdminQuery;
 
-class Administrator implements EventSubscriberInterface
+class Administrator extends BaseAction implements EventSubscriberInterface
 {
     /**
      * @param AdministratorEvent $event

@@ -29,7 +29,7 @@ use Thelia\Exception\OrderException;
 use Thelia\Model\CountryQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
-use Thelia\TaxEngine\TaxEngine;
+
 
 /**
  * Class Delivery

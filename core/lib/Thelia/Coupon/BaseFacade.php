@@ -71,7 +71,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getCart()
     {
-        return $this->getCartFromTrait($this->getRequest());
+        return $this->getCartFromTrait($this->getDispatcher(), $this->getRequest());
     }
 
     /**

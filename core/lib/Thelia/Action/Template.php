@@ -56,7 +56,7 @@ class Template extends BaseAction implements EventSubscriberInterface
         $template = new TemplateModel();
 
         $template
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
 
             ->setLocale($event->getLocale())
             ->setName($event->getTemplateName())
@@ -78,7 +78,7 @@ class Template extends BaseAction implements EventSubscriberInterface
         if (null !== $template = TemplateQuery::create()->findPk($event->getTemplateId())) {
 
             $template
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
 
                  ->setLocale($event->getLocale())
                  ->setName($event->getTemplateName())
@@ -102,7 +102,7 @@ class Template extends BaseAction implements EventSubscriberInterface
 
             if ($product_count <= 0) {
                 $template
-                    ->setDispatcher($this->getDispatcher())
+                    ->setDispatcher($event->getDispatcher())
                     ->delete()
                 ;
             }

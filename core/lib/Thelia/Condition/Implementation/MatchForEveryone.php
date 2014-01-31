@@ -24,7 +24,7 @@
 namespace Thelia\Condition\Implementation;
 
 use InvalidArgumentException;
-use Thelia\Condition\Implementation\ConditionAbstract;
+
 
 /**
  * Allow every one, perform no check

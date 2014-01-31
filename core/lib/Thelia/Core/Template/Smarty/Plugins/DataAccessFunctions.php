@@ -37,7 +37,7 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\OrderQuery;
-use Thelia\Model\Product;
+
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Tools\ModelCriteriaTools;
 use Thelia\TaxEngine\TaxEngine;
@@ -190,7 +190,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             self::$dataAccessCache['currentCountry'] = $taxCountry;
         }
 
-        $cart = $this->getCart($this->request);
+        $cart = $this->getCart($this->getDispatcher(), $this->request);
         $result = "";
         switch ($params["attr"]) {
             case "count_item":

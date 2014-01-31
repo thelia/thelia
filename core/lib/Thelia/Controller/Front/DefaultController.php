@@ -24,7 +24,7 @@ namespace Thelia\Controller\Front;
 
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Model\ConfigQuery;
-use Thelia\Tools\Redirect;
+
 use Thelia\Tools\URL;
 
 /**

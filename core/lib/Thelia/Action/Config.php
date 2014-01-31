@@ -41,7 +41,7 @@ class Config extends BaseAction implements EventSubscriberInterface
     {
         $config = new ConfigModel();
 
-        $config->setDispatcher($this->getDispatcher())
+        $config->setDispatcher($event->getDispatcher())
             ->setName($event->getEventName())
             ->setValue($event->getValue())
             ->setLocale($event->getLocale())
@@ -65,7 +65,7 @@ class Config extends BaseAction implements EventSubscriberInterface
 
             if ($event->getValue() !== $config->getValue()) {
 
-                $config->setDispatcher($this->getDispatcher())->setValue($event->getValue())->save();
+                $config->setDispatcher($event->getDispatcher())->setValue($event->getValue())->save();
 
                 $event->setConfig($config);
             }
@@ -82,7 +82,7 @@ class Config extends BaseAction implements EventSubscriberInterface
 
         if (null !== $config = ConfigQuery::create()->findPk($event->getConfigId())) {
 
-            $config->setDispatcher($this->getDispatcher())
+            $config->setDispatcher($event->getDispatcher())
                 ->setName($event->getEventName())
                 ->setValue($event->getValue())
                 ->setHidden($event->getHidden())
@@ -110,7 +110,7 @@ class Config extends BaseAction implements EventSubscriberInterface
 
             if (!$config->getSecured()) {
 
-                $config->setDispatcher($this->getDispatcher())->delete();
+                $config->setDispatcher($event->getDispatcher())->delete();
 
                 $event->setConfig($config);
             }

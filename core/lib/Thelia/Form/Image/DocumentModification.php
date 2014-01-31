@@ -22,7 +22,7 @@
 /*************************************************************************************/
 namespace Thelia\Form\Image;
 
-use Symfony\Component\Validator\Constraints\Image;
+
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;

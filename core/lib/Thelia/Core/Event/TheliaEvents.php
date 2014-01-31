@@ -706,6 +706,10 @@ final class TheliaEvents
     const MODULE_UPDATE = 'thelia.module.update';
     const MODULE_DELETE = 'thelia.module.delete';
 
+    /* Invoke payment module */
+
+    const MODULE_PAY = 'thelia.module.pay';
+
     /**
      * sent for clearing cache
      */

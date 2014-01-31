@@ -5,7 +5,7 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\Base\TaxRuleQuery as BaseTaxRuleQuery;
 use Thelia\Model\Map\TaxRuleCountryTableMap;
-use Thelia\Model\Map\TaxTableMap;
+
 
 /**
  * Skeleton subclass for performing query and update operations on the 'tax_rule' table.

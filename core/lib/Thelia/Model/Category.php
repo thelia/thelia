@@ -4,9 +4,8 @@ namespace Thelia\Model;
 
 use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Model\Base\Category as BaseCategory;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Model\ProductCategoryQuery;
-use Thelia\Tools\URL;
+
+
 use Thelia\Core\Event\TheliaEvents;
 use Propel\Runtime\Connection\ConnectionInterface;
 

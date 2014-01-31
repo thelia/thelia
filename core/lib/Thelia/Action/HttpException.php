@@ -29,6 +29,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Core\Template\ParserInterface;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Template\TemplateHelper;
 
@@ -40,6 +41,16 @@ use Thelia\Core\Template\TemplateHelper;
  */
 class HttpException extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * @var ParserInterface
+     */
+    protected $parser;
+
+    public function __construct(ParserInterface $parser)
+    {
+         $this->parser = $parser;
+    }
+
     public function checkHttpException(GetResponseForExceptionEvent $event)
     {
         if ($event->getException() instanceof NotFoundHttpException) {
@@ -53,14 +64,12 @@ class HttpException extends BaseAction implements EventSubscriberInterface
 
     protected function display404(GetResponseForExceptionEvent $event)
     {
-        $parser = $this->container->get("thelia.parser");
-
         // Define the template thant shoud be used
-        $parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveFrontTemplate());
+        $this->parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveFrontTemplate());
 
         //$event->getRequest()->attributes->set('_view', ConfigQuery::getPageNotFoundView());
 
-        $response = new Response($parser->render(ConfigQuery::getPageNotFoundView()), 404);
+        $response = new Response($this->parser->render(ConfigQuery::getPageNotFoundView()), 404);
 
         $event->setResponse($response);
     }
