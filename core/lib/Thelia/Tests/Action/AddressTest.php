@@ -109,7 +109,7 @@ class AddressTest extends \PHPUnit_Framework_TestCase
         $addressEvent->setAddress($address);
         $addressEvent->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
-        $actionAddress = new Address($this->getContainer());
+        $actionAddress = new Address();
         $actionAddress->update($addressEvent);
 
         $updatedAddress = $addressEvent->getAddress();

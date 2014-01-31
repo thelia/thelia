@@ -155,7 +155,6 @@
         </service>
 
         <service id="thelia.action.administrator" class="Thelia\Action\Administrator">
-            <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
