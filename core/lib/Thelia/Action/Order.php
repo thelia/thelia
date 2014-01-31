@@ -151,7 +151,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     protected function createOrder(EventDispatcherInterface $dispatcher, ModelOrder $sessionOrder, Currency $currency, Lang $lang, CartModel $cart, CustomerModel $customer)
-
     {
         $con = \Propel\Runtime\Propel::getConnection(
                 OrderTableMap::DATABASE_NAME
@@ -342,7 +341,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
 
 
-
         /* clear session */
         $session
             ->setProcessedOrder($placedOrder)
@@ -399,6 +397,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             // Build subject and body
             $message->buildMessage($this->parser, $instance);
+
 
             $this->getMailer()->send($instance);
         }
