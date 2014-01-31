@@ -59,7 +59,7 @@ use Thelia\Log\Tlog;
 class Thelia extends Kernel
 {
 
-    const THELIA_VERSION = '2.0.0-beta3';
+    const THELIA_VERSION = '2.0.0-beta4';
 
     public function init()
     {
