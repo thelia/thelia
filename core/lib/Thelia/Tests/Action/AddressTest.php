@@ -36,7 +36,7 @@ use Thelia\Tests\Action\BaseAction;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class AddressTest extends BaseAction
+class AddressTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testCreatedAddress()
@@ -59,8 +59,9 @@ class AddressTest extends BaseAction
             ""
         );
         $AddressCreateOrUpdateEvent->setCustomer($customer);
+        $AddressCreateOrUpdateEvent->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
-        $actionAddress = new Address($this->getContainer());
+        $actionAddress = new Address();
         $actionAddress->create($AddressCreateOrUpdateEvent);
 
         $createdAddress = $AddressCreateOrUpdateEvent->getAddress();
@@ -106,6 +107,7 @@ class AddressTest extends BaseAction
             ""
         );
         $addressEvent->setAddress($address);
+        $addressEvent->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
         $actionAddress = new Address($this->getContainer());
         $actionAddress->update($addressEvent);

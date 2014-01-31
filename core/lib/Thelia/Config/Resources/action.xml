@@ -22,7 +22,6 @@
         </service>
 
         <service id="thelia.action.address" class="Thelia\Action\Address">
-            <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
