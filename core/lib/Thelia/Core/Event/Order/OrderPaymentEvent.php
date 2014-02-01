@@ -21,11 +21,9 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Module;
+namespace Thelia\Core\Event\Order;
 
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Model\Module;
-use Thelia\Model\Order;
 
 /**
  * Class PaymentEvent

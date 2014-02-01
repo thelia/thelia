@@ -31,14 +31,14 @@ use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
-use Thelia\Core\Event\Module\OrderPaymentEvent;
+use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Translation\Translator;
+use Thelia\Log\Tlog;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
-use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Log\Tlog;
-use Thelia\Core\Translation\Translator;
 
 /**
  * Class Module
