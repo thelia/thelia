@@ -24,6 +24,7 @@
 namespace Thelia\Core\Event\Order;
 
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Order;
 
 /**
  * Class PaymentEvent
