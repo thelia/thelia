@@ -192,7 +192,6 @@ class Module extends BaseAction implements EventSubscriberInterface
     protected function cacheClear(EventDispatcherInterface $dispatcher)
     {
         $cacheEvent = new CacheEvent(
-            $dispatcher,
             $this->container->getParameter('kernel.cache_dir')
         );
 
