@@ -129,7 +129,7 @@ class TemplateHelper
                 if ($file->isDot() || ! $file->isDir()) continue;
 
                     // Ignore reserved directory names
-                    if (in_array($file->getFilename()."/", $exclude)) continue;
+                    if (in_array($file->getFilename(), $exclude)) continue;
 
                     $list[] = new TemplateDefinition($file->getFilename(), $templateType);
                 }
