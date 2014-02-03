@@ -21,48 +21,37 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Area;
-use Thelia\Core\Event\ActionEvent;
+namespace Thelia\Tests\Action;
+
+use Thelia\Action\Area;
+use Thelia\Core\Event\Area\AreaCreateEvent;
+
 
 /**
- * Class AreaEvent
- * @package Thelia\Core\Event\Shipping
+ * Class AreaTest
+ * @package Thelia\Tests\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class AreaEvent extends ActionEvent
+class AreaTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \Thelia\Model\Area
-     */
-    protected $area;
 
-    public function __construct($area = null)
+    public function testCreate()
     {
-        $this->area = $area;
+        $event = new AreaCreateEvent();
+        $event
+            ->setAreaName('foo')
+            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+
+        $areaAction = new Area();
+        $areaAction->create($event);
+
+        $createdArea = $event->getArea();
+
+        $this->assertInstanceOf('Thelia\Model\Area', $createdArea);
+        $this->assertFalse($createdArea->isNew());
+        $this->assertTrue($event->hasArea());
+
+        $this->assertEquals('foo', $createdArea->getName());
     }
 
-    /**
-     * @param mixed $area
-     *
-     * @return $this
-     */
-    public function setArea($area)
-    {
-        $this->area = $area;
-
-        return $this;
-    }
-
-    /**
-     * @return null|\Thelia\Model\Area
-     */
-    public function getArea()
-    {
-        return $this->area;
-    }
-
-    public function hasArea()
-    {
-        return null !== $this->area;
-    }
-}
+} 
