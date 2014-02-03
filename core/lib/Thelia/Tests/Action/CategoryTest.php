@@ -23,6 +23,8 @@
 
 namespace Thelia\Tests\Action;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Routing\Router;
 use Thelia\Action\Category;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
@@ -30,6 +32,7 @@ use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\Category as CategoryModel;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Model\CategoryQuery;
+use Thelia\Tests\TestCaseWithURLToolSetup;
 use Thelia\Tools\URL;
 
 
@@ -38,19 +41,8 @@ use Thelia\Tools\URL;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CategoryTest extends \PHPUnit_Framework_TestCase
+class CategoryTest extends TestCaseWithURLToolSetup
 {
-    use RewrittenUrlTestTrait;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    public function setUp()
-    {
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-    }
 
     protected function getRandomCategory()
     {
@@ -81,7 +73,7 @@ class CategoryTest extends \PHPUnit_Framework_TestCase
             ->setPostscriptum('bar postscriptum')
             ->setVisible(0)
             ->setParent(0)
-            ->setDispatcher($this->dispatcher)
+            ->setDispatcher($this->getDispatcher())
         ;
     }
 
@@ -92,7 +84,7 @@ class CategoryTest extends \PHPUnit_Framework_TestCase
         }
 
         $event = new UpdateSeoEvent($category->getId());
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getDispatcher());
         $event
             ->setLocale($category->getLocale())
             ->setMetaTitle($category->getMetaTitle())
@@ -127,7 +119,7 @@ class CategoryTest extends \PHPUnit_Framework_TestCase
             ->setParent(0)
             ->setTitle('foo')
             ->setVisible(1)
-            ->setDispatcher($this->dispatcher);
+            ->setDispatcher($this->getDispatcher());
 
         $action = new Category();
         $action->create($event);
@@ -165,7 +157,7 @@ class CategoryTest extends \PHPUnit_Framework_TestCase
             ->setPostscriptum('bar postscriptum')
             ->setVisible(0)
             ->setParent(0)
-            ->setDispatcher($this->dispatcher)
+            ->setDispatcher($this->getDispatcher())
         ;
 
         $action = new Category();
@@ -192,7 +184,7 @@ class CategoryTest extends \PHPUnit_Framework_TestCase
     public function testDelete(CategoryModel $category)
     {
         $event = new CategoryDeleteEvent($category->getId());
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getDispatcher());
 
         $action = new Category();
         $action->delete($event);
@@ -201,8 +193,5 @@ class CategoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Thelia\Model\Category', $deletedCategory);
         $this->assertTrue($deletedCategory->isDeleted());
-
-
     }
-
 }
