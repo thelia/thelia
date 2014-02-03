@@ -34,6 +34,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.customer" class="Thelia\Action\Customer" scope="request">
+            <argument type="service" id="thelia.securityContext"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
 
         <service id="thelia.action.address" class="Thelia\Action\Address">
             <tag name="kernel.event_subscriber"/>
@@ -44,10 +49,6 @@
         </service>
 
         <service id="thelia.action.cart" class="Thelia\Action\Cart">
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.customer" class="Thelia\Action\Customer" scope="request">
             <tag name="kernel.event_subscriber"/>
         </service>
 
