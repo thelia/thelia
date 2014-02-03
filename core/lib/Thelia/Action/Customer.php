@@ -127,7 +127,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     public function login(CustomerLoginEvent $event)
     {
-        $this->getSecurityContext()->setCustomerUser($event->getCustomer());
+        $this->securityContext->setCustomerUser($event->getCustomer());
     }
 
     /**
@@ -137,17 +137,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     public function logout(ActionEvent $event)
     {
-        $this->getSecurityContext()->clearCustomerUser();
-    }
-
-    /**
-     * Return the security context
-     *
-     * @return \Thelia\Core\Security\SecurityContext
-     */
-    protected function getSecurityContext()
-    {
-        return $this->securityContext;
+        $this->securityContext->clearCustomerUser();
     }
 
     /**
