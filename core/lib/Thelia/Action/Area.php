@@ -56,6 +56,8 @@ class Area extends BaseAction implements EventSubscriberInterface
     public function removeCountry(AreaRemoveCountryEvent $event)
     {
         if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
+            $event->setArea($country->getArea());
+
             $country->setDispatcher($event->getDispatcher());
             $country->setAreaId(null)
                 ->save();
