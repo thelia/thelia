@@ -23,7 +23,7 @@
 
 namespace Thelia\Action;
 use Propel\Runtime\Propel;
-use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -53,7 +53,7 @@ class Module extends BaseAction implements EventSubscriberInterface
      */
     protected $container;
 
-    public function __construct(ServiceContainerInterface $container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
