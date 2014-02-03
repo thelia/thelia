@@ -333,7 +333,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function sendOrderEmail(OrderEvent $event)
     {
-        $contact_email = ConfigQuery::read('contact_email');
+        $contact_email = ConfigQuery::read('store_email');
 
         if ($contact_email) {
 
@@ -358,11 +358,11 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             $instance = \Swift_Message::newInstance()
                 ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
-                ->addFrom(ConfigQuery::read('contact_email'), ConfigQuery::read('company_name'))
+                ->addFrom($contact_email, ConfigQuery::read('store_name'))
             ;
 
             // Build subject and body
-            $message->build($parser, $instance);
+            $message->buildMessage($parser, $instance);
 
             $this->getMailer()->send($instance);
         }
