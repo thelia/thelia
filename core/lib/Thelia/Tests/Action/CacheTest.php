@@ -21,7 +21,7 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Tests\Action\assets;
+namespace Thelia\Tests\Action;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Action\Cache;
