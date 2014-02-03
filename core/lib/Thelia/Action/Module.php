@@ -49,7 +49,7 @@ use Thelia\Module\BaseModule;
 class Module extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @var \Propel\Runtime\ServiceContainer\ServiceContainerInterface
+     * @var ContainerInterface
      */
     protected $container;
 
@@ -66,7 +66,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             $moduleInstance = $moduleClass->newInstance();
 
             if ( method_exists($moduleInstance, 'setContainer')) {
-                $moduleInstance->setContainer($this->getContainer());
+                $moduleInstance->setContainer($this->container);
                 if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
                     $moduleInstance->deActivate($module);
                 } else {
@@ -99,7 +99,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                     $reflected = new \ReflectionClass($module->getFullNamespace());
 
                     $instance = $reflected->newInstance();
-                    $instance->setContainer($this->getContainer());
+                    $instance->setContainer($this->container);
 
                     $path = dirname($reflected->getFileName());
 
@@ -193,7 +193,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     {
         $cacheEvent = new CacheEvent(
             $dispatcher,
-            $this->getContainer()->getParameter('kernel.cache_dir')
+            $this->container->getParameter('kernel.cache_dir')
         );
 
         $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
