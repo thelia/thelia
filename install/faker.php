@@ -524,11 +524,11 @@ function createProduct($faker, Thelia\Model\Category $category, $position, $temp
 
     $image = new \Thelia\Model\ProductImage();
     $image->setProductId($productId);
-    generate_image($image, 1, 'product', $productId);
+    generate_image($image, 'product', $productId);
 
     $document = new \Thelia\Model\ProductDocument();
     $document->setProductId($productId);
-    generate_document($document, 1, 'product', $productId);
+    generate_document($document, 'product', $productId);
 
     return $product;
 }
