@@ -24,7 +24,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('page_not_found_view', '404.html', 0, 0, NOW(), NOW()),
 ('obsolete_rewriten_url_view', 'obsolete-rewritten-url', 0, 0, NOW(), NOW()),
 ('use_tax_free_amounts', 0, 0, 0, NOW(), NOW()),
-('process_assets', '1', 0, 0, NOW(), NOW()),
+('process_assets', '0', 0, 0, NOW(), NOW()),
 ('thelia_admin_remember_me_cookie_name', 'tarmcn', 0, 0, NOW(), NOW()),
 ('thelia_admin_remember_me_cookie_expiration', 2592000, 0, 0, NOW(), NOW()),
 ('thelia_customer_remember_me_cookie_name', 'tcrmcn', 0, 0, NOW(), NOW()),
