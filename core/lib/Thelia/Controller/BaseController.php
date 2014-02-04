@@ -32,15 +32,15 @@ use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Router;
-use Thelia\Core\Security\SecurityContext;
+
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\OrderQuery;
-use Thelia\Tools\URL;
+
 use Thelia\Tools\Redirect;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Event\ActionEvent;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Symfony\Component\EventDispatcher\Event;

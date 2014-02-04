@@ -23,10 +23,10 @@
 
 namespace Thelia\Core\Security\Authentication;
 
-use Thelia\Core\Security\Authentication\AuthenticatorInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Security\UserProvider\UserProviderInterface;
-use Symfony\Component\Form\Form;
+
 use Thelia\Core\Security\Exception\WrongPasswordException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Symfony\Component\Validator\Exception\ValidatorException;

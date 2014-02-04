@@ -28,7 +28,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionOrganizerInterface;
-use Thelia\Exception\InvalidConditionException;
+
 
 /**
  * Assist in writing a CouponInterface

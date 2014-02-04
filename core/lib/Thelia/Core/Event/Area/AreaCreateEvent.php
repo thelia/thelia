@@ -38,6 +38,8 @@ class AreaCreateEvent extends AreaEvent
     public function setAreaName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**

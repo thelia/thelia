@@ -27,7 +27,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Thelia\Command\ContainerAwareCommand;
+
 use Thelia\Model\Admin;
 
 class CreateAdminUser extends ContainerAwareCommand

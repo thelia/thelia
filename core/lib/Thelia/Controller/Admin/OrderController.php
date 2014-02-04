@@ -23,7 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\HttpFoundation\Response;
+
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -67,10 +67,8 @@ class OrderController extends BaseAdminController
         $message = null;
 
         try {
-            if ($order_id !== null) {
-                $order_id = $order_id;
-            } else {
-                $order_id = $this->getRequest()->get("order_id");
+            if ($order_id === null) {
+               $order_id = $this->getRequest()->get("order_id");
             }
 
             $order = OrderQuery::create()->findPk($order_id);

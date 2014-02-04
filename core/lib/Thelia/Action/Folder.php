@@ -44,7 +44,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
     {
 
         if (null !== $folder = FolderQuery::create()->findPk($event->getFolderId())) {
-            $folder->setDispatcher($this->getDispatcher());
+            $folder->setDispatcher($event->getDispatcher());
 
             $folder
                 ->setParent($event->getParent())
@@ -76,7 +76,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
     public function delete(FolderDeleteEvent $event)
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getFolderId())) {
-            $folder->setDispatcher($this->getDispatcher())
+            $folder->setDispatcher($event->getDispatcher())
                 ->delete();
 
             $event->setFolder($folder);
@@ -89,7 +89,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
     public function create(FolderCreateEvent $event)
     {
         $folder = new FolderModel();
-        $folder->setDispatcher($this->getDispatcher());
+        $folder->setDispatcher($event->getDispatcher());
 
         $folder
             ->setParent($event->getParent())
@@ -106,7 +106,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
         $folder = $event->getFolder();
 
         $folder
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
             ->setVisible(!$folder->getVisible())
             ->save();
 
@@ -117,7 +117,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
     public function updatePosition(UpdatePositionEvent $event)
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getObjectId())) {
-            $folder->setDispatcher($this->getDispatcher());
+            $folder->setDispatcher($event->getDispatcher());
 
             switch ($event->getMode()) {
                 case UpdatePositionEvent::POSITION_ABSOLUTE:

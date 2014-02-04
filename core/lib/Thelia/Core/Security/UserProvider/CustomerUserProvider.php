@@ -23,7 +23,7 @@
 
 namespace Thelia\Core\Security\UserProvider;
 
-use Thelia\Action\Customer;
+
 use Thelia\Model\CustomerQuery;
 class CustomerUserProvider implements UserProviderInterface
 {

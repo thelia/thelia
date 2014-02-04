@@ -31,7 +31,7 @@ use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\AreaQuery;
 use Thelia\Model\CountryQuery;
-use Thelia\Action\BaseAction;
+
 use Thelia\Model\Area as AreaModel;
 
 /**
@@ -45,7 +45,7 @@ class Area extends BaseAction implements EventSubscriberInterface
     public function addCountry(AreaAddCountryEvent $event)
     {
         if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
-            $country->setDispatcher($this->getDispatcher());
+            $country->setDispatcher($event->getDispatcher());
             $country->setAreaId($event->getAreaId())
                 ->save();
 
@@ -56,7 +56,9 @@ class Area extends BaseAction implements EventSubscriberInterface
     public function removeCountry(AreaRemoveCountryEvent $event)
     {
         if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
-            $country->setDispatcher($this->getDispatcher());
+            $event->setArea($country->getArea());
+
+            $country->setDispatcher($event->getDispatcher());
             $country->setAreaId(null)
                 ->save();
         }
@@ -65,7 +67,7 @@ class Area extends BaseAction implements EventSubscriberInterface
     public function updatePostage(AreaUpdatePostageEvent $event)
     {
         if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
-            $area->setDispatcher($this->getDispatcher());
+            $area->setDispatcher($event->getDispatcher());
             $area
                 ->setPostage($event->getPostage())
                 ->save();
@@ -77,7 +79,7 @@ class Area extends BaseAction implements EventSubscriberInterface
     public function delete(AreaDeleteEvent $event)
     {
         if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
-            $area->setDispatcher($this->getDispatcher());
+            $area->setDispatcher($event->getDispatcher());
             $area->delete();
 
             $event->setArea($area);
@@ -89,7 +91,7 @@ class Area extends BaseAction implements EventSubscriberInterface
         $area = new AreaModel();
 
         $area
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
             ->setName($event->getAreaName())
             ->save();
 

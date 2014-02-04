@@ -45,7 +45,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
     public function update(LangUpdateEvent $event)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getId())) {
-            $lang->setDispatcher($this->getDispatcher());
+            $lang->setDispatcher($event->getDispatcher());
 
             $lang->setTitle($event->getTitle())
                 ->setLocale($event->getLocale())
@@ -61,7 +61,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
     public function toggleDefault(LangToggleDefaultEvent $event)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
-            $lang->setDispatcher($this->getDispatcher());
+            $lang->setDispatcher($event->getDispatcher());
 
             $lang->toggleDefault();
 
@@ -74,7 +74,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
         $lang = new LangModel();
 
         $lang
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
             ->setTitle($event->getTitle())
             ->setCode($event->getCode())
             ->setLocale($event->getLocale())
@@ -88,7 +88,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
     public function delete(LangDeleteEvent $event)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
-            $lang->setDispatcher($this->getDispatcher())
+            $lang->setDispatcher($event->getDispatcher())
                 ->delete();
 
             $event->setLang($lang);

@@ -40,7 +40,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
         $administrator = new AdminModel();
 
         $administrator
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
             ->setFirstname($event->getFirstname())
             ->setLastname($event->getLastname())
             ->setLogin($event->getLogin())
@@ -62,7 +62,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
         if (null !== $administrator = AdminQuery::create()->findPk($event->getId())) {
 
             $administrator
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->setFirstname($event->getFirstname())
                 ->setLastname($event->getLastname())
                 ->setLogin($event->getLogin())

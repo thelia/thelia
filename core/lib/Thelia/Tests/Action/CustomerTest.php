@@ -24,6 +24,9 @@
 namespace Thelia\Tests\Action\ImageTest;
 use Thelia\Action\Customer;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Model\CustomerQuery;
 
 /**
  * Class CustomerTest
@@ -32,15 +35,12 @@ use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
  */
 class CustomerTest extends \PHPUnit_Framework_TestCase
 {
-    public function getContainer()
+
+    public static function setUpBeforeClass()
     {
-        $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
-
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-
-        $container->set("event_dispatcher", $dispatcher);
-
-        return $container;
+        CustomerQuery::create()
+            ->filterByRef('testRef')
+            ->delete();
     }
 
     public function testCreatedCustomer()
@@ -67,7 +67,9 @@ class CustomerTest extends \PHPUnit_Framework_TestCase
             null
         );
 
-        $customerAction = new Customer($this->getContainer());
+        $customerCreateEvent->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+
+        $customerAction = new Customer(new SecurityContext(new Request()));
 
         $customerAction->create($customerCreateEvent);
 
@@ -126,7 +128,9 @@ class CustomerTest extends \PHPUnit_Framework_TestCase
             'testRef'
         );
 
-        $customerAction = new Customer($this->getContainer());
+        $customerCreateEvent->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+
+        $customerAction = new Customer(new SecurityContext(new Request()));
 
         $customerAction->create($customerCreateEvent);
 

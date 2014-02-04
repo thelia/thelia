@@ -31,6 +31,7 @@ use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Form\ModuleModificationForm;
+use Thelia\Log\Tlog;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
 use Thelia\Core\Event\UpdatePositionEvent;
@@ -56,20 +57,6 @@ class ModuleController extends AbstractCrudController
             null,
             null,
             TheliaEvents::MODULE_UPDATE_POSITION
-/*
-                $objectName,
-
-                $defaultListOrder = null,
-                $orderRequestParameterName = null,
-
-                $resourceCode,
-
-                $createEventIdentifier,
-                $updateEventIdentifier,
-                $deleteEventIdentifier,
-                $visibilityToggleEventIdentifier = null,
-                $changePositionEventIdentifier = null
-*/
         );
     }
 
@@ -249,6 +236,8 @@ class ModuleController extends AbstractCrudController
             }
         } catch (\Exception $e) {
             $message = $e->getMessage();
+
+            Tlog::getInstance()->addError("Failed to activate/deactivate module:", $e);
         }
 
         if ($this->getRequest()->isXmlHttpRequest()) {
@@ -288,8 +277,9 @@ class ModuleController extends AbstractCrudController
             }
 
         } catch (\Exception $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("error during module removal : %s", $message));
             $message = $e->getMessage();
+
+            Tlog::getInstance()->addError("Error during module removal", $e);
         }
 
         if ($message) {

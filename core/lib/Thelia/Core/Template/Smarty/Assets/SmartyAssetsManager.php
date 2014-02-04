@@ -23,7 +23,8 @@
 
 namespace Thelia\Core\Template\Smarty\Assets;
 
-use Thelia\Core\Template\TemplateDefinition;
+
+use Thelia\Log\Tlog;
 use Thelia\Tools\URL;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
 
@@ -108,6 +109,11 @@ class SmartyAssetsManager
         }
 
         $assetSource = $templateDirectories[$templateDefinition->getName()][$assetOrigin];
+
+        if (DS != '/') {
+            // Just to be sure to generate a clean pathname
+            $file = str_replace('/', DS, $file);
+        }
 
         $url = $this->assetsManager->processAsset(
             $assetSource . DS . $file,

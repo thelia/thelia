@@ -23,6 +23,7 @@
 
 namespace Thelia\Tests\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Content;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
@@ -44,6 +45,15 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
  */
 class ContentTest extends TestCaseWithURLToolSetup
 {
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    public function setUp()
+    {
+        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+    }
 
     public function getUpdateEvent(&$content)
     {
@@ -52,6 +62,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         }
 
         $event = new ContentUpdateEvent($content->getId());
+        $event->setDispatcher($this->dispatcher);
         $event
             ->setVisible(1)
             ->setLocale($content->getLocale())
@@ -78,6 +89,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         $folder = $this->getRandomFolder();
 
         $event = new ContentCreateEvent();
+        $event->setDispatcher($this->dispatcher);
         $event
             ->setVisible(1)
             ->setLocale('en_US')
@@ -103,6 +115,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         $folder = $this->getRandomFolder();
 
         $event = new ContentUpdateEvent($content->getId());
+        $event->setDispatcher($this->dispatcher);
         $event
             ->setVisible(1)
             ->setLocale('en_US')
@@ -132,6 +145,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         $content = $this->getRandomContent();
 
         $event = new ContentDeleteEvent($content->getId());
+        $event->setDispatcher($this->dispatcher);
 
         $contentAction = new Content($this->getContainer());
         $contentAction->delete($event);
@@ -150,6 +164,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         $visibility = $content->getVisible();
 
         $event = new ContentToggleVisibilityEvent($content);
+        $event->setDispatcher($this->dispatcher);
 
         $contentAction = new Content($this->getContainer());
         $contentAction->toggleVisibility($event);
@@ -173,6 +188,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         $newPosition = $content->getPosition()-1;
 
         $event = new UpdatePositionEvent($content->getId(), UpdatePositionEvent::POSITION_UP);
+        $event->setDispatcher($this->dispatcher);
 
         $contentAction = new Content($this->getContainer());
         $contentAction->updatePosition($event);
@@ -195,6 +211,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         $newPosition = $content->getPosition()+1;
 
         $event = new UpdatePositionEvent($content->getId(), UpdatePositionEvent::POSITION_DOWN);
+        $event->setDispatcher($this->dispatcher);
 
         $contentAction = new Content($this->getContainer());
         $contentAction->updatePosition($event);
@@ -215,6 +232,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         }
 
         $event = new UpdatePositionEvent($content->getId(), UpdatePositionEvent::POSITION_ABSOLUTE, 1);
+        $event->setDispatcher($this->dispatcher);
 
         $contentAction = new Content($this->getContainer());
         $contentAction->updatePosition($event);
@@ -237,6 +255,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         } while ($test->count() > 0);
 
         $event = new ContentAddFolderEvent($content, $folder->getId());
+        $event->setDispatcher($this->dispatcher);
 
         $contentAction = new Content($this->getContainer());
         $contentAction->addFolder($event);
@@ -260,6 +279,7 @@ class ContentTest extends TestCaseWithURLToolSetup
     public function testRemoveFolder(ContentFolder $association)
     {
         $event = new ContentRemoveFolderEvent($association->getContent(), $association->getFolder()->getId());
+        $event->setDispatcher($this->dispatcher);
 
         $contentAction = new Content($this->getContainer());
         $contentAction->removeFolder($event);

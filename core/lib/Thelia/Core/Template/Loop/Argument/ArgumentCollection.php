@@ -153,6 +153,11 @@ class ArgumentCollection implements \Iterator
             unset($arguments['name']);
         }
 
-        return sha1(serialize($arguments));
+        $string = '';
+        foreach ($arguments as $key => $argument) {
+            $string .= $key.'='.$argument->getRawValue();
+        }
+
+        return md5($string);
     }
 }

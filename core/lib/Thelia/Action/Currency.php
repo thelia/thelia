@@ -23,6 +23,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Thelia\Model\CurrencyQuery;
@@ -48,7 +49,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
         $currency = new CurrencyModel();
 
         $currency
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
 
             ->setLocale($event->getLocale())
             ->setName($event->getCurrencyName())
@@ -74,7 +75,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
 
             $currency
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
 
                 ->setLocale($event->getLocale())
                 ->setName($event->getCurrencyName())
@@ -104,7 +105,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 CurrencyQuery::create()->filterByByDefault(true)->update(array('ByDefault' => false));
 
                 $currency
-                    ->setDispatcher($this->getDispatcher())
+                    ->setDispatcher($event->getDispatcher())
                     ->setByDefault($event->getIsDefault())
                     ->save()
                 ;
@@ -125,7 +126,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
         if (null !== ($currency = CurrencyQuery::create()->findPk($event->getCurrencyId()))) {
 
             $currency
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->delete()
             ;
 
@@ -133,7 +134,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updateRates()
+    public function updateRates(EventDispatcherInterface $dispatcher)
     {
         $rates_url = ConfigQuery::read('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml');
 
@@ -147,7 +148,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
                 if (null !== $currency = CurrencyQuery::create()->findOneByCode($code)) {
                     $currency
-                        ->setDispatcher($this->getDispatcher())
+                        ->setDispatcher($dispatcher)
                         ->setRate($rate)
                         ->save()
                     ;
@@ -165,7 +166,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        return $this->genericUpdatePosition(CurrencyQuery::create(), $event);
+        $this->genericUpdatePosition(CurrencyQuery::create(), $event);
     }
 
     /**

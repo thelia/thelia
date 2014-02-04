@@ -6,172 +6,153 @@
 
     <services>
 
-        <service id="thelia.action.cart" class="Thelia\Action\Cart">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.order" class="Thelia\Action\Order">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.customer" class="Thelia\Action\Customer">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.address" class="Thelia\Action\Address">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.image" class="Thelia\Action\Image">
-            <argument type="service" id="service_container"/>
-             <tag name="kernel.event_subscriber"/>
-        </service>
-        <service id="thelia.action.document" class="Thelia\Action\Document">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.category" class="Thelia\Action\Category">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.product" class="Thelia\Action\Product">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.product_sale_element" class="Thelia\Action\ProductSaleElement">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.config" class="Thelia\Action\Config">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.message" class="Thelia\Action\Message">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.coupon" class="Thelia\Action\Coupon">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.currency" class="Thelia\Action\Currency">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.template" class="Thelia\Action\Template">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.attribute" class="Thelia\Action\Attribute">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.feature" class="Thelia\Action\Feature">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.attributeav" class="Thelia\Action\AttributeAv">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.featureav" class="Thelia\Action\FeatureAv">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.httpException" class="Thelia\Action\HttpException">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.folder" class="Thelia\Action\Folder">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.taxrule" class="Thelia\Action\TaxRule">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.tax" class="Thelia\Action\Tax">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.content" class="Thelia\Action\Content">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.pdf" class="Thelia\Action\Pdf">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.country" class="Thelia\Action\Country">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.area" class="Thelia\Action\Area">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.shippingZone" class="Thelia\Action\ShippingZone">
-            <argument type="service" id="service_container"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
         <service id="thelia.action.module" class="Thelia\Action\Module">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.cache" class="Thelia\Action\Cache">
-            <argument type="service" id="service_container"/>
+        <service id="thelia.action.order" class="Thelia\Action\Order" scope="request">
+            <argument type="service" id="request"/>
+            <argument type="service" id="thelia.parser"/>
+            <argument type="service" id="mailer"/>
+            <argument type="service" id="thelia.securityContext"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.profile" class="Thelia\Action\Profile">
-            <argument type="service" id="service_container"/>
+        <service id="thelia.action.coupon" class="Thelia\Action\Coupon" scope="request">
+            <argument type="service" id="request"/>
+            <argument type="service" id="thelia.coupon.factory"/>
+            <argument type="service" id="thelia.coupon.manager"/>
+            <argument type="service" id="thelia.condition.match_for_everyone"/>
+            <argument type="service" id="thelia.condition.factory"/>
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.httpException" class="Thelia\Action\HttpException" scope="request">
+            <argument type="service" id="thelia.parser"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.customer" class="Thelia\Action\Customer" scope="request">
+            <argument type="service" id="thelia.securityContext"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+
+        <service id="thelia.action.address" class="Thelia\Action\Address">
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.administrator" class="Thelia\Action\Administrator">
-            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.cart" class="Thelia\Action\Cart">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.image" class="Thelia\Action\Image">
+             <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="thelia.action.document" class="Thelia\Action\Document">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.category" class="Thelia\Action\Category">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.product" class="Thelia\Action\Product">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.product_sale_element" class="Thelia\Action\ProductSaleElement">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.config" class="Thelia\Action\Config">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.message" class="Thelia\Action\Message">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.currency" class="Thelia\Action\Currency">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.template" class="Thelia\Action\Template">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.attribute" class="Thelia\Action\Attribute">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.feature" class="Thelia\Action\Feature">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.attributeav" class="Thelia\Action\AttributeAv">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.featureav" class="Thelia\Action\FeatureAv">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.folder" class="Thelia\Action\Folder">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.taxrule" class="Thelia\Action\TaxRule">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.tax" class="Thelia\Action\Tax">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.content" class="Thelia\Action\Content">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.pdf" class="Thelia\Action\Pdf">
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.country" class="Thelia\Action\Country">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.area" class="Thelia\Action\Area">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.shippingZone" class="Thelia\Action\ShippingZone">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.cache" class="Thelia\Action\Cache">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.profile" class="Thelia\Action\Profile">
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.mailing_system" class="Thelia\Action\MailingSystem">
-            <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.newsletter" class="Thelia\Action\Newsletter">
-            <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.lang" class="Thelia\Action\Lang">
-            <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
     </services>

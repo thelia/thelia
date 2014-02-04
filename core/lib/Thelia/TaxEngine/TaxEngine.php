@@ -57,8 +57,8 @@ class TaxEngine
      * Add a directroy which contains tax types classes. The tax engine
      * will scan this directory, and add all the tax type classes.
      *
-     * @param unknown $namespace                the namespace of the classes in the directory
-     * @param unknown $path_to_tax_type_classes the path to the directory
+     * @param string $namespace                the namespace of the classes in the directory
+     * @param string $path_to_tax_type_classes the path to the directory
      */
     public function addTaxTypeDirectory($namespace, $path_to_tax_type_classes)
     {

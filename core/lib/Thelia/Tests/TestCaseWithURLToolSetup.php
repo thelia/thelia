@@ -23,6 +23,9 @@
 
 namespace Thelia\Tests;
 
+use Symfony\Component\Routing\RequestContext;
+use Thelia\Tools\URL;
+
 /**
  * This class provides URL Tool class initialisation
  *
@@ -31,21 +34,22 @@ namespace Thelia\Tests;
 class TestCaseWithURLToolSetup extends \PHPUnit_Framework_TestCase
 {
     private $container = null;
+    private $dispatcher = null;
 
     public function __construct()
     {
         $this->container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
 
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
-        $this->container->set("event_dispatcher", $dispatcher);
+        $this->container->set("event_dispatcher", $this->dispatcher);
 
         $this->setupURLTool();
     }
 
     protected function setupURLTool()
     {
-        $context = new \Symfony\Component\Routing\RequestContext(
+        $context = new RequestContext(
                 '/thelia/index.php',
                 'GET',
                 'localhost',
@@ -65,11 +69,16 @@ class TestCaseWithURLToolSetup extends \PHPUnit_Framework_TestCase
 
         $this->container->set("router.admin", $router);
 
-        new \Thelia\Tools\URL($this->container);
+        new URL($this->container);
     }
 
     public function getContainer()
     {
         return $this->container;
+    }
+
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
     }
 }

@@ -28,7 +28,7 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ModuleQuery;
-use Thelia\Tools\Redirect;
+
 use Thelia\Tools\URL;
 
 class BaseFrontController extends BaseController

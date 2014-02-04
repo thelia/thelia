@@ -3,11 +3,10 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Thelia\Model\Base\Cart as BaseCart;
-use Thelia\Model\ProductSaleElementsQuery;
-use Thelia\Model\ProductPriceQuery;
-use Thelia\Model\CartItemQuery;
+
+
 use Thelia\TaxEngine\Calculator;
 
 class Cart extends BaseCart

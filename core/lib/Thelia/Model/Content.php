@@ -6,9 +6,9 @@ use Propel\Runtime\Propel;
 use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Content as BaseContent;
-use Thelia\Model\ContentFolderQuery;
+
 use Thelia\Model\Map\ContentTableMap;
-use Thelia\Tools\URL;
+
 use Propel\Runtime\Connection\ConnectionInterface;
 
 class Content extends BaseContent

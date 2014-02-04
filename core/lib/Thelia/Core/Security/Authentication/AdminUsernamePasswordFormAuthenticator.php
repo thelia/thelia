@@ -25,10 +25,10 @@
 namespace Thelia\Core\Security\Authentication;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Form;
+
 
 use Thelia\Core\Security\UserProvider\AdminUserProvider;
-use Thelia\Core\Security\Authentication\UsernamePasswordFormAuthenticator;
+
 use Thelia\Form\AdminLogin;
 
 class AdminUsernamePasswordFormAuthenticator extends UsernamePasswordFormAuthenticator

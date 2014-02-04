@@ -663,9 +663,13 @@ class Tlog Implements LoggerInterface
     {
         $text = '';
 
-        if (is_scalar($message) === false) {
-            $text = print_r($message, true);
-        } else {
+        if ($message instanceof \Exception) {
+            $text = $message->getMessage()."\n".$message->getTraceAsString();
+        }
+        else if (is_scalar($message) === false) {
+            $text = print_r($message, 1);
+        }
+        else {
             $text = $message;
         }
 

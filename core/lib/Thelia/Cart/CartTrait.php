@@ -22,6 +22,7 @@
 /*************************************************************************************/
 namespace Thelia\Cart;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
@@ -44,10 +45,11 @@ trait CartTrait
      *
      * search if cart already exists in session. If not try to create a new one or duplicate an old one.
      *
+     * @param EventDispatcherInterface $dispatcher the event dispatcher
      * @param  \Symfony\Component\HttpFoundation\Request $request
      * @return \Thelia\Model\Cart
      */
-    public function getCart(Request $request)
+    public function getCart(EventDispatcherInterface $dispatcher, Request $request)
     {
         $session = $request->getSession();
 
@@ -68,12 +70,12 @@ trait CartTrait
                 if ($customer) {
                     if ($cart->getCustomerId() != $customer->getId()) {
                         //le customer du panier n'est pas le mm que celui connecté, il faut cloner le panier sans le customer_id
-                        $cart = $this->duplicateCart($cart, $session, $customer);
+                        $cart = $this->duplicateCart($dispatcher, $cart, $session, $customer);
                     }
                 } else {
                     if ($cart->getCustomerId() != null) {
                         //il faut dupliquer le panier sans le customer_id
-                        $cart = $this->duplicateCart($cart, $session);
+                        $cart = $this->duplicateCart($dispatcher, $cart, $session);
                     }
                 }
 
@@ -116,13 +118,14 @@ trait CartTrait
      * @param  \Thelia\Model\Customer                      $customer
      * @return \Thelia\Model\Cart
      */
-    protected function duplicateCart(CartModel $cart, Session $session, Customer $customer = null)
+    protected function duplicateCart(EventDispatcherInterface $dispatcher, CartModel $cart, Session $session, Customer $customer = null)
     {
         $newCart = $cart->duplicate($this->generateCookie(), $customer);
         $session->setCart($newCart->getId());
 
         $cartEvent = new CartEvent($newCart);
-        $this->getDispatcher()->dispatch(TheliaEvents::CART_DUPLICATE, $cartEvent);
+
+        $dispatcher->dispatch(TheliaEvents::CART_DUPLICATE, $cartEvent);
 
         return $cartEvent->getCart();
     }
@@ -139,6 +142,4 @@ trait CartTrait
         return $id;
 
     }
-
-    abstract public function getDispatcher();
 }

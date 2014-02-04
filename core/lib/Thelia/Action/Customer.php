@@ -28,6 +28,7 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 
@@ -41,6 +42,12 @@ use Thelia\Core\Event\Customer\CustomerLoginEvent;
  */
 class Customer extends BaseAction implements EventSubscriberInterface
 {
+    protected $securityContext;
+
+    public function __construct(SecurityContext $securityContext)
+    {
+        $this->securityContext = $securityContext;
+    }
 
     public function create(CustomerCreateOrUpdateEvent $event)
     {
@@ -65,7 +72,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         $customer = $event->getCustomer();
 
-        $customer->setDispatcher($this->getDispatcher());
+        $customer->setDispatcher($event->getDispatcher());
 
         $customer
             ->setTitleId($event->getTitle())
@@ -91,7 +98,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event)
     {
-        $customer->setDispatcher($this->getDispatcher());
+        $customer->setDispatcher($event->getDispatcher());
 
         $customer->createOrUpdate(
             $event->getTitle(),
@@ -120,7 +127,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     public function login(CustomerLoginEvent $event)
     {
-        $this->getSecurityContext()->setCustomerUser($event->getCustomer());
+        $this->securityContext->setCustomerUser($event->getCustomer());
     }
 
     /**
@@ -130,17 +137,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     public function logout(ActionEvent $event)
     {
-        $this->getSecurityContext()->clearCustomerUser();
-    }
-
-    /**
-     * Return the security context
-     *
-     * @return Thelia\Core\Security\SecurityContext
-     */
-    protected function getSecurityContext()
-    {
-        return $this->container->get('thelia.securityContext');
+        $this->securityContext->clearCustomerUser();
     }
 
     /**

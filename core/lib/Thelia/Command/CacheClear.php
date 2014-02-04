@@ -26,10 +26,10 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
+
 use Symfony\Component\Filesystem\Exception\IOException;
 
-use Thelia\Command\ContainerAwareCommand;
+
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 

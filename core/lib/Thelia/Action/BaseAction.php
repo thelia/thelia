@@ -34,26 +34,6 @@ use Thelia\Form\Exception\FormValidationException;
 class BaseAction
 {
     /**
-     * @var The container
-     */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * Return the event dispatcher,
-     *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    public function getDispatcher()
-    {
-        return $this->container->get('event_dispatcher');
-    }
-
-    /**
      * Changes object position, selecting absolute ou relative change.
      *
      * @param ModelCriteria       $query
@@ -65,16 +45,16 @@ class BaseAction
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
 
-            $object->setDispatcher($this->getDispatcher());
+            $object->setDispatcher($event->getDispatcher());
 
             $mode = $event->getMode();
 
             if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $object->changeAbsolutePosition($event->getPosition());
+                $object->changeAbsolutePosition($event->getPosition());
             else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $object->movePositionUp();
+                $object->movePositionUp();
             else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $object->movePositionDown();
+                $object->movePositionDown();
         }
     }
 
@@ -84,14 +64,15 @@ class BaseAction
      * @param ModelCriteria  $query
      * @param UpdateSeoEvent $event
      *
-     * @return mixed
+     * @return mixed an SEOxxx object
+     * @throws FormValidationException if a rewritten URL cannot be created
      */
     protected function genericUpdateSeo(ModelCriteria $query, UpdateSeoEvent $event)
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
 
             $object
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
 
                 ->setLocale($event->getLocale())
                 ->setMetaTitle($event->getMetaTitle())
@@ -109,9 +90,8 @@ class BaseAction
             }
 
            $event->setObject($object);
-
-           return $object;
         }
-    }
 
+        return $object;
+    }
 }

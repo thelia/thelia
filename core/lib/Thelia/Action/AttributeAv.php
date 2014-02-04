@@ -47,7 +47,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
         $attribute = new AttributeAvModel();
 
         $attribute
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
 
             ->setAttributeId($event->getAttributeId())
             ->setLocale($event->getLocale())
@@ -70,7 +70,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
         if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId())) {
 
             $attribute
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
 
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
@@ -95,7 +95,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
         if (null !== ($attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId()))) {
 
             $attribute
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->delete()
             ;
 
@@ -110,7 +110,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        return $this->genericUpdatePosition(AttributeAvQuery::create(), $event);
+        $this->genericUpdatePosition(AttributeAvQuery::create(), $event);
     }
 
     /**

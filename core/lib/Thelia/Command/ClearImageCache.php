@@ -23,7 +23,7 @@
 
 namespace Thelia\Command;
 
-use Thelia\Command\ContainerAwareCommand;
+
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

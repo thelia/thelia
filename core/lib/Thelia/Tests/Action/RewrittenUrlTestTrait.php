@@ -29,6 +29,7 @@ trait RewrittenUrlTestTrait
     {
         $object = null;
         $event = $this->getUpdateSeoEvent($object);
+        $event->setDispatcher($this->dispatcher);
 
         /* get an existing url */
         $existingUrl = RewritingUrlQuery::create()
@@ -50,6 +51,7 @@ trait RewrittenUrlTestTrait
     {
         $object = null;
         $event = $this->getUpdateSeoEvent($object);
+        $event->setDispatcher($this->dispatcher);
 
         $currentUrl = $object->getRewrittenUrl($object->getLocale());
 

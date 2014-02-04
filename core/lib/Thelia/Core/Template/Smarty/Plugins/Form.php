@@ -24,7 +24,7 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Symfony\Component\Form\FormView;
 use Thelia\Core\Form\Type\TheliaType;
-use Thelia\Form\BaseForm;
+
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;

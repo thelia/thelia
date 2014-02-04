@@ -56,9 +56,6 @@ trait StandardDescriptionFieldsTrait
                         new NotBlank()
                     ),
                     "label" => Translator::getInstance()->trans("Title"),
-                    "label_attr" => array(
-                        "for" => "title"
-                    ),
                     "label_attr" => array("for" => "title_field")
                 )
             );

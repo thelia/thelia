@@ -47,7 +47,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\TheliaContainerBuilder;
+
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
