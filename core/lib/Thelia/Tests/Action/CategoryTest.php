@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Routing\Router;
 use Thelia\Action\Category;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
+use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\Category as CategoryModel;
@@ -43,6 +44,22 @@ use Thelia\Tools\URL;
  */
 class CategoryTest extends TestCaseWithURLToolSetup
 {
+
+    /**
+     * @return \Thelia\Model\Category
+     */
+    protected function getRandomCategory()
+    {
+        $category = CategoryQuery::create()
+        ->addAscendingOrderByColumn('RAND()')
+        ->findOne();
+
+        if (null === $category) {
+            $this->fail('use fixtures before launching test, there is no category in database');
+        }
+
+        return $category;
+    }
 
     public function testCreate()
     {
@@ -127,5 +144,22 @@ class CategoryTest extends TestCaseWithURLToolSetup
 
         $this->assertInstanceOf('Thelia\Model\Category', $deletedCategory);
         $this->assertTrue($deletedCategory->isDeleted());
+    }
+
+    public function testToggleVisibility()
+    {
+        $category = $this->getRandomCategory();
+        $expectedVisibility = !$category->getVisible();
+
+        $event = new CategoryToggleVisibilityEvent($category);
+        $event->setDispatcher($this->getDispatcher());
+
+        $action = new Category();
+        $action->toggleVisibility($event);
+
+        $updatedCategory = $event->getCategory();
+
+        $this->assertInstanceOf('Thelia\Model\Category', $updatedCategory);
+        $this->assertEquals($expectedVisibility, $updatedCategory->getVisible());
     }
 }
