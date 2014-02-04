@@ -5,7 +5,7 @@ namespace Thelia\Model;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\Module as BaseModule;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
-use Thelia\Core\Event\TheliaEvents;
+
 
 class Module extends BaseModule
 {

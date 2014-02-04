@@ -101,6 +101,10 @@ try {
         ->find();
     $customer->delete();
 
+    $admin = Thelia\Model\AdminQuery::create()
+        ->find();
+    $admin->delete();
+
     $folder = Thelia\Model\FolderQuery::create()
         ->find();
     $folder->delete();
@@ -181,6 +185,17 @@ try {
             ->setCustomer($customer)
             ->save()
         ;
+    }
+
+    for ($i=0; $i<3; $i++) {
+        $admin = new Thelia\Model\Admin();
+        $admin
+            ->setFirstname($faker->firstname)
+            ->setLastname($faker->lastname)
+            ->setLogin($faker->firstname)
+            ->setPassword('azerty')
+            ->setLocale('en_US')
+            ->save();
     }
 
     for ($i = 0; $i < 50; $i++) {
@@ -509,11 +524,11 @@ function createProduct($faker, Thelia\Model\Category $category, $position, $temp
 
     $image = new \Thelia\Model\ProductImage();
     $image->setProductId($productId);
-    generate_image($image, 1, 'product', $productId);
+    generate_image($image, 'product', $productId);
 
     $document = new \Thelia\Model\ProductDocument();
     $document->setProductId($productId);
-    generate_document($document, 1, 'product', $productId);
+    generate_document($document, 'product', $productId);
 
     return $product;
 }

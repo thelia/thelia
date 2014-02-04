@@ -48,7 +48,13 @@ class Module extends AbstractSmartyPlugin
     /**
      * Process theliaModule template inclusion function
      *
-     * @param unknown                   $params
+     * This function accepts two parameters:
+     *
+     * - location : this is the location in the admin template. Example: folder-edit'. The function will search for
+     *   AdminIncludes/<location>.html file, and fetch it as a Smarty template.
+     * - countvar : this is the name of a template variable where the number of found modules includes will be assigned.
+     *
+     * @param array $params
      * @param \Smarty_Internal_Template $template
      * @internal param \Thelia\Core\Template\Smarty\Plugins\unknown $smarty
      *
@@ -68,6 +74,8 @@ class Module extends AbstractSmartyPlugin
 
             $modules = ModuleQuery::getActivated();
 
+            $count = 0;
+
             foreach ($modules as $module) {
 
                 if (null !== $moduleLimit && $moduleLimit != $module->getCode()) {
@@ -78,12 +86,18 @@ class Module extends AbstractSmartyPlugin
 
                 if (file_exists($file)) {
                     $content .= file_get_contents($file);
+
+                    $count++;
                 }
             }
         }
 
         if (! empty($content)) {
             return $template->fetch(sprintf("string:%s", $content));
+        }
+
+        if (false !== $countvarname = $this->getParam($params, 'countvar', false)) {
+            $template->assign($countvarname, $count);
         }
 
         return "";

@@ -47,6 +47,8 @@ class CartTraitTest extends \PHPUnit_Framework_TestCase
 
     protected $uniqid;
 
+    protected $dispatcher;
+
     public function getContainer()
     {
         $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
@@ -67,6 +69,8 @@ class CartTraitTest extends \PHPUnit_Framework_TestCase
 
         $this->uniqid = uniqid('', true);
 
+        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+
         $this->cartTrait = new MockCartTrait($this->uniqid, $this->getContainer());
     }
 
@@ -79,7 +83,7 @@ class CartTraitTest extends \PHPUnit_Framework_TestCase
     {
         $cartTrait = $this->cartTrait;
 
-        $cart = $cartTrait->getCart($this->request);
+        $cart = $cartTrait->getCart($this->dispatcher, $this->request);
 
         $this->assertInstanceOf("Thelia\Model\Cart", $cart, '$cart must be an instance of cart model Thelia\Model\Cart');
         $this->assertNull($cart->getCustomerId());
@@ -109,7 +113,7 @@ class CartTraitTest extends \PHPUnit_Framework_TestCase
 
         $request->getSession()->setCustomerUser($customer);
 
-        $cart = $cartTrait->getCart($request);
+        $cart = $cartTrait->getCart($this->dispatcher, $request);
         $this->assertInstanceOf("Thelia\Model\Cart", $cart, '$cart must be an instance of cart model Thelia\Model\Cart');
         $this->assertNotNull($cart->getCustomerId());
         $this->assertEquals($customer->getId(), $cart->getCustomerId());
@@ -137,7 +141,7 @@ class CartTraitTest extends \PHPUnit_Framework_TestCase
 
         $request->cookies->set("thelia_cart", $uniqid);
 
-        $getCart = $cartTrait->getCart($request);
+        $getCart = $cartTrait->getCart($this->dispatcher, $request);
         $this->assertInstanceOf("Thelia\Model\Cart", $getCart, '$cart must be an instance of cart model Thelia\Model\Cart');
         $this->assertNull($getCart->getCustomerId());
         $this->assertNull($getCart->getAddressDeliveryId());
@@ -159,7 +163,7 @@ class CartTraitTest extends \PHPUnit_Framework_TestCase
         $token = "WrongToken";
         $request->cookies->set("thelia_cart", $token);
 
-        $cart = $cartTrait->getCart($request);
+        $cart = $cartTrait->getCart($this->dispatcher, $request);
         $this->assertInstanceOf("Thelia\Model\Cart", $cart, '$cart must be an instance of cart model Thelia\Model\Cart');
         $this->assertNull($cart->getCustomerId());
         $this->assertNull($cart->getAddressDeliveryId());
@@ -196,7 +200,7 @@ class CartTraitTest extends \PHPUnit_Framework_TestCase
 
         $request->getSession()->setCustomerUser($customer);
 
-        $getCart = $cartTrait->getCart($request);
+        $getCart = $cartTrait->getCart($this->dispatcher, $request);
         $this->assertInstanceOf("Thelia\Model\Cart", $getCart, '$cart must be an instance of cart model Thelia\Model\Cart');
         $this->assertNotNull($getCart->getCustomerId());
         $this->assertNull($getCart->getAddressDeliveryId());
@@ -234,7 +238,7 @@ class CartTraitTest extends \PHPUnit_Framework_TestCase
 
         $request->getSession()->setCustomerUser($customer);
 
-        $getCart = $cartTrait->getCart($request);
+        $getCart = $cartTrait->getCart($this->dispatcher, $request);
         $this->assertInstanceOf("Thelia\Model\Cart", $getCart, '$cart must be an instance of cart model Thelia\Model\Cart');
         $this->assertNotNull($getCart->getCustomerId());
         $this->assertNull($getCart->getAddressDeliveryId());

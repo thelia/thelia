@@ -23,7 +23,7 @@
 
 namespace Thelia\Core\Template\Element;
 
-use Symfony\Component\HttpFoundation\Request;
+
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Model\Tools\ModelCriteriaTools;

@@ -22,12 +22,12 @@
 /**********************************************************************************/
 namespace Thelia\Tools;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
 use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\Translation\Translator;
+
 use Thelia\Exception\ImageException;
 use Thelia\Form\CategoryDocumentModification;
 use Thelia\Form\CategoryImageModification;
@@ -80,23 +80,6 @@ class FileManager
 
     CONST FILE_TYPE_IMAGES   = 'images';
     CONST FILE_TYPE_DOCUMENTS   = 'documents';
-
-    /** @var ContainerInterface Service Container */
-    protected $container = null;
-
-    /** @var Translator Service Translator */
-    protected $translator = null;
-
-    /**
-     * Constructor
-     *
-     * @param ContainerInterface $container Service container
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-        $this->translator = $this->container->get('thelia.translator');
-    }
 
     /**
      * Copy UploadedFile into the server storage directory

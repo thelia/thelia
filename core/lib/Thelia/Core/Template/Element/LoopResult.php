@@ -25,7 +25,7 @@ namespace Thelia\Core\Template\Element;
 
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Util\PropelModelPager;
-use Thelia\Core\Template\Element\LoopResultRow;
+
 
 class LoopResult implements \Iterator
 {

@@ -53,12 +53,12 @@ class Category extends BaseAction implements EventSubscriberInterface
         $category = new CategoryModel();
 
         $category
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
 
             ->setLocale($event->getLocale())
-            ->setTitle($event->getTitle())
             ->setParent($event->getParent())
             ->setVisible($event->getVisible())
+            ->setTitle($event->getTitle())
 
             ->save()
         ;
@@ -76,7 +76,7 @@ class Category extends BaseAction implements EventSubscriberInterface
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
 
             $category
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
 
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
@@ -115,7 +115,7 @@ class Category extends BaseAction implements EventSubscriberInterface
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
 
             $category
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->delete()
             ;
 
@@ -133,7 +133,7 @@ class Category extends BaseAction implements EventSubscriberInterface
          $category = $event->getCategory();
 
          $category
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
             ->setVisible($category->getVisible() ? false : true)
             ->save()
             ;
@@ -146,7 +146,7 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        return $this->genericUpdatePosition(CategoryQuery::create(), $event);
+        $this->genericUpdatePosition(CategoryQuery::create(), $event);
     }
 
     public function addContent(CategoryAddContentEvent $event)
@@ -158,7 +158,7 @@ class Category extends BaseAction implements EventSubscriberInterface
             $content = new CategoryAssociatedContent();
 
             $content
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->setCategory($event->getCategory())
                 ->setContentId($event->getContentId())
                 ->save()
@@ -175,7 +175,7 @@ class Category extends BaseAction implements EventSubscriberInterface
 
         if ($content !== null) {
             $content
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->delete();
         }
     }

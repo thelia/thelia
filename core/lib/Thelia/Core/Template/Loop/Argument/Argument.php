@@ -56,6 +56,11 @@ class Argument
         return $this->type->getFormattedValue($this->value);
     }
 
+    public function getRawValue()
+    {
+        return $this->value;
+    }
+
     public function setValue($value)
     {
         if ($value === null) {
@@ -147,4 +152,5 @@ class Argument
             $empty
         );
     }
+
 }

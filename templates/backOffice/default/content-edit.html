@@ -97,7 +97,7 @@
                                             {$myparent=$DEFAULT_FOLDER}
                                             {loop name="fold-parent" type="folder-tree" visible="*" folder="0"}
                                                  <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if}>{$TITLE}</option>
-                                            {/loop }
+                                            {/loop}
 
                                         </select>
                                     </div>
@@ -156,7 +156,23 @@
         </div>
 
         <div class="tab-pane fade" id="modules">
-            {module_include location='content-edit'}
+            <div class="form-container">
+                {include
+                    file = "includes/inner-form-toolbar.html"
+                    hide_submit_buttons = true
+                    page_url  = {$pageUrl}
+                    close_url = {$closeUrl}
+                    current_tab = "modules"
+                }
+            </div>
+
+            {module_include location='content-edit' countvar='module_count'}
+
+            {if $countvar == 0}
+                <div class="alert alert-info">
+                    {intl l="There is currently no active module here."}
+                </div>
+            {/if}
         </div>
         </div>
         </div>

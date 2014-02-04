@@ -37,7 +37,7 @@ use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
 use Thelia\Model\ProductPriceQuery;
 use Propel\Runtime\Propel;
 use Thelia\Model\AttributeAvQuery;
-use Thelia\Model\Currency;
+
 use Thelia\Model\Map\AttributeCombinationTableMap;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;

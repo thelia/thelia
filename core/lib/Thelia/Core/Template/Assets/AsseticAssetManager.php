@@ -316,8 +316,6 @@ class AsseticAssetManager implements AssetManagerInterface
         // Get the URL part from the relative path
         $outputRelativePath = $webAssetsTemplate . DS . $webAssetsKey;
 
-        $outputRelativeWebPath = rtrim(str_replace('\\', '/', $outputRelativePath), '/') . '/';
-
         $assetTargetFilename = $asset->getTargetPath();
 
         /*
@@ -333,9 +331,16 @@ class AsseticAssetManager implements AssetManagerInterface
 
             $writer = new AssetWriter($outputDirectory . DS . $assetFileDirectoryInAssetDirectory);
 
-            Tlog::getInstance()->addDebug("Writing asset to $outputDirectory . DS . $assetFileDirectoryInAssetDirectory");
+            Tlog::getInstance()->addDebug("Writing asset to $outputDirectory" . DS . "$assetFileDirectoryInAssetDirectory");
 
             $writer->writeAsset($asset);
+        }
+
+        // Normalize path to generate a valid URL
+        if (DS != '/') {
+            $outputRelativeWebPath = str_replace(DS, '/', $outputRelativePath);
+            $assetFileDirectoryInAssetDirectory = str_replace(DS, '/', $assetFileDirectoryInAssetDirectory);
+            $assetTargetFilename = str_replace(DS, '/', $assetTargetFilename);
         }
 
         return rtrim($outputUrl, '/') . '/' . trim($outputRelativeWebPath, '/') . '/' . trim($assetFileDirectoryInAssetDirectory, '/') . '/' . ltrim($assetTargetFilename, '/');

@@ -54,6 +54,8 @@ class AdministratorUpdatePasswordEvent extends ActionEvent
     public function setPassword($password)
     {
         $this->password = $password;
+
+        return $this;
     }
 
     /**
@@ -70,6 +72,8 @@ class AdministratorUpdatePasswordEvent extends ActionEvent
     public function setAdmin(Admin $admin)
     {
         $this->admin = $admin;
+
+        return $this;
     }
 
     /**

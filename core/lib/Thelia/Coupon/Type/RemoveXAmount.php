@@ -23,7 +23,7 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Coupon\Type\CouponAbstract;
+
 
 /**
  * Allow to remove an amount from the checkout total

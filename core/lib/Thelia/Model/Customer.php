@@ -3,11 +3,11 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\AddressQuery;
+
 use Thelia\Model\Base\Customer as BaseCustomer;
 
 use Thelia\Model\Exception\InvalidArgumentException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 
 use Thelia\Core\Event\CustomRefEvent;
 use Thelia\Core\Event\TheliaEvents;

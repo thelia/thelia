@@ -31,6 +31,9 @@ use Thelia\Core\Event\ActionEvent;
  */
 class AreaEvent extends ActionEvent
 {
+    /**
+     * @var \Thelia\Model\Area
+     */
     protected $area;
 
     public function __construct($area = null)
@@ -51,7 +54,7 @@ class AreaEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
+     * @return null|\Thelia\Model\Area
      */
     public function getArea()
     {

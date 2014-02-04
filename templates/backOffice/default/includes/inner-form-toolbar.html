@@ -16,7 +16,12 @@ Parameters:
 		<ul class="nav nav-pills">
 		    {loop name="lang_list" type="lang"}
 		    <li {if $ID == $edit_language_id}class="active"{/if}>
-		        <a class="language-change-button" data-language-id="{$ID}" href="{url path={$page_url|default:$current_url nofilter} edit_language_id=$ID}" title="{intl l='Edit information in %lng' lng=$TITLE}">
+                {if $current_tab}
+                    {$lang_url = {url path={$page_url|default:$current_url nofilter} edit_language_id=$ID current_tab=$current_tab}}
+                {else}
+                    {$lang_url = {url path={$page_url|default:$current_url nofilter} edit_language_id=$ID}}
+                {/if}
+		        <a class="language-change-button" data-language-id="{$ID}" href="{$lang_url nofilter}" title="{intl l='Edit information in %lng' lng=$TITLE}">
 		            <img src="{image file="../assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" />
 		        </a>
 		    </li>

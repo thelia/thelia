@@ -24,8 +24,7 @@
 namespace Thelia\Coupon\Type;
 
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Coupon\Type\CouponAbstract;
-use Thelia\Exception\MissingFacadeException;
+
 
 /**
  * @package Coupon

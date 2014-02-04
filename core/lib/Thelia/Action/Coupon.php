@@ -23,6 +23,8 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
@@ -49,6 +51,34 @@ use Thelia\Model\OrderCoupon;
 class Coupon extends BaseAction implements EventSubscriberInterface
 {
     /**
+     * @var \Thelia\Core\HttpFoundation\Request
+     */
+    protected $request;
+
+    /** @var CouponFactory $couponFactory */
+    protected $couponFactory;
+
+    /** @var CouponManager $couponManager */
+    protected $couponManager;
+
+    /** @var ConditionInterface $noConditionRule */
+    protected $noConditionRule;
+
+    /** @var ConditionFactory $conditionFactory */
+    protected $conditionFactory;
+
+    public function __construct(Request $request,
+        CouponFactory $couponFactory, CouponManager $couponManager,
+        ConditionInterface $noConditionRule, ConditionFactory $conditionFactory)
+    {
+        $this->request = $request;
+        $this->couponFactory = $couponFactory;
+        $this->couponManager = $couponManager;
+        $this->noConditionRule = $noConditionRule;
+        $this->conditionFactory = $conditionFactory;
+    }
+
+     /**
      * Occurring when a Coupon is about to be created
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
@@ -94,21 +124,13 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $totalDiscount = 0;
         $isValid = false;
 
-        /** @var CouponFactory $couponFactory */
-        $couponFactory = $this->container->get('thelia.coupon.factory');
-
-        /** @var CouponManager $couponManager */
-        $couponManager = $this->container->get('thelia.coupon.manager');
-
         /** @var CouponInterface $coupon */
-        $coupon = $couponFactory->buildCouponFromCode($event->getCode());
+        $coupon = $this->couponFactory->buildCouponFromCode($event->getCode());
 
         if ($coupon) {
             $isValid = $coupon->isMatching();
             if ($isValid) {
-                /** @var Request $request */
-                $request = $this->container->get('request');
-                $consumedCoupons = $request->getSession()->getConsumedCoupons();
+                $consumedCoupons = $this->request->getSession()->getConsumedCoupons();
 
                 if (!isset($consumedCoupons) || !$consumedCoupons) {
                     $consumedCoupons = array();
@@ -117,16 +139,16 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 // Prevent accumulation of the same Coupon on a Checkout
                 $consumedCoupons[$event->getCode()] = $event->getCode();
 
-                $request->getSession()->setConsumedCoupons($consumedCoupons);
+                $this->request->getSession()->setConsumedCoupons($consumedCoupons);
 
-                $totalDiscount = $couponManager->getDiscount();
+                $totalDiscount = $this->couponManager->getDiscount();
 
-                $request
+                $this->request
                     ->getSession()
                     ->getCart()
                     ->setDiscount($totalDiscount)
                     ->save();
-                $request
+                $this->request
                     ->getSession()
                     ->getOrder()
                     ->setDiscount($totalDiscount)
@@ -148,13 +170,13 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     protected function createOrUpdate(CouponModel $coupon, CouponCreateOrUpdateEvent $event)
     {
-        $coupon->setDispatcher($this->getDispatcher());
+        $coupon->setDispatcher($event->getDispatcher());
 
         // Set default condition if none found
         /** @var ConditionInterface $noConditionRule */
-        $noConditionRule = $this->container->get('thelia.condition.match_for_everyone');
+        $noConditionRule = $this->getContainer()->get('thelia.condition.match_for_everyone');
         /** @var ConditionFactory $conditionFactory */
-        $conditionFactory = $this->container->get('thelia.condition.factory');
+        $conditionFactory = $this->getContainer()->get('thelia.condition.factory');
         $couponRuleCollection = new ConditionCollection();
         $couponRuleCollection[] = $noConditionRule;
         $defaultSerializedRule = $conditionFactory->serializeConditionCollection(
@@ -190,10 +212,10 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     protected function createOrUpdateCondition(CouponModel $coupon, CouponCreateOrUpdateEvent $event)
     {
-        $coupon->setDispatcher($this->getDispatcher());
+        $coupon->setDispatcher($event->getDispatcher());
 
         /** @var ConditionFactory $conditionFactory */
-        $conditionFactory = $this->container->get('thelia.condition.factory');
+        $conditionFactory = $this->getContainer()->get('thelia.condition.factory');
 
         $coupon->createOrUpdateConditions(
             $conditionFactory->serializeConditionCollection($event->getConditions()),
@@ -208,10 +230,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     public function testFreePostage(OrderEvent $event)
     {
-        /** @var CouponManager $couponManager */
-        $couponManager = $this->container->get('thelia.coupon.manager');
-
-        if ($couponManager->isCouponRemovingPostage()) {
+        if ($this->couponManager->isCouponRemovingPostage()) {
             $order = $event->getOrder();
 
             $order->setPostage(0);
@@ -227,21 +246,16 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     public function afterOrder(OrderEvent $event)
     {
-        $request = $this->container->get('request');
-
-        /** @var CouponManager $couponManager */
-        $couponManager = $this->container->get('thelia.coupon.manager');
-
-        $consumedCoupons = $request->getSession()->getConsumedCoupons();
+        $consumedCoupons = $this->request->getSession()->getConsumedCoupons();
 
         if (is_array($consumedCoupons)) {
             foreach ($consumedCoupons as $couponCode) {
                 $couponQuery = CouponQuery::create();
                 $couponModel = $couponQuery->findOneByCode($couponCode);
-                $couponModel->setLocale($request->getSession()->getLang()->getLocale());
+                $couponModel->setLocale($this->request->getSession()->getLang()->getLocale());
 
                 /* decrease coupon quantity */
-                $couponManager->decrementQuantity($couponModel);
+                $this->couponManager->decrementQuantity($couponModel);
 
                 /* memorize coupon */
                 $orderCoupon = new OrderCoupon();
@@ -264,7 +278,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             }
         }
 
-        $request->getSession()->setConsumedCoupons(array());
+        $this->request->getSession()->setConsumedCoupons(array());
     }
 
     /**

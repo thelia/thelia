@@ -51,7 +51,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
         $attribute = new AttributeModel();
 
         $attribute
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
 
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
@@ -78,7 +78,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
         if (null !== $attribute = AttributeQuery::create()->findPk($event->getAttributeId())) {
 
             $attribute
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
 
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
@@ -103,7 +103,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
         if (null !== ($attribute = AttributeQuery::create()->findPk($event->getAttributeId()))) {
 
             $attribute
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->delete()
             ;
 
@@ -118,7 +118,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        return $this->genericUpdatePosition(AttributeQuery::create(), $event);
+        $this->genericUpdatePosition(AttributeQuery::create(), $event);
     }
 
     protected function doAddToAllTemplates(AttributeModel $attribute)

@@ -1,3 +1,7 @@
+#2.0.0-beta5
+- Remove container from BaseAction.
+- fix sending mail on order creation
+
 #2.0.0-beta4
 - Tinymce is now a dedicated module. You need to activate it.
 - Fix PDF creation. Bug #180

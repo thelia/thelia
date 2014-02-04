@@ -2,8 +2,7 @@
 
 namespace Thelia\Model;
 
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 use Thelia\Model\Base\CategoryImage as BaseCategoryImage;
 use Propel\Runtime\Connection\ConnectionInterface;
 

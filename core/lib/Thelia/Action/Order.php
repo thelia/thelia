@@ -23,14 +23,20 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Cart\CartTrait;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderManualEvent;
+use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Template\ParserInterface;
 use Thelia\Exception\TheliaProcessException;
+use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
@@ -39,7 +45,6 @@ use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\Lang;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\MessageQuery;
-use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderProduct;
@@ -47,6 +52,8 @@ use Thelia\Model\OrderProductAttributeCombination;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Tools\I18n;
+use Thelia\Model\Country;
+
 
 /**
  *
@@ -57,6 +64,31 @@ use Thelia\Tools\I18n;
 class Order extends BaseAction implements EventSubscriberInterface
 {
     use CartTrait;
+
+    /**
+     * @var \Thelia\Core\HttpFoundation\Request
+     */
+    protected $request;
+    /**
+     * @var MailerFactory
+     */
+    protected $mailer;
+    /**
+     * @var ParserInterface
+     */
+    protected $parser;
+    /**
+     * @var SecurityContext
+     */
+    protected $securityContext;
+
+    public function __construct(Request $request, ParserInterface $parser, MailerFactory $mailer, SecurityContext $securityContext)
+    {
+        $this->request = $request;
+        $this->parser = $parser;
+        $this->mailer = $mailer;
+        $this->securityContext = $securityContext;
+    }
 
     /**
      * @param \Thelia\Core\Event\Order\OrderEvent $event
@@ -118,7 +150,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    protected function createOrder(ModelOrder $sessionOrder, Currency $currency, Lang $lang, CartModel $cart, CustomerModel $customer)
+    protected function createOrder(EventDispatcherInterface $dispatcher, ModelOrder $sessionOrder, Currency $currency, Lang $lang, CartModel $cart, CustomerModel $customer)
     {
         $con = \Propel\Runtime\Propel::getConnection(
                 OrderTableMap::DATABASE_NAME
@@ -126,9 +158,9 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $con->beginTransaction();
 
-        /* use a copy to avoid errored record in session */
+
         $placedOrder = $sessionOrder->copy();
-        $placedOrder->setDispatcher($this->getDispatcher());
+        $placedOrder->setDispatcher($dispatcher);
 
         $deliveryAddress = AddressQuery::create()->findPk($sessionOrder->chosenDeliveryAddress);
         $taxCountry = $deliveryAddress->getCountry();
@@ -238,7 +270,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ->setTaxRuleTitle($taxRuleI18n->getTitle())
                 ->setTaxRuleDescription($taxRuleI18n->getDescription())
                 ->setEanCode($pse->getEanCode())
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($dispatcher)
             ->save($con)
             ;
 
@@ -279,6 +311,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     public function createManual(OrderManualEvent $event) {
 
         $placedOrder = $this->createOrder(
+            $event->getDispatcher(),
             $event->getOrder(),
             $event->getCurrency(),
             $event->getLang(),
@@ -297,14 +330,15 @@ class Order extends BaseAction implements EventSubscriberInterface
         $session = $this->getSession();
 
         $placedOrder = $this->createOrder(
+            $event->getDispatcher(),
             $event->getOrder(),
             $session->getCurrency(),
             $session->getLang(),
             $session->getCart(),
-            $this->getSecurityContext()->getCustomerUser()
+            $this->securityContext->getCustomerUser()
         );
 
-        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
+        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
 
 
         /* clear session */
@@ -318,14 +352,16 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setPlacedOrder($placedOrder);
 
         /* empty cart */
-        $this->getDispatcher()->dispatch(TheliaEvents::CART_CLEAR, new CartEvent($this->getCart($this->getRequest())));
+        $dispatcher = $event->getDispatcher();
+
+        $dispatcher->dispatch(
+            TheliaEvents::CART_CLEAR, new CartEvent($this->getCart($dispatcher, $this->request)));
+
 
         /* call pay method */
+        $payEvent = new OrderPaymentEvent($placedOrder);
 
-        $paymentModule = ModuleQuery::create()->findPk($placedOrder->getPaymentModuleId());
-
-        $paymentModuleInstance = $this->container->get(sprintf('module.%s', $paymentModule->getCode()));
-        $paymentModuleInstance->pay($placedOrder);
+        $dispatcher->dispatch(TheliaEvents::MODULE_PAY, $payEvent);
     }
 
     /**
@@ -348,10 +384,8 @@ class Order extends BaseAction implements EventSubscriberInterface
             $order = $event->getOrder();
             $customer = $order->getCustomer();
 
-            $parser = $this->container->get("thelia.parser");
-
-            $parser->assign('order_id', $order->getId());
-            $parser->assign('order_ref', $order->getRef());
+            $this->parser->assign('order_id', $order->getId());
+            $this->parser->assign('order_ref', $order->getRef());
 
             $message
                 ->setLocale($order->getLang()->getLocale());
@@ -362,7 +396,8 @@ class Order extends BaseAction implements EventSubscriberInterface
             ;
 
             // Build subject and body
-            $message->buildMessage($parser, $instance);
+
+            $message->buildMessage($this->parser, $instance);
 
             $this->getMailer()->send($instance);
         }
@@ -376,9 +411,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function getMailer()
     {
-        $mailer = $this->container->get('mailer');
-
-        return $mailer->getSwiftMailer();
+        return $this->mailer->getSwiftMailer();
     }
 
     /**
@@ -470,32 +503,12 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Return the security context
-     *
-     * @return SecurityContext
-     */
-    protected function getSecurityContext()
-    {
-        return $this->container->get('thelia.securityContext');
-    }
-
-    /**
-     * @return \Symfony\Component\HttpFoundation\Request
-     */
-    protected function getRequest()
-    {
-        return $this->container->get('request');
-    }
-
-    /**
      * Returns the session from the current request
      *
      * @return \Thelia\Core\HttpFoundation\Session\Session
      */
     protected function getSession()
     {
-        $request = $this->getRequest();
-
-        return $request->getSession();
+        return $this->request->getSession();
     }
 }

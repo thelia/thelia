@@ -51,7 +51,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
         $feature = new FeatureModel();
 
         $feature
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($event->getDispatcher())
 
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
@@ -78,7 +78,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
         if (null !== $feature = FeatureQuery::create()->findPk($event->getFeatureId())) {
 
             $feature
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
 
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
@@ -103,7 +103,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
         if (null !== ($feature = FeatureQuery::create()->findPk($event->getFeatureId()))) {
 
             $feature
-                ->setDispatcher($this->getDispatcher())
+                ->setDispatcher($event->getDispatcher())
                 ->delete()
             ;
 
@@ -114,11 +114,11 @@ class Feature extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param CategoryChangePositionEvent $event
+     * @param UpdatePositionEvent $event
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        return $this->genericUpdatePosition(FeatureQuery::create(), $event);
+        $this->genericUpdatePosition(FeatureQuery::create(), $event);
     }
 
     protected function doAddToAllTemplates(FeatureModel $feature)

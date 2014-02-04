@@ -30,10 +30,10 @@ class TemplateDefinition
     const PDF = 3;
     const EMAIL = 4;
 
-    const FRONT_OFFICE_SUBDIR = 'frontOffice/';
-    const BACK_OFFICE_SUBDIR = 'backOffice/';
-    const PDF_SUBDIR = 'pdf/';
-    const EMAIL_SUBDIR = 'email/';
+    const FRONT_OFFICE_SUBDIR = 'frontOffice';
+    const BACK_OFFICE_SUBDIR = 'backOffice';
+    const PDF_SUBDIR = 'pdf';
+    const EMAIL_SUBDIR = 'email';
 
     protected static $standardTemplatesSubdirs = array(
         self::FRONT_OFFICE => self::FRONT_OFFICE_SUBDIR,
@@ -64,16 +64,16 @@ class TemplateDefinition
 
         switch ($type) {
             case TemplateDefinition::FRONT_OFFICE:
-                $this->path = self::FRONT_OFFICE_SUBDIR . $name;
+                $this->path = self::FRONT_OFFICE_SUBDIR . DS . $name;
                 break;
             case TemplateDefinition::BACK_OFFICE:
-                $this->path = self::BACK_OFFICE_SUBDIR . $name;
+                $this->path = self::BACK_OFFICE_SUBDIR . DS . $name;
                 break;
             case TemplateDefinition::PDF:
-                $this->path = self::PDF_SUBDIR . $name;
+                $this->path = self::PDF_SUBDIR . DS . $name;
                 break;
             case TemplateDefinition::EMAIL:
-                $this->path = self::EMAIL_SUBDIR . $name;
+                $this->path = self::EMAIL_SUBDIR . DS . $name;
                 break;
             default:
                 $this->path = $name;

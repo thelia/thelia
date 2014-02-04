@@ -23,7 +23,7 @@
 
 namespace Thelia\Condition\Implementation;
 
-use Thelia\Condition\Implementation\ConditionAbstract;
+
 use Thelia\Condition\Operators;
 use Thelia\Exception\InvalidConditionOperatorException;
 use Thelia\Model\Currency;

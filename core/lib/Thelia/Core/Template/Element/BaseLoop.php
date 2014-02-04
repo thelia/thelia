@@ -24,14 +24,11 @@
 namespace Thelia\Core\Template\Element;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\LoopException;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Core\Security\SecurityContext;
-use Thelia\Type\AlphaNumStringListType;
 use Thelia\Type\EnumListType;
 use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
@@ -339,7 +336,7 @@ abstract class BaseLoop
     public function count()
     {
         $hash = $this->args->getHash();
-        if(false === array_key_exists($hash, self::$cacheCount))
+        if(false === isset(self::$cacheCount[$hash]))
         {
             $count = 0;
             if ($this instanceof PropelSearchLoopInterface) {
@@ -370,7 +367,7 @@ abstract class BaseLoop
     public function exec(&$pagination)
     {
         $hash = $this->args->getHash();
-        if(false === array_key_exists($hash, self::$cacheLoopResult))
+        if(false === isset(self::$cacheLoopResult[$hash]))
         {
             if ($this instanceof PropelSearchLoopInterface) {
                 $searchModelCriteria = $this->buildModelCriteria();

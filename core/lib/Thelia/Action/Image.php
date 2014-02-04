@@ -255,7 +255,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     public function saveImage(ImageCreateOrUpdateEvent $event)
     {
-        $fileManager = new FileManager($this->container);
+        $fileManager = new FileManager();
         $model = $event->getModelImage();
 
         $nbModifiedLines = $model->save();
@@ -286,7 +286,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     public function updateImage(ImageCreateOrUpdateEvent $event)
     {
-        $fileManager = new FileManager($this->container);
+        $fileManager = new FileManager();
         // Copy and save file
         if ($event->getUploadedFile()) {
             // Remove old picture file from file storage
@@ -304,7 +304,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
     public function updatePosition(UpdateFilePositionEvent $event)
     {
-        return $this->genericUpdatePosition($event->getQuery(), $event);
+        $this->genericUpdatePosition($event->getQuery(), $event);
     }
 
     /**
@@ -317,7 +317,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     public function deleteImage(ImageDeleteEvent $event)
     {
-        $fileManager = new FileManager($this->container);
+        $fileManager = new FileManager();
 
         $fileManager->deleteFile($event->getImageToDelete(), $event->getImageType(), FileManager::FILE_TYPE_IMAGES);
     }
@@ -416,7 +416,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     /**
      * Create a new Imagine object using current driver configuration
      *
-     * @return \Imagine\ImagineInterface
+     * @return ImagineInterface
      */
     protected function createImagineInstance()
     {
