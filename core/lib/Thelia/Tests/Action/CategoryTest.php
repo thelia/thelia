@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Routing\Router;
 use Thelia\Action\Category;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
+use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\Category as CategoryModel;
@@ -44,6 +45,9 @@ use Thelia\Tools\URL;
 class CategoryTest extends TestCaseWithURLToolSetup
 {
 
+    /**
+     * @return \Thelia\Model\Category
+     */
     protected function getRandomCategory()
     {
         $category = CategoryQuery::create()
@@ -55,59 +59,6 @@ class CategoryTest extends TestCaseWithURLToolSetup
         }
 
         return $category;
-    }
-
-    public function getUpdateEvent(&$category)
-    {
-        if (!$category instanceof \Thelia\Model\Category) {
-            $category = $this->getRandomCategory();
-        }
-
-        $event = new CategoryUpdateEvent($category->getId());
-
-        $event
-            ->setLocale('en_US')
-            ->setTitle('bar')
-            ->setDescription('bar description')
-            ->setChapo('bar chapo')
-            ->setPostscriptum('bar postscriptum')
-            ->setVisible(0)
-            ->setParent(0)
-            ->setDispatcher($this->getDispatcher())
-        ;
-    }
-
-    public function getUpdateSeoEvent(&$category)
-    {
-        if (!$category instanceof \Thelia\Model\Category) {
-            $category = $this->getRandomCategory();
-        }
-
-        $event = new UpdateSeoEvent($category->getId());
-        $event->setDispatcher($this->getDispatcher());
-        $event
-            ->setLocale($category->getLocale())
-            ->setMetaTitle($category->getMetaTitle())
-            ->setMetaDescription($category->getMetaDescription())
-            ->setMetaKeywords($category->getMetaKeywords());
-
-        return $event;
-    }
-
-    public function processUpdateAction($event)
-    {
-        $action = new Category();
-        $action->update($event);
-
-        return $event->getCategory();
-    }
-
-    public function processUpdateSeoAction($event)
-    {
-        $action = new Category();
-
-        return $action->updateSeo($event);
-
     }
 
     public function testCreate()
@@ -193,5 +144,22 @@ class CategoryTest extends TestCaseWithURLToolSetup
 
         $this->assertInstanceOf('Thelia\Model\Category', $deletedCategory);
         $this->assertTrue($deletedCategory->isDeleted());
+    }
+
+    public function testToggleVisibility()
+    {
+        $category = $this->getRandomCategory();
+        $expectedVisibility = !$category->getVisible();
+
+        $event = new CategoryToggleVisibilityEvent($category);
+        $event->setDispatcher($this->getDispatcher());
+
+        $action = new Category();
+        $action->toggleVisibility($event);
+
+        $updatedCategory = $event->getCategory();
+
+        $this->assertInstanceOf('Thelia\Model\Category', $updatedCategory);
+        $this->assertEquals($expectedVisibility, $updatedCategory->getVisible());
     }
 }
