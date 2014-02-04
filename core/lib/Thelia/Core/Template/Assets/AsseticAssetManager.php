@@ -314,7 +314,7 @@ class AsseticAssetManager implements AssetManagerInterface
         $outputDirectory = $this->getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey);
 
         // Get the URL part from the relative path
-        $outputRelativePath = $webAssetsTemplate . DS . $webAssetsKey;
+        $outputRelativeWebPath = $webAssetsTemplate . DS . $webAssetsKey;
 
         $assetTargetFilename = $asset->getTargetPath();
 
@@ -338,7 +338,7 @@ class AsseticAssetManager implements AssetManagerInterface
 
         // Normalize path to generate a valid URL
         if (DS != '/') {
-            $outputRelativeWebPath = str_replace(DS, '/', $outputRelativePath);
+            $outputRelativeWebPath = str_replace(DS, '/', $outputRelativeWebPath);
             $assetFileDirectoryInAssetDirectory = str_replace(DS, '/', $assetFileDirectoryInAssetDirectory);
             $assetTargetFilename = str_replace(DS, '/', $assetTargetFilename);
         }
