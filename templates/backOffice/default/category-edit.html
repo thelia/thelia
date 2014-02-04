@@ -260,8 +260,14 @@
                                     {include file='includes/document-upload-form.html' documentType='category' parentId=$ID}
                                 </div>
 
-                                <div class="tab-pane fade" id="modules">
-                                    {module_include location='category-edit'}
+                                <div class="tab-pane fade module-tab" id="modules">
+                                    {module_include location='category-edit' countvar='module_count'}
+
+                                    {if $countvar == 0}
+                                        <div class="alert alert-info">
+                                            {intl l="There are currently no active module here."}
+                                        </div>
+                                    {/if}
                                 </div>
                              </div>
                         </div>

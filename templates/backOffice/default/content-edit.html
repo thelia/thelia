@@ -155,8 +155,14 @@
             {include file='includes/document-upload-form.html' documentType='content' parentId=$content_id}
         </div>
 
-        <div class="tab-pane fade" id="modules">
-            {module_include location='content-edit'}
+        <div class="tab-pane fade module-tab" id="modules">
+            {module_include location='content-edit' countvar='module_count'}
+
+            {if $countvar == 0}
+                <div class="alert alert-info">
+                    {intl l="There are currently no active module here."}
+                </div>
+            {/if}
         </div>
         </div>
         </div>

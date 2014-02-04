@@ -108,8 +108,14 @@
                                     <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
                                 </div>
 
-                                <div class="tab-pane fade" id="modules">
-                                    {module_include location='product-edit'}
+                                <div class="tab-pane fade module-tab" id="modules">
+                                    {module_include location='product-edit' countvar='module_count'}
+
+                                    {if $countvar == 0}
+                                        <div class="alert alert-info">
+                                            {intl l="There are currently no active module here."}
+                                        </div>
+                                    {/if}
                                 </div>
 
                              </div>
