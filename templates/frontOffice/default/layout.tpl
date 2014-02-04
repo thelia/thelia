@@ -48,7 +48,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     {/block}
 
     {* Stylesheets *}
-    {stylesheets file='assets/less/styles.less' filters='less'}
+    {stylesheets file='assets/css/styles.css'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 

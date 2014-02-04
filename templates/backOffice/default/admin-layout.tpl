@@ -25,7 +25,7 @@
 
     {block name="before-bootstrap-css"}{/block}
 
-	{stylesheets file='assets/less/main.less' filters='less'}
+	{stylesheets file='assets/css/styles.css'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 
