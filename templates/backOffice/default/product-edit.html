@@ -108,7 +108,17 @@
                                     <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
                                 </div>
 
-                                <div class="tab-pane fade module-tab" id="modules">
+                                <div class="tab-pane fade" id="modules">
+                                    <div class="form-container">
+                                        {include
+                                        file = "includes/inner-form-toolbar.html"
+                                        hide_submit_buttons = true
+                                        page_url  = {$pageUrl}
+                                        close_url = {$closeUrl}
+                                        current_tab = "modules"
+                                        }
+                                    </div>
+
                                     {module_include location='product-edit' countvar='module_count'}
 
                                     {if $countvar == 0}
