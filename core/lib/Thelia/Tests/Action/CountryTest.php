@@ -39,13 +39,7 @@ use Thelia\Model\CountryQuery;
  */
 class CountryTest extends \PHPUnit_Framework_TestCase
 {
-
     protected  $dispatcher;
-
-    public static function setUpBeforeClass()
-    {
-
-    }
 
     public function setUp()
     {

@@ -52,7 +52,6 @@ use Thelia\Model\OrderProductAttributeCombination;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Tools\I18n;
-use Thelia\Model\Country;
 
 
 /**
