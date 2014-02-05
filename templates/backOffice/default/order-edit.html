@@ -59,6 +59,7 @@
                                 <ul class="nav nav-tabs clearfix">
                                     <li {if $oder_tab == 'cart'}class="active"{/if}><a href="#cart" data-tab-name="cart" data-toggle="tab"><span class="glyphicon glyphicon-shopping-cart"></span> {intl l="Ordered products"}</a></li>
                                     <li {if $oder_tab == 'bill'}class="active"{/if}><a href="#bill" data-tab-name="bill" data-toggle="tab"><span class="glyphicon glyphicon-list-alt"></span> {intl l="Invoice and Delivery"}</a></li>
+                                    <li {if $oder_tab == 'modules'}class="active"{/if}><a href="#modules" data-tab-name="modules" data-toggle="tab"><span class="glyphicon glyphicon-paperclip"></span> {intl l="Modules"}</a></li>
 
                                 </ul>
 
@@ -348,6 +349,16 @@
 
                                     </div> <!-- #bill -->
 
+                                    <div class="tab-pane fade {if $oder_tab == 'modules'}active in{/if} clearfix" id="modules">
+
+                                        {module_include location='order-edit' countvar='module_count'}
+
+                                        {if $countvar == 0}
+                                            <div class="alert alert-info">
+                                                {intl l="There is currently no active module here."}
+                                            </div>
+                                        {/if}
+                                    </div>
                                 </div>
                             {/loop}
 
