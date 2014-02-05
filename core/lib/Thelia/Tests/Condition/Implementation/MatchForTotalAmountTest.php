@@ -21,10 +21,11 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Condition\Implementation;
+namespace Thelia\Tests\Condition\Implementation;
 
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
+use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Operators;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;

@@ -40,7 +40,7 @@ use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Currency;
+use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\Lang;
 use Thelia\Model\Map\OrderTableMap;
@@ -149,7 +149,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    protected function createOrder(EventDispatcherInterface $dispatcher, ModelOrder $sessionOrder, Currency $currency, Lang $lang, CartModel $cart, CustomerModel $customer)
+    protected function createOrder(EventDispatcherInterface $dispatcher, ModelOrder $sessionOrder, CurrencyModel $currency, Lang $lang, CartModel $cart, CustomerModel $customer)
     {
         $con = \Propel\Runtime\Propel::getConnection(
                 OrderTableMap::DATABASE_NAME
