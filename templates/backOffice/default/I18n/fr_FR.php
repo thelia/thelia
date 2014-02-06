@@ -590,7 +590,7 @@ return array(
     'Other addresses' => 'Autres adresses',
     'Overall sales' => 'Total des ventes',
     'PDF templates' => 'templates PDF',
-    'PDF | Invoice' => 'Facure PDF',
+    'PDF | Invoice' => 'Facture PDF',
     'PDF | Purchase order' => 'Bon de commande PDF',
     'Page not found' => 'Page non trouvée',
     'Parameters' => 'Paramètres',
