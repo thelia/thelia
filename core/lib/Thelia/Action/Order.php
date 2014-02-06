@@ -340,12 +340,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
 
 
-        /* clear session */
-        $session
-            ->setProcessedOrder($placedOrder)
-            ->setOrder(new \Thelia\Model\Order())
-        ;
-
         /* but memorize placed order */
         $event->setOrder(new \Thelia\Model\Order());
         $event->setPlacedOrder($placedOrder);
@@ -353,14 +347,14 @@ class Order extends BaseAction implements EventSubscriberInterface
         /* empty cart */
         $dispatcher = $event->getDispatcher();
 
-        $dispatcher->dispatch(
-            TheliaEvents::CART_CLEAR, new CartEvent($this->getCart($dispatcher, $this->request)));
-
-
         /* call pay method */
         $payEvent = new OrderPaymentEvent($placedOrder);
 
         $dispatcher->dispatch(TheliaEvents::MODULE_PAY, $payEvent);
+
+        if ($payEvent->hasResponse()) {
+            $event->setResponse($payEvent->getResponse());
+        }
     }
 
     /**

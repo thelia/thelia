@@ -135,7 +135,12 @@ trait CartTrait
         $id = null;
         if (ConfigQuery::read("cart.session_only", 0) == 0) {
             $id = uniqid('', true);
-            setcookie("thelia_cart", $id, time()+ConfigQuery::read("cart.cookie_lifetime", 60*60*24*365));
+            setcookie(
+                "thelia_cart",
+                $id,
+                time()+ConfigQuery::read("cart.cookie_lifetime", 60*60*24*365),
+                '/'
+            );
 
         }
 

@@ -176,7 +176,11 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         $paymentModuleInstance = $this->container->get(sprintf('module.%s', $paymentModule->getCode()));
 
-        $paymentModuleInstance->pay($order);
+        $response = $paymentModuleInstance->pay($order);
+
+        if (null !== $response && $response instanceof \Thelia\Core\HttpFoundation\Response) {
+            $event->setResponse($response);
+        }
     }
 
     /**

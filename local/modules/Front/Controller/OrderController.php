@@ -23,6 +23,7 @@
 namespace Front\Controller;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Cart\CartTrait;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\HttpFoundation\Response;
@@ -51,6 +52,7 @@ use Thelia\Tools\URL;
  */
 class OrderController extends BaseFrontController
 {
+    use CartTrait;
     /**
      * set delivery address
      * set delivery module
@@ -199,7 +201,11 @@ class OrderController extends BaseFrontController
 
         if (null !== $placedOrder && null !== $placedOrder->getId()) {
             /* order has been placed */
-            $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute('order.placed', array('order_id' => $orderEvent->getPlacedOrder()->getId()))));
+            if($orderEvent->hasResponse()) {
+                return $orderEvent->getResponse();
+            } else {
+                $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute('order.placed', array('order_id' => $orderEvent->getPlacedOrder()->getId()))));
+            }
         } else {
             /* order has not been placed */
             $this->redirectToRoute('cart.view');
@@ -222,6 +228,10 @@ class OrderController extends BaseFrontController
         if (null === $customer || $placedOrder->getCustomerId() !== $customer->getId()) {
             throw new TheliaProcessException("Received placed order id does not belong to the current customer", TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER, $placedOrder);
         }
+        $session = $this->getRequest()->getSession();
+        $this->createCart($this->getRequest()->getSession());
+
+        $session->setOrder(new Order());
 
         $this->getParserContext()->set("placed_order_id", $placedOrder->getId());
     }

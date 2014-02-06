@@ -254,26 +254,6 @@ class Session extends BaseSession
     }
 
     /**
-     * @param Order $order
-     * @return $this
-     */
-    public function setProcessedOrder(Order $order)
-    {
-        $this->set('thelia.order.processed', $order);
-
-        return $this;
-    }
-
-    /**
-     * Return an order already processed, usefull for payment modules
-     * @return Order
-     */
-    public function getProcessedOrder()
-    {
-        return $this->get('thelia.order.processed');
-    }
-
-    /**
      * Set consumed coupons by the Customer
      *
      * @param array $couponsCode An array of Coupon code

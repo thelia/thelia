@@ -24,6 +24,7 @@
 namespace Thelia\Core\Event\Order;
 
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Model\Order;
 
 class OrderEvent extends ActionEvent
@@ -38,6 +39,11 @@ class OrderEvent extends ActionEvent
     protected $ref = null;
     protected $status = null;
     protected $deliveryRef = null;
+
+    /**
+     * @var Response
+     */
+    protected $response;
 
     /**
      * @param Order $order
@@ -205,5 +211,29 @@ class OrderEvent extends ActionEvent
     public function getDeliveryRef()
     {
         return $this->deliveryRef;
+    }
+
+    /**
+     * @param Response $response
+     * @return $this
+     */
+    public function setResponse(Response $response)
+    {
+        $this->response = $response;
+
+        return $this;
+    }
+
+    /**
+     * @return Response
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    public function hasResponse()
+    {
+        return null !== $this->response;
     }
 }

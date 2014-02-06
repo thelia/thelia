@@ -24,6 +24,7 @@
 namespace Thelia\Core\Event\Order;
 
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Model\Order;
 
 /**
@@ -38,6 +39,11 @@ class OrderPaymentEvent extends ActionEvent
      */
     protected $order;
 
+    /**
+     * @var \Thelia\Core\HttpFoundation\Response
+     */
+    protected $response;
+
     public function __construct(Order $order) {
         $this->order = $order;
     }
@@ -49,4 +55,29 @@ class OrderPaymentEvent extends ActionEvent
     {
         return $this->order;
     }
+
+    /**
+     * @param \Thelia\Core\HttpFoundation\Response $response
+     */
+    public function setResponse(Response $response)
+    {
+        $this->response = $response;
+
+        return $this;
+    }
+
+    /**
+     * @return \Thelia\Core\HttpFoundation\Response
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    public function hasResponse()
+    {
+        return null !== $this->response;
+    }
+
+
 }
