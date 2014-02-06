@@ -72,7 +72,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
                 new TypeCollection(
                     new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse', 'random', 'given_id'))
                 ),
-                'alpha'
+                'manual'
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createIntListTypeArgument('exclude_folder')
