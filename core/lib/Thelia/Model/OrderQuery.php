@@ -6,8 +6,11 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 
 
+use Propel\Runtime\Propel;
 use Thelia\Model\Base\OrderQuery as BaseOrderQuery;
 
+use Thelia\Model\Map\OrderProductTableMap;
+use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Map\OrderTableMap;
 
 /**
@@ -97,17 +100,31 @@ class OrderQuery extends BaseOrderQuery
      */
     public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping)
     {
-        $amount = 0;
-        foreach(self::create()
-                    ->filterByStatusId(array(2,3,4), Criteria::IN)
-                    ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
-                    ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
-                    ->find() as $order) {
-            $tax = 0;
-            $amount += $order->getTotalAmount($tax, $includeShipping);
+
+        $orderTaxJoin = new Join();
+        $orderTaxJoin->addExplicitCondition(OrderProductTableMap::TABLE_NAME, 'ID', null, OrderProductTaxTableMap::TABLE_NAME, 'ORDER_PRODUCT_ID', null);
+        $orderTaxJoin->setJoinType(Criteria::INNER_JOIN);
+
+        $query = self::create('o')
+            ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
+            ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
+            ->filterByStatusId("2,3,4", Criteria::IN)
+            ->innerJoinOrderProduct()
+            ->addJoinObject($orderTaxJoin)
+
+        ;
+
+        if($includeShipping) {
+            $query->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE+`order_product_tax`.PROMO_AMOUNT,`order_product`.PRICE+`order_product_tax`.AMOUNT)) + `order`.postage )", 'TOTAL');
+        } else {
+            $query->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE+`order_product_tax`.PROMO_AMOUNT,`order_product`.PRICE+`order_product_tax`.AMOUNT)))", 'TOTAL');
         }
 
-        return $amount;
+        $query->select('TOTAL');
+
+        $amount = $query->findOne();
+
+        return null === $amount ? 0 : round($amount, 2);
     }
 
     /**
