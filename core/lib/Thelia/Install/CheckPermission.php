@@ -64,6 +64,7 @@ class CheckPermission extends BaseInstall
 
     protected $extensions = array(
         'curl',
+        'fileinfo',
         'gd',
         'intl',
         'mcrypt',

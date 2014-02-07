@@ -94,7 +94,10 @@ $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
         </div>
         <div class="form-group">
             <label for="admin_locale"><?php echo $trans->trans('Administrator preferred locale :'); ?></label>
-            <input id="admin_locale" class="form-control" type="password" name="admin_locale" value="" required>
+            <select id="admin_locale" name="admin_locale" class="form-control" required>
+                <option value="en_US">English</option>
+                <option value="fr_FR">Français</option>
+            </select>
         </div>
         <div class="form-group">
             <label for="email_contact"><?php echo $trans->trans('Contact email :'); ?></label>
