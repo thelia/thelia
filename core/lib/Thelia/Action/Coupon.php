@@ -174,9 +174,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
         // Set default condition if none found
         /** @var ConditionInterface $noConditionRule */
-        $noConditionRule = $this->getContainer()->get('thelia.condition.match_for_everyone');
+        $noConditionRule = $this->noConditionRule;
         /** @var ConditionFactory $conditionFactory */
-        $conditionFactory = $this->getContainer()->get('thelia.condition.factory');
+        $conditionFactory = $this->conditionFactory;
         $couponRuleCollection = new ConditionCollection();
         $couponRuleCollection[] = $noConditionRule;
         $defaultSerializedRule = $conditionFactory->serializeConditionCollection(
@@ -215,7 +215,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $coupon->setDispatcher($event->getDispatcher());
 
         /** @var ConditionFactory $conditionFactory */
-        $conditionFactory = $this->getContainer()->get('thelia.condition.factory');
+        $conditionFactory = $this->conditionFactory;
 
         $coupon->createOrUpdateConditions(
             $conditionFactory->serializeConditionCollection($event->getConditions()),
