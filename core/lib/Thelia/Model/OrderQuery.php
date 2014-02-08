@@ -31,14 +31,11 @@ class OrderQuery extends BaseOrderQuery
 
         $stats = array();
         for($day=1; $day<=$numberOfDay; $day++) {
-            $dayAmount = 0;
-            foreach(self::create()
-                        ->filterByStatusId(array(2,3,4), Criteria::IN)
-                        ->filterByCreatedAt(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
-                        ->filterByCreatedAt(sprintf("%s-%s-%s 23:59:59", $year, $month, $day), Criteria::LESS_EQUAL)
-                        ->find() as $dayOrders) {
-                $dayAmount += $dayOrders->getTotalAmount();
-            }
+            $dayAmount = self::getSaleStats(
+                new \DateTime(sprintf('%s-%s-%s', $year, $month, $day)),
+                new \DateTime(sprintf('%s-%s-%s', $year, $month, $day)),
+                true
+            );
             $stats[] = array($day-1, $dayAmount);
         }
 

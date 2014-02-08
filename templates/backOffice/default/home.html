@@ -336,7 +336,6 @@ jQuery(function($){
     });
 
     function retrieveJQPlotJson(month, year, callback) {
-        console.log(month, year);
 
         $.getJSON(url, {month: month, year: year})
             .done(function(data) {
@@ -386,16 +385,11 @@ jQuery(function($){
         // Init jQPlot
         var series = initJqplotData(jQplotData);
 
-        console.log('END_INIT', series);
-
         // Start jQPlot
         if(jQPlotInstance) {
             jQPlotInstance.destroy();
-            console.log('OLD_DELETED');
         }
         jQPlotInstance = $.jqplot("jqplot", series, jQPlotsOptions);
-
-        console.log('END_LAUNCH');
 
         $(window).bind('resize', function(event, ui) {
             jQPlotInstance.replot( { resetAxes: true } );
