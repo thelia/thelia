@@ -159,6 +159,19 @@
                             </div><!--/.form-group-->
                         {/form_field}
 
+                        {form_field form=$form field="zipcode"}
+                            <div class="form-group group-zip{if $error} has-error{/if}">
+                                <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                                <div class="control-input">
+                                    <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="10" placeholder="{intl l="Placeholder zipcode"}" value="{$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                                    {if $error }
+                                        <span class="help-block">{$message}</span>
+                                        {assign var="error_focus" value="true"}
+                                    {/if}
+                                </div>
+                            </div><!--/.form-group-->
+                        {/form_field}
+
                         {form_field form=$form field="city"}
                             <div class="form-group group-city{if $error} has-error{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
@@ -172,18 +185,7 @@
                             </div><!--/.form-group-->
                         {/form_field}
 
-                        {form_field form=$form field="zipcode"}
-                            <div class="form-group group-zip{if $error} has-error{/if}">
-                                <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
-                                <div class="control-input">
-                                    <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="10" placeholder="{intl l="Placeholder zipcode"}" value="{$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
-                                    {if $error }
-                                        <span class="help-block">{$message}</span>
-                                        {assign var="error_focus" value="true"}
-                                    {/if}
-                                </div>
-                            </div><!--/.form-group-->
-                        {/form_field}
+
 
                         {form_field form=$form field="country"}
                             <div class="form-group group-country{if $error} has-error{/if}">
