@@ -82,6 +82,7 @@ abstract class ProductVersion implements ActiveRecordInterface
 
     /**
      * The value for the position field.
+     * Note: this column has a database default value of: 0
      * @var        int
      */
     protected $position;
@@ -145,6 +146,7 @@ abstract class ProductVersion implements ActiveRecordInterface
     public function applyDefaultValues()
     {
         $this->visible = 0;
+        $this->position = 0;
         $this->version = 0;
     }
 
@@ -802,6 +804,10 @@ abstract class ProductVersion implements ActiveRecordInterface
     public function hasOnlyDefaultValues()
     {
             if ($this->visible !== 0) {
+                return false;
+            }
+
+            if ($this->position !== 0) {
                 return false;
             }
 

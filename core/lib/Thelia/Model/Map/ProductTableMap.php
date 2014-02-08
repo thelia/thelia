@@ -189,7 +189,7 @@ class ProductTableMap extends TableMap
         $this->addForeignKey('TAX_RULE_ID', 'TaxRuleId', 'INTEGER', 'tax_rule', 'ID', false, null, null);
         $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
         $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, 0);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
+        $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, 0);
         $this->addForeignKey('TEMPLATE_ID', 'TemplateId', 'INTEGER', 'template', 'ID', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);

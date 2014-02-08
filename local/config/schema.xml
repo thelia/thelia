@@ -37,7 +37,7 @@
     <column name="tax_rule_id" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
     <column defaultValue="0" name="visible" required="true" type="TINYINT" />
-    <column name="position" required="true" type="INTEGER" />
+    <column name="position" required="true" defaultValue="0" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
