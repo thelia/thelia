@@ -31,4 +31,15 @@ interface PaymentModuleInterface extends BaseModuleInterface
      * @return mixed
      */
     public function pay(Order $order);
+
+    /**
+     *
+     * This method is call on Payment loop.
+     *
+     * If you return true, the payment method will de display
+     * If you return false, the payment method will not be display
+     *
+     * @return boolean
+     */
+    public function isValidPayment();
 }

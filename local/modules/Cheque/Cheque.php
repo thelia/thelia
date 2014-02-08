@@ -61,6 +61,20 @@ class Cheque extends BaseModule implements PaymentModuleInterface
         // no special process, waiting for the cheque.
     }
 
+    /**
+     *
+     * This method is call on Payment loop.
+     *
+     * If you return true, the payment method will de display
+     * If you return false, the payment method will not be display
+     *
+     * @return boolean
+     */
+    public function isValidPayment()
+    {
+        return true;
+    }
+
 
     public function postActivation(ConnectionInterface $con = null)
     {
