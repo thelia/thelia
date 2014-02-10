@@ -187,6 +187,9 @@ class CouponController extends BaseAdminController
             return $this->pageNotFound();
 
         }
+
+        $coupon->setLocale($this->getCurrentEditionLocale());
+
         /** @var CouponFactory $couponFactory */
         $couponFactory = $this->container->get('thelia.coupon.factory');
         $couponManager = $couponFactory->buildCouponFromModel($coupon);
@@ -232,7 +235,7 @@ class CouponController extends BaseAdminController
                 'isRemovingPostage' => $coupon->getIsRemovingPostage(),
                 'maxUsage' => $coupon->getMaxUsage(),
                 'conditions' => $conditions,
-                'locale' => $coupon->getLocale(),
+                'locale' => $this->getCurrentEditionLocale(),
             );
 
             $args['conditions'] = $this->cleanConditionForTemplate($conditions);

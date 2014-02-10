@@ -3,6 +3,7 @@
 
 <section class="row">
     <form action="{$formAction}" {form_enctype form=$form} method="POST" >
+
         <div class="col-md-12 general-block-decorator">
 
             {form_hidden_fields form=$form}
@@ -17,6 +18,14 @@
 
             <div class="span4">
                 <div class="control-group">
+                    {if !$noConditions}
+                        {include
+                        file = "includes/inner-form-toolbar.html"
+                        hide_submit_buttons = false
+
+                        page_url  = "{url path="{$formAction}"}"
+                        }
+                    {/if}
             <div class="col-md-4">
                 {form_field form=$form field='code'}
                     <div class="form-group {if $error}has-error{/if}">
@@ -146,7 +155,9 @@
                     </div>
                 {/form_field}
 
-                <button id="save-coupon-btn" type="submit" class="btn btn-default btn-primary">{intl l='Save your modifications'}</button>
+                {if $noConditions}
+                    <button id="save-coupon-btn" type="submit" class="btn btn-default btn-primary">{intl l='Save your modifications'}</button>
+                {/if}
             </div>
 
         </div>
