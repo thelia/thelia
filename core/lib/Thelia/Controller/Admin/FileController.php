@@ -860,7 +860,7 @@ class FileController extends BaseAdminController
     protected function createDocumentEventInstance($parentType, $model, $data)
     {
         $documentCreateEvent = new DocumentCreateOrUpdateEvent($parentType, null);
-
+        $model->setLocale($data['locale']);
         if (isset($data['title'])) {
             $model->setTitle($data['title']);
         }
