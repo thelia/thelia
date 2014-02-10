@@ -98,9 +98,8 @@ class CouponController extends BaseAdminController
     {
         $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
 
-        // Database request repeated in the loop but cached
-        $search = CouponQuery::create();
-        $coupon = $search->findOneById($couponId);
+
+        $coupon = CouponQuery::create()->findPk($couponId);
 
         if ($coupon === null) {
             return $this->pageNotFound();

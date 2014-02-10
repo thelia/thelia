@@ -823,6 +823,7 @@ class FileController extends BaseAdminController
     protected function createImageEventInstance($parentType, $model, $data)
     {
         $imageCreateEvent = new ImageCreateOrUpdateEvent($parentType, null);
+        $model->setLocale($data['locale']);
 
         if (isset($data['title'])) {
             $model->setTitle($data['title']);
@@ -839,6 +840,8 @@ class FileController extends BaseAdminController
         if (isset($data['postscriptum'])) {
             $model->setPostscriptum($data['postscriptum']);
         }
+
+
 
         $imageCreateEvent->setModelImage($model);
 

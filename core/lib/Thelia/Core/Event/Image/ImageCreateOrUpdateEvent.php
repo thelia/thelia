@@ -57,6 +57,8 @@ class ImageCreateOrUpdateEvent extends ActionEvent
     /** @var string Parent name */
     protected $parentName = null;
 
+    protected $locale;
+
     /**
      * Constructor
      *
@@ -69,6 +71,26 @@ class ImageCreateOrUpdateEvent extends ActionEvent
         $this->imageType = $imageType;
         $this->parentId  = $parentId;
     }
+
+    /**
+     * @param mixed $locale
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+
 
     /**
      * Set Image to save

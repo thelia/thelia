@@ -30,19 +30,23 @@
 
         						    {form name="$formId"}
         						    	<form method="POST" action="{url path="/admin/image/type/{$imageType}/{$ID}/update"}" {form_enctype form=$form} class="clearfix">
+                                            {include
+                                                file = "includes/inner-form-toolbar.html"
+                                                hide_submit_buttons = false
 
-                                            <div class="row inner-toolbar clearfix">
-                                                <div class="col-md-6 inner-actions pull-right">
-                                                    <a href="{url path="{$redirectUrl}"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
-                                                    <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-primary" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>
-                                                </div>
-                                            </div>
+                                                page_url  = "{url path="/admin/image/type/{$imageType}/{$ID}/update"}"
+                                                close_url = "{url path="{$redirectUrl}"}"
+                                            }
 
         						        	{form_hidden_fields form=$form}
 
         						        	{form_field form=$form field='success_url'}
         						        		<input type="hidden" name="{$name}" value="{url path="/admin/image/type/{$imageType}/{$ID}/update"}" />
         						        	{/form_field}
+
+                                            {form_field form=$form field='locale'}
+                                                <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+                                            {/form_field}
 
         					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
@@ -101,12 +105,15 @@
                                                 </div>
                                             </div>
 
-                                            <div class="row inner-toolbar clearfix">
-                                                <div class="col-md-6 inner-actions pull-right">
-                                                    <a href="{url path="{$redirectUrl}"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
-                                                    <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-primary" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>
-                                                </div>
-                                            </div>
+                                            {include
+                                                file = "includes/inner-form-toolbar.html"
+                                                hide_submit_buttons = false
+                                                hide_flags = true
+
+                                                page_url  = "{url path="/admin/image/type/{$imageType}/{$ID}/update"}"
+                                                close_url = "{url path="{$redirectUrl}"}"
+                                            }
+
 
                                         </form>
         							{/form}

@@ -130,6 +130,12 @@ abstract class ImageModification extends BaseForm
                     )
                 )
             )
+            ->add("locale", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label_attr" => array("for" => "locale_create")
+            ))
         ;
     }
 }
