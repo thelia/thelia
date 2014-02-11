@@ -27,8 +27,8 @@ use Thelia\Action\FeatureAv;
 use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
 use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
 use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
-use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureAv as FeatureAvModel;
+use Thelia\Model\FeatureQuery;
 
 
 /**
@@ -50,7 +50,7 @@ class FeatureAvTest extends \PHPUnit_Framework_TestCase
      */
     protected function getRandomFeature()
     {
-        $feature = FeatureAvQuery::create()
+        $feature = FeatureQuery::create()
             ->addAscendingOrderByColumn('RAND()')
             ->findOne();
 
