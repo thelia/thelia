@@ -209,7 +209,7 @@ return array(
     'Deactivate %title module' => 'Désactiver le module %title',
     'Default' => 'Défaut',
     'Default address' => 'Adresse par défaut',
-    'Define here this product\'s accessories' => 'Choisir ici les accessoire pour ce produit',
+    'Define here this product\'s accessories' => 'Choisir ici les accessoires pour ce produit',
     'Delete' => 'Supprimer',
     'Delete a combination' => 'Supprimer une combinaison',
     'Delete a module' => 'Supprimer un module',
