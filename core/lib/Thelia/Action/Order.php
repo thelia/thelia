@@ -42,7 +42,7 @@ use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
-use Thelia\Model\Lang;
+use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\Order as ModelOrder;
@@ -149,7 +149,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    protected function createOrder(EventDispatcherInterface $dispatcher, ModelOrder $sessionOrder, CurrencyModel $currency, Lang $lang, CartModel $cart, CustomerModel $customer)
+    protected function createOrder(EventDispatcherInterface $dispatcher, ModelOrder $sessionOrder, CurrencyModel $currency, LangModel $lang, CartModel $cart, CustomerModel $customer)
     {
         $con = \Propel\Runtime\Propel::getConnection(
                 OrderTableMap::DATABASE_NAME
