@@ -6,7 +6,10 @@
 {block name="page-title"}{intl l='Coupon'}{/block}
 
 {block name="main-content"}
-    <section id="wrapper" class="container">
+<div class="coupons">
+
+    <div id="wrapper" class="container">
+
         {loop type="coupon" name="read_coupon" id={$couponId} backend_context="true"}
         <nav>
             <ul class="breadcrumb">
@@ -16,22 +19,18 @@
             </ul>
         </nav>
 
-
-            <div class="page-header">
-                <h1>{intl l='Coupon : '}<small>{$CODE}</small></h1>
-            </div>
-
-            <section class="row">
-                <div class="col-md-12 general-block-decorator">
-
-                    {if !$IS_ENABLED}
-                        <div class="alert alert-info">
-                            <span class="glyphicon glyphicon-question-sign"></span>
-                            {intl l='This coupon is disabled, you can enable at the bottom of this form.'}
-                        </div>
-                    {/if}
-                    
+        <div class="row">
+            <div class="col-md-12">
+                <div class="general-block-decorator">
                     <div class="table-responsive">
+
+                        {if !$IS_ENABLED}
+                            <div class="alert alert-info">
+                                <span class="glyphicon glyphicon-question-sign"></span>
+                                {intl l='This coupon is disabled, you can enable at the bottom of this form.'}
+                            </div>
+                        {/if}
+
                         <table class="table table-striped">
                             <tbody>
                             <tr>
@@ -142,8 +141,8 @@
                             </tr>
                             <tr>
                                 <td colspan="2">
-                                    <a href="{$urlEditCoupon}" class="btn btn-default btn-primary btn-medium">
-                                    <span class="icon-edit icon-white"></span> {intl l='Edit'}
+                                    <a href="{$urlEditCoupon}" class="btn btn-default btn-primary btn-medium pull-right">
+                                        <span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}
                                     </a>
                                 </td>
                             </tr>
@@ -151,11 +150,13 @@
                         </table>
                     </div>
                 </div>
-            </section>
+            </div>
+        </div>
         {/loop}
-    </section> <!-- #wrapper -->
+    </div> <!-- #wrapper -->
+</div>
 
-    {include file='includes/confirmation-modal.html' id="enable" message="{intl l='Do you really want to enable this element ?'}"}
+{include file='includes/confirmation-modal.html' id="enable" message="{intl l='Do you really want to enable this element ?'}"}
 
 {/block}
 
