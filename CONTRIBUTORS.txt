@@ -5,8 +5,9 @@ Manuel Raynaud - manu@thelia.net
 Etienne Roudeix - etienne@thelia.net
 Franck Allimant - franck@allimant.org
 Guillaume Morel - gmorel@openstudio.fr
-Michael Espeche - mespeche@openstudio.fr
+Michaël Espeche - mespeche@openstudio.fr
 Christophe Laffont - claffont@openstudio.fr
 Bruno Goléo - bgoleo@openstudio.fr
 Stéphanie Pinet - spinet@openstudio.fr
 Cédric Sibaud - csibaud@openstudio.fr
+Emmanuel Nurit - enurit@openstudio.fr
