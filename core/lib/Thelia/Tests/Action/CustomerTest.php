@@ -22,10 +22,15 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Action\ImageTest;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Customer;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Template\Smarty\SmartyParser;
+use Thelia\Mailer\MailerFactory;
 use Thelia\Model\CustomerQuery;
 
 /**
@@ -36,11 +41,38 @@ use Thelia\Model\CustomerQuery;
 class CustomerTest extends \PHPUnit_Framework_TestCase
 {
 
+    /**
+     * @var SecurityContext
+     */
+    protected $securityContext;
+
+    protected $request;
+
+    protected $customerAction;
+
     public static function setUpBeforeClass()
     {
         CustomerQuery::create()
             ->filterByRef('testRef')
             ->delete();
+    }
+
+    public function setUp()
+    {
+        $session = new Session(new MockArraySessionStorage());
+
+        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+
+        $this->request = new Request();
+        $this->request->setSession($session);
+
+        $this->securityContext = new SecurityContext($this->request);
+
+        $this->customerAction = new Customer(
+            $this->securityContext,
+            new SmartyParser($this->request, $dispatcher, new ParserContext($this->request)),
+            new MailerFactory($dispatcher)
+        );
     }
 
     public function testCreatedCustomer()
@@ -69,7 +101,7 @@ class CustomerTest extends \PHPUnit_Framework_TestCase
 
         $customerCreateEvent->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
-        $customerAction = new Customer(new SecurityContext(new Request()));
+        $customerAction = $this->customerAction;
 
         $customerAction->create($customerCreateEvent);
 
@@ -130,7 +162,7 @@ class CustomerTest extends \PHPUnit_Framework_TestCase
 
         $customerCreateEvent->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
-        $customerAction = new Customer(new SecurityContext(new Request()));
+        $customerAction = $this->customerAction;
 
         $customerAction->create($customerCreateEvent);
 
