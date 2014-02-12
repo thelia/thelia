@@ -106,7 +106,7 @@ class RemoveXPercent extends CouponAbstract
 
         $basePrice = $this->facade->getCartTotalPrice();
 
-        return $basePrice * (( $this->percentage ) / 100);
+        return round($basePrice *  $this->percentage/100, 2);
     }
 
     /**
