@@ -23,9 +23,11 @@
 
 namespace Colissimo;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Exception\OrderException;
+use Thelia\Install\Database;
 use Thelia\Model\Country;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
@@ -105,6 +107,13 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
     public function getDispatcher()
     {
         return $this->dispatcher;
+    }
+
+    public function postActivation(ConnectionInterface $con = null)
+    {
+        $database = new Database($con->getWrappedConnection());
+
+        $database->insertSql(null, array(__DIR__ . '/Config/thelia.sql'));
     }
 
     /**
