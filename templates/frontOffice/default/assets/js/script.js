@@ -296,13 +296,13 @@
         $(".form-product").submit(function () {
             var url_action      = $(this).attr("action");
             var $cartContainer  = $(".cart-container");
-
+			var product_id  = "product_id=" + $("input[name$='product_id']",this).val();
+			
             $.ajax({type: "POST", data: $(this).serialize(), url: url_action,
                     success: function(data){
 
                         $cartContainer.html($(data).html());
-
-                        $.ajax({url:"ajax/addCartMessage",
+                        $.ajax({url:"ajax/addCartMessage", data:product_id,
                             success: function (data) {
                                 bootbox.dialog({
                                     message : data,
