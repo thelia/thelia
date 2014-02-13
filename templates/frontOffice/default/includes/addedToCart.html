@@ -1,6 +1,6 @@
 {loop type="product" name="add_product_to_cart" id=$smarty.get.product_id}
 <div class="clearfix">
-	<table>
+        <table>
             <tr>
                 <td class="col-md-4">
                     {loop name="product_thumbnail" type="image" product=$ID width="218" height="146" resize_mode="borders" limit="1"}
@@ -38,9 +38,9 @@
         </div>
         <div class="products-content">
             <ul class="products-grid product-col-3 hover-effect">
-                {loop type="accessory" name="accessories" product="$ID" order="min_price"}
-				{include file="includes/single-product.html" product_id=$ACCESSORY_ID hasBtn=false hasDescription=false width="218" height="146"}
-				{/loop}
+                {loop type="accessory" name="accessories" product="$ID" order="random" limit="3"}
+                    {include file="includes/single-product.html" product_id=$ACCESSORY_ID hasBtn=false hasDescription=false width="218" height="146"}
+                {/loop}
             </ul>
         </div>
     </aside><!-- #products-upsell -->
