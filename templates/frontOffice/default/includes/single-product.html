@@ -1,68 +1,62 @@
-<li class="item">
-    {assign var="hasSubmit" value = false}
-    {assign var="productTitle" value="{$TITLE}"}
-    {if not $product_id}
-	{assign var="$product_id" value=$ID}
-    {/if}
-    <article itemscope itemtype="http://schema.org/Product">
-        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
-        {loop name="brand.feature" type="feature" product=$product_id title="brand"}
-        {loop name="brand.value" type="feature_value" feature=$product_id product=$product_id}
+{assign var="hasSubmit" value = false}
+<article itemscope itemtype="http://schema.org/Product">
+{if not $product_id}
+{assign var="$product_id" value=$ID}
+{/if}
+    <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+    {loop name="brand.feature" type="feature" product=$product_id title="brand"}
+        {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
             <meta itemprop="brand" content="{$TITLE}">
         {/loop}
-        {/loop}
-        {loop name="brand.feature" type="feature" product=$product_id title="isbn"}
+    {/loop}
+    {loop name="brand.feature" type="feature" product=$product_id title="isbn"}
         {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
             <meta itemprop="productID" content="isbn:{$TITLE}">
         {/loop}
+    {/loop}
+
+    <div class="product-image">
+        {loop name="product_thumbnail" type="image" product="$product_id" width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
+            <img itemprop="image" src="{$IMAGE_URL}" alt="Product #{$LOOP_COUNT}">
         {/loop}
+    
+        <span class="mask">
+            <div class="product-btn">
+                <a class="product-link-btn" href="{$URL}">{intl l="More details"}</a>
 
-        <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
-            {loop name="product_thumbnail" type="image" product=$product_id width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
-                <img itemprop="image" src="{$IMAGE_URL}" alt="{$productTitle}">
-            {/loop}
-            {elseloop rel="product_thumbnail"}
-                {images file='../assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="{$productTitle}">{/images}
-            {/elseloop}
-            <span class="mask"></span>
-        </a>
+            </div>
+        </span>
+    </div>
 
-        <div class="product-info">
-            <h3 class="name"><a href="{$URL}"><span itemprop="name">{$productTitle}</span></a></h3>
-            {if $hasDescription}
+    <div class="product-info">
+        <h3 class="name"><a href="{$URL}"><span itemprop="name">{$TITLE}</span></a></h3>
+        {if $hasDescription}
             <div class="description" itemprop="description">
                 <p>{$DESCRIPTION}</p>
             </div>
+        {/if}
+    </div>
+
+    <div class="product-price">
+        <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+            <meta itemprop="category" content="{category attr="title"}">
+            <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
+            <meta itemprop="priceCurrency" content="{currency attr="symbol"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+            <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
+            {if $IS_PROMO }
+                {loop name="productSaleElements_promo" type="product_sale_elements" product=$product_id limit="1" order="min_price"}
+                {assign var="default_product_sale_elements" value=$ID}
+                    <span class="special-price"><span class="price">{format_number number=$TAXED_PROMO_PRICE} {currency attr="symbol"}</span>
+                    <span class="old-price"><span class="price">{format_number number=$TAXED_PRICE} {currency attr="symbol"}</span>
+                {/loop}
+            {else}
+                <span class="regular-price">{format_number number=$BEST_TAXED_PRICE} {currency attr="symbol"}</span>
             {/if}
+
         </div>
-
-        <div class="product-price">
-            <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-                <meta itemprop="category" content="{category attr="title"}">
-                <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
-                <meta itemprop="priceCurrency" content="{currency attr="symbol"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
-                <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
-                <!-- List of availibility :
-                    out_of_stock : http://schema.org/OutOfStock
-                    in_stock : http://schema.org/InStock
-                    instore_only : http://schema.org/InStoreOnly
-                    preorder : http://schema.org/PreOrder
-                    online_only : http://schema.org/OnlineOnly
-                -->
-                {if $IS_PROMO }
-                    {loop name="productSaleElements_promo" type="product_sale_elements" product=$product_id limit="1" order="min_price"}
-                    {assign var="default_product_sale_elements" value=$product_id}
-                        <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number=$TAXED_PROMO_PRICE} {currency attr="symbol"}</span></span>
-                        <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number=$TAXED_PRICE} {currency attr="symbol"}</span></span>
-                    {/loop}
-                {else}
-                    <span class="regular-price"><span itemprop="price" class="price">{format_number number=$BEST_TAXED_PRICE} {currency attr="symbol"}</span></span>
-                {/if}
-
-            </div>
-            {if $hasBtn == true}
+        {if $hasBtn == true}
             {form name="thelia.cart.add" }
-            <form id="form-product-details" action="{url path="/cart/add" }" method="post" class="form-product">
+            <form id="form-product-details" action="{url path="/cart/add" }" method="post" role="form" class="form-product">
                 {form_hidden_fields form=$form}
                 <input type="hidden" name="view" value="product">
                 <input type="hidden" name="product_id" value="{$product_id}">
@@ -132,7 +126,6 @@
                 </fieldset>
             </form>
             {/form}
-            {/if}
-        </div>
-    </article><!-- /product -->
-</li>
+        {/if}
+    </div>
+</article><!-- /product -->
