@@ -1,9 +1,9 @@
+{loop type="product" name="add_product_to_cart" id=$smarty.get.product_id}
 <div class="clearfix">
-    {loop type="cart" name="cartloop" limit="1" order="reverse"}
-        <table>
+	<table>
             <tr>
                 <td class="col-md-4">
-                    {loop name="product_thumbnail" type="image" product=$PRODUCT_ID width="218" height="146" resize_mode="borders" limit="1"}
+                    {loop name="product_thumbnail" type="image" product=$ID width="218" height="146" resize_mode="borders" limit="1"}
                         <img itemprop="image" src="{$IMAGE_URL}" alt="Product #{$LOOP_COUNT}">
                     {/loop}
                 </td>
@@ -17,8 +17,8 @@
                 <td class="col-md-4">
 
                     {if $IS_PROMO == 1}
-                        {assign "real_price" $PROMO_TAXED_PRICE}
-                        <div class="special-price"><span class="price">{$PROMO_TAXED_PRICE} {currency attr="symbol"}</span></div>
+                        {assign "real_price" $TAXED_PROMO_PRICE}
+                        <div class="special-price"><span class="price">{$TAXED_PROMO_PRICE} {currency attr="symbol"}</span></div>
                         <small class="old-price"> <span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></small>
                     {else}
                         {assign "real_price" $TAXED_PRICE}
@@ -28,25 +28,21 @@
                 </td>
             </tr>
         </table>
-    {/loop}
-
     <a href="{url path="/cart"}" role="button" class="btn btn_add_to_cart pull-right"><span>{intl l="View Cart"}</span></a>
     <button type="button" class="btn btn-checkout pull-right" data-dismiss="modal"><span>{intl l="Continue Shopping"}</span></button>
 </div>
-
-{ifloop rel="product_upsell"}
-        <aside id="products-upsell" role="complementary" aria-labelledby="products-upsell-label">
-            <div class="products-heading">
-                <h3 id="products-upsell-label">{intl l="Upsell Products"}</h3>
-            </div>
-
-            <div class="products-content">
-                <ul class="products-grid product-col-3 hover-effect">
-                    {loop name="product_upsell" type="product" promo="yes" limit="3"}
-                        {include file="includes/single-product.html" product_id=$ID hasBtn=false hasDescription=true width="218" height="146"}
-                    {/loop}
-
-                </ul>
-            </div>
-        </aside><!-- #products-upsell -->
-    {/ifloop}
+{ifloop rel="accessories"}
+    <aside id="products-upsell" role="complementary" aria-labelledby="products-upsell-label">
+        <div class="products-heading">
+            <h3 id="products-upsell-label">{intl l="Upsell Products"}</h3>
+        </div>
+        <div class="products-content">
+            <ul class="products-grid product-col-3 hover-effect">
+                {loop type="accessory" name="accessories" product="$ID" order="min_price"}
+				{include file="includes/single-product.html" product_id=$ACCESSORY_ID hasBtn=false hasDescription=false width="218" height="146"}
+				{/loop}
+            </ul>
+        </div>
+    </aside><!-- #products-upsell -->
+{/ifloop}
+{/loop}
