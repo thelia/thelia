@@ -84,7 +84,7 @@
                                     {/loop}
                                 </dl>
                             </div>
-                            <a href="{url path="/cart/delete/{$ITEM_ID}"}" class="btn btn-remove"><i class="icon-trash"></i> {intl l="Remove"}</a>
+                            <a href="{url path="/cart/delete/$ITEM_ID"}" class="btn btn-remove"><i class="icon-trash"></i> {intl l="Remove"}</a>
                         </td>
                         <td class="unitprice">
                             {if $IS_PROMO == 1}
@@ -101,7 +101,7 @@
                                 <form action="{url path="/cart/update"}" class="form-inline" method="post">
                                     <input type="hidden" name="cart_item" value="{$ITEM_ID}">
                                     <div class="form-group">
-                                        <select name="quantity" class="form-control" onchange="jQuery(this).parent('form').submit();">
+                                        <select name="quantity" class="form-control" >
                                             {for $will=1 to $STOCK}
                                                 <option {if $QUANTITY == $will}selected="selected"{/if}>{$will}</option>
                                             {/for}
@@ -162,3 +162,14 @@
 
     </div>
 {/block}
+
+{block name="after-javascript-include"}
+<script>
+    $(document).ready(function(){
+        $("select[name=quantity]").change(function(){
+            $(this).parents('form').submit();
+        });
+    });
+</script>
+{/block}
+
