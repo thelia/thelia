@@ -87,7 +87,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $search->orderByPosition(Criteria::ASC);
+
         $orders  = $this->getOrder();
 
         foreach ($orders as $order) {
