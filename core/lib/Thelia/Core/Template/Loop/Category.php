@@ -80,6 +80,8 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanTypeArgument('with_prev_next_info', false),
+            Argument::createBooleanTypeArgument('need_count_child', false),
+            Argument::createBooleanTypeArgument('need_product_count', false),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             new Argument(
                 'order',
@@ -213,12 +215,19 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("META_TITLE"              , $category->getVirtualColumn('i18n_META_TITLE'))
                 ->set("META_DESCRIPTION"        , $category->getVirtualColumn('i18n_META_DESCRIPTION'))
                 ->set("META_KEYWORDS"            , $category->getVirtualColumn('i18n_META_KEYWORDS'))
-                ->set("PRODUCT_COUNT"           , $category->countAllProducts())
-                ->set("CHILD_COUNT"             , $category->countChild())
+
                 ->set("VISIBLE"                 , $category->getVisible() ? "1" : "0")
                 ->set("POSITION"                , $category->getPosition())
 
             ;
+
+            if ($this->getNeedCountChild()) {
+                $loopResultRow->set("CHILD_COUNT", $category->countChild());
+            }
+
+            if ($this->getNeedProductCount()) {
+                $loopResultRow->set("PRODUCT_COUNT", $category->countAllProducts());
+            }
 
             if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
                 // Find previous and next category
