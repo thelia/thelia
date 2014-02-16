@@ -79,6 +79,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntTypeArgument('exclude_product'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
+            Argument::createBooleanTypeArgument('with_prev_next_info', false),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             new Argument(
                 'order',
@@ -190,20 +191,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface
     public function parseResults(LoopResult $loopResult)
     {
         foreach ($loopResult->getResultDataCollection() as $category) {
-            // Find previous and next category
-            $previous = CategoryQuery::create()
-                ->filterByParent($category->getParent())
-                ->filterByPosition($category->getPosition(), Criteria::LESS_THAN)
-                ->orderByPosition(Criteria::DESC)
-                ->findOne()
-            ;
 
-            $next = CategoryQuery::create()
-                ->filterByParent($category->getParent())
-                ->filterByPosition($category->getPosition(), Criteria::GREATER_THAN)
-                ->orderByPosition(Criteria::ASC)
-                ->findOne()
-            ;
 
             /*
              * no cause pagination lost :
@@ -230,12 +218,33 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("VISIBLE"                 , $category->getVisible() ? "1" : "0")
                 ->set("POSITION"                , $category->getPosition())
 
-                ->set("HAS_PREVIOUS"            , $previous != null ? 1 : 0)
-                ->set("HAS_NEXT"                , $next != null ? 1 : 0)
-
-                ->set("PREVIOUS"                , $previous != null ? $previous->getId() : -1)
-                ->set("NEXT"                    , $next != null ? $next->getId() : -1)
             ;
+
+            if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
+                // Find previous and next category
+                $previous = CategoryQuery::create()
+                    ->filterByParent($category->getParent())
+                    ->filterByPosition($category->getPosition(), Criteria::LESS_THAN)
+                    ->orderByPosition(Criteria::DESC)
+                    ->findOne()
+                ;
+
+                $next = CategoryQuery::create()
+                    ->filterByParent($category->getParent())
+                    ->filterByPosition($category->getPosition(), Criteria::GREATER_THAN)
+                    ->orderByPosition(Criteria::ASC)
+                    ->findOne()
+                ;
+
+                $loopResultRow
+                    ->set("HAS_PREVIOUS"            , $previous != null ? 1 : 0)
+                    ->set("HAS_NEXT"                , $next != null ? 1 : 0)
+
+                    ->set("PREVIOUS"                , $previous != null ? $previous->getId() : -1)
+                    ->set("NEXT"                    , $next != null ? $next->getId() : -1)
+                ;
+            }
+
 
             $loopResult->addRow($loopResultRow);
         }
