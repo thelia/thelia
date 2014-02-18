@@ -123,13 +123,15 @@ class CustomerUpdateForm extends BaseForm
                 "label" => Translator::getInstance()->trans("Phone"),
                 "label_attr" => array(
                     "for" => "phone"
-                )
+                ),
+                "required" => false
             ))
             ->add("cellphone", "text", array(
                 "label" => Translator::getInstance()->trans("Cellphone"),
                 "label_attr" => array(
                     "for" => "cellphone"
-                )
+                ),
+                "required" => false
             ))
             ->add("zipcode", "text", array(
                 "constraints" => array(
