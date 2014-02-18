@@ -27,6 +27,12 @@ use Thelia\Model\Order;
 
 interface PaymentModuleInterface extends BaseModuleInterface
 {
+    const NOT_PAID = 1;
+    const PAID = 2;
+    const PROCESSING = 3;
+    const SENT = 4;
+    const CANCELED = 5;
+
     /**
      * @return mixed
      */

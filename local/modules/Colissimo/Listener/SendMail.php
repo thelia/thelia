@@ -23,11 +23,15 @@
 
 namespace Colissimo\Listener;
 
+use Colissimo\Colissimo;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Mailer\MailerFactory;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\MessageQuery;
+use Thelia\Module\PaymentModuleInterface;
 
 
 /**
@@ -50,7 +54,47 @@ class SendMail implements EventSubscriberInterface
 
     public function updateStatus(OrderEvent $event)
     {
+        $order = $event->getOrder();
+        $colissimo = new Colissimo();
 
+        if ($order->getStatusId() == PaymentModuleInterface::SENT && $order->getDeliveryModuleId() == $colissimo->getModuleModel()->getId()) {
+            $contact_email = ConfigQuery::read('store_email');
+
+            if ($contact_email) {
+
+                $message = MessageQuery::create()
+                    ->filterByName('mail_colissimo')
+                    ->findOne();
+
+                if (false === $message) {
+                    throw new \Exception("Failed to load message 'order_confirmation'.");
+                }
+
+                $order = $event->getOrder();
+                $customer = $order->getCustomer();
+
+                $this->parser->assign('customer_id', $customer->getId());
+                $this->parser->assign('order_ref', $order->getRef());
+                $this->parser->assign('order_date', $order->getCreatedAt());
+                $this->parser->assign('update_date', $order->getUpdatedAt());
+                $this->parser->assign('package', $order->getDeliveryRef());
+
+
+                $message
+                    ->setLocale($order->getLang()->getLocale());
+
+                $instance = \Swift_Message::newInstance()
+                    ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
+                    ->addFrom($contact_email, ConfigQuery::read('store_name'))
+                ;
+
+                // Build subject and body
+
+                $message->buildMessage($this->parser, $instance);
+
+                $this->mailer->send($instance);
+            }
+        }
     }
 
     /**
