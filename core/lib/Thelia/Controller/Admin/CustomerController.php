@@ -27,6 +27,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Exception\CustomerException;
 use Thelia\Form\CustomerCreateForm;
 use Thelia\Form\CustomerUpdateForm;
 use Thelia\Model\CustomerQuery;
@@ -178,13 +179,14 @@ class CustomerController extends AbstractCrudController
         );
     }
 
-    protected function renderListTemplate($currentOrder)
+    protected function renderListTemplate($currentOrder, $customParams = array())
     {
-        return $this->render('customers', array(
+        return $this->render('customers', array_merge(array(
                 'customer_order'   => $currentOrder,
                 'display_customer' => 20,
                 'page'             => $this->getRequest()->get('page', 1)
-        ));
+            ), $customParams)
+        );
     }
 
     protected function redirectToListTemplate()
@@ -202,5 +204,19 @@ class CustomerController extends AbstractCrudController
     protected function redirectToEditionTemplate()
     {
         $this->redirectToRoute("admin.customer.update.view", $this->getEditionArguments());
+    }
+
+    public function deleteAction()
+    {
+        try {
+            parent::deleteAction();
+        } catch (CustomerException $e) {
+            $error_msg = $e->getMessage();
+        }
+
+        return $this->renderListTemplate($this->getCurrentListOrder(), array(
+                "removal_error" => true,
+                "error_message" => $error_msg
+            ));
     }
 }

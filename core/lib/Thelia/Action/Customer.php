@@ -31,6 +31,8 @@ use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Translation\Translator;
+use Thelia\Exception\CustomerException;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer as CustomerModel;
@@ -105,6 +107,10 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public function delete(CustomerEvent $event)
     {
         if (null !== $customer = $event->getCustomer()) {
+
+            if (true === $customer->hasOrder()) {
+                throw new CustomerException(Translator::getInstance()->trans("Impossible to delete a customer who already have orders"));
+            }
 
             $customer->delete();
         }

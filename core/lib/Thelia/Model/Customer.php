@@ -239,6 +239,15 @@ class Customer extends BaseCustomer implements UserInterface
         return $this->getRememberMeSerial();
     }
 
+    public function hasOrder()
+    {
+        $order = OrderQuery::create()
+            ->filterByCustomerId($this->getId())
+            ->count();
+
+        return $order > 0;
+    }
+
     /**
      * {@inheritDoc}
      */

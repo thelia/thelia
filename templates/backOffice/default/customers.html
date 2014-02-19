@@ -20,6 +20,12 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="general-block-decorator">
+                        {if $removal_error }
+                            <div class="alert alert-danger fade in">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">{$error_message}</h4>
+                            </div>
+                        {/if}
                         <div class="table-responsive">
                             <table class="table table-striped table-condensed" id="customer_list">
                                 <caption>
