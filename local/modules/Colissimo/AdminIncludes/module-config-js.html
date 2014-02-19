@@ -1,17 +1,16 @@
-{block name="javascript-initialization"}
-
 {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
-<script src="{$asset_url}"></script>
+<script src='{$asset_url}'></script>
 {/javascripts}
 
 
 <script>
     $(document).ready(function() {
-        $(".freeshipping-activation").on("switch-change", function(e, data){
+        $(".freeshipping-activation-Colissimo").bootstrapSwitch();
+
+        $(".freeshipping-activation-Colissimo").on("switch-change", function(e, data){
             var is_checked = data.value;
             var form = $("#freeshippingform");
             $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
-
             $.ajax({
                 url: form.attr('action'),
                 type: form.attr('method'),
@@ -37,4 +36,3 @@
         });
     });
 </script>
-{/block}
