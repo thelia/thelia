@@ -10,9 +10,7 @@
     </loops>
 
     <forms>
-        <!--
-        <form name="MyFormName" class="MyModule\Form\MySuperForm" />
-        -->
+        <form name="colissimo.freeshipping.form" class="Colissimo\Form\FreeShipping" />
     </forms>
 
     <commands>

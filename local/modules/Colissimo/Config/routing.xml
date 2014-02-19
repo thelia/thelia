@@ -3,8 +3,11 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-	<route id="icirelais.edit.prices" path="/admin/module/colissimo/prices" methods="post">
+	<route id="colissimo.edit.prices" path="/admin/module/colissimo/prices" methods="post">
 		<default key="_controller">Colissimo\Controller\EditPrices::editprices</default>
 	</route>
 
+    <route id="colissimo.edit.freeshipping" path="/admin/module/colissimo/freeshipping" methods="post">
+        <default key="_controller">Colissimo\Controller\FreeShipping::set</default>
+    </route>
 </routes>
