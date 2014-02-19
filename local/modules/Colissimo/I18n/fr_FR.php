@@ -1,0 +1,21 @@
+<?php
+	return array(
+		'Can\'t read Config directory'=>'Le dossier Config ne peut être lu',
+		'Can\'t write Config directory'=>'Le dossier Config ne peut être écrit',
+		'Can\'t read file'=>'Le fichier suivant ne peut être lu',
+		'Can\'t write file'=>'Le fichier suivant ne peut être écrit',
+		'Please change the access rights'=>'Veuillez changer les droits d\'accès',
+		'Colissimo Module allows to send your products all around the world with La Poste.'=>'Le module Colissimo vous permet d\'envoyer des colis dans le monde entier avec La Poste.',
+        'Create a price slice' => 'Créer une tranche de prix',
+		'Weight up to ... (kg)'=>'Poids ... (kg)',
+		'Price (€)'=>'Prix (€)',
+		'Create'=>'Créer',
+		'Cancel'=>'Annuler',
+		'Area : '=>'Zone de livraison : ',
+		'Actions'=>'Actions',
+		'Edit'=>'Modifer',
+        'Edit a price slice' => 'Modifier une tranche de prix',
+        'Delete a price slice' => 'Supprimer une tranche de prix',
+		'Do you really want to delete this slice ?'=>'Voulez-vous réellement supprimer cette tranche de prix ?',
+		'Delete'=>'Supprimer',
+	);

@@ -6,6 +6,7 @@
 
     <loops>
         <loop class="Colissimo\Loop\Price" name="colissimo"/>
+        <loop class="Colissimo\Loop\CheckRightsLoop" name="colissimo.check.rights" />
     </loops>
 
     <forms>

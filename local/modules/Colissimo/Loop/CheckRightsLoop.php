@@ -23,66 +23,60 @@
 
 namespace Colissimo\Loop;
 
-use Colissimo\Colissimo;
-use Thelia\Core\Template\Element\ArraySearchLoopInterface;
-use Thelia\Core\Template\Element\BaseLoop;
-use Thelia\Core\Template\Element\LoopResult;
-use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
+use Thelia\Core\Translation\Translator;
 
 /**
- *
- * Price loop
- *
- *
- * Class Price
- * @package Colissimo\Loop
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * Class CheckRightsLoop
+ * @package Colissimo\Looop
+ * @author Thelia <info@thelia.net>
  */
-class Price extends BaseLoop implements ArraySearchLoopInterface
-{
-    /* set countable to false since we need to preserve keys */
-    protected $countable = false;
 
-    /**
-     * @return ArgumentCollection
-     */
+class CheckRightsLoop extends BaseLoop implements ArraySearchLoopInterface
+{
     protected function getArgDefinitions()
     {
-        return new ArgumentCollection(
-            Argument::createIntTypeArgument('area', null, true)
-        );
+        return new ArgumentCollection();
     }
 
     public function buildArray()
     {
-        $area = $this->getArea();
-
-        $prices = Colissimo::getPrices();
-
-        if(!isset($prices[$area]) || !isset($prices[$area]["slices"])) {
-            return array();
+        $ret = array();
+        $dir = __DIR__."/../Config/";
+        if (!is_readable($dir)) {
+            $ret[] = array("ERRMES"=>Translator::getInstance()->trans("Can't read Config directory"), "ERRFILE"=>"");
+        }
+        if (!is_writable($dir)) {
+            $ret[] = array("ERRMES"=>Translator::getInstance()->trans("Can't write Config directory"), "ERRFILE"=>"");
+        }
+        if ($handle = opendir($dir)) {
+            while (false !== ($file = readdir($handle))) {
+                if (strlen($file) > 5 && substr($file, -5) === ".json") {
+                    if (!is_readable($dir.$file)) {
+                        $ret[] = array("ERRMES"=>Translator::getInstance()->trans("Can't read file"), "ERRFILE"=>"Colissimo/Config/".$file);
+                    }
+                    if (!is_writable($dir.$file)) {
+                        $ret[] = array("ERRMES"=>Translator::getInstance()->trans("Can't write file"), "ERRFILE"=>"Colissimo/Config/".$file);
+                    }
+                }
+            }
         }
 
-        $areaPrices = $prices[$area]["slices"];
-        ksort($areaPrices);
-
-        return $areaPrices;
+        return $ret;
     }
-
     public function parseResults(LoopResult $loopResult)
     {
-        foreach ($loopResult->getResultDataCollection() as $maxWeight => $price) {
+        foreach ($loopResult->getResultDataCollection() as $arr) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("MAX_WEIGHT", $maxWeight)
-                ->set("PRICE", $price);
-
+            $loopResultRow->set("ERRMES", $arr["ERRMES"])
+                ->set("ERRFILE", $arr["ERRFILE"]);
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
-
     }
 }
