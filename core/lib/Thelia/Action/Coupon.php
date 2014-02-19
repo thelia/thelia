@@ -136,24 +136,26 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                     $consumedCoupons = array();
                 }
 
-                // Prevent accumulation of the same Coupon on a Checkout
-                $consumedCoupons[$event->getCode()] = $event->getCode();
+                if (!isset($consumedCoupons[$event->getCode()])) {
+                    // Prevent accumulation of the same Coupon on a Checkout
+                    $consumedCoupons[$event->getCode()] = $event->getCode();
 
-                $this->request->getSession()->setConsumedCoupons($consumedCoupons);
+                    $this->request->getSession()->setConsumedCoupons($consumedCoupons);
 
-                $totalDiscount = $this->couponManager->getDiscount();
+                    $totalDiscount = $this->couponManager->getDiscount();
 
-                $this->request
-                    ->getSession()
-                    ->getCart()
-                    ->setDiscount($totalDiscount)
-                    ->save();
-                $this->request
-                    ->getSession()
-                    ->getOrder()
-                    ->setDiscount($totalDiscount)
-                    // ->save()
-                ;
+                    $this->request
+                        ->getSession()
+                        ->getCart()
+                        ->setDiscount($totalDiscount)
+                        ->save();
+                    $this->request
+                        ->getSession()
+                        ->getOrder()
+                        ->setDiscount($totalDiscount)
+                        // ->save()
+                    ;
+                }
             }
         }
 

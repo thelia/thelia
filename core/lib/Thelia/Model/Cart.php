@@ -76,17 +76,10 @@ class Cart extends BaseCart
 
     public function getTaxedAmount(Country $country)
     {
-        $taxCalculator = new Calculator();
-
         $total = 0;
 
         foreach($this->getCartItems() as $cartItem) {
-            $subtotal = $cartItem->getRealPrice();
-            /* we round it for the unit price, before the quantity factor */
-            $subtotal = round($taxCalculator->load($cartItem->getProduct(), $country)->getTaxedPrice($subtotal), 2);
-            $subtotal *= $cartItem->getQuantity();
-
-            $total += $subtotal;
+            $total += $cartItem->getRealTaxedPrice($country) * $cartItem->getQuantity();
         }
 
         $total -= $this->getDiscount();
