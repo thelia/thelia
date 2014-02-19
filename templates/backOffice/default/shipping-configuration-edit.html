@@ -79,38 +79,7 @@
                                         </tr>
                                         {/loop}
                                     </tbody>
-                                    <tfoot>
-                                        <tr class="active">
-                                            <td colspan="2">
-                                                {form name="thelia.admin.area.postage"}
-                                                <form method="POST" action="{url path="/admin/configuration/shipping_configuration/update_postage/{$area_id}"}">
-                                                    {form_hidden_fields form=$form}
-
-                                                    {form_field form=$form field='success_url'}
-                                                        <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_configuration/update/{$area_id}"}" >
-                                                    {/form_field}
-
-                                                    {form_field form=$form field='area_id'}
-                                                        <input type="hidden" name="{$name}" value="{$area_id}">
-                                                    {/form_field}
-                                                    {form_field form=$form field='postage'}
-                                                    <label for="{$label_attr.for}" class="control-label">{$label}</label>
-                                                    <div class="input-group {if $error}has-error{/if}">
-                                                        <input type="text" class="form-control" name="{$name}" value="{$POSTAGE}" id="{$label_attr.for}" placeholder="Postage">
-                                                        <span class="input-group-addon">&euro;</span>
-                                                        <span class="input-group-btn">
-                                                            <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span></button>
-                                                        </span>
-                                                        {if $error }
-                                                            <span class="help-block"><i class="icon-remove"></i> {$message}</span>
-                                                        {/if}
-                                                    </div>
-                                                    {/form_field}
-                                                </form>
-                                                {/form}
-                                            </td>
-                                        </tr>
-                                    </tfoot>
+                                    {module_include location='shipping-configuration-edit'}
                                 </table>
                             </div>
                         </div>
