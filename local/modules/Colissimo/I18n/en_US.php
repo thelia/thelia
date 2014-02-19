@@ -18,4 +18,5 @@
 		'Delete a price slice'=>'Delete a price slice',
 		'Do you really want to delete this slice '=>'Do you really want to delete this slice ',
 		'Delete'=>'Delete',
+        'Activate free shipping: '=>'Activate free shipping: ',
 	);

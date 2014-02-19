@@ -23,6 +23,7 @@
 
 namespace Colissimo;
 
+use Colissimo\Model\ColissimoFreeshippingQuery;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,34 +60,38 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
      */
     public static function getPostageAmount($areaId, $weight)
     {
-        $prices = self::getPrices();
+        $freeshipping = ColissimoFreeshippingQuery::create()->getLast();
+        $postage=0;
+        if(!$freeshipping) {
+            $prices = self::getPrices();
 
-        /* check if Colissimo delivers the asked area */
-        if(!isset($prices[$areaId]) || !isset($prices[$areaId]["slices"])) {
-            throw new OrderException("Colissimo delivery unavailable for the chosen delivery country", OrderException::DELIVERY_MODULE_UNAVAILABLE);
-        }
+            /* check if Colissimo delivers the asked area */
+            if(!isset($prices[$areaId]) || !isset($prices[$areaId]["slices"])) {
+                throw new OrderException("Colissimo delivery unavailable for the chosen delivery country", OrderException::DELIVERY_MODULE_UNAVAILABLE);
+            }
 
-        $areaPrices = $prices[$areaId]["slices"];
-        ksort($areaPrices);
+            $areaPrices = $prices[$areaId]["slices"];
+            ksort($areaPrices);
 
-        /* check this weight is not too much */
-        end($areaPrices);
-        $maxWeight = key($areaPrices);
-        if($weight > $maxWeight) {
-            throw new OrderException(sprintf("Colissimo delivery unavailable for this cart weight (%s kg)", $weight), OrderException::DELIVERY_MODULE_UNAVAILABLE);
-        }
-
-        $postage = current($areaPrices);
-
-        while(prev($areaPrices)) {
-            if($weight > key($areaPrices)) {
-                break;
+            /* check this weight is not too much */
+            end($areaPrices);
+            $maxWeight = key($areaPrices);
+            if($weight > $maxWeight) {
+                throw new OrderException(sprintf("Colissimo delivery unavailable for this cart weight (%s kg)", $weight), OrderException::DELIVERY_MODULE_UNAVAILABLE);
             }
 
             $postage = current($areaPrices);
-        }
 
+            while(prev($areaPrices)) {
+                if($weight > key($areaPrices)) {
+                    break;
+                }
+
+                $postage = current($areaPrices);
+            }
+        }
         return $postage;
+
     }
 
     public function setRequest(Request $request)

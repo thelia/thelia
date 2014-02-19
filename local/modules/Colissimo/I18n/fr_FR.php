@@ -18,4 +18,5 @@
         'Delete a price slice' => 'Supprimer une tranche de prix',
 		'Do you really want to delete this slice ?'=>'Voulez-vous réellement supprimer cette tranche de prix ?',
 		'Delete'=>'Supprimer',
+        'Activate free shipping: '=>'Livraison offerte: ',
 	);
