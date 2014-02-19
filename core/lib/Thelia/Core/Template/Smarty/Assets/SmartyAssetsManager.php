@@ -24,7 +24,6 @@
 namespace Thelia\Core\Template\Smarty\Assets;
 
 
-use Thelia\Core\Template\Smarty\SmartyParser;
 use Thelia\Log\Tlog;
 use Thelia\Tools\URL;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
@@ -87,28 +86,12 @@ class SmartyAssetsManager
         }
     }
 
-    /**
-     * Retrieve asset URL
-     *
-     * @param string                    $assetType js|css|image
-     * @param array                     $params    Parameters
-     *                                             - file File path in the default template
-     *                                             - source module asset
-     *                                             - filters filter to apply
-     *                                             - debug
-     *                                             - template if you want to load asset from another template
-     * @param \Smarty_Internal_Template $template  Smarty Template
-     *
-     * @return string
-     * @throws \Exception
-     */
     public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template)
     {
-        $file             = $params['file'];
-        $assetOrigin      = isset($params['source']) ? $params['source'] : "0";
-        $filters          = isset($params['filters']) ? $params['filters'] : '';
-        $debug            = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
-        $webAssetTemplate = isset($params['template']) ? $params['template'] : false;
+        $file           = $params['file'];
+        $assetOrigin    = isset($params['source']) ? $params['source'] : "0";
+        $filters        = isset($params['filters']) ? $params['filters'] : '';
+        $debug          = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
 
         /* we trick here relative thinking for file attribute */
         $file = ltrim($file, '/');
@@ -117,8 +100,7 @@ class SmartyAssetsManager
         }
 
         $smartyParser = $template->smarty;
-        /** @var SmartyParser $templateDefinition */
-        $templateDefinition = $smartyParser->getTemplateDefinition($webAssetTemplate);
+        $templateDefinition = $smartyParser->getTemplateDefinition();
 
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
 
