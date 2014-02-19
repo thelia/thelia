@@ -1,0 +1,21 @@
+<?php
+	return array(
+		'Can\'t read Config directory'=>'Can\'t read Config directory',
+		'Can\'t write Config directory'=>'Can\'t write Config directory',
+		'Can\'t read file'=>'Can\'t read file',
+		'Can\'t write file'=>'Can\'t write file',
+		'Please change the access rights'=>'Please change the access rights',
+		'Colissimo Module allows to send your products all around the world with La Poste.'=>'Colissimo Module allows to send your products all around the world with La Poste.',
+		'Create a price slice'=>'Create a price slice',
+		'Weight up to ... (kg)'=>'Weight up to ... (kg)',
+		'Price ('=>'Price (',
+		'Create'=>'Create',
+		'Cancel'=>'Cancel',
+		'Area '=>'Area ',
+		'Actions'=>'Actions',
+		'Edit a price slice'=>'Edit a price slice',
+		'Edit'=>'Edit',
+		'Delete a price slice'=>'Delete a price slice',
+		'Do you really want to delete this slice '=>'Do you really want to delete this slice ',
+		'Delete'=>'Delete',
+	);
