@@ -84,6 +84,13 @@ interface FacadeInterface
     public function getCartTotalPrice();
 
     /**
+     * Return Product total tax price
+     *
+     * @return float
+     */
+    public function getCartTotalTaxPrice();
+
+    /**
      * Return the Checkout currency EUR|USD
      *
      * @return string

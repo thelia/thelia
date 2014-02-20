@@ -103,10 +103,9 @@ class RemoveXPercent extends CouponAbstract
                 'Percentage must be inferior to 100'
             );
         }
-        $taxCountry = $this->facade->getContainer()->get('thelia.taxEngine')->getDeliveryCountry();
-        $basePrice = $this->facade->getCart()->getTaxedAmount($taxCountry);
 
-        return round($basePrice *  $this->percentage/100, 2);
+
+        return round($this->facade->getCartTotalTaxPrice() *  $this->percentage/100, 2);
     }
 
     /**
