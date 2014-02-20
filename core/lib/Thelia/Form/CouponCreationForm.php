@@ -65,21 +65,13 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'shortDescription',
-                'text',
-                array(
-                    'constraints' => array(
-                        new NotBlank()
-                    )
-                )
+                'text'
+
             )
             ->add(
                 'description',
-                'textarea',
-                array(
-                    'constraints' => array(
-                        new NotBlank()
-                    )
-                )
+                'textarea'
+
             )
             ->add(
                 'type',
