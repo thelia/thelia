@@ -24,6 +24,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\TaxRuleQuery;
 
 class TaxRuleModificationForm extends TaxRuleCreationForm
@@ -60,7 +61,7 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
             ->findPk($value);
 
         if (null === $taxRule) {
-            $context->addViolation("Tax rule ID not found");
+            $context->addViolation(Translator::getInstance()->trans("Tax rule ID not found"));
         }
     }
 }

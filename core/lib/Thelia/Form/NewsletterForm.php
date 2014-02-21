@@ -83,7 +83,7 @@ class NewsletterForm extends BaseForm
     {
         $customer = NewsletterQuery::create()->findOneByEmail($value);
         if ($customer) {
-            $context->addViolation("You are already registered!");
+            $context->addViolation(Translator::getInstance()->trans("You are already registered!"));
         }
     }
 

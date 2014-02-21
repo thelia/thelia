@@ -24,6 +24,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\ProfileQuery;
 
 /**
@@ -67,7 +68,7 @@ class ProfileModificationForm extends ProfileCreationForm
             ->findPk($value);
 
         if (null === $profile) {
-            $context->addViolation("Profile ID not found");
+            $context->addViolation(Translator::getInstance()->trans("Profile ID not found"));
         }
     }
 }

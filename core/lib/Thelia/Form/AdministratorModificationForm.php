@@ -25,6 +25,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\AdminQuery;
 
 class AdministratorModificationForm extends AdministratorCreationForm
@@ -67,7 +68,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
             ->findPk($value);
 
         if (null === $administrator) {
-            $context->addViolation("Administrator ID not found");
+            $context->addViolation(Translator::getInstance()->trans("Administrator ID not found"));
         }
     }
 
@@ -77,7 +78,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
 
         $administrator = AdminQuery::create()->findOneByLogin($value);
         if ($administrator !== null && $administrator->getId() != $data['id']) {
-            $context->addViolation("This login already exists");
+            $context->addViolation(Translator::getInstance()->trans("This login already exists"));
         }
     }
 
@@ -86,11 +87,11 @@ class AdministratorModificationForm extends AdministratorCreationForm
         $data = $context->getRoot()->getData();
 
         if ($data["password"] != $data["password_confirm"]) {
-            $context->addViolation("password confirmation is not the same as password field");
+            $context->addViolation(Translator::getInstance()->trans("password confirmation is not the same as password field"));
         }
 
         if ($data["password"] !== '' && strlen($data["password"]) < 4) {
-            $context->addViolation("password must be composed of at least 4 characters");
+            $context->addViolation(Translator::getInstance()->trans("password must be composed of at least 4 characters"));
         }
     }
 }

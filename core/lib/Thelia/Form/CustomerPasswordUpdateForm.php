@@ -81,7 +81,7 @@ class CustomerPasswordUpdateForm extends BaseForm
     {
         // Check if value of the old password match the password of the current user
         if (!password_verify($value, $this->getRequest()->getSession()->getCustomerUser()->getPassword())) {
-            $context->addViolation("Your current password does not match.");
+            $context->addViolation(Translator::getInstance()->trans("Your current password does not match."));
         }
     }
 
@@ -90,7 +90,7 @@ class CustomerPasswordUpdateForm extends BaseForm
         $data = $context->getRoot()->getData();
 
         if ($data["password"] != $data["password_confirm"]) {
-            $context->addViolation("Password confirmation is not the same as password field.");
+            $context->addViolation(Translator::getInstance()->trans("password confirmation is not the same as password field"));
         }
     }
 
