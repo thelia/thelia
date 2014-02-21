@@ -88,7 +88,7 @@ class OrderDelivery extends BaseForm
         $moduleReflection = new \ReflectionClass($module->getFullNamespace());
         if ($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
             $context->addViolation(
-                Translator::getInstance()->trans(sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $module->getCode()))
+                sprintf(Translator::getInstance()->trans("delivery module %s is not a Thelia\Module\DeliveryModuleInterface"), $module->getCode())
             );
         }
     }

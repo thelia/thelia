@@ -88,7 +88,7 @@ class OrderPayment extends BaseForm
         $moduleReflection = new \ReflectionClass($module->getFullNamespace());
         if ($moduleReflection->isSubclassOf("Thelia\Module\PaymentModuleInterface") === false) {
             $context->addViolation(
-                Translator::getInstance()->trans(sprintf("delivery module %s is not a Thelia\Module\PaymentModuleInterface", $module->getCode()))
+                sprintf(Translator::getInstance()->trans("delivery module %s is not a Thelia\Module\PaymentModuleInterface"), $module->getCode())
             );
         }
     }

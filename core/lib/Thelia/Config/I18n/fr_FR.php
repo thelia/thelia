@@ -225,4 +225,6 @@ return array(
     'Tax list is not valid JSON' => 'Le JSON de la liste des taxes n\'est pas valide',
     'Bad tax list JSON' => 'Mauvais JSON de la liste des taxes',
     'Tax ID not found in tax list JSON' => 'ID de la taxe non trouvé dans le JSON de la liste des taxes',
+    'Please check your input: %s' => 'Veuillez vérifier votre saisie: %s',
+    'Sorry, an error occured: %s' => 'Désolé, une erreur est survenue: %s',
 );

@@ -26,6 +26,7 @@ use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\AddressCreateForm;
 use Thelia\Form\AddressUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
@@ -77,9 +78,9 @@ class AddressController extends BaseFrontController
             $this->redirectSuccess($addressCreate);
 
         } catch (FormValidationException $e) {
-            $message = sprintf("Please check your input: %s", $e->getMessage());
+            $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
         } catch (\Exception $e) {
-            $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+            $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
         }
 
         if ($message !== false) {
@@ -137,9 +138,9 @@ class AddressController extends BaseFrontController
 
             $this->redirectSuccess($addressUpdate);
         } catch (FormValidationException $e) {
-            $message = sprintf("Please check your input: %s", $e->getMessage());
+            $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
         } catch (\Exception $e) {
-            $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+            $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
         }
         $this->getParserContext()->set("address_id", $address_id);
         if ($message !== false) {

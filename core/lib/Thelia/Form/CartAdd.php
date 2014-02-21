@@ -109,7 +109,7 @@ class CartAdd extends BaseForm
         $product = ProductQuery::create()->findPk($value);
 
         if (is_null($product) || $product->getVisible() == 0) {
-            throw new ProductNotFoundException(Translator::getInstance()->trans(sprintf("this product id does not exists : %d", $value)));
+            throw new ProductNotFoundException(sprintf(Translator::getInstance()->trans("this product id does not exists : %d"), $value));
         }
     }
 
@@ -124,7 +124,7 @@ class CartAdd extends BaseForm
                 ->count();
 
             if ($productSaleElements == 0) {
-                throw new StockNotFoundException(Translator::getInstance()->trans(sprintf("This product_sale_elements_id does not exists for this product : %d", $value)));
+                throw new StockNotFoundException(sprintf(Translator::getInstance()->trans("This product_sale_elements_id does not exists for this product : %d"), $value));
             }
         }
     }
