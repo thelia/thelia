@@ -71,7 +71,6 @@ abstract class BaseForm
     public function __construct(Request $request, $type= "form", $data = array(), $options = array())
     {
         $this->request = $request;
-        $lang = $request->getSession()->getLang();
 
         $validator = Validation::createValidatorBuilder();
 
@@ -93,25 +92,6 @@ abstract class BaseForm
         }
 
         $translator = Translator::getInstance();
-
-        $vendorDir = THELIA_ROOT . "/core/vendor";
-        $vendorFormDir = $vendorDir . '/symfony/form/Symfony/Component/Form';
-        $vendorValidatorDir =
-            $vendorDir . '/symfony/validator/Symfony/Component/Validator';
-
-        $translator->addResource(
-            'xlf',
-            sprintf($vendorFormDir . '/Resources/translations/validators.%s.xlf', $lang->getCode()),
-            $lang->getLocale(),
-            'validators'
-        );
-        $translator->addResource(
-            'xlf',
-            sprintf($vendorValidatorDir . '/Resources/translations/validators.%s.xlf', $lang->getCode()),
-            $lang->getLocale(),
-            'validators'
-        );
-
 
         $validator
             ->setTranslationDomain('validators')
