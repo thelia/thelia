@@ -95,6 +95,7 @@ abstract class BaseLoop
         $defaultArgs = array(
             Argument::createBooleanTypeArgument('backend_context', false),
             Argument::createBooleanTypeArgument('force_return', false),
+            Argument::createAnyTypeArgument('type'),
         );
 
         if (true === $this->countable) {
