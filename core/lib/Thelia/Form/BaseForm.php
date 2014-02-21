@@ -29,6 +29,7 @@ use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 use Symfony\Component\Validator\Validation;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 
@@ -70,8 +71,9 @@ abstract class BaseForm
     public function __construct(Request $request, $type= "form", $data = array(), $options = array())
     {
         $this->request = $request;
+        $lang = $request->getSession()->getLang();
 
-        $validator = Validation::createValidator();
+        $validator = Validation::createValidatorBuilder();
 
         if (!isset($options["attr"]["name"])) {
             $options["attr"]["thelia_name"] = $this->getName();
@@ -89,8 +91,33 @@ abstract class BaseForm
                 )
             );
         }
+
+        $translator = Translator::getInstance();
+
+        $vendorDir = THELIA_ROOT . "/core/vendor";
+        $vendorFormDir = $vendorDir . '/symfony/form/Symfony/Component/Form';
+        $vendorValidatorDir =
+            $vendorDir . '/symfony/validator/Symfony/Component/Validator';
+
+        $translator->addResource(
+            'xlf',
+            sprintf($vendorFormDir . '/Resources/translations/validators.%s.xlf', $lang->getCode()),
+            $lang->getLocale(),
+            'validators'
+        );
+        $translator->addResource(
+            'xlf',
+            sprintf($vendorValidatorDir . '/Resources/translations/validators.%s.xlf', $lang->getCode()),
+            $lang->getLocale(),
+            'validators'
+        );
+
+
+        $validator
+            ->setTranslationDomain('validators')
+            ->setTranslator($translator);
         $this->formBuilder = $builder
-            ->addExtension(new ValidatorExtension($validator))
+            ->addExtension(new ValidatorExtension($validator->getValidator()))
             ->getFormFactory()
             ->createNamedBuilder($this->getName(), $type, $data, $this->cleanOptions($options));
         ;
