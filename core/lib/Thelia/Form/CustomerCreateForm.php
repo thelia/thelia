@@ -100,7 +100,7 @@ class CustomerCreateForm extends AddressCreateForm
             // Add terms & conditions
             ->add("agreed", "checkbox", array(
                 "constraints" => array(
-                    new Constraints\True(array("message" => "Please accept the Terms and conditions in order to register."))
+                    new Constraints\True(array("message" => Translator::getInstance()->trans("Please accept the Terms and conditions in order to register.")))
                 ),
                 "label"=>"Test",
                 "label_attr" => array(
@@ -114,7 +114,7 @@ class CustomerCreateForm extends AddressCreateForm
         $data = $context->getRoot()->getData();
 
         if ($data["password"] != $data["password_confirm"]) {
-            $context->addViolation("password confirmation is not the same as password field.");
+            $context->addViolation(Translator::getInstance()->trans("password confirmation is not the same as password field"));
         }
     }
 
@@ -122,7 +122,7 @@ class CustomerCreateForm extends AddressCreateForm
     {
         $customer = CustomerQuery::getCustomerByEmail($value);
         if ($customer) {
-            $context->addViolation("This email already exists.");
+            $context->addViolation(Translator::getInstance()->trans("This email already exists."));
         }
     }
 

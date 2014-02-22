@@ -23,6 +23,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\CustomerQuery;
 
 /**
@@ -66,7 +67,7 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
         $customer = CustomerQuery::getCustomerByEmail($value);
         // If there is already a customer for this email address and if the customer is different from the current user, do a violation
         if ($customer && $customer->getId() != $this->getRequest()->getSession()->getCustomerUser()->getId()) {
-            $context->addViolation("This email already exists.");
+            $context->addViolation(Translator::getInstance()->trans("This email already exists."));
         }
     }
 

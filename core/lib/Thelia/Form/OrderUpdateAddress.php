@@ -166,7 +166,7 @@ class OrderUpdateAddress extends BaseForm
             ->findPk($value);
 
         if (null === $address) {
-            $context->addViolation("Order address ID not found");
+            $context->addViolation(Translator::getInstance()->trans("Order address ID not found"));
         }
     }
 
@@ -176,7 +176,7 @@ class OrderUpdateAddress extends BaseForm
             ->findPk($value);
 
         if (null === $address) {
-            $context->addViolation("Title ID not found");
+            $context->addViolation(Translator::getInstance()->trans("Title ID not found"));
         }
     }
 
@@ -186,7 +186,7 @@ class OrderUpdateAddress extends BaseForm
             ->findPk($value);
 
         if (null === $address) {
-            $context->addViolation("Country ID not found");
+            $context->addViolation(Translator::getInstance()->trans("Country ID not found"));
         }
     }
 }

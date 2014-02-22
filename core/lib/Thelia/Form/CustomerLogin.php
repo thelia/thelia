@@ -96,7 +96,7 @@ class CustomerLogin extends BaseForm
             if (false === $data['password'] || (empty($data['password']) && '0' != $data['password'])) {
 
                 $context->getViolations()->add(new ConstraintViolation(
-                    'This value should not be blank.',
+                    Translator::getInstance()->trans('This value should not be blank.'),
                     'account_password',
                     array(),
                     $context->getRoot(),
@@ -117,7 +117,7 @@ class CustomerLogin extends BaseForm
         if ($data["account"] == 0) {
             $customer = CustomerQuery::create()->findOneByEmail($value);
             if ($customer) {
-                $context->addViolation("A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password.");
+                $context->addViolation(Translator::getInstance()->trans("A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password."));
             }
         }
     }

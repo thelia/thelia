@@ -51,7 +51,7 @@ class TaxCreationForm extends BaseForm
     protected function buildForm($change_mode = false)
     {
         if ($this->taxEngine == null) {
-            throw new \LogicException("The TaxEngine should be passed to this form before using it.");
+            throw new \LogicException(Translator::getInstance()->trans("The TaxEngine should be passed to this form before using it."));
         }
 
         $types = $this->taxEngine->getTaxTypeList();

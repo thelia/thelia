@@ -24,6 +24,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
@@ -68,7 +69,7 @@ class OrderPayment extends BaseForm
             ->findPk($value);
 
         if (null === $address) {
-            $context->addViolation("Address ID not found");
+            $context->addViolation(Translator::getInstance()->trans("Address ID not found"));
         }
     }
 
@@ -87,7 +88,7 @@ class OrderPayment extends BaseForm
         $moduleReflection = new \ReflectionClass($module->getFullNamespace());
         if ($moduleReflection->isSubclassOf("Thelia\Module\PaymentModuleInterface") === false) {
             $context->addViolation(
-                sprintf("delivery module %s is not a Thelia\Module\PaymentModuleInterface", $module->getCode())
+                sprintf(Translator::getInstance()->trans("delivery module %s is not a Thelia\Module\PaymentModuleInterface"), $module->getCode())
             );
         }
     }

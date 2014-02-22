@@ -24,6 +24,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\TaxQuery;
 use Thelia\Model\TaxRuleQuery;
@@ -89,7 +90,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
             ->findPk($value);
 
         if (null === $taxRule) {
-            $context->addViolation("Tax rule ID not found");
+            $context->addViolation(Translator::getInstance()->trans("Tax rule ID not found"));
         }
     }
 
@@ -97,7 +98,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
     {
         $jsonType = new JsonType();
         if (!$jsonType->isValid($value)) {
-            $context->addViolation("Tax list is not valid JSON");
+            $context->addViolation(Translator::getInstance()->trans("Tax list is not valid JSON"));
         }
 
         $taxList = json_decode($value, true);
@@ -108,18 +109,18 @@ class TaxRuleTaxListUpdateForm extends BaseForm
             if (is_array($taxLevel1)) {
                 foreach ($taxLevel1 as $taxLevel2) {
                     if (is_array($taxLevel2)) {
-                        $context->addViolation("Bad tax list JSON");
+                        $context->addViolation(Translator::getInstance()->trans("Bad tax list JSON"));
                     } else {
                         $taxModel = TaxQuery::create()->findPk($taxLevel2);
                         if (null === $taxModel) {
-                            $context->addViolation("Tax ID not found in tax list JSON");
+                            $context->addViolation(Translator::getInstance()->trans("Tax ID not found in tax list JSON"));
                         }
                     }
                 }
             } else {
                 $taxModel = TaxQuery::create()->findPk($taxLevel1);
                 if (null === $taxModel) {
-                    $context->addViolation("Tax ID not found in tax list JSON");
+                    $context->addViolation(Translator::getInstance()->trans("Tax ID not found in tax list JSON"));
                 }
             }
         }
