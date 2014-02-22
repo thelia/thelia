@@ -27,7 +27,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Translation\Translator;
 
-
 /**
  * Class RequestListener
  * @package Thelia\Core\EventListener

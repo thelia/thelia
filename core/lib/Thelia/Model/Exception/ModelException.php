@@ -22,7 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Model\Exception;
 
-
 class ModelException extends \RuntimeException
 {
 }

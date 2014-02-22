@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\CustomerTitleI18nQuery as BaseCustomerTitleI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'customer_title_i18n' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\CustomerTitleI18nQuery as BaseCustomerTitleI18nQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class CustomerTitleI18nQuery extends BaseCustomerTitleI18nQuery {
-
+class CustomerTitleI18nQuery extends BaseCustomerTitleI18nQuery
+{
 } // CustomerTitleI18nQuery

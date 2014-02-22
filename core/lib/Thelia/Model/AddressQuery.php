@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\AddressQuery as BaseAddressQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'address' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\AddressQuery as BaseAddressQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class AddressQuery extends BaseAddressQuery {
-
+class AddressQuery extends BaseAddressQuery
+{
 } // AddressQuery

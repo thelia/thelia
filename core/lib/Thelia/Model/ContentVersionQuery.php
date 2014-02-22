@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ContentVersionQuery as BaseContentVersionQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'content_version' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\ContentVersionQuery as BaseContentVersionQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ContentVersionQuery extends BaseContentVersionQuery {
-
+class ContentVersionQuery extends BaseContentVersionQuery
+{
 } // ContentVersionQuery

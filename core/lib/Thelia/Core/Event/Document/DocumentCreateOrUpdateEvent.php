@@ -66,7 +66,7 @@ class DocumentCreateOrUpdateEvent extends ActionEvent
      *
      * @param string $documentType Document type
      *                             ex : FileManager::TYPE_CATEGORY
-     * @param int $parentId Document parent id
+     * @param int    $parentId     Document parent id
      */
     public function __construct($documentType, $parentId)
     {

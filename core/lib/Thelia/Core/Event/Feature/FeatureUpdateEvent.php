@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event\Feature;
 
-use Thelia\Core\Event\Feature\FeatureCreateEvent;
-
 class FeatureUpdateEvent extends FeatureCreateEvent
 {
     protected $feature_id;

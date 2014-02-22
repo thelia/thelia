@@ -5,7 +5,6 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\Base\AdminLogQuery as BaseAdminLogQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'admin_log' table.
  *
@@ -19,11 +18,11 @@ use Thelia\Model\Base\AdminLogQuery as BaseAdminLogQuery;
 class AdminLogQuery extends BaseAdminLogQuery
 {
     /**
-     * @param null      $login
-     * @param null      $minDate
-     * @param null      $maxDate
-     * @param null      $resources
-     * @param null      $actions
+     * @param null $login
+     * @param null $minDate
+     * @param null $maxDate
+     * @param null $resources
+     * @param null $actions
      *
      * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
      */
@@ -31,25 +30,25 @@ class AdminLogQuery extends BaseAdminLogQuery
     {
         $search = self::create();
 
-        if(null !== $minDate) {
+        if (null !== $minDate) {
             $search->filterByCreatedAt($minDate, Criteria::GREATER_EQUAL);
         }
 
-        if(null !== $maxDate) {
+        if (null !== $maxDate) {
             $maxDateObject = new \DateTime($maxDate);
             $maxDateObject->add(new \DateInterval('P1D'));
             $search->filterByCreatedAt(date('Y-m-d', $maxDateObject->getTimestamp()), Criteria::LESS_THAN);
         }
 
-        if(null !== $resources) {
+        if (null !== $resources) {
             $search->filterByResource($resources);
         }
 
-        if(null !== $actions) {
+        if (null !== $actions) {
             $search->filterByAction($actions);
         }
 
-        if(null !== $login) {
+        if (null !== $login) {
             $search->filterByAdminLogin($login);
         }
 

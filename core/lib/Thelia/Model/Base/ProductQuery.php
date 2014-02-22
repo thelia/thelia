@@ -143,9 +143,9 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\ProductQuery object.
      *
-     * @param     string $dbName The database name
-     * @param     string $modelName The phpName of a model, e.g. 'Book'
-     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param string $dbName     The database name
+     * @param string $modelName  The phpName of a model, e.g. 'Book'
+     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Product', $modelAlias = null)
     {
@@ -155,8 +155,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Returns a new ChildProductQuery object.
      *
-     * @param     string $modelAlias The alias of a model in the query
-     * @param     Criteria $criteria Optional Criteria to build the query from
+     * @param string   $modelAlias The alias of a model in the query
+     * @param Criteria $criteria   Optional Criteria to build the query from
      *
      * @return ChildProductQuery
      */
@@ -185,7 +185,7 @@ abstract class ProductQuery extends ModelCriteria
      * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param mixed               $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildProduct|array|mixed the result, formatted by the current formatter
@@ -216,10 +216,10 @@ abstract class ProductQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
-     * @return   ChildProduct A model object, or null if the key is not found
+     * @return ChildProduct A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -246,8 +246,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @return ChildProduct|array|mixed the result, formatted by the current formatter
      */
@@ -267,8 +267,8 @@ abstract class ProductQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
-     * @param     array $keys Primary keys to use for the query
-     * @param     ConnectionInterface $con an optional connection object
+     * @param array               $keys Primary keys to use for the query
+     * @param ConnectionInterface $con  an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -289,26 +289,24 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param     mixed $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
-
         return $this->addUsingAlias(ProductTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
      * Filter the query by a list of primary keys
      *
-     * @param     array $keys The list of primary key to use for the query
+     * @param array $keys The list of primary key to use for the query
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
-
         return $this->addUsingAlias(ProductTableMap::ID, $keys, Criteria::IN);
     }
 
@@ -322,11 +320,11 @@ abstract class ProductQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $id         The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -365,11 +363,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see       filterByTaxRule()
      *
-     * @param     mixed $taxRuleId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $taxRuleId  The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -405,9 +403,9 @@ abstract class ProductQuery extends ModelCriteria
      * $query->filterByRef('%fooValue%'); // WHERE ref LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $ref The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $ref        The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -435,11 +433,11 @@ abstract class ProductQuery extends ModelCriteria
      * $query->filterByVisible(array('min' => 12)); // WHERE visible > 12
      * </code>
      *
-     * @param     mixed $visible The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $visible    The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -476,11 +474,11 @@ abstract class ProductQuery extends ModelCriteria
      * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
      * </code>
      *
-     * @param     mixed $position The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $position   The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -519,11 +517,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see       filterByTemplate()
      *
-     * @param     mixed $templateId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $templateId The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -560,13 +558,13 @@ abstract class ProductQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $createdAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $createdAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -603,13 +601,13 @@ abstract class ProductQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $updatedAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $updatedAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -646,11 +644,11 @@ abstract class ProductQuery extends ModelCriteria
      * $query->filterByVersion(array('min' => 12)); // WHERE version > 12
      * </code>
      *
-     * @param     mixed $version The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $version    The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -687,13 +685,13 @@ abstract class ProductQuery extends ModelCriteria
      * $query->filterByVersionCreatedAt(array('max' => 'yesterday')); // WHERE version_created_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $versionCreatedAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $versionCreatedAt The value to use as filter.
+     *                                 Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                                 Empty strings are treated as NULL.
+     *                                 Use scalar values for equality.
+     *                                 Use array values for in_array() equivalent.
+     *                                 Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison       Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -729,9 +727,9 @@ abstract class ProductQuery extends ModelCriteria
      * $query->filterByVersionCreatedBy('%fooValue%'); // WHERE version_created_by LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $versionCreatedBy The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $versionCreatedBy The value to use as filter.
+     *                                 Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison       Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -752,8 +750,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\TaxRule object
      *
-     * @param \Thelia\Model\TaxRule|ObjectCollection $taxRule The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\TaxRule|ObjectCollection $taxRule    The related object(s) to use as filter
+     * @param string                                 $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -777,8 +775,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the TaxRule relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -811,11 +809,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\TaxRuleQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\TaxRuleQuery A secondary query class using the current class as primary query
      */
     public function useTaxRuleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -827,8 +825,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Template object
      *
-     * @param \Thelia\Model\Template|ObjectCollection $template The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Template|ObjectCollection $template   The related object(s) to use as filter
+     * @param string                                  $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -852,8 +850,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Template relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -886,11 +884,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\TemplateQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\TemplateQuery A secondary query class using the current class as primary query
      */
     public function useTemplateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -902,8 +900,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\ProductCategory object
      *
-     * @param \Thelia\Model\ProductCategory|ObjectCollection $productCategory  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\ProductCategory|ObjectCollection $productCategory the related object to use as filter
+     * @param string                                         $comparison      Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -925,8 +923,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ProductCategory relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -959,11 +957,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProductCategoryQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\ProductCategoryQuery A secondary query class using the current class as primary query
      */
     public function useProductCategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -975,8 +973,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\FeatureProduct object
      *
-     * @param \Thelia\Model\FeatureProduct|ObjectCollection $featureProduct  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\FeatureProduct|ObjectCollection $featureProduct the related object to use as filter
+     * @param string                                        $comparison     Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -998,8 +996,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the FeatureProduct relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1032,11 +1030,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\FeatureProductQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\FeatureProductQuery A secondary query class using the current class as primary query
      */
     public function useFeatureProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1048,8 +1046,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\ProductSaleElements object
      *
-     * @param \Thelia\Model\ProductSaleElements|ObjectCollection $productSaleElements  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\ProductSaleElements|ObjectCollection $productSaleElements the related object to use as filter
+     * @param string                                             $comparison          Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1071,8 +1069,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ProductSaleElements relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1105,11 +1103,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProductSaleElementsQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\ProductSaleElementsQuery A secondary query class using the current class as primary query
      */
     public function useProductSaleElementsQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1121,8 +1119,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\ProductImage object
      *
-     * @param \Thelia\Model\ProductImage|ObjectCollection $productImage  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\ProductImage|ObjectCollection $productImage the related object to use as filter
+     * @param string                                      $comparison   Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1144,8 +1142,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ProductImage relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1178,11 +1176,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProductImageQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\ProductImageQuery A secondary query class using the current class as primary query
      */
     public function useProductImageQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1194,8 +1192,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\ProductDocument object
      *
-     * @param \Thelia\Model\ProductDocument|ObjectCollection $productDocument  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\ProductDocument|ObjectCollection $productDocument the related object to use as filter
+     * @param string                                         $comparison      Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1217,8 +1215,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ProductDocument relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1251,11 +1249,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProductDocumentQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\ProductDocumentQuery A secondary query class using the current class as primary query
      */
     public function useProductDocumentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1268,7 +1266,7 @@ abstract class ProductQuery extends ModelCriteria
      * Filter the query by a related \Thelia\Model\Accessory object
      *
      * @param \Thelia\Model\Accessory|ObjectCollection $accessory  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string                                   $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1290,8 +1288,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the AccessoryRelatedByProductId relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1324,11 +1322,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\AccessoryQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\AccessoryQuery A secondary query class using the current class as primary query
      */
     public function useAccessoryRelatedByProductIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1341,7 +1339,7 @@ abstract class ProductQuery extends ModelCriteria
      * Filter the query by a related \Thelia\Model\Accessory object
      *
      * @param \Thelia\Model\Accessory|ObjectCollection $accessory  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string                                   $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1363,8 +1361,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the AccessoryRelatedByAccessory relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1397,11 +1395,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\AccessoryQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\AccessoryQuery A secondary query class using the current class as primary query
      */
     public function useAccessoryRelatedByAccessoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1413,8 +1411,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\CartItem object
      *
-     * @param \Thelia\Model\CartItem|ObjectCollection $cartItem  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\CartItem|ObjectCollection $cartItem   the related object to use as filter
+     * @param string                                  $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1436,8 +1434,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the CartItem relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1470,11 +1468,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CartItemQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CartItemQuery A secondary query class using the current class as primary query
      */
     public function useCartItemQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1486,8 +1484,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\ProductAssociatedContent object
      *
-     * @param \Thelia\Model\ProductAssociatedContent|ObjectCollection $productAssociatedContent  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\ProductAssociatedContent|ObjectCollection $productAssociatedContent the related object to use as filter
+     * @param string                                                  $comparison               Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1509,8 +1507,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ProductAssociatedContent relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1543,11 +1541,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProductAssociatedContentQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\ProductAssociatedContentQuery A secondary query class using the current class as primary query
      */
     public function useProductAssociatedContentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1559,8 +1557,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\ProductI18n object
      *
-     * @param \Thelia\Model\ProductI18n|ObjectCollection $productI18n  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\ProductI18n|ObjectCollection $productI18n the related object to use as filter
+     * @param string                                     $comparison  Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1582,8 +1580,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ProductI18n relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1616,11 +1614,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProductI18nQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\ProductI18nQuery A secondary query class using the current class as primary query
      */
     public function useProductI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
@@ -1632,8 +1630,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\ProductVersion object
      *
-     * @param \Thelia\Model\ProductVersion|ObjectCollection $productVersion  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\ProductVersion|ObjectCollection $productVersion the related object to use as filter
+     * @param string                                        $comparison     Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1655,8 +1653,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ProductVersion relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1689,11 +1687,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProductVersionQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\ProductVersionQuery A secondary query class using the current class as primary query
      */
     public function useProductVersionQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1706,8 +1704,8 @@ abstract class ProductQuery extends ModelCriteria
      * Filter the query by a related Category object
      * using the product_category table as cross reference
      *
-     * @param Category $category the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param Category $category   the related object to use as filter
+     * @param string   $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1723,8 +1721,8 @@ abstract class ProductQuery extends ModelCriteria
      * Filter the query by a related Product object
      * using the accessory table as cross reference
      *
-     * @param Product $product the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param Product $product    the related object to use as filter
+     * @param string  $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1740,8 +1738,8 @@ abstract class ProductQuery extends ModelCriteria
      * Filter the query by a related Product object
      * using the accessory table as cross reference
      *
-     * @param Product $product the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param Product $product    the related object to use as filter
+     * @param string  $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1756,7 +1754,7 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildProduct $product Object to remove from the list of results
+     * @param ChildProduct $product Object to remove from the list of results
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
@@ -1772,8 +1770,8 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Deletes all rows from the product table.
      *
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).
+     * @param  ConnectionInterface $con the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -1804,13 +1802,13 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildProduct or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildProduct object or primary key or array of primary keys
-     *              which is used to create the DELETE statement
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                if supported by native driver or if emulated using Propel.
-     * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     * @param  mixed               $values Criteria or ChildProduct object or primary key or array of primary keys
+     *                                     which is used to create the DELETE statement
+     * @param  ConnectionInterface $con    the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                                    if supported by native driver or if emulated using Propel.
+     * @throws PropelException     Any exceptions caught during processing will be
+     *                                    rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -1830,7 +1828,6 @@ abstract class ProductQuery extends ModelCriteria
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-
         ProductTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
@@ -1849,9 +1846,9 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param      int $nbDays Maximum age of the latest update in days
+     * @param int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildProductQuery The current query, for fluid interface
+     * @return ChildProductQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
@@ -1861,9 +1858,9 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Filter by the latest created
      *
-     * @param      int $nbDays Maximum age of in days
+     * @param int $nbDays Maximum age of in days
      *
-     * @return     ChildProductQuery The current query, for fluid interface
+     * @return ChildProductQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
@@ -1873,7 +1870,7 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Order by update date desc
      *
-     * @return     ChildProductQuery The current query, for fluid interface
+     * @return ChildProductQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
@@ -1883,7 +1880,7 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Order by update date asc
      *
-     * @return     ChildProductQuery The current query, for fluid interface
+     * @return ChildProductQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
@@ -1893,7 +1890,7 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Order by create date desc
      *
-     * @return     ChildProductQuery The current query, for fluid interface
+     * @return ChildProductQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
@@ -1903,7 +1900,7 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Order by create date asc
      *
-     * @return     ChildProductQuery The current query, for fluid interface
+     * @return ChildProductQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
@@ -1915,11 +1912,11 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the i18n relation
      *
-     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     * @param string $locale        Locale to use for the join condition, e.g. 'fr_FR'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildProductQuery The current query, for fluid interface
+     * @return ChildProductQuery The current query, for fluid interface
      */
     public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -1934,10 +1931,10 @@ abstract class ProductQuery extends ModelCriteria
      * Adds a JOIN clause to the query and hydrates the related I18n object.
      * Shortcut for $c->joinI18n($locale)->with()
      *
-     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     * @param string $locale   Locale to use for the join condition, e.g. 'fr_FR'
+     * @param string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildProductQuery The current query, for fluid interface
+     * @return ChildProductQuery The current query, for fluid interface
      */
     public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
@@ -1954,11 +1951,11 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @see       useQuery()
      *
-     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     * @param string $locale        Locale to use for the join condition, e.g. 'fr_FR'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildProductI18nQuery A secondary query class using the current class as primary query
+     * @return ChildProductI18nQuery A secondary query class using the current class as primary query
      */
     public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -1974,7 +1971,7 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @return boolean
      */
-    static public function isVersioningEnabled()
+    public static function isVersioningEnabled()
     {
         return self::$isVersioningEnabled;
     }
@@ -1982,7 +1979,7 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Enables versioning
      */
-    static public function enableVersioning()
+    public static function enableVersioning()
     {
         self::$isVersioningEnabled = true;
     }
@@ -1990,7 +1987,7 @@ abstract class ProductQuery extends ModelCriteria
     /**
      * Disables versioning
      */
-    static public function disableVersioning()
+    public static function disableVersioning()
     {
         self::$isVersioningEnabled = false;
     }

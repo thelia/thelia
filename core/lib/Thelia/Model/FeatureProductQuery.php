@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\FeatureProductQuery as BaseFeatureProductQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'feature_product' table.
  *

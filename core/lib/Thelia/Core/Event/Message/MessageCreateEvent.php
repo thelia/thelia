@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event\Message;
 
-use Thelia\Core\Event\Message\MessageEvent;
-
 class MessageCreateEvent extends MessageEvent
 {
     protected $message_name;

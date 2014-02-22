@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\FolderI18nQuery as BaseFolderI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'folder_i18n' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\FolderI18nQuery as BaseFolderI18nQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class FolderI18nQuery extends BaseFolderI18nQuery {
-
+class FolderI18nQuery extends BaseFolderI18nQuery
+{
 } // FolderI18nQuery

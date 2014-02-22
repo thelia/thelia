@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event\Product;
 
-use Thelia\Core\Event\Product\ProductCreateEvent;
-
 class ProductUpdateEvent extends ProductCreateEvent
 {
     protected $product_id;

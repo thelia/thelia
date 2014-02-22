@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\AccessoryQuery as BaseAccessoryQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'accessory' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\AccessoryQuery as BaseAccessoryQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class AccessoryQuery extends BaseAccessoryQuery {
-
+class AccessoryQuery extends BaseAccessoryQuery
+{
 } // AccessoryQuery

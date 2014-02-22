@@ -43,7 +43,6 @@ abstract class Category implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\CategoryTableMap';
 
-
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -189,7 +188,6 @@ abstract class Category implements ActiveRecordInterface
     protected $currentTranslations;
 
     // versionable behavior
-
 
     /**
      * @var bool
@@ -460,9 +458,9 @@ abstract class Category implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed $parser A AbstractParser instance,
+     * @param mixed  $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data The source data to import from
+     * @param string $data   The source data to import from
      *
      * @return Category The current object, for fluid interface
      */
@@ -512,44 +510,40 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getId()
     {
-
         return $this->id;
     }
 
     /**
      * Get the [parent] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getParent()
     {
-
         return $this->parent;
     }
 
     /**
      * Get the [visible] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getVisible()
     {
-
         return $this->visible;
     }
 
     /**
      * Get the [position] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getPosition()
     {
-
         return $this->position;
     }
 
@@ -557,8 +551,8 @@ abstract class Category implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -577,8 +571,8 @@ abstract class Category implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -596,11 +590,10 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Get the [version] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getVersion()
     {
-
         return $this->version;
     }
 
@@ -608,8 +601,8 @@ abstract class Category implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [version_created_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -627,19 +620,18 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Get the [version_created_by] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getVersionCreatedBy()
     {
-
         return $this->version_created_by;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  int                    $v new value
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -652,15 +644,14 @@ abstract class Category implements ActiveRecordInterface
             $this->modifiedColumns[CategoryTableMap::ID] = true;
         }
 
-
         return $this;
     } // setId()
 
     /**
      * Set the value of [parent] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  int                    $v new value
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function setParent($v)
     {
@@ -673,15 +664,14 @@ abstract class Category implements ActiveRecordInterface
             $this->modifiedColumns[CategoryTableMap::PARENT] = true;
         }
 
-
         return $this;
     } // setParent()
 
     /**
      * Set the value of [visible] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  int                    $v new value
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function setVisible($v)
     {
@@ -694,15 +684,14 @@ abstract class Category implements ActiveRecordInterface
             $this->modifiedColumns[CategoryTableMap::VISIBLE] = true;
         }
 
-
         return $this;
     } // setVisible()
 
     /**
      * Set the value of [position] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  int                    $v new value
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function setPosition($v)
     {
@@ -715,16 +704,15 @@ abstract class Category implements ActiveRecordInterface
             $this->modifiedColumns[CategoryTableMap::POSITION] = true;
         }
 
-
         return $this;
     } // setPosition()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  mixed                  $v string, integer (timestamp), or \DateTime value.
+     *                                   Empty strings are treated as NULL.
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -736,16 +724,15 @@ abstract class Category implements ActiveRecordInterface
             }
         } // if either are not null
 
-
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  mixed                  $v string, integer (timestamp), or \DateTime value.
+     *                                   Empty strings are treated as NULL.
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -757,15 +744,14 @@ abstract class Category implements ActiveRecordInterface
             }
         } // if either are not null
 
-
         return $this;
     } // setUpdatedAt()
 
     /**
      * Set the value of [version] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  int                    $v new value
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function setVersion($v)
     {
@@ -778,16 +764,15 @@ abstract class Category implements ActiveRecordInterface
             $this->modifiedColumns[CategoryTableMap::VERSION] = true;
         }
 
-
         return $this;
     } // setVersion()
 
     /**
      * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  mixed                  $v string, integer (timestamp), or \DateTime value.
+     *                                   Empty strings are treated as NULL.
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function setVersionCreatedAt($v)
     {
@@ -799,15 +784,14 @@ abstract class Category implements ActiveRecordInterface
             }
         } // if either are not null
 
-
         return $this;
     } // setVersionCreatedAt()
 
     /**
      * Set the value of [version_created_by] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  string                 $v new value
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function setVersionCreatedBy($v)
     {
@@ -819,7 +803,6 @@ abstract class Category implements ActiveRecordInterface
             $this->version_created_by = $v;
             $this->modifiedColumns[CategoryTableMap::VERSION_CREATED_BY] = true;
         }
-
 
         return $this;
     } // setVersionCreatedBy()
@@ -863,7 +846,6 @@ abstract class Category implements ActiveRecordInterface
     public function hydrate($row, $startcol = 0, $rehydrate = false, $indexType = TableMap::TYPE_NUM)
     {
         try {
-
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CategoryTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
@@ -937,10 +919,10 @@ abstract class Category implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
-     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
+     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
+     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -988,7 +970,7 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param      ConnectionInterface $con
+     * @param  ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see Category::setDeleted()
@@ -1031,8 +1013,8 @@ abstract class Category implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -1105,8 +1087,8 @@ abstract class Category implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -1266,7 +1248,7 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1368,7 +1350,7 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1384,12 +1366,12 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param      string $name name
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed Value of field.
+     * @param  string $name name
+     * @param  string $type The type of fieldname the $name is of:
+     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                      Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed  Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1403,7 +1385,7 @@ abstract class Category implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
+     * @param  int   $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1448,12 +1430,12 @@ abstract class Category implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                    Defaults to TableMap::TYPE_PHPNAME.
-     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
-     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                                        Defaults to TableMap::TYPE_PHPNAME.
+     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
+     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1507,12 +1489,12 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param      string $name
-     * @param      mixed  $value field value
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @param  string $name
+     * @param  mixed  $value field value
+     * @param  string $type  The type of fieldname the $name is of:
+     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                       Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1526,8 +1508,8 @@ abstract class Category implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
-     * @param      mixed $value field value
+     * @param  int   $pos   position in xml schema
+     * @param  mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1576,8 +1558,8 @@ abstract class Category implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param      array  $arr     An array to populate the object from.
-     * @param      string $keyType The type of keys the array uses.
+     * @param  array  $arr     An array to populate the object from.
+     * @param  string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1613,7 +1595,6 @@ abstract class Category implements ActiveRecordInterface
         if ($this->isColumnModified(CategoryTableMap::VERSION)) $criteria->add(CategoryTableMap::VERSION, $this->version);
         if ($this->isColumnModified(CategoryTableMap::VERSION_CREATED_AT)) $criteria->add(CategoryTableMap::VERSION_CREATED_AT, $this->version_created_at);
         if ($this->isColumnModified(CategoryTableMap::VERSION_CREATED_BY)) $criteria->add(CategoryTableMap::VERSION_CREATED_BY, $this->version_created_by);
-
         return $criteria;
     }
 
@@ -1635,7 +1616,7 @@ abstract class Category implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return   int
+     * @return int
      */
     public function getPrimaryKey()
     {
@@ -1645,7 +1626,7 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param       int $key Primary key.
+     * @param  int  $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -1659,7 +1640,6 @@ abstract class Category implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-
         return null === $this->getId();
     }
 
@@ -1669,9 +1649,9 @@ abstract class Category implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\Category (or compatible) type.
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
+     * @param  object          $copyObj  An object of \Thelia\Model\Category (or compatible) type.
+     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1742,8 +1722,8 @@ abstract class Category implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\Category Clone of current object.
+     * @param  boolean                $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return \Thelia\Model\Category Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1756,13 +1736,12 @@ abstract class Category implements ActiveRecordInterface
         return $copyObj;
     }
 
-
     /**
      * Initializes a collection based on the name of a relation.
      * Avoids crafting an 'init[$relationName]s' method name
      * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param      string $relationName The name of the relation to initialize
+     * @param  string $relationName The name of the relation to initialize
      * @return void
      */
     public function initRelation($relationName)
@@ -1816,8 +1795,8 @@ abstract class Category implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -1839,8 +1818,8 @@ abstract class Category implements ActiveRecordInterface
      * If this ChildCategory is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                          $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface               $con      optional connection object
      * @return Collection|ChildProductCategory[] List of ChildProductCategory objects
      * @throws PropelException
      */
@@ -1896,9 +1875,9 @@ abstract class Category implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $productCategories A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCategory The current object (for fluent API support)
+     * @param  Collection          $productCategories A Propel collection.
+     * @param  ConnectionInterface $con               Optional connection object
+     * @return ChildCategory       The current object (for fluent API support)
      */
     public function setProductCategories(Collection $productCategories, ConnectionInterface $con = null)
     {
@@ -1928,10 +1907,10 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Returns the number of related ProductCategory objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ProductCategory objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related ProductCategory objects.
      * @throws PropelException
      */
     public function countProductCategories(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -1963,8 +1942,8 @@ abstract class Category implements ActiveRecordInterface
      * Method called to associate a ChildProductCategory object to this object
      * through the ChildProductCategory foreign key attribute.
      *
-     * @param    ChildProductCategory $l ChildProductCategory
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  ChildProductCategory   $l ChildProductCategory
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function addProductCategory(ChildProductCategory $l)
     {
@@ -1991,7 +1970,7 @@ abstract class Category implements ActiveRecordInterface
 
     /**
      * @param  ProductCategory $productCategory The productCategory object to remove.
-     * @return ChildCategory The current object (for fluent API support)
+     * @return ChildCategory   The current object (for fluent API support)
      */
     public function removeProductCategory($productCategory)
     {
@@ -2020,9 +1999,9 @@ abstract class Category implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Category.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                          $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface               $con          optional connection object
+     * @param  string                            $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildProductCategory[] List of ChildProductCategory objects
      */
     public function getProductCategoriesJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2062,8 +2041,8 @@ abstract class Category implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2085,8 +2064,8 @@ abstract class Category implements ActiveRecordInterface
      * If this ChildCategory is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                        $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface             $con      optional connection object
      * @return Collection|ChildCategoryImage[] List of ChildCategoryImage objects
      * @throws PropelException
      */
@@ -2142,9 +2121,9 @@ abstract class Category implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $categoryImages A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCategory The current object (for fluent API support)
+     * @param  Collection          $categoryImages A Propel collection.
+     * @param  ConnectionInterface $con            Optional connection object
+     * @return ChildCategory       The current object (for fluent API support)
      */
     public function setCategoryImages(Collection $categoryImages, ConnectionInterface $con = null)
     {
@@ -2171,10 +2150,10 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Returns the number of related CategoryImage objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related CategoryImage objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related CategoryImage objects.
      * @throws PropelException
      */
     public function countCategoryImages(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2206,8 +2185,8 @@ abstract class Category implements ActiveRecordInterface
      * Method called to associate a ChildCategoryImage object to this object
      * through the ChildCategoryImage foreign key attribute.
      *
-     * @param    ChildCategoryImage $l ChildCategoryImage
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  ChildCategoryImage     $l ChildCategoryImage
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function addCategoryImage(ChildCategoryImage $l)
     {
@@ -2280,8 +2259,8 @@ abstract class Category implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2303,8 +2282,8 @@ abstract class Category implements ActiveRecordInterface
      * If this ChildCategory is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                           $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface                $con      optional connection object
      * @return Collection|ChildCategoryDocument[] List of ChildCategoryDocument objects
      * @throws PropelException
      */
@@ -2360,9 +2339,9 @@ abstract class Category implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $categoryDocuments A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCategory The current object (for fluent API support)
+     * @param  Collection          $categoryDocuments A Propel collection.
+     * @param  ConnectionInterface $con               Optional connection object
+     * @return ChildCategory       The current object (for fluent API support)
      */
     public function setCategoryDocuments(Collection $categoryDocuments, ConnectionInterface $con = null)
     {
@@ -2389,10 +2368,10 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Returns the number of related CategoryDocument objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related CategoryDocument objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related CategoryDocument objects.
      * @throws PropelException
      */
     public function countCategoryDocuments(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2424,8 +2403,8 @@ abstract class Category implements ActiveRecordInterface
      * Method called to associate a ChildCategoryDocument object to this object
      * through the ChildCategoryDocument foreign key attribute.
      *
-     * @param    ChildCategoryDocument $l ChildCategoryDocument
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  ChildCategoryDocument  $l ChildCategoryDocument
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function addCategoryDocument(ChildCategoryDocument $l)
     {
@@ -2452,7 +2431,7 @@ abstract class Category implements ActiveRecordInterface
 
     /**
      * @param  CategoryDocument $categoryDocument The categoryDocument object to remove.
-     * @return ChildCategory The current object (for fluent API support)
+     * @return ChildCategory    The current object (for fluent API support)
      */
     public function removeCategoryDocument($categoryDocument)
     {
@@ -2498,8 +2477,8 @@ abstract class Category implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2521,8 +2500,8 @@ abstract class Category implements ActiveRecordInterface
      * If this ChildCategory is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                                    $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface                         $con      optional connection object
      * @return Collection|ChildCategoryAssociatedContent[] List of ChildCategoryAssociatedContent objects
      * @throws PropelException
      */
@@ -2578,9 +2557,9 @@ abstract class Category implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $categoryAssociatedContents A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCategory The current object (for fluent API support)
+     * @param  Collection          $categoryAssociatedContents A Propel collection.
+     * @param  ConnectionInterface $con                        Optional connection object
+     * @return ChildCategory       The current object (for fluent API support)
      */
     public function setCategoryAssociatedContents(Collection $categoryAssociatedContents, ConnectionInterface $con = null)
     {
@@ -2607,10 +2586,10 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Returns the number of related CategoryAssociatedContent objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related CategoryAssociatedContent objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related CategoryAssociatedContent objects.
      * @throws PropelException
      */
     public function countCategoryAssociatedContents(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2642,8 +2621,8 @@ abstract class Category implements ActiveRecordInterface
      * Method called to associate a ChildCategoryAssociatedContent object to this object
      * through the ChildCategoryAssociatedContent foreign key attribute.
      *
-     * @param    ChildCategoryAssociatedContent $l ChildCategoryAssociatedContent
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  ChildCategoryAssociatedContent $l ChildCategoryAssociatedContent
+     * @return \Thelia\Model\Category         The current object (for fluent API support)
      */
     public function addCategoryAssociatedContent(ChildCategoryAssociatedContent $l)
     {
@@ -2670,7 +2649,7 @@ abstract class Category implements ActiveRecordInterface
 
     /**
      * @param  CategoryAssociatedContent $categoryAssociatedContent The categoryAssociatedContent object to remove.
-     * @return ChildCategory The current object (for fluent API support)
+     * @return ChildCategory             The current object (for fluent API support)
      */
     public function removeCategoryAssociatedContent($categoryAssociatedContent)
     {
@@ -2699,9 +2678,9 @@ abstract class Category implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Category.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                                    $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface                         $con          optional connection object
+     * @param  string                                      $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildCategoryAssociatedContent[] List of ChildCategoryAssociatedContent objects
      */
     public function getCategoryAssociatedContentsJoinContent($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2741,8 +2720,8 @@ abstract class Category implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2764,8 +2743,8 @@ abstract class Category implements ActiveRecordInterface
      * If this ChildCategory is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                       $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface            $con      optional connection object
      * @return Collection|ChildCategoryI18n[] List of ChildCategoryI18n objects
      * @throws PropelException
      */
@@ -2821,9 +2800,9 @@ abstract class Category implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $categoryI18ns A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCategory The current object (for fluent API support)
+     * @param  Collection          $categoryI18ns A Propel collection.
+     * @param  ConnectionInterface $con           Optional connection object
+     * @return ChildCategory       The current object (for fluent API support)
      */
     public function setCategoryI18ns(Collection $categoryI18ns, ConnectionInterface $con = null)
     {
@@ -2853,10 +2832,10 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Returns the number of related CategoryI18n objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related CategoryI18n objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related CategoryI18n objects.
      * @throws PropelException
      */
     public function countCategoryI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2888,8 +2867,8 @@ abstract class Category implements ActiveRecordInterface
      * Method called to associate a ChildCategoryI18n object to this object
      * through the ChildCategoryI18n foreign key attribute.
      *
-     * @param    ChildCategoryI18n $l ChildCategoryI18n
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  ChildCategoryI18n      $l ChildCategoryI18n
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function addCategoryI18n(ChildCategoryI18n $l)
     {
@@ -2919,7 +2898,7 @@ abstract class Category implements ActiveRecordInterface
     }
 
     /**
-     * @param  CategoryI18n $categoryI18n The categoryI18n object to remove.
+     * @param  CategoryI18n  $categoryI18n The categoryI18n object to remove.
      * @return ChildCategory The current object (for fluent API support)
      */
     public function removeCategoryI18n($categoryI18n)
@@ -2966,8 +2945,8 @@ abstract class Category implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2989,8 +2968,8 @@ abstract class Category implements ActiveRecordInterface
      * If this ChildCategory is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                          $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface               $con      optional connection object
      * @return Collection|ChildCategoryVersion[] List of ChildCategoryVersion objects
      * @throws PropelException
      */
@@ -3046,9 +3025,9 @@ abstract class Category implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $categoryVersions A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCategory The current object (for fluent API support)
+     * @param  Collection          $categoryVersions A Propel collection.
+     * @param  ConnectionInterface $con              Optional connection object
+     * @return ChildCategory       The current object (for fluent API support)
      */
     public function setCategoryVersions(Collection $categoryVersions, ConnectionInterface $con = null)
     {
@@ -3078,10 +3057,10 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Returns the number of related CategoryVersion objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related CategoryVersion objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related CategoryVersion objects.
      * @throws PropelException
      */
     public function countCategoryVersions(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -3113,8 +3092,8 @@ abstract class Category implements ActiveRecordInterface
      * Method called to associate a ChildCategoryVersion object to this object
      * through the ChildCategoryVersion foreign key attribute.
      *
-     * @param    ChildCategoryVersion $l ChildCategoryVersion
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     * @param  ChildCategoryVersion   $l ChildCategoryVersion
+     * @return \Thelia\Model\Category The current object (for fluent API support)
      */
     public function addCategoryVersion(ChildCategoryVersion $l)
     {
@@ -3141,7 +3120,7 @@ abstract class Category implements ActiveRecordInterface
 
     /**
      * @param  CategoryVersion $categoryVersion The categoryVersion object to remove.
-     * @return ChildCategory The current object (for fluent API support)
+     * @return ChildCategory   The current object (for fluent API support)
      */
     public function removeCategoryVersion($categoryVersion)
     {
@@ -3198,8 +3177,8 @@ abstract class Category implements ActiveRecordInterface
      * If this ChildCategory is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      ConnectionInterface $con Optional connection object
+     * @param Criteria            $criteria Optional query object to filter the query
+     * @param ConnectionInterface $con      Optional connection object
      *
      * @return ObjectCollection|ChildProduct[] List of ChildProduct objects
      */
@@ -3229,9 +3208,9 @@ abstract class Category implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection $products A Propel collection.
-     * @param  ConnectionInterface $con Optional connection object
-     * @return ChildCategory The current object (for fluent API support)
+     * @param  Collection          $products A Propel collection.
+     * @param  ConnectionInterface $con      Optional connection object
+     * @return ChildCategory       The current object (for fluent API support)
      */
     public function setProducts(Collection $products, ConnectionInterface $con = null)
     {
@@ -3255,9 +3234,9 @@ abstract class Category implements ActiveRecordInterface
      * Gets the number of ChildProduct objects related by a many-to-many relationship
      * to the current object by way of the product_category cross-reference table.
      *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      boolean $distinct Set to true to force count distinct
-     * @param      ConnectionInterface $con Optional connection object
+     * @param Criteria            $criteria Optional query object to filter the query
+     * @param boolean             $distinct Set to true to force count distinct
+     * @param ConnectionInterface $con      Optional connection object
      *
      * @return int the number of related ChildProduct objects
      */
@@ -3285,7 +3264,7 @@ abstract class Category implements ActiveRecordInterface
      * Associate a ChildProduct object to this object
      * through the product_category cross reference table.
      *
-     * @param  ChildProduct $product The ChildProductCategory object to relate
+     * @param  ChildProduct  $product The ChildProductCategory object to relate
      * @return ChildCategory The current object (for fluent API support)
      */
     public function addProduct(ChildProduct $product)
@@ -3303,7 +3282,7 @@ abstract class Category implements ActiveRecordInterface
     }
 
     /**
-     * @param    Product $product The product object to add.
+     * @param Product $product The product object to add.
      */
     protected function doAddProduct($product)
     {
@@ -3322,7 +3301,7 @@ abstract class Category implements ActiveRecordInterface
      * Remove a ChildProduct object to this object
      * through the product_category cross reference table.
      *
-     * @param ChildProduct $product The ChildProductCategory object to relate
+     * @param  ChildProduct  $product The ChildProductCategory object to relate
      * @return ChildCategory The current object (for fluent API support)
      */
     public function removeProduct(ChildProduct $product)
@@ -3370,7 +3349,7 @@ abstract class Category implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param      boolean $deep Whether to also clear the references on all referrer objects.
+     * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -3440,9 +3419,9 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Sets the locale for translations
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param string $locale Locale to use for the translation, e.g. 'fr_FR'
      *
-     * @return    ChildCategory The current object (for fluent API support)
+     * @return ChildCategory The current object (for fluent API support)
      */
     public function setLocale($locale = 'en_US')
     {
@@ -3454,7 +3433,7 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Gets the locale for translations
      *
-     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @return string $locale Locale to use for the translation, e.g. 'fr_FR'
      */
     public function getLocale()
     {
@@ -3464,8 +3443,8 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Returns the current translation for a given locale
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param     ConnectionInterface $con an optional connection object
+     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param ConnectionInterface $con    an optional connection object
      *
      * @return ChildCategoryI18n */
     public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
@@ -3498,10 +3477,10 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Remove the translation for a given locale
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param     ConnectionInterface $con an optional connection object
+     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param ConnectionInterface $con    an optional connection object
      *
-     * @return    ChildCategory The current object (for fluent API support)
+     * @return ChildCategory The current object (for fluent API support)
      */
     public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
@@ -3526,14 +3505,13 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Returns the current translation
      *
-     * @param     ConnectionInterface $con an optional connection object
+     * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildCategoryI18n */
     public function getCurrentTranslation(ConnectionInterface $con = null)
     {
         return $this->getTranslation($this->getLocale(), $con);
     }
-
 
         /**
          * Get the [title] column value.
@@ -3544,7 +3522,6 @@ abstract class Category implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getTitle();
     }
-
 
         /**
          * Set the value of [title] column.
@@ -3558,7 +3535,6 @@ abstract class Category implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [description] column value.
          *
@@ -3568,7 +3544,6 @@ abstract class Category implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getDescription();
     }
-
 
         /**
          * Set the value of [description] column.
@@ -3582,7 +3557,6 @@ abstract class Category implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [chapo] column value.
          *
@@ -3592,7 +3566,6 @@ abstract class Category implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getChapo();
     }
-
 
         /**
          * Set the value of [chapo] column.
@@ -3606,7 +3579,6 @@ abstract class Category implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [postscriptum] column value.
          *
@@ -3616,7 +3588,6 @@ abstract class Category implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getPostscriptum();
     }
-
 
         /**
          * Set the value of [postscriptum] column.
@@ -3630,7 +3601,6 @@ abstract class Category implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [meta_title] column value.
          *
@@ -3640,7 +3610,6 @@ abstract class Category implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getMetaTitle();
     }
-
 
         /**
          * Set the value of [meta_title] column.
@@ -3654,7 +3623,6 @@ abstract class Category implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [meta_description] column value.
          *
@@ -3664,7 +3632,6 @@ abstract class Category implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getMetaDescription();
     }
-
 
         /**
          * Set the value of [meta_description] column.
@@ -3678,7 +3645,6 @@ abstract class Category implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [meta_keywords] column value.
          *
@@ -3688,7 +3654,6 @@ abstract class Category implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getMetaKeywords();
     }
-
 
         /**
          * Set the value of [meta_keywords] column.
@@ -3719,7 +3684,7 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Checks whether the current state must be recorded as a version
      *
-     * @return  boolean
+     * @return boolean
      */
     public function isVersioningNecessary($con = null)
     {
@@ -3741,9 +3706,9 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Creates a version of the current object and saves it.
      *
-     * @param   ConnectionInterface $con the connection to use
+     * @param ConnectionInterface $con the connection to use
      *
-     * @return  ChildCategoryVersion A version object
+     * @return ChildCategoryVersion A version object
      */
     public function addVersion($con = null)
     {
@@ -3768,10 +3733,10 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Sets the properties of the current object to the value they had at a specific version
      *
-     * @param   integer $versionNumber The version number to read
-     * @param   ConnectionInterface $con The connection to use
+     * @param integer             $versionNumber The version number to read
+     * @param ConnectionInterface $con           The connection to use
      *
-     * @return  ChildCategory The current object (for fluent API support)
+     * @return ChildCategory The current object (for fluent API support)
      */
     public function toVersion($versionNumber, $con = null)
     {
@@ -3787,9 +3752,9 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Sets the properties of the current object to the value they had at a specific version
      *
-     * @param ChildCategoryVersion $version The version object to use
-     * @param ConnectionInterface   $con the connection to use
-     * @param array                 $loadedObjects objects that been loaded in a chain of populateFromVersion calls on referrer or fk objects.
+     * @param ChildCategoryVersion $version       The version object to use
+     * @param ConnectionInterface  $con           the connection to use
+     * @param array                $loadedObjects objects that been loaded in a chain of populateFromVersion calls on referrer or fk objects.
      *
      * @return ChildCategory The current object (for fluent API support)
      */
@@ -3812,9 +3777,9 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Gets the latest persisted version number for the current object
      *
-     * @param   ConnectionInterface $con the connection to use
+     * @param ConnectionInterface $con the connection to use
      *
-     * @return  integer
+     * @return integer
      */
     public function getLastVersionNumber($con = null)
     {
@@ -3832,9 +3797,9 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Checks whether the current object is the latest one
      *
-     * @param   ConnectionInterface $con the connection to use
+     * @param ConnectionInterface $con the connection to use
      *
-     * @return  Boolean
+     * @return Boolean
      */
     public function isLastVersion($con = null)
     {
@@ -3844,10 +3809,10 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Retrieves a version object for this entity and a version number
      *
-     * @param   integer $versionNumber The version number to read
-     * @param   ConnectionInterface $con the connection to use
+     * @param integer             $versionNumber The version number to read
+     * @param ConnectionInterface $con           the connection to use
      *
-     * @return  ChildCategoryVersion A version object
+     * @return ChildCategoryVersion A version object
      */
     public function getOneVersion($versionNumber, $con = null)
     {
@@ -3860,9 +3825,9 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Gets all the versions of this object, in incremental order
      *
-     * @param   ConnectionInterface $con the connection to use
+     * @param ConnectionInterface $con the connection to use
      *
-     * @return  ObjectCollection A list of ChildCategoryVersion objects
+     * @return ObjectCollection A list of ChildCategoryVersion objects
      */
     public function getAllVersions($con = null)
     {
@@ -3882,12 +3847,12 @@ abstract class Category implements ActiveRecordInterface
      * );
      * </code>
      *
-     * @param   integer             $versionNumber
-     * @param   string              $keys Main key used for the result diff (versions|columns)
-     * @param   ConnectionInterface $con the connection to use
-     * @param   array               $ignoredColumns  The columns to exclude from the diff.
+     * @param integer             $versionNumber
+     * @param string              $keys           Main key used for the result diff (versions|columns)
+     * @param ConnectionInterface $con            the connection to use
+     * @param array               $ignoredColumns The columns to exclude from the diff.
      *
-     * @return  array A list of differences
+     * @return array A list of differences
      */
     public function compareVersion($versionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
     {
@@ -3907,13 +3872,13 @@ abstract class Category implements ActiveRecordInterface
      * );
      * </code>
      *
-     * @param   integer             $fromVersionNumber
-     * @param   integer             $toVersionNumber
-     * @param   string              $keys Main key used for the result diff (versions|columns)
-     * @param   ConnectionInterface $con the connection to use
-     * @param   array               $ignoredColumns  The columns to exclude from the diff.
+     * @param integer             $fromVersionNumber
+     * @param integer             $toVersionNumber
+     * @param string              $keys              Main key used for the result diff (versions|columns)
+     * @param ConnectionInterface $con               the connection to use
+     * @param array               $ignoredColumns    The columns to exclude from the diff.
      *
-     * @return  array A list of differences
+     * @return array A list of differences
      */
     public function compareVersions($fromVersionNumber, $toVersionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
     {
@@ -3933,12 +3898,12 @@ abstract class Category implements ActiveRecordInterface
      * );
      * </code>
      *
-     * @param   array     $fromVersion     An array representing the original version.
-     * @param   array     $toVersion       An array representing the destination version.
-     * @param   string    $keys            Main key used for the result diff (versions|columns).
-     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     * @param array  $fromVersion    An array representing the original version.
+     * @param array  $toVersion      An array representing the destination version.
+     * @param string $keys           Main key used for the result diff (versions|columns).
+     * @param array  $ignoredColumns The columns to exclude from the diff.
      *
-     * @return  array A list of differences
+     * @return array A list of differences
      */
     protected function computeDiff($fromVersion, $toVersion, $keys = 'columns', $ignoredColumns = array())
     {
@@ -3975,7 +3940,7 @@ abstract class Category implements ActiveRecordInterface
     /**
      * retrieve the last $number versions.
      *
-     * @param Integer $number the number of record to return.
+     * @param  Integer                $number the number of record to return.
      * @return PropelCollection|array \Thelia\Model\CategoryVersion[] List of \Thelia\Model\CategoryVersion objects
      */
     public function getLastVersions($number = 10, $criteria = null, $con = null)
@@ -3991,7 +3956,7 @@ abstract class Category implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildCategory The current object (for fluent API support)
+     * @return ChildCategory The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {

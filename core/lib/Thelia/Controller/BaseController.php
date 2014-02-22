@@ -293,8 +293,8 @@ abstract class BaseController extends ContainerAware
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
-     * @throws \InvalidArgumentException When the router doesn't exist
-     * @return string                    The generated URL
+     * @throws \InvalidArgumentException           When the router doesn't exist
+     * @return string                              The generated URL
      */
     protected function getRouteFromRouter($routerName, $routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_URL)
     {

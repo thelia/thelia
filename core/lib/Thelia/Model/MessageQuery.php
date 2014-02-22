@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\MessageQuery as BaseMessageQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'message' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\MessageQuery as BaseMessageQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class MessageQuery extends BaseMessageQuery {
-
+class MessageQuery extends BaseMessageQuery
+{
 } // MessageQuery

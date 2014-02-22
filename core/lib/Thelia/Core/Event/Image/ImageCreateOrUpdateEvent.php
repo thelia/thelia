@@ -63,8 +63,8 @@ class ImageCreateOrUpdateEvent extends ActionEvent
      * Constructor
      *
      * @param string $imageType Image type
-     *                            ex : FileManager::TYPE_CATEGORY
-     * @param int $parentId Image parent id
+     *                          ex : FileManager::TYPE_CATEGORY
+     * @param int    $parentId  Image parent id
      */
     public function __construct($imageType, $parentId)
     {
@@ -89,8 +89,6 @@ class ImageCreateOrUpdateEvent extends ActionEvent
     {
         return $this->locale;
     }
-
-
 
     /**
      * Set Image to save

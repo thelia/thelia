@@ -8,8 +8,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\Currency\CurrencyEvent;
 
-class Currency extends BaseCurrency {
-
+class Currency extends BaseCurrency
+{
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     use \Thelia\Model\Tools\PositionManagementTrait;
@@ -85,12 +85,12 @@ class Currency extends BaseCurrency {
     /**
      * Get the [rate] column value.
      *
-     * @return   double
+     * @return double
      * @throws PropelException
      */
     public function getRate()
     {
-        if(false === filter_var($this->rate, FILTER_VALIDATE_FLOAT)) {
+        if (false === filter_var($this->rate, FILTER_VALIDATE_FLOAT)) {
             throw new PropelException('Currency::rate is not float value');
         }
 

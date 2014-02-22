@@ -32,7 +32,6 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 
-
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
 
@@ -75,8 +74,8 @@ class SessionController extends BaseAdminController
         return $this->render("login");
     }
 
-    protected function applyUserLocale(Admin $user) {
-
+    protected function applyUserLocale(Admin $user)
+    {
         // Set the current language according to Admin locale preference
         $locale = $user->getLocale();
 

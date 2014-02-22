@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ContentDocumentI18nQuery as BaseContentDocumentI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'content_document_i18n' table.
  *

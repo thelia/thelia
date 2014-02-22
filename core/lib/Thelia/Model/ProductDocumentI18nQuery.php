@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ProductDocumentI18nQuery as BaseProductDocumentI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'product_document_i18n' table.
  *

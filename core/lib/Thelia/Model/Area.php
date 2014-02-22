@@ -7,8 +7,8 @@ use Thelia\Core\Event\Area\AreaEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Area as BaseArea;
 
-class Area extends BaseArea {
-
+class Area extends BaseArea
+{
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     public function preInsert(ConnectionInterface $con = null)

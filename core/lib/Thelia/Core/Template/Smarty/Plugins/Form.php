@@ -109,8 +109,7 @@ class Form extends AbstractSmartyPlugin
             if (null != $form) {
                 // Re-use the form
                 $instance = $form;
-            }
-            else {
+            } else {
                 // Create a new one
                 $class = new \ReflectionClass($formClass);
 

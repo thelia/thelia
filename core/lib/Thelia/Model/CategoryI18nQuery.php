@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\CategoryI18nQuery as BaseCategoryI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'category_i18n' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\CategoryI18nQuery as BaseCategoryI18nQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class CategoryI18nQuery extends BaseCategoryI18nQuery {
-
+class CategoryI18nQuery extends BaseCategoryI18nQuery
+{
 } // CategoryI18nQuery

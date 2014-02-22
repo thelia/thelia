@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ProfileI18nQuery as BaseProfileI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'profile_i18n' table.
  *

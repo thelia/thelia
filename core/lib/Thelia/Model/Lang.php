@@ -14,27 +14,25 @@ use Thelia\Model\Base\Lang as BaseLang;
 
 use Thelia\Model\Map\LangTableMap;
 
-class Lang extends BaseLang {
-
+class Lang extends BaseLang
+{
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
     /**
      * Return the default language object, using a local variable to cache it.
      *
      * @throws \RuntimeException
      */
-    public static function getDefaultLanguage() {
-
-
+    public static function getDefaultLanguage()
+    {
         $default_lang = LangQuery::create()->findOneByByDefault(1);
 
         if ($default_lang == null) throw new \RuntimeException("No default language is defined. Please define one.");
-
         return $default_lang;
     }
 
     public function toggleDefault()
     {
-        if($this->getId() === null) {
+        if ($this->getId() === null) {
             throw new \RuntimeException("impossible to just uncheck default language, choose a new one");
         }
         $con = Propel::getWriteConnection(LangTableMap::DATABASE_NAME);
@@ -49,14 +47,15 @@ class Lang extends BaseLang {
                 ->save($con);
 
             $con->commit();
-        } catch(PropelException $e) {
+        } catch (PropelException $e) {
             $con->rollBack();
             throw $e;
         }
 
     }
 
-    protected function fixMissingFlag() {
+    protected function fixMissingFlag()
+    {
         // Be sure that a lang have a flag, otherwise copy the
         // "unknown" flag
         $adminTemplate = TemplateHelper::getInstance()->getActiveAdminTemplate();

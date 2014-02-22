@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ContentImageQuery as BaseContentImageQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'content_image' table.
  *

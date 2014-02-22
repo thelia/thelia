@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\FeatureTemplateQuery as BaseFeatureTemplateQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'feature_template' table.
  *

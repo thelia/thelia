@@ -131,9 +131,9 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\AddressQuery object.
      *
-     * @param     string $dbName The database name
-     * @param     string $modelName The phpName of a model, e.g. 'Book'
-     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param string $dbName     The database name
+     * @param string $modelName  The phpName of a model, e.g. 'Book'
+     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Address', $modelAlias = null)
     {
@@ -143,8 +143,8 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Returns a new ChildAddressQuery object.
      *
-     * @param     string $modelAlias The alias of a model in the query
-     * @param     Criteria $criteria Optional Criteria to build the query from
+     * @param string   $modelAlias The alias of a model in the query
+     * @param Criteria $criteria   Optional Criteria to build the query from
      *
      * @return ChildAddressQuery
      */
@@ -173,7 +173,7 @@ abstract class AddressQuery extends ModelCriteria
      * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param mixed               $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildAddress|array|mixed the result, formatted by the current formatter
@@ -204,10 +204,10 @@ abstract class AddressQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
-     * @return   ChildAddress A model object, or null if the key is not found
+     * @return ChildAddress A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -234,8 +234,8 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @return ChildAddress|array|mixed the result, formatted by the current formatter
      */
@@ -255,8 +255,8 @@ abstract class AddressQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
-     * @param     array $keys Primary keys to use for the query
-     * @param     ConnectionInterface $con an optional connection object
+     * @param array               $keys Primary keys to use for the query
+     * @param ConnectionInterface $con  an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -277,26 +277,24 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param     mixed $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
-
         return $this->addUsingAlias(AddressTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
      * Filter the query by a list of primary keys
      *
-     * @param     array $keys The list of primary key to use for the query
+     * @param array $keys The list of primary key to use for the query
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
-
         return $this->addUsingAlias(AddressTableMap::ID, $keys, Criteria::IN);
     }
 
@@ -310,11 +308,11 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $id         The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -350,9 +348,9 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByLabel('%fooValue%'); // WHERE label LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $label The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $label      The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -382,11 +380,11 @@ abstract class AddressQuery extends ModelCriteria
      *
      * @see       filterByCustomer()
      *
-     * @param     mixed $customerId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $customerId The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -425,11 +423,11 @@ abstract class AddressQuery extends ModelCriteria
      *
      * @see       filterByCustomerTitle()
      *
-     * @param     mixed $titleId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $titleId    The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -465,9 +463,9 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByCompany('%fooValue%'); // WHERE company LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $company The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $company    The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -494,9 +492,9 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByFirstname('%fooValue%'); // WHERE firstname LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $firstname The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $firstname  The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -523,9 +521,9 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByLastname('%fooValue%'); // WHERE lastname LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $lastname The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $lastname   The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -552,9 +550,9 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByAddress1('%fooValue%'); // WHERE address1 LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $address1 The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $address1   The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -581,9 +579,9 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByAddress2('%fooValue%'); // WHERE address2 LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $address2 The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $address2   The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -610,9 +608,9 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByAddress3('%fooValue%'); // WHERE address3 LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $address3 The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $address3   The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -639,9 +637,9 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByZipcode('%fooValue%'); // WHERE zipcode LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $zipcode The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $zipcode    The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -668,9 +666,9 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByCity('%fooValue%'); // WHERE city LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $city The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $city       The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -700,11 +698,11 @@ abstract class AddressQuery extends ModelCriteria
      *
      * @see       filterByCountry()
      *
-     * @param     mixed $countryId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $countryId  The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -740,9 +738,9 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByPhone('%fooValue%'); // WHERE phone LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $phone The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $phone      The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -769,9 +767,9 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByCellphone('%fooValue%'); // WHERE cellphone LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $cellphone The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $cellphone  The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -799,11 +797,11 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByIsDefault(array('min' => 12)); // WHERE is_default > 12
      * </code>
      *
-     * @param     mixed $isDefault The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $isDefault  The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -840,13 +838,13 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $createdAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $createdAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -883,13 +881,13 @@ abstract class AddressQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $updatedAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $updatedAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -919,8 +917,8 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Customer object
      *
-     * @param \Thelia\Model\Customer|ObjectCollection $customer The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Customer|ObjectCollection $customer   The related object(s) to use as filter
+     * @param string                                  $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -944,8 +942,8 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Customer relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -978,11 +976,11 @@ abstract class AddressQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CustomerQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CustomerQuery A secondary query class using the current class as primary query
      */
     public function useCustomerQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -995,7 +993,7 @@ abstract class AddressQuery extends ModelCriteria
      * Filter the query by a related \Thelia\Model\CustomerTitle object
      *
      * @param \Thelia\Model\CustomerTitle|ObjectCollection $customerTitle The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string                                       $comparison    Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -1019,8 +1017,8 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the CustomerTitle relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -1053,11 +1051,11 @@ abstract class AddressQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CustomerTitleQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CustomerTitleQuery A secondary query class using the current class as primary query
      */
     public function useCustomerTitleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1069,8 +1067,8 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Country object
      *
-     * @param \Thelia\Model\Country|ObjectCollection $country The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Country|ObjectCollection $country    The related object(s) to use as filter
+     * @param string                                 $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -1094,8 +1092,8 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Country relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -1128,11 +1126,11 @@ abstract class AddressQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CountryQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CountryQuery A secondary query class using the current class as primary query
      */
     public function useCountryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1144,8 +1142,8 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Cart object
      *
-     * @param \Thelia\Model\Cart|ObjectCollection $cart  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Cart|ObjectCollection $cart       the related object to use as filter
+     * @param string                              $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -1167,8 +1165,8 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the CartRelatedByAddressDeliveryId relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -1201,11 +1199,11 @@ abstract class AddressQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CartQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CartQuery A secondary query class using the current class as primary query
      */
     public function useCartRelatedByAddressDeliveryIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -1217,8 +1215,8 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Cart object
      *
-     * @param \Thelia\Model\Cart|ObjectCollection $cart  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Cart|ObjectCollection $cart       the related object to use as filter
+     * @param string                              $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -1240,8 +1238,8 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the CartRelatedByAddressInvoiceId relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -1274,11 +1272,11 @@ abstract class AddressQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CartQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CartQuery A secondary query class using the current class as primary query
      */
     public function useCartRelatedByAddressInvoiceIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -1290,7 +1288,7 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildAddress $address Object to remove from the list of results
+     * @param ChildAddress $address Object to remove from the list of results
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
@@ -1306,8 +1304,8 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Deletes all rows from the address table.
      *
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).
+     * @param  ConnectionInterface $con the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -1338,13 +1336,13 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildAddress or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildAddress object or primary key or array of primary keys
-     *              which is used to create the DELETE statement
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                if supported by native driver or if emulated using Propel.
-     * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     * @param  mixed               $values Criteria or ChildAddress object or primary key or array of primary keys
+     *                                     which is used to create the DELETE statement
+     * @param  ConnectionInterface $con    the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                                    if supported by native driver or if emulated using Propel.
+     * @throws PropelException     Any exceptions caught during processing will be
+     *                                    rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -1364,7 +1362,6 @@ abstract class AddressQuery extends ModelCriteria
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-
         AddressTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
@@ -1383,9 +1380,9 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param      int $nbDays Maximum age of the latest update in days
+     * @param int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildAddressQuery The current query, for fluid interface
+     * @return ChildAddressQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
@@ -1395,9 +1392,9 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Filter by the latest created
      *
-     * @param      int $nbDays Maximum age of in days
+     * @param int $nbDays Maximum age of in days
      *
-     * @return     ChildAddressQuery The current query, for fluid interface
+     * @return ChildAddressQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
@@ -1407,7 +1404,7 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Order by update date desc
      *
-     * @return     ChildAddressQuery The current query, for fluid interface
+     * @return ChildAddressQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
@@ -1417,7 +1414,7 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Order by update date asc
      *
-     * @return     ChildAddressQuery The current query, for fluid interface
+     * @return ChildAddressQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
@@ -1427,7 +1424,7 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Order by create date desc
      *
-     * @return     ChildAddressQuery The current query, for fluid interface
+     * @return ChildAddressQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
@@ -1437,7 +1434,7 @@ abstract class AddressQuery extends ModelCriteria
     /**
      * Order by create date asc
      *
-     * @return     ChildAddressQuery The current query, for fluid interface
+     * @return ChildAddressQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {

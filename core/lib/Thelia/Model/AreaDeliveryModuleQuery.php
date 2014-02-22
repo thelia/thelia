@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\AreaDeliveryModuleQuery as BaseAreaDeliveryModuleQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'area_delivery_module' table.
  *

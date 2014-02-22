@@ -45,7 +45,7 @@ trait CartTrait
      *
      * search if cart already exists in session. If not try to create a new one or duplicate an old one.
      *
-     * @param EventDispatcherInterface $dispatcher the event dispatcher
+     * @param  EventDispatcherInterface                  $dispatcher the event dispatcher
      * @param  \Symfony\Component\HttpFoundation\Request $request
      * @return \Thelia\Model\Cart
      */

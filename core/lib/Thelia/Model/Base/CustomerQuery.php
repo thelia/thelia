@@ -119,9 +119,9 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\CustomerQuery object.
      *
-     * @param     string $dbName The database name
-     * @param     string $modelName The phpName of a model, e.g. 'Book'
-     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param string $dbName     The database name
+     * @param string $modelName  The phpName of a model, e.g. 'Book'
+     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Customer', $modelAlias = null)
     {
@@ -131,8 +131,8 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Returns a new ChildCustomerQuery object.
      *
-     * @param     string $modelAlias The alias of a model in the query
-     * @param     Criteria $criteria Optional Criteria to build the query from
+     * @param string   $modelAlias The alias of a model in the query
+     * @param Criteria $criteria   Optional Criteria to build the query from
      *
      * @return ChildCustomerQuery
      */
@@ -161,7 +161,7 @@ abstract class CustomerQuery extends ModelCriteria
      * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param mixed               $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildCustomer|array|mixed the result, formatted by the current formatter
@@ -192,10 +192,10 @@ abstract class CustomerQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
-     * @return   ChildCustomer A model object, or null if the key is not found
+     * @return ChildCustomer A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -222,8 +222,8 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @return ChildCustomer|array|mixed the result, formatted by the current formatter
      */
@@ -243,8 +243,8 @@ abstract class CustomerQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
-     * @param     array $keys Primary keys to use for the query
-     * @param     ConnectionInterface $con an optional connection object
+     * @param array               $keys Primary keys to use for the query
+     * @param ConnectionInterface $con  an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -265,26 +265,24 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param     mixed $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
-
         return $this->addUsingAlias(CustomerTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
      * Filter the query by a list of primary keys
      *
-     * @param     array $keys The list of primary key to use for the query
+     * @param array $keys The list of primary key to use for the query
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
-
         return $this->addUsingAlias(CustomerTableMap::ID, $keys, Criteria::IN);
     }
 
@@ -298,11 +296,11 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $id         The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -338,9 +336,9 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByRef('%fooValue%'); // WHERE ref LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $ref The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $ref        The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -370,11 +368,11 @@ abstract class CustomerQuery extends ModelCriteria
      *
      * @see       filterByCustomerTitle()
      *
-     * @param     mixed $titleId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $titleId    The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -410,9 +408,9 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByFirstname('%fooValue%'); // WHERE firstname LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $firstname The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $firstname  The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -439,9 +437,9 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByLastname('%fooValue%'); // WHERE lastname LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $lastname The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $lastname   The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -468,9 +466,9 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByEmail('%fooValue%'); // WHERE email LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $email The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $email      The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -497,9 +495,9 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByPassword('%fooValue%'); // WHERE password LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $password The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $password   The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -526,9 +524,9 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByAlgo('%fooValue%'); // WHERE algo LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $algo The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $algo       The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -556,11 +554,11 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByReseller(array('min' => 12)); // WHERE reseller > 12
      * </code>
      *
-     * @param     mixed $reseller The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $reseller   The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -596,9 +594,9 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByLang('%fooValue%'); // WHERE lang LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $lang The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $lang       The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -625,9 +623,9 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterBySponsor('%fooValue%'); // WHERE sponsor LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $sponsor The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $sponsor    The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -655,11 +653,11 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByDiscount(array('min' => 12)); // WHERE discount > 12
      * </code>
      *
-     * @param     mixed $discount The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $discount   The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -695,9 +693,9 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByRememberMeToken('%fooValue%'); // WHERE remember_me_token LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $rememberMeToken The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $rememberMeToken The value to use as filter.
+     *                                Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison      Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -724,9 +722,9 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByRememberMeSerial('%fooValue%'); // WHERE remember_me_serial LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $rememberMeSerial The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $rememberMeSerial The value to use as filter.
+     *                                 Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison       Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -754,13 +752,13 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $createdAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $createdAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -797,13 +795,13 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $updatedAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $updatedAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -834,7 +832,7 @@ abstract class CustomerQuery extends ModelCriteria
      * Filter the query by a related \Thelia\Model\CustomerTitle object
      *
      * @param \Thelia\Model\CustomerTitle|ObjectCollection $customerTitle The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string                                       $comparison    Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -858,8 +856,8 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the CustomerTitle relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -892,11 +890,11 @@ abstract class CustomerQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CustomerTitleQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CustomerTitleQuery A secondary query class using the current class as primary query
      */
     public function useCustomerTitleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -908,8 +906,8 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Address object
      *
-     * @param \Thelia\Model\Address|ObjectCollection $address  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Address|ObjectCollection $address    the related object to use as filter
+     * @param string                                 $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -931,8 +929,8 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Address relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -965,11 +963,11 @@ abstract class CustomerQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\AddressQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\AddressQuery A secondary query class using the current class as primary query
      */
     public function useAddressQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -981,8 +979,8 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Order object
      *
-     * @param \Thelia\Model\Order|ObjectCollection $order  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Order|ObjectCollection $order      the related object to use as filter
+     * @param string                               $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -1004,8 +1002,8 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Order relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -1038,11 +1036,11 @@ abstract class CustomerQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\OrderQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\OrderQuery A secondary query class using the current class as primary query
      */
     public function useOrderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1054,8 +1052,8 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Cart object
      *
-     * @param \Thelia\Model\Cart|ObjectCollection $cart  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Cart|ObjectCollection $cart       the related object to use as filter
+     * @param string                              $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -1077,8 +1075,8 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Cart relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -1111,11 +1109,11 @@ abstract class CustomerQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CartQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CartQuery A secondary query class using the current class as primary query
      */
     public function useCartQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -1127,7 +1125,7 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildCustomer $customer Object to remove from the list of results
+     * @param ChildCustomer $customer Object to remove from the list of results
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
@@ -1143,8 +1141,8 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Deletes all rows from the customer table.
      *
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).
+     * @param  ConnectionInterface $con the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -1175,13 +1173,13 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildCustomer or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildCustomer object or primary key or array of primary keys
-     *              which is used to create the DELETE statement
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                if supported by native driver or if emulated using Propel.
-     * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     * @param  mixed               $values Criteria or ChildCustomer object or primary key or array of primary keys
+     *                                     which is used to create the DELETE statement
+     * @param  ConnectionInterface $con    the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                                    if supported by native driver or if emulated using Propel.
+     * @throws PropelException     Any exceptions caught during processing will be
+     *                                    rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -1201,7 +1199,6 @@ abstract class CustomerQuery extends ModelCriteria
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-
         CustomerTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
@@ -1220,9 +1217,9 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param      int $nbDays Maximum age of the latest update in days
+     * @param int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildCustomerQuery The current query, for fluid interface
+     * @return ChildCustomerQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
@@ -1232,9 +1229,9 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Filter by the latest created
      *
-     * @param      int $nbDays Maximum age of in days
+     * @param int $nbDays Maximum age of in days
      *
-     * @return     ChildCustomerQuery The current query, for fluid interface
+     * @return ChildCustomerQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
@@ -1244,7 +1241,7 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Order by update date desc
      *
-     * @return     ChildCustomerQuery The current query, for fluid interface
+     * @return ChildCustomerQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
@@ -1254,7 +1251,7 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Order by update date asc
      *
-     * @return     ChildCustomerQuery The current query, for fluid interface
+     * @return ChildCustomerQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
@@ -1264,7 +1261,7 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Order by create date desc
      *
-     * @return     ChildCustomerQuery The current query, for fluid interface
+     * @return ChildCustomerQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
@@ -1274,7 +1271,7 @@ abstract class CustomerQuery extends ModelCriteria
     /**
      * Order by create date asc
      *
-     * @return     ChildCustomerQuery The current query, for fluid interface
+     * @return ChildCustomerQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {

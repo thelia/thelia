@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\FolderImageI18nQuery as BaseFolderImageI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'folder_image_i18n' table.
  *

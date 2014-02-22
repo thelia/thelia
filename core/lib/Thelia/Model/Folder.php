@@ -19,7 +19,8 @@ class Folder extends BaseFolder
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName() {
+    protected function getRewrittenUrlViewName()
+    {
         return 'folder';
     }
 
@@ -44,8 +45,7 @@ class Folder extends BaseFolder
 
         $contentsCount = 0;
 
-        foreach($children as $child)
-        {
+        foreach ($children as $child) {
             $contentsCount += ContentQuery::create()
                 ->filterByFolder($child)
                 ->count();
@@ -58,7 +58,8 @@ class Folder extends BaseFolder
     /**
      * Calculate next position relative to our parent
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         $query->filterByParent($this->getParent());
     }
 
@@ -99,6 +100,7 @@ class Folder extends BaseFolder
                 "parent" => $this->getParent(),
             )
         );
+
         return true;
     }
 

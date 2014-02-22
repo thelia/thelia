@@ -155,11 +155,11 @@ class Module extends BaseAction implements EventSubscriberInterface
     /**
      * Call the payment method of the payment module of the given order
      *
-     * @param OrderPaymentEvent $event
+     * @param  OrderPaymentEvent $event
      * @throws \RuntimeException if no payment module can be found.
      */
-    public function pay(OrderPaymentEvent $event) {
-
+    public function pay(OrderPaymentEvent $event)
+    {
         $order = $event->getOrder();
 
         /* call pay method */

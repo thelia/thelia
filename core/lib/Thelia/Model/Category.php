@@ -5,7 +5,6 @@ namespace Thelia\Model;
 use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Model\Base\Category as BaseCategory;
 
-
 use Thelia\Core\Event\TheliaEvents;
 use Propel\Runtime\Connection\ConnectionInterface;
 
@@ -28,7 +27,8 @@ class Category extends BaseCategory
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName() {
+    protected function getRewrittenUrlViewName()
+    {
         return 'category';
     }
 
@@ -45,8 +45,7 @@ class Category extends BaseCategory
 
         $countProduct = 0;
 
-        foreach($children as $child)
-        {
+        foreach ($children as $child) {
             $countProduct += ProductQuery::create()
                 ->filterByCategory($child)
                 ->count();
@@ -58,7 +57,8 @@ class Category extends BaseCategory
     /**
      * Calculate next position relative to our parent
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         $query->filterByParent($this->getParent());
     }
 
@@ -69,10 +69,10 @@ class Category extends BaseCategory
             ->filterByDefaultCategory(1)
             ->find($con);
 
-        if($productsCategories) {
+        if ($productsCategories) {
             foreach ($productsCategories as $productCategory) {
                 $product = $productCategory->getProduct();
-                if($product) {
+                if ($product) {
                     $product->delete($con);
                 }
             }
@@ -129,6 +129,7 @@ class Category extends BaseCategory
             )
         );
         $this->deleteProducts($con);
+
         return true;
     }
 
@@ -142,7 +143,7 @@ class Category extends BaseCategory
         //delete all subcategories
         $subCategories = CategoryQuery::findAllChild($this->getId());
 
-        foreach($subCategories as $category) {
+        foreach ($subCategories as $category) {
             if (!is_null($this->dispatcher)) {
                 $category->setDispatcher($this->getDispatcher());
             }

@@ -7,8 +7,8 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Feature\FeatureEvent;
 
-class Feature extends BaseFeature {
-
+class Feature extends BaseFeature
+{
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
     use \Thelia\Model\Tools\PositionManagementTrait;
 

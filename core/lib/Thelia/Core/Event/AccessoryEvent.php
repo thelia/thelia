@@ -24,7 +24,6 @@
 namespace Thelia\Core\Event;
 
 use Thelia\Model\Accessory;
-use Thelia\Core\Event\ActionEvent;
 
 class AccessoryEvent extends ActionEvent
 {

@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ModuleQuery as BaseModuleQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'module' table.
  *
@@ -15,15 +14,15 @@ use Thelia\Model\Base\ModuleQuery as BaseModuleQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ModuleQuery extends BaseModuleQuery {
-
+class ModuleQuery extends BaseModuleQuery
+{
     protected static $activated = null;
     /**
      * @return array|mixed|\PropelObjectCollection
      */
     public static function getActivated()
     {
-        if(null === self::$activated) {
+        if (null === self::$activated) {
             self::$activated = self::create()
                 ->filterByActivate(1)
                 ->find();
@@ -36,6 +35,5 @@ class ModuleQuery extends BaseModuleQuery {
     {
         self::$activated = null;
     }
-
 
 } // ModuleQuery

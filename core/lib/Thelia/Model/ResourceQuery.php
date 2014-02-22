@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ResourceQuery as BaseResourceQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'resource' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\ResourceQuery as BaseResourceQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ResourceQuery extends BaseResourceQuery {
-
+class ResourceQuery extends BaseResourceQuery
+{
 } // ResourceQuery

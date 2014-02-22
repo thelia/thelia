@@ -26,7 +26,7 @@ class ModelCriteriaTools
      */
     public static function getFrontEndI18n(ModelCriteria &$search, $requestedLocale, $columns, $foreignTable, $foreignKey, $forceReturn = false)
     {
-        if($foreignTable === null) {
+        if ($foreignTable === null) {
             $foreignTable = $search->getTableMap()->getName();
             $aliasPrefix = '';
         } else {
@@ -38,8 +38,8 @@ class ModelCriteriaTools
         $requestedLocaleI18nAlias = $aliasPrefix . 'requested_locale_i18n';
         $defaultLocaleI18nAlias = $aliasPrefix . 'default_locale_i18n';
 
-        if($defaultLangWithoutTranslation == 0) {
-            
+        if ($defaultLangWithoutTranslation == 0) {
+
             $requestedLocaleJoin = new Join();
             $requestedLocaleJoin->addExplicitCondition($search->getTableMap()->getName(), $foreignKey, null, $foreignTable . '_i18n', 'ID', $requestedLocaleI18nAlias);
             $requestedLocaleJoin->setJoinType($forceReturn === false ? Criteria::INNER_JOIN : Criteria::LEFT_JOIN);
@@ -49,7 +49,7 @@ class ModelCriteriaTools
 
             $search->withColumn('NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.`ID`)', $aliasPrefix . 'IS_TRANSLATED');
 
-            foreach($columns as $column) {
+            foreach ($columns as $column) {
                 $search->withColumn('`' . $requestedLocaleI18nAlias . '`.`' . $column . '`', $aliasPrefix . 'i18n_' . $column);
             }
         } else {
@@ -71,11 +71,11 @@ class ModelCriteriaTools
 
             $search->withColumn('NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.`ID`)', $aliasPrefix . 'IS_TRANSLATED');
 
-            if($forceReturn === false) {
+            if ($forceReturn === false) {
                 $search->where('NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.ID)')->_or()->where('NOT ISNULL(`' . $defaultLocaleI18nAlias . '`.ID)');
             }
 
-            foreach($columns as $column) {
+            foreach ($columns as $column) {
                 $search->withColumn('CASE WHEN NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.ID) THEN `' . $requestedLocaleI18nAlias . '`.`' . $column . '` ELSE `' . $defaultLocaleI18nAlias . '`.`' . $column . '` END', $aliasPrefix . 'i18n_' . $column);
             }
         }
@@ -83,7 +83,7 @@ class ModelCriteriaTools
 
     public static function getBackEndI18n(ModelCriteria &$search, $requestedLocale, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID')
     {
-        if($foreignTable === null) {
+        if ($foreignTable === null) {
             $foreignTable = $search->getTableMap()->getName();
             $aliasPrefix = '';
         } else {
@@ -101,7 +101,7 @@ class ModelCriteriaTools
 
         $search->withColumn('NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.`ID`)', $aliasPrefix . 'IS_TRANSLATED');
 
-        foreach($columns as $column) {
+        foreach ($columns as $column) {
             $search->withColumn('`' . $requestedLocaleI18nAlias . '`.`' . $column . '`', $aliasPrefix . 'i18n_' . $column);
         }
     }
@@ -117,8 +117,7 @@ class ModelCriteriaTools
             }
 
             $locale = $localeSearch->getLocale();
-        }
-        else {
+        } else {
             // Use the currently defined locale
             $locale = $currentLocale;
         }

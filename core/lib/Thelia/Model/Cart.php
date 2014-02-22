@@ -6,9 +6,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 
 use Thelia\Model\Base\Cart as BaseCart;
 
-
-use Thelia\TaxEngine\Calculator;
-
 class Cart extends BaseCart
 {
     public function duplicate($token, Customer $customer = null)
@@ -22,13 +19,13 @@ class Cart extends BaseCart
         // TODO : set current Currency
         $cart->setCurrencyId($this->getCurrencyId());
 
-        if ($customer){
+        if ($customer) {
             $cart->setCustomer($customer);
         }
 
         $cart->save();
         $currentDateTime = new \DateTime();
-        foreach ($cartItems as $cartItem){
+        foreach ($cartItems as $cartItem) {
 
             $product = $cartItem->getProduct();
             $productSaleElements = $cartItem->getProductSaleElements();
@@ -78,7 +75,7 @@ class Cart extends BaseCart
     {
         $total = 0;
 
-        foreach($this->getCartItems() as $cartItem) {
+        foreach ($this->getCartItems() as $cartItem) {
             $total += $cartItem->getRealTaxedPrice($country) * $cartItem->getQuantity();
         }
 
@@ -91,7 +88,7 @@ class Cart extends BaseCart
     {
         $total = 0;
 
-        foreach($this->getCartItems() as $cartItem) {
+        foreach ($this->getCartItems() as $cartItem) {
             $subtotal = $cartItem->getRealPrice();
             $subtotal *= $cartItem->getQuantity();
 
@@ -107,7 +104,7 @@ class Cart extends BaseCart
     {
         $weight = 0;
 
-        foreach($this->getCartItems() as $cartItem) {
+        foreach ($this->getCartItems() as $cartItem) {
             $itemWeight = $cartItem->getProductSaleElements()->getWeight();
             $itemWeight *= $cartItem->getQuantity();
 

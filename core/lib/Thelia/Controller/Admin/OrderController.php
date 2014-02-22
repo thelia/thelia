@@ -23,7 +23,6 @@
 
 namespace Thelia\Controller\Admin;
 
-
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -46,7 +45,6 @@ class OrderController extends BaseAdminController
     public function indexAction()
     {
         if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::VIEW)) return $response;
-
         return $this->render("orders", array(
                 "display_order" => 20,
                 "orders_order"   => $this->getListOrderFromSession("orders", "orders_order", "create-date-reverse")

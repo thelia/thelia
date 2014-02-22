@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Template\Element;
 
-
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Model\Tools\ModelCriteriaTools;

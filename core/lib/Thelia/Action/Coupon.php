@@ -23,8 +23,6 @@
 
 namespace Thelia\Action;
 
-use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;

@@ -7,9 +7,8 @@ use Thelia\Core\Event\Attribute\AttributeAvEvent;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
 
-
-class AttributeAv extends BaseAttributeAv {
-
+class AttributeAv extends BaseAttributeAv
+{
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     use \Thelia\Model\Tools\PositionManagementTrait;
@@ -17,7 +16,8 @@ class AttributeAv extends BaseAttributeAv {
     /**
      * when dealing with position, be sure to work insite the current attribute.
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         $query->filterByAttributeId($this->getAttributeId());
     }
 

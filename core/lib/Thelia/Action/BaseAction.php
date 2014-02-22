@@ -22,7 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 
 use Thelia\Core\Event\UpdatePositionEvent;
@@ -64,7 +63,7 @@ class BaseAction
      * @param ModelCriteria  $query
      * @param UpdateSeoEvent $event
      *
-     * @return mixed an SEOxxx object
+     * @return mixed                   an SEOxxx object
      * @throws FormValidationException if a rewritten URL cannot be created
      */
     protected function genericUpdateSeo(ModelCriteria $query, UpdateSeoEvent $event)

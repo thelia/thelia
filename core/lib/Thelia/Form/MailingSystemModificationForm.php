@@ -22,9 +22,7 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-
 use Thelia\Core\Translation\Translator;
-
 
 /**
  * Class MailingSystemModificationForm

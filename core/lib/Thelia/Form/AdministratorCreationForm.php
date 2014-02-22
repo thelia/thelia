@@ -118,12 +118,13 @@ class AdministratorCreationForm extends BaseForm
         ;
     }
 
-    protected function getLocaleList() {
+    protected function getLocaleList()
+    {
         $locales = array();
 
         $list = LangQuery::create()->find();
 
-        foreach($list as $item) {
+        foreach ($list as $item) {
             $locales[$item->getLocale()] = $item->getLocale();
         }
 

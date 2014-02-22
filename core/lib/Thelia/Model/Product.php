@@ -13,7 +13,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\ProductTableMap;
 
-
 class Product extends BaseProduct
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
@@ -25,7 +24,8 @@ class Product extends BaseProduct
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName() {
+    protected function getRewrittenUrlViewName()
+    {
         return 'product';
     }
 
@@ -33,8 +33,7 @@ class Product extends BaseProduct
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
-        }
-        catch(PropelException $e) {
+        } catch (PropelException $e) {
             throw new PropelException("Virtual column `$virtualColumnName` does not exist in Product::getRealLowestPrice");
         }
 
@@ -44,12 +43,14 @@ class Product extends BaseProduct
     public function getTaxedPrice(Country $country, $price)
     {
         $taxCalculator = new Calculator();
+
         return round($taxCalculator->load($this, $country)->getTaxedPrice($price), 2);
     }
 
     public function getTaxedPromoPrice(Country $country, $price)
     {
         $taxCalculator = new Calculator();
+
         return round($taxCalculator->load($this, $country)->getTaxedPrice($price), 2);
     }
 
@@ -58,14 +59,16 @@ class Product extends BaseProduct
      *
      * @return ProductSaleElements
      */
-    public function getDefaultSaleElements() {
+    public function getDefaultSaleElements()
+    {
         return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->find();
     }
 
     /**
      * Return PSE count fir this product.
      */
-    public function countSaleElements() {
+    public function countSaleElements()
+    {
         return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->count();
     }
 
@@ -109,8 +112,8 @@ class Product extends BaseProduct
         return $this;
     }
 
-    public function updateDefaultCategory($defaultCategoryId) {
-
+    public function updateDefaultCategory($defaultCategoryId)
+    {
         // Allow uncategorized products (NULL instead of 0, to bypass delete cascade constraint)
         if ($defaultCategoryId <= 0) $defaultCategoryId = NULL;
 
@@ -141,15 +144,15 @@ class Product extends BaseProduct
     /**
      * Create a new product, along with the default category ID
      *
-     * @param int $defaultCategoryId the default category ID of this product
-     * @param float $basePrice the product base price
-     * @param int $priceCurrencyId the price currency Id
-     * @param int $taxRuleId the product tax rule ID
-     * @param float $baseWeight base weight in Kg
+     * @param int   $defaultCategoryId the default category ID of this product
+     * @param float $basePrice         the product base price
+     * @param int   $priceCurrencyId   the price currency Id
+     * @param int   $taxRuleId         the product tax rule ID
+     * @param float $baseWeight        base weight in Kg
      */
 
-    public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight) {
-
+    public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight)
+    {
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
         $con->beginTransaction();
@@ -175,8 +178,7 @@ class Product extends BaseProduct
             $con->commit();
 
             $this->dispatchEvent(TheliaEvents::AFTER_CREATEPRODUCT, new ProductEvent($this));
-        }
-        catch(\Exception $ex) {
+        } catch (\Exception $ex) {
 
             $con->rollback();
 
@@ -187,8 +189,8 @@ class Product extends BaseProduct
     /**
      * Create a basic product sale element attached to this product.
      */
-    public function createProductSaleElement(ConnectionInterface $con, $weight, $basePrice, $salePrice, $currencyId, $isDefault, $isPromo = false, $isNew = false, $quantity = 0, $eanCode = '', $ref = false) {
-
+    public function createProductSaleElement(ConnectionInterface $con, $weight, $basePrice, $salePrice, $currencyId, $isDefault, $isPromo = false, $isNew = false, $quantity = 0, $eanCode = '', $ref = false)
+    {
         // Create an empty product sale element
         $sale_elements = new ProductSaleElements();
 
@@ -233,7 +235,6 @@ class Product extends BaseProduct
         // Filtrer la requete sur ces produits
         if ($produits != null) $query->filterById($produits, Criteria::IN);
     }
-
 
     public function preUpdate(ConnectionInterface $con = null)
     {

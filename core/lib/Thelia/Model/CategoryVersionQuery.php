@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\CategoryVersionQuery as BaseCategoryVersionQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'category_version' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\CategoryVersionQuery as BaseCategoryVersionQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class CategoryVersionQuery extends BaseCategoryVersionQuery {
-
+class CategoryVersionQuery extends BaseCategoryVersionQuery
+{
 } // CategoryVersionQuery

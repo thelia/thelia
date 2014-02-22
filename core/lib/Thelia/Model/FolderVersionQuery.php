@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\FolderVersionQuery as BaseFolderVersionQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'folder_version' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\FolderVersionQuery as BaseFolderVersionQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class FolderVersionQuery extends BaseFolderVersionQuery {
-
+class FolderVersionQuery extends BaseFolderVersionQuery
+{
 } // FolderVersionQuery

@@ -71,9 +71,9 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\AccessoryQuery object.
      *
-     * @param     string $dbName The database name
-     * @param     string $modelName The phpName of a model, e.g. 'Book'
-     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param string $dbName     The database name
+     * @param string $modelName  The phpName of a model, e.g. 'Book'
+     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Accessory', $modelAlias = null)
     {
@@ -83,8 +83,8 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Returns a new ChildAccessoryQuery object.
      *
-     * @param     string $modelAlias The alias of a model in the query
-     * @param     Criteria $criteria Optional Criteria to build the query from
+     * @param string   $modelAlias The alias of a model in the query
+     * @param Criteria $criteria   Optional Criteria to build the query from
      *
      * @return ChildAccessoryQuery
      */
@@ -113,7 +113,7 @@ abstract class AccessoryQuery extends ModelCriteria
      * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param mixed               $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildAccessory|array|mixed the result, formatted by the current formatter
@@ -144,10 +144,10 @@ abstract class AccessoryQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
-     * @return   ChildAccessory A model object, or null if the key is not found
+     * @return ChildAccessory A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -174,8 +174,8 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @return ChildAccessory|array|mixed the result, formatted by the current formatter
      */
@@ -195,8 +195,8 @@ abstract class AccessoryQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
-     * @param     array $keys Primary keys to use for the query
-     * @param     ConnectionInterface $con an optional connection object
+     * @param array               $keys Primary keys to use for the query
+     * @param ConnectionInterface $con  an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -217,26 +217,24 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param     mixed $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      *
      * @return ChildAccessoryQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
-
         return $this->addUsingAlias(AccessoryTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
      * Filter the query by a list of primary keys
      *
-     * @param     array $keys The list of primary key to use for the query
+     * @param array $keys The list of primary key to use for the query
      *
      * @return ChildAccessoryQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
-
         return $this->addUsingAlias(AccessoryTableMap::ID, $keys, Criteria::IN);
     }
 
@@ -250,11 +248,11 @@ abstract class AccessoryQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $id         The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAccessoryQuery The current query, for fluid interface
      */
@@ -293,11 +291,11 @@ abstract class AccessoryQuery extends ModelCriteria
      *
      * @see       filterByProductRelatedByProductId()
      *
-     * @param     mixed $productId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $productId  The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAccessoryQuery The current query, for fluid interface
      */
@@ -336,11 +334,11 @@ abstract class AccessoryQuery extends ModelCriteria
      *
      * @see       filterByProductRelatedByAccessory()
      *
-     * @param     mixed $accessory The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $accessory  The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAccessoryQuery The current query, for fluid interface
      */
@@ -377,11 +375,11 @@ abstract class AccessoryQuery extends ModelCriteria
      * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
      * </code>
      *
-     * @param     mixed $position The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $position   The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAccessoryQuery The current query, for fluid interface
      */
@@ -418,13 +416,13 @@ abstract class AccessoryQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $createdAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $createdAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAccessoryQuery The current query, for fluid interface
      */
@@ -461,13 +459,13 @@ abstract class AccessoryQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $updatedAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $updatedAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAccessoryQuery The current query, for fluid interface
      */
@@ -497,8 +495,8 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Product object
      *
-     * @param \Thelia\Model\Product|ObjectCollection $product The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Product|ObjectCollection $product    The related object(s) to use as filter
+     * @param string                                 $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAccessoryQuery The current query, for fluid interface
      */
@@ -522,8 +520,8 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ProductRelatedByProductId relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAccessoryQuery The current query, for fluid interface
      */
@@ -556,11 +554,11 @@ abstract class AccessoryQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProductQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\ProductQuery A secondary query class using the current class as primary query
      */
     public function useProductRelatedByProductIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -572,8 +570,8 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Product object
      *
-     * @param \Thelia\Model\Product|ObjectCollection $product The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Product|ObjectCollection $product    The related object(s) to use as filter
+     * @param string                                 $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAccessoryQuery The current query, for fluid interface
      */
@@ -597,8 +595,8 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ProductRelatedByAccessory relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAccessoryQuery The current query, for fluid interface
      */
@@ -631,11 +629,11 @@ abstract class AccessoryQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProductQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\ProductQuery A secondary query class using the current class as primary query
      */
     public function useProductRelatedByAccessoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -647,7 +645,7 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildAccessory $accessory Object to remove from the list of results
+     * @param ChildAccessory $accessory Object to remove from the list of results
      *
      * @return ChildAccessoryQuery The current query, for fluid interface
      */
@@ -663,8 +661,8 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Deletes all rows from the accessory table.
      *
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).
+     * @param  ConnectionInterface $con the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -695,13 +693,13 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildAccessory or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildAccessory object or primary key or array of primary keys
-     *              which is used to create the DELETE statement
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                if supported by native driver or if emulated using Propel.
-     * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     * @param  mixed               $values Criteria or ChildAccessory object or primary key or array of primary keys
+     *                                     which is used to create the DELETE statement
+     * @param  ConnectionInterface $con    the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                                    if supported by native driver or if emulated using Propel.
+     * @throws PropelException     Any exceptions caught during processing will be
+     *                                    rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -721,7 +719,6 @@ abstract class AccessoryQuery extends ModelCriteria
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-
         AccessoryTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
@@ -740,9 +737,9 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param      int $nbDays Maximum age of the latest update in days
+     * @param int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildAccessoryQuery The current query, for fluid interface
+     * @return ChildAccessoryQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
@@ -752,9 +749,9 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Filter by the latest created
      *
-     * @param      int $nbDays Maximum age of in days
+     * @param int $nbDays Maximum age of in days
      *
-     * @return     ChildAccessoryQuery The current query, for fluid interface
+     * @return ChildAccessoryQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
@@ -764,7 +761,7 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Order by update date desc
      *
-     * @return     ChildAccessoryQuery The current query, for fluid interface
+     * @return ChildAccessoryQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
@@ -774,7 +771,7 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Order by update date asc
      *
-     * @return     ChildAccessoryQuery The current query, for fluid interface
+     * @return ChildAccessoryQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
@@ -784,7 +781,7 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Order by create date desc
      *
-     * @return     ChildAccessoryQuery The current query, for fluid interface
+     * @return ChildAccessoryQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
@@ -794,7 +791,7 @@ abstract class AccessoryQuery extends ModelCriteria
     /**
      * Order by create date asc
      *
-     * @return     ChildAccessoryQuery The current query, for fluid interface
+     * @return ChildAccessoryQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {

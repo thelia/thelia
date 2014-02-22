@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\TaxQuery as BaseTaxQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'tax' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\TaxQuery as BaseTaxQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class TaxQuery extends BaseTaxQuery {
-
+class TaxQuery extends BaseTaxQuery
+{
 } // TaxQuery

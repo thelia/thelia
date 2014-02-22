@@ -26,7 +26,6 @@ abstract class FolderI18n implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\FolderI18nTableMap';
 
-
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -343,9 +342,9 @@ abstract class FolderI18n implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed $parser A AbstractParser instance,
+     * @param mixed  $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data The source data to import from
+     * @param string $data   The source data to import from
      *
      * @return FolderI18n The current object, for fluid interface
      */
@@ -395,107 +394,98 @@ abstract class FolderI18n implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getId()
     {
-
         return $this->id;
     }
 
     /**
      * Get the [locale] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getLocale()
     {
-
         return $this->locale;
     }
 
     /**
      * Get the [title] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getTitle()
     {
-
         return $this->title;
     }
 
     /**
      * Get the [description] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getDescription()
     {
-
         return $this->description;
     }
 
     /**
      * Get the [chapo] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getChapo()
     {
-
         return $this->chapo;
     }
 
     /**
      * Get the [postscriptum] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getPostscriptum()
     {
-
         return $this->postscriptum;
     }
 
     /**
      * Get the [meta_title] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getMetaTitle()
     {
-
         return $this->meta_title;
     }
 
     /**
      * Get the [meta_description] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getMetaDescription()
     {
-
         return $this->meta_description;
     }
 
     /**
      * Get the [meta_keywords] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getMetaKeywords()
     {
-
         return $this->meta_keywords;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\FolderI18n The current object (for fluent API support)
+     * @param  int                      $v new value
+     * @return \Thelia\Model\FolderI18n The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -512,15 +502,14 @@ abstract class FolderI18n implements ActiveRecordInterface
             $this->aFolder = null;
         }
 
-
         return $this;
     } // setId()
 
     /**
      * Set the value of [locale] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\FolderI18n The current object (for fluent API support)
+     * @param  string                   $v new value
+     * @return \Thelia\Model\FolderI18n The current object (for fluent API support)
      */
     public function setLocale($v)
     {
@@ -533,15 +522,14 @@ abstract class FolderI18n implements ActiveRecordInterface
             $this->modifiedColumns[FolderI18nTableMap::LOCALE] = true;
         }
 
-
         return $this;
     } // setLocale()
 
     /**
      * Set the value of [title] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\FolderI18n The current object (for fluent API support)
+     * @param  string                   $v new value
+     * @return \Thelia\Model\FolderI18n The current object (for fluent API support)
      */
     public function setTitle($v)
     {
@@ -554,15 +542,14 @@ abstract class FolderI18n implements ActiveRecordInterface
             $this->modifiedColumns[FolderI18nTableMap::TITLE] = true;
         }
 
-
         return $this;
     } // setTitle()
 
     /**
      * Set the value of [description] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\FolderI18n The current object (for fluent API support)
+     * @param  string                   $v new value
+     * @return \Thelia\Model\FolderI18n The current object (for fluent API support)
      */
     public function setDescription($v)
     {
@@ -575,15 +562,14 @@ abstract class FolderI18n implements ActiveRecordInterface
             $this->modifiedColumns[FolderI18nTableMap::DESCRIPTION] = true;
         }
 
-
         return $this;
     } // setDescription()
 
     /**
      * Set the value of [chapo] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\FolderI18n The current object (for fluent API support)
+     * @param  string                   $v new value
+     * @return \Thelia\Model\FolderI18n The current object (for fluent API support)
      */
     public function setChapo($v)
     {
@@ -596,15 +582,14 @@ abstract class FolderI18n implements ActiveRecordInterface
             $this->modifiedColumns[FolderI18nTableMap::CHAPO] = true;
         }
 
-
         return $this;
     } // setChapo()
 
     /**
      * Set the value of [postscriptum] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\FolderI18n The current object (for fluent API support)
+     * @param  string                   $v new value
+     * @return \Thelia\Model\FolderI18n The current object (for fluent API support)
      */
     public function setPostscriptum($v)
     {
@@ -617,15 +602,14 @@ abstract class FolderI18n implements ActiveRecordInterface
             $this->modifiedColumns[FolderI18nTableMap::POSTSCRIPTUM] = true;
         }
 
-
         return $this;
     } // setPostscriptum()
 
     /**
      * Set the value of [meta_title] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\FolderI18n The current object (for fluent API support)
+     * @param  string                   $v new value
+     * @return \Thelia\Model\FolderI18n The current object (for fluent API support)
      */
     public function setMetaTitle($v)
     {
@@ -638,15 +622,14 @@ abstract class FolderI18n implements ActiveRecordInterface
             $this->modifiedColumns[FolderI18nTableMap::META_TITLE] = true;
         }
 
-
         return $this;
     } // setMetaTitle()
 
     /**
      * Set the value of [meta_description] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\FolderI18n The current object (for fluent API support)
+     * @param  string                   $v new value
+     * @return \Thelia\Model\FolderI18n The current object (for fluent API support)
      */
     public function setMetaDescription($v)
     {
@@ -659,15 +642,14 @@ abstract class FolderI18n implements ActiveRecordInterface
             $this->modifiedColumns[FolderI18nTableMap::META_DESCRIPTION] = true;
         }
 
-
         return $this;
     } // setMetaDescription()
 
     /**
      * Set the value of [meta_keywords] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\FolderI18n The current object (for fluent API support)
+     * @param  string                   $v new value
+     * @return \Thelia\Model\FolderI18n The current object (for fluent API support)
      */
     public function setMetaKeywords($v)
     {
@@ -679,7 +661,6 @@ abstract class FolderI18n implements ActiveRecordInterface
             $this->meta_keywords = $v;
             $this->modifiedColumns[FolderI18nTableMap::META_KEYWORDS] = true;
         }
-
 
         return $this;
     } // setMetaKeywords()
@@ -723,7 +704,6 @@ abstract class FolderI18n implements ActiveRecordInterface
     public function hydrate($row, $startcol = 0, $rehydrate = false, $indexType = TableMap::TYPE_NUM)
     {
         try {
-
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : FolderI18nTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
@@ -791,10 +771,10 @@ abstract class FolderI18n implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
-     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
+     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
+     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -830,7 +810,7 @@ abstract class FolderI18n implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param      ConnectionInterface $con
+     * @param  ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see FolderI18n::setDeleted()
@@ -873,8 +853,8 @@ abstract class FolderI18n implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -924,8 +904,8 @@ abstract class FolderI18n implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -968,7 +948,7 @@ abstract class FolderI18n implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1059,7 +1039,7 @@ abstract class FolderI18n implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1075,12 +1055,12 @@ abstract class FolderI18n implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param      string $name name
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed Value of field.
+     * @param  string $name name
+     * @param  string $type The type of fieldname the $name is of:
+     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                      Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed  Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1094,7 +1074,7 @@ abstract class FolderI18n implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
+     * @param  int   $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1139,12 +1119,12 @@ abstract class FolderI18n implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                    Defaults to TableMap::TYPE_PHPNAME.
-     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
-     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                                        Defaults to TableMap::TYPE_PHPNAME.
+     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
+     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1183,12 +1163,12 @@ abstract class FolderI18n implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param      string $name
-     * @param      mixed  $value field value
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @param  string $name
+     * @param  mixed  $value field value
+     * @param  string $type  The type of fieldname the $name is of:
+     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                       Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1202,8 +1182,8 @@ abstract class FolderI18n implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
-     * @param      mixed $value field value
+     * @param  int   $pos   position in xml schema
+     * @param  mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1252,8 +1232,8 @@ abstract class FolderI18n implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param      array  $arr     An array to populate the object from.
-     * @param      string $keyType The type of keys the array uses.
+     * @param  array  $arr     An array to populate the object from.
+     * @param  string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1289,7 +1269,6 @@ abstract class FolderI18n implements ActiveRecordInterface
         if ($this->isColumnModified(FolderI18nTableMap::META_TITLE)) $criteria->add(FolderI18nTableMap::META_TITLE, $this->meta_title);
         if ($this->isColumnModified(FolderI18nTableMap::META_DESCRIPTION)) $criteria->add(FolderI18nTableMap::META_DESCRIPTION, $this->meta_description);
         if ($this->isColumnModified(FolderI18nTableMap::META_KEYWORDS)) $criteria->add(FolderI18nTableMap::META_KEYWORDS, $this->meta_keywords);
-
         return $criteria;
     }
 
@@ -1327,7 +1306,7 @@ abstract class FolderI18n implements ActiveRecordInterface
     /**
      * Set the [composite] primary key.
      *
-     * @param      array $keys The elements of the composite key (order must match the order in XML file).
+     * @param  array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
     public function setPrimaryKey($keys)
@@ -1342,7 +1321,6 @@ abstract class FolderI18n implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-
         return (null === $this->getId()) && (null === $this->getLocale());
     }
 
@@ -1352,9 +1330,9 @@ abstract class FolderI18n implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\FolderI18n (or compatible) type.
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
+     * @param  object          $copyObj  An object of \Thelia\Model\FolderI18n (or compatible) type.
+     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1381,8 +1359,8 @@ abstract class FolderI18n implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\FolderI18n Clone of current object.
+     * @param  boolean                  $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return \Thelia\Model\FolderI18n Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1398,8 +1376,8 @@ abstract class FolderI18n implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildFolder object.
      *
-     * @param                  ChildFolder $v
-     * @return                 \Thelia\Model\FolderI18n The current object (for fluent API support)
+     * @param  ChildFolder              $v
+     * @return \Thelia\Model\FolderI18n The current object (for fluent API support)
      * @throws PropelException
      */
     public function setFolder(ChildFolder $v = null)
@@ -1418,16 +1396,14 @@ abstract class FolderI18n implements ActiveRecordInterface
             $v->addFolderI18n($this);
         }
 
-
         return $this;
     }
-
 
     /**
      * Get the associated ChildFolder object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildFolder The associated ChildFolder object.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildFolder         The associated ChildFolder object.
      * @throws PropelException
      */
     public function getFolder(ConnectionInterface $con = null)
@@ -1475,7 +1451,7 @@ abstract class FolderI18n implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param      boolean $deep Whether to also clear the references on all referrer objects.
+     * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {

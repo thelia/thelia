@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\CountryI18nQuery as BaseCountryI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'country_i18n' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\CountryI18nQuery as BaseCountryI18nQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class CountryI18nQuery extends BaseCountryI18nQuery {
-
+class CountryI18nQuery extends BaseCountryI18nQuery
+{
 } // CountryI18nQuery

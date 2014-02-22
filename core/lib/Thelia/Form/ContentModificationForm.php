@@ -24,7 +24,6 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\GreaterThan;
-use Thelia\Form\StandardDescriptionFieldsTrait;
 
 /**
  * Class ContentModificationForm

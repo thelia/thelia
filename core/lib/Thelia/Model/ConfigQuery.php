@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'config' table.
  *
@@ -15,8 +14,8 @@ use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ConfigQuery extends BaseConfigQuery {
-
+class ConfigQuery extends BaseConfigQuery
+{
     protected static $cache = array();
 
     public static function read($search, $default = null)
@@ -36,7 +35,7 @@ class ConfigQuery extends BaseConfigQuery {
     {
         $config = self::create()->findOneByName($configName);
 
-        if(null == $config) {
+        if (null == $config) {
             $config = new Config();
             $config->setName($configName);
         }
@@ -52,13 +51,15 @@ class ConfigQuery extends BaseConfigQuery {
 
     public static function resetCache($key = null)
     {
-        if($key) {
-            if(array_key_exists($key, self::$cache)) {
+        if ($key) {
+            if (array_key_exists($key, self::$cache)) {
                 unset(self::$cache[$key]);
+
                 return true;
             }
         }
         self::$cache = array();
+
         return true;
     }
 
@@ -92,7 +93,8 @@ class ConfigQuery extends BaseConfigQuery {
         return self::read('check-available-stock', 1) != 0;
     }
 
-    public static function getUnknownFlagPath() {
+    public static function getUnknownFlagPath()
+    {
         return self::read('unknown-flag-path', '/assets/img/flags/unknown.png');
     }
     /* smtp config */

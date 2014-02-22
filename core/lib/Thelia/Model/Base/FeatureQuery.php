@@ -76,9 +76,9 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\FeatureQuery object.
      *
-     * @param     string $dbName The database name
-     * @param     string $modelName The phpName of a model, e.g. 'Book'
-     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param string $dbName     The database name
+     * @param string $modelName  The phpName of a model, e.g. 'Book'
+     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Feature', $modelAlias = null)
     {
@@ -88,8 +88,8 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Returns a new ChildFeatureQuery object.
      *
-     * @param     string $modelAlias The alias of a model in the query
-     * @param     Criteria $criteria Optional Criteria to build the query from
+     * @param string   $modelAlias The alias of a model in the query
+     * @param Criteria $criteria   Optional Criteria to build the query from
      *
      * @return ChildFeatureQuery
      */
@@ -118,7 +118,7 @@ abstract class FeatureQuery extends ModelCriteria
      * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param mixed               $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildFeature|array|mixed the result, formatted by the current formatter
@@ -149,10 +149,10 @@ abstract class FeatureQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
-     * @return   ChildFeature A model object, or null if the key is not found
+     * @return ChildFeature A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -179,8 +179,8 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @return ChildFeature|array|mixed the result, formatted by the current formatter
      */
@@ -200,8 +200,8 @@ abstract class FeatureQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
-     * @param     array $keys Primary keys to use for the query
-     * @param     ConnectionInterface $con an optional connection object
+     * @param array               $keys Primary keys to use for the query
+     * @param ConnectionInterface $con  an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -222,26 +222,24 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param     mixed $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
-
         return $this->addUsingAlias(FeatureTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
      * Filter the query by a list of primary keys
      *
-     * @param     array $keys The list of primary key to use for the query
+     * @param array $keys The list of primary key to use for the query
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
-
         return $this->addUsingAlias(FeatureTableMap::ID, $keys, Criteria::IN);
     }
 
@@ -255,11 +253,11 @@ abstract class FeatureQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $id         The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -296,11 +294,11 @@ abstract class FeatureQuery extends ModelCriteria
      * $query->filterByVisible(array('min' => 12)); // WHERE visible > 12
      * </code>
      *
-     * @param     mixed $visible The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $visible    The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -337,11 +335,11 @@ abstract class FeatureQuery extends ModelCriteria
      * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
      * </code>
      *
-     * @param     mixed $position The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $position   The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -378,13 +376,13 @@ abstract class FeatureQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $createdAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $createdAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -421,13 +419,13 @@ abstract class FeatureQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $updatedAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $updatedAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -458,7 +456,7 @@ abstract class FeatureQuery extends ModelCriteria
      * Filter the query by a related \Thelia\Model\FeatureAv object
      *
      * @param \Thelia\Model\FeatureAv|ObjectCollection $featureAv  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string                                   $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -480,8 +478,8 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the FeatureAv relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -514,11 +512,11 @@ abstract class FeatureQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\FeatureAvQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\FeatureAvQuery A secondary query class using the current class as primary query
      */
     public function useFeatureAvQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -530,8 +528,8 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\FeatureProduct object
      *
-     * @param \Thelia\Model\FeatureProduct|ObjectCollection $featureProduct  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\FeatureProduct|ObjectCollection $featureProduct the related object to use as filter
+     * @param string                                        $comparison     Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -553,8 +551,8 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the FeatureProduct relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -587,11 +585,11 @@ abstract class FeatureQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\FeatureProductQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\FeatureProductQuery A secondary query class using the current class as primary query
      */
     public function useFeatureProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -603,8 +601,8 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\FeatureTemplate object
      *
-     * @param \Thelia\Model\FeatureTemplate|ObjectCollection $featureTemplate  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\FeatureTemplate|ObjectCollection $featureTemplate the related object to use as filter
+     * @param string                                         $comparison      Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -626,8 +624,8 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the FeatureTemplate relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -660,11 +658,11 @@ abstract class FeatureQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\FeatureTemplateQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\FeatureTemplateQuery A secondary query class using the current class as primary query
      */
     public function useFeatureTemplateQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -676,8 +674,8 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\FeatureI18n object
      *
-     * @param \Thelia\Model\FeatureI18n|ObjectCollection $featureI18n  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\FeatureI18n|ObjectCollection $featureI18n the related object to use as filter
+     * @param string                                     $comparison  Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -699,8 +697,8 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the FeatureI18n relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -733,11 +731,11 @@ abstract class FeatureQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\FeatureI18nQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\FeatureI18nQuery A secondary query class using the current class as primary query
      */
     public function useFeatureI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
@@ -750,8 +748,8 @@ abstract class FeatureQuery extends ModelCriteria
      * Filter the query by a related Template object
      * using the feature_template table as cross reference
      *
-     * @param Template $template the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param Template $template   the related object to use as filter
+     * @param string   $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -766,7 +764,7 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildFeature $feature Object to remove from the list of results
+     * @param ChildFeature $feature Object to remove from the list of results
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
@@ -782,8 +780,8 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Deletes all rows from the feature table.
      *
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).
+     * @param  ConnectionInterface $con the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -814,13 +812,13 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildFeature or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildFeature object or primary key or array of primary keys
-     *              which is used to create the DELETE statement
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                if supported by native driver or if emulated using Propel.
-     * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     * @param  mixed               $values Criteria or ChildFeature object or primary key or array of primary keys
+     *                                     which is used to create the DELETE statement
+     * @param  ConnectionInterface $con    the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                                    if supported by native driver or if emulated using Propel.
+     * @throws PropelException     Any exceptions caught during processing will be
+     *                                    rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -840,7 +838,6 @@ abstract class FeatureQuery extends ModelCriteria
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-
         FeatureTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
@@ -859,9 +856,9 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param      int $nbDays Maximum age of the latest update in days
+     * @param int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildFeatureQuery The current query, for fluid interface
+     * @return ChildFeatureQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
@@ -871,9 +868,9 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Filter by the latest created
      *
-     * @param      int $nbDays Maximum age of in days
+     * @param int $nbDays Maximum age of in days
      *
-     * @return     ChildFeatureQuery The current query, for fluid interface
+     * @return ChildFeatureQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
@@ -883,7 +880,7 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Order by update date desc
      *
-     * @return     ChildFeatureQuery The current query, for fluid interface
+     * @return ChildFeatureQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
@@ -893,7 +890,7 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Order by update date asc
      *
-     * @return     ChildFeatureQuery The current query, for fluid interface
+     * @return ChildFeatureQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
@@ -903,7 +900,7 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Order by create date desc
      *
-     * @return     ChildFeatureQuery The current query, for fluid interface
+     * @return ChildFeatureQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
@@ -913,7 +910,7 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Order by create date asc
      *
-     * @return     ChildFeatureQuery The current query, for fluid interface
+     * @return ChildFeatureQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
@@ -925,11 +922,11 @@ abstract class FeatureQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the i18n relation
      *
-     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     * @param string $locale        Locale to use for the join condition, e.g. 'fr_FR'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildFeatureQuery The current query, for fluid interface
+     * @return ChildFeatureQuery The current query, for fluid interface
      */
     public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -944,10 +941,10 @@ abstract class FeatureQuery extends ModelCriteria
      * Adds a JOIN clause to the query and hydrates the related I18n object.
      * Shortcut for $c->joinI18n($locale)->with()
      *
-     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     * @param string $locale   Locale to use for the join condition, e.g. 'fr_FR'
+     * @param string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildFeatureQuery The current query, for fluid interface
+     * @return ChildFeatureQuery The current query, for fluid interface
      */
     public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
@@ -964,11 +961,11 @@ abstract class FeatureQuery extends ModelCriteria
      *
      * @see       useQuery()
      *
-     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     * @param string $locale        Locale to use for the join condition, e.g. 'fr_FR'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildFeatureI18nQuery A secondary query class using the current class as primary query
+     * @return ChildFeatureI18nQuery A secondary query class using the current class as primary query
      */
     public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {

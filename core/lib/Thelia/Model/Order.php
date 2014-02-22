@@ -11,7 +11,6 @@ use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Base\OrderProductTaxQuery;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 
-
 class Order extends BaseOrder
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
@@ -42,6 +41,7 @@ class Order extends BaseOrder
     public function generateRef()
     {
         /* order addresses are unique */
+
         return uniqid('ORD', true);
     }
 
@@ -59,10 +59,10 @@ class Order extends BaseOrder
         $tax = 0;
 
         /* browse all products */
-        foreach($this->getOrderProducts() as $orderProduct) {
+        foreach ($this->getOrderProducts() as $orderProduct) {
             $taxAmountQuery = OrderProductTaxQuery::create();
 
-            if($orderProduct->getWasInPromo() == 1) {
+            if ($orderProduct->getWasInPromo() == 1) {
                 $taxAmountQuery->withColumn('SUM(' . OrderProductTaxTableMap::PROMO_AMOUNT . ')', 'total_tax');
             } else {
                 $taxAmountQuery->withColumn('SUM(' . OrderProductTaxTableMap::AMOUNT . ')', 'total_tax');
@@ -77,17 +77,17 @@ class Order extends BaseOrder
         $total = $amount + $tax;
 
         // @todo : manage discount : free postage ?
-        if(true === $includeDiscount) {
+        if (true === $includeDiscount) {
             $total -= $this->getDiscount();
 
-            if($total<0) {
+            if ($total<0) {
                 $total = 0;
             } else {
                 $total = round($total, 2);
             }
         }
 
-        if(false !== $includePostage) {
+        if (false !== $includePostage) {
             $total += $this->getPostage();
         }
 

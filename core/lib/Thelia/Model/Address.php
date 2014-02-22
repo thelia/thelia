@@ -8,8 +8,8 @@ use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Address as BaseAddress;
 
-
-class Address extends BaseAddress {
+class Address extends BaseAddress
+{
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     /**
@@ -33,6 +33,7 @@ class Address extends BaseAddress {
     public function preInsert(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEADDRESS, new AddressEvent($this));
+
         return true;
     }
 
@@ -53,6 +54,7 @@ class Address extends BaseAddress {
     public function preUpdate(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEADDRESS, new AddressEvent($this));
+
         return true;
     }
 
@@ -72,11 +74,12 @@ class Address extends BaseAddress {
      */
     public function preDelete(ConnectionInterface $con = null)
     {
-        if($this->getIsDefault()) {
+        if ($this->getIsDefault()) {
             return false;
         }
 
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEADDRESS, new AddressEvent($this));
+
         return true;
     }
 

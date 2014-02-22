@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Security\Authentication;
 
-
 use Thelia\Core\Security\UserProvider\TokenUserProvider;
 use Thelia\Core\Security\Exception\TokenAuthenticationException;
 

@@ -98,7 +98,6 @@ class CouponController extends BaseAdminController
     {
         $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
 
-
         $coupon = CouponQuery::create()->findPk($couponId);
 
         if ($coupon === null) {

@@ -128,6 +128,7 @@ class BaseFacade implements FacadeInterface
     public function getCartTotalTaxPrice()
     {
         $taxCountry = $this->getContainer()->get('thelia.taxEngine')->getDeliveryCountry();
+
         return $this->getCart()->getTaxedAmount($taxCountry);
     }
 

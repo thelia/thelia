@@ -5,7 +5,6 @@ namespace Thelia\Model;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Model\Base\ProfileQuery as BaseProfileQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'profile' table.
  *
@@ -23,9 +22,10 @@ class ProfileQuery extends BaseProfileQuery
         $profileList = array(
             0 => AdminResources::SUPERADMINISTRATOR,
         );
-        foreach(ProfileQuery::create()->find() as $profile) {
+        foreach (ProfileQuery::create()->find() as $profile) {
             $profileList[$profile->getId()] = $profile->getCode();
         }
+
         return $profileList;
     }
 } // ProfileQuery

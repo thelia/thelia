@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderProductAttributeCombinationQuery as BaseOrderProductAttributeCombinationQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'order_product_attribute_combination' table.
  *

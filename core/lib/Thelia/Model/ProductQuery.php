@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ProductQuery as BaseProductQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'product' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\ProductQuery as BaseProductQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ProductQuery extends BaseProductQuery {
-
+class ProductQuery extends BaseProductQuery
+{
 } // ProductQuery

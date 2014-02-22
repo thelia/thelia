@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event\Category;
 
-use Thelia\Core\Event\Category\CategoryEvent;
-
 class CategoryCreateEvent extends CategoryEvent
 {
     protected $title;

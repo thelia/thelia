@@ -13,7 +13,8 @@ class ContentDocument extends BaseContentDocument
     /**
      * Calculate next position relative to our parent
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         $query->filterByContent($this->getContent());
     }
 
@@ -58,6 +59,7 @@ class ContentDocument extends BaseContentDocument
                 "content_id" => $this->getContentId(),
             )
         );
+
         return true;
     }
 }

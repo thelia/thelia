@@ -24,8 +24,6 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Propel;
-use Thelia\Constraint\Rule\CouponRuleInterface;
-use Thelia\Coupon\ConditionCollection;
 use Thelia\Model\Base\Coupon as BaseCoupon;
 use Thelia\Model\Exception\InvalidArgumentException;
 use Thelia\Model\Map\CouponTableMap;
@@ -43,7 +41,6 @@ class Coupon extends BaseCoupon
 {
 
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
-
 
     /**
      * Create or Update this Coupon
@@ -65,7 +62,7 @@ class Coupon extends BaseCoupon
      *
      * @throws \Exception
      */
-    function createOrUpdate($code, $title, array $effects, $type, $isRemovingPostage, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $defaultSerializedRule, $locale = null)
+    public function createOrUpdate($code, $title, array $effects, $type, $isRemovingPostage, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $defaultSerializedRule, $locale = null)
     {
         $this->setCode($code)
             ->setType($type)
@@ -96,7 +93,7 @@ class Coupon extends BaseCoupon
             $this->save($con);
             $con->commit();
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $con->rollback();
             throw $e;
         }
@@ -124,7 +121,7 @@ class Coupon extends BaseCoupon
         try {
             $this->save($con);
             $con->commit();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $con->rollback();
             throw $e;
         }

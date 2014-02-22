@@ -2,7 +2,6 @@
 
 namespace Thelia\Model;
 
-
 use Thelia\Model\Base\CategoryImage as BaseCategoryImage;
 use Propel\Runtime\Connection\ConnectionInterface;
 
@@ -14,7 +13,8 @@ class CategoryImage extends BaseCategoryImage
     /**
      * Calculate next position relative to our parent
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         $query->filterByCategory($this->getCategory());
     }
 
@@ -59,6 +59,7 @@ class CategoryImage extends BaseCategoryImage
                 "category_id" => $this->getCategoryId(),
             )
         );
+
         return true;
     }
 }

@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\NewsletterQuery as BaseNewsletterQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'newsletter' table.
  *

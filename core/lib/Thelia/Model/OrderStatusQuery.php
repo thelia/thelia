@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderStatusQuery as BaseOrderStatusQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'order_status' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\OrderStatusQuery as BaseOrderStatusQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class OrderStatusQuery extends BaseOrderStatusQuery {
-
+class OrderStatusQuery extends BaseOrderStatusQuery
+{
 } // OrderStatusQuery

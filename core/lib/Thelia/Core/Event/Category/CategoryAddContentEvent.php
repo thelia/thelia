@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Category;
 
-use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Model\Category;
 
 class CategoryAddContentEvent extends CategoryEvent

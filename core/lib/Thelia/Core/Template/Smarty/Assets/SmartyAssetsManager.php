@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Template\Smarty\Assets;
 
-
-use Thelia\Log\Tlog;
 use Thelia\Tools\URL;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
 

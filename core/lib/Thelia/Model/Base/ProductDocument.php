@@ -32,7 +32,6 @@ abstract class ProductDocument implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\ProductDocumentTableMap';
 
-
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -343,9 +342,9 @@ abstract class ProductDocument implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed $parser A AbstractParser instance,
+     * @param mixed  $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data The source data to import from
+     * @param string $data   The source data to import from
      *
      * @return ProductDocument The current object, for fluid interface
      */
@@ -395,44 +394,40 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getId()
     {
-
         return $this->id;
     }
 
     /**
      * Get the [product_id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getProductId()
     {
-
         return $this->product_id;
     }
 
     /**
      * Get the [file] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getFile()
     {
-
         return $this->file;
     }
 
     /**
      * Get the [position] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getPosition()
     {
-
         return $this->position;
     }
 
@@ -440,8 +435,8 @@ abstract class ProductDocument implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -460,8 +455,8 @@ abstract class ProductDocument implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -479,8 +474,8 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Set the value of [id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductDocument The current object (for fluent API support)
+     * @param  int                           $v new value
+     * @return \Thelia\Model\ProductDocument The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -493,15 +488,14 @@ abstract class ProductDocument implements ActiveRecordInterface
             $this->modifiedColumns[ProductDocumentTableMap::ID] = true;
         }
 
-
         return $this;
     } // setId()
 
     /**
      * Set the value of [product_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductDocument The current object (for fluent API support)
+     * @param  int                           $v new value
+     * @return \Thelia\Model\ProductDocument The current object (for fluent API support)
      */
     public function setProductId($v)
     {
@@ -518,15 +512,14 @@ abstract class ProductDocument implements ActiveRecordInterface
             $this->aProduct = null;
         }
 
-
         return $this;
     } // setProductId()
 
     /**
      * Set the value of [file] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\ProductDocument The current object (for fluent API support)
+     * @param  string                        $v new value
+     * @return \Thelia\Model\ProductDocument The current object (for fluent API support)
      */
     public function setFile($v)
     {
@@ -539,15 +532,14 @@ abstract class ProductDocument implements ActiveRecordInterface
             $this->modifiedColumns[ProductDocumentTableMap::FILE] = true;
         }
 
-
         return $this;
     } // setFile()
 
     /**
      * Set the value of [position] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductDocument The current object (for fluent API support)
+     * @param  int                           $v new value
+     * @return \Thelia\Model\ProductDocument The current object (for fluent API support)
      */
     public function setPosition($v)
     {
@@ -560,16 +552,15 @@ abstract class ProductDocument implements ActiveRecordInterface
             $this->modifiedColumns[ProductDocumentTableMap::POSITION] = true;
         }
 
-
         return $this;
     } // setPosition()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\ProductDocument The current object (for fluent API support)
+     * @param  mixed                         $v string, integer (timestamp), or \DateTime value.
+     *                                          Empty strings are treated as NULL.
+     * @return \Thelia\Model\ProductDocument The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -581,16 +572,15 @@ abstract class ProductDocument implements ActiveRecordInterface
             }
         } // if either are not null
 
-
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\ProductDocument The current object (for fluent API support)
+     * @param  mixed                         $v string, integer (timestamp), or \DateTime value.
+     *                                          Empty strings are treated as NULL.
+     * @return \Thelia\Model\ProductDocument The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -601,7 +591,6 @@ abstract class ProductDocument implements ActiveRecordInterface
                 $this->modifiedColumns[ProductDocumentTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
-
 
         return $this;
     } // setUpdatedAt()
@@ -706,10 +695,10 @@ abstract class ProductDocument implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
-     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
+     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
+     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -747,7 +736,7 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param      ConnectionInterface $con
+     * @param  ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see ProductDocument::setDeleted()
@@ -790,8 +779,8 @@ abstract class ProductDocument implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -852,8 +841,8 @@ abstract class ProductDocument implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -913,7 +902,7 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -997,7 +986,7 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1013,12 +1002,12 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param      string $name name
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed Value of field.
+     * @param  string $name name
+     * @param  string $type The type of fieldname the $name is of:
+     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                      Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed  Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1032,7 +1021,7 @@ abstract class ProductDocument implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
+     * @param  int   $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1068,12 +1057,12 @@ abstract class ProductDocument implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                    Defaults to TableMap::TYPE_PHPNAME.
-     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
-     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                                        Defaults to TableMap::TYPE_PHPNAME.
+     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
+     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1112,12 +1101,12 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param      string $name
-     * @param      mixed  $value field value
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @param  string $name
+     * @param  mixed  $value field value
+     * @param  string $type  The type of fieldname the $name is of:
+     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                       Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1131,8 +1120,8 @@ abstract class ProductDocument implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
-     * @param      mixed $value field value
+     * @param  int   $pos   position in xml schema
+     * @param  mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1172,8 +1161,8 @@ abstract class ProductDocument implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param      array  $arr     An array to populate the object from.
-     * @param      string $keyType The type of keys the array uses.
+     * @param  array  $arr     An array to populate the object from.
+     * @param  string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1203,7 +1192,6 @@ abstract class ProductDocument implements ActiveRecordInterface
         if ($this->isColumnModified(ProductDocumentTableMap::POSITION)) $criteria->add(ProductDocumentTableMap::POSITION, $this->position);
         if ($this->isColumnModified(ProductDocumentTableMap::CREATED_AT)) $criteria->add(ProductDocumentTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ProductDocumentTableMap::UPDATED_AT)) $criteria->add(ProductDocumentTableMap::UPDATED_AT, $this->updated_at);
-
         return $criteria;
     }
 
@@ -1225,7 +1213,7 @@ abstract class ProductDocument implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return   int
+     * @return int
      */
     public function getPrimaryKey()
     {
@@ -1235,7 +1223,7 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param       int $key Primary key.
+     * @param  int  $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -1249,7 +1237,6 @@ abstract class ProductDocument implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-
         return null === $this->getId();
     }
 
@@ -1259,9 +1246,9 @@ abstract class ProductDocument implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\ProductDocument (or compatible) type.
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
+     * @param  object          $copyObj  An object of \Thelia\Model\ProductDocument (or compatible) type.
+     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1299,8 +1286,8 @@ abstract class ProductDocument implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\ProductDocument Clone of current object.
+     * @param  boolean                       $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return \Thelia\Model\ProductDocument Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1316,8 +1303,8 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildProduct object.
      *
-     * @param                  ChildProduct $v
-     * @return                 \Thelia\Model\ProductDocument The current object (for fluent API support)
+     * @param  ChildProduct                  $v
+     * @return \Thelia\Model\ProductDocument The current object (for fluent API support)
      * @throws PropelException
      */
     public function setProduct(ChildProduct $v = null)
@@ -1336,16 +1323,14 @@ abstract class ProductDocument implements ActiveRecordInterface
             $v->addProductDocument($this);
         }
 
-
         return $this;
     }
-
 
     /**
      * Get the associated ChildProduct object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildProduct The associated ChildProduct object.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildProduct        The associated ChildProduct object.
      * @throws PropelException
      */
     public function getProduct(ConnectionInterface $con = null)
@@ -1364,13 +1349,12 @@ abstract class ProductDocument implements ActiveRecordInterface
         return $this->aProduct;
     }
 
-
     /**
      * Initializes a collection based on the name of a relation.
      * Avoids crafting an 'init[$relationName]s' method name
      * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param      string $relationName The name of the relation to initialize
+     * @param  string $relationName The name of the relation to initialize
      * @return void
      */
     public function initRelation($relationName)
@@ -1409,8 +1393,8 @@ abstract class ProductDocument implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -1432,8 +1416,8 @@ abstract class ProductDocument implements ActiveRecordInterface
      * If this ChildProductDocument is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                              $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface                   $con      optional connection object
      * @return Collection|ChildProductDocumentI18n[] List of ChildProductDocumentI18n objects
      * @throws PropelException
      */
@@ -1489,9 +1473,9 @@ abstract class ProductDocument implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $productDocumentI18ns A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildProductDocument The current object (for fluent API support)
+     * @param  Collection           $productDocumentI18ns A Propel collection.
+     * @param  ConnectionInterface  $con                  Optional connection object
+     * @return ChildProductDocument The current object (for fluent API support)
      */
     public function setProductDocumentI18ns(Collection $productDocumentI18ns, ConnectionInterface $con = null)
     {
@@ -1521,10 +1505,10 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Returns the number of related ProductDocumentI18n objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ProductDocumentI18n objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related ProductDocumentI18n objects.
      * @throws PropelException
      */
     public function countProductDocumentI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -1556,8 +1540,8 @@ abstract class ProductDocument implements ActiveRecordInterface
      * Method called to associate a ChildProductDocumentI18n object to this object
      * through the ChildProductDocumentI18n foreign key attribute.
      *
-     * @param    ChildProductDocumentI18n $l ChildProductDocumentI18n
-     * @return   \Thelia\Model\ProductDocument The current object (for fluent API support)
+     * @param  ChildProductDocumentI18n      $l ChildProductDocumentI18n
+     * @return \Thelia\Model\ProductDocument The current object (for fluent API support)
      */
     public function addProductDocumentI18n(ChildProductDocumentI18n $l)
     {
@@ -1587,7 +1571,7 @@ abstract class ProductDocument implements ActiveRecordInterface
     }
 
     /**
-     * @param  ProductDocumentI18n $productDocumentI18n The productDocumentI18n object to remove.
+     * @param  ProductDocumentI18n  $productDocumentI18n The productDocumentI18n object to remove.
      * @return ChildProductDocument The current object (for fluent API support)
      */
     public function removeProductDocumentI18n($productDocumentI18n)
@@ -1630,7 +1614,7 @@ abstract class ProductDocument implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param      boolean $deep Whether to also clear the references on all referrer objects.
+     * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -1665,7 +1649,7 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildProductDocument The current object (for fluent API support)
+     * @return ChildProductDocument The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
@@ -1679,9 +1663,9 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Sets the locale for translations
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param string $locale Locale to use for the translation, e.g. 'fr_FR'
      *
-     * @return    ChildProductDocument The current object (for fluent API support)
+     * @return ChildProductDocument The current object (for fluent API support)
      */
     public function setLocale($locale = 'en_US')
     {
@@ -1693,7 +1677,7 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Gets the locale for translations
      *
-     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @return string $locale Locale to use for the translation, e.g. 'fr_FR'
      */
     public function getLocale()
     {
@@ -1703,8 +1687,8 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Returns the current translation for a given locale
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param     ConnectionInterface $con an optional connection object
+     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param ConnectionInterface $con    an optional connection object
      *
      * @return ChildProductDocumentI18n */
     public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
@@ -1737,10 +1721,10 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Remove the translation for a given locale
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param     ConnectionInterface $con an optional connection object
+     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param ConnectionInterface $con    an optional connection object
      *
-     * @return    ChildProductDocument The current object (for fluent API support)
+     * @return ChildProductDocument The current object (for fluent API support)
      */
     public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
@@ -1765,7 +1749,7 @@ abstract class ProductDocument implements ActiveRecordInterface
     /**
      * Returns the current translation
      *
-     * @param     ConnectionInterface $con an optional connection object
+     * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildProductDocumentI18n */
     public function getCurrentTranslation(ConnectionInterface $con = null)

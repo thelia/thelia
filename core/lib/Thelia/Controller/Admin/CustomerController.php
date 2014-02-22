@@ -32,7 +32,6 @@ use Thelia\Form\CustomerCreateForm;
 use Thelia\Form\CustomerUpdateForm;
 use Thelia\Model\CustomerQuery;
 
-
 /**
  * Class CustomerController
  * @package Thelia\Controller\Admin

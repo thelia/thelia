@@ -29,8 +29,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * A trait to provide event dispatching mechanism to Model objects
  */
-trait ModelEventDispatcherTrait {
-
+trait ModelEventDispatcherTrait
+{
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */

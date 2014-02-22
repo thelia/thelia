@@ -13,7 +13,8 @@ class ProductDocument extends BaseProductDocument
     /**
      * Calculate next position relative to our parent
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         $query->filterByProduct($this->getProduct());
     }
 
@@ -58,6 +59,7 @@ class ProductDocument extends BaseProductDocument
                 "product_id" => $this->getProductId(),
             )
         );
+
         return true;
     }
 

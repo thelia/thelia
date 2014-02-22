@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ProfileResourceQuery as BaseProfileResourceQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'profile_resource' table.
  *

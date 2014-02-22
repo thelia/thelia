@@ -13,7 +13,8 @@ class FolderDocument extends BaseFolderDocument
     /**
      * Calculate next position relative to our parent
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         $query->filterByFolder($this->getFolder());
     }
 
@@ -58,6 +59,7 @@ class FolderDocument extends BaseFolderDocument
                 "folder_id" => $this->getFolderId(),
             )
         );
+
         return true;
     }
 }

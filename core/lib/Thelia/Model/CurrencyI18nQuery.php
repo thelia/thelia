@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\CurrencyI18nQuery as BaseCurrencyI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'currency_i18n' table.
  *

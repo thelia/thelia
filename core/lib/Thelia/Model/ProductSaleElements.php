@@ -11,7 +11,7 @@ class ProductSaleElements extends BaseProductSaleElements
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
-        } catch(PropelException $e) {
+        } catch (PropelException $e) {
             throw new PropelException("Virtual column `$virtualColumnName` does not exist in ProductSaleElements::getPrice");
         }
 
@@ -22,7 +22,7 @@ class ProductSaleElements extends BaseProductSaleElements
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
-        } catch(PropelException $e) {
+        } catch (PropelException $e) {
             throw new PropelException("Virtual column `$virtualColumnName` does not exist in ProductSaleElements::getPromoPrice");
         }
 
@@ -32,12 +32,14 @@ class ProductSaleElements extends BaseProductSaleElements
     public function getTaxedPrice(Country $country)
     {
         $taxCalculator = new Calculator();
+
         return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice()), 2);
     }
 
     public function getTaxedPromoPrice(Country $country)
     {
         $taxCalculator = new Calculator();
+
         return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice()), 2);
     }
 }

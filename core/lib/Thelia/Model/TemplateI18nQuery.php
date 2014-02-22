@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\TemplateI18nQuery as BaseTemplateI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'template_i18n' table.
  *

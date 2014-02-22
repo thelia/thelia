@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\CategoryDocumentQuery as BaseCategoryDocumentQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'category_document' table.
  *

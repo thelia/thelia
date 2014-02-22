@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ModuleI18nQuery as BaseModuleI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'module_i18n' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\ModuleI18nQuery as BaseModuleI18nQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ModuleI18nQuery extends BaseModuleI18nQuery {
-
+class ModuleI18nQuery extends BaseModuleI18nQuery
+{
 } // ModuleI18nQuery

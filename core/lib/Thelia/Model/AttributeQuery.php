@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\AttributeQuery as BaseAttributeQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'attribute' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\AttributeQuery as BaseAttributeQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class AttributeQuery extends BaseAttributeQuery {
-
+class AttributeQuery extends BaseAttributeQuery
+{
 } // AttributeQuery

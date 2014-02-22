@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event;
 
-use Thelia\Core\Event\ActionEvent;
-
 class DefaultActionEvent extends ActionEvent
 {
 }

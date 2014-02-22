@@ -27,19 +27,21 @@ use Propel\Runtime\ActiveQuery\PropelQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 
-trait PositionManagementTrait {
-
+trait PositionManagementTrait
+{
     /**
      * Create an instancer of this object query
      */
-    private function createQuery() {
+    private function createQuery()
+    {
         return PropelQuery::from(__CLASS__);
     }
 
     /**
      * Return the database name from this object's table map.
      */
-    private function getDatabaseNameFromMap() {
+    private function getDatabaseNameFromMap()
+    {
         $class = new \ReflectionClass(self::TABLE_MAP);
 
         return $class->getConstant('DATABASE_NAME');
@@ -49,15 +51,16 @@ trait PositionManagementTrait {
      * Implementors may add some search criteria (e.g., parent id) to the queries
      * used to change/get position by overloading this method.
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         // Add required criteria here...
     }
 
     /**
      * Get the position of the next inserted object
      */
-    public function getNextPosition() {
-
+    public function getNextPosition()
+    {
          $query = $this->createQuery()
             ->orderByPosition(Criteria::DESC)
             ->limit(1);
@@ -72,14 +75,16 @@ trait PositionManagementTrait {
     /**
      * Move up a object
      */
-    public function movePositionUp() {
+    public function movePositionUp()
+    {
         $this->movePositionUpOrDown(true);
     }
 
     /**
      * Move down a object
      */
-    public function movePositionDown() {
+    public function movePositionDown()
+    {
         $this->movePositionUpOrDown(false);
     }
 
@@ -102,8 +107,7 @@ trait PositionManagementTrait {
         if ($up === true) {
             // Find the object immediately before me
             $search->filterByPosition(array('max' => $my_position-1))->orderByPosition(Criteria::DESC);
-        }
-        else {
+        } else {
             // Find the object immediately after me
             $search->filterByPosition(array('min' => $my_position+1))->orderByPosition(Criteria::ASC);
         }
@@ -126,8 +130,7 @@ trait PositionManagementTrait {
                 $result->setDispatcher($this->getDispatcher())->setPosition($my_position)->save($cnx);
 
                 $cnx->commit();
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 $cnx->rollback();
             }
         }
@@ -136,7 +139,8 @@ trait PositionManagementTrait {
     /**
      * Simply return the database name, from the constant in the MAP class.
      */
-    protected function getDatabaseName() {
+    protected function getDatabaseName()
+    {
         // Find DATABASE_NAME constant
         $mapClassName = self::TABLE_MAP;
 
@@ -192,8 +196,7 @@ trait PositionManagementTrait {
                 ;
 
                 $cnx->commit();
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 $cnx->rollback();
             }
         }
@@ -207,7 +210,7 @@ trait PositionManagementTrait {
         $data = array();
         $whereCriteria = array();
 
-        foreach($fields as $field => $value) {
+        foreach ($fields as $field => $value) {
             $whereCriteria[] = $field . '=:' . $field;
             $data[':' . $field] = $value;
         }

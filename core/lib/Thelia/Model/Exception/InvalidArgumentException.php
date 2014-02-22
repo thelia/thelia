@@ -22,6 +22,5 @@
 /*************************************************************************************/
 namespace Thelia\Model\Exception;
 
-
 class InvalidArgumentException extends ModelException
 {}

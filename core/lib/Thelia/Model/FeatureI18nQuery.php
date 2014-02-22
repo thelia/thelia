@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\FeatureI18nQuery as BaseFeatureI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'feature_i18n' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\FeatureI18nQuery as BaseFeatureI18nQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class FeatureI18nQuery extends BaseFeatureI18nQuery {
-
+class FeatureI18nQuery extends BaseFeatureI18nQuery
+{
 } // FeatureI18nQuery

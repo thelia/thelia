@@ -37,7 +37,6 @@ class CartItem extends BaseCartItem
         }
     }
 
-
     /**
      * @param $value
      * @return $this
@@ -46,16 +45,14 @@ class CartItem extends BaseCartItem
     {
         $currentQuantity = $this->getQuantity();
 
-        if($value <= 0)
-        {
+        if ($value <= 0) {
             $value = $currentQuantity;
         }
 
-        if(ConfigQuery::checkAvailableStock())
-        {
+        if (ConfigQuery::checkAvailableStock()) {
             $productSaleElements = $this->getProductSaleElements();
 
-            if($productSaleElements->getQuantity() < $value) {
+            if ($productSaleElements->getQuantity() < $value) {
                 $value = $currentQuantity;
             }
         }
@@ -70,16 +67,14 @@ class CartItem extends BaseCartItem
         $currentQuantity = $this->getQuantity();
         $newQuantity = $currentQuantity + $value;
 
-        if($value <= 0)
-        {
+        if ($value <= 0) {
             $value = $currentQuantity;
         }
 
-        if(ConfigQuery::checkAvailableStock())
-        {
+        if (ConfigQuery::checkAvailableStock()) {
             $productSaleElements = $this->getProductSaleElements();
 
-            if($productSaleElements->getQuantity() < $newQuantity) {
+            if ($productSaleElements->getQuantity() < $newQuantity) {
                 $newQuantity = $currentQuantity;
             }
         }
@@ -102,12 +97,14 @@ class CartItem extends BaseCartItem
     public function getTaxedPrice(Country $country)
     {
         $taxCalculator = new Calculator();
+
         return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice()), 2);
     }
 
     public function getTaxedPromoPrice(Country $country)
     {
         $taxCalculator = new Calculator();
+
         return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice()), 2);
     }
 }

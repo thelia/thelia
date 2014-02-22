@@ -46,11 +46,13 @@ class TlogDestinationFile extends AbstractTlogDestination
         parent::__construct();
     }
 
-    protected function getFilePath() {
+    protected function getFilePath()
+    {
         return $this->getConfig(self::VAR_PATH_FILE);
     }
 
-    protected function getOpenMode() {
+    protected function getOpenMode()
+    {
         return strtolower($this->getConfig(self::VAR_MODE, self::VALEUR_MODE_DEFAULT)) == 'a' ? 'a' : 'w';
     }
 
