@@ -47,12 +47,16 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
             ->setLastname($event->getLastname())
             ->setLocale($event->getLocale())
             ->save();
+
+        $event->setNewsletter($newsletter);
     }
 
     public function unsubscribe(NewsletterEvent $event)
     {
         if (null !== $nl = NewsletterQuery::create()->findPk($event->getId())) {
             $nl->delete();
+
+            $event->setNewsletter($nl);
         }
     }
 
@@ -64,6 +68,8 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
                 ->setLastname($event->getLastname())
                 ->setLocale($event->getLocale())
                 ->save();
+
+            $event->setNewsletter($nl);
         }
     }
 
