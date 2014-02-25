@@ -189,7 +189,7 @@ class SmartyParser extends Smarty implements ParserInterface
     public function getTemplateDefinition($webAssetTemplate = false)
     {
         $ret = $this->templateDefinition;
-        if ($webAssetTemplate) {
+        if (false !== $webAssetTemplate) {
             $customPath = str_replace($ret->getName(), $webAssetTemplate, $ret->getPath());
             $ret->setName($webAssetTemplate);
             $ret->setPath($customPath);
