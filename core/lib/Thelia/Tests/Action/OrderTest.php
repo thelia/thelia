@@ -25,6 +25,7 @@ namespace Thelia\Tests\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Action\Order;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\HttpFoundation\Request;
@@ -37,18 +38,17 @@ use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\OrderAddressQuery;
 use Thelia\Model\Base\OrderProductQuery;
 use Thelia\Model\Base\OrderQuery;
-
-use Thelia\Model\OrderStatus;
-use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order as OrderModel;
-use Thelia\Model\Customer as CustomerModel;
-use Thelia\Action\Order;
+use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Module\BaseModule;
 
 /**
@@ -401,6 +401,101 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             $newStatus,
             OrderQuery::create()->findPk($order->getId())->getStatusId()
+        );
+    }
+
+    /**
+     * @depends testCreate
+     *
+     * @param OrderModel $order
+     */
+    public function testModelUpdateStatusPaidWithHelpers(OrderModel $order)
+    {
+        $order->setPaid();
+
+        $this->assertEquals(
+            $order->getStatusId(),
+            OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_PAID)->getId()
+        );
+
+        $this->assertTrue(
+            $order->isPaid()
+        );
+    }
+
+    /**
+     * @depends testCreate
+     *
+     * @param OrderModel $order
+     */
+    public function testModelUpdateStatusNotPaidWithHelpers(OrderModel $order)
+    {
+        $order->setNotPaid();
+
+        $this->assertEquals(
+            $order->getStatusId(),
+            OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_NOT_PAID)->getId()
+        );
+
+        $this->assertTrue(
+            $order->isNotPaid()
+        );
+    }
+
+    /**
+     * @depends testCreate
+     *
+     * @param OrderModel $order
+     */
+    public function testModelUpdateStatusProcessedWithHelpers(OrderModel $order)
+    {
+        $order->setProcessing();
+
+        $this->assertEquals(
+            $order->getStatusId(),
+            OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_PROCESSING)->getId()
+        );
+
+        $this->assertTrue(
+            $order->isProcessing()
+        );
+    }
+
+    /**
+     * @depends testCreate
+     *
+     * @param OrderModel $order
+     */
+    public function testModelUpdateStatusSentWithHelpers(OrderModel $order)
+    {
+        $order->setSent();
+
+        $this->assertEquals(
+            $order->getStatusId(),
+            OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_SENT)->getId()
+        );
+
+        $this->assertTrue(
+            $order->isSent()
+        );
+    }
+
+    /**
+     * @depends testCreate
+     *
+     * @param OrderModel $order
+     */
+    public function testModelUpdateStatusCanceledWithHelpers(OrderModel $order)
+    {
+        $order->setCancelled();
+
+        $this->assertEquals(
+            $order->getStatusId(),
+            OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED)->getId()
+        );
+
+        $this->assertTrue(
+            $order->isCancelled()
         );
     }
 

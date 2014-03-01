@@ -45,13 +45,14 @@ class Order extends BaseOrder
         return uniqid('ORD', true);
     }
 
+
     /**
-     * calculate the total amount
+     * Compute this order amount.
      *
-     * @param int  $tax
-     * @param bool $includePostage
-     *
-     * @return float|int|string
+     * @param float $tax (output only) returns the tax amount for this order
+     * @param bool $includePostage if true, the postage cost is included to the total
+     * @param bool $includeDiscount if true, the discount will be included to the total
+     * @return float
      */
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)
     {
@@ -93,4 +94,106 @@ class Order extends BaseOrder
 
         return $total;
     }
+
+    /**
+     * Set the status of the current order to NOT PAID
+     */
+    public function setNotPaid() {
+        $this->setStatusHelper(OrderStatus::CODE_NOT_PAID);
+    }
+
+    /**
+     * Check if the current status of this order is NOT PAID
+     *
+     * @return bool true if this order is NOT PAID, false otherwise.
+     */
+    public function isNotPaid() {
+        return $this->hasStatusHelper(OrderStatus::CODE_NOT_PAID);
+    }
+
+    /**
+     * Set the status of the current order to PAID
+     */
+    public function setPaid() {
+        $this->setStatusHelper(OrderStatus::CODE_PAID);
+    }
+
+    /**
+     * Check if the current status of this order is PAID
+     *
+     * @return bool true if this order is PAID, false otherwise.
+     */
+    public function isPaid() {
+        return $this->hasStatusHelper(OrderStatus::CODE_PAID);
+    }
+
+    /**
+     * Set the status of the current order to PROCESSING
+     */
+    public function setProcessing() {
+        $this->setStatusHelper(OrderStatus::CODE_PROCESSING);
+    }
+
+    /**
+     * Check if the current status of this order is PROCESSING
+     *
+     * @return bool true if this order is PROCESSING, false otherwise.
+     */
+    public function isProcessing() {
+        return $this->hasStatusHelper(OrderStatus::CODE_PROCESSING);
+    }
+
+    /**
+     * Set the status of the current order to SENT
+     */
+    public function setSent() {
+        $this->setStatusHelper(OrderStatus::CODE_SENT);
+    }
+
+    /**
+     * Check if the current status of this order is SENT
+     *
+     * @return bool true if this order is SENT, false otherwise.
+     */
+    public function isSent() {
+        return $this->hasStatusHelper(OrderStatus::CODE_SENT);
+    }
+
+    /**
+     * Set the status of the current order to CANCELED
+     */
+    public function setCancelled() {
+        $this->setStatusHelper(OrderStatus::CODE_CANCELED);
+    }
+
+    /**
+     * Check if the current status of this order is CANCELED
+     *
+     * @return bool true if this order is CANCELED, false otherwise.
+     */
+    public function isCancelled() {
+        return $this->hasStatusHelper(OrderStatus::CODE_CANCELED);
+    }
+
+    /**
+     * Set the status of the current order to the provided status
+     *
+     * @param string $statusCode the status code, one of OrderStatus::CODE_xxx constants.
+     */
+    public function setStatusHelper($statusCode) {
+        if (null !== $ordeStatus = OrderStatusQuery::create()->findOneByCode($statusCode)) {
+            $this->setOrderStatus($ordeStatus)->save();
+        }
+    }
+
+    /**
+     * Check if the current status of this order is $statusCode
+     *
+     * @param string $statusCode the status code, one of OrderStatus::CODE_xxx constants.
+     * @return bool true if this order have the provided status, false otherwise.
+     */
+    public function hasStatusHelper($statusCode) {
+        return $this->getOrderStatus()->getCode() == $statusCode;
+    }
+
 }
