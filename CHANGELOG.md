@@ -1,3 +1,6 @@
+#2.0.0
+- coupons effect are recalculated after each product's cart modification
+
 #2.0.0-RC1
 - Remove container from BaseAction.
 - fix sending mail on order creation
