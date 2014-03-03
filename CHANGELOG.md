@@ -1,7 +1,7 @@
-#2.0.0-beta5
+#2.0.0-RC1
 - Remove container from BaseAction.
 - fix sending mail on order creation
-- less files in default templates are already compile in css.
+- less files in default templates are already compiled in css.
 - all validator message are translated
 - type argument is now a default argument and used for generating loop cache
 - fix total amount without discount in backoffice. Fix #235
@@ -9,6 +9,8 @@
 - Do not allow to cumulate the same coupon many times. Fix #217
 - colissimo module is now fully configurable
 - test suite are executed on PHP 5.4, 5.5, 5.6 and HHVM. Thelia is not fully compatible with HHVM
+- add new attributes to loop pager (http://doc.thelia.net/en/documentation/loop/index.html#page-loop)
+- we created a new github repo dedicated for modules : https://github.com/thelia-modules
 
 #2.0.0-beta4
 - Tinymce is now a dedicated module. You need to activate it.
