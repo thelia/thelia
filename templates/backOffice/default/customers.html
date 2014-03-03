@@ -182,13 +182,15 @@
 
                                                 <div class="text-center">
                                                     <ul class="pagination pagination-centered">
-                                                        {if $page != 1}
-                                                            <li><a href="{url path="/admin/customers" page="1"}">&laquo;</a></li>
-                                                        {else}
-                                                            <li class="disabled"><a href="#">&laquo;</a></li>
+
+                                                    {if $page != 1}
+                                                        <li><a href="{url path="/admin/customers" page="1"}">&laquo;</a></li>
+                                                    {/if}
+                                                    {pageloop rel="customer_list" numPage="20"}
+                                                        {if $PAGE == $CURRENT && $PAGE > 2}
+                                                            <li><a href="{url path="/admin/customers" page=$PREV}">&lsaquo;</a></li>
                                                         {/if}
 
-                                                    {pageloop rel="customer_list"}
                                                         {if $PAGE != $CURRENT}
                                                             <li><a href="{url path="/admin/customers" page="{$PAGE}"}">{$PAGE}</a></li>
 
@@ -196,12 +198,12 @@
                                                             <li class="active"><a href="#">{$PAGE}</a></li>
                                                         {/if}
 
-
+                                                        {if $PAGE == $END && $PAGE < $LAST}
+                                                            <li><a href="{url path="/admin/customers" page=$NEXT}">&rsaquo;</a></li>
+                                                        {/if}
                                                     {/pageloop}
-                                                        {if $PAGE == $LAST && $LAST != $CURRENT}
-                                                            <li><a href="{url path="/admin/customers" page="$PAGE"}">&raquo;</a></li>
-                                                        {else}
-                                                            <li class="disabled"><a href="#">&raquo;</a></li>
+                                                        {if $LAST > $CURRENT}
+                                                            <li><a href="{url path="/admin/customers" page="$LAST"}">&raquo;</a></li>
                                                         {/if}
                                                     </ul>
                                                 </div>
