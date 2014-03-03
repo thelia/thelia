@@ -71,7 +71,7 @@ class Cart extends BaseCart
         ;
     }
 
-    public function getTaxedAmount(Country $country)
+    public function getTaxedAmount(Country $country, $discount = true)
     {
         $total = 0;
 
@@ -79,7 +79,9 @@ class Cart extends BaseCart
             $total += $cartItem->getRealTaxedPrice($country) * $cartItem->getQuantity();
         }
 
-        $total -= $this->getDiscount();
+        if ($discount) {
+            $total -= $this->getDiscount();
+        }
 
         return $total;
     }
