@@ -176,9 +176,25 @@ class SmartyParser extends Smarty implements ParserInterface
         }
     }
 
-    public function getTemplateDefinition()
+    /**
+     * Get template definition
+     *
+     * @param bool $webAssetTemplate Allow to load asset from another template
+     *                               If the name of the template if provided
+     *
+     * @return TemplateDefinition
+     */
+    public function getTemplateDefinition($webAssetTemplate = false)
     {
-        return $this->templateDefinition;
+        $ret = $this->templateDefinition;
+        if (false !== $webAssetTemplate) {
+            $customPath = str_replace($ret->getName(), $webAssetTemplate, $ret->getPath());
+            $ret->setName($webAssetTemplate);
+            $ret->setPath($customPath);
+
+        }
+
+        return $ret;
     }
 
     public function getTemplate()
