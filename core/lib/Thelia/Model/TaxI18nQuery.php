@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\TaxI18nQuery as BaseTaxI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'tax_i18n' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\TaxI18nQuery as BaseTaxI18nQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class TaxI18nQuery extends BaseTaxI18nQuery {
-
+class TaxI18nQuery extends BaseTaxI18nQuery
+{
 } // TaxI18nQuery

@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderFeatureQuery as BaseOrderFeatureQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'order_feature' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\OrderFeatureQuery as BaseOrderFeatureQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class OrderFeatureQuery extends BaseOrderFeatureQuery {
-
+class OrderFeatureQuery extends BaseOrderFeatureQuery
+{
 } // OrderFeatureQuery

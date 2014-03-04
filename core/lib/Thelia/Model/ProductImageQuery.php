@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ProductImageQuery as BaseProductImageQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'product_image' table.
  *

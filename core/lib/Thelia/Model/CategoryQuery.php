@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\CategoryQuery as BaseCategoryQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'category' table.
  *
@@ -15,12 +14,13 @@ use Thelia\Model\Base\CategoryQuery as BaseCategoryQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class CategoryQuery extends BaseCategoryQuery {
+class CategoryQuery extends BaseCategoryQuery
+{
     /**
      *
      * count how many direct children have a category
      *
-     * @param int $parent category parent id
+     * @param  int $parent category parent id
      * @return int
      */
     public static function countChild($parent)
@@ -33,16 +33,16 @@ class CategoryQuery extends BaseCategoryQuery {
      * find all category children for a given category. an array of \Thelia\Model\Category is return
      *
      * @param $categoryId the category id or an array of id
-     * @param int $depth max depth you want to search
-     * @param int $currentPos don't change this param, it is used for recursion
+     * @param  int                      $depth      max depth you want to search
+     * @param  int                      $currentPos don't change this param, it is used for recursion
      * @return \Thelia\Model\Category[]
      */
     public static function findAllChild($categoryId, $depth = 0, $currentPos = 0)
     {
         $result = array();
 
-        if(is_array($categoryId)) {
-            foreach($categoryId as $categorySingleId) {
+        if (is_array($categoryId)) {
+            foreach ($categoryId as $categorySingleId) {
                 $result = array_merge($result, (array) self::findAllChild($categorySingleId, $depth, $currentPos));
             }
         } else {
@@ -53,7 +53,6 @@ class CategoryQuery extends BaseCategoryQuery {
             $categories = self::create()
                 ->filterByParent($categoryId)
                 ->find();
-
 
             foreach ($categories as $category) {
                 array_push($result, $category);

@@ -103,9 +103,9 @@ abstract class CouponVersionQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\CouponVersionQuery object.
      *
-     * @param     string $dbName The database name
-     * @param     string $modelName The phpName of a model, e.g. 'Book'
-     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param string $dbName     The database name
+     * @param string $modelName  The phpName of a model, e.g. 'Book'
+     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\CouponVersion', $modelAlias = null)
     {
@@ -115,8 +115,8 @@ abstract class CouponVersionQuery extends ModelCriteria
     /**
      * Returns a new ChildCouponVersionQuery object.
      *
-     * @param     string $modelAlias The alias of a model in the query
-     * @param     Criteria $criteria Optional Criteria to build the query from
+     * @param string   $modelAlias The alias of a model in the query
+     * @param Criteria $criteria   Optional Criteria to build the query from
      *
      * @return ChildCouponVersionQuery
      */
@@ -176,10 +176,10 @@ abstract class CouponVersionQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
-     * @return   ChildCouponVersion A model object, or null if the key is not found
+     * @return ChildCouponVersion A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -207,8 +207,8 @@ abstract class CouponVersionQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @return ChildCouponVersion|array|mixed the result, formatted by the current formatter
      */
@@ -228,8 +228,8 @@ abstract class CouponVersionQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
      * </code>
-     * @param     array $keys Primary keys to use for the query
-     * @param     ConnectionInterface $con an optional connection object
+     * @param array               $keys Primary keys to use for the query
+     * @param ConnectionInterface $con  an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -250,7 +250,7 @@ abstract class CouponVersionQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param     mixed $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -265,7 +265,7 @@ abstract class CouponVersionQuery extends ModelCriteria
     /**
      * Filter the query by a list of primary keys
      *
-     * @param     array $keys The list of primary key to use for the query
+     * @param array $keys The list of primary key to use for the query
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -296,11 +296,11 @@ abstract class CouponVersionQuery extends ModelCriteria
      *
      * @see       filterByCoupon()
      *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $id         The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -336,9 +336,9 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterByCode('%fooValue%'); // WHERE code LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $code The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $code       The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -365,9 +365,9 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterByType('%fooValue%'); // WHERE type LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $type The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $type       The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -394,9 +394,9 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterBySerializedEffects('%fooValue%'); // WHERE serialized_effects LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $serializedEffects The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $serializedEffects The value to use as filter.
+     *                                  Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison        Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -423,12 +423,12 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterByIsEnabled('yes'); // WHERE is_enabled = true
      * </code>
      *
-     * @param     boolean|string $isEnabled The value to use as filter.
-     *              Non-boolean arguments are converted using the following rules:
-     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param boolean|string $isEnabled  The value to use as filter.
+     *                                   Non-boolean arguments are converted using the following rules:
+     *                                   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                                   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *                                   Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param string         $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -451,13 +451,13 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterByExpirationDate(array('max' => 'yesterday')); // WHERE expiration_date > '2011-03-13'
      * </code>
      *
-     * @param     mixed $expirationDate The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $expirationDate The value to use as filter.
+     *                               Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                               Empty strings are treated as NULL.
+     *                               Use scalar values for equality.
+     *                               Use array values for in_array() equivalent.
+     *                               Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison     Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -494,11 +494,11 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterByMaxUsage(array('min' => 12)); // WHERE max_usage > 12
      * </code>
      *
-     * @param     mixed $maxUsage The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $maxUsage   The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -534,12 +534,12 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterByIsCumulative('yes'); // WHERE is_cumulative = true
      * </code>
      *
-     * @param     boolean|string $isCumulative The value to use as filter.
-     *              Non-boolean arguments are converted using the following rules:
-     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param boolean|string $isCumulative The value to use as filter.
+     *                                     Non-boolean arguments are converted using the following rules:
+     *                                     * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                                     * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *                                     Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param string         $comparison   Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -561,12 +561,12 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterByIsRemovingPostage('yes'); // WHERE is_removing_postage = true
      * </code>
      *
-     * @param     boolean|string $isRemovingPostage The value to use as filter.
-     *              Non-boolean arguments are converted using the following rules:
-     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param boolean|string $isRemovingPostage The value to use as filter.
+     *                                          Non-boolean arguments are converted using the following rules:
+     *                                          * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                                          * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *                                          Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param string         $comparison        Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -588,12 +588,12 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterByIsAvailableOnSpecialOffers('yes'); // WHERE is_available_on_special_offers = true
      * </code>
      *
-     * @param     boolean|string $isAvailableOnSpecialOffers The value to use as filter.
-     *              Non-boolean arguments are converted using the following rules:
-     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param boolean|string $isAvailableOnSpecialOffers The value to use as filter.
+     *                                                   Non-boolean arguments are converted using the following rules:
+     *                                                   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                                                   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *                                                   Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param string         $comparison                 Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -615,12 +615,12 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterByIsUsed('yes'); // WHERE is_used = true
      * </code>
      *
-     * @param     boolean|string $isUsed The value to use as filter.
-     *              Non-boolean arguments are converted using the following rules:
-     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param boolean|string $isUsed     The value to use as filter.
+     *                                   Non-boolean arguments are converted using the following rules:
+     *                                   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                                   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *                                   Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param string         $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -642,9 +642,9 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterBySerializedConditions('%fooValue%'); // WHERE serialized_conditions LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $serializedConditions The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $serializedConditions The value to use as filter.
+     *                                     Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison           Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -672,13 +672,13 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $createdAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $createdAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -715,13 +715,13 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $updatedAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $updatedAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -758,11 +758,11 @@ abstract class CouponVersionQuery extends ModelCriteria
      * $query->filterByVersion(array('min' => 12)); // WHERE version > 12
      * </code>
      *
-     * @param     mixed $version The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $version    The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -792,8 +792,8 @@ abstract class CouponVersionQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Coupon object
      *
-     * @param \Thelia\Model\Coupon|ObjectCollection $coupon The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Coupon|ObjectCollection $coupon     The related object(s) to use as filter
+     * @param string                                $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -817,8 +817,8 @@ abstract class CouponVersionQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Coupon relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -851,11 +851,11 @@ abstract class CouponVersionQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CouponQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CouponQuery A secondary query class using the current class as primary query
      */
     public function useCouponQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -867,7 +867,7 @@ abstract class CouponVersionQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildCouponVersion $couponVersion Object to remove from the list of results
+     * @param ChildCouponVersion $couponVersion Object to remove from the list of results
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
@@ -885,8 +885,8 @@ abstract class CouponVersionQuery extends ModelCriteria
     /**
      * Deletes all rows from the coupon_version table.
      *
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).
+     * @param  ConnectionInterface $con the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -917,13 +917,13 @@ abstract class CouponVersionQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildCouponVersion or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildCouponVersion object or primary key or array of primary keys
-     *              which is used to create the DELETE statement
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                if supported by native driver or if emulated using Propel.
-     * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     * @param  mixed               $values Criteria or ChildCouponVersion object or primary key or array of primary keys
+     *                                     which is used to create the DELETE statement
+     * @param  ConnectionInterface $con    the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                                    if supported by native driver or if emulated using Propel.
+     * @throws PropelException     Any exceptions caught during processing will be
+     *                                    rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -942,7 +942,6 @@ abstract class CouponVersionQuery extends ModelCriteria
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-
 
         CouponVersionTableMap::removeInstanceFromPool($criteria);
 

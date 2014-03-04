@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event\Category;
 
-use Thelia\Core\Event\Category\CategoryEvent;
-
 class CategoryDeleteEvent extends CategoryEvent
 {
     public function __construct($category_id)

@@ -29,6 +29,7 @@ use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 use Symfony\Component\Validator\Validation;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 
@@ -71,7 +72,7 @@ abstract class BaseForm
     {
         $this->request = $request;
 
-        $validator = Validation::createValidator();
+        $validator = Validation::createValidatorBuilder();
 
         if (!isset($options["attr"]["name"])) {
             $options["attr"]["thelia_name"] = $this->getName();
@@ -89,8 +90,14 @@ abstract class BaseForm
                 )
             );
         }
+
+        $translator = Translator::getInstance();
+
+        $validator
+            ->setTranslationDomain('validators')
+            ->setTranslator($translator);
         $this->formBuilder = $builder
-            ->addExtension(new ValidatorExtension($validator))
+            ->addExtension(new ValidatorExtension($validator->getValidator()))
             ->getFormFactory()
             ->createNamedBuilder($this->getName(), $type, $data, $this->cleanOptions($options));
         ;

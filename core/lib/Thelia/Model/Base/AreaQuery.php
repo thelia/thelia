@@ -67,9 +67,9 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\AreaQuery object.
      *
-     * @param     string $dbName The database name
-     * @param     string $modelName The phpName of a model, e.g. 'Book'
-     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param string $dbName     The database name
+     * @param string $modelName  The phpName of a model, e.g. 'Book'
+     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Area', $modelAlias = null)
     {
@@ -79,8 +79,8 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Returns a new ChildAreaQuery object.
      *
-     * @param     string $modelAlias The alias of a model in the query
-     * @param     Criteria $criteria Optional Criteria to build the query from
+     * @param string   $modelAlias The alias of a model in the query
+     * @param Criteria $criteria   Optional Criteria to build the query from
      *
      * @return ChildAreaQuery
      */
@@ -109,7 +109,7 @@ abstract class AreaQuery extends ModelCriteria
      * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param mixed               $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildArea|array|mixed the result, formatted by the current formatter
@@ -140,10 +140,10 @@ abstract class AreaQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
-     * @return   ChildArea A model object, or null if the key is not found
+     * @return ChildArea A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -170,8 +170,8 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @return ChildArea|array|mixed the result, formatted by the current formatter
      */
@@ -191,8 +191,8 @@ abstract class AreaQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
-     * @param     array $keys Primary keys to use for the query
-     * @param     ConnectionInterface $con an optional connection object
+     * @param array               $keys Primary keys to use for the query
+     * @param ConnectionInterface $con  an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -213,26 +213,24 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param     mixed $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
-
         return $this->addUsingAlias(AreaTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
      * Filter the query by a list of primary keys
      *
-     * @param     array $keys The list of primary key to use for the query
+     * @param array $keys The list of primary key to use for the query
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
-
         return $this->addUsingAlias(AreaTableMap::ID, $keys, Criteria::IN);
     }
 
@@ -246,11 +244,11 @@ abstract class AreaQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $id         The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
@@ -286,9 +284,9 @@ abstract class AreaQuery extends ModelCriteria
      * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $name The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $name       The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
@@ -316,11 +314,11 @@ abstract class AreaQuery extends ModelCriteria
      * $query->filterByPostage(array('min' => 12)); // WHERE postage > 12
      * </code>
      *
-     * @param     mixed $postage The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $postage    The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
@@ -357,13 +355,13 @@ abstract class AreaQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $createdAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $createdAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
@@ -400,13 +398,13 @@ abstract class AreaQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $updatedAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $updatedAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
@@ -436,8 +434,8 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Country object
      *
-     * @param \Thelia\Model\Country|ObjectCollection $country  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Country|ObjectCollection $country    the related object to use as filter
+     * @param string                                 $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
@@ -459,8 +457,8 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Country relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
@@ -493,11 +491,11 @@ abstract class AreaQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CountryQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CountryQuery A secondary query class using the current class as primary query
      */
     public function useCountryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -509,8 +507,8 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\AreaDeliveryModule object
      *
-     * @param \Thelia\Model\AreaDeliveryModule|ObjectCollection $areaDeliveryModule  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\AreaDeliveryModule|ObjectCollection $areaDeliveryModule the related object to use as filter
+     * @param string                                            $comparison         Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
@@ -532,8 +530,8 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the AreaDeliveryModule relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
@@ -566,11 +564,11 @@ abstract class AreaQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\AreaDeliveryModuleQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\AreaDeliveryModuleQuery A secondary query class using the current class as primary query
      */
     public function useAreaDeliveryModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -582,7 +580,7 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildArea $area Object to remove from the list of results
+     * @param ChildArea $area Object to remove from the list of results
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
@@ -598,8 +596,8 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Deletes all rows from the area table.
      *
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).
+     * @param  ConnectionInterface $con the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -630,13 +628,13 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildArea or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildArea object or primary key or array of primary keys
-     *              which is used to create the DELETE statement
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                if supported by native driver or if emulated using Propel.
-     * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     * @param  mixed               $values Criteria or ChildArea object or primary key or array of primary keys
+     *                                     which is used to create the DELETE statement
+     * @param  ConnectionInterface $con    the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                                    if supported by native driver or if emulated using Propel.
+     * @throws PropelException     Any exceptions caught during processing will be
+     *                                    rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -656,7 +654,6 @@ abstract class AreaQuery extends ModelCriteria
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-
         AreaTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
@@ -675,9 +672,9 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param      int $nbDays Maximum age of the latest update in days
+     * @param int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildAreaQuery The current query, for fluid interface
+     * @return ChildAreaQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
@@ -687,9 +684,9 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Filter by the latest created
      *
-     * @param      int $nbDays Maximum age of in days
+     * @param int $nbDays Maximum age of in days
      *
-     * @return     ChildAreaQuery The current query, for fluid interface
+     * @return ChildAreaQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
@@ -699,7 +696,7 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Order by update date desc
      *
-     * @return     ChildAreaQuery The current query, for fluid interface
+     * @return ChildAreaQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
@@ -709,7 +706,7 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Order by update date asc
      *
-     * @return     ChildAreaQuery The current query, for fluid interface
+     * @return ChildAreaQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
@@ -719,7 +716,7 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Order by create date desc
      *
-     * @return     ChildAreaQuery The current query, for fluid interface
+     * @return ChildAreaQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
@@ -729,7 +726,7 @@ abstract class AreaQuery extends ModelCriteria
     /**
      * Order by create date asc
      *
-     * @return     ChildAreaQuery The current query, for fluid interface
+     * @return ChildAreaQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {

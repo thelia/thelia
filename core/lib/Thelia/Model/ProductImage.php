@@ -13,7 +13,8 @@ class ProductImage extends BaseProductImage
     /**
      * Calculate next position relative to our parent
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         $query->filterByProduct($this->getProduct());
     }
 
@@ -58,6 +59,7 @@ class ProductImage extends BaseProductImage
                 "product_id" => $this->getProductId(),
             )
         );
+
         return true;
     }
 }

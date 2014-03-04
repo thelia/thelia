@@ -36,7 +36,6 @@ abstract class Customer implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\CustomerTableMap';
 
-
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -417,9 +416,9 @@ abstract class Customer implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed $parser A AbstractParser instance,
+     * @param mixed  $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data The source data to import from
+     * @param string $data   The source data to import from
      *
      * @return Customer The current object, for fluid interface
      */
@@ -469,154 +468,140 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getId()
     {
-
         return $this->id;
     }
 
     /**
      * Get the [ref] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getRef()
     {
-
         return $this->ref;
     }
 
     /**
      * Get the [title_id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getTitleId()
     {
-
         return $this->title_id;
     }
 
     /**
      * Get the [firstname] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getFirstname()
     {
-
         return $this->firstname;
     }
 
     /**
      * Get the [lastname] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getLastname()
     {
-
         return $this->lastname;
     }
 
     /**
      * Get the [email] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getEmail()
     {
-
         return $this->email;
     }
 
     /**
      * Get the [password] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getPassword()
     {
-
         return $this->password;
     }
 
     /**
      * Get the [algo] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getAlgo()
     {
-
         return $this->algo;
     }
 
     /**
      * Get the [reseller] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getReseller()
     {
-
         return $this->reseller;
     }
 
     /**
      * Get the [lang] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getLang()
     {
-
         return $this->lang;
     }
 
     /**
      * Get the [sponsor] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getSponsor()
     {
-
         return $this->sponsor;
     }
 
     /**
      * Get the [discount] column value.
      *
-     * @return   double
+     * @return double
      */
     public function getDiscount()
     {
-
         return $this->discount;
     }
 
     /**
      * Get the [remember_me_token] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getRememberMeToken()
     {
-
         return $this->remember_me_token;
     }
 
     /**
      * Get the [remember_me_serial] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getRememberMeSerial()
     {
-
         return $this->remember_me_serial;
     }
 
@@ -624,8 +609,8 @@ abstract class Customer implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -644,8 +629,8 @@ abstract class Customer implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -663,8 +648,8 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Set the value of [id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  int                    $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -677,15 +662,14 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::ID] = true;
         }
 
-
         return $this;
     } // setId()
 
     /**
      * Set the value of [ref] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  string                 $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setRef($v)
     {
@@ -698,15 +682,14 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::REF] = true;
         }
 
-
         return $this;
     } // setRef()
 
     /**
      * Set the value of [title_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  int                    $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setTitleId($v)
     {
@@ -723,15 +706,14 @@ abstract class Customer implements ActiveRecordInterface
             $this->aCustomerTitle = null;
         }
 
-
         return $this;
     } // setTitleId()
 
     /**
      * Set the value of [firstname] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  string                 $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setFirstname($v)
     {
@@ -744,15 +726,14 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::FIRSTNAME] = true;
         }
 
-
         return $this;
     } // setFirstname()
 
     /**
      * Set the value of [lastname] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  string                 $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setLastname($v)
     {
@@ -765,15 +746,14 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::LASTNAME] = true;
         }
 
-
         return $this;
     } // setLastname()
 
     /**
      * Set the value of [email] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  string                 $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setEmail($v)
     {
@@ -786,15 +766,14 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::EMAIL] = true;
         }
 
-
         return $this;
     } // setEmail()
 
     /**
      * Set the value of [password] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  string                 $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setPassword($v)
     {
@@ -807,15 +786,14 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::PASSWORD] = true;
         }
 
-
         return $this;
     } // setPassword()
 
     /**
      * Set the value of [algo] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  string                 $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setAlgo($v)
     {
@@ -828,15 +806,14 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::ALGO] = true;
         }
 
-
         return $this;
     } // setAlgo()
 
     /**
      * Set the value of [reseller] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  int                    $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setReseller($v)
     {
@@ -849,15 +826,14 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::RESELLER] = true;
         }
 
-
         return $this;
     } // setReseller()
 
     /**
      * Set the value of [lang] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  string                 $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setLang($v)
     {
@@ -870,15 +846,14 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::LANG] = true;
         }
 
-
         return $this;
     } // setLang()
 
     /**
      * Set the value of [sponsor] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  string                 $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setSponsor($v)
     {
@@ -891,15 +866,14 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::SPONSOR] = true;
         }
 
-
         return $this;
     } // setSponsor()
 
     /**
      * Set the value of [discount] column.
      *
-     * @param      double $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  double                 $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setDiscount($v)
     {
@@ -912,15 +886,14 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::DISCOUNT] = true;
         }
 
-
         return $this;
     } // setDiscount()
 
     /**
      * Set the value of [remember_me_token] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  string                 $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setRememberMeToken($v)
     {
@@ -933,15 +906,14 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::REMEMBER_ME_TOKEN] = true;
         }
 
-
         return $this;
     } // setRememberMeToken()
 
     /**
      * Set the value of [remember_me_serial] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  string                 $v new value
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setRememberMeSerial($v)
     {
@@ -954,16 +926,15 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::REMEMBER_ME_SERIAL] = true;
         }
 
-
         return $this;
     } // setRememberMeSerial()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  mixed                  $v string, integer (timestamp), or \DateTime value.
+     *                                   Empty strings are treated as NULL.
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -975,16 +946,15 @@ abstract class Customer implements ActiveRecordInterface
             }
         } // if either are not null
 
-
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  mixed                  $v string, integer (timestamp), or \DateTime value.
+     *                                   Empty strings are treated as NULL.
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -995,7 +965,6 @@ abstract class Customer implements ActiveRecordInterface
                 $this->modifiedColumns[CustomerTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
-
 
         return $this;
     } // setUpdatedAt()
@@ -1130,10 +1099,10 @@ abstract class Customer implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
-     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
+     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
+     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -1175,7 +1144,7 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param      ConnectionInterface $con
+     * @param  ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see Customer::setDeleted()
@@ -1218,8 +1187,8 @@ abstract class Customer implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -1280,8 +1249,8 @@ abstract class Customer implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -1375,7 +1344,7 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1519,7 +1488,7 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1535,12 +1504,12 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param      string $name name
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed Value of field.
+     * @param  string $name name
+     * @param  string $type The type of fieldname the $name is of:
+     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                      Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed  Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1554,7 +1523,7 @@ abstract class Customer implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
+     * @param  int   $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1620,12 +1589,12 @@ abstract class Customer implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                    Defaults to TableMap::TYPE_PHPNAME.
-     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
-     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                                        Defaults to TableMap::TYPE_PHPNAME.
+     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
+     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1680,12 +1649,12 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param      string $name
-     * @param      mixed  $value field value
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @param  string $name
+     * @param  mixed  $value field value
+     * @param  string $type  The type of fieldname the $name is of:
+     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                       Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1699,8 +1668,8 @@ abstract class Customer implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
-     * @param      mixed $value field value
+     * @param  int   $pos   position in xml schema
+     * @param  mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1770,8 +1739,8 @@ abstract class Customer implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param      array  $arr     An array to populate the object from.
-     * @param      string $keyType The type of keys the array uses.
+     * @param  array  $arr     An array to populate the object from.
+     * @param  string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1821,7 +1790,6 @@ abstract class Customer implements ActiveRecordInterface
         if ($this->isColumnModified(CustomerTableMap::REMEMBER_ME_SERIAL)) $criteria->add(CustomerTableMap::REMEMBER_ME_SERIAL, $this->remember_me_serial);
         if ($this->isColumnModified(CustomerTableMap::CREATED_AT)) $criteria->add(CustomerTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CustomerTableMap::UPDATED_AT)) $criteria->add(CustomerTableMap::UPDATED_AT, $this->updated_at);
-
         return $criteria;
     }
 
@@ -1843,7 +1811,7 @@ abstract class Customer implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return   int
+     * @return int
      */
     public function getPrimaryKey()
     {
@@ -1853,7 +1821,7 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param       int $key Primary key.
+     * @param  int  $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -1867,7 +1835,6 @@ abstract class Customer implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-
         return null === $this->getId();
     }
 
@@ -1877,9 +1844,9 @@ abstract class Customer implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\Customer (or compatible) type.
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
+     * @param  object          $copyObj  An object of \Thelia\Model\Customer (or compatible) type.
+     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1939,8 +1906,8 @@ abstract class Customer implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\Customer Clone of current object.
+     * @param  boolean                $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return \Thelia\Model\Customer Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1956,8 +1923,8 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildCustomerTitle object.
      *
-     * @param                  ChildCustomerTitle $v
-     * @return                 \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  ChildCustomerTitle     $v
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCustomerTitle(ChildCustomerTitle $v = null)
@@ -1976,16 +1943,14 @@ abstract class Customer implements ActiveRecordInterface
             $v->addCustomer($this);
         }
 
-
         return $this;
     }
-
 
     /**
      * Get the associated ChildCustomerTitle object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildCustomerTitle The associated ChildCustomerTitle object.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildCustomerTitle  The associated ChildCustomerTitle object.
      * @throws PropelException
      */
     public function getCustomerTitle(ConnectionInterface $con = null)
@@ -2004,13 +1969,12 @@ abstract class Customer implements ActiveRecordInterface
         return $this->aCustomerTitle;
     }
 
-
     /**
      * Initializes a collection based on the name of a relation.
      * Avoids crafting an 'init[$relationName]s' method name
      * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param      string $relationName The name of the relation to initialize
+     * @param  string $relationName The name of the relation to initialize
      * @return void
      */
     public function initRelation($relationName)
@@ -2055,8 +2019,8 @@ abstract class Customer implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2078,8 +2042,8 @@ abstract class Customer implements ActiveRecordInterface
      * If this ChildCustomer is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                  $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface       $con      optional connection object
      * @return Collection|ChildAddress[] List of ChildAddress objects
      * @throws PropelException
      */
@@ -2135,9 +2099,9 @@ abstract class Customer implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $addresses A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCustomer The current object (for fluent API support)
+     * @param  Collection          $addresses A Propel collection.
+     * @param  ConnectionInterface $con       Optional connection object
+     * @return ChildCustomer       The current object (for fluent API support)
      */
     public function setAddresses(Collection $addresses, ConnectionInterface $con = null)
     {
@@ -2164,10 +2128,10 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Returns the number of related Address objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Address objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related Address objects.
      * @throws PropelException
      */
     public function countAddresses(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2199,8 +2163,8 @@ abstract class Customer implements ActiveRecordInterface
      * Method called to associate a ChildAddress object to this object
      * through the ChildAddress foreign key attribute.
      *
-     * @param    ChildAddress $l ChildAddress
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  ChildAddress           $l ChildAddress
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function addAddress(ChildAddress $l)
     {
@@ -2226,7 +2190,7 @@ abstract class Customer implements ActiveRecordInterface
     }
 
     /**
-     * @param  Address $address The address object to remove.
+     * @param  Address       $address The address object to remove.
      * @return ChildCustomer The current object (for fluent API support)
      */
     public function removeAddress($address)
@@ -2256,9 +2220,9 @@ abstract class Customer implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Customer.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                  $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface       $con          optional connection object
+     * @param  string                    $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildAddress[] List of ChildAddress objects
      */
     public function getAddressesJoinCustomerTitle($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2281,9 +2245,9 @@ abstract class Customer implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Customer.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                  $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface       $con          optional connection object
+     * @param  string                    $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildAddress[] List of ChildAddress objects
      */
     public function getAddressesJoinCountry($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2323,8 +2287,8 @@ abstract class Customer implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2346,8 +2310,8 @@ abstract class Customer implements ActiveRecordInterface
      * If this ChildCustomer is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con      optional connection object
      * @return Collection|ChildOrder[] List of ChildOrder objects
      * @throws PropelException
      */
@@ -2403,9 +2367,9 @@ abstract class Customer implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $orders A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCustomer The current object (for fluent API support)
+     * @param  Collection          $orders A Propel collection.
+     * @param  ConnectionInterface $con    Optional connection object
+     * @return ChildCustomer       The current object (for fluent API support)
      */
     public function setOrders(Collection $orders, ConnectionInterface $con = null)
     {
@@ -2432,10 +2396,10 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Returns the number of related Order objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Order objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related Order objects.
      * @throws PropelException
      */
     public function countOrders(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2467,8 +2431,8 @@ abstract class Customer implements ActiveRecordInterface
      * Method called to associate a ChildOrder object to this object
      * through the ChildOrder foreign key attribute.
      *
-     * @param    ChildOrder $l ChildOrder
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  ChildOrder             $l ChildOrder
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function addOrder(ChildOrder $l)
     {
@@ -2494,7 +2458,7 @@ abstract class Customer implements ActiveRecordInterface
     }
 
     /**
-     * @param  Order $order The order object to remove.
+     * @param  Order         $order The order object to remove.
      * @return ChildCustomer The current object (for fluent API support)
      */
     public function removeOrder($order)
@@ -2524,9 +2488,9 @@ abstract class Customer implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Customer.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersJoinCurrency($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2549,9 +2513,9 @@ abstract class Customer implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Customer.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersJoinOrderAddressRelatedByInvoiceOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2574,9 +2538,9 @@ abstract class Customer implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Customer.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersJoinOrderAddressRelatedByDeliveryOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2599,9 +2563,9 @@ abstract class Customer implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Customer.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersJoinOrderStatus($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2624,9 +2588,9 @@ abstract class Customer implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Customer.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersJoinModuleRelatedByPaymentModuleId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2649,9 +2613,9 @@ abstract class Customer implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Customer.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersJoinModuleRelatedByDeliveryModuleId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2674,9 +2638,9 @@ abstract class Customer implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Customer.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersJoinLang($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2716,8 +2680,8 @@ abstract class Customer implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2739,8 +2703,8 @@ abstract class Customer implements ActiveRecordInterface
      * If this ChildCustomer is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria               $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface    $con      optional connection object
      * @return Collection|ChildCart[] List of ChildCart objects
      * @throws PropelException
      */
@@ -2796,9 +2760,9 @@ abstract class Customer implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $carts A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCustomer The current object (for fluent API support)
+     * @param  Collection          $carts A Propel collection.
+     * @param  ConnectionInterface $con   Optional connection object
+     * @return ChildCustomer       The current object (for fluent API support)
      */
     public function setCarts(Collection $carts, ConnectionInterface $con = null)
     {
@@ -2825,10 +2789,10 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Returns the number of related Cart objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Cart objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related Cart objects.
      * @throws PropelException
      */
     public function countCarts(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2860,8 +2824,8 @@ abstract class Customer implements ActiveRecordInterface
      * Method called to associate a ChildCart object to this object
      * through the ChildCart foreign key attribute.
      *
-     * @param    ChildCart $l ChildCart
-     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     * @param  ChildCart              $l ChildCart
+     * @return \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function addCart(ChildCart $l)
     {
@@ -2887,7 +2851,7 @@ abstract class Customer implements ActiveRecordInterface
     }
 
     /**
-     * @param  Cart $cart The cart object to remove.
+     * @param  Cart          $cart The cart object to remove.
      * @return ChildCustomer The current object (for fluent API support)
      */
     public function removeCart($cart)
@@ -2917,9 +2881,9 @@ abstract class Customer implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Customer.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria               $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface    $con          optional connection object
+     * @param  string                 $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildCart[] List of ChildCart objects
      */
     public function getCartsJoinAddressRelatedByAddressDeliveryId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2942,9 +2906,9 @@ abstract class Customer implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Customer.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria               $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface    $con          optional connection object
+     * @param  string                 $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildCart[] List of ChildCart objects
      */
     public function getCartsJoinAddressRelatedByAddressInvoiceId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2967,9 +2931,9 @@ abstract class Customer implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Customer.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria               $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface    $con          optional connection object
+     * @param  string                 $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildCart[] List of ChildCart objects
      */
     public function getCartsJoinCurrency($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -3015,7 +2979,7 @@ abstract class Customer implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param      boolean $deep Whether to also clear the references on all referrer objects.
+     * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -3058,7 +3022,7 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildCustomer The current object (for fluent API support)
+     * @return ChildCustomer The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {

@@ -44,7 +44,6 @@ abstract class Order implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\OrderTableMap';
 
-
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -466,9 +465,9 @@ abstract class Order implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed $parser A AbstractParser instance,
+     * @param mixed  $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data The source data to import from
+     * @param string $data   The source data to import from
      *
      * @return Order The current object, for fluid interface
      */
@@ -518,55 +517,50 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getId()
     {
-
         return $this->id;
     }
 
     /**
      * Get the [ref] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getRef()
     {
-
         return $this->ref;
     }
 
     /**
      * Get the [customer_id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getCustomerId()
     {
-
         return $this->customer_id;
     }
 
     /**
      * Get the [invoice_order_address_id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getInvoiceOrderAddressId()
     {
-
         return $this->invoice_order_address_id;
     }
 
     /**
      * Get the [delivery_order_address_id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getDeliveryOrderAddressId()
     {
-
         return $this->delivery_order_address_id;
     }
 
@@ -574,8 +568,8 @@ abstract class Order implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [invoice_date] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00
      *
@@ -593,121 +587,110 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the [currency_id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getCurrencyId()
     {
-
         return $this->currency_id;
     }
 
     /**
      * Get the [currency_rate] column value.
      *
-     * @return   double
+     * @return double
      */
     public function getCurrencyRate()
     {
-
         return $this->currency_rate;
     }
 
     /**
      * Get the [transaction_ref] column value.
      * transaction reference - usually use to identify a transaction with banking modules
-     * @return   string
+     * @return string
      */
     public function getTransactionRef()
     {
-
         return $this->transaction_ref;
     }
 
     /**
      * Get the [delivery_ref] column value.
      * delivery reference - usually use to identify a delivery progress on a distant delivery tracker website
-     * @return   string
+     * @return string
      */
     public function getDeliveryRef()
     {
-
         return $this->delivery_ref;
     }
 
     /**
      * Get the [invoice_ref] column value.
      * the invoice reference
-     * @return   string
+     * @return string
      */
     public function getInvoiceRef()
     {
-
         return $this->invoice_ref;
     }
 
     /**
      * Get the [discount] column value.
      *
-     * @return   double
+     * @return double
      */
     public function getDiscount()
     {
-
         return $this->discount;
     }
 
     /**
      * Get the [postage] column value.
      *
-     * @return   double
+     * @return double
      */
     public function getPostage()
     {
-
         return $this->postage;
     }
 
     /**
      * Get the [payment_module_id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getPaymentModuleId()
     {
-
         return $this->payment_module_id;
     }
 
     /**
      * Get the [delivery_module_id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getDeliveryModuleId()
     {
-
         return $this->delivery_module_id;
     }
 
     /**
      * Get the [status_id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getStatusId()
     {
-
         return $this->status_id;
     }
 
     /**
      * Get the [lang_id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getLangId()
     {
-
         return $this->lang_id;
     }
 
@@ -715,8 +698,8 @@ abstract class Order implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -735,8 +718,8 @@ abstract class Order implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -754,8 +737,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Set the value of [id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  int                 $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -768,15 +751,14 @@ abstract class Order implements ActiveRecordInterface
             $this->modifiedColumns[OrderTableMap::ID] = true;
         }
 
-
         return $this;
     } // setId()
 
     /**
      * Set the value of [ref] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  string              $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setRef($v)
     {
@@ -789,15 +771,14 @@ abstract class Order implements ActiveRecordInterface
             $this->modifiedColumns[OrderTableMap::REF] = true;
         }
 
-
         return $this;
     } // setRef()
 
     /**
      * Set the value of [customer_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  int                 $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setCustomerId($v)
     {
@@ -814,15 +795,14 @@ abstract class Order implements ActiveRecordInterface
             $this->aCustomer = null;
         }
 
-
         return $this;
     } // setCustomerId()
 
     /**
      * Set the value of [invoice_order_address_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  int                 $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setInvoiceOrderAddressId($v)
     {
@@ -839,15 +819,14 @@ abstract class Order implements ActiveRecordInterface
             $this->aOrderAddressRelatedByInvoiceOrderAddressId = null;
         }
 
-
         return $this;
     } // setInvoiceOrderAddressId()
 
     /**
      * Set the value of [delivery_order_address_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  int                 $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setDeliveryOrderAddressId($v)
     {
@@ -864,16 +843,15 @@ abstract class Order implements ActiveRecordInterface
             $this->aOrderAddressRelatedByDeliveryOrderAddressId = null;
         }
 
-
         return $this;
     } // setDeliveryOrderAddressId()
 
     /**
      * Sets the value of [invoice_date] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  mixed               $v string, integer (timestamp), or \DateTime value.
+     *                                Empty strings are treated as NULL.
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setInvoiceDate($v)
     {
@@ -885,15 +863,14 @@ abstract class Order implements ActiveRecordInterface
             }
         } // if either are not null
 
-
         return $this;
     } // setInvoiceDate()
 
     /**
      * Set the value of [currency_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  int                 $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setCurrencyId($v)
     {
@@ -910,15 +887,14 @@ abstract class Order implements ActiveRecordInterface
             $this->aCurrency = null;
         }
 
-
         return $this;
     } // setCurrencyId()
 
     /**
      * Set the value of [currency_rate] column.
      *
-     * @param      double $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  double              $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setCurrencyRate($v)
     {
@@ -931,15 +907,14 @@ abstract class Order implements ActiveRecordInterface
             $this->modifiedColumns[OrderTableMap::CURRENCY_RATE] = true;
         }
 
-
         return $this;
     } // setCurrencyRate()
 
     /**
      * Set the value of [transaction_ref] column.
      * transaction reference - usually use to identify a transaction with banking modules
-     * @param      string $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  string              $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setTransactionRef($v)
     {
@@ -952,15 +927,14 @@ abstract class Order implements ActiveRecordInterface
             $this->modifiedColumns[OrderTableMap::TRANSACTION_REF] = true;
         }
 
-
         return $this;
     } // setTransactionRef()
 
     /**
      * Set the value of [delivery_ref] column.
      * delivery reference - usually use to identify a delivery progress on a distant delivery tracker website
-     * @param      string $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  string              $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setDeliveryRef($v)
     {
@@ -973,15 +947,14 @@ abstract class Order implements ActiveRecordInterface
             $this->modifiedColumns[OrderTableMap::DELIVERY_REF] = true;
         }
 
-
         return $this;
     } // setDeliveryRef()
 
     /**
      * Set the value of [invoice_ref] column.
      * the invoice reference
-     * @param      string $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  string              $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setInvoiceRef($v)
     {
@@ -994,15 +967,14 @@ abstract class Order implements ActiveRecordInterface
             $this->modifiedColumns[OrderTableMap::INVOICE_REF] = true;
         }
 
-
         return $this;
     } // setInvoiceRef()
 
     /**
      * Set the value of [discount] column.
      *
-     * @param      double $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  double              $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setDiscount($v)
     {
@@ -1015,15 +987,14 @@ abstract class Order implements ActiveRecordInterface
             $this->modifiedColumns[OrderTableMap::DISCOUNT] = true;
         }
 
-
         return $this;
     } // setDiscount()
 
     /**
      * Set the value of [postage] column.
      *
-     * @param      double $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  double              $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setPostage($v)
     {
@@ -1036,15 +1007,14 @@ abstract class Order implements ActiveRecordInterface
             $this->modifiedColumns[OrderTableMap::POSTAGE] = true;
         }
 
-
         return $this;
     } // setPostage()
 
     /**
      * Set the value of [payment_module_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  int                 $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setPaymentModuleId($v)
     {
@@ -1061,15 +1031,14 @@ abstract class Order implements ActiveRecordInterface
             $this->aModuleRelatedByPaymentModuleId = null;
         }
 
-
         return $this;
     } // setPaymentModuleId()
 
     /**
      * Set the value of [delivery_module_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  int                 $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setDeliveryModuleId($v)
     {
@@ -1086,15 +1055,14 @@ abstract class Order implements ActiveRecordInterface
             $this->aModuleRelatedByDeliveryModuleId = null;
         }
 
-
         return $this;
     } // setDeliveryModuleId()
 
     /**
      * Set the value of [status_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  int                 $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setStatusId($v)
     {
@@ -1111,15 +1079,14 @@ abstract class Order implements ActiveRecordInterface
             $this->aOrderStatus = null;
         }
 
-
         return $this;
     } // setStatusId()
 
     /**
      * Set the value of [lang_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  int                 $v new value
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setLangId($v)
     {
@@ -1136,16 +1103,15 @@ abstract class Order implements ActiveRecordInterface
             $this->aLang = null;
         }
 
-
         return $this;
     } // setLangId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  mixed               $v string, integer (timestamp), or \DateTime value.
+     *                                Empty strings are treated as NULL.
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -1157,16 +1123,15 @@ abstract class Order implements ActiveRecordInterface
             }
         } // if either are not null
 
-
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  mixed               $v string, integer (timestamp), or \DateTime value.
+     *                                Empty strings are treated as NULL.
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -1177,7 +1142,6 @@ abstract class Order implements ActiveRecordInterface
                 $this->modifiedColumns[OrderTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
-
 
         return $this;
     } // setUpdatedAt()
@@ -1345,10 +1309,10 @@ abstract class Order implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
-     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
+     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
+     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -1395,7 +1359,7 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param      ConnectionInterface $con
+     * @param  ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see Order::setDeleted()
@@ -1438,8 +1402,8 @@ abstract class Order implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -1500,8 +1464,8 @@ abstract class Order implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -1627,7 +1591,7 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1789,7 +1753,7 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1805,12 +1769,12 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param      string $name name
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed Value of field.
+     * @param  string $name name
+     * @param  string $type The type of fieldname the $name is of:
+     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                      Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed  Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1824,7 +1788,7 @@ abstract class Order implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
+     * @param  int   $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1899,12 +1863,12 @@ abstract class Order implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                    Defaults to TableMap::TYPE_PHPNAME.
-     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
-     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                                        Defaults to TableMap::TYPE_PHPNAME.
+     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
+     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1980,12 +1944,12 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param      string $name
-     * @param      mixed  $value field value
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @param  string $name
+     * @param  mixed  $value field value
+     * @param  string $type  The type of fieldname the $name is of:
+     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                       Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1999,8 +1963,8 @@ abstract class Order implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
-     * @param      mixed $value field value
+     * @param  int   $pos   position in xml schema
+     * @param  mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -2079,8 +2043,8 @@ abstract class Order implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param      array  $arr     An array to populate the object from.
-     * @param      string $keyType The type of keys the array uses.
+     * @param  array  $arr     An array to populate the object from.
+     * @param  string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -2136,7 +2100,6 @@ abstract class Order implements ActiveRecordInterface
         if ($this->isColumnModified(OrderTableMap::LANG_ID)) $criteria->add(OrderTableMap::LANG_ID, $this->lang_id);
         if ($this->isColumnModified(OrderTableMap::CREATED_AT)) $criteria->add(OrderTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(OrderTableMap::UPDATED_AT)) $criteria->add(OrderTableMap::UPDATED_AT, $this->updated_at);
-
         return $criteria;
     }
 
@@ -2158,7 +2121,7 @@ abstract class Order implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return   int
+     * @return int
      */
     public function getPrimaryKey()
     {
@@ -2168,7 +2131,7 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param       int $key Primary key.
+     * @param  int  $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -2182,7 +2145,6 @@ abstract class Order implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-
         return null === $this->getId();
     }
 
@@ -2192,9 +2154,9 @@ abstract class Order implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\Order (or compatible) type.
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
+     * @param  object          $copyObj  An object of \Thelia\Model\Order (or compatible) type.
+     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -2251,8 +2213,8 @@ abstract class Order implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\Order Clone of current object.
+     * @param  boolean             $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return \Thelia\Model\Order Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -2268,8 +2230,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildCurrency object.
      *
-     * @param                  ChildCurrency $v
-     * @return                 \Thelia\Model\Order The current object (for fluent API support)
+     * @param  ChildCurrency       $v
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCurrency(ChildCurrency $v = null)
@@ -2288,7 +2250,6 @@ abstract class Order implements ActiveRecordInterface
             $v->addOrder($this);
         }
 
-
         return $this;
     }
 
@@ -2296,8 +2257,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the associated ChildCurrency object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildCurrency The associated ChildCurrency object.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildCurrency       The associated ChildCurrency object.
      * @throws PropelException
      */
     public function getCurrency(ConnectionInterface $con = null)
@@ -2319,8 +2280,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildCustomer object.
      *
-     * @param                  ChildCustomer $v
-     * @return                 \Thelia\Model\Order The current object (for fluent API support)
+     * @param  ChildCustomer       $v
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCustomer(ChildCustomer $v = null)
@@ -2339,7 +2300,6 @@ abstract class Order implements ActiveRecordInterface
             $v->addOrder($this);
         }
 
-
         return $this;
     }
 
@@ -2347,8 +2307,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the associated ChildCustomer object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildCustomer The associated ChildCustomer object.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildCustomer       The associated ChildCustomer object.
      * @throws PropelException
      */
     public function getCustomer(ConnectionInterface $con = null)
@@ -2370,8 +2330,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildOrderAddress object.
      *
-     * @param                  ChildOrderAddress $v
-     * @return                 \Thelia\Model\Order The current object (for fluent API support)
+     * @param  ChildOrderAddress   $v
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      * @throws PropelException
      */
     public function setOrderAddressRelatedByInvoiceOrderAddressId(ChildOrderAddress $v = null)
@@ -2390,7 +2350,6 @@ abstract class Order implements ActiveRecordInterface
             $v->addOrderRelatedByInvoiceOrderAddressId($this);
         }
 
-
         return $this;
     }
 
@@ -2398,8 +2357,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the associated ChildOrderAddress object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildOrderAddress The associated ChildOrderAddress object.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildOrderAddress   The associated ChildOrderAddress object.
      * @throws PropelException
      */
     public function getOrderAddressRelatedByInvoiceOrderAddressId(ConnectionInterface $con = null)
@@ -2421,8 +2380,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildOrderAddress object.
      *
-     * @param                  ChildOrderAddress $v
-     * @return                 \Thelia\Model\Order The current object (for fluent API support)
+     * @param  ChildOrderAddress   $v
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      * @throws PropelException
      */
     public function setOrderAddressRelatedByDeliveryOrderAddressId(ChildOrderAddress $v = null)
@@ -2441,7 +2400,6 @@ abstract class Order implements ActiveRecordInterface
             $v->addOrderRelatedByDeliveryOrderAddressId($this);
         }
 
-
         return $this;
     }
 
@@ -2449,8 +2407,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the associated ChildOrderAddress object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildOrderAddress The associated ChildOrderAddress object.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildOrderAddress   The associated ChildOrderAddress object.
      * @throws PropelException
      */
     public function getOrderAddressRelatedByDeliveryOrderAddressId(ConnectionInterface $con = null)
@@ -2472,8 +2430,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildOrderStatus object.
      *
-     * @param                  ChildOrderStatus $v
-     * @return                 \Thelia\Model\Order The current object (for fluent API support)
+     * @param  ChildOrderStatus    $v
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      * @throws PropelException
      */
     public function setOrderStatus(ChildOrderStatus $v = null)
@@ -2492,7 +2450,6 @@ abstract class Order implements ActiveRecordInterface
             $v->addOrder($this);
         }
 
-
         return $this;
     }
 
@@ -2500,8 +2457,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the associated ChildOrderStatus object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildOrderStatus The associated ChildOrderStatus object.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildOrderStatus    The associated ChildOrderStatus object.
      * @throws PropelException
      */
     public function getOrderStatus(ConnectionInterface $con = null)
@@ -2523,8 +2480,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildModule object.
      *
-     * @param                  ChildModule $v
-     * @return                 \Thelia\Model\Order The current object (for fluent API support)
+     * @param  ChildModule         $v
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      * @throws PropelException
      */
     public function setModuleRelatedByPaymentModuleId(ChildModule $v = null)
@@ -2543,7 +2500,6 @@ abstract class Order implements ActiveRecordInterface
             $v->addOrderRelatedByPaymentModuleId($this);
         }
 
-
         return $this;
     }
 
@@ -2551,8 +2507,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the associated ChildModule object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildModule The associated ChildModule object.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildModule         The associated ChildModule object.
      * @throws PropelException
      */
     public function getModuleRelatedByPaymentModuleId(ConnectionInterface $con = null)
@@ -2574,8 +2530,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildModule object.
      *
-     * @param                  ChildModule $v
-     * @return                 \Thelia\Model\Order The current object (for fluent API support)
+     * @param  ChildModule         $v
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      * @throws PropelException
      */
     public function setModuleRelatedByDeliveryModuleId(ChildModule $v = null)
@@ -2594,7 +2550,6 @@ abstract class Order implements ActiveRecordInterface
             $v->addOrderRelatedByDeliveryModuleId($this);
         }
 
-
         return $this;
     }
 
@@ -2602,8 +2557,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the associated ChildModule object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildModule The associated ChildModule object.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildModule         The associated ChildModule object.
      * @throws PropelException
      */
     public function getModuleRelatedByDeliveryModuleId(ConnectionInterface $con = null)
@@ -2625,8 +2580,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildLang object.
      *
-     * @param                  ChildLang $v
-     * @return                 \Thelia\Model\Order The current object (for fluent API support)
+     * @param  ChildLang           $v
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      * @throws PropelException
      */
     public function setLang(ChildLang $v = null)
@@ -2645,7 +2600,6 @@ abstract class Order implements ActiveRecordInterface
             $v->addOrder($this);
         }
 
-
         return $this;
     }
 
@@ -2653,8 +2607,8 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the associated ChildLang object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildLang The associated ChildLang object.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildLang           The associated ChildLang object.
      * @throws PropelException
      */
     public function getLang(ConnectionInterface $con = null)
@@ -2679,7 +2633,7 @@ abstract class Order implements ActiveRecordInterface
      * Avoids crafting an 'init[$relationName]s' method name
      * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param      string $relationName The name of the relation to initialize
+     * @param  string $relationName The name of the relation to initialize
      * @return void
      */
     public function initRelation($relationName)
@@ -2721,8 +2675,8 @@ abstract class Order implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2744,8 +2698,8 @@ abstract class Order implements ActiveRecordInterface
      * If this ChildOrder is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                       $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface            $con      optional connection object
      * @return Collection|ChildOrderProduct[] List of ChildOrderProduct objects
      * @throws PropelException
      */
@@ -2801,14 +2755,13 @@ abstract class Order implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $orderProducts A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildOrder The current object (for fluent API support)
+     * @param  Collection          $orderProducts A Propel collection.
+     * @param  ConnectionInterface $con           Optional connection object
+     * @return ChildOrder          The current object (for fluent API support)
      */
     public function setOrderProducts(Collection $orderProducts, ConnectionInterface $con = null)
     {
         $orderProductsToDelete = $this->getOrderProducts(new Criteria(), $con)->diff($orderProducts);
-
 
         $this->orderProductsScheduledForDeletion = $orderProductsToDelete;
 
@@ -2830,10 +2783,10 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Returns the number of related OrderProduct objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related OrderProduct objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related OrderProduct objects.
      * @throws PropelException
      */
     public function countOrderProducts(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2865,8 +2818,8 @@ abstract class Order implements ActiveRecordInterface
      * Method called to associate a ChildOrderProduct object to this object
      * through the ChildOrderProduct foreign key attribute.
      *
-     * @param    ChildOrderProduct $l ChildOrderProduct
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  ChildOrderProduct   $l ChildOrderProduct
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function addOrderProduct(ChildOrderProduct $l)
     {
@@ -2893,7 +2846,7 @@ abstract class Order implements ActiveRecordInterface
 
     /**
      * @param  OrderProduct $orderProduct The orderProduct object to remove.
-     * @return ChildOrder The current object (for fluent API support)
+     * @return ChildOrder   The current object (for fluent API support)
      */
     public function removeOrderProduct($orderProduct)
     {
@@ -2939,8 +2892,8 @@ abstract class Order implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2962,8 +2915,8 @@ abstract class Order implements ActiveRecordInterface
      * If this ChildOrder is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                      $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface           $con      optional connection object
      * @return Collection|ChildOrderCoupon[] List of ChildOrderCoupon objects
      * @throws PropelException
      */
@@ -3019,14 +2972,13 @@ abstract class Order implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $orderCoupons A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildOrder The current object (for fluent API support)
+     * @param  Collection          $orderCoupons A Propel collection.
+     * @param  ConnectionInterface $con          Optional connection object
+     * @return ChildOrder          The current object (for fluent API support)
      */
     public function setOrderCoupons(Collection $orderCoupons, ConnectionInterface $con = null)
     {
         $orderCouponsToDelete = $this->getOrderCoupons(new Criteria(), $con)->diff($orderCoupons);
-
 
         $this->orderCouponsScheduledForDeletion = $orderCouponsToDelete;
 
@@ -3048,10 +3000,10 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Returns the number of related OrderCoupon objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related OrderCoupon objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related OrderCoupon objects.
      * @throws PropelException
      */
     public function countOrderCoupons(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -3083,8 +3035,8 @@ abstract class Order implements ActiveRecordInterface
      * Method called to associate a ChildOrderCoupon object to this object
      * through the ChildOrderCoupon foreign key attribute.
      *
-     * @param    ChildOrderCoupon $l ChildOrderCoupon
-     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     * @param  ChildOrderCoupon    $l ChildOrderCoupon
+     * @return \Thelia\Model\Order The current object (for fluent API support)
      */
     public function addOrderCoupon(ChildOrderCoupon $l)
     {
@@ -3111,7 +3063,7 @@ abstract class Order implements ActiveRecordInterface
 
     /**
      * @param  OrderCoupon $orderCoupon The orderCoupon object to remove.
-     * @return ChildOrder The current object (for fluent API support)
+     * @return ChildOrder  The current object (for fluent API support)
      */
     public function removeOrderCoupon($orderCoupon)
     {
@@ -3166,7 +3118,7 @@ abstract class Order implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param      boolean $deep Whether to also clear the references on all referrer objects.
+     * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -3210,7 +3162,7 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildOrder The current object (for fluent API support)
+     * @return ChildOrder The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
@@ -3294,7 +3246,6 @@ abstract class Order implements ActiveRecordInterface
     {
 
     }
-
 
     /**
      * Derived method to catches calls to undefined methods.

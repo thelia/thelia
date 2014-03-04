@@ -26,6 +26,7 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserContext;
@@ -201,6 +202,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 break;
             case "total_taxed_price":
                 $result = $cart->getTaxedAmount($taxCountry);
+                break;
+            case "total_taxed_price_without_discount":
+                $result = $cart->getTaxedAmount($taxCountry, false);
                 break;
         }
 
@@ -388,9 +392,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             }
 
             return $this->dataAccess($objectLabel, $params, $data, $noGetterData);
+        } else {
+            throw new NotFoundHttpException();
         }
-
-        return '';
     }
 
     /**

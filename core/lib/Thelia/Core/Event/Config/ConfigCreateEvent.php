@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event\Config;
 
-use Thelia\Core\Event\Config\ConfigEvent;
-
 class ConfigCreateEvent extends ConfigEvent
 {
     protected $event_name;

@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event\Attribute;
 
-use Thelia\Core\Event\Attribute\AttributeAvCreateEvent;
-
 class AttributeAvUpdateEvent extends AttributeAvCreateEvent
 {
     protected $attributeAv_id;

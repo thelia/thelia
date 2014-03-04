@@ -23,7 +23,6 @@
 
 namespace Thelia\Controller\Admin;
 
-
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;

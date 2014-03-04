@@ -30,7 +30,6 @@ use Thelia\Rewriting\RewritingRetriever;
 use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-
 class URL
 {
     protected $resolver = null;

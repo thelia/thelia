@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\MessageVersionQuery as BaseMessageVersionQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'message_version' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\MessageVersionQuery as BaseMessageVersionQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class MessageVersionQuery extends BaseMessageVersionQuery {
-
+class MessageVersionQuery extends BaseMessageVersionQuery
+{
 } // MessageVersionQuery

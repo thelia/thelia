@@ -241,7 +241,7 @@ class TheliaLoop extends AbstractSmartyPlugin
 
         // Find pagination
         $pagination = self::getPagination($loopName);
-        if ($pagination === null) { // loop gas no result
+        if ($pagination === null) { // loop has no result
 
             return '';
         }
@@ -250,17 +250,33 @@ class TheliaLoop extends AbstractSmartyPlugin
             return '';
         }
 
+        $nbPage = $this->getParam($params, 'numPage', 10);
+        $maxPage = $pagination->getLastPage();
+
+
         if ($content === null) {
-            $page = 1;
+            $page = $pagination->getPage();
+            if($maxPage > ($page + $nbPage)) {
+                $end = $page + $nbPage;
+            } else {
+                $end = $maxPage;
+            }
+            $template->assign('PREV', $page > 1 ? $page-1: $page);
+            $template->assign('NEXT', $page < $maxPage ? $page+1 : $maxPage);
+            $template->assign('END', $end);
+            $template->assign('LAST', $pagination->getLastPage());
+
         } else {
             $page = $template->getTemplateVars('PAGE');
             $page++;
         }
 
-        if ($page <= $pagination->getLastPage()) {
+
+
+        if ($page <= $template->getTemplateVars('END')) {
             $template->assign('PAGE', $page);
             $template->assign('CURRENT', $pagination->getPage());
-            $template->assign('LAST', $pagination->getLastPage());
+
 
             $repeat = true;
         }

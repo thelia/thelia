@@ -54,7 +54,7 @@ class Module extends AbstractSmartyPlugin
      *   AdminIncludes/<location>.html file, and fetch it as a Smarty template.
      * - countvar : this is the name of a template variable where the number of found modules includes will be assigned.
      *
-     * @param array $params
+     * @param array                     $params
      * @param \Smarty_Internal_Template $template
      * @internal param \Thelia\Core\Template\Smarty\Plugins\unknown $smarty
      *

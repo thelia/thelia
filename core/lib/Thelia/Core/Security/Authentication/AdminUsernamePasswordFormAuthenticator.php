@@ -26,7 +26,6 @@ namespace Thelia\Core\Security\Authentication;
 
 use Symfony\Component\HttpFoundation\Request;
 
-
 use Thelia\Core\Security\UserProvider\AdminUserProvider;
 
 use Thelia\Form\AdminLogin;

@@ -28,6 +28,7 @@ use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\TemplateHelper;
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -103,11 +104,11 @@ class OrderController extends BaseFrontController
             $this->redirectToRoute("order.invoice");
 
         } catch (FormValidationException $e) {
-            $message = sprintf("Please check your input: %s", $e->getMessage());
+            $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
-            $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+            $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
         }
 
         if ($message !== false) {
@@ -159,11 +160,11 @@ class OrderController extends BaseFrontController
             $this->redirectToRoute("order.payment.process");
 
         } catch (FormValidationException $e) {
-            $message = sprintf("Please check your input: %s", $e->getMessage());
+            $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
-            $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+            $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
         }
 
         if ($message !== false) {

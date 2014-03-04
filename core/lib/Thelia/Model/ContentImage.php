@@ -13,7 +13,8 @@ class ContentImage extends BaseContentImage
     /**
      * Calculate next position relative to our parent
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         $query->filterByContent($this->getContent());
     }
 
@@ -58,6 +59,7 @@ class ContentImage extends BaseContentImage
                 "content_id" => $this->getContentId(),
             )
         );
+
         return true;
     }
 }

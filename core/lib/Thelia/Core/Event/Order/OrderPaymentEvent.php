@@ -44,7 +44,8 @@ class OrderPaymentEvent extends ActionEvent
      */
     protected $response;
 
-    public function __construct(Order $order) {
+    public function __construct(Order $order)
+    {
         $this->order = $order;
     }
 
@@ -78,6 +79,5 @@ class OrderPaymentEvent extends ActionEvent
     {
         return null !== $this->response;
     }
-
 
 }

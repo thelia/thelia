@@ -10,34 +10,32 @@ use Thelia\Model\Base\Admin as BaseAdminUser;
 class AdminLog extends BaseAdminLog
 {
     /**
-	 * A simple helper to insert an entry in the admin log
-	 *
+     * A simple helper to insert an entry in the admin log
+     *
      * @param            $resource
      * @param            $action
      * @param            $message
      * @param Request    $request
      * @param Base\Admin $adminUser
      */
-    public static function append($resource, $action, $message, Request $request, BaseAdminUser $adminUser = null, $withRequestContent = true) {
-
-		$log = new AdminLog();
+    public static function append($resource, $action, $message, Request $request, BaseAdminUser $adminUser = null, $withRequestContent = true)
+    {
+        $log = new AdminLog();
 
         $log
-	       	->setAdminLogin($adminUser !== null ? $adminUser->getLogin() : '<no login>')
-	       	->setAdminFirstname($adminUser !== null ? $adminUser->getFirstname() : '<no first name>')
-	       	->setAdminLastname($adminUser !== null ? $adminUser->getLastname() : '<no last name>')
-	       	->setResource($resource)
-	       	->setAction($action)
+            ->setAdminLogin($adminUser !== null ? $adminUser->getLogin() : '<no login>')
+            ->setAdminFirstname($adminUser !== null ? $adminUser->getFirstname() : '<no first name>')
+            ->setAdminLastname($adminUser !== null ? $adminUser->getLastname() : '<no last name>')
+            ->setResource($resource)
+            ->setAction($action)
             ->setMessage($message)
-	       	->setRequest($request->toString($withRequestContent))
-	    ;
+            ->setRequest($request->toString($withRequestContent));
 
         try {
-        	$log->save();
-        }
-        catch (\Exception $ex) {
-        	Tlog::getInstance()->err("Failed to insert new entry in AdminLog: {ex}", array('ex' => $ex));
+            $log->save();
+        } catch (\Exception $ex) {
+            Tlog::getInstance()->err("Failed to insert new entry in AdminLog: {ex}", array('ex' => $ex));
         }
 
-	}
+    }
 }

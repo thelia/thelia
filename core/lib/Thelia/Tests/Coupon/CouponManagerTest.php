@@ -166,7 +166,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->method('getCheckoutPostagePrice')
             ->will($this->returnValue(8.30));
         $stubFacade->expects($this->any())
-            ->method('getCartTotalPrice')
+            ->method('getCartTotalTaxPrice')
             ->will($this->returnValue(122.53));
 
         $couponManager = new CouponManager($stubContainer);
@@ -227,7 +227,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->method('getCheckoutPostagePrice')
             ->will($this->returnValue(8.30));
         $stubFacade->expects($this->any())
-            ->method('getCartTotalPrice')
+            ->method('getCartTotalTaxPrice')
             ->will($this->returnValue(122.53));
 
         $couponManager = new CouponManager($stubContainer);
@@ -543,7 +543,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->will($this->returnValue($currencies));
 
         $stubFacade->expects($this->any())
-            ->method('getCartTotalPrice')
+            ->method('getCartTotalTaxPrice')
             ->will($this->returnValue($cartTotalPrice));
 
         $stubFacade->expects($this->any())

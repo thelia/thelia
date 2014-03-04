@@ -23,6 +23,9 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Core\Translation\Translator;
+use Thelia\Model\CouponQuery;
 
 /**
  * Class CouponCode
@@ -44,9 +47,23 @@ class CouponCode extends BaseForm
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
+                    new Constraints\Callback(array(
+                        "methods" => array(
+                            array($this,
+                                "verifyExistingCode")
+                        )
+                    ))
                 )
             )
         );
+    }
+
+    public function verifyExistingCode($value, ExecutionContextInterface $context)
+    {
+        $coupon = CouponQuery::create()->findOneByCode($value);
+        if (null === $coupon) {
+            $context->addViolation(Translator::getInstance()->trans("This coupon does not exists"));
+        }
     }
 
     /**

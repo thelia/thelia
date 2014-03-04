@@ -13,7 +13,8 @@ class CategoryDocument extends BaseCategoryDocument
     /**
      * Calculate next position relative to our parent
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         $query->filterByCategory($this->getCategory());
     }
 
@@ -58,6 +59,7 @@ class CategoryDocument extends BaseCategoryDocument
                 "category_id" => $this->getCategoryId(),
             )
         );
+
         return true;
     }
 }

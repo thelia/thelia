@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\CategoryAssociatedContentQuery as BaseCategoryAssociatedContentQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'category_associated_content' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\CategoryAssociatedContentQuery as BaseCategoryAssociatedCo
  * long as it does not already exist in the output directory.
  *
  */
-class CategoryAssociatedContentQuery extends BaseCategoryAssociatedContentQuery {
-
+class CategoryAssociatedContentQuery extends BaseCategoryAssociatedContentQuery
+{
 } // CategoryAssociatedContentQuery

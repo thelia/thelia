@@ -5,7 +5,6 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 
-
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\OrderQuery as BaseOrderQuery;
 
@@ -30,7 +29,7 @@ class OrderQuery extends BaseOrderQuery
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
         $stats = array();
-        for($day=1; $day<=$numberOfDay; $day++) {
+        for ($day=1; $day<=$numberOfDay; $day++) {
             $dayAmount = self::getSaleStats(
                 new \DateTime(sprintf('%s-%s-%s', $year, $month, $day)),
                 new \DateTime(sprintf('%s-%s-%s', $year, $month, $day)),
@@ -47,11 +46,11 @@ class OrderQuery extends BaseOrderQuery
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
         $stats = array();
-        for($day=1; $day<=$numberOfDay; $day++) {
+        for ($day=1; $day<=$numberOfDay; $day++) {
             $dayOrdersQuery = self::create()
                 ->filterByCreatedAt(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
                 ->filterByCreatedAt(sprintf("%s-%s-%s 23:59:59", $year, $month, $day), Criteria::LESS_EQUAL);
-            if(null !== $status) {
+            if (null !== $status) {
                 $dayOrdersQuery->filterByStatusId($status, Criteria::IN);
             }
             $dayOrders = $dayOrdersQuery->count();
@@ -66,7 +65,7 @@ class OrderQuery extends BaseOrderQuery
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
         $stats = array();
-        for($day=1; $day<=$numberOfDay; $day++) {
+        for ($day=1; $day<=$numberOfDay; $day++) {
             $dayOrdersQuery = self::create('matching_order')
                 ->filterByCreatedAt(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
                 ->filterByCreatedAt(sprintf("%s-%s-%s 23:59:59", $year, $month, $day), Criteria::LESS_EQUAL);
@@ -111,7 +110,7 @@ class OrderQuery extends BaseOrderQuery
 
         ;
 
-        if($includeShipping) {
+        if ($includeShipping) {
             $query->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE+`order_product_tax`.PROMO_AMOUNT,`order_product`.PRICE+`order_product_tax`.AMOUNT)) + `order`.postage )", 'TOTAL');
         } else {
             $query->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE+`order_product_tax`.PROMO_AMOUNT,`order_product`.PRICE+`order_product_tax`.AMOUNT)))", 'TOTAL');

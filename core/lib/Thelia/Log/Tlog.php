@@ -104,7 +104,7 @@ class Tlog Implements LoggerInterface
     /**
      *
      */
-    private function __construct(){}
+    private function __construct() {}
 
     /**
      *
@@ -665,11 +665,9 @@ class Tlog Implements LoggerInterface
 
         if ($message instanceof \Exception) {
             $text = $message->getMessage()."\n".$message->getTraceAsString();
-        }
-        else if (is_scalar($message) === false) {
+        } elseif (is_scalar($message) === false) {
             $text = print_r($message, 1);
-        }
-        else {
+        } else {
             $text = $message;
         }
 

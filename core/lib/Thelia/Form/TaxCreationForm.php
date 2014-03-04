@@ -41,8 +41,8 @@ class TaxCreationForm extends BaseForm
 
     protected $taxEngine = null;
 
-    public function __construct(Request $request, $type= "form", $data = array(), $options = array(), TaxEngine $taxEngine = null) {
-
+    public function __construct(Request $request, $type= "form", $data = array(), $options = array(), TaxEngine $taxEngine = null)
+    {
         $this->taxEngine = $taxEngine;
 
         parent::__construct($request, $type, $data, $options);
@@ -51,7 +51,7 @@ class TaxCreationForm extends BaseForm
     protected function buildForm($change_mode = false)
     {
         if ($this->taxEngine == null) {
-            throw new \LogicException("The TaxEngine should be passed to this form before using it.");
+            throw new \LogicException(Translator::getInstance()->trans("The TaxEngine should be passed to this form before using it."));
         }
 
         $types = $this->taxEngine->getTaxTypeList();

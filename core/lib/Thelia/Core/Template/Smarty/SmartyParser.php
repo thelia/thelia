@@ -7,9 +7,7 @@ use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use \Smarty;
 
-
 use Thelia\Core\Template\ParserInterface;
-
 
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;

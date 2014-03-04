@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Template\Loop;
 
-
-
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\LoopResult;
 

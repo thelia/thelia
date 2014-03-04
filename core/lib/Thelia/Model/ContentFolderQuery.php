@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ContentFolderQuery as BaseContentFolderQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'content_folder' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\ContentFolderQuery as BaseContentFolderQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ContentFolderQuery extends BaseContentFolderQuery {
-
+class ContentFolderQuery extends BaseContentFolderQuery
+{
 } // ContentFolderQuery

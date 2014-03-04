@@ -194,7 +194,6 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         foreach ($loopResult->getResultDataCollection() as $category) {
 
-
             /*
              * no cause pagination lost :
              * if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
@@ -253,7 +252,6 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("NEXT"                    , $next != null ? $next->getId() : -1)
                 ;
             }
-
 
             $loopResult->addRow($loopResultRow);
         }

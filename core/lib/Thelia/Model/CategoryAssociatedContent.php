@@ -7,8 +7,8 @@ use Thelia\Core\Event\Category\CategoryAssociatedContentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Propel\Runtime\Connection\ConnectionInterface;
 
-class CategoryAssociatedContent extends BaseCategoryAssociatedContent {
-
+class CategoryAssociatedContent extends BaseCategoryAssociatedContent
+{
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     /**

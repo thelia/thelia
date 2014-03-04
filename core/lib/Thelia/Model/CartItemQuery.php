@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\CartItemQuery as BaseCartItemQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'cart_item' table.
  *

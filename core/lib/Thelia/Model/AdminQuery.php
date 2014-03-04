@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\AdminQuery as BaseAdminQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'admin' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\AdminQuery as BaseAdminQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class AdminQuery extends BaseAdminQuery {
-
+class AdminQuery extends BaseAdminQuery
+{
 } // AdminQuery

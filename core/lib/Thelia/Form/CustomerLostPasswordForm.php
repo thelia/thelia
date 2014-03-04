@@ -82,7 +82,7 @@ class CustomerLostPasswordForm extends BaseForm
     {
         $customer = CustomerQuery::create()->findOneByEmail($value);
         if (null === $customer) {
-            $context->addViolation("This email does not exists");
+            $context->addViolation(Translator::getInstance()->trans("This email does not exists"));
         }
     }
 

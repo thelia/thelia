@@ -30,7 +30,6 @@ use Thelia\Model\CountryQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
 
-
 /**
  * Class Delivery
  * @package Thelia\Core\Template\Loop

@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event\Template;
 
-use Thelia\Core\Event\Template\TemplateEvent;
-
 class TemplateDeleteEvent extends TemplateEvent
 {
     protected $template_id;

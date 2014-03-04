@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\FolderDocumentQuery as BaseFolderDocumentQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'folder_document' table.
  *

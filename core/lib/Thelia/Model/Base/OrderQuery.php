@@ -155,9 +155,9 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\OrderQuery object.
      *
-     * @param     string $dbName The database name
-     * @param     string $modelName The phpName of a model, e.g. 'Book'
-     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param string $dbName     The database name
+     * @param string $modelName  The phpName of a model, e.g. 'Book'
+     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Order', $modelAlias = null)
     {
@@ -167,8 +167,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Returns a new ChildOrderQuery object.
      *
-     * @param     string $modelAlias The alias of a model in the query
-     * @param     Criteria $criteria Optional Criteria to build the query from
+     * @param string   $modelAlias The alias of a model in the query
+     * @param Criteria $criteria   Optional Criteria to build the query from
      *
      * @return ChildOrderQuery
      */
@@ -197,7 +197,7 @@ abstract class OrderQuery extends ModelCriteria
      * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param mixed               $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildOrder|array|mixed the result, formatted by the current formatter
@@ -228,10 +228,10 @@ abstract class OrderQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
-     * @return   ChildOrder A model object, or null if the key is not found
+     * @return ChildOrder A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -258,8 +258,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @return ChildOrder|array|mixed the result, formatted by the current formatter
      */
@@ -279,8 +279,8 @@ abstract class OrderQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
-     * @param     array $keys Primary keys to use for the query
-     * @param     ConnectionInterface $con an optional connection object
+     * @param array               $keys Primary keys to use for the query
+     * @param ConnectionInterface $con  an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -301,26 +301,24 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param     mixed $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
-
         return $this->addUsingAlias(OrderTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
      * Filter the query by a list of primary keys
      *
-     * @param     array $keys The list of primary key to use for the query
+     * @param array $keys The list of primary key to use for the query
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
-
         return $this->addUsingAlias(OrderTableMap::ID, $keys, Criteria::IN);
     }
 
@@ -334,11 +332,11 @@ abstract class OrderQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $id         The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -374,9 +372,9 @@ abstract class OrderQuery extends ModelCriteria
      * $query->filterByRef('%fooValue%'); // WHERE ref LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $ref The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $ref        The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -406,11 +404,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see       filterByCustomer()
      *
-     * @param     mixed $customerId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $customerId The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -449,11 +447,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see       filterByOrderAddressRelatedByInvoiceOrderAddressId()
      *
-     * @param     mixed $invoiceOrderAddressId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $invoiceOrderAddressId The value to use as filter.
+     *                                      Use scalar values for equality.
+     *                                      Use array values for in_array() equivalent.
+     *                                      Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison            Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -492,11 +490,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see       filterByOrderAddressRelatedByDeliveryOrderAddressId()
      *
-     * @param     mixed $deliveryOrderAddressId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $deliveryOrderAddressId The value to use as filter.
+     *                                       Use scalar values for equality.
+     *                                       Use array values for in_array() equivalent.
+     *                                       Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison             Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -533,13 +531,13 @@ abstract class OrderQuery extends ModelCriteria
      * $query->filterByInvoiceDate(array('max' => 'yesterday')); // WHERE invoice_date > '2011-03-13'
      * </code>
      *
-     * @param     mixed $invoiceDate The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $invoiceDate The value to use as filter.
+     *                            Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                            Empty strings are treated as NULL.
+     *                            Use scalar values for equality.
+     *                            Use array values for in_array() equivalent.
+     *                            Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison  Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -578,11 +576,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see       filterByCurrency()
      *
-     * @param     mixed $currencyId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $currencyId The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -619,11 +617,11 @@ abstract class OrderQuery extends ModelCriteria
      * $query->filterByCurrencyRate(array('min' => 12)); // WHERE currency_rate > 12
      * </code>
      *
-     * @param     mixed $currencyRate The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $currencyRate The value to use as filter.
+     *                             Use scalar values for equality.
+     *                             Use array values for in_array() equivalent.
+     *                             Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison   Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -659,9 +657,9 @@ abstract class OrderQuery extends ModelCriteria
      * $query->filterByTransactionRef('%fooValue%'); // WHERE transaction_ref LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $transactionRef The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $transactionRef The value to use as filter.
+     *                               Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison     Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -688,9 +686,9 @@ abstract class OrderQuery extends ModelCriteria
      * $query->filterByDeliveryRef('%fooValue%'); // WHERE delivery_ref LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $deliveryRef The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $deliveryRef The value to use as filter.
+     *                            Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison  Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -717,9 +715,9 @@ abstract class OrderQuery extends ModelCriteria
      * $query->filterByInvoiceRef('%fooValue%'); // WHERE invoice_ref LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $invoiceRef The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $invoiceRef The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -747,11 +745,11 @@ abstract class OrderQuery extends ModelCriteria
      * $query->filterByDiscount(array('min' => 12)); // WHERE discount > 12
      * </code>
      *
-     * @param     mixed $discount The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $discount   The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -788,11 +786,11 @@ abstract class OrderQuery extends ModelCriteria
      * $query->filterByPostage(array('min' => 12)); // WHERE postage > 12
      * </code>
      *
-     * @param     mixed $postage The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $postage    The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -831,11 +829,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see       filterByModuleRelatedByPaymentModuleId()
      *
-     * @param     mixed $paymentModuleId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $paymentModuleId The value to use as filter.
+     *                                Use scalar values for equality.
+     *                                Use array values for in_array() equivalent.
+     *                                Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison      Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -874,11 +872,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see       filterByModuleRelatedByDeliveryModuleId()
      *
-     * @param     mixed $deliveryModuleId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $deliveryModuleId The value to use as filter.
+     *                                 Use scalar values for equality.
+     *                                 Use array values for in_array() equivalent.
+     *                                 Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison       Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -917,11 +915,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see       filterByOrderStatus()
      *
-     * @param     mixed $statusId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $statusId   The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -960,11 +958,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see       filterByLang()
      *
-     * @param     mixed $langId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $langId     The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1001,13 +999,13 @@ abstract class OrderQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $createdAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $createdAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1044,13 +1042,13 @@ abstract class OrderQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $updatedAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $updatedAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1080,8 +1078,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Currency object
      *
-     * @param \Thelia\Model\Currency|ObjectCollection $currency The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Currency|ObjectCollection $currency   The related object(s) to use as filter
+     * @param string                                  $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1105,8 +1103,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Currency relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1139,11 +1137,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CurrencyQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CurrencyQuery A secondary query class using the current class as primary query
      */
     public function useCurrencyQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1155,8 +1153,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Customer object
      *
-     * @param \Thelia\Model\Customer|ObjectCollection $customer The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Customer|ObjectCollection $customer   The related object(s) to use as filter
+     * @param string                                  $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1180,8 +1178,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Customer relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1214,11 +1212,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CustomerQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CustomerQuery A secondary query class using the current class as primary query
      */
     public function useCustomerQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1231,7 +1229,7 @@ abstract class OrderQuery extends ModelCriteria
      * Filter the query by a related \Thelia\Model\OrderAddress object
      *
      * @param \Thelia\Model\OrderAddress|ObjectCollection $orderAddress The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string                                      $comparison   Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1255,8 +1253,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the OrderAddressRelatedByInvoiceOrderAddressId relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1289,11 +1287,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\OrderAddressQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\OrderAddressQuery A secondary query class using the current class as primary query
      */
     public function useOrderAddressRelatedByInvoiceOrderAddressIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1306,7 +1304,7 @@ abstract class OrderQuery extends ModelCriteria
      * Filter the query by a related \Thelia\Model\OrderAddress object
      *
      * @param \Thelia\Model\OrderAddress|ObjectCollection $orderAddress The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string                                      $comparison   Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1330,8 +1328,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the OrderAddressRelatedByDeliveryOrderAddressId relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1364,11 +1362,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\OrderAddressQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\OrderAddressQuery A secondary query class using the current class as primary query
      */
     public function useOrderAddressRelatedByDeliveryOrderAddressIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1381,7 +1379,7 @@ abstract class OrderQuery extends ModelCriteria
      * Filter the query by a related \Thelia\Model\OrderStatus object
      *
      * @param \Thelia\Model\OrderStatus|ObjectCollection $orderStatus The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string                                     $comparison  Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1405,8 +1403,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the OrderStatus relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1439,11 +1437,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\OrderStatusQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\OrderStatusQuery A secondary query class using the current class as primary query
      */
     public function useOrderStatusQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1455,8 +1453,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Module object
      *
-     * @param \Thelia\Model\Module|ObjectCollection $module The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Module|ObjectCollection $module     The related object(s) to use as filter
+     * @param string                                $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1480,8 +1478,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ModuleRelatedByPaymentModuleId relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1514,11 +1512,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ModuleQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\ModuleQuery A secondary query class using the current class as primary query
      */
     public function useModuleRelatedByPaymentModuleIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1530,8 +1528,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Module object
      *
-     * @param \Thelia\Model\Module|ObjectCollection $module The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Module|ObjectCollection $module     The related object(s) to use as filter
+     * @param string                                $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1555,8 +1553,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ModuleRelatedByDeliveryModuleId relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1589,11 +1587,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ModuleQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\ModuleQuery A secondary query class using the current class as primary query
      */
     public function useModuleRelatedByDeliveryModuleIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1605,8 +1603,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Lang object
      *
-     * @param \Thelia\Model\Lang|ObjectCollection $lang The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Lang|ObjectCollection $lang       The related object(s) to use as filter
+     * @param string                              $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1630,8 +1628,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Lang relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1664,11 +1662,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\LangQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\LangQuery A secondary query class using the current class as primary query
      */
     public function useLangQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1680,8 +1678,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\OrderProduct object
      *
-     * @param \Thelia\Model\OrderProduct|ObjectCollection $orderProduct  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\OrderProduct|ObjectCollection $orderProduct the related object to use as filter
+     * @param string                                      $comparison   Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1703,8 +1701,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the OrderProduct relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1737,11 +1735,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\OrderProductQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\OrderProductQuery A secondary query class using the current class as primary query
      */
     public function useOrderProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1753,8 +1751,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\OrderCoupon object
      *
-     * @param \Thelia\Model\OrderCoupon|ObjectCollection $orderCoupon  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\OrderCoupon|ObjectCollection $orderCoupon the related object to use as filter
+     * @param string                                     $comparison  Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1776,8 +1774,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the OrderCoupon relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1810,11 +1808,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\OrderCouponQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\OrderCouponQuery A secondary query class using the current class as primary query
      */
     public function useOrderCouponQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -1826,7 +1824,7 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildOrder $order Object to remove from the list of results
+     * @param ChildOrder $order Object to remove from the list of results
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
@@ -1842,8 +1840,8 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Deletes all rows from the order table.
      *
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).
+     * @param  ConnectionInterface $con the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -1874,13 +1872,13 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildOrder or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildOrder object or primary key or array of primary keys
-     *              which is used to create the DELETE statement
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                if supported by native driver or if emulated using Propel.
-     * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     * @param  mixed               $values Criteria or ChildOrder object or primary key or array of primary keys
+     *                                     which is used to create the DELETE statement
+     * @param  ConnectionInterface $con    the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                                    if supported by native driver or if emulated using Propel.
+     * @throws PropelException     Any exceptions caught during processing will be
+     *                                    rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -1900,7 +1898,6 @@ abstract class OrderQuery extends ModelCriteria
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-
         OrderTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
@@ -1919,9 +1916,9 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param      int $nbDays Maximum age of the latest update in days
+     * @param int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildOrderQuery The current query, for fluid interface
+     * @return ChildOrderQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
@@ -1931,9 +1928,9 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Filter by the latest created
      *
-     * @param      int $nbDays Maximum age of in days
+     * @param int $nbDays Maximum age of in days
      *
-     * @return     ChildOrderQuery The current query, for fluid interface
+     * @return ChildOrderQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
@@ -1943,7 +1940,7 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Order by update date desc
      *
-     * @return     ChildOrderQuery The current query, for fluid interface
+     * @return ChildOrderQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
@@ -1953,7 +1950,7 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Order by update date asc
      *
-     * @return     ChildOrderQuery The current query, for fluid interface
+     * @return ChildOrderQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
@@ -1963,7 +1960,7 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Order by create date desc
      *
-     * @return     ChildOrderQuery The current query, for fluid interface
+     * @return ChildOrderQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
@@ -1973,7 +1970,7 @@ abstract class OrderQuery extends ModelCriteria
     /**
      * Order by create date asc
      *
-     * @return     ChildOrderQuery The current query, for fluid interface
+     * @return ChildOrderQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {

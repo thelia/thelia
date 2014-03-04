@@ -26,7 +26,6 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Cart\CartTrait;
-use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderManualEvent;
@@ -52,7 +51,6 @@ use Thelia\Model\OrderProductAttributeCombination;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Tools\I18n;
-
 
 /**
  *
@@ -156,7 +154,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         );
 
         $con->beginTransaction();
-
 
         $placedOrder = $sessionOrder->copy();
         $placedOrder->setDispatcher($dispatcher);
@@ -307,8 +304,8 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * Create an order outside of the front-office context, e.g. manually from the back-office.
      */
-    public function createManual(OrderManualEvent $event) {
-
+    public function createManual(OrderManualEvent $event)
+    {
         $placedOrder = $this->createOrder(
             $event->getDispatcher(),
             $event->getOrder(),
@@ -338,7 +335,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         );
 
         $event->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
-
 
         /* but memorize placed order */
         $event->setOrder(new \Thelia\Model\Order());

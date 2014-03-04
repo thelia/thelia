@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\AttributeCombinationQuery as BaseAttributeCombinationQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'attribute_combination' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\AttributeCombinationQuery as BaseAttributeCombinationQuery
  * long as it does not already exist in the output directory.
  *
  */
-class AttributeCombinationQuery extends BaseAttributeCombinationQuery {
-
+class AttributeCombinationQuery extends BaseAttributeCombinationQuery
+{
 } // AttributeCombinationQuery

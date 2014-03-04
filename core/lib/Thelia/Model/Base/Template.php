@@ -40,7 +40,6 @@ abstract class Template implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\TemplateTableMap';
 
-
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -386,9 +385,9 @@ abstract class Template implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed $parser A AbstractParser instance,
+     * @param mixed  $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data The source data to import from
+     * @param string $data   The source data to import from
      *
      * @return Template The current object, for fluid interface
      */
@@ -438,11 +437,10 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getId()
     {
-
         return $this->id;
     }
 
@@ -450,8 +448,8 @@ abstract class Template implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -470,8 +468,8 @@ abstract class Template implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -489,8 +487,8 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Set the value of [id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Template The current object (for fluent API support)
+     * @param  int                    $v new value
+     * @return \Thelia\Model\Template The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -503,16 +501,15 @@ abstract class Template implements ActiveRecordInterface
             $this->modifiedColumns[TemplateTableMap::ID] = true;
         }
 
-
         return $this;
     } // setId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Template The current object (for fluent API support)
+     * @param  mixed                  $v string, integer (timestamp), or \DateTime value.
+     *                                   Empty strings are treated as NULL.
+     * @return \Thelia\Model\Template The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -524,16 +521,15 @@ abstract class Template implements ActiveRecordInterface
             }
         } // if either are not null
 
-
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Template The current object (for fluent API support)
+     * @param  mixed                  $v string, integer (timestamp), or \DateTime value.
+     *                                   Empty strings are treated as NULL.
+     * @return \Thelia\Model\Template The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -544,7 +540,6 @@ abstract class Template implements ActiveRecordInterface
                 $this->modifiedColumns[TemplateTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
-
 
         return $this;
     } // setUpdatedAt()
@@ -637,10 +632,10 @@ abstract class Template implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
-     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
+     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
+     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -685,7 +680,7 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param      ConnectionInterface $con
+     * @param  ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see Template::setDeleted()
@@ -728,8 +723,8 @@ abstract class Template implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -790,8 +785,8 @@ abstract class Template implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -945,7 +940,7 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1011,7 +1006,7 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1027,12 +1022,12 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param      string $name name
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed Value of field.
+     * @param  string $name name
+     * @param  string $type The type of fieldname the $name is of:
+     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                      Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed  Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1046,7 +1041,7 @@ abstract class Template implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
+     * @param  int   $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1073,12 +1068,12 @@ abstract class Template implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                    Defaults to TableMap::TYPE_PHPNAME.
-     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
-     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                                        Defaults to TableMap::TYPE_PHPNAME.
+     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
+     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1120,12 +1115,12 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param      string $name
-     * @param      mixed  $value field value
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @param  string $name
+     * @param  mixed  $value field value
+     * @param  string $type  The type of fieldname the $name is of:
+     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                       Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1139,8 +1134,8 @@ abstract class Template implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
-     * @param      mixed $value field value
+     * @param  int   $pos   position in xml schema
+     * @param  mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1171,8 +1166,8 @@ abstract class Template implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param      array  $arr     An array to populate the object from.
-     * @param      string $keyType The type of keys the array uses.
+     * @param  array  $arr     An array to populate the object from.
+     * @param  string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1196,7 +1191,6 @@ abstract class Template implements ActiveRecordInterface
         if ($this->isColumnModified(TemplateTableMap::ID)) $criteria->add(TemplateTableMap::ID, $this->id);
         if ($this->isColumnModified(TemplateTableMap::CREATED_AT)) $criteria->add(TemplateTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(TemplateTableMap::UPDATED_AT)) $criteria->add(TemplateTableMap::UPDATED_AT, $this->updated_at);
-
         return $criteria;
     }
 
@@ -1218,7 +1212,7 @@ abstract class Template implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return   int
+     * @return int
      */
     public function getPrimaryKey()
     {
@@ -1228,7 +1222,7 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param       int $key Primary key.
+     * @param  int  $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -1242,7 +1236,6 @@ abstract class Template implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-
         return null === $this->getId();
     }
 
@@ -1252,9 +1245,9 @@ abstract class Template implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\Template (or compatible) type.
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
+     * @param  object          $copyObj  An object of \Thelia\Model\Template (or compatible) type.
+     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1307,8 +1300,8 @@ abstract class Template implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\Template Clone of current object.
+     * @param  boolean                $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return \Thelia\Model\Template Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1327,7 +1320,7 @@ abstract class Template implements ActiveRecordInterface
      * Avoids crafting an 'init[$relationName]s' method name
      * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param      string $relationName The name of the relation to initialize
+     * @param  string $relationName The name of the relation to initialize
      * @return void
      */
     public function initRelation($relationName)
@@ -1375,8 +1368,8 @@ abstract class Template implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -1398,8 +1391,8 @@ abstract class Template implements ActiveRecordInterface
      * If this ChildTemplate is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                  $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface       $con      optional connection object
      * @return Collection|ChildProduct[] List of ChildProduct objects
      * @throws PropelException
      */
@@ -1455,14 +1448,13 @@ abstract class Template implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $products A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildTemplate The current object (for fluent API support)
+     * @param  Collection          $products A Propel collection.
+     * @param  ConnectionInterface $con      Optional connection object
+     * @return ChildTemplate       The current object (for fluent API support)
      */
     public function setProducts(Collection $products, ConnectionInterface $con = null)
     {
         $productsToDelete = $this->getProducts(new Criteria(), $con)->diff($products);
-
 
         $this->productsScheduledForDeletion = $productsToDelete;
 
@@ -1484,10 +1476,10 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Returns the number of related Product objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Product objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related Product objects.
      * @throws PropelException
      */
     public function countProducts(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -1519,8 +1511,8 @@ abstract class Template implements ActiveRecordInterface
      * Method called to associate a ChildProduct object to this object
      * through the ChildProduct foreign key attribute.
      *
-     * @param    ChildProduct $l ChildProduct
-     * @return   \Thelia\Model\Template The current object (for fluent API support)
+     * @param  ChildProduct           $l ChildProduct
+     * @return \Thelia\Model\Template The current object (for fluent API support)
      */
     public function addProduct(ChildProduct $l)
     {
@@ -1546,7 +1538,7 @@ abstract class Template implements ActiveRecordInterface
     }
 
     /**
-     * @param  Product $product The product object to remove.
+     * @param  Product       $product The product object to remove.
      * @return ChildTemplate The current object (for fluent API support)
      */
     public function removeProduct($product)
@@ -1564,7 +1556,6 @@ abstract class Template implements ActiveRecordInterface
         return $this;
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -1576,9 +1567,9 @@ abstract class Template implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Template.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                  $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface       $con          optional connection object
+     * @param  string                    $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildProduct[] List of ChildProduct objects
      */
     public function getProductsJoinTaxRule($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -1618,8 +1609,8 @@ abstract class Template implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -1641,8 +1632,8 @@ abstract class Template implements ActiveRecordInterface
      * If this ChildTemplate is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                          $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface               $con      optional connection object
      * @return Collection|ChildFeatureTemplate[] List of ChildFeatureTemplate objects
      * @throws PropelException
      */
@@ -1698,14 +1689,13 @@ abstract class Template implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $featureTemplates A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildTemplate The current object (for fluent API support)
+     * @param  Collection          $featureTemplates A Propel collection.
+     * @param  ConnectionInterface $con              Optional connection object
+     * @return ChildTemplate       The current object (for fluent API support)
      */
     public function setFeatureTemplates(Collection $featureTemplates, ConnectionInterface $con = null)
     {
         $featureTemplatesToDelete = $this->getFeatureTemplates(new Criteria(), $con)->diff($featureTemplates);
-
 
         $this->featureTemplatesScheduledForDeletion = $featureTemplatesToDelete;
 
@@ -1727,10 +1717,10 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Returns the number of related FeatureTemplate objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related FeatureTemplate objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related FeatureTemplate objects.
      * @throws PropelException
      */
     public function countFeatureTemplates(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -1762,8 +1752,8 @@ abstract class Template implements ActiveRecordInterface
      * Method called to associate a ChildFeatureTemplate object to this object
      * through the ChildFeatureTemplate foreign key attribute.
      *
-     * @param    ChildFeatureTemplate $l ChildFeatureTemplate
-     * @return   \Thelia\Model\Template The current object (for fluent API support)
+     * @param  ChildFeatureTemplate   $l ChildFeatureTemplate
+     * @return \Thelia\Model\Template The current object (for fluent API support)
      */
     public function addFeatureTemplate(ChildFeatureTemplate $l)
     {
@@ -1790,7 +1780,7 @@ abstract class Template implements ActiveRecordInterface
 
     /**
      * @param  FeatureTemplate $featureTemplate The featureTemplate object to remove.
-     * @return ChildTemplate The current object (for fluent API support)
+     * @return ChildTemplate   The current object (for fluent API support)
      */
     public function removeFeatureTemplate($featureTemplate)
     {
@@ -1807,7 +1797,6 @@ abstract class Template implements ActiveRecordInterface
         return $this;
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -1819,9 +1808,9 @@ abstract class Template implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Template.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                          $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface               $con          optional connection object
+     * @param  string                            $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildFeatureTemplate[] List of ChildFeatureTemplate objects
      */
     public function getFeatureTemplatesJoinFeature($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -1861,8 +1850,8 @@ abstract class Template implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -1884,8 +1873,8 @@ abstract class Template implements ActiveRecordInterface
      * If this ChildTemplate is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                            $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface                 $con      optional connection object
      * @return Collection|ChildAttributeTemplate[] List of ChildAttributeTemplate objects
      * @throws PropelException
      */
@@ -1941,14 +1930,13 @@ abstract class Template implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $attributeTemplates A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildTemplate The current object (for fluent API support)
+     * @param  Collection          $attributeTemplates A Propel collection.
+     * @param  ConnectionInterface $con                Optional connection object
+     * @return ChildTemplate       The current object (for fluent API support)
      */
     public function setAttributeTemplates(Collection $attributeTemplates, ConnectionInterface $con = null)
     {
         $attributeTemplatesToDelete = $this->getAttributeTemplates(new Criteria(), $con)->diff($attributeTemplates);
-
 
         $this->attributeTemplatesScheduledForDeletion = $attributeTemplatesToDelete;
 
@@ -1970,10 +1958,10 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Returns the number of related AttributeTemplate objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related AttributeTemplate objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related AttributeTemplate objects.
      * @throws PropelException
      */
     public function countAttributeTemplates(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2005,8 +1993,8 @@ abstract class Template implements ActiveRecordInterface
      * Method called to associate a ChildAttributeTemplate object to this object
      * through the ChildAttributeTemplate foreign key attribute.
      *
-     * @param    ChildAttributeTemplate $l ChildAttributeTemplate
-     * @return   \Thelia\Model\Template The current object (for fluent API support)
+     * @param  ChildAttributeTemplate $l ChildAttributeTemplate
+     * @return \Thelia\Model\Template The current object (for fluent API support)
      */
     public function addAttributeTemplate(ChildAttributeTemplate $l)
     {
@@ -2033,7 +2021,7 @@ abstract class Template implements ActiveRecordInterface
 
     /**
      * @param  AttributeTemplate $attributeTemplate The attributeTemplate object to remove.
-     * @return ChildTemplate The current object (for fluent API support)
+     * @return ChildTemplate     The current object (for fluent API support)
      */
     public function removeAttributeTemplate($attributeTemplate)
     {
@@ -2050,7 +2038,6 @@ abstract class Template implements ActiveRecordInterface
         return $this;
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2062,9 +2049,9 @@ abstract class Template implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Template.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                            $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface                 $con          optional connection object
+     * @param  string                              $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildAttributeTemplate[] List of ChildAttributeTemplate objects
      */
     public function getAttributeTemplatesJoinAttribute($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2104,8 +2091,8 @@ abstract class Template implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2127,8 +2114,8 @@ abstract class Template implements ActiveRecordInterface
      * If this ChildTemplate is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                       $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface            $con      optional connection object
      * @return Collection|ChildTemplateI18n[] List of ChildTemplateI18n objects
      * @throws PropelException
      */
@@ -2184,14 +2171,13 @@ abstract class Template implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $templateI18ns A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildTemplate The current object (for fluent API support)
+     * @param  Collection          $templateI18ns A Propel collection.
+     * @param  ConnectionInterface $con           Optional connection object
+     * @return ChildTemplate       The current object (for fluent API support)
      */
     public function setTemplateI18ns(Collection $templateI18ns, ConnectionInterface $con = null)
     {
         $templateI18nsToDelete = $this->getTemplateI18ns(new Criteria(), $con)->diff($templateI18ns);
-
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
@@ -2216,10 +2202,10 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Returns the number of related TemplateI18n objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related TemplateI18n objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related TemplateI18n objects.
      * @throws PropelException
      */
     public function countTemplateI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2251,8 +2237,8 @@ abstract class Template implements ActiveRecordInterface
      * Method called to associate a ChildTemplateI18n object to this object
      * through the ChildTemplateI18n foreign key attribute.
      *
-     * @param    ChildTemplateI18n $l ChildTemplateI18n
-     * @return   \Thelia\Model\Template The current object (for fluent API support)
+     * @param  ChildTemplateI18n      $l ChildTemplateI18n
+     * @return \Thelia\Model\Template The current object (for fluent API support)
      */
     public function addTemplateI18n(ChildTemplateI18n $l)
     {
@@ -2282,7 +2268,7 @@ abstract class Template implements ActiveRecordInterface
     }
 
     /**
-     * @param  TemplateI18n $templateI18n The templateI18n object to remove.
+     * @param  TemplateI18n  $templateI18n The templateI18n object to remove.
      * @return ChildTemplate The current object (for fluent API support)
      */
     public function removeTemplateI18n($templateI18n)
@@ -2340,8 +2326,8 @@ abstract class Template implements ActiveRecordInterface
      * If this ChildTemplate is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      ConnectionInterface $con Optional connection object
+     * @param Criteria            $criteria Optional query object to filter the query
+     * @param ConnectionInterface $con      Optional connection object
      *
      * @return ObjectCollection|ChildFeature[] List of ChildFeature objects
      */
@@ -2371,9 +2357,9 @@ abstract class Template implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection $features A Propel collection.
-     * @param  ConnectionInterface $con Optional connection object
-     * @return ChildTemplate The current object (for fluent API support)
+     * @param  Collection          $features A Propel collection.
+     * @param  ConnectionInterface $con      Optional connection object
+     * @return ChildTemplate       The current object (for fluent API support)
      */
     public function setFeatures(Collection $features, ConnectionInterface $con = null)
     {
@@ -2397,9 +2383,9 @@ abstract class Template implements ActiveRecordInterface
      * Gets the number of ChildFeature objects related by a many-to-many relationship
      * to the current object by way of the feature_template cross-reference table.
      *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      boolean $distinct Set to true to force count distinct
-     * @param      ConnectionInterface $con Optional connection object
+     * @param Criteria            $criteria Optional query object to filter the query
+     * @param boolean             $distinct Set to true to force count distinct
+     * @param ConnectionInterface $con      Optional connection object
      *
      * @return int the number of related ChildFeature objects
      */
@@ -2427,7 +2413,7 @@ abstract class Template implements ActiveRecordInterface
      * Associate a ChildFeature object to this object
      * through the feature_template cross reference table.
      *
-     * @param  ChildFeature $feature The ChildFeatureTemplate object to relate
+     * @param  ChildFeature  $feature The ChildFeatureTemplate object to relate
      * @return ChildTemplate The current object (for fluent API support)
      */
     public function addFeature(ChildFeature $feature)
@@ -2445,7 +2431,7 @@ abstract class Template implements ActiveRecordInterface
     }
 
     /**
-     * @param    Feature $feature The feature object to add.
+     * @param Feature $feature The feature object to add.
      */
     protected function doAddFeature($feature)
     {
@@ -2464,7 +2450,7 @@ abstract class Template implements ActiveRecordInterface
      * Remove a ChildFeature object to this object
      * through the feature_template cross reference table.
      *
-     * @param ChildFeature $feature The ChildFeatureTemplate object to relate
+     * @param  ChildFeature  $feature The ChildFeatureTemplate object to relate
      * @return ChildTemplate The current object (for fluent API support)
      */
     public function removeFeature(ChildFeature $feature)
@@ -2523,8 +2509,8 @@ abstract class Template implements ActiveRecordInterface
      * If this ChildTemplate is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      ConnectionInterface $con Optional connection object
+     * @param Criteria            $criteria Optional query object to filter the query
+     * @param ConnectionInterface $con      Optional connection object
      *
      * @return ObjectCollection|ChildAttribute[] List of ChildAttribute objects
      */
@@ -2554,9 +2540,9 @@ abstract class Template implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection $attributes A Propel collection.
-     * @param  ConnectionInterface $con Optional connection object
-     * @return ChildTemplate The current object (for fluent API support)
+     * @param  Collection          $attributes A Propel collection.
+     * @param  ConnectionInterface $con        Optional connection object
+     * @return ChildTemplate       The current object (for fluent API support)
      */
     public function setAttributes(Collection $attributes, ConnectionInterface $con = null)
     {
@@ -2580,9 +2566,9 @@ abstract class Template implements ActiveRecordInterface
      * Gets the number of ChildAttribute objects related by a many-to-many relationship
      * to the current object by way of the attribute_template cross-reference table.
      *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      boolean $distinct Set to true to force count distinct
-     * @param      ConnectionInterface $con Optional connection object
+     * @param Criteria            $criteria Optional query object to filter the query
+     * @param boolean             $distinct Set to true to force count distinct
+     * @param ConnectionInterface $con      Optional connection object
      *
      * @return int the number of related ChildAttribute objects
      */
@@ -2611,7 +2597,7 @@ abstract class Template implements ActiveRecordInterface
      * through the attribute_template cross reference table.
      *
      * @param  ChildAttribute $attribute The ChildAttributeTemplate object to relate
-     * @return ChildTemplate The current object (for fluent API support)
+     * @return ChildTemplate  The current object (for fluent API support)
      */
     public function addAttribute(ChildAttribute $attribute)
     {
@@ -2628,7 +2614,7 @@ abstract class Template implements ActiveRecordInterface
     }
 
     /**
-     * @param    Attribute $attribute The attribute object to add.
+     * @param Attribute $attribute The attribute object to add.
      */
     protected function doAddAttribute($attribute)
     {
@@ -2647,8 +2633,8 @@ abstract class Template implements ActiveRecordInterface
      * Remove a ChildAttribute object to this object
      * through the attribute_template cross reference table.
      *
-     * @param ChildAttribute $attribute The ChildAttributeTemplate object to relate
-     * @return ChildTemplate The current object (for fluent API support)
+     * @param  ChildAttribute $attribute The ChildAttributeTemplate object to relate
+     * @return ChildTemplate  The current object (for fluent API support)
      */
     public function removeAttribute(ChildAttribute $attribute)
     {
@@ -2688,7 +2674,7 @@ abstract class Template implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param      boolean $deep Whether to also clear the references on all referrer objects.
+     * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -2752,9 +2738,9 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Sets the locale for translations
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param string $locale Locale to use for the translation, e.g. 'fr_FR'
      *
-     * @return    ChildTemplate The current object (for fluent API support)
+     * @return ChildTemplate The current object (for fluent API support)
      */
     public function setLocale($locale = 'en_US')
     {
@@ -2766,7 +2752,7 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Gets the locale for translations
      *
-     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @return string $locale Locale to use for the translation, e.g. 'fr_FR'
      */
     public function getLocale()
     {
@@ -2776,8 +2762,8 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Returns the current translation for a given locale
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param     ConnectionInterface $con an optional connection object
+     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param ConnectionInterface $con    an optional connection object
      *
      * @return ChildTemplateI18n */
     public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
@@ -2810,10 +2796,10 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Remove the translation for a given locale
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param     ConnectionInterface $con an optional connection object
+     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param ConnectionInterface $con    an optional connection object
      *
-     * @return    ChildTemplate The current object (for fluent API support)
+     * @return ChildTemplate The current object (for fluent API support)
      */
     public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
@@ -2838,7 +2824,7 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Returns the current translation
      *
-     * @param     ConnectionInterface $con an optional connection object
+     * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildTemplateI18n */
     public function getCurrentTranslation(ConnectionInterface $con = null)
@@ -2875,7 +2861,7 @@ abstract class Template implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildTemplate The current object (for fluent API support)
+     * @return ChildTemplate The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
@@ -2959,7 +2945,6 @@ abstract class Template implements ActiveRecordInterface
     {
 
     }
-
 
     /**
      * Derived method to catches calls to undefined methods.

@@ -13,7 +13,8 @@ class FolderImage extends BaseFolderImage
     /**
      * Calculate next position relative to our parent
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         $query->filterByFolder($this->getFolder());
     }
 
@@ -58,6 +59,7 @@ class FolderImage extends BaseFolderImage
                 "folder_id" => $this->getFolderId(),
             )
         );
+
         return true;
     }
 }

@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ContentQuery as BaseContentQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'content' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\ContentQuery as BaseContentQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ContentQuery extends BaseContentQuery {
-
+class ContentQuery extends BaseContentQuery
+{
 } // ContentQuery

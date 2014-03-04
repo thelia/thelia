@@ -76,7 +76,7 @@ class CouponManager
             $discount = $this->getEffect($couponsKept);
 
             // Just In Case test
-            $checkoutTotalPrice = $this->facade->getCartTotalPrice();
+            $checkoutTotalPrice = $this->facade->getCartTotalTaxPrice();
             if ($discount >= $checkoutTotalPrice) {
                 $discount = $checkoutTotalPrice;
             }

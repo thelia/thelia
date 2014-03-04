@@ -38,7 +38,6 @@ abstract class Module implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\ModuleTableMap';
 
-
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -416,9 +415,9 @@ abstract class Module implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed $parser A AbstractParser instance,
+     * @param mixed  $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data The source data to import from
+     * @param string $data   The source data to import from
      *
      * @return Module The current object, for fluid interface
      */
@@ -468,66 +467,60 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getId()
     {
-
         return $this->id;
     }
 
     /**
      * Get the [code] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getCode()
     {
-
         return $this->code;
     }
 
     /**
      * Get the [type] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getType()
     {
-
         return $this->type;
     }
 
     /**
      * Get the [activate] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getActivate()
     {
-
         return $this->activate;
     }
 
     /**
      * Get the [position] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getPosition()
     {
-
         return $this->position;
     }
 
     /**
      * Get the [full_namespace] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getFullNamespace()
     {
-
         return $this->full_namespace;
     }
 
@@ -535,8 +528,8 @@ abstract class Module implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -555,8 +548,8 @@ abstract class Module implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -574,8 +567,8 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Set the value of [id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  int                  $v new value
+     * @return \Thelia\Model\Module The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -588,15 +581,14 @@ abstract class Module implements ActiveRecordInterface
             $this->modifiedColumns[ModuleTableMap::ID] = true;
         }
 
-
         return $this;
     } // setId()
 
     /**
      * Set the value of [code] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  string               $v new value
+     * @return \Thelia\Model\Module The current object (for fluent API support)
      */
     public function setCode($v)
     {
@@ -609,15 +601,14 @@ abstract class Module implements ActiveRecordInterface
             $this->modifiedColumns[ModuleTableMap::CODE] = true;
         }
 
-
         return $this;
     } // setCode()
 
     /**
      * Set the value of [type] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  int                  $v new value
+     * @return \Thelia\Model\Module The current object (for fluent API support)
      */
     public function setType($v)
     {
@@ -630,15 +621,14 @@ abstract class Module implements ActiveRecordInterface
             $this->modifiedColumns[ModuleTableMap::TYPE] = true;
         }
 
-
         return $this;
     } // setType()
 
     /**
      * Set the value of [activate] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  int                  $v new value
+     * @return \Thelia\Model\Module The current object (for fluent API support)
      */
     public function setActivate($v)
     {
@@ -651,15 +641,14 @@ abstract class Module implements ActiveRecordInterface
             $this->modifiedColumns[ModuleTableMap::ACTIVATE] = true;
         }
 
-
         return $this;
     } // setActivate()
 
     /**
      * Set the value of [position] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  int                  $v new value
+     * @return \Thelia\Model\Module The current object (for fluent API support)
      */
     public function setPosition($v)
     {
@@ -672,15 +661,14 @@ abstract class Module implements ActiveRecordInterface
             $this->modifiedColumns[ModuleTableMap::POSITION] = true;
         }
 
-
         return $this;
     } // setPosition()
 
     /**
      * Set the value of [full_namespace] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  string               $v new value
+     * @return \Thelia\Model\Module The current object (for fluent API support)
      */
     public function setFullNamespace($v)
     {
@@ -693,16 +681,15 @@ abstract class Module implements ActiveRecordInterface
             $this->modifiedColumns[ModuleTableMap::FULL_NAMESPACE] = true;
         }
 
-
         return $this;
     } // setFullNamespace()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  mixed                $v string, integer (timestamp), or \DateTime value.
+     *                                 Empty strings are treated as NULL.
+     * @return \Thelia\Model\Module The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -714,16 +701,15 @@ abstract class Module implements ActiveRecordInterface
             }
         } // if either are not null
 
-
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  mixed                $v string, integer (timestamp), or \DateTime value.
+     *                                 Empty strings are treated as NULL.
+     * @return \Thelia\Model\Module The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -734,7 +720,6 @@ abstract class Module implements ActiveRecordInterface
                 $this->modifiedColumns[ModuleTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
-
 
         return $this;
     } // setUpdatedAt()
@@ -842,10 +827,10 @@ abstract class Module implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
-     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
+     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
+     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -892,7 +877,7 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param      ConnectionInterface $con
+     * @param  ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see Module::setDeleted()
@@ -935,8 +920,8 @@ abstract class Module implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -997,8 +982,8 @@ abstract class Module implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -1131,7 +1116,7 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1227,7 +1212,7 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1243,12 +1228,12 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param      string $name name
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed Value of field.
+     * @param  string $name name
+     * @param  string $type The type of fieldname the $name is of:
+     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                      Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed  Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1262,7 +1247,7 @@ abstract class Module implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
+     * @param  int   $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1304,12 +1289,12 @@ abstract class Module implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                    Defaults to TableMap::TYPE_PHPNAME.
-     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
-     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                                        Defaults to TableMap::TYPE_PHPNAME.
+     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
+     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1362,12 +1347,12 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param      string $name
-     * @param      mixed  $value field value
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @param  string $name
+     * @param  mixed  $value field value
+     * @param  string $type  The type of fieldname the $name is of:
+     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                       Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1381,8 +1366,8 @@ abstract class Module implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
-     * @param      mixed $value field value
+     * @param  int   $pos   position in xml schema
+     * @param  mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1428,8 +1413,8 @@ abstract class Module implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param      array  $arr     An array to populate the object from.
-     * @param      string $keyType The type of keys the array uses.
+     * @param  array  $arr     An array to populate the object from.
+     * @param  string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1463,7 +1448,6 @@ abstract class Module implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleTableMap::FULL_NAMESPACE)) $criteria->add(ModuleTableMap::FULL_NAMESPACE, $this->full_namespace);
         if ($this->isColumnModified(ModuleTableMap::CREATED_AT)) $criteria->add(ModuleTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ModuleTableMap::UPDATED_AT)) $criteria->add(ModuleTableMap::UPDATED_AT, $this->updated_at);
-
         return $criteria;
     }
 
@@ -1485,7 +1469,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return   int
+     * @return int
      */
     public function getPrimaryKey()
     {
@@ -1495,7 +1479,7 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param       int $key Primary key.
+     * @param  int  $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -1509,7 +1493,6 @@ abstract class Module implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-
         return null === $this->getId();
     }
 
@@ -1519,9 +1502,9 @@ abstract class Module implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\Module (or compatible) type.
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
+     * @param  object          $copyObj  An object of \Thelia\Model\Module (or compatible) type.
+     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1591,8 +1574,8 @@ abstract class Module implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\Module Clone of current object.
+     * @param  boolean              $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return \Thelia\Model\Module Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1611,7 +1594,7 @@ abstract class Module implements ActiveRecordInterface
      * Avoids crafting an 'init[$relationName]s' method name
      * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param      string $relationName The name of the relation to initialize
+     * @param  string $relationName The name of the relation to initialize
      * @return void
      */
     public function initRelation($relationName)
@@ -1665,8 +1648,8 @@ abstract class Module implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -1688,8 +1671,8 @@ abstract class Module implements ActiveRecordInterface
      * If this ChildModule is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con      optional connection object
      * @return Collection|ChildOrder[] List of ChildOrder objects
      * @throws PropelException
      */
@@ -1745,14 +1728,13 @@ abstract class Module implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $ordersRelatedByPaymentModuleId A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildModule The current object (for fluent API support)
+     * @param  Collection          $ordersRelatedByPaymentModuleId A Propel collection.
+     * @param  ConnectionInterface $con                            Optional connection object
+     * @return ChildModule         The current object (for fluent API support)
      */
     public function setOrdersRelatedByPaymentModuleId(Collection $ordersRelatedByPaymentModuleId, ConnectionInterface $con = null)
     {
         $ordersRelatedByPaymentModuleIdToDelete = $this->getOrdersRelatedByPaymentModuleId(new Criteria(), $con)->diff($ordersRelatedByPaymentModuleId);
-
 
         $this->ordersRelatedByPaymentModuleIdScheduledForDeletion = $ordersRelatedByPaymentModuleIdToDelete;
 
@@ -1774,10 +1756,10 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Returns the number of related Order objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Order objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related Order objects.
      * @throws PropelException
      */
     public function countOrdersRelatedByPaymentModuleId(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -1809,8 +1791,8 @@ abstract class Module implements ActiveRecordInterface
      * Method called to associate a ChildOrder object to this object
      * through the ChildOrder foreign key attribute.
      *
-     * @param    ChildOrder $l ChildOrder
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  ChildOrder           $l ChildOrder
+     * @return \Thelia\Model\Module The current object (for fluent API support)
      */
     public function addOrderRelatedByPaymentModuleId(ChildOrder $l)
     {
@@ -1837,7 +1819,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * @param  OrderRelatedByPaymentModuleId $orderRelatedByPaymentModuleId The orderRelatedByPaymentModuleId object to remove.
-     * @return ChildModule The current object (for fluent API support)
+     * @return ChildModule                   The current object (for fluent API support)
      */
     public function removeOrderRelatedByPaymentModuleId($orderRelatedByPaymentModuleId)
     {
@@ -1854,7 +1836,6 @@ abstract class Module implements ActiveRecordInterface
         return $this;
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -1866,9 +1847,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersRelatedByPaymentModuleIdJoinCurrency($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -1879,7 +1860,6 @@ abstract class Module implements ActiveRecordInterface
         return $this->getOrdersRelatedByPaymentModuleId($query, $con);
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -1891,9 +1871,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersRelatedByPaymentModuleIdJoinCustomer($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -1904,7 +1884,6 @@ abstract class Module implements ActiveRecordInterface
         return $this->getOrdersRelatedByPaymentModuleId($query, $con);
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -1916,9 +1895,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersRelatedByPaymentModuleIdJoinOrderAddressRelatedByInvoiceOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -1929,7 +1908,6 @@ abstract class Module implements ActiveRecordInterface
         return $this->getOrdersRelatedByPaymentModuleId($query, $con);
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -1941,9 +1919,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersRelatedByPaymentModuleIdJoinOrderAddressRelatedByDeliveryOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -1954,7 +1932,6 @@ abstract class Module implements ActiveRecordInterface
         return $this->getOrdersRelatedByPaymentModuleId($query, $con);
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -1966,9 +1943,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersRelatedByPaymentModuleIdJoinOrderStatus($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -1979,7 +1956,6 @@ abstract class Module implements ActiveRecordInterface
         return $this->getOrdersRelatedByPaymentModuleId($query, $con);
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -1991,9 +1967,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersRelatedByPaymentModuleIdJoinLang($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2033,8 +2009,8 @@ abstract class Module implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2056,8 +2032,8 @@ abstract class Module implements ActiveRecordInterface
      * If this ChildModule is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con      optional connection object
      * @return Collection|ChildOrder[] List of ChildOrder objects
      * @throws PropelException
      */
@@ -2113,14 +2089,13 @@ abstract class Module implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $ordersRelatedByDeliveryModuleId A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildModule The current object (for fluent API support)
+     * @param  Collection          $ordersRelatedByDeliveryModuleId A Propel collection.
+     * @param  ConnectionInterface $con                             Optional connection object
+     * @return ChildModule         The current object (for fluent API support)
      */
     public function setOrdersRelatedByDeliveryModuleId(Collection $ordersRelatedByDeliveryModuleId, ConnectionInterface $con = null)
     {
         $ordersRelatedByDeliveryModuleIdToDelete = $this->getOrdersRelatedByDeliveryModuleId(new Criteria(), $con)->diff($ordersRelatedByDeliveryModuleId);
-
 
         $this->ordersRelatedByDeliveryModuleIdScheduledForDeletion = $ordersRelatedByDeliveryModuleIdToDelete;
 
@@ -2142,10 +2117,10 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Returns the number of related Order objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Order objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related Order objects.
      * @throws PropelException
      */
     public function countOrdersRelatedByDeliveryModuleId(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2177,8 +2152,8 @@ abstract class Module implements ActiveRecordInterface
      * Method called to associate a ChildOrder object to this object
      * through the ChildOrder foreign key attribute.
      *
-     * @param    ChildOrder $l ChildOrder
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  ChildOrder           $l ChildOrder
+     * @return \Thelia\Model\Module The current object (for fluent API support)
      */
     public function addOrderRelatedByDeliveryModuleId(ChildOrder $l)
     {
@@ -2205,7 +2180,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * @param  OrderRelatedByDeliveryModuleId $orderRelatedByDeliveryModuleId The orderRelatedByDeliveryModuleId object to remove.
-     * @return ChildModule The current object (for fluent API support)
+     * @return ChildModule                    The current object (for fluent API support)
      */
     public function removeOrderRelatedByDeliveryModuleId($orderRelatedByDeliveryModuleId)
     {
@@ -2222,7 +2197,6 @@ abstract class Module implements ActiveRecordInterface
         return $this;
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2234,9 +2208,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersRelatedByDeliveryModuleIdJoinCurrency($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2247,7 +2221,6 @@ abstract class Module implements ActiveRecordInterface
         return $this->getOrdersRelatedByDeliveryModuleId($query, $con);
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2259,9 +2232,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersRelatedByDeliveryModuleIdJoinCustomer($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2272,7 +2245,6 @@ abstract class Module implements ActiveRecordInterface
         return $this->getOrdersRelatedByDeliveryModuleId($query, $con);
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2284,9 +2256,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersRelatedByDeliveryModuleIdJoinOrderAddressRelatedByInvoiceOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2297,7 +2269,6 @@ abstract class Module implements ActiveRecordInterface
         return $this->getOrdersRelatedByDeliveryModuleId($query, $con);
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2309,9 +2280,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersRelatedByDeliveryModuleIdJoinOrderAddressRelatedByDeliveryOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2322,7 +2293,6 @@ abstract class Module implements ActiveRecordInterface
         return $this->getOrdersRelatedByDeliveryModuleId($query, $con);
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2334,9 +2304,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersRelatedByDeliveryModuleIdJoinOrderStatus($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2347,7 +2317,6 @@ abstract class Module implements ActiveRecordInterface
         return $this->getOrdersRelatedByDeliveryModuleId($query, $con);
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2359,9 +2328,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface     $con          optional connection object
+     * @param  string                  $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
     public function getOrdersRelatedByDeliveryModuleIdJoinLang($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2401,8 +2370,8 @@ abstract class Module implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2424,8 +2393,8 @@ abstract class Module implements ActiveRecordInterface
      * If this ChildModule is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                             $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface                  $con      optional connection object
      * @return Collection|ChildAreaDeliveryModule[] List of ChildAreaDeliveryModule objects
      * @throws PropelException
      */
@@ -2481,14 +2450,13 @@ abstract class Module implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $areaDeliveryModules A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildModule The current object (for fluent API support)
+     * @param  Collection          $areaDeliveryModules A Propel collection.
+     * @param  ConnectionInterface $con                 Optional connection object
+     * @return ChildModule         The current object (for fluent API support)
      */
     public function setAreaDeliveryModules(Collection $areaDeliveryModules, ConnectionInterface $con = null)
     {
         $areaDeliveryModulesToDelete = $this->getAreaDeliveryModules(new Criteria(), $con)->diff($areaDeliveryModules);
-
 
         $this->areaDeliveryModulesScheduledForDeletion = $areaDeliveryModulesToDelete;
 
@@ -2510,10 +2478,10 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Returns the number of related AreaDeliveryModule objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related AreaDeliveryModule objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related AreaDeliveryModule objects.
      * @throws PropelException
      */
     public function countAreaDeliveryModules(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2545,8 +2513,8 @@ abstract class Module implements ActiveRecordInterface
      * Method called to associate a ChildAreaDeliveryModule object to this object
      * through the ChildAreaDeliveryModule foreign key attribute.
      *
-     * @param    ChildAreaDeliveryModule $l ChildAreaDeliveryModule
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  ChildAreaDeliveryModule $l ChildAreaDeliveryModule
+     * @return \Thelia\Model\Module    The current object (for fluent API support)
      */
     public function addAreaDeliveryModule(ChildAreaDeliveryModule $l)
     {
@@ -2573,7 +2541,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * @param  AreaDeliveryModule $areaDeliveryModule The areaDeliveryModule object to remove.
-     * @return ChildModule The current object (for fluent API support)
+     * @return ChildModule        The current object (for fluent API support)
      */
     public function removeAreaDeliveryModule($areaDeliveryModule)
     {
@@ -2590,7 +2558,6 @@ abstract class Module implements ActiveRecordInterface
         return $this;
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2602,9 +2569,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                             $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface                  $con          optional connection object
+     * @param  string                               $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildAreaDeliveryModule[] List of ChildAreaDeliveryModule objects
      */
     public function getAreaDeliveryModulesJoinArea($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2644,8 +2611,8 @@ abstract class Module implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2667,8 +2634,8 @@ abstract class Module implements ActiveRecordInterface
      * If this ChildModule is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                        $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface             $con      optional connection object
      * @return Collection|ChildProfileModule[] List of ChildProfileModule objects
      * @throws PropelException
      */
@@ -2724,14 +2691,13 @@ abstract class Module implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $profileModules A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildModule The current object (for fluent API support)
+     * @param  Collection          $profileModules A Propel collection.
+     * @param  ConnectionInterface $con            Optional connection object
+     * @return ChildModule         The current object (for fluent API support)
      */
     public function setProfileModules(Collection $profileModules, ConnectionInterface $con = null)
     {
         $profileModulesToDelete = $this->getProfileModules(new Criteria(), $con)->diff($profileModules);
-
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
@@ -2756,10 +2722,10 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Returns the number of related ProfileModule objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ProfileModule objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related ProfileModule objects.
      * @throws PropelException
      */
     public function countProfileModules(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2791,8 +2757,8 @@ abstract class Module implements ActiveRecordInterface
      * Method called to associate a ChildProfileModule object to this object
      * through the ChildProfileModule foreign key attribute.
      *
-     * @param    ChildProfileModule $l ChildProfileModule
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  ChildProfileModule   $l ChildProfileModule
+     * @return \Thelia\Model\Module The current object (for fluent API support)
      */
     public function addProfileModule(ChildProfileModule $l)
     {
@@ -2819,7 +2785,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * @param  ProfileModule $profileModule The profileModule object to remove.
-     * @return ChildModule The current object (for fluent API support)
+     * @return ChildModule   The current object (for fluent API support)
      */
     public function removeProfileModule($profileModule)
     {
@@ -2836,7 +2802,6 @@ abstract class Module implements ActiveRecordInterface
         return $this;
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2848,9 +2813,9 @@ abstract class Module implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Module.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                        $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface             $con          optional connection object
+     * @param  string                          $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildProfileModule[] List of ChildProfileModule objects
      */
     public function getProfileModulesJoinProfile($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2890,8 +2855,8 @@ abstract class Module implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2913,8 +2878,8 @@ abstract class Module implements ActiveRecordInterface
      * If this ChildModule is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                      $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface           $con      optional connection object
      * @return Collection|ChildModuleImage[] List of ChildModuleImage objects
      * @throws PropelException
      */
@@ -2970,14 +2935,13 @@ abstract class Module implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $moduleImages A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildModule The current object (for fluent API support)
+     * @param  Collection          $moduleImages A Propel collection.
+     * @param  ConnectionInterface $con          Optional connection object
+     * @return ChildModule         The current object (for fluent API support)
      */
     public function setModuleImages(Collection $moduleImages, ConnectionInterface $con = null)
     {
         $moduleImagesToDelete = $this->getModuleImages(new Criteria(), $con)->diff($moduleImages);
-
 
         $this->moduleImagesScheduledForDeletion = $moduleImagesToDelete;
 
@@ -2999,10 +2963,10 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Returns the number of related ModuleImage objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ModuleImage objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related ModuleImage objects.
      * @throws PropelException
      */
     public function countModuleImages(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -3034,8 +2998,8 @@ abstract class Module implements ActiveRecordInterface
      * Method called to associate a ChildModuleImage object to this object
      * through the ChildModuleImage foreign key attribute.
      *
-     * @param    ChildModuleImage $l ChildModuleImage
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  ChildModuleImage     $l ChildModuleImage
+     * @return \Thelia\Model\Module The current object (for fluent API support)
      */
     public function addModuleImage(ChildModuleImage $l)
     {
@@ -3108,8 +3072,8 @@ abstract class Module implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -3131,8 +3095,8 @@ abstract class Module implements ActiveRecordInterface
      * If this ChildModule is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                     $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface          $con      optional connection object
      * @return Collection|ChildModuleI18n[] List of ChildModuleI18n objects
      * @throws PropelException
      */
@@ -3188,14 +3152,13 @@ abstract class Module implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $moduleI18ns A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildModule The current object (for fluent API support)
+     * @param  Collection          $moduleI18ns A Propel collection.
+     * @param  ConnectionInterface $con         Optional connection object
+     * @return ChildModule         The current object (for fluent API support)
      */
     public function setModuleI18ns(Collection $moduleI18ns, ConnectionInterface $con = null)
     {
         $moduleI18nsToDelete = $this->getModuleI18ns(new Criteria(), $con)->diff($moduleI18ns);
-
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
@@ -3220,10 +3183,10 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Returns the number of related ModuleI18n objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ModuleI18n objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related ModuleI18n objects.
      * @throws PropelException
      */
     public function countModuleI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -3255,8 +3218,8 @@ abstract class Module implements ActiveRecordInterface
      * Method called to associate a ChildModuleI18n object to this object
      * through the ChildModuleI18n foreign key attribute.
      *
-     * @param    ChildModuleI18n $l ChildModuleI18n
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     * @param  ChildModuleI18n      $l ChildModuleI18n
+     * @return \Thelia\Model\Module The current object (for fluent API support)
      */
     public function addModuleI18n(ChildModuleI18n $l)
     {
@@ -3286,7 +3249,7 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
-     * @param  ModuleI18n $moduleI18n The moduleI18n object to remove.
+     * @param  ModuleI18n  $moduleI18n The moduleI18n object to remove.
      * @return ChildModule The current object (for fluent API support)
      */
     public function removeModuleI18n($moduleI18n)
@@ -3331,7 +3294,7 @@ abstract class Module implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param      boolean $deep Whether to also clear the references on all referrer objects.
+     * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -3395,7 +3358,7 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildModule The current object (for fluent API support)
+     * @return ChildModule The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
@@ -3409,9 +3372,9 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Sets the locale for translations
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param string $locale Locale to use for the translation, e.g. 'fr_FR'
      *
-     * @return    ChildModule The current object (for fluent API support)
+     * @return ChildModule The current object (for fluent API support)
      */
     public function setLocale($locale = 'en_US')
     {
@@ -3423,7 +3386,7 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Gets the locale for translations
      *
-     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @return string $locale Locale to use for the translation, e.g. 'fr_FR'
      */
     public function getLocale()
     {
@@ -3433,8 +3396,8 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Returns the current translation for a given locale
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param     ConnectionInterface $con an optional connection object
+     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param ConnectionInterface $con    an optional connection object
      *
      * @return ChildModuleI18n */
     public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
@@ -3467,10 +3430,10 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Remove the translation for a given locale
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param     ConnectionInterface $con an optional connection object
+     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param ConnectionInterface $con    an optional connection object
      *
-     * @return    ChildModule The current object (for fluent API support)
+     * @return ChildModule The current object (for fluent API support)
      */
     public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
@@ -3495,14 +3458,13 @@ abstract class Module implements ActiveRecordInterface
     /**
      * Returns the current translation
      *
-     * @param     ConnectionInterface $con an optional connection object
+     * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildModuleI18n */
     public function getCurrentTranslation(ConnectionInterface $con = null)
     {
         return $this->getTranslation($this->getLocale(), $con);
     }
-
 
         /**
          * Get the [title] column value.
@@ -3513,7 +3475,6 @@ abstract class Module implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getTitle();
     }
-
 
         /**
          * Set the value of [title] column.
@@ -3527,7 +3488,6 @@ abstract class Module implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [description] column value.
          *
@@ -3537,7 +3497,6 @@ abstract class Module implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getDescription();
     }
-
 
         /**
          * Set the value of [description] column.
@@ -3551,7 +3510,6 @@ abstract class Module implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [chapo] column value.
          *
@@ -3561,7 +3519,6 @@ abstract class Module implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getChapo();
     }
-
 
         /**
          * Set the value of [chapo] column.
@@ -3575,7 +3532,6 @@ abstract class Module implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [postscriptum] column value.
          *
@@ -3585,7 +3541,6 @@ abstract class Module implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getPostscriptum();
     }
-
 
         /**
          * Set the value of [postscriptum] column.
@@ -3674,7 +3629,6 @@ abstract class Module implements ActiveRecordInterface
     {
 
     }
-
 
     /**
      * Derived method to catches calls to undefined methods.

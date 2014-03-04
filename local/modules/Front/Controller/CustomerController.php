@@ -30,6 +30,7 @@ use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\CustomerCreateForm;
 use Thelia\Form\CustomerLogin;
 use Thelia\Form\CustomerLostPasswordForm;
@@ -68,9 +69,9 @@ class CustomerController extends BaseFrontController
                 $this->dispatch(TheliaEvents::LOST_PASSWORD, $event);
 
             } catch (FormValidationException $e) {
-                $message = sprintf("Please check your input: %s", $e->getMessage());
+                $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
             } catch (\Exception $e) {
-                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+                $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
             }
 
             if ($message !== false) {
@@ -132,9 +133,9 @@ class CustomerController extends BaseFrontController
                     $this->redirectSuccess($customerCreation);
                 }
             } catch (FormValidationException $e) {
-                $message = sprintf("Please check your input: %s", $e->getMessage());
+                $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
             } catch (\Exception $e) {
-                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+                $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
             }
 
             if ($message !== false) {
@@ -193,9 +194,9 @@ class CustomerController extends BaseFrontController
                 $this->redirectSuccess($customerPasswordUpdateForm);
 
             } catch (FormValidationException $e) {
-                $message = sprintf("Please check your input: %s", $e->getMessage());
+                $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
             } catch (\Exception $e) {
-                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+                $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
             }
 
             if ($message !== false) {
@@ -256,9 +257,9 @@ class CustomerController extends BaseFrontController
                 $this->redirectSuccess($customerProfileUpdateForm);
 
             } catch (FormValidationException $e) {
-                $message = sprintf("Please check your input: %s", $e->getMessage());
+                $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
             } catch (\Exception $e) {
-                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+                $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
             }
 
             if ($message !== false) {
@@ -319,9 +320,9 @@ class CustomerController extends BaseFrontController
                 }
 
             } catch (FormValidationException $e) {
-                $message = sprintf("Please check your input: %s", $e->getMessage());
+                $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
             } catch (\Exception $e) {
-                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+                $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
             }
 
             if ($message !== false) {

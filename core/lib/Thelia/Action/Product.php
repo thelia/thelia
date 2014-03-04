@@ -73,8 +73,8 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->setDispatcher($event->getDispatcher())
 
             ->setRef($event->getRef())
-            ->setTitle($event->getTitle())
             ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
             ->setVisible($event->getVisible())
 
             // Set the default tax rule to this product
@@ -163,6 +163,8 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->setVisible($product->getVisible() ? false : true)
             ->save()
             ;
+
+         $event->setProduct($product);
     }
 
     /**
@@ -292,6 +294,10 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             // Create a new default product sale element
             $product->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
+
+            $product->clearProductSaleElementss();
+
+            $event->setProduct($product);
 
             // Store all the stuff !
             $con->commit();

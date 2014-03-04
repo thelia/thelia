@@ -33,7 +33,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\AttributeCombinationTableMap';
 
-
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -322,9 +321,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed $parser A AbstractParser instance,
+     * @param mixed  $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data The source data to import from
+     * @param string $data   The source data to import from
      *
      * @return AttributeCombination The current object, for fluid interface
      */
@@ -374,33 +373,30 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Get the [attribute_id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getAttributeId()
     {
-
         return $this->attribute_id;
     }
 
     /**
      * Get the [attribute_av_id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getAttributeAvId()
     {
-
         return $this->attribute_av_id;
     }
 
     /**
      * Get the [product_sale_elements_id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getProductSaleElementsId()
     {
-
         return $this->product_sale_elements_id;
     }
 
@@ -408,8 +404,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -428,8 +424,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -447,8 +443,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Set the value of [attribute_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\AttributeCombination The current object (for fluent API support)
+     * @param  int                                $v new value
+     * @return \Thelia\Model\AttributeCombination The current object (for fluent API support)
      */
     public function setAttributeId($v)
     {
@@ -465,15 +461,14 @@ abstract class AttributeCombination implements ActiveRecordInterface
             $this->aAttribute = null;
         }
 
-
         return $this;
     } // setAttributeId()
 
     /**
      * Set the value of [attribute_av_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\AttributeCombination The current object (for fluent API support)
+     * @param  int                                $v new value
+     * @return \Thelia\Model\AttributeCombination The current object (for fluent API support)
      */
     public function setAttributeAvId($v)
     {
@@ -490,15 +485,14 @@ abstract class AttributeCombination implements ActiveRecordInterface
             $this->aAttributeAv = null;
         }
 
-
         return $this;
     } // setAttributeAvId()
 
     /**
      * Set the value of [product_sale_elements_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\AttributeCombination The current object (for fluent API support)
+     * @param  int                                $v new value
+     * @return \Thelia\Model\AttributeCombination The current object (for fluent API support)
      */
     public function setProductSaleElementsId($v)
     {
@@ -515,16 +509,15 @@ abstract class AttributeCombination implements ActiveRecordInterface
             $this->aProductSaleElements = null;
         }
 
-
         return $this;
     } // setProductSaleElementsId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\AttributeCombination The current object (for fluent API support)
+     * @param  mixed                              $v string, integer (timestamp), or \DateTime value.
+     *                                               Empty strings are treated as NULL.
+     * @return \Thelia\Model\AttributeCombination The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -536,16 +529,15 @@ abstract class AttributeCombination implements ActiveRecordInterface
             }
         } // if either are not null
 
-
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\AttributeCombination The current object (for fluent API support)
+     * @param  mixed                              $v string, integer (timestamp), or \DateTime value.
+     *                                               Empty strings are treated as NULL.
+     * @return \Thelia\Model\AttributeCombination The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -556,7 +548,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
                 $this->modifiedColumns[AttributeCombinationTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
-
 
         return $this;
     } // setUpdatedAt()
@@ -664,10 +655,10 @@ abstract class AttributeCombination implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
-     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
+     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
+     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -705,7 +696,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param      ConnectionInterface $con
+     * @param  ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see AttributeCombination::setDeleted()
@@ -748,8 +739,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -810,8 +801,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -868,7 +859,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -877,7 +868,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
     {
         $modifiedColumns = array();
         $index = 0;
-
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(AttributeCombinationTableMap::ATTRIBUTE_ID)) {
@@ -935,7 +925,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -951,12 +941,12 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param      string $name name
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed Value of field.
+     * @param  string $name name
+     * @param  string $type The type of fieldname the $name is of:
+     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                      Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed  Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -970,7 +960,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
+     * @param  int   $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1003,12 +993,12 @@ abstract class AttributeCombination implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                    Defaults to TableMap::TYPE_PHPNAME.
-     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
-     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                                        Defaults to TableMap::TYPE_PHPNAME.
+     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
+     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1049,12 +1039,12 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param      string $name
-     * @param      mixed  $value field value
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @param  string $name
+     * @param  mixed  $value field value
+     * @param  string $type  The type of fieldname the $name is of:
+     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                       Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1068,8 +1058,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
-     * @param      mixed $value field value
+     * @param  int   $pos   position in xml schema
+     * @param  mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1106,8 +1096,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param      array  $arr     An array to populate the object from.
-     * @param      string $keyType The type of keys the array uses.
+     * @param  array  $arr     An array to populate the object from.
+     * @param  string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1135,7 +1125,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
         if ($this->isColumnModified(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID)) $criteria->add(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $this->product_sale_elements_id);
         if ($this->isColumnModified(AttributeCombinationTableMap::CREATED_AT)) $criteria->add(AttributeCombinationTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(AttributeCombinationTableMap::UPDATED_AT)) $criteria->add(AttributeCombinationTableMap::UPDATED_AT, $this->updated_at);
-
         return $criteria;
     }
 
@@ -1175,7 +1164,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Set the [composite] primary key.
      *
-     * @param      array $keys The elements of the composite key (order must match the order in XML file).
+     * @param  array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
     public function setPrimaryKey($keys)
@@ -1191,7 +1180,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-
         return (null === $this->getAttributeId()) && (null === $this->getAttributeAvId()) && (null === $this->getProductSaleElementsId());
     }
 
@@ -1201,9 +1189,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\AttributeCombination (or compatible) type.
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
+     * @param  object          $copyObj  An object of \Thelia\Model\AttributeCombination (or compatible) type.
+     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1226,8 +1214,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\AttributeCombination Clone of current object.
+     * @param  boolean                            $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return \Thelia\Model\AttributeCombination Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1243,8 +1231,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildAttribute object.
      *
-     * @param                  ChildAttribute $v
-     * @return                 \Thelia\Model\AttributeCombination The current object (for fluent API support)
+     * @param  ChildAttribute                     $v
+     * @return \Thelia\Model\AttributeCombination The current object (for fluent API support)
      * @throws PropelException
      */
     public function setAttribute(ChildAttribute $v = null)
@@ -1263,7 +1251,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
             $v->addAttributeCombination($this);
         }
 
-
         return $this;
     }
 
@@ -1271,8 +1258,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Get the associated ChildAttribute object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildAttribute The associated ChildAttribute object.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildAttribute      The associated ChildAttribute object.
      * @throws PropelException
      */
     public function getAttribute(ConnectionInterface $con = null)
@@ -1294,8 +1281,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildAttributeAv object.
      *
-     * @param                  ChildAttributeAv $v
-     * @return                 \Thelia\Model\AttributeCombination The current object (for fluent API support)
+     * @param  ChildAttributeAv                   $v
+     * @return \Thelia\Model\AttributeCombination The current object (for fluent API support)
      * @throws PropelException
      */
     public function setAttributeAv(ChildAttributeAv $v = null)
@@ -1314,7 +1301,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
             $v->addAttributeCombination($this);
         }
 
-
         return $this;
     }
 
@@ -1322,8 +1308,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Get the associated ChildAttributeAv object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildAttributeAv The associated ChildAttributeAv object.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildAttributeAv    The associated ChildAttributeAv object.
      * @throws PropelException
      */
     public function getAttributeAv(ConnectionInterface $con = null)
@@ -1345,8 +1331,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildProductSaleElements object.
      *
-     * @param                  ChildProductSaleElements $v
-     * @return                 \Thelia\Model\AttributeCombination The current object (for fluent API support)
+     * @param  ChildProductSaleElements           $v
+     * @return \Thelia\Model\AttributeCombination The current object (for fluent API support)
      * @throws PropelException
      */
     public function setProductSaleElements(ChildProductSaleElements $v = null)
@@ -1365,7 +1351,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
             $v->addAttributeCombination($this);
         }
 
-
         return $this;
     }
 
@@ -1373,8 +1358,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Get the associated ChildProductSaleElements object
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildProductSaleElements The associated ChildProductSaleElements object.
+     * @param  ConnectionInterface      $con Optional Connection object.
+     * @return ChildProductSaleElements The associated ChildProductSaleElements object.
      * @throws PropelException
      */
     public function getProductSaleElements(ConnectionInterface $con = null)
@@ -1417,7 +1402,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param      boolean $deep Whether to also clear the references on all referrer objects.
+     * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -1444,7 +1429,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildAttributeCombination The current object (for fluent API support)
+     * @return ChildAttributeCombination The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {

@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderProductQuery as BaseOrderProductQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'order_product' table.
  *

@@ -22,7 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Folder;
-use Thelia\Core\Event\Folder\FolderEvent;
 
 /**
  * Class FolderCreateEvent

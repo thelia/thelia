@@ -22,15 +22,16 @@ class Content extends BaseContent
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName() {
+    protected function getRewrittenUrlViewName()
+    {
         return 'content';
     }
 
     /**
      * Calculate next position relative to our parent
      */
-    protected function addCriteriaToPositionQuery($query) {
-
+    protected function addCriteriaToPositionQuery($query)
+    {
         // TODO: Find the default folder for this content,
         // and generate the position relative to this folder
     }
@@ -54,7 +55,6 @@ class Content extends BaseContent
 
         return $this;
     }
-
 
     public function updateDefaultFolder($defaultFolderId)
     {
@@ -118,14 +118,13 @@ class Content extends BaseContent
             $con->commit();
 
             $this->dispatchEvent(TheliaEvents::AFTER_CREATECONTENT,new ContentEvent($this));
-        } catch(\Exception $ex) {
+        } catch (\Exception $ex) {
 
             $con->rollback();
 
             throw $ex;
         }
     }
-
 
     public function preUpdate(ConnectionInterface $con = null)
     {

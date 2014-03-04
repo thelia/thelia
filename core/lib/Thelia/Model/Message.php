@@ -9,8 +9,8 @@ use Thelia\Core\Event\Message\MessageEvent;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelper;
 
-class Message extends BaseMessage {
-
+class Message extends BaseMessage
+{
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     /**
@@ -70,8 +70,8 @@ class Message extends BaseMessage {
     /**
      * Calculate the message body, given the HTML entered in the back-office, the message layout, and the message template
      */
-    protected function getMessageBody($parser, $message, $layout, $template) {
-
+    protected function getMessageBody($parser, $message, $layout, $template)
+    {
         $body = false;
 
         $mail_template_path = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath() . DS;
@@ -107,8 +107,8 @@ class Message extends BaseMessage {
     /**
      * Get the HTML message body
      */
-    public function getHtmlMessageBody(ParserInterface $parser) {
-
+    public function getHtmlMessageBody(ParserInterface $parser)
+    {
         return $this->getMessageBody(
                 $parser,
                 $this->getHtmlMessage(),
@@ -120,8 +120,8 @@ class Message extends BaseMessage {
     /**
      * Get the TEXT message body
      */
-    public function getTextMessageBody(ParserInterface $parser) {
-
+    public function getTextMessageBody(ParserInterface $parser)
+    {
         return $this->getMessageBody(
                 $parser,
                 $this->getTextMessage(),
@@ -134,8 +134,8 @@ class Message extends BaseMessage {
      * Add a subject and a body (TEXT, HTML or both, depending on the message
      * configuration.
      */
-    public function buildMessage($parser, \Swift_Message $messageInstance) {
-
+    public function buildMessage($parser, \Swift_Message $messageInstance)
+    {
         $subject     = $parser->fetch(sprintf("string:%s", $this->getSubject()));
         $htmlMessage = $this->getHtmlMessageBody($parser);
         $textMessage = $this->getTextMessageBody($parser);
@@ -146,8 +146,7 @@ class Message extends BaseMessage {
         if (empty($htmlMessage)) {
             // Message body is the text message
             $messageInstance->setBody($textMessage, 'text/plain');
-        }
-        else {
+        } else {
             // The main body is the HTML messahe
             $messageInstance->setBody($htmlMessage, 'text/html');
 

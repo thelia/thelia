@@ -23,7 +23,6 @@
 
 namespace Thelia\Exception;
 
-
 /**
  * Class CustomerException
  * @package Thelia\Exception
@@ -31,4 +30,4 @@ namespace Thelia\Exception;
  */
 class CustomerException extends \RuntimeException
 {
-} 
+}

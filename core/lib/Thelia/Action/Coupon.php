@@ -23,8 +23,6 @@
 
 namespace Thelia\Action;
 
-use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
@@ -161,6 +159,22 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
         $event->setIsValid($isValid);
         $event->setDiscount($totalDiscount);
+    }
+
+    public function updateOrderDiscount($event)
+    {
+
+        $discount = $this->couponManager->getDiscount();
+
+        $this->request
+            ->getSession()
+            ->getCart()
+            ->setDiscount($discount)
+            ->save();
+        $this->request
+            ->getSession()
+            ->getOrder()
+            ->setDiscount($discount);
     }
 
     /**
@@ -312,6 +326,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::COUPON_CONDITION_UPDATE => array("updateCondition", 128),
             TheliaEvents::ORDER_SET_POSTAGE => array("testFreePostage", 256),
             TheliaEvents::ORDER_BEFORE_PAYMENT => array("afterOrder", 128),
+            TheliaEvents::CART_ADDITEM => array("updateOrderDiscount", 10),
+            TheliaEvents::CART_UPDATEITEM => array("updateOrderDiscount", 10),
+            TheliaEvents::CART_DELETEITEM => array("updateOrderDiscount", 10),
         );
     }
 }

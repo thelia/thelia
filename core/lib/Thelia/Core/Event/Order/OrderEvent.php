@@ -214,7 +214,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param Response $response
+     * @param  Response $response
      * @return $this
      */
     public function setResponse(Response $response)

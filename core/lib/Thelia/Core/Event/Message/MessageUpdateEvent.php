@@ -22,7 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Message;
-use Thelia\Core\Event\Message\MessageCreateEvent;
 
 class MessageUpdateEvent extends MessageCreateEvent
 {

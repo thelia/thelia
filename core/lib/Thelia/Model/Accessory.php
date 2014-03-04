@@ -7,8 +7,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\AccessoryEvent;
 
-class Accessory extends BaseAccessory {
-
+class Accessory extends BaseAccessory
+{
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     use \Thelia\Model\Tools\PositionManagementTrait;
@@ -16,7 +16,8 @@ class Accessory extends BaseAccessory {
     /**
      * Calculate next position relative to our product
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         $query->filterByProductId($this->getProductId());
     }
 

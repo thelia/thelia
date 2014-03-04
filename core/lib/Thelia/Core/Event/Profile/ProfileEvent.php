@@ -64,6 +64,8 @@ class ProfileEvent extends ActionEvent
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
     }
 
     public function getId()
@@ -74,6 +76,8 @@ class ProfileEvent extends ActionEvent
     public function setCode($code)
     {
         $this->code = $code;
+
+        return $this;
     }
 
     public function getCode()
@@ -84,6 +88,8 @@ class ProfileEvent extends ActionEvent
     public function setChapo($chapo)
     {
         $this->chapo = $chapo;
+
+        return $this;
     }
 
     public function getChapo()
@@ -94,6 +100,8 @@ class ProfileEvent extends ActionEvent
     public function setDescription($description)
     {
         $this->description = $description;
+
+        return $this;
     }
 
     public function getDescription()
@@ -104,6 +112,8 @@ class ProfileEvent extends ActionEvent
     public function setLocale($locale)
     {
         $this->locale = $locale;
+
+        return $this;
     }
 
     public function getLocale()
@@ -114,6 +124,8 @@ class ProfileEvent extends ActionEvent
     public function setPostscriptum($postscriptum)
     {
         $this->postscriptum = $postscriptum;
+
+        return $this;
     }
 
     public function getPostscriptum()
@@ -124,6 +136,8 @@ class ProfileEvent extends ActionEvent
     public function setTitle($title)
     {
         $this->title = $title;
+
+        return $this;
     }
 
     public function getTitle()
@@ -134,6 +148,8 @@ class ProfileEvent extends ActionEvent
     public function setResourceAccess($resourceAccess)
     {
         $this->resourceAccess = $resourceAccess;
+
+        return $this;
     }
 
     public function getResourceAccess()
@@ -144,6 +160,8 @@ class ProfileEvent extends ActionEvent
     public function setModuleAccess($moduleAccess)
     {
         $this->moduleAccess = $moduleAccess;
+
+        return $this;
     }
 
     public function getModuleAccess()

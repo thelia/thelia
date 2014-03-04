@@ -28,7 +28,7 @@ class TaxRule extends BaseTaxRule
         $promoTaxCollection = new OrderProductTaxCollection();
         $taxCalculator->loadTaxRule($this, $country, $product)->getTaxedPrice($untaxedPromoAmount, $promoTaxCollection, $askedLocale);
 
-        foreach($taxCollection as $index => $tax) {
+        foreach ($taxCollection as $index => $tax) {
             $tax->setPromoAmount($promoTaxCollection->getKey($index)->getAmount());
         }
 

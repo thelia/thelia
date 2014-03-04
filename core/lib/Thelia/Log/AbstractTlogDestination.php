@@ -49,7 +49,6 @@ abstract class AbstractTlogDestination
 
                 // Appliquer les changements
                 if ($apply_changes) $this->configure();
-
                 return true;
             }
         }

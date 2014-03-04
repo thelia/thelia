@@ -84,10 +84,10 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
             ->orderByUpdatedAt(Criteria::DESC);
 
         $otherParametersCount = count($viewOtherParameters);
-        if($otherParametersCount > 0) {
+        if ($otherParametersCount > 0) {
             $parameterConditions = array();
 
-            foreach($viewOtherParameters as $parameter => $value) {
+            foreach ($viewOtherParameters as $parameter => $value) {
                 $conditionName = 'other_parameter_condition_' . count($parameterConditions);
                 $urlQuery->condition('parameter_condition', '`ra`.PARAMETER= ?', $parameter, \PDO::PARAM_STR)
                     ->condition('value_condition', '`ra`.VALUE = ?', $value, \PDO::PARAM_STR)

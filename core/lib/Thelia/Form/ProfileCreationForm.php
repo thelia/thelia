@@ -74,7 +74,7 @@ class ProfileCreationForm extends BaseForm
             ->findOneByCode($value);
 
         if (null !== $profile) {
-            $context->addViolation("Profile `code` already exists");
+            $context->addViolation(Translator::getInstance()->trans("Profile `code` already exists"));
         }
     }
 }

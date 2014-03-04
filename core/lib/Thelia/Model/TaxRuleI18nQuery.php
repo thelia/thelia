@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\TaxRuleI18nQuery as BaseTaxRuleI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'tax_rule_i18n' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\TaxRuleI18nQuery as BaseTaxRuleI18nQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class TaxRuleI18nQuery extends BaseTaxRuleI18nQuery {
-
+class TaxRuleI18nQuery extends BaseTaxRuleI18nQuery
+{
 } // TaxRuleI18nQuery

@@ -6,7 +6,6 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\Module as BaseModule;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 
-
 class Module extends BaseModule
 {
     use ModelEventDispatcherTrait;
@@ -21,42 +20,48 @@ class Module extends BaseModule
     /**
      * @return the module's base directory path, relative to THELIA_MODULE_DIR
      */
-    public function getBaseDir() {
+    public function getBaseDir()
+    {
         return ucfirst($this->getCode());
     }
 
     /**
      * @return the module's base directory path, relative to THELIA_MODULE_DIR
      */
-    public function getAbsoluteBaseDir() {
+    public function getAbsoluteBaseDir()
+    {
         return THELIA_MODULE_DIR . $this->getBaseDir();
     }
 
     /**
      * @return the module's config directory path, relative to THELIA_MODULE_DIR
      */
-    public function getConfigPath() {
+    public function getConfigPath()
+    {
         return $this->getBaseDir() . DS . "Config";
     }
 
     /**
      * @return the module's config absolute directory path
      */
-    public function getAbsoluteConfigPath() {
+    public function getAbsoluteConfigPath()
+    {
         return THELIA_MODULE_DIR . $this->getConfigPath();
     }
 
     /**
      * @return the module's i18N directory path, relative to THELIA_MODULE_DIR
      */
-    public function getI18nPath() {
+    public function getI18nPath()
+    {
         return $this->getBaseDir() . DS . "I18n";
     }
 
     /**
      * @return the module's i18N absolute directory path
      */
-    public function getAbsoluteI18nPath() {
+    public function getAbsoluteI18nPath()
+    {
         return THELIA_MODULE_DIR . $this->getI18nPath();
     }
 
@@ -65,14 +70,16 @@ class Module extends BaseModule
      *
      * @param int $templateSubdirName the name of the, probably one of TemplateDefinition::xxx_SUBDIR constants
      */
-    public function getAbsoluteTemplateDirectoryPath($templateSubdirName) {
+    public function getAbsoluteTemplateDirectoryPath($templateSubdirName)
+    {
         return sprintf("%s%stemplates%s%s", $this->getAbsoluteBaseDir(), DS, DS, $templateSubdirName);
     }
 
     /**
      * Calculate next position relative to module type
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
         $query->filterByType($this->getType());
     }
 

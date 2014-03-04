@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ModuleImageI18nQuery as BaseModuleImageI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'module_image_i18n' table.
  *

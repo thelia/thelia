@@ -28,8 +28,8 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Config\ConfigEvent;
 
-class Config extends BaseConfig {
-
+class Config extends BaseConfig
+{
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     /**

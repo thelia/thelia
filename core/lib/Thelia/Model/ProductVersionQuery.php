@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ProductVersionQuery as BaseProductVersionQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'product_version' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\ProductVersionQuery as BaseProductVersionQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ProductVersionQuery extends BaseProductVersionQuery {
-
+class ProductVersionQuery extends BaseProductVersionQuery
+{
 } // ProductVersionQuery

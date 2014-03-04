@@ -45,7 +45,7 @@ Installation
 
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.0.0-beta4
+$ php composer.phar create-project thelia/thelia path/ 2.0.0-RC1
 ```
 
 Finish the installation using cli tools :

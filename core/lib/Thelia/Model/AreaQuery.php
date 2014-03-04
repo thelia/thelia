@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\AreaQuery as BaseAreaQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'area' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\AreaQuery as BaseAreaQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class AreaQuery extends BaseAreaQuery {
-
+class AreaQuery extends BaseAreaQuery
+{
 } // AreaQuery

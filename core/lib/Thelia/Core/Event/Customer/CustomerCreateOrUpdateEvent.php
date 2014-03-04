@@ -68,8 +68,8 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
      * @param string $email
      * @param string $password  plain password, don't put hash password, it will hashes again
      * @param $lang
-     * @param int    $reseller if customer is a reseller
-     * @param int    $sponsor  customer's id sponsor
+     * @param int    $reseller  if customer is a reseller
+     * @param int    $sponsor   customer's id sponsor
      * @param float  $discount
      * @param string $company
      * @param string $ref

@@ -51,8 +51,8 @@ class TaxRuleController extends AbstractCrudController
         );
     }
 
-    public function defaultAction() {
-
+    public function defaultAction()
+    {
         // In the tax rule template we use the TaxCreationForm.
         //
         // The TaxCreationForm require the TaxEngine, but we cannot pass it from the Parser Form plugin,

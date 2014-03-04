@@ -75,9 +75,9 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\ProductPriceQuery object.
      *
-     * @param     string $dbName The database name
-     * @param     string $modelName The phpName of a model, e.g. 'Book'
-     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param string $dbName     The database name
+     * @param string $modelName  The phpName of a model, e.g. 'Book'
+     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\ProductPrice', $modelAlias = null)
     {
@@ -87,8 +87,8 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Returns a new ChildProductPriceQuery object.
      *
-     * @param     string $modelAlias The alias of a model in the query
-     * @param     Criteria $criteria Optional Criteria to build the query from
+     * @param string   $modelAlias The alias of a model in the query
+     * @param Criteria $criteria   Optional Criteria to build the query from
      *
      * @return ChildProductPriceQuery
      */
@@ -148,10 +148,10 @@ abstract class ProductPriceQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
-     * @return   ChildProductPrice A model object, or null if the key is not found
+     * @return ChildProductPrice A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -179,8 +179,8 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @return ChildProductPrice|array|mixed the result, formatted by the current formatter
      */
@@ -200,8 +200,8 @@ abstract class ProductPriceQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
      * </code>
-     * @param     array $keys Primary keys to use for the query
-     * @param     ConnectionInterface $con an optional connection object
+     * @param array               $keys Primary keys to use for the query
+     * @param ConnectionInterface $con  an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -222,7 +222,7 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param     mixed $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -237,7 +237,7 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Filter the query by a list of primary keys
      *
-     * @param     array $keys The list of primary key to use for the query
+     * @param array $keys The list of primary key to use for the query
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -268,11 +268,11 @@ abstract class ProductPriceQuery extends ModelCriteria
      *
      * @see       filterByProductSaleElements()
      *
-     * @param     mixed $productSaleElementsId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $productSaleElementsId The value to use as filter.
+     *                                      Use scalar values for equality.
+     *                                      Use array values for in_array() equivalent.
+     *                                      Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison            Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -311,11 +311,11 @@ abstract class ProductPriceQuery extends ModelCriteria
      *
      * @see       filterByCurrency()
      *
-     * @param     mixed $currencyId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $currencyId The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -352,11 +352,11 @@ abstract class ProductPriceQuery extends ModelCriteria
      * $query->filterByPrice(array('min' => 12)); // WHERE price > 12
      * </code>
      *
-     * @param     mixed $price The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $price      The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -393,11 +393,11 @@ abstract class ProductPriceQuery extends ModelCriteria
      * $query->filterByPromoPrice(array('min' => 12)); // WHERE promo_price > 12
      * </code>
      *
-     * @param     mixed $promoPrice The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $promoPrice The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -433,12 +433,12 @@ abstract class ProductPriceQuery extends ModelCriteria
      * $query->filterByFromDefaultCurrency('yes'); // WHERE from_default_currency = true
      * </code>
      *
-     * @param     boolean|string $fromDefaultCurrency The value to use as filter.
-     *              Non-boolean arguments are converted using the following rules:
-     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param boolean|string $fromDefaultCurrency The value to use as filter.
+     *                                            Non-boolean arguments are converted using the following rules:
+     *                                            * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                                            * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *                                            Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param string         $comparison          Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -461,13 +461,13 @@ abstract class ProductPriceQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $createdAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $createdAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -504,13 +504,13 @@ abstract class ProductPriceQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $updatedAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $updatedAt  The value to use as filter.
+     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
+     *                           Empty strings are treated as NULL.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -541,7 +541,7 @@ abstract class ProductPriceQuery extends ModelCriteria
      * Filter the query by a related \Thelia\Model\ProductSaleElements object
      *
      * @param \Thelia\Model\ProductSaleElements|ObjectCollection $productSaleElements The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string                                             $comparison          Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -565,8 +565,8 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ProductSaleElements relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -599,11 +599,11 @@ abstract class ProductPriceQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProductSaleElementsQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\ProductSaleElementsQuery A secondary query class using the current class as primary query
      */
     public function useProductSaleElementsQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -615,8 +615,8 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Currency object
      *
-     * @param \Thelia\Model\Currency|ObjectCollection $currency The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Currency|ObjectCollection $currency   The related object(s) to use as filter
+     * @param string                                  $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -640,8 +640,8 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Currency relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -674,11 +674,11 @@ abstract class ProductPriceQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CurrencyQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CurrencyQuery A secondary query class using the current class as primary query
      */
     public function useCurrencyQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -690,7 +690,7 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildProductPrice $productPrice Object to remove from the list of results
+     * @param ChildProductPrice $productPrice Object to remove from the list of results
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
@@ -708,8 +708,8 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Deletes all rows from the product_price table.
      *
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).
+     * @param  ConnectionInterface $con the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -740,13 +740,13 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildProductPrice or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildProductPrice object or primary key or array of primary keys
-     *              which is used to create the DELETE statement
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                if supported by native driver or if emulated using Propel.
-     * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     * @param  mixed               $values Criteria or ChildProductPrice object or primary key or array of primary keys
+     *                                     which is used to create the DELETE statement
+     * @param  ConnectionInterface $con    the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                                    if supported by native driver or if emulated using Propel.
+     * @throws PropelException     Any exceptions caught during processing will be
+     *                                    rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -766,7 +766,6 @@ abstract class ProductPriceQuery extends ModelCriteria
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-
         ProductPriceTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
@@ -785,9 +784,9 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param      int $nbDays Maximum age of the latest update in days
+     * @param int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildProductPriceQuery The current query, for fluid interface
+     * @return ChildProductPriceQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
@@ -797,9 +796,9 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Filter by the latest created
      *
-     * @param      int $nbDays Maximum age of in days
+     * @param int $nbDays Maximum age of in days
      *
-     * @return     ChildProductPriceQuery The current query, for fluid interface
+     * @return ChildProductPriceQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
@@ -809,7 +808,7 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Order by update date desc
      *
-     * @return     ChildProductPriceQuery The current query, for fluid interface
+     * @return ChildProductPriceQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
@@ -819,7 +818,7 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Order by update date asc
      *
-     * @return     ChildProductPriceQuery The current query, for fluid interface
+     * @return ChildProductPriceQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
@@ -829,7 +828,7 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Order by create date desc
      *
-     * @return     ChildProductPriceQuery The current query, for fluid interface
+     * @return ChildProductPriceQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
@@ -839,7 +838,7 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Order by create date asc
      *
-     * @return     ChildProductPriceQuery The current query, for fluid interface
+     * @return ChildProductPriceQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {

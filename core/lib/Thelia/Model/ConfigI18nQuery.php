@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ConfigI18nQuery as BaseConfigI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'config_i18n' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\ConfigI18nQuery as BaseConfigI18nQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ConfigI18nQuery extends BaseConfigI18nQuery {
-
+class ConfigI18nQuery extends BaseConfigI18nQuery
+{
 } // ConfigI18nQuery

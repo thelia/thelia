@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Template\Smarty\Assets;
 
-use Thelia\Core\Template\Smarty\SmartyParser;
-use Thelia\Log\Tlog;
 use Thelia\Tools\URL;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
 
@@ -116,7 +114,7 @@ class SmartyAssetsManager
         }
 
         $smartyParser = $template->smarty;
-        /** @var SmartyParser $templateDefinition */
+        /** @var \Thelia\Core\Template\Smarty\SmartyParser $templateDefinition */
         $templateDefinition = $smartyParser->getTemplateDefinition($webAssetTemplate);
 
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());

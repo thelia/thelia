@@ -45,7 +45,6 @@ abstract class Content implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\ContentTableMap';
 
-
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -191,7 +190,6 @@ abstract class Content implements ActiveRecordInterface
     protected $currentTranslations;
 
     // versionable behavior
-
 
     /**
      * @var bool
@@ -468,9 +466,9 @@ abstract class Content implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed $parser A AbstractParser instance,
+     * @param mixed  $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data The source data to import from
+     * @param string $data   The source data to import from
      *
      * @return Content The current object, for fluid interface
      */
@@ -520,33 +518,30 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getId()
     {
-
         return $this->id;
     }
 
     /**
      * Get the [visible] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getVisible()
     {
-
         return $this->visible;
     }
 
     /**
      * Get the [position] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getPosition()
     {
-
         return $this->position;
     }
 
@@ -554,8 +549,8 @@ abstract class Content implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -574,8 +569,8 @@ abstract class Content implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -593,11 +588,10 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Get the [version] column value.
      *
-     * @return   int
+     * @return int
      */
     public function getVersion()
     {
-
         return $this->version;
     }
 
@@ -605,8 +599,8 @@ abstract class Content implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [version_created_at] column value.
      *
      *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *                       If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -624,19 +618,18 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Get the [version_created_by] column value.
      *
-     * @return   string
+     * @return string
      */
     public function getVersionCreatedBy()
     {
-
         return $this->version_created_by;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  int                   $v new value
+     * @return \Thelia\Model\Content The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -649,15 +642,14 @@ abstract class Content implements ActiveRecordInterface
             $this->modifiedColumns[ContentTableMap::ID] = true;
         }
 
-
         return $this;
     } // setId()
 
     /**
      * Set the value of [visible] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  int                   $v new value
+     * @return \Thelia\Model\Content The current object (for fluent API support)
      */
     public function setVisible($v)
     {
@@ -670,15 +662,14 @@ abstract class Content implements ActiveRecordInterface
             $this->modifiedColumns[ContentTableMap::VISIBLE] = true;
         }
 
-
         return $this;
     } // setVisible()
 
     /**
      * Set the value of [position] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  int                   $v new value
+     * @return \Thelia\Model\Content The current object (for fluent API support)
      */
     public function setPosition($v)
     {
@@ -691,16 +682,15 @@ abstract class Content implements ActiveRecordInterface
             $this->modifiedColumns[ContentTableMap::POSITION] = true;
         }
 
-
         return $this;
     } // setPosition()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  mixed                 $v string, integer (timestamp), or \DateTime value.
+     *                                  Empty strings are treated as NULL.
+     * @return \Thelia\Model\Content The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -712,16 +702,15 @@ abstract class Content implements ActiveRecordInterface
             }
         } // if either are not null
 
-
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  mixed                 $v string, integer (timestamp), or \DateTime value.
+     *                                  Empty strings are treated as NULL.
+     * @return \Thelia\Model\Content The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -733,15 +722,14 @@ abstract class Content implements ActiveRecordInterface
             }
         } // if either are not null
 
-
         return $this;
     } // setUpdatedAt()
 
     /**
      * Set the value of [version] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  int                   $v new value
+     * @return \Thelia\Model\Content The current object (for fluent API support)
      */
     public function setVersion($v)
     {
@@ -754,16 +742,15 @@ abstract class Content implements ActiveRecordInterface
             $this->modifiedColumns[ContentTableMap::VERSION] = true;
         }
 
-
         return $this;
     } // setVersion()
 
     /**
      * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  mixed                 $v string, integer (timestamp), or \DateTime value.
+     *                                  Empty strings are treated as NULL.
+     * @return \Thelia\Model\Content The current object (for fluent API support)
      */
     public function setVersionCreatedAt($v)
     {
@@ -775,15 +762,14 @@ abstract class Content implements ActiveRecordInterface
             }
         } // if either are not null
 
-
         return $this;
     } // setVersionCreatedAt()
 
     /**
      * Set the value of [version_created_by] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  string                $v new value
+     * @return \Thelia\Model\Content The current object (for fluent API support)
      */
     public function setVersionCreatedBy($v)
     {
@@ -795,7 +781,6 @@ abstract class Content implements ActiveRecordInterface
             $this->version_created_by = $v;
             $this->modifiedColumns[ContentTableMap::VERSION_CREATED_BY] = true;
         }
-
 
         return $this;
     } // setVersionCreatedBy()
@@ -839,7 +824,6 @@ abstract class Content implements ActiveRecordInterface
     public function hydrate($row, $startcol = 0, $rehydrate = false, $indexType = TableMap::TYPE_NUM)
     {
         try {
-
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ContentTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
@@ -910,10 +894,10 @@ abstract class Content implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
-     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
+     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
+     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -963,7 +947,7 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param      ConnectionInterface $con
+     * @param  ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see Content::setDeleted()
@@ -1006,8 +990,8 @@ abstract class Content implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -1080,8 +1064,8 @@ abstract class Content implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param  ConnectionInterface $con
+     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -1258,7 +1242,7 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1354,7 +1338,7 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1370,12 +1354,12 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param      string $name name
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed Value of field.
+     * @param  string $name name
+     * @param  string $type The type of fieldname the $name is of:
+     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                      Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed  Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1389,7 +1373,7 @@ abstract class Content implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
+     * @param  int   $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1431,12 +1415,12 @@ abstract class Content implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                    Defaults to TableMap::TYPE_PHPNAME.
-     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
-     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                                        Defaults to TableMap::TYPE_PHPNAME.
+     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
+     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1492,12 +1476,12 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param      string $name
-     * @param      mixed  $value field value
-     * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @param  string $name
+     * @param  mixed  $value field value
+     * @param  string $type  The type of fieldname the $name is of:
+     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                       Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1511,8 +1495,8 @@ abstract class Content implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
-     * @param      mixed $value field value
+     * @param  int   $pos   position in xml schema
+     * @param  mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1558,8 +1542,8 @@ abstract class Content implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param      array  $arr     An array to populate the object from.
-     * @param      string $keyType The type of keys the array uses.
+     * @param  array  $arr     An array to populate the object from.
+     * @param  string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1593,7 +1577,6 @@ abstract class Content implements ActiveRecordInterface
         if ($this->isColumnModified(ContentTableMap::VERSION)) $criteria->add(ContentTableMap::VERSION, $this->version);
         if ($this->isColumnModified(ContentTableMap::VERSION_CREATED_AT)) $criteria->add(ContentTableMap::VERSION_CREATED_AT, $this->version_created_at);
         if ($this->isColumnModified(ContentTableMap::VERSION_CREATED_BY)) $criteria->add(ContentTableMap::VERSION_CREATED_BY, $this->version_created_by);
-
         return $criteria;
     }
 
@@ -1615,7 +1598,7 @@ abstract class Content implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return   int
+     * @return int
      */
     public function getPrimaryKey()
     {
@@ -1625,7 +1608,7 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param       int $key Primary key.
+     * @param  int  $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -1639,7 +1622,6 @@ abstract class Content implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-
         return null === $this->getId();
     }
 
@@ -1649,9 +1631,9 @@ abstract class Content implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\Content (or compatible) type.
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
+     * @param  object          $copyObj  An object of \Thelia\Model\Content (or compatible) type.
+     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1727,8 +1709,8 @@ abstract class Content implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\Content Clone of current object.
+     * @param  boolean               $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return \Thelia\Model\Content Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1747,7 +1729,7 @@ abstract class Content implements ActiveRecordInterface
      * Avoids crafting an 'init[$relationName]s' method name
      * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param      string $relationName The name of the relation to initialize
+     * @param  string $relationName The name of the relation to initialize
      * @return void
      */
     public function initRelation($relationName)
@@ -1804,8 +1786,8 @@ abstract class Content implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -1827,8 +1809,8 @@ abstract class Content implements ActiveRecordInterface
      * If this ChildContent is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                        $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface             $con      optional connection object
      * @return Collection|ChildContentFolder[] List of ChildContentFolder objects
      * @throws PropelException
      */
@@ -1884,14 +1866,13 @@ abstract class Content implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $contentFolders A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildContent The current object (for fluent API support)
+     * @param  Collection          $contentFolders A Propel collection.
+     * @param  ConnectionInterface $con            Optional connection object
+     * @return ChildContent        The current object (for fluent API support)
      */
     public function setContentFolders(Collection $contentFolders, ConnectionInterface $con = null)
     {
         $contentFoldersToDelete = $this->getContentFolders(new Criteria(), $con)->diff($contentFolders);
-
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
@@ -1916,10 +1897,10 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Returns the number of related ContentFolder objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ContentFolder objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related ContentFolder objects.
      * @throws PropelException
      */
     public function countContentFolders(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -1951,8 +1932,8 @@ abstract class Content implements ActiveRecordInterface
      * Method called to associate a ChildContentFolder object to this object
      * through the ChildContentFolder foreign key attribute.
      *
-     * @param    ChildContentFolder $l ChildContentFolder
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  ChildContentFolder    $l ChildContentFolder
+     * @return \Thelia\Model\Content The current object (for fluent API support)
      */
     public function addContentFolder(ChildContentFolder $l)
     {
@@ -1979,7 +1960,7 @@ abstract class Content implements ActiveRecordInterface
 
     /**
      * @param  ContentFolder $contentFolder The contentFolder object to remove.
-     * @return ChildContent The current object (for fluent API support)
+     * @return ChildContent  The current object (for fluent API support)
      */
     public function removeContentFolder($contentFolder)
     {
@@ -1996,7 +1977,6 @@ abstract class Content implements ActiveRecordInterface
         return $this;
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2008,9 +1988,9 @@ abstract class Content implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Content.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                        $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface             $con          optional connection object
+     * @param  string                          $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildContentFolder[] List of ChildContentFolder objects
      */
     public function getContentFoldersJoinFolder($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2050,8 +2030,8 @@ abstract class Content implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2073,8 +2053,8 @@ abstract class Content implements ActiveRecordInterface
      * If this ChildContent is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                       $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface            $con      optional connection object
      * @return Collection|ChildContentImage[] List of ChildContentImage objects
      * @throws PropelException
      */
@@ -2130,14 +2110,13 @@ abstract class Content implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $contentImages A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildContent The current object (for fluent API support)
+     * @param  Collection          $contentImages A Propel collection.
+     * @param  ConnectionInterface $con           Optional connection object
+     * @return ChildContent        The current object (for fluent API support)
      */
     public function setContentImages(Collection $contentImages, ConnectionInterface $con = null)
     {
         $contentImagesToDelete = $this->getContentImages(new Criteria(), $con)->diff($contentImages);
-
 
         $this->contentImagesScheduledForDeletion = $contentImagesToDelete;
 
@@ -2159,10 +2138,10 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Returns the number of related ContentImage objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ContentImage objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related ContentImage objects.
      * @throws PropelException
      */
     public function countContentImages(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2194,8 +2173,8 @@ abstract class Content implements ActiveRecordInterface
      * Method called to associate a ChildContentImage object to this object
      * through the ChildContentImage foreign key attribute.
      *
-     * @param    ChildContentImage $l ChildContentImage
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  ChildContentImage     $l ChildContentImage
+     * @return \Thelia\Model\Content The current object (for fluent API support)
      */
     public function addContentImage(ChildContentImage $l)
     {
@@ -2268,8 +2247,8 @@ abstract class Content implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2291,8 +2270,8 @@ abstract class Content implements ActiveRecordInterface
      * If this ChildContent is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                          $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface               $con      optional connection object
      * @return Collection|ChildContentDocument[] List of ChildContentDocument objects
      * @throws PropelException
      */
@@ -2348,14 +2327,13 @@ abstract class Content implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $contentDocuments A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildContent The current object (for fluent API support)
+     * @param  Collection          $contentDocuments A Propel collection.
+     * @param  ConnectionInterface $con              Optional connection object
+     * @return ChildContent        The current object (for fluent API support)
      */
     public function setContentDocuments(Collection $contentDocuments, ConnectionInterface $con = null)
     {
         $contentDocumentsToDelete = $this->getContentDocuments(new Criteria(), $con)->diff($contentDocuments);
-
 
         $this->contentDocumentsScheduledForDeletion = $contentDocumentsToDelete;
 
@@ -2377,10 +2355,10 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Returns the number of related ContentDocument objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ContentDocument objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related ContentDocument objects.
      * @throws PropelException
      */
     public function countContentDocuments(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2412,8 +2390,8 @@ abstract class Content implements ActiveRecordInterface
      * Method called to associate a ChildContentDocument object to this object
      * through the ChildContentDocument foreign key attribute.
      *
-     * @param    ChildContentDocument $l ChildContentDocument
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  ChildContentDocument  $l ChildContentDocument
+     * @return \Thelia\Model\Content The current object (for fluent API support)
      */
     public function addContentDocument(ChildContentDocument $l)
     {
@@ -2440,7 +2418,7 @@ abstract class Content implements ActiveRecordInterface
 
     /**
      * @param  ContentDocument $contentDocument The contentDocument object to remove.
-     * @return ChildContent The current object (for fluent API support)
+     * @return ChildContent    The current object (for fluent API support)
      */
     public function removeContentDocument($contentDocument)
     {
@@ -2486,8 +2464,8 @@ abstract class Content implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2509,8 +2487,8 @@ abstract class Content implements ActiveRecordInterface
      * If this ChildContent is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                                   $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface                        $con      optional connection object
      * @return Collection|ChildProductAssociatedContent[] List of ChildProductAssociatedContent objects
      * @throws PropelException
      */
@@ -2566,14 +2544,13 @@ abstract class Content implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $productAssociatedContents A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildContent The current object (for fluent API support)
+     * @param  Collection          $productAssociatedContents A Propel collection.
+     * @param  ConnectionInterface $con                       Optional connection object
+     * @return ChildContent        The current object (for fluent API support)
      */
     public function setProductAssociatedContents(Collection $productAssociatedContents, ConnectionInterface $con = null)
     {
         $productAssociatedContentsToDelete = $this->getProductAssociatedContents(new Criteria(), $con)->diff($productAssociatedContents);
-
 
         $this->productAssociatedContentsScheduledForDeletion = $productAssociatedContentsToDelete;
 
@@ -2595,10 +2572,10 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Returns the number of related ProductAssociatedContent objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ProductAssociatedContent objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related ProductAssociatedContent objects.
      * @throws PropelException
      */
     public function countProductAssociatedContents(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2630,8 +2607,8 @@ abstract class Content implements ActiveRecordInterface
      * Method called to associate a ChildProductAssociatedContent object to this object
      * through the ChildProductAssociatedContent foreign key attribute.
      *
-     * @param    ChildProductAssociatedContent $l ChildProductAssociatedContent
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  ChildProductAssociatedContent $l ChildProductAssociatedContent
+     * @return \Thelia\Model\Content         The current object (for fluent API support)
      */
     public function addProductAssociatedContent(ChildProductAssociatedContent $l)
     {
@@ -2658,7 +2635,7 @@ abstract class Content implements ActiveRecordInterface
 
     /**
      * @param  ProductAssociatedContent $productAssociatedContent The productAssociatedContent object to remove.
-     * @return ChildContent The current object (for fluent API support)
+     * @return ChildContent             The current object (for fluent API support)
      */
     public function removeProductAssociatedContent($productAssociatedContent)
     {
@@ -2675,7 +2652,6 @@ abstract class Content implements ActiveRecordInterface
         return $this;
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2687,9 +2663,9 @@ abstract class Content implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Content.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                                   $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface                        $con          optional connection object
+     * @param  string                                     $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildProductAssociatedContent[] List of ChildProductAssociatedContent objects
      */
     public function getProductAssociatedContentsJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2729,8 +2705,8 @@ abstract class Content implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2752,8 +2728,8 @@ abstract class Content implements ActiveRecordInterface
      * If this ChildContent is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                                    $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface                         $con      optional connection object
      * @return Collection|ChildCategoryAssociatedContent[] List of ChildCategoryAssociatedContent objects
      * @throws PropelException
      */
@@ -2809,14 +2785,13 @@ abstract class Content implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $categoryAssociatedContents A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildContent The current object (for fluent API support)
+     * @param  Collection          $categoryAssociatedContents A Propel collection.
+     * @param  ConnectionInterface $con                        Optional connection object
+     * @return ChildContent        The current object (for fluent API support)
      */
     public function setCategoryAssociatedContents(Collection $categoryAssociatedContents, ConnectionInterface $con = null)
     {
         $categoryAssociatedContentsToDelete = $this->getCategoryAssociatedContents(new Criteria(), $con)->diff($categoryAssociatedContents);
-
 
         $this->categoryAssociatedContentsScheduledForDeletion = $categoryAssociatedContentsToDelete;
 
@@ -2838,10 +2813,10 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Returns the number of related CategoryAssociatedContent objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related CategoryAssociatedContent objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related CategoryAssociatedContent objects.
      * @throws PropelException
      */
     public function countCategoryAssociatedContents(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2873,8 +2848,8 @@ abstract class Content implements ActiveRecordInterface
      * Method called to associate a ChildCategoryAssociatedContent object to this object
      * through the ChildCategoryAssociatedContent foreign key attribute.
      *
-     * @param    ChildCategoryAssociatedContent $l ChildCategoryAssociatedContent
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  ChildCategoryAssociatedContent $l ChildCategoryAssociatedContent
+     * @return \Thelia\Model\Content          The current object (for fluent API support)
      */
     public function addCategoryAssociatedContent(ChildCategoryAssociatedContent $l)
     {
@@ -2901,7 +2876,7 @@ abstract class Content implements ActiveRecordInterface
 
     /**
      * @param  CategoryAssociatedContent $categoryAssociatedContent The categoryAssociatedContent object to remove.
-     * @return ChildContent The current object (for fluent API support)
+     * @return ChildContent              The current object (for fluent API support)
      */
     public function removeCategoryAssociatedContent($categoryAssociatedContent)
     {
@@ -2918,7 +2893,6 @@ abstract class Content implements ActiveRecordInterface
         return $this;
     }
 
-
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2930,9 +2904,9 @@ abstract class Content implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Content.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param  Criteria                                    $criteria     optional Criteria object to narrow the query
+     * @param  ConnectionInterface                         $con          optional connection object
+     * @param  string                                      $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildCategoryAssociatedContent[] List of ChildCategoryAssociatedContent objects
      */
     public function getCategoryAssociatedContentsJoinCategory($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2972,8 +2946,8 @@ abstract class Content implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -2995,8 +2969,8 @@ abstract class Content implements ActiveRecordInterface
      * If this ChildContent is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                      $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface           $con      optional connection object
      * @return Collection|ChildContentI18n[] List of ChildContentI18n objects
      * @throws PropelException
      */
@@ -3052,14 +3026,13 @@ abstract class Content implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $contentI18ns A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildContent The current object (for fluent API support)
+     * @param  Collection          $contentI18ns A Propel collection.
+     * @param  ConnectionInterface $con          Optional connection object
+     * @return ChildContent        The current object (for fluent API support)
      */
     public function setContentI18ns(Collection $contentI18ns, ConnectionInterface $con = null)
     {
         $contentI18nsToDelete = $this->getContentI18ns(new Criteria(), $con)->diff($contentI18ns);
-
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
@@ -3084,10 +3057,10 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Returns the number of related ContentI18n objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ContentI18n objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related ContentI18n objects.
      * @throws PropelException
      */
     public function countContentI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -3119,8 +3092,8 @@ abstract class Content implements ActiveRecordInterface
      * Method called to associate a ChildContentI18n object to this object
      * through the ChildContentI18n foreign key attribute.
      *
-     * @param    ChildContentI18n $l ChildContentI18n
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  ChildContentI18n      $l ChildContentI18n
+     * @return \Thelia\Model\Content The current object (for fluent API support)
      */
     public function addContentI18n(ChildContentI18n $l)
     {
@@ -3150,7 +3123,7 @@ abstract class Content implements ActiveRecordInterface
     }
 
     /**
-     * @param  ContentI18n $contentI18n The contentI18n object to remove.
+     * @param  ContentI18n  $contentI18n The contentI18n object to remove.
      * @return ChildContent The current object (for fluent API support)
      */
     public function removeContentI18n($contentI18n)
@@ -3197,8 +3170,8 @@ abstract class Content implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                  the collection even if it is not empty
      *
      * @return void
      */
@@ -3220,8 +3193,8 @@ abstract class Content implements ActiveRecordInterface
      * If this ChildContent is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
+     * @param  Criteria                         $criteria optional Criteria object to narrow the query
+     * @param  ConnectionInterface              $con      optional connection object
      * @return Collection|ChildContentVersion[] List of ChildContentVersion objects
      * @throws PropelException
      */
@@ -3277,14 +3250,13 @@ abstract class Content implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $contentVersions A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildContent The current object (for fluent API support)
+     * @param  Collection          $contentVersions A Propel collection.
+     * @param  ConnectionInterface $con             Optional connection object
+     * @return ChildContent        The current object (for fluent API support)
      */
     public function setContentVersions(Collection $contentVersions, ConnectionInterface $con = null)
     {
         $contentVersionsToDelete = $this->getContentVersions(new Criteria(), $con)->diff($contentVersions);
-
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
@@ -3309,10 +3281,10 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Returns the number of related ContentVersion objects.
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ContentVersion objects.
+     * @param  Criteria            $criteria
+     * @param  boolean             $distinct
+     * @param  ConnectionInterface $con
+     * @return int                 Count of related ContentVersion objects.
      * @throws PropelException
      */
     public function countContentVersions(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -3344,8 +3316,8 @@ abstract class Content implements ActiveRecordInterface
      * Method called to associate a ChildContentVersion object to this object
      * through the ChildContentVersion foreign key attribute.
      *
-     * @param    ChildContentVersion $l ChildContentVersion
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     * @param  ChildContentVersion   $l ChildContentVersion
+     * @return \Thelia\Model\Content The current object (for fluent API support)
      */
     public function addContentVersion(ChildContentVersion $l)
     {
@@ -3372,7 +3344,7 @@ abstract class Content implements ActiveRecordInterface
 
     /**
      * @param  ContentVersion $contentVersion The contentVersion object to remove.
-     * @return ChildContent The current object (for fluent API support)
+     * @return ChildContent   The current object (for fluent API support)
      */
     public function removeContentVersion($contentVersion)
     {
@@ -3429,8 +3401,8 @@ abstract class Content implements ActiveRecordInterface
      * If this ChildContent is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      ConnectionInterface $con Optional connection object
+     * @param Criteria            $criteria Optional query object to filter the query
+     * @param ConnectionInterface $con      Optional connection object
      *
      * @return ObjectCollection|ChildFolder[] List of ChildFolder objects
      */
@@ -3460,9 +3432,9 @@ abstract class Content implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection $folders A Propel collection.
-     * @param  ConnectionInterface $con Optional connection object
-     * @return ChildContent The current object (for fluent API support)
+     * @param  Collection          $folders A Propel collection.
+     * @param  ConnectionInterface $con     Optional connection object
+     * @return ChildContent        The current object (for fluent API support)
      */
     public function setFolders(Collection $folders, ConnectionInterface $con = null)
     {
@@ -3486,9 +3458,9 @@ abstract class Content implements ActiveRecordInterface
      * Gets the number of ChildFolder objects related by a many-to-many relationship
      * to the current object by way of the content_folder cross-reference table.
      *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      boolean $distinct Set to true to force count distinct
-     * @param      ConnectionInterface $con Optional connection object
+     * @param Criteria            $criteria Optional query object to filter the query
+     * @param boolean             $distinct Set to true to force count distinct
+     * @param ConnectionInterface $con      Optional connection object
      *
      * @return int the number of related ChildFolder objects
      */
@@ -3516,7 +3488,7 @@ abstract class Content implements ActiveRecordInterface
      * Associate a ChildFolder object to this object
      * through the content_folder cross reference table.
      *
-     * @param  ChildFolder $folder The ChildContentFolder object to relate
+     * @param  ChildFolder  $folder The ChildContentFolder object to relate
      * @return ChildContent The current object (for fluent API support)
      */
     public function addFolder(ChildFolder $folder)
@@ -3534,7 +3506,7 @@ abstract class Content implements ActiveRecordInterface
     }
 
     /**
-     * @param    Folder $folder The folder object to add.
+     * @param Folder $folder The folder object to add.
      */
     protected function doAddFolder($folder)
     {
@@ -3553,7 +3525,7 @@ abstract class Content implements ActiveRecordInterface
      * Remove a ChildFolder object to this object
      * through the content_folder cross reference table.
      *
-     * @param ChildFolder $folder The ChildContentFolder object to relate
+     * @param  ChildFolder  $folder The ChildContentFolder object to relate
      * @return ChildContent The current object (for fluent API support)
      */
     public function removeFolder(ChildFolder $folder)
@@ -3600,7 +3572,7 @@ abstract class Content implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param      boolean $deep Whether to also clear the references on all referrer objects.
+     * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -3676,7 +3648,7 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildContent The current object (for fluent API support)
+     * @return ChildContent The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
@@ -3690,9 +3662,9 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Sets the locale for translations
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param string $locale Locale to use for the translation, e.g. 'fr_FR'
      *
-     * @return    ChildContent The current object (for fluent API support)
+     * @return ChildContent The current object (for fluent API support)
      */
     public function setLocale($locale = 'en_US')
     {
@@ -3704,7 +3676,7 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Gets the locale for translations
      *
-     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @return string $locale Locale to use for the translation, e.g. 'fr_FR'
      */
     public function getLocale()
     {
@@ -3714,8 +3686,8 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Returns the current translation for a given locale
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param     ConnectionInterface $con an optional connection object
+     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param ConnectionInterface $con    an optional connection object
      *
      * @return ChildContentI18n */
     public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
@@ -3748,10 +3720,10 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Remove the translation for a given locale
      *
-     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param     ConnectionInterface $con an optional connection object
+     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param ConnectionInterface $con    an optional connection object
      *
-     * @return    ChildContent The current object (for fluent API support)
+     * @return ChildContent The current object (for fluent API support)
      */
     public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
@@ -3776,14 +3748,13 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Returns the current translation
      *
-     * @param     ConnectionInterface $con an optional connection object
+     * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildContentI18n */
     public function getCurrentTranslation(ConnectionInterface $con = null)
     {
         return $this->getTranslation($this->getLocale(), $con);
     }
-
 
         /**
          * Get the [title] column value.
@@ -3794,7 +3765,6 @@ abstract class Content implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getTitle();
     }
-
 
         /**
          * Set the value of [title] column.
@@ -3808,7 +3778,6 @@ abstract class Content implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [description] column value.
          *
@@ -3818,7 +3787,6 @@ abstract class Content implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getDescription();
     }
-
 
         /**
          * Set the value of [description] column.
@@ -3832,7 +3800,6 @@ abstract class Content implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [chapo] column value.
          *
@@ -3842,7 +3809,6 @@ abstract class Content implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getChapo();
     }
-
 
         /**
          * Set the value of [chapo] column.
@@ -3856,7 +3822,6 @@ abstract class Content implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [postscriptum] column value.
          *
@@ -3866,7 +3831,6 @@ abstract class Content implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getPostscriptum();
     }
-
 
         /**
          * Set the value of [postscriptum] column.
@@ -3880,7 +3844,6 @@ abstract class Content implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [meta_title] column value.
          *
@@ -3890,7 +3853,6 @@ abstract class Content implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getMetaTitle();
     }
-
 
         /**
          * Set the value of [meta_title] column.
@@ -3904,7 +3866,6 @@ abstract class Content implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [meta_description] column value.
          *
@@ -3914,7 +3875,6 @@ abstract class Content implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getMetaDescription();
     }
-
 
         /**
          * Set the value of [meta_description] column.
@@ -3928,7 +3888,6 @@ abstract class Content implements ActiveRecordInterface
         return $this;
     }
 
-
         /**
          * Get the [meta_keywords] column value.
          *
@@ -3938,7 +3897,6 @@ abstract class Content implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getMetaKeywords();
     }
-
 
         /**
          * Set the value of [meta_keywords] column.
@@ -3969,7 +3927,7 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Checks whether the current state must be recorded as a version
      *
-     * @return  boolean
+     * @return boolean
      */
     public function isVersioningNecessary($con = null)
     {
@@ -3991,9 +3949,9 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Creates a version of the current object and saves it.
      *
-     * @param   ConnectionInterface $con the connection to use
+     * @param ConnectionInterface $con the connection to use
      *
-     * @return  ChildContentVersion A version object
+     * @return ChildContentVersion A version object
      */
     public function addVersion($con = null)
     {
@@ -4017,10 +3975,10 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Sets the properties of the current object to the value they had at a specific version
      *
-     * @param   integer $versionNumber The version number to read
-     * @param   ConnectionInterface $con The connection to use
+     * @param integer             $versionNumber The version number to read
+     * @param ConnectionInterface $con           The connection to use
      *
-     * @return  ChildContent The current object (for fluent API support)
+     * @return ChildContent The current object (for fluent API support)
      */
     public function toVersion($versionNumber, $con = null)
     {
@@ -4036,9 +3994,9 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Sets the properties of the current object to the value they had at a specific version
      *
-     * @param ChildContentVersion $version The version object to use
-     * @param ConnectionInterface   $con the connection to use
-     * @param array                 $loadedObjects objects that been loaded in a chain of populateFromVersion calls on referrer or fk objects.
+     * @param ChildContentVersion $version       The version object to use
+     * @param ConnectionInterface $con           the connection to use
+     * @param array               $loadedObjects objects that been loaded in a chain of populateFromVersion calls on referrer or fk objects.
      *
      * @return ChildContent The current object (for fluent API support)
      */
@@ -4060,9 +4018,9 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Gets the latest persisted version number for the current object
      *
-     * @param   ConnectionInterface $con the connection to use
+     * @param ConnectionInterface $con the connection to use
      *
-     * @return  integer
+     * @return integer
      */
     public function getLastVersionNumber($con = null)
     {
@@ -4080,9 +4038,9 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Checks whether the current object is the latest one
      *
-     * @param   ConnectionInterface $con the connection to use
+     * @param ConnectionInterface $con the connection to use
      *
-     * @return  Boolean
+     * @return Boolean
      */
     public function isLastVersion($con = null)
     {
@@ -4092,10 +4050,10 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Retrieves a version object for this entity and a version number
      *
-     * @param   integer $versionNumber The version number to read
-     * @param   ConnectionInterface $con the connection to use
+     * @param integer             $versionNumber The version number to read
+     * @param ConnectionInterface $con           the connection to use
      *
-     * @return  ChildContentVersion A version object
+     * @return ChildContentVersion A version object
      */
     public function getOneVersion($versionNumber, $con = null)
     {
@@ -4108,9 +4066,9 @@ abstract class Content implements ActiveRecordInterface
     /**
      * Gets all the versions of this object, in incremental order
      *
-     * @param   ConnectionInterface $con the connection to use
+     * @param ConnectionInterface $con the connection to use
      *
-     * @return  ObjectCollection A list of ChildContentVersion objects
+     * @return ObjectCollection A list of ChildContentVersion objects
      */
     public function getAllVersions($con = null)
     {
@@ -4130,12 +4088,12 @@ abstract class Content implements ActiveRecordInterface
      * );
      * </code>
      *
-     * @param   integer             $versionNumber
-     * @param   string              $keys Main key used for the result diff (versions|columns)
-     * @param   ConnectionInterface $con the connection to use
-     * @param   array               $ignoredColumns  The columns to exclude from the diff.
+     * @param integer             $versionNumber
+     * @param string              $keys           Main key used for the result diff (versions|columns)
+     * @param ConnectionInterface $con            the connection to use
+     * @param array               $ignoredColumns The columns to exclude from the diff.
      *
-     * @return  array A list of differences
+     * @return array A list of differences
      */
     public function compareVersion($versionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
     {
@@ -4155,13 +4113,13 @@ abstract class Content implements ActiveRecordInterface
      * );
      * </code>
      *
-     * @param   integer             $fromVersionNumber
-     * @param   integer             $toVersionNumber
-     * @param   string              $keys Main key used for the result diff (versions|columns)
-     * @param   ConnectionInterface $con the connection to use
-     * @param   array               $ignoredColumns  The columns to exclude from the diff.
+     * @param integer             $fromVersionNumber
+     * @param integer             $toVersionNumber
+     * @param string              $keys              Main key used for the result diff (versions|columns)
+     * @param ConnectionInterface $con               the connection to use
+     * @param array               $ignoredColumns    The columns to exclude from the diff.
      *
-     * @return  array A list of differences
+     * @return array A list of differences
      */
     public function compareVersions($fromVersionNumber, $toVersionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
     {
@@ -4181,12 +4139,12 @@ abstract class Content implements ActiveRecordInterface
      * );
      * </code>
      *
-     * @param   array     $fromVersion     An array representing the original version.
-     * @param   array     $toVersion       An array representing the destination version.
-     * @param   string    $keys            Main key used for the result diff (versions|columns).
-     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     * @param array  $fromVersion    An array representing the original version.
+     * @param array  $toVersion      An array representing the destination version.
+     * @param string $keys           Main key used for the result diff (versions|columns).
+     * @param array  $ignoredColumns The columns to exclude from the diff.
      *
-     * @return  array A list of differences
+     * @return array A list of differences
      */
     protected function computeDiff($fromVersion, $toVersion, $keys = 'columns', $ignoredColumns = array())
     {
@@ -4223,7 +4181,7 @@ abstract class Content implements ActiveRecordInterface
     /**
      * retrieve the last $number versions.
      *
-     * @param Integer $number the number of record to return.
+     * @param  Integer                $number the number of record to return.
      * @return PropelCollection|array \Thelia\Model\ContentVersion[] List of \Thelia\Model\ContentVersion objects
      */
     public function getLastVersions($number = 10, $criteria = null, $con = null)
@@ -4309,7 +4267,6 @@ abstract class Content implements ActiveRecordInterface
     {
 
     }
-
 
     /**
      * Derived method to catches calls to undefined methods.

@@ -31,7 +31,7 @@ class Admin extends BaseAdmin implements UserInterface
     {
         $profileId = $this->getProfileId();
 
-        if( null === $profileId || 0 === $profileId ) {
+        if (null === $profileId || 0 === $profileId) {
             return AdminResources::SUPERADMINISTRATOR;
         }
 
@@ -48,10 +48,10 @@ class Admin extends BaseAdmin implements UserInterface
             ->find();
 
         $userPermissions = array();
-        foreach($userResourcePermissionsQuery as $userResourcePermission) {
+        foreach ($userResourcePermissionsQuery as $userResourcePermission) {
             $userPermissions[$userResourcePermission->getVirtualColumn('code')] = new AccessManager($userResourcePermission->getAccess());
         }
-        foreach($userModulePermissionsQuery as $userModulePermission) {
+        foreach ($userModulePermissionsQuery as $userModulePermission) {
             $userPermissions['module'][strtolower($userModulePermission->getVirtualColumn('code'))] = new AccessManager($userModulePermission->getAccess());
         }
 
@@ -75,8 +75,9 @@ class Admin extends BaseAdmin implements UserInterface
             throw new \InvalidArgumentException("customer password is mandatory on creation");
         }
 
-        if($password !== null && trim($password) != "") {
+        if ($password !== null && trim($password) != "") {
             $this->setAlgo("PASSWORD_BCRYPT");
+
             return parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
         }
 
@@ -88,55 +89,62 @@ class Admin extends BaseAdmin implements UserInterface
      */
     public function checkPassword($password)
     {
-    	return password_verify($password, $this->password);
+        return password_verify($password, $this->password);
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
-    public function getUsername() {
+    public function getUsername()
+    {
         return $this->getLogin();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function eraseCredentials() {
-    	$this->setPassword(null);
+    public function eraseCredentials()
+    {
+        $this->setPassword(null);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getRoles() {
-    	return array(new Role('ADMIN'));
+    public function getRoles()
+    {
+        return array(new Role('ADMIN'));
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getToken() {
+    public function getToken()
+    {
         return $this->getRememberMeToken();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setToken($token) {
+    public function setToken($token)
+    {
         $this->setRememberMeToken($token)->save();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getSerial() {
+    public function getSerial()
+    {
         return $this->getRememberMeSerial();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setSerial($serial) {
+    public function setSerial($serial)
+    {
         $this->setRememberMeSerial($serial)->save();
     }
 }

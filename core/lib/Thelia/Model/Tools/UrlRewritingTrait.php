@@ -35,12 +35,12 @@ use Thelia\Model\ConfigQuery;
 /**
  * A trait for managing Rewritten URLs from model classes
  */
-trait UrlRewritingTrait {
-
+trait UrlRewritingTrait
+{
     /**
      * @returns string the view name of the rewritten object (e.g., 'category', 'product')
      */
-    protected abstract function getRewrittenUrlViewName();
+    abstract protected function getRewrittenUrlViewName();
 
     /**
      * Get the object URL for the given locale, rewritten if rewriting is enabled.
@@ -49,9 +49,10 @@ trait UrlRewritingTrait {
      */
     public function getUrl($locale = null)
     {
-        if(null === $locale) {
+        if (null === $locale) {
             $locale = $this->getLocale();
         }
+
         return URL::getInstance()->retrieve($this->getRewrittenUrlViewName(), $this->getId(), $locale)->toString();
     }
 
@@ -73,15 +74,13 @@ trait UrlRewritingTrait {
 
         $this->dispatchEvent(TheliaEvents::GENERATE_REWRITTENURL, $generateEvent);
 
-
-        if($generateEvent->isRewritten())
-        {
+        if ($generateEvent->isRewritten()) {
             return $generateEvent->getUrl();
         }
 
         $title = $this->getTitle();
 
-        if(null == $title) {
+        if (null == $title) {
             throw new \RuntimeException('Impossible to create an url if title is null');
         }
         // Replace all weird characters with dashes
@@ -94,9 +93,9 @@ trait UrlRewritingTrait {
 
         // TODO :
         // check if URL url already exists, and add a numeric suffix, or the like
-        try{
+        try {
             $i=0;
-            while(URL::getInstance()->resolve($urlFilePart)) {
+            while (URL::getInstance()->resolve($urlFilePart)) {
                 $i++;
                 $urlFilePart = sprintf("%s-%d.html",$cleanString, $i);
             }
@@ -117,7 +116,7 @@ trait UrlRewritingTrait {
     /**
      * return the rewritten URL for the given locale
      *
-     * @param string $locale a valid locale (e.g. en_US)
+     * @param  string $locale a valid locale (e.g. en_US)
      * @return null
      */
     public function getRewrittenUrl($locale)
@@ -130,7 +129,7 @@ trait UrlRewritingTrait {
             ->findOne()
         ;
 
-        if($rewritingUrl) {
+        if ($rewritingUrl) {
             $url = $rewritingUrl->getUrl();
         } else {
             $url = null;
@@ -142,7 +141,8 @@ trait UrlRewritingTrait {
     /**
      * Mark the current URL as obseolete
      */
-    public function markRewritenUrlObsolete() {
+    public function markRewritenUrlObsolete()
+    {
         RewritingUrlQuery::create()
             ->filterByView($this->getRewrittenUrlViewName())
             ->filterByViewId($this->getId())
@@ -154,7 +154,7 @@ trait UrlRewritingTrait {
     /**
      * Set the rewritten URL for the given locale
      *
-     * @param string $locale a valid locale (e.g. en_US)
+     * @param  string                                  $locale a valid locale (e.g. en_US)
      * @param $url
      * @return $this
      * @throws UrlRewritingException
@@ -163,8 +163,9 @@ trait UrlRewritingTrait {
     public function setRewrittenUrl($locale, $url)
     {
         $currentUrl = $this->getRewrittenUrl($locale);
-        if($currentUrl == $url || null === $url) {
+        if ($currentUrl == $url || null === $url) {
             /* no url update */
+
             return $this;
         }
 
@@ -172,12 +173,12 @@ trait UrlRewritingTrait {
             $resolver = new RewritingResolver($url);
 
             /* we can reassign old url */
-            if(null === $resolver->redirectedToUrl) {
+            if (null === $resolver->redirectedToUrl) {
                 /* else ... */
-                if($resolver->view == $this->getRewrittenUrlViewName() && $resolver->viewId == $this->getId()) {
+                if ($resolver->view == $this->getRewrittenUrlViewName() && $resolver->viewId == $this->getId()) {
                     /* it's an url related to the current object */
 
-                    if($resolver->locale != $locale) {
+                    if ($resolver->locale != $locale) {
                         /* it is an url related to this product for another locale */
                         throw new UrlRewritingException('URL_ALREADY_EXISTS', UrlRewritingException::URL_ALREADY_EXISTS);
                     }
@@ -193,15 +194,15 @@ trait UrlRewritingTrait {
                     throw new UrlRewritingException('URL_ALREADY_EXISTS', UrlRewritingException::URL_ALREADY_EXISTS);
                 }
             }
-        } catch(UrlRewritingException $e) {
+        } catch (UrlRewritingException $e) {
             /* It's all good if URL is not found */
-            if($e->getCode() !== UrlRewritingException::URL_NOT_FOUND) {
+            if ($e->getCode() !== UrlRewritingException::URL_NOT_FOUND) {
                 throw $e;
             }
         }
 
         /* set the new URL */
-        if(isset($resolver)) {
+        if (isset($resolver)) {
             /* erase the old one */
             $rewritingUrl = RewritingUrlQuery::create()->findOneByUrl($url);
             $rewritingUrl->setView($this->getRewrittenUrlViewName())

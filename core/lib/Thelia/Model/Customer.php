@@ -8,8 +8,6 @@ use Thelia\Model\Base\Customer as BaseCustomer;
 
 use Thelia\Model\Exception\InvalidArgumentException;
 
-
-use Thelia\Core\Event\CustomRefEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\User\UserInterface;
 
@@ -35,29 +33,29 @@ class Customer extends BaseCustomer implements UserInterface
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     /**
-     * @param int $titleId customer title id (from customer_title table)
-     * @param string $firstname customer first name
-     * @param string $lastname customer last name
-     * @param string $address1 customer address
-     * @param string $address2 customer adress complement 1
-     * @param string $address3 customer adress complement 2
-     * @param string $phone customer phone number
-     * @param string $cellphone customer cellphone number
-     * @param string $zipcode customer zipcode
-     * @param string $city
-     * @param int $countryId customer country id (from Country table)
-     * @param string $email customer email, must be unique
-     * @param string $plainPassword customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
-     * @param string $lang
-     * @param int $reseller
-     * @param null $sponsor
-     * @param int $discount
+     * @param  int                                                                 $titleId       customer title id (from customer_title table)
+     * @param  string                                                              $firstname     customer first name
+     * @param  string                                                              $lastname      customer last name
+     * @param  string                                                              $address1      customer address
+     * @param  string                                                              $address2      customer adress complement 1
+     * @param  string                                                              $address3      customer adress complement 2
+     * @param  string                                                              $phone         customer phone number
+     * @param  string                                                              $cellphone     customer cellphone number
+     * @param  string                                                              $zipcode       customer zipcode
+     * @param  string                                                              $city
+     * @param  int                                                                 $countryId     customer country id (from Country table)
+     * @param  string                                                              $email         customer email, must be unique
+     * @param  string                                                              $plainPassword customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
+     * @param  string                                                              $lang
+     * @param  int                                                                 $reseller
+     * @param  null                                                                $sponsor
+     * @param  int                                                                 $discount
      * @throws \Exception|\Symfony\Component\Config\Definition\Exception\Exception
      */
     public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email = null, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0, $company = null, $ref = null)
     {
         $this
-        	->setTitleId($titleId)
+            ->setTitleId($titleId)
             ->setFirstname($firstname)
             ->setLastname($lastname)
             ->setEmail($email)
@@ -68,10 +66,9 @@ class Customer extends BaseCustomer implements UserInterface
             ->setRef($ref)
         ;
 
-        if(!is_null($lang)) {
+        if (!is_null($lang)) {
             $this->setLang($lang);
         }
-
 
         $con = Propel::getWriteConnection(CustomerTableMap::DATABASE_NAME);
         $con->beginTransaction();
@@ -121,7 +118,7 @@ class Customer extends BaseCustomer implements UserInterface
 
             $con->commit();
 
-        } catch(PropelException $e) {
+        } catch (PropelException $e) {
             $con->rollback();
             throw $e;
         }
@@ -146,7 +143,7 @@ class Customer extends BaseCustomer implements UserInterface
     /**
      * create hash for plain password and set it in Customer object
      *
-     * @param string $password plain password before hashing
+     * @param  string                             $password plain password before hashing
      * @throws Exception\InvalidArgumentException
      * @return $this|Customer
      */
@@ -156,18 +153,20 @@ class Customer extends BaseCustomer implements UserInterface
             throw new InvalidArgumentException("customer password is mandatory on creation");
         }
 
-        if($password !== null && trim($password) != "") {
+        if ($password !== null && trim($password) != "") {
             $this->setAlgo("PASSWORD_BCRYPT");
+
             return parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
         }
+
         return $this;
     }
 
     public function setRef($ref)
     {
-        if(null === $ref && null === $this->ref) {
+        if (null === $ref && null === $this->ref) {
             parent::setRef($this->generateRef());
-        } else if(null !== $ref) {
+        } elseif (null !== $ref) {
             parent::setRef($ref);
         }
 
@@ -192,8 +191,9 @@ class Customer extends BaseCustomer implements UserInterface
    /**
      * {@inheritDoc}
      */
-    public function getUsername() {
-    	return $this->getEmail();
+    public function getUsername()
+    {
+        return $this->getEmail();
     }
 
     /**
@@ -201,41 +201,46 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function checkPassword($password)
     {
-    	return password_verify($password, $this->password);
+        return password_verify($password, $this->password);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function eraseCredentials() {
-    	$this->setPassword(null);
+    public function eraseCredentials()
+    {
+        $this->setPassword(null);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getRoles() {
-    	return array(new Role('CUSTOMER'));
+    public function getRoles()
+    {
+        return array(new Role('CUSTOMER'));
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getToken() {
+    public function getToken()
+    {
         return $this->getRememberMeToken();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setToken($token) {
+    public function setToken($token)
+    {
         $this->setRememberMeToken($token)->save();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getSerial() {
+    public function getSerial()
+    {
         return $this->getRememberMeSerial();
     }
 
@@ -251,7 +256,8 @@ class Customer extends BaseCustomer implements UserInterface
     /**
      * {@inheritDoc}
      */
-    public function setSerial($serial) {
+    public function setSerial($serial)
+    {
         $this->setRememberMeSerial($serial)->save();
     }
 
@@ -268,6 +274,7 @@ class Customer extends BaseCustomer implements UserInterface
         }
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECUSTOMER, new CustomerEvent($this));
+
         return true;
     }
 
@@ -285,6 +292,7 @@ class Customer extends BaseCustomer implements UserInterface
     public function preUpdate(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECUSTOMER, new CustomerEvent($this));
+
         return true;
     }
 
@@ -302,6 +310,7 @@ class Customer extends BaseCustomer implements UserInterface
     public function preDelete(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECUSTOMER, new CustomerEvent($this));
+
         return true;
     }
 

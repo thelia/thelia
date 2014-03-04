@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\AttributeTemplateQuery as BaseAttributeTemplateQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'attribute_template' table.
  *

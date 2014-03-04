@@ -841,8 +841,6 @@ class FileController extends BaseAdminController
             $model->setPostscriptum($data['postscriptum']);
         }
 
-
-
         $imageCreateEvent->setModelImage($model);
 
         return $imageCreateEvent;

@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\CategoryImageI18nQuery as BaseCategoryImageI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'category_image_i18n' table.
  *

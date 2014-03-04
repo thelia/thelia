@@ -56,11 +56,35 @@ class NewsletterEvent extends ActionEvent
      */
     protected $locale;
 
+    /**
+     * @var \Thelia\Model\Newsletter
+     */
+    protected $newsletter;
+
     public function __construct($email, $locale)
     {
         $this->email = $email;
         $this->locale = $locale;
     }
+
+    /**
+     * @param \Thelia\Model\Newsletter $newsletter
+     */
+    public function setNewsletter($newsletter)
+    {
+        $this->newsletter = $newsletter;
+
+        return $this;
+    }
+
+    /**
+     * @return \Thelia\Model\Newsletter
+     */
+    public function getNewsletter()
+    {
+        return $this->newsletter;
+    }
+
 
     /**
      * @param string $email
@@ -148,6 +172,8 @@ class NewsletterEvent extends ActionEvent
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
     }
 
     /**

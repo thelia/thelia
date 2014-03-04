@@ -63,9 +63,9 @@ abstract class CouponI18nQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\CouponI18nQuery object.
      *
-     * @param     string $dbName The database name
-     * @param     string $modelName The phpName of a model, e.g. 'Book'
-     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param string $dbName     The database name
+     * @param string $modelName  The phpName of a model, e.g. 'Book'
+     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\CouponI18n', $modelAlias = null)
     {
@@ -75,8 +75,8 @@ abstract class CouponI18nQuery extends ModelCriteria
     /**
      * Returns a new ChildCouponI18nQuery object.
      *
-     * @param     string $modelAlias The alias of a model in the query
-     * @param     Criteria $criteria Optional Criteria to build the query from
+     * @param string   $modelAlias The alias of a model in the query
+     * @param Criteria $criteria   Optional Criteria to build the query from
      *
      * @return ChildCouponI18nQuery
      */
@@ -136,10 +136,10 @@ abstract class CouponI18nQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
-     * @return   ChildCouponI18n A model object, or null if the key is not found
+     * @return ChildCouponI18n A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -167,8 +167,8 @@ abstract class CouponI18nQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed               $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @return ChildCouponI18n|array|mixed the result, formatted by the current formatter
      */
@@ -188,8 +188,8 @@ abstract class CouponI18nQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
      * </code>
-     * @param     array $keys Primary keys to use for the query
-     * @param     ConnectionInterface $con an optional connection object
+     * @param array               $keys Primary keys to use for the query
+     * @param ConnectionInterface $con  an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -210,7 +210,7 @@ abstract class CouponI18nQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param     mixed $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      *
      * @return ChildCouponI18nQuery The current query, for fluid interface
      */
@@ -225,7 +225,7 @@ abstract class CouponI18nQuery extends ModelCriteria
     /**
      * Filter the query by a list of primary keys
      *
-     * @param     array $keys The list of primary key to use for the query
+     * @param array $keys The list of primary key to use for the query
      *
      * @return ChildCouponI18nQuery The current query, for fluid interface
      */
@@ -256,11 +256,11 @@ abstract class CouponI18nQuery extends ModelCriteria
      *
      * @see       filterByCoupon()
      *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param mixed  $id         The value to use as filter.
+     *                           Use scalar values for equality.
+     *                           Use array values for in_array() equivalent.
+     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponI18nQuery The current query, for fluid interface
      */
@@ -296,9 +296,9 @@ abstract class CouponI18nQuery extends ModelCriteria
      * $query->filterByLocale('%fooValue%'); // WHERE locale LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $locale The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $locale     The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponI18nQuery The current query, for fluid interface
      */
@@ -325,9 +325,9 @@ abstract class CouponI18nQuery extends ModelCriteria
      * $query->filterByTitle('%fooValue%'); // WHERE title LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $title The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $title      The value to use as filter.
+     *                           Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponI18nQuery The current query, for fluid interface
      */
@@ -354,9 +354,9 @@ abstract class CouponI18nQuery extends ModelCriteria
      * $query->filterByShortDescription('%fooValue%'); // WHERE short_description LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $shortDescription The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $shortDescription The value to use as filter.
+     *                                 Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison       Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponI18nQuery The current query, for fluid interface
      */
@@ -383,9 +383,9 @@ abstract class CouponI18nQuery extends ModelCriteria
      * $query->filterByDescription('%fooValue%'); // WHERE description LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $description The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $description The value to use as filter.
+     *                            Accepts wildcards (* and % trigger a LIKE)
+     * @param string $comparison  Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponI18nQuery The current query, for fluid interface
      */
@@ -406,8 +406,8 @@ abstract class CouponI18nQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Coupon object
      *
-     * @param \Thelia\Model\Coupon|ObjectCollection $coupon The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Coupon|ObjectCollection $coupon     The related object(s) to use as filter
+     * @param string                                $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponI18nQuery The current query, for fluid interface
      */
@@ -431,8 +431,8 @@ abstract class CouponI18nQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Coupon relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildCouponI18nQuery The current query, for fluid interface
      */
@@ -465,11 +465,11 @@ abstract class CouponI18nQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $relationAlias optional alias for the relation,
+     *                              to be used as main alias in the secondary query
+     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CouponQuery A secondary query class using the current class as primary query
+     * @return \Thelia\Model\CouponQuery A secondary query class using the current class as primary query
      */
     public function useCouponQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
@@ -481,7 +481,7 @@ abstract class CouponI18nQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildCouponI18n $couponI18n Object to remove from the list of results
+     * @param ChildCouponI18n $couponI18n Object to remove from the list of results
      *
      * @return ChildCouponI18nQuery The current query, for fluid interface
      */
@@ -499,8 +499,8 @@ abstract class CouponI18nQuery extends ModelCriteria
     /**
      * Deletes all rows from the coupon_i18n table.
      *
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).
+     * @param  ConnectionInterface $con the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -531,13 +531,13 @@ abstract class CouponI18nQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildCouponI18n or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildCouponI18n object or primary key or array of primary keys
-     *              which is used to create the DELETE statement
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                if supported by native driver or if emulated using Propel.
-     * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     * @param  mixed               $values Criteria or ChildCouponI18n object or primary key or array of primary keys
+     *                                     which is used to create the DELETE statement
+     * @param  ConnectionInterface $con    the connection to use
+     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                                    if supported by native driver or if emulated using Propel.
+     * @throws PropelException     Any exceptions caught during processing will be
+     *                                    rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -556,7 +556,6 @@ abstract class CouponI18nQuery extends ModelCriteria
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-
 
         CouponI18nTableMap::removeInstanceFromPool($criteria);
 

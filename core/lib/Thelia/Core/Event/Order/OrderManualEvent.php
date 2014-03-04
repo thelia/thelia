@@ -56,6 +56,7 @@ class OrderManualEvent extends OrderEvent
     public function setOrder(Order $order)
     {
         $this->order = $order;
+
         return $this;
     }
 
@@ -65,6 +66,7 @@ class OrderManualEvent extends OrderEvent
     public function setPlacedOrder(Order $order)
     {
         $this->placedOrder = $order;
+
         return $this;
     }
 
@@ -74,6 +76,7 @@ class OrderManualEvent extends OrderEvent
     public function setInvoiceAddress($address)
     {
         $this->invoiceAddress = $address;
+
         return $this;
     }
 
@@ -83,6 +86,7 @@ class OrderManualEvent extends OrderEvent
     public function setDeliveryAddress($address)
     {
         $this->deliveryAddress = $address;
+
         return $this;
     }
 
@@ -92,6 +96,7 @@ class OrderManualEvent extends OrderEvent
     public function setDeliveryModule($module)
     {
         $this->deliveryModule = $module;
+
         return $this;
     }
 
@@ -101,6 +106,7 @@ class OrderManualEvent extends OrderEvent
     public function setPaymentModule($module)
     {
         $this->paymentModule = $module;
+
         return $this;
     }
 
@@ -110,6 +116,7 @@ class OrderManualEvent extends OrderEvent
     public function setPostage($postage)
     {
         $this->postage = $postage;
+
         return $this;
     }
 
@@ -119,6 +126,7 @@ class OrderManualEvent extends OrderEvent
     public function setRef($ref)
     {
         $this->ref = $ref;
+
         return $this;
     }
 
@@ -128,6 +136,7 @@ class OrderManualEvent extends OrderEvent
     public function setStatus($status)
     {
         $this->status = $status;
+
         return $this;
     }
 
@@ -227,6 +236,7 @@ class OrderManualEvent extends OrderEvent
     public function setCurrency($currency)
     {
         $this->currency = $currency;
+
         return $this;
     }
 
@@ -238,6 +248,7 @@ class OrderManualEvent extends OrderEvent
     public function setLang($lang)
     {
         $this->lang = $lang;
+
         return $this;
     }
 
@@ -249,6 +260,7 @@ class OrderManualEvent extends OrderEvent
     public function setCart($cart)
     {
         $this->cart = $cart;
+
         return $this;
     }
 
@@ -260,6 +272,7 @@ class OrderManualEvent extends OrderEvent
     public function setCustomer($customer)
     {
         $this->customer = $customer;
+
         return $this;
     }
 

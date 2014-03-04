@@ -43,7 +43,7 @@ class ShippingZone extends BaseAction implements EventSubscriberInterface
 
         $areaDelivery
             ->setAreaId($event->getAreaId())
-            ->setDeliveryModuleId($event->getShoppingZoneId())
+            ->setDeliveryModuleId($event->getShippingZoneId())
             ->save();
     }
 
@@ -51,13 +51,13 @@ class ShippingZone extends BaseAction implements EventSubscriberInterface
     {
         $areaDelivery = AreaDeliveryModuleQuery::create()
             ->filterByAreaId($event->getAreaId())
-            ->filterByDeliveryModuleId($event->getShoppingZoneId())
+            ->filterByDeliveryModuleId($event->getShippingZoneId())
             ->findOne();
 
         if ($areaDelivery) {
             $areaDelivery->delete();
         } else {
-            throw new \RuntimeException(sprintf('areaDeliveryModule not found with area_id = %d and delivery_module_id = %d', $event->getAreaId(), $event->getShoppingZoneId()));
+            throw new \RuntimeException(sprintf('areaDeliveryModule not found with area_id = %d and delivery_module_id = %d', $event->getAreaId(), $event->getShippingZoneId()));
         }
     }
 

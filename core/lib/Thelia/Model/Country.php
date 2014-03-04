@@ -18,7 +18,7 @@ class Country extends BaseCountry
 
     public function toggleDefault()
     {
-        if($this->getId() === null) {
+        if ($this->getId() === null) {
             throw new \RuntimeException("impossible to just uncheck default country, choose a new one");
         }
 
@@ -35,7 +35,7 @@ class Country extends BaseCountry
                 ->save($con);
 
             $con->commit();
-        } catch(PropelException $e) {
+        } catch (PropelException $e) {
             $con->rollBack();
             throw $e;
         }
@@ -45,6 +45,7 @@ class Country extends BaseCountry
     public function preInsert(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECOUNTRY, new CountryEvent($this));
+
         return true;
     }
 
@@ -67,7 +68,7 @@ class Country extends BaseCountry
 
     public function preDelete(ConnectionInterface $con = null)
     {
-        if($this->getByDefault()) {
+        if ($this->getByDefault()) {
             return false;
         }
 
@@ -86,7 +87,8 @@ class Country extends BaseCountry
      *
      * @throws LogicException if no default country is defined
      */
-    public static function getDefaultCountry() {
+    public static function getDefaultCountry()
+    {
         $dc = CountryQuery::create()->findOneByByDefault(true);
 
         if ($dc == null)
@@ -100,7 +102,8 @@ class Country extends BaseCountry
      *
      * @throws LogicException if no shop country is defined
      */
-    public static function getShopLocation() {
+    public static function getShopLocation()
+    {
         $dc = CountryQuery::create()->findOneByShopCountry(true);
 
         if ($dc == null)

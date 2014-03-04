@@ -57,6 +57,11 @@
         <service id="translation.loader.ini" class="%translation.loader.ini.class%">
             <tag name="translation.loader" alias="ini" />
         </service>
+
+        <service id="validators.translator" class="Thelia\Core\EventListener\RequestListener">
+            <argument type="service" id="thelia.translator"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
     </services>
 
 </config>

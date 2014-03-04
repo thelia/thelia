@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\RewritingArgumentQuery as BaseRewritingArgumentQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'rewriting_argument' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\RewritingArgumentQuery as BaseRewritingArgumentQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class RewritingArgumentQuery extends BaseRewritingArgumentQuery {
-
+class RewritingArgumentQuery extends BaseRewritingArgumentQuery
+{
 } // RewritingArgumentQuery

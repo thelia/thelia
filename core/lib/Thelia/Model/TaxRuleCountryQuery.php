@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\TaxRuleCountryQuery as BaseTaxRuleCountryQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'tax_rule_country' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\TaxRuleCountryQuery as BaseTaxRuleCountryQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class TaxRuleCountryQuery extends BaseTaxRuleCountryQuery {
-
+class TaxRuleCountryQuery extends BaseTaxRuleCountryQuery
+{
 } // TaxRuleCountryQuery

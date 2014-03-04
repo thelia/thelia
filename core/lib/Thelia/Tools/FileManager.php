@@ -22,7 +22,6 @@
 /**********************************************************************************/
 namespace Thelia\Tools;
 
-
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
 use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;

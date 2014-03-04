@@ -52,6 +52,7 @@ class MoneyFormat extends NumberFormat
             // FIXME: should be a parameter related to i18n configuration
             $number = $number . ' ' . $symbol;
         }
+
         return $number;
     }
 }

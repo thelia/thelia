@@ -26,6 +26,7 @@ use Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\ProfileQuery;
 use Thelia\Model\ResourceQuery;
 
@@ -91,7 +92,7 @@ class ProfileUpdateResourceAccessForm extends BaseForm
             ->findPk($value);
 
         if (null === $profile) {
-            $context->addViolation("Profile ID not found");
+            $context->addViolation(Translator::getInstance()->trans("Profile ID not found"));
         }
     }
 }

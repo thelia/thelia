@@ -23,7 +23,6 @@
 
 namespace Thelia\Log\Destination;
 
-
 use Thelia\Log\TlogDestinationConfig;
 use Thelia\Core\Translation\Translator;
 

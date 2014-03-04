@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event\Template;
 
-use Thelia\Core\Event\Template\TemplateEvent;
-
 class TemplateCreateEvent extends TemplateEvent
 {
     protected $template_name;

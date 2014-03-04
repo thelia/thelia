@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\FeatureAvQuery as BaseFeatureAvQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'feature_av' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\FeatureAvQuery as BaseFeatureAvQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class FeatureAvQuery extends BaseFeatureAvQuery {
-
+class FeatureAvQuery extends BaseFeatureAvQuery
+{
 } // FeatureAvQuery

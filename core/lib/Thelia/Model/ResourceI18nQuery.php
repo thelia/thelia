@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ResourceI18nQuery as BaseResourceI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'resource_i18n' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\ResourceI18nQuery as BaseResourceI18nQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ResourceI18nQuery extends BaseResourceI18nQuery {
-
+class ResourceI18nQuery extends BaseResourceI18nQuery
+{
 } // ResourceI18nQuery

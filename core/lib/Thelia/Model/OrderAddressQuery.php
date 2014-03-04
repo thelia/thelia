@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderAddressQuery as BaseOrderAddressQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'order_address' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\OrderAddressQuery as BaseOrderAddressQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class OrderAddressQuery extends BaseOrderAddressQuery {
-
+class OrderAddressQuery extends BaseOrderAddressQuery
+{
 } // OrderAddressQuery

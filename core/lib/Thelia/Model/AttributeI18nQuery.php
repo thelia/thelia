@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\AttributeI18nQuery as BaseAttributeI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'attribute_i18n' table.
  *
@@ -15,6 +14,6 @@ use Thelia\Model\Base\AttributeI18nQuery as BaseAttributeI18nQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class AttributeI18nQuery extends BaseAttributeI18nQuery {
-
+class AttributeI18nQuery extends BaseAttributeI18nQuery
+{
 } // AttributeI18nQuery
