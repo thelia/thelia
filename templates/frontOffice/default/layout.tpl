@@ -104,6 +104,9 @@ GNU General Public License : http://www.gnu.org/licenses/
                             {form name="thelia.front.customer.login"}
                             <form id="form-login-mini" action="{url path="/login"}" method="post" {form_enctype form=$form}>
                                 {form_hidden_fields form=$form}
+                                {form_field form=$form field="success_url"}
+                                    <input type="hidden" name="{$name}" value="{navigate to="current"}">
+                                {/form_field}
                                 {form_field form=$form field="email"}
                                 <div class="form-group group-email">
                                     <label for="{$label_attr.for}-mini">{intl l="Email address"}</label>
