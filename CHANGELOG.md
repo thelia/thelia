@@ -1,5 +1,7 @@
 #2.0.0
 - coupons effect are recalculated after each product's cart modification
+- You can declare new compilerPass in modules. See Thelia\Module\BaseModule::getCompilers phpDoc
+- Add ability to load assets from another template. See https://gist.github.com/lunika/9365180
 
 #2.0.0-RC1
 - Remove container from BaseAction.
