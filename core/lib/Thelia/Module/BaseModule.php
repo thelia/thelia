@@ -262,6 +262,46 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         return basename(dirname($this->reflected->getFileName()));
     }
 
+    /**
+     *
+     * This method allow adding new compilers to Thelia container
+     *
+     * You must return an array. This array can contain :
+     *  - arrays
+     *  - one or many instance(s) of \Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface
+     *
+     * in the first case, your array must contains 2 indexes. The first is the compiler instance and the second the compilerPass type.
+     * Example :
+     * return array(
+     *  array(
+     *    new \MyModule\DependencyInjection\Compiler\MySuperCompilerPass(),
+     *    \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION
+     *  )
+     * );
+     *
+     * In the seconde case, just an instance of CompilerPassInterface.
+     * Example :
+     * return array (
+     *  new \MyModule\DependencyInjection\Compiler\MySuperCompilerPass()
+     * );
+     *
+     * But you can combine both behaviors
+     * Example :
+     *
+     * return array(
+     *  new \MyModule\DependencyInjection\Compiler\MySuperCompilerPass(),
+     *  array(
+     *      new \MyModule\DependencyInjection\Compiler\MyOtherSuperCompilerPass(),
+     *      Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION
+     *  )
+     * );
+     *
+     */
+    public static function getCompilers()
+    {
+        return array();
+    }
+
     public function install(ConnectionInterface $con = null)
     {
         // Implement this method to do something useful.

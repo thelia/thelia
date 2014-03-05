@@ -196,6 +196,17 @@ class Thelia extends Kernel
                         $definition
                     );
 
+                    $compilers = call_user_func(array($module->getFullNamespace(), 'getCompilers'));
+
+                    foreach ($compilers as $compiler) {
+                        if (is_array($compiler)) {
+                            $container->addCompilerPass($compiler[0], $compiler[1]);
+                        } else {
+                            $container->addCompilerPass($compiler);
+                        }
+
+                    }
+
                     $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
                     $loader->load("config.xml");
 

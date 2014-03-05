@@ -311,8 +311,8 @@
                             }
                         });
                 },
-                error: function () {
-                    console.log('Error.');
+                error: function (e) {
+                    console.log('Error.', e);
                 }
             });
 
