@@ -12,9 +12,10 @@ class TaxRule extends BaseTaxRule
     use ModelEventDispatcherTrait;
 
     /**
+     * @param Product $product
      * @param Country $country
-     * @param         $untaxedAmount
-     * @param         $untaxedPromoAmount
+     * @param $untaxedAmount
+     * @param $untaxedPromoAmount
      * @param null    $askedLocale
      *
      * @return OrderProductTaxCollection

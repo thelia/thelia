@@ -33,24 +33,27 @@ class Customer extends BaseCustomer implements UserInterface
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     /**
-     * @param  int                                                                 $titleId       customer title id (from customer_title table)
-     * @param  string                                                              $firstname     customer first name
-     * @param  string                                                              $lastname      customer last name
-     * @param  string                                                              $address1      customer address
-     * @param  string                                                              $address2      customer adress complement 1
-     * @param  string                                                              $address3      customer adress complement 2
-     * @param  string                                                              $phone         customer phone number
-     * @param  string                                                              $cellphone     customer cellphone number
-     * @param  string                                                              $zipcode       customer zipcode
-     * @param  string                                                              $city
-     * @param  int                                                                 $countryId     customer country id (from Country table)
-     * @param  string                                                              $email         customer email, must be unique
-     * @param  string                                                              $plainPassword customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
-     * @param  string                                                              $lang
-     * @param  int                                                                 $reseller
-     * @param  null                                                                $sponsor
-     * @param  int                                                                 $discount
-     * @throws \Exception|\Symfony\Component\Config\Definition\Exception\Exception
+     * @param  int                                       $titleId       customer title id (from customer_title table)
+     * @param  string                                    $firstname     customer first name
+     * @param  string                                    $lastname      customer last name
+     * @param  string                                    $address1      customer address
+     * @param  string                                    $address2      customer adress complement 1
+     * @param  string                                    $address3      customer adress complement 2
+     * @param  string                                    $phone         customer phone number
+     * @param  string                                    $cellphone     customer cellphone number
+     * @param  string                                    $zipcode       customer zipcode
+     * @param  string                                    $city
+     * @param  int                                       $countryId     customer country id (from Country table)
+     * @param  string                                    $email         customer email, must be unique
+     * @param  string                                    $plainPassword customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
+     * @param  string                                    $lang
+     * @param  int                                       $reseller
+     * @param  null                                      $sponsor
+     * @param  int                                       $discount
+     * @param  null                                      $company
+     * @param  null                                      $ref
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email = null, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0, $company = null, $ref = null)
     {

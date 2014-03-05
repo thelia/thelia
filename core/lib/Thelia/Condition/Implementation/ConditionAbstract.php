@@ -23,7 +23,6 @@
 
 namespace Thelia\Condition\Implementation;
 
-
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
 use Thelia\Condition\SerializableCondition;

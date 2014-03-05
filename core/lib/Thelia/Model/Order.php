@@ -45,13 +45,12 @@ class Order extends BaseOrder
         return uniqid('ORD', true);
     }
 
-
     /**
      * Compute this order amount.
      *
-     * @param float $tax (output only) returns the tax amount for this order
-     * @param bool $includePostage if true, the postage cost is included to the total
-     * @param bool $includeDiscount if true, the discount will be included to the total
+     * @param  float $tax             (output only) returns the tax amount for this order
+     * @param  bool  $includePostage  if true, the postage cost is included to the total
+     * @param  bool  $includeDiscount if true, the discount will be included to the total
      * @return float
      */
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)
@@ -98,7 +97,8 @@ class Order extends BaseOrder
     /**
      * Set the status of the current order to NOT PAID
      */
-    public function setNotPaid() {
+    public function setNotPaid()
+    {
         $this->setStatusHelper(OrderStatus::CODE_NOT_PAID);
     }
 
@@ -107,14 +107,16 @@ class Order extends BaseOrder
      *
      * @return bool true if this order is NOT PAID, false otherwise.
      */
-    public function isNotPaid() {
+    public function isNotPaid()
+    {
         return $this->hasStatusHelper(OrderStatus::CODE_NOT_PAID);
     }
 
     /**
      * Set the status of the current order to PAID
      */
-    public function setPaid() {
+    public function setPaid()
+    {
         $this->setStatusHelper(OrderStatus::CODE_PAID);
     }
 
@@ -123,14 +125,16 @@ class Order extends BaseOrder
      *
      * @return bool true if this order is PAID, false otherwise.
      */
-    public function isPaid() {
+    public function isPaid()
+    {
         return $this->hasStatusHelper(OrderStatus::CODE_PAID);
     }
 
     /**
      * Set the status of the current order to PROCESSING
      */
-    public function setProcessing() {
+    public function setProcessing()
+    {
         $this->setStatusHelper(OrderStatus::CODE_PROCESSING);
     }
 
@@ -139,14 +143,16 @@ class Order extends BaseOrder
      *
      * @return bool true if this order is PROCESSING, false otherwise.
      */
-    public function isProcessing() {
+    public function isProcessing()
+    {
         return $this->hasStatusHelper(OrderStatus::CODE_PROCESSING);
     }
 
     /**
      * Set the status of the current order to SENT
      */
-    public function setSent() {
+    public function setSent()
+    {
         $this->setStatusHelper(OrderStatus::CODE_SENT);
     }
 
@@ -155,14 +161,16 @@ class Order extends BaseOrder
      *
      * @return bool true if this order is SENT, false otherwise.
      */
-    public function isSent() {
+    public function isSent()
+    {
         return $this->hasStatusHelper(OrderStatus::CODE_SENT);
     }
 
     /**
      * Set the status of the current order to CANCELED
      */
-    public function setCancelled() {
+    public function setCancelled()
+    {
         $this->setStatusHelper(OrderStatus::CODE_CANCELED);
     }
 
@@ -171,7 +179,8 @@ class Order extends BaseOrder
      *
      * @return bool true if this order is CANCELED, false otherwise.
      */
-    public function isCancelled() {
+    public function isCancelled()
+    {
         return $this->hasStatusHelper(OrderStatus::CODE_CANCELED);
     }
 
@@ -180,7 +189,8 @@ class Order extends BaseOrder
      *
      * @param string $statusCode the status code, one of OrderStatus::CODE_xxx constants.
      */
-    public function setStatusHelper($statusCode) {
+    public function setStatusHelper($statusCode)
+    {
         if (null !== $ordeStatus = OrderStatusQuery::create()->findOneByCode($statusCode)) {
             $this->setOrderStatus($ordeStatus)->save();
         }
@@ -189,10 +199,11 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is $statusCode
      *
-     * @param string $statusCode the status code, one of OrderStatus::CODE_xxx constants.
-     * @return bool true if this order have the provided status, false otherwise.
+     * @param  string $statusCode the status code, one of OrderStatus::CODE_xxx constants.
+     * @return bool   true if this order have the provided status, false otherwise.
      */
-    public function hasStatusHelper($statusCode) {
+    public function hasStatusHelper($statusCode)
+    {
         return $this->getOrderStatus()->getCode() == $statusCode;
     }
 

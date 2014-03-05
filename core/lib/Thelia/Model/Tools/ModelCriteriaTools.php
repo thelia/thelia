@@ -23,6 +23,7 @@ class ModelCriteriaTools
      * @param array         $columns
      * @param null          $foreignTable
      * @param string        $foreignKey
+     * @param bool          $forceReturn
      */
     public static function getFrontEndI18n(ModelCriteria &$search, $requestedLocale, $columns, $foreignTable, $foreignKey, $forceReturn = false)
     {

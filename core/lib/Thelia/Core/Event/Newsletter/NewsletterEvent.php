@@ -85,7 +85,6 @@ class NewsletterEvent extends ActionEvent
         return $this->newsletter;
     }
 
-
     /**
      * @param string $email
      *

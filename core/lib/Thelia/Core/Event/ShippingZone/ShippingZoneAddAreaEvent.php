@@ -61,7 +61,7 @@ class ShippingZoneAddAreaEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $shopping_zone_id
+     * @param mixed $shipping_zone_id
      *
      * @return $this
      */

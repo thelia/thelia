@@ -256,7 +256,7 @@ class TheliaLoop extends AbstractSmartyPlugin
 
         if ($content === null) {
             $page = $pagination->getPage();
-            if($maxPage > ($page + $nbPage)) {
+            if ($maxPage > ($page + $nbPage)) {
                 $end = $page + $nbPage;
             } else {
                 $end = $maxPage;

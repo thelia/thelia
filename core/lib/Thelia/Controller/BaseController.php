@@ -259,6 +259,8 @@ abstract class BaseController extends ContainerAware
      * redirect request to the specified url
      *
      * @param string $url
+     * @param int    $status  http status. Must be a 30x status
+     * @param array  $cookies
      */
     public function redirect($url, $status = 302, $cookies = array())
     {

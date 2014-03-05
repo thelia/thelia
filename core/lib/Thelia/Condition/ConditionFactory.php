@@ -27,7 +27,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Coupon\FacadeInterface;
 
-
 /**
  * Manage how Condition could interact with the current application state (Thelia)
  *

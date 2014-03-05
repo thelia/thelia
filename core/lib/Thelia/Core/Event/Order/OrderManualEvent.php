@@ -37,7 +37,11 @@ class OrderManualEvent extends OrderEvent
     protected $customer = null;
 
     /**
-     * @param Order $order
+     * @param \Thelia\Model\Order    $order
+     * @param \Thelia\Model\Currency $currency
+     * @param \Thelia\Model\Lang     $lang
+     * @param \Thelia\Model\Cart     $cart
+     * @param \Thelia\Model\Customer $customer
      */
     public function __construct(Order $order, Currency $currency, Lang $lang, Cart $cart, Customer $customer)
     {

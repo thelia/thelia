@@ -48,8 +48,9 @@ class BaseFrontController extends BaseController
     /**
      * Redirect to à route ID related URL
      *
-     * @param unknown $routeId       the route ID, as found in Config/Resources/routing/admin.xml
-     * @param unknown $urlParameters the URL parametrs, as a var/value pair array
+     * @param unknown                                $routeId       the route ID, as found in Config/Resources/routing/admin.xml
+     * @param array|\Thelia\Controller\Front\unknown $urlParameters the URL parametrs, as a var/value pair array
+     * @param bool                                   $referenceType
      */
     public function redirectToRoute($routeId, $urlParameters = array(), $referenceType = Router::ABSOLUTE_PATH)
     {

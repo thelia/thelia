@@ -25,7 +25,6 @@ namespace Thelia\Condition;
 
 use Thelia\Condition\Implementation\ConditionInterface;
 
-
 /**
  * Validate Conditions
  *

@@ -51,13 +51,13 @@ class ViewListener implements EventSubscriberInterface
 {
     /**
      *
-     * @var Symfony\Component\DependencyInjection\ContainerInterface
+     * @var \Symfony\Component\DependencyInjection\ContainerInterface
      */
     private $container;
 
     /**
      *
-     * @param \Thelia\Core\Template\ParserInterface $parser
+     * @param \Symfony\Component\DependencyInjection\ContainerInterfac $container
      */
     public function __construct(ContainerInterface $container)
     {
