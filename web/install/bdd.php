@@ -32,7 +32,8 @@ if (isset($_POST['host']) && isset($_POST['username'])  && isset($_POST['passwor
     $_SESSION['install']['port'] = $_POST['port'];
 
     $checkConnection = new \Thelia\Install\CheckDatabaseConnection($_POST['host'], $_POST['username'], $_POST['password'], $_POST['port']);
-    if(! $checkConnection->exec() || $checkConnection->getConnection()->query('show databases') === false){
+    $databases = $checkConnection->getConnection()->query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
+    if(! $checkConnection->exec() || $databases === false){
         header('location: connection.php?err=1');
         exit;
     }
@@ -48,7 +49,6 @@ else {
 $_SESSION['install']['step'] = 4;
 $connection = $checkConnection->getConnection();
 
-$databases = $connection->query('show databases');
 ?>
     <div class="well">
         <form action="config.php" method="post">
@@ -59,9 +59,9 @@ $databases = $connection->query('show databases');
                     <?php echo $trans->trans('Select below the one you want to use.'); ?>
                 </p>
                 <?php foreach($databases as $database): ?>
-                    <?php if ($database['Database'] == 'information_schema') continue; ?>
+                    <?php if ($database['SCHEMA_NAME'] == 'information_schema') continue; ?>
                     <?php
-                        $connection->exec(sprintf('use %s', $database['Database']));
+                        $connection->exec(sprintf('use %s', $database['SCHEMA_NAME']));
 
                         $tables = $connection->query('SHOW TABLES');
 
@@ -75,9 +75,9 @@ $databases = $connection->query('show databases');
 
                     ?>
                 <div class="radio">
-                    <label for="database_<?php echo $database['Database']; ?>">
-                        <input type="radio" name="database" id="database_<?php echo $database['Database']; ?>" value="<?php echo $database['Database']; ?>" <?php if($found){ echo "disabled"; } ?>>
-                        <?php echo $database['Database']; ?>
+                    <label for="database_<?php echo $database['SCHEMA_NAME']; ?>">
+                        <input type="radio" name="database" id="database_<?php echo $database['SCHEMA_NAME']; ?>" value="<?php echo $database['SCHEMA_NAME']; ?>" <?php if($found){ echo "disabled"; } ?>>
+                        <?php echo $database['SCHEMA_NAME']; ?>
                     </label>
                 </div>
                 <?php endforeach; ?>
