@@ -377,8 +377,8 @@ CREATE TABLE `product_sale_elements`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_product_sale_element_product_id` (`product_id`),
-    INDEX `ref` (`ref`),
     INDEX `idx_product_elements_product_id_promo_is_default` (`product_id`, `promo`, `is_default`),
+    INDEX `ref` (`ref`),
     CONSTRAINT `fk_product_sale_element_product_id`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
