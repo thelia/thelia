@@ -20,7 +20,7 @@ ALTER TABLE `folder_image` ADD INDEX `idx_folder_image_folder_id_position` (`fol
 
 ALTER TABLE `rewriting_url` ADD INDEX `idx_rewriting_url_view_updated_at` (`view`, `updated_at`);
 ALTER TABLE `rewriting_url` ADD INDEX `idx_rewriting_url_view_id_view_view_locale_updated_at` (`view_id`, `view`, `view_locale`, `updated_at`);
-ALTER TABLE `rewriting_url` DROP INDEX `idx_view_id` (`view_id`);
+ALTER TABLE `rewriting_url` DROP INDEX `idx_view_id`;
 
 ALTER TABLE `feature_product` ADD INDEX `idx_feature_product_product_id_feature_id_position` (`product_id`, `feature_id`, `position`);
 ALTER TABLE `feature_template` ADD INDEX `idx_feature_template_template_id_position` (`template_id`, `position`);
