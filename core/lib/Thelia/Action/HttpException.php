@@ -30,6 +30,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Exception\AdminAccessDenied;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Template\TemplateHelper;
 
@@ -53,13 +54,36 @@ class HttpException extends BaseAction implements EventSubscriberInterface
 
     public function checkHttpException(GetResponseForExceptionEvent $event)
     {
-        if ($event->getException() instanceof NotFoundHttpException) {
+        $exception = $event->getException();
+        if ($exception instanceof NotFoundHttpException) {
             $this->display404($event);
         }
 
-        if ($event->getException() instanceof AccessDeniedHttpException) {
+        if ($exception instanceof AccessDeniedHttpException) {
             $this->display403($event);
         }
+
+        if ($exception instanceof AdminAccessDenied) {
+            $this->displayAdminGeneralError($event);
+        }
+    }
+
+    protected function displayAdminGeneralError(GetResponseForExceptionEvent $event)
+    {
+        // Define the template thant shoud be used
+        $this->parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveAdminTemplate());
+
+        $message = $event->getException()->getMessage();
+
+        $response = Response::create(
+            $this->parser->render('general_error.html',
+                array(
+                    "error_message" => $message
+                )),
+            403
+        ) ;
+
+        $event->setResponse($response);
     }
 
     protected function display404(GetResponseForExceptionEvent $event)

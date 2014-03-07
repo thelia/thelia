@@ -7,6 +7,7 @@
     <!-- Route to administration base -->
     <route id="admin" path="/admin">
         <default key="_controller">Thelia\Controller\Admin\AdminController::indexAction</default>
+        <default key="not-logged">1</default>
     </route>
 
     <!-- home -->
@@ -24,6 +25,7 @@
     <!-- Route to the administration login page -->
     <route id="admin.login" path="/admin/login">
         <default key="_controller">Thelia\Controller\Admin\SessionController::showLoginAction</default>
+        <default key="not-logged">1</default>
     </route>
 
     <!-- Route to the administration logout page -->
@@ -34,6 +36,7 @@
     <!-- Route to the login check controller -->
     <route id="admin.checklogin" path="/admin/checklogin">
         <default key="_controller">Thelia\Controller\Admin\SessionController::checkLoginAction</default>
+        <default key="not-logged">1</default>
     </route>
 
     <!-- Route to the catalog controller -->
