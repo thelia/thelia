@@ -29,7 +29,6 @@ use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Model\AdminQuery;
 use Thelia\Model\LangQuery;
 
-
 /**
  * Class AdministratorTest
  * @package Thelia\Tests\Action
@@ -139,5 +138,4 @@ class AdministratorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(password_verify($adminEvent->getPassword(), $updatedAdmin->getPassword()));
     }
 
-
-} 
+}

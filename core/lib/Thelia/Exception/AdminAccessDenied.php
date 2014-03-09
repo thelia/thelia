@@ -23,7 +23,6 @@
 
 namespace Thelia\Exception;
 
-
 /**
  * Class AdminAccessDenied
  * @package Thelia\Exception
@@ -32,4 +31,4 @@ namespace Thelia\Exception;
 class AdminAccessDenied extends \RuntimeException
 {
 
-} 
+}

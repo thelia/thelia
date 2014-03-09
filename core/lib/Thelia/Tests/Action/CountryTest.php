@@ -31,7 +31,6 @@ use Thelia\Core\Event\Country\CountryUpdateEvent;
 use Thelia\Model\Country as CountryModel;
 use Thelia\Model\CountryQuery;
 
-
 /**
  * Class CountryTest
  * @package Thelia\Tests\Action
@@ -39,13 +38,12 @@ use Thelia\Model\CountryQuery;
  */
 class CountryTest extends \PHPUnit_Framework_TestCase
 {
-    protected  $dispatcher;
+    protected $dispatcher;
 
     public function setUp()
     {
         $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
     }
-
 
     public function testCreate()
     {

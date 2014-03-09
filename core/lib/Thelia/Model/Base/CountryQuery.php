@@ -92,9 +92,9 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\CountryQuery object.
      *
-     * @param string $dbName     The database name
-     * @param string $modelName  The phpName of a model, e.g. 'Book'
-     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param     string $dbName The database name
+     * @param     string $modelName The phpName of a model, e.g. 'Book'
+     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Country', $modelAlias = null)
     {
@@ -104,8 +104,8 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Returns a new ChildCountryQuery object.
      *
-     * @param string   $modelAlias The alias of a model in the query
-     * @param Criteria $criteria   Optional Criteria to build the query from
+     * @param     string $modelAlias The alias of a model in the query
+     * @param     Criteria $criteria Optional Criteria to build the query from
      *
      * @return ChildCountryQuery
      */
@@ -134,7 +134,7 @@ abstract class CountryQuery extends ModelCriteria
      * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param mixed               $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildCountry|array|mixed the result, formatted by the current formatter
@@ -165,10 +165,10 @@ abstract class CountryQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param mixed               $key Primary key to use for the query
-     * @param ConnectionInterface $con A connection object
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildCountry A model object, or null if the key is not found
+     * @return   ChildCountry A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -195,8 +195,8 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param mixed               $key Primary key to use for the query
-     * @param ConnectionInterface $con A connection object
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
      *
      * @return ChildCountry|array|mixed the result, formatted by the current formatter
      */
@@ -216,8 +216,8 @@ abstract class CountryQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
-     * @param array               $keys Primary keys to use for the query
-     * @param ConnectionInterface $con  an optional connection object
+     * @param     array $keys Primary keys to use for the query
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -238,24 +238,26 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param mixed $key Primary key to use for the query
+     * @param     mixed $key Primary key to use for the query
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
+
         return $this->addUsingAlias(CountryTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
      * Filter the query by a list of primary keys
      *
-     * @param array $keys The list of primary key to use for the query
+     * @param     array $keys The list of primary key to use for the query
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
+
         return $this->addUsingAlias(CountryTableMap::ID, $keys, Criteria::IN);
     }
 
@@ -269,11 +271,11 @@ abstract class CountryQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @param mixed  $id         The value to use as filter.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -312,11 +314,11 @@ abstract class CountryQuery extends ModelCriteria
      *
      * @see       filterByArea()
      *
-     * @param mixed  $areaId     The value to use as filter.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $areaId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -352,9 +354,9 @@ abstract class CountryQuery extends ModelCriteria
      * $query->filterByIsocode('%fooValue%'); // WHERE isocode LIKE '%fooValue%'
      * </code>
      *
-     * @param string $isocode    The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $isocode The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -381,9 +383,9 @@ abstract class CountryQuery extends ModelCriteria
      * $query->filterByIsoalpha2('%fooValue%'); // WHERE isoalpha2 LIKE '%fooValue%'
      * </code>
      *
-     * @param string $isoalpha2  The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $isoalpha2 The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -410,9 +412,9 @@ abstract class CountryQuery extends ModelCriteria
      * $query->filterByIsoalpha3('%fooValue%'); // WHERE isoalpha3 LIKE '%fooValue%'
      * </code>
      *
-     * @param string $isoalpha3  The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $isoalpha3 The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -440,11 +442,11 @@ abstract class CountryQuery extends ModelCriteria
      * $query->filterByByDefault(array('min' => 12)); // WHERE by_default > 12
      * </code>
      *
-     * @param mixed  $byDefault  The value to use as filter.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $byDefault The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -480,12 +482,12 @@ abstract class CountryQuery extends ModelCriteria
      * $query->filterByShopCountry('yes'); // WHERE shop_country = true
      * </code>
      *
-     * @param boolean|string $shopCountry The value to use as filter.
-     *                                    Non-boolean arguments are converted using the following rules:
-     *                                    * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *                                    * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     *                                    Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param string         $comparison  Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     boolean|string $shopCountry The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -508,13 +510,13 @@ abstract class CountryQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param mixed  $createdAt  The value to use as filter.
-     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
-     *                           Empty strings are treated as NULL.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -551,13 +553,13 @@ abstract class CountryQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param mixed  $updatedAt  The value to use as filter.
-     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
-     *                           Empty strings are treated as NULL.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -587,8 +589,8 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Area object
      *
-     * @param \Thelia\Model\Area|ObjectCollection $area       The related object(s) to use as filter
-     * @param string                              $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Area|ObjectCollection $area The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -612,8 +614,8 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Area relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -646,11 +648,11 @@ abstract class CountryQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\AreaQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\AreaQuery A secondary query class using the current class as primary query
      */
     public function useAreaQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -662,8 +664,8 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\TaxRuleCountry object
      *
-     * @param \Thelia\Model\TaxRuleCountry|ObjectCollection $taxRuleCountry the related object to use as filter
-     * @param string                                        $comparison     Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\TaxRuleCountry|ObjectCollection $taxRuleCountry  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -685,8 +687,8 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the TaxRuleCountry relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -719,11 +721,11 @@ abstract class CountryQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\TaxRuleCountryQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\TaxRuleCountryQuery A secondary query class using the current class as primary query
      */
     public function useTaxRuleCountryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -735,8 +737,8 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Address object
      *
-     * @param \Thelia\Model\Address|ObjectCollection $address    the related object to use as filter
-     * @param string                                 $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Address|ObjectCollection $address  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -758,8 +760,8 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Address relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -792,11 +794,11 @@ abstract class CountryQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\AddressQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\AddressQuery A secondary query class using the current class as primary query
      */
     public function useAddressQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -808,8 +810,8 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\CountryI18n object
      *
-     * @param \Thelia\Model\CountryI18n|ObjectCollection $countryI18n the related object to use as filter
-     * @param string                                     $comparison  Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\CountryI18n|ObjectCollection $countryI18n  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -831,8 +833,8 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the CountryI18n relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -865,11 +867,11 @@ abstract class CountryQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\CountryI18nQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\CountryI18nQuery A secondary query class using the current class as primary query
      */
     public function useCountryI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
@@ -881,7 +883,7 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param ChildCountry $country Object to remove from the list of results
+     * @param   ChildCountry $country Object to remove from the list of results
      *
      * @return ChildCountryQuery The current query, for fluid interface
      */
@@ -897,8 +899,8 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Deletes all rows from the country table.
      *
-     * @param  ConnectionInterface $con the connection to use
-     * @return int                 The number of affected rows (if supported by underlying database driver).
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -929,13 +931,13 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildCountry or Criteria object OR a primary key value.
      *
-     * @param  mixed               $values Criteria or ChildCountry object or primary key or array of primary keys
-     *                                     which is used to create the DELETE statement
-     * @param  ConnectionInterface $con    the connection to use
-     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                                    if supported by native driver or if emulated using Propel.
-     * @throws PropelException     Any exceptions caught during processing will be
-     *                                    rethrown wrapped into a PropelException.
+     * @param mixed               $values Criteria or ChildCountry object or primary key or array of primary keys
+     *              which is used to create the DELETE statement
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
+     * @throws PropelException Any exceptions caught during processing will be
+     *         rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -955,6 +957,7 @@ abstract class CountryQuery extends ModelCriteria
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
+
         CountryTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
@@ -973,9 +976,9 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param int $nbDays Maximum age of the latest update in days
+     * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return ChildCountryQuery The current query, for fluid interface
+     * @return     ChildCountryQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
@@ -985,9 +988,9 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Filter by the latest created
      *
-     * @param int $nbDays Maximum age of in days
+     * @param      int $nbDays Maximum age of in days
      *
-     * @return ChildCountryQuery The current query, for fluid interface
+     * @return     ChildCountryQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
@@ -997,7 +1000,7 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Order by update date desc
      *
-     * @return ChildCountryQuery The current query, for fluid interface
+     * @return     ChildCountryQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
@@ -1007,7 +1010,7 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Order by update date asc
      *
-     * @return ChildCountryQuery The current query, for fluid interface
+     * @return     ChildCountryQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
@@ -1017,7 +1020,7 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Order by create date desc
      *
-     * @return ChildCountryQuery The current query, for fluid interface
+     * @return     ChildCountryQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
@@ -1027,7 +1030,7 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Order by create date asc
      *
-     * @return ChildCountryQuery The current query, for fluid interface
+     * @return     ChildCountryQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
@@ -1039,11 +1042,11 @@ abstract class CountryQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the i18n relation
      *
-     * @param string $locale        Locale to use for the join condition, e.g. 'fr_FR'
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return ChildCountryQuery The current query, for fluid interface
+     * @return    ChildCountryQuery The current query, for fluid interface
      */
     public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -1058,10 +1061,10 @@ abstract class CountryQuery extends ModelCriteria
      * Adds a JOIN clause to the query and hydrates the related I18n object.
      * Shortcut for $c->joinI18n($locale)->with()
      *
-     * @param string $locale   Locale to use for the join condition, e.g. 'fr_FR'
-     * @param string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return ChildCountryQuery The current query, for fluid interface
+     * @return    ChildCountryQuery The current query, for fluid interface
      */
     public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
@@ -1078,11 +1081,11 @@ abstract class CountryQuery extends ModelCriteria
      *
      * @see       useQuery()
      *
-     * @param string $locale        Locale to use for the join condition, e.g. 'fr_FR'
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return ChildCountryI18nQuery A secondary query class using the current class as primary query
+     * @return    ChildCountryI18nQuery A secondary query class using the current class as primary query
      */
     public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {

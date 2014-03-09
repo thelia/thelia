@@ -32,7 +32,6 @@ use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Model\Area as AreaModel;
 use Thelia\Model\CountryQuery;
 
-
 /**
  * Class AreaTest
  * @package Thelia\Tests\Action
@@ -149,4 +148,4 @@ class AreaTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($deletedArea->isDeleted());
     }
 
-} 
+}

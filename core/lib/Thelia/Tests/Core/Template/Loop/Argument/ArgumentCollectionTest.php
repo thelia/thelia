@@ -33,7 +33,7 @@ use Thelia\Type\TypeCollection;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class ArgumentTest extends \PHPUnit_Framework_TestCase
+class ArgumentCollectionTest extends \PHPUnit_Framework_TestCase
 {
     public function testArgumentCollectionCreateAndWalk()
     {

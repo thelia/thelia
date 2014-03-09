@@ -27,7 +27,6 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolver as BaseController
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Exception\AdminAccessDenied;
 
@@ -97,7 +96,7 @@ class ControllerResolver extends BaseControllerResolver
         if ($controller instanceof BaseAdminController) {
             $securityContext = $this->container->get('thelia.securityContext');
             $request = $this->container->get('request');
-            if(false === $securityContext->hasAdminUser() && $request->attributes->get('not-logged') != 1) {
+            if (false === $securityContext->hasAdminUser() && $request->attributes->get('not-logged') != 1) {
             throw new AdminAccessDenied();
             }
         }

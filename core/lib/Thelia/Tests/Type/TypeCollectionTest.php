@@ -31,7 +31,7 @@ use Thelia\Type\TypeCollection;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class TypeTest extends \PHPUnit_Framework_TestCase
+class TypeCollectionTest extends \PHPUnit_Framework_TestCase
 {
     public function testTypeCollectionConstruction()
     {

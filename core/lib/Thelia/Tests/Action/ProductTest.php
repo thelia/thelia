@@ -42,11 +42,9 @@ use Thelia\Model\ContentQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Product as ProductModel;
-use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Model\TemplateQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
-
 
 /**
  * Class ProductTest
@@ -113,7 +111,6 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals(10, $defaultProductSaleElement->getWeight());
 
         $productPrice = $defaultProductSaleElement->getProductPrices()->getFirst();
-
 
         $this->assertEquals(10, $productPrice->getPrice());
         $this->assertEquals($currencyId, $productPrice->getCurrencyId());
@@ -379,7 +376,6 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $productPrice = $newProductSaleElements->getProductPrices()->getFirst();
 
-
         $this->assertEquals(0, $productPrice->getPrice());
         $this->assertEquals(0, $productPrice->getPromoPrice());
         $this->assertEquals($currencyId, $productPrice->getCurrencyId());
@@ -405,4 +401,4 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $this->assertTrue($deletedProduct->isDeleted());
     }
-} 
+}

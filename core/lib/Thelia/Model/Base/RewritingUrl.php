@@ -30,6 +30,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\RewritingUrlTableMap';
 
+
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -350,9 +351,9 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed  $parser A AbstractParser instance,
+     * @param mixed $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data   The source data to import from
+     * @param string $data The source data to import from
      *
      * @return RewritingUrl The current object, for fluid interface
      */
@@ -402,60 +403,66 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getId()
     {
+
         return $this->id;
     }
 
     /**
      * Get the [url] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getUrl()
     {
+
         return $this->url;
     }
 
     /**
      * Get the [view] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getView()
     {
+
         return $this->view;
     }
 
     /**
      * Get the [view_id] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getViewId()
     {
+
         return $this->view_id;
     }
 
     /**
      * Get the [view_locale] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getViewLocale()
     {
+
         return $this->view_locale;
     }
 
     /**
      * Get the [redirected] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getRedirected()
     {
+
         return $this->redirected;
     }
 
@@ -463,8 +470,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -483,8 +490,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -502,8 +509,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Set the value of [id] column.
      *
-     * @param  int                        $v new value
-     * @return \Thelia\Model\RewritingUrl The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -516,14 +523,15 @@ abstract class RewritingUrl implements ActiveRecordInterface
             $this->modifiedColumns[RewritingUrlTableMap::ID] = true;
         }
 
+
         return $this;
     } // setId()
 
     /**
      * Set the value of [url] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\RewritingUrl The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function setUrl($v)
     {
@@ -536,14 +544,15 @@ abstract class RewritingUrl implements ActiveRecordInterface
             $this->modifiedColumns[RewritingUrlTableMap::URL] = true;
         }
 
+
         return $this;
     } // setUrl()
 
     /**
      * Set the value of [view] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\RewritingUrl The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function setView($v)
     {
@@ -556,14 +565,15 @@ abstract class RewritingUrl implements ActiveRecordInterface
             $this->modifiedColumns[RewritingUrlTableMap::VIEW] = true;
         }
 
+
         return $this;
     } // setView()
 
     /**
      * Set the value of [view_id] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\RewritingUrl The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function setViewId($v)
     {
@@ -576,14 +586,15 @@ abstract class RewritingUrl implements ActiveRecordInterface
             $this->modifiedColumns[RewritingUrlTableMap::VIEW_ID] = true;
         }
 
+
         return $this;
     } // setViewId()
 
     /**
      * Set the value of [view_locale] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\RewritingUrl The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function setViewLocale($v)
     {
@@ -596,14 +607,15 @@ abstract class RewritingUrl implements ActiveRecordInterface
             $this->modifiedColumns[RewritingUrlTableMap::VIEW_LOCALE] = true;
         }
 
+
         return $this;
     } // setViewLocale()
 
     /**
      * Set the value of [redirected] column.
      *
-     * @param  int                        $v new value
-     * @return \Thelia\Model\RewritingUrl The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function setRedirected($v)
     {
@@ -620,15 +632,16 @@ abstract class RewritingUrl implements ActiveRecordInterface
             $this->aRewritingUrlRelatedByRedirected = null;
         }
 
+
         return $this;
     } // setRedirected()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                      $v string, integer (timestamp), or \DateTime value.
-     *                                       Empty strings are treated as NULL.
-     * @return \Thelia\Model\RewritingUrl The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -640,15 +653,16 @@ abstract class RewritingUrl implements ActiveRecordInterface
             }
         } // if either are not null
 
+
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                      $v string, integer (timestamp), or \DateTime value.
-     *                                       Empty strings are treated as NULL.
-     * @return \Thelia\Model\RewritingUrl The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -659,6 +673,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
                 $this->modifiedColumns[RewritingUrlTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
+
 
         return $this;
     } // setUpdatedAt()
@@ -769,10 +784,10 @@ abstract class RewritingUrl implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
-     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
+     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
+     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -812,7 +827,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param  ConnectionInterface $con
+     * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see RewritingUrl::setDeleted()
@@ -855,8 +870,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -917,8 +932,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -996,7 +1011,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1092,7 +1107,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1108,12 +1123,12 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param  string $name name
-     * @param  string $type The type of fieldname the $name is of:
-     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                      Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed  Value of field.
+     * @param      string $name name
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1127,7 +1142,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos position in xml schema
+     * @param      int $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1169,12 +1184,12 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                                        Defaults to TableMap::TYPE_PHPNAME.
-     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
-     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                    Defaults to TableMap::TYPE_PHPNAME.
+     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1218,12 +1233,12 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param  string $name
-     * @param  mixed  $value field value
-     * @param  string $type  The type of fieldname the $name is of:
-     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                       Defaults to TableMap::TYPE_PHPNAME.
+     * @param      string $name
+     * @param      mixed  $value field value
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1237,8 +1252,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos   position in xml schema
-     * @param  mixed $value field value
+     * @param      int $pos position in xml schema
+     * @param      mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1284,8 +1299,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param  array  $arr     An array to populate the object from.
-     * @param  string $keyType The type of keys the array uses.
+     * @param      array  $arr     An array to populate the object from.
+     * @param      string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1319,6 +1334,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
         if ($this->isColumnModified(RewritingUrlTableMap::REDIRECTED)) $criteria->add(RewritingUrlTableMap::REDIRECTED, $this->redirected);
         if ($this->isColumnModified(RewritingUrlTableMap::CREATED_AT)) $criteria->add(RewritingUrlTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(RewritingUrlTableMap::UPDATED_AT)) $criteria->add(RewritingUrlTableMap::UPDATED_AT, $this->updated_at);
+
         return $criteria;
     }
 
@@ -1340,7 +1356,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return int
+     * @return   int
      */
     public function getPrimaryKey()
     {
@@ -1350,7 +1366,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param  int  $key Primary key.
+     * @param       int $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -1364,6 +1380,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
+
         return null === $this->getId();
     }
 
@@ -1373,9 +1390,9 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  object          $copyObj  An object of \Thelia\Model\RewritingUrl (or compatible) type.
-     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
+     * @param      object $copyObj An object of \Thelia\Model\RewritingUrl (or compatible) type.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1421,8 +1438,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  boolean                    $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Thelia\Model\RewritingUrl Clone of current object.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return                 \Thelia\Model\RewritingUrl Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1438,8 +1455,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildRewritingUrl object.
      *
-     * @param  ChildRewritingUrl          $v
-     * @return \Thelia\Model\RewritingUrl The current object (for fluent API support)
+     * @param                  ChildRewritingUrl $v
+     * @return                 \Thelia\Model\RewritingUrl The current object (for fluent API support)
      * @throws PropelException
      */
     public function setRewritingUrlRelatedByRedirected(ChildRewritingUrl $v = null)
@@ -1458,6 +1475,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
             $v->addRewritingUrlRelatedById($this);
         }
 
+
         return $this;
     }
 
@@ -1465,8 +1483,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Get the associated ChildRewritingUrl object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildRewritingUrl   The associated ChildRewritingUrl object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildRewritingUrl The associated ChildRewritingUrl object.
      * @throws PropelException
      */
     public function getRewritingUrlRelatedByRedirected(ConnectionInterface $con = null)
@@ -1491,7 +1509,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * Avoids crafting an 'init[$relationName]s' method name
      * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param  string $relationName The name of the relation to initialize
+     * @param      string $relationName The name of the relation to initialize
      * @return void
      */
     public function initRelation($relationName)
@@ -1533,8 +1551,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -1556,8 +1574,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * If this ChildRewritingUrl is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                       $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface            $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildRewritingUrl[] List of ChildRewritingUrl objects
      * @throws PropelException
      */
@@ -1613,13 +1631,14 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $rewritingUrlsRelatedById A Propel collection.
-     * @param  ConnectionInterface $con                      Optional connection object
-     * @return ChildRewritingUrl   The current object (for fluent API support)
+     * @param      Collection $rewritingUrlsRelatedById A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildRewritingUrl The current object (for fluent API support)
      */
     public function setRewritingUrlsRelatedById(Collection $rewritingUrlsRelatedById, ConnectionInterface $con = null)
     {
         $rewritingUrlsRelatedByIdToDelete = $this->getRewritingUrlsRelatedById(new Criteria(), $con)->diff($rewritingUrlsRelatedById);
+
 
         $this->rewritingUrlsRelatedByIdScheduledForDeletion = $rewritingUrlsRelatedByIdToDelete;
 
@@ -1641,10 +1660,10 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Returns the number of related RewritingUrl objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related RewritingUrl objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related RewritingUrl objects.
      * @throws PropelException
      */
     public function countRewritingUrlsRelatedById(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -1676,8 +1695,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * Method called to associate a ChildRewritingUrl object to this object
      * through the ChildRewritingUrl foreign key attribute.
      *
-     * @param  ChildRewritingUrl          $l ChildRewritingUrl
-     * @return \Thelia\Model\RewritingUrl The current object (for fluent API support)
+     * @param    ChildRewritingUrl $l ChildRewritingUrl
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function addRewritingUrlRelatedById(ChildRewritingUrl $l)
     {
@@ -1704,7 +1723,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
 
     /**
      * @param  RewritingUrlRelatedById $rewritingUrlRelatedById The rewritingUrlRelatedById object to remove.
-     * @return ChildRewritingUrl       The current object (for fluent API support)
+     * @return ChildRewritingUrl The current object (for fluent API support)
      */
     public function removeRewritingUrlRelatedById($rewritingUrlRelatedById)
     {
@@ -1750,8 +1769,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -1773,8 +1792,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * If this ChildRewritingUrl is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                            $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface                 $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildRewritingArgument[] List of ChildRewritingArgument objects
      * @throws PropelException
      */
@@ -1830,13 +1849,14 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $rewritingArguments A Propel collection.
-     * @param  ConnectionInterface $con                Optional connection object
-     * @return ChildRewritingUrl   The current object (for fluent API support)
+     * @param      Collection $rewritingArguments A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildRewritingUrl The current object (for fluent API support)
      */
     public function setRewritingArguments(Collection $rewritingArguments, ConnectionInterface $con = null)
     {
         $rewritingArgumentsToDelete = $this->getRewritingArguments(new Criteria(), $con)->diff($rewritingArguments);
+
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
@@ -1861,10 +1881,10 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Returns the number of related RewritingArgument objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related RewritingArgument objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related RewritingArgument objects.
      * @throws PropelException
      */
     public function countRewritingArguments(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -1896,8 +1916,8 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * Method called to associate a ChildRewritingArgument object to this object
      * through the ChildRewritingArgument foreign key attribute.
      *
-     * @param  ChildRewritingArgument     $l ChildRewritingArgument
-     * @return \Thelia\Model\RewritingUrl The current object (for fluent API support)
+     * @param    ChildRewritingArgument $l ChildRewritingArgument
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function addRewritingArgument(ChildRewritingArgument $l)
     {
@@ -1968,7 +1988,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param boolean $deep Whether to also clear the references on all referrer objects.
+     * @param      boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -2005,7 +2025,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return ChildRewritingUrl The current object (for fluent API support)
+     * @return     ChildRewritingUrl The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
@@ -2089,6 +2109,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
     {
 
     }
+
 
     /**
      * Derived method to catches calls to undefined methods.

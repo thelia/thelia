@@ -83,9 +83,9 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\RewritingUrlQuery object.
      *
-     * @param string $dbName     The database name
-     * @param string $modelName  The phpName of a model, e.g. 'Book'
-     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param     string $dbName The database name
+     * @param     string $modelName The phpName of a model, e.g. 'Book'
+     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\RewritingUrl', $modelAlias = null)
     {
@@ -95,8 +95,8 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Returns a new ChildRewritingUrlQuery object.
      *
-     * @param string   $modelAlias The alias of a model in the query
-     * @param Criteria $criteria   Optional Criteria to build the query from
+     * @param     string $modelAlias The alias of a model in the query
+     * @param     Criteria $criteria Optional Criteria to build the query from
      *
      * @return ChildRewritingUrlQuery
      */
@@ -125,7 +125,7 @@ abstract class RewritingUrlQuery extends ModelCriteria
      * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param mixed               $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildRewritingUrl|array|mixed the result, formatted by the current formatter
@@ -156,10 +156,10 @@ abstract class RewritingUrlQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param mixed               $key Primary key to use for the query
-     * @param ConnectionInterface $con A connection object
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildRewritingUrl A model object, or null if the key is not found
+     * @return   ChildRewritingUrl A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -186,8 +186,8 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param mixed               $key Primary key to use for the query
-     * @param ConnectionInterface $con A connection object
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
      *
      * @return ChildRewritingUrl|array|mixed the result, formatted by the current formatter
      */
@@ -207,8 +207,8 @@ abstract class RewritingUrlQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
-     * @param array               $keys Primary keys to use for the query
-     * @param ConnectionInterface $con  an optional connection object
+     * @param     array $keys Primary keys to use for the query
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -229,24 +229,26 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param mixed $key Primary key to use for the query
+     * @param     mixed $key Primary key to use for the query
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
+
         return $this->addUsingAlias(RewritingUrlTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
      * Filter the query by a list of primary keys
      *
-     * @param array $keys The list of primary key to use for the query
+     * @param     array $keys The list of primary key to use for the query
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
+
         return $this->addUsingAlias(RewritingUrlTableMap::ID, $keys, Criteria::IN);
     }
 
@@ -260,11 +262,11 @@ abstract class RewritingUrlQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @param mixed  $id         The value to use as filter.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -300,9 +302,9 @@ abstract class RewritingUrlQuery extends ModelCriteria
      * $query->filterByUrl('%fooValue%'); // WHERE url LIKE '%fooValue%'
      * </code>
      *
-     * @param string $url        The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $url The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -329,9 +331,9 @@ abstract class RewritingUrlQuery extends ModelCriteria
      * $query->filterByView('%fooValue%'); // WHERE view LIKE '%fooValue%'
      * </code>
      *
-     * @param string $view       The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $view The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -358,9 +360,9 @@ abstract class RewritingUrlQuery extends ModelCriteria
      * $query->filterByViewId('%fooValue%'); // WHERE view_id LIKE '%fooValue%'
      * </code>
      *
-     * @param string $viewId     The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $viewId The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -387,9 +389,9 @@ abstract class RewritingUrlQuery extends ModelCriteria
      * $query->filterByViewLocale('%fooValue%'); // WHERE view_locale LIKE '%fooValue%'
      * </code>
      *
-     * @param string $viewLocale The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $viewLocale The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -419,11 +421,11 @@ abstract class RewritingUrlQuery extends ModelCriteria
      *
      * @see       filterByRewritingUrlRelatedByRedirected()
      *
-     * @param mixed  $redirected The value to use as filter.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $redirected The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -460,13 +462,13 @@ abstract class RewritingUrlQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param mixed  $createdAt  The value to use as filter.
-     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
-     *                           Empty strings are treated as NULL.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -503,13 +505,13 @@ abstract class RewritingUrlQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param mixed  $updatedAt  The value to use as filter.
-     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
-     *                           Empty strings are treated as NULL.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -540,7 +542,7 @@ abstract class RewritingUrlQuery extends ModelCriteria
      * Filter the query by a related \Thelia\Model\RewritingUrl object
      *
      * @param \Thelia\Model\RewritingUrl|ObjectCollection $rewritingUrl The related object(s) to use as filter
-     * @param string                                      $comparison   Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -564,8 +566,8 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the RewritingUrlRelatedByRedirected relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -598,11 +600,11 @@ abstract class RewritingUrlQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\RewritingUrlQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\RewritingUrlQuery A secondary query class using the current class as primary query
      */
     public function useRewritingUrlRelatedByRedirectedQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -614,8 +616,8 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\RewritingUrl object
      *
-     * @param \Thelia\Model\RewritingUrl|ObjectCollection $rewritingUrl the related object to use as filter
-     * @param string                                      $comparison   Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\RewritingUrl|ObjectCollection $rewritingUrl  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -637,8 +639,8 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the RewritingUrlRelatedById relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -671,11 +673,11 @@ abstract class RewritingUrlQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\RewritingUrlQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\RewritingUrlQuery A secondary query class using the current class as primary query
      */
     public function useRewritingUrlRelatedByIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -687,8 +689,8 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\RewritingArgument object
      *
-     * @param \Thelia\Model\RewritingArgument|ObjectCollection $rewritingArgument the related object to use as filter
-     * @param string                                           $comparison        Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\RewritingArgument|ObjectCollection $rewritingArgument  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -710,8 +712,8 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the RewritingArgument relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -744,11 +746,11 @@ abstract class RewritingUrlQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\RewritingArgumentQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\RewritingArgumentQuery A secondary query class using the current class as primary query
      */
     public function useRewritingArgumentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -760,7 +762,7 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param ChildRewritingUrl $rewritingUrl Object to remove from the list of results
+     * @param   ChildRewritingUrl $rewritingUrl Object to remove from the list of results
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
@@ -776,8 +778,8 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Deletes all rows from the rewriting_url table.
      *
-     * @param  ConnectionInterface $con the connection to use
-     * @return int                 The number of affected rows (if supported by underlying database driver).
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -808,13 +810,13 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildRewritingUrl or Criteria object OR a primary key value.
      *
-     * @param  mixed               $values Criteria or ChildRewritingUrl object or primary key or array of primary keys
-     *                                     which is used to create the DELETE statement
-     * @param  ConnectionInterface $con    the connection to use
-     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                                    if supported by native driver or if emulated using Propel.
-     * @throws PropelException     Any exceptions caught during processing will be
-     *                                    rethrown wrapped into a PropelException.
+     * @param mixed               $values Criteria or ChildRewritingUrl object or primary key or array of primary keys
+     *              which is used to create the DELETE statement
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
+     * @throws PropelException Any exceptions caught during processing will be
+     *         rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -834,6 +836,7 @@ abstract class RewritingUrlQuery extends ModelCriteria
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
+
         RewritingUrlTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
@@ -852,9 +855,9 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param int $nbDays Maximum age of the latest update in days
+     * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return ChildRewritingUrlQuery The current query, for fluid interface
+     * @return     ChildRewritingUrlQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
@@ -864,9 +867,9 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Filter by the latest created
      *
-     * @param int $nbDays Maximum age of in days
+     * @param      int $nbDays Maximum age of in days
      *
-     * @return ChildRewritingUrlQuery The current query, for fluid interface
+     * @return     ChildRewritingUrlQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
@@ -876,7 +879,7 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Order by update date desc
      *
-     * @return ChildRewritingUrlQuery The current query, for fluid interface
+     * @return     ChildRewritingUrlQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
@@ -886,7 +889,7 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Order by update date asc
      *
-     * @return ChildRewritingUrlQuery The current query, for fluid interface
+     * @return     ChildRewritingUrlQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
@@ -896,7 +899,7 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Order by create date desc
      *
-     * @return ChildRewritingUrlQuery The current query, for fluid interface
+     * @return     ChildRewritingUrlQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
@@ -906,7 +909,7 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Order by create date asc
      *
-     * @return ChildRewritingUrlQuery The current query, for fluid interface
+     * @return     ChildRewritingUrlQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {

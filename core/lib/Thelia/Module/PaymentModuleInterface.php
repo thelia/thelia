@@ -37,7 +37,7 @@ interface PaymentModuleInterface extends BaseModuleInterface
      *  In many cases, it's necessary to send a form to the payment gateway. On your response you can return this form already
      *  completed, ready to be sent
      *
-     * @param \Thelia\Model\Order $order processed order
+     * @param  \Thelia\Model\Order                       $order processed order
      * @return null|\Thelia\Core\HttpFoundation\Response
      */
     public function pay(Order $order);

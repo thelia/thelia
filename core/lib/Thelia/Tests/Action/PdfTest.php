@@ -26,7 +26,6 @@ namespace Thelia\Tests\Action;
 use Thelia\Action\Pdf;
 use Thelia\Core\Event\PdfEvent;
 
-
 /**
  * Class PdfTest
  * @package Thelia\Tests\Action
@@ -47,4 +46,4 @@ class PdfTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($generatedPdf);
     }
 
-} 
+}

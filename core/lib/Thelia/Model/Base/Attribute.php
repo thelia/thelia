@@ -38,6 +38,7 @@ abstract class Attribute implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\AttributeTableMap';
 
+
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -378,9 +379,9 @@ abstract class Attribute implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed  $parser A AbstractParser instance,
+     * @param mixed $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data   The source data to import from
+     * @param string $data The source data to import from
      *
      * @return Attribute The current object, for fluid interface
      */
@@ -430,20 +431,22 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getId()
     {
+
         return $this->id;
     }
 
     /**
      * Get the [position] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getPosition()
     {
+
         return $this->position;
     }
 
@@ -451,8 +454,8 @@ abstract class Attribute implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -471,8 +474,8 @@ abstract class Attribute implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -490,8 +493,8 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Set the value of [id] column.
      *
-     * @param  int                     $v new value
-     * @return \Thelia\Model\Attribute The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Attribute The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -504,14 +507,15 @@ abstract class Attribute implements ActiveRecordInterface
             $this->modifiedColumns[AttributeTableMap::ID] = true;
         }
 
+
         return $this;
     } // setId()
 
     /**
      * Set the value of [position] column.
      *
-     * @param  int                     $v new value
-     * @return \Thelia\Model\Attribute The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Attribute The current object (for fluent API support)
      */
     public function setPosition($v)
     {
@@ -524,15 +528,16 @@ abstract class Attribute implements ActiveRecordInterface
             $this->modifiedColumns[AttributeTableMap::POSITION] = true;
         }
 
+
         return $this;
     } // setPosition()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                   $v string, integer (timestamp), or \DateTime value.
-     *                                    Empty strings are treated as NULL.
-     * @return \Thelia\Model\Attribute The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\Attribute The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -544,15 +549,16 @@ abstract class Attribute implements ActiveRecordInterface
             }
         } // if either are not null
 
+
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                   $v string, integer (timestamp), or \DateTime value.
-     *                                    Empty strings are treated as NULL.
-     * @return \Thelia\Model\Attribute The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\Attribute The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -563,6 +569,7 @@ abstract class Attribute implements ActiveRecordInterface
                 $this->modifiedColumns[AttributeTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
+
 
         return $this;
     } // setUpdatedAt()
@@ -658,10 +665,10 @@ abstract class Attribute implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
-     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
+     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
+     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -705,7 +712,7 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param  ConnectionInterface $con
+     * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see Attribute::setDeleted()
@@ -748,8 +755,8 @@ abstract class Attribute implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -810,8 +817,8 @@ abstract class Attribute implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -937,7 +944,7 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1009,7 +1016,7 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1025,12 +1032,12 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param  string $name name
-     * @param  string $type The type of fieldname the $name is of:
-     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                      Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed  Value of field.
+     * @param      string $name name
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1044,7 +1051,7 @@ abstract class Attribute implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos position in xml schema
+     * @param      int $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1074,12 +1081,12 @@ abstract class Attribute implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                                        Defaults to TableMap::TYPE_PHPNAME.
-     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
-     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                    Defaults to TableMap::TYPE_PHPNAME.
+     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1122,12 +1129,12 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param  string $name
-     * @param  mixed  $value field value
-     * @param  string $type  The type of fieldname the $name is of:
-     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                       Defaults to TableMap::TYPE_PHPNAME.
+     * @param      string $name
+     * @param      mixed  $value field value
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1141,8 +1148,8 @@ abstract class Attribute implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos   position in xml schema
-     * @param  mixed $value field value
+     * @param      int $pos position in xml schema
+     * @param      mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1176,8 +1183,8 @@ abstract class Attribute implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param  array  $arr     An array to populate the object from.
-     * @param  string $keyType The type of keys the array uses.
+     * @param      array  $arr     An array to populate the object from.
+     * @param      string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1203,6 +1210,7 @@ abstract class Attribute implements ActiveRecordInterface
         if ($this->isColumnModified(AttributeTableMap::POSITION)) $criteria->add(AttributeTableMap::POSITION, $this->position);
         if ($this->isColumnModified(AttributeTableMap::CREATED_AT)) $criteria->add(AttributeTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(AttributeTableMap::UPDATED_AT)) $criteria->add(AttributeTableMap::UPDATED_AT, $this->updated_at);
+
         return $criteria;
     }
 
@@ -1224,7 +1232,7 @@ abstract class Attribute implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return int
+     * @return   int
      */
     public function getPrimaryKey()
     {
@@ -1234,7 +1242,7 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param  int  $key Primary key.
+     * @param       int $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -1248,6 +1256,7 @@ abstract class Attribute implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
+
         return null === $this->getId();
     }
 
@@ -1257,9 +1266,9 @@ abstract class Attribute implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  object          $copyObj  An object of \Thelia\Model\Attribute (or compatible) type.
-     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
+     * @param      object $copyObj An object of \Thelia\Model\Attribute (or compatible) type.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1313,8 +1322,8 @@ abstract class Attribute implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  boolean                 $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Thelia\Model\Attribute Clone of current object.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return                 \Thelia\Model\Attribute Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1333,7 +1342,7 @@ abstract class Attribute implements ActiveRecordInterface
      * Avoids crafting an 'init[$relationName]s' method name
      * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param  string $relationName The name of the relation to initialize
+     * @param      string $relationName The name of the relation to initialize
      * @return void
      */
     public function initRelation($relationName)
@@ -1381,8 +1390,8 @@ abstract class Attribute implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -1404,8 +1413,8 @@ abstract class Attribute implements ActiveRecordInterface
      * If this ChildAttribute is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                      $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface           $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildAttributeAv[] List of ChildAttributeAv objects
      * @throws PropelException
      */
@@ -1461,13 +1470,14 @@ abstract class Attribute implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $attributeAvs A Propel collection.
-     * @param  ConnectionInterface $con          Optional connection object
-     * @return ChildAttribute      The current object (for fluent API support)
+     * @param      Collection $attributeAvs A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildAttribute The current object (for fluent API support)
      */
     public function setAttributeAvs(Collection $attributeAvs, ConnectionInterface $con = null)
     {
         $attributeAvsToDelete = $this->getAttributeAvs(new Criteria(), $con)->diff($attributeAvs);
+
 
         $this->attributeAvsScheduledForDeletion = $attributeAvsToDelete;
 
@@ -1489,10 +1499,10 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Returns the number of related AttributeAv objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related AttributeAv objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related AttributeAv objects.
      * @throws PropelException
      */
     public function countAttributeAvs(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -1524,8 +1534,8 @@ abstract class Attribute implements ActiveRecordInterface
      * Method called to associate a ChildAttributeAv object to this object
      * through the ChildAttributeAv foreign key attribute.
      *
-     * @param  ChildAttributeAv        $l ChildAttributeAv
-     * @return \Thelia\Model\Attribute The current object (for fluent API support)
+     * @param    ChildAttributeAv $l ChildAttributeAv
+     * @return   \Thelia\Model\Attribute The current object (for fluent API support)
      */
     public function addAttributeAv(ChildAttributeAv $l)
     {
@@ -1551,7 +1561,7 @@ abstract class Attribute implements ActiveRecordInterface
     }
 
     /**
-     * @param  AttributeAv    $attributeAv The attributeAv object to remove.
+     * @param  AttributeAv $attributeAv The attributeAv object to remove.
      * @return ChildAttribute The current object (for fluent API support)
      */
     public function removeAttributeAv($attributeAv)
@@ -1598,8 +1608,8 @@ abstract class Attribute implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -1621,8 +1631,8 @@ abstract class Attribute implements ActiveRecordInterface
      * If this ChildAttribute is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                               $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface                    $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildAttributeCombination[] List of ChildAttributeCombination objects
      * @throws PropelException
      */
@@ -1678,13 +1688,14 @@ abstract class Attribute implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $attributeCombinations A Propel collection.
-     * @param  ConnectionInterface $con                   Optional connection object
-     * @return ChildAttribute      The current object (for fluent API support)
+     * @param      Collection $attributeCombinations A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildAttribute The current object (for fluent API support)
      */
     public function setAttributeCombinations(Collection $attributeCombinations, ConnectionInterface $con = null)
     {
         $attributeCombinationsToDelete = $this->getAttributeCombinations(new Criteria(), $con)->diff($attributeCombinations);
+
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
@@ -1709,10 +1720,10 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Returns the number of related AttributeCombination objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related AttributeCombination objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related AttributeCombination objects.
      * @throws PropelException
      */
     public function countAttributeCombinations(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -1744,8 +1755,8 @@ abstract class Attribute implements ActiveRecordInterface
      * Method called to associate a ChildAttributeCombination object to this object
      * through the ChildAttributeCombination foreign key attribute.
      *
-     * @param  ChildAttributeCombination $l ChildAttributeCombination
-     * @return \Thelia\Model\Attribute   The current object (for fluent API support)
+     * @param    ChildAttributeCombination $l ChildAttributeCombination
+     * @return   \Thelia\Model\Attribute The current object (for fluent API support)
      */
     public function addAttributeCombination(ChildAttributeCombination $l)
     {
@@ -1772,7 +1783,7 @@ abstract class Attribute implements ActiveRecordInterface
 
     /**
      * @param  AttributeCombination $attributeCombination The attributeCombination object to remove.
-     * @return ChildAttribute       The current object (for fluent API support)
+     * @return ChildAttribute The current object (for fluent API support)
      */
     public function removeAttributeCombination($attributeCombination)
     {
@@ -1789,6 +1800,7 @@ abstract class Attribute implements ActiveRecordInterface
         return $this;
     }
 
+
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -1800,9 +1812,9 @@ abstract class Attribute implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Attribute.
      *
-     * @param  Criteria                               $criteria     optional Criteria object to narrow the query
-     * @param  ConnectionInterface                    $con          optional connection object
-     * @param  string                                 $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildAttributeCombination[] List of ChildAttributeCombination objects
      */
     public function getAttributeCombinationsJoinAttributeAv($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -1813,6 +1825,7 @@ abstract class Attribute implements ActiveRecordInterface
         return $this->getAttributeCombinations($query, $con);
     }
 
+
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -1824,9 +1837,9 @@ abstract class Attribute implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Attribute.
      *
-     * @param  Criteria                               $criteria     optional Criteria object to narrow the query
-     * @param  ConnectionInterface                    $con          optional connection object
-     * @param  string                                 $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildAttributeCombination[] List of ChildAttributeCombination objects
      */
     public function getAttributeCombinationsJoinProductSaleElements($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -1866,8 +1879,8 @@ abstract class Attribute implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -1889,8 +1902,8 @@ abstract class Attribute implements ActiveRecordInterface
      * If this ChildAttribute is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                            $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface                 $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildAttributeTemplate[] List of ChildAttributeTemplate objects
      * @throws PropelException
      */
@@ -1946,13 +1959,14 @@ abstract class Attribute implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $attributeTemplates A Propel collection.
-     * @param  ConnectionInterface $con                Optional connection object
-     * @return ChildAttribute      The current object (for fluent API support)
+     * @param      Collection $attributeTemplates A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildAttribute The current object (for fluent API support)
      */
     public function setAttributeTemplates(Collection $attributeTemplates, ConnectionInterface $con = null)
     {
         $attributeTemplatesToDelete = $this->getAttributeTemplates(new Criteria(), $con)->diff($attributeTemplates);
+
 
         $this->attributeTemplatesScheduledForDeletion = $attributeTemplatesToDelete;
 
@@ -1974,10 +1988,10 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Returns the number of related AttributeTemplate objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related AttributeTemplate objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related AttributeTemplate objects.
      * @throws PropelException
      */
     public function countAttributeTemplates(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2009,8 +2023,8 @@ abstract class Attribute implements ActiveRecordInterface
      * Method called to associate a ChildAttributeTemplate object to this object
      * through the ChildAttributeTemplate foreign key attribute.
      *
-     * @param  ChildAttributeTemplate  $l ChildAttributeTemplate
-     * @return \Thelia\Model\Attribute The current object (for fluent API support)
+     * @param    ChildAttributeTemplate $l ChildAttributeTemplate
+     * @return   \Thelia\Model\Attribute The current object (for fluent API support)
      */
     public function addAttributeTemplate(ChildAttributeTemplate $l)
     {
@@ -2037,7 +2051,7 @@ abstract class Attribute implements ActiveRecordInterface
 
     /**
      * @param  AttributeTemplate $attributeTemplate The attributeTemplate object to remove.
-     * @return ChildAttribute    The current object (for fluent API support)
+     * @return ChildAttribute The current object (for fluent API support)
      */
     public function removeAttributeTemplate($attributeTemplate)
     {
@@ -2054,6 +2068,7 @@ abstract class Attribute implements ActiveRecordInterface
         return $this;
     }
 
+
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2065,9 +2080,9 @@ abstract class Attribute implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Attribute.
      *
-     * @param  Criteria                            $criteria     optional Criteria object to narrow the query
-     * @param  ConnectionInterface                 $con          optional connection object
-     * @param  string                              $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildAttributeTemplate[] List of ChildAttributeTemplate objects
      */
     public function getAttributeTemplatesJoinTemplate($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2107,8 +2122,8 @@ abstract class Attribute implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -2130,8 +2145,8 @@ abstract class Attribute implements ActiveRecordInterface
      * If this ChildAttribute is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                        $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface             $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildAttributeI18n[] List of ChildAttributeI18n objects
      * @throws PropelException
      */
@@ -2187,13 +2202,14 @@ abstract class Attribute implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $attributeI18ns A Propel collection.
-     * @param  ConnectionInterface $con            Optional connection object
-     * @return ChildAttribute      The current object (for fluent API support)
+     * @param      Collection $attributeI18ns A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildAttribute The current object (for fluent API support)
      */
     public function setAttributeI18ns(Collection $attributeI18ns, ConnectionInterface $con = null)
     {
         $attributeI18nsToDelete = $this->getAttributeI18ns(new Criteria(), $con)->diff($attributeI18ns);
+
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
@@ -2218,10 +2234,10 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Returns the number of related AttributeI18n objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related AttributeI18n objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related AttributeI18n objects.
      * @throws PropelException
      */
     public function countAttributeI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2253,8 +2269,8 @@ abstract class Attribute implements ActiveRecordInterface
      * Method called to associate a ChildAttributeI18n object to this object
      * through the ChildAttributeI18n foreign key attribute.
      *
-     * @param  ChildAttributeI18n      $l ChildAttributeI18n
-     * @return \Thelia\Model\Attribute The current object (for fluent API support)
+     * @param    ChildAttributeI18n $l ChildAttributeI18n
+     * @return   \Thelia\Model\Attribute The current object (for fluent API support)
      */
     public function addAttributeI18n(ChildAttributeI18n $l)
     {
@@ -2284,7 +2300,7 @@ abstract class Attribute implements ActiveRecordInterface
     }
 
     /**
-     * @param  AttributeI18n  $attributeI18n The attributeI18n object to remove.
+     * @param  AttributeI18n $attributeI18n The attributeI18n object to remove.
      * @return ChildAttribute The current object (for fluent API support)
      */
     public function removeAttributeI18n($attributeI18n)
@@ -2342,8 +2358,8 @@ abstract class Attribute implements ActiveRecordInterface
      * If this ChildAttribute is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param Criteria            $criteria Optional query object to filter the query
-     * @param ConnectionInterface $con      Optional connection object
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
      *
      * @return ObjectCollection|ChildTemplate[] List of ChildTemplate objects
      */
@@ -2373,9 +2389,9 @@ abstract class Attribute implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $templates A Propel collection.
-     * @param  ConnectionInterface $con       Optional connection object
-     * @return ChildAttribute      The current object (for fluent API support)
+     * @param  Collection $templates A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return ChildAttribute The current object (for fluent API support)
      */
     public function setTemplates(Collection $templates, ConnectionInterface $con = null)
     {
@@ -2399,9 +2415,9 @@ abstract class Attribute implements ActiveRecordInterface
      * Gets the number of ChildTemplate objects related by a many-to-many relationship
      * to the current object by way of the attribute_template cross-reference table.
      *
-     * @param Criteria            $criteria Optional query object to filter the query
-     * @param boolean             $distinct Set to true to force count distinct
-     * @param ConnectionInterface $con      Optional connection object
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
      *
      * @return int the number of related ChildTemplate objects
      */
@@ -2429,7 +2445,7 @@ abstract class Attribute implements ActiveRecordInterface
      * Associate a ChildTemplate object to this object
      * through the attribute_template cross reference table.
      *
-     * @param  ChildTemplate  $template The ChildAttributeTemplate object to relate
+     * @param  ChildTemplate $template The ChildAttributeTemplate object to relate
      * @return ChildAttribute The current object (for fluent API support)
      */
     public function addTemplate(ChildTemplate $template)
@@ -2447,7 +2463,7 @@ abstract class Attribute implements ActiveRecordInterface
     }
 
     /**
-     * @param Template $template The template object to add.
+     * @param    Template $template The template object to add.
      */
     protected function doAddTemplate($template)
     {
@@ -2466,7 +2482,7 @@ abstract class Attribute implements ActiveRecordInterface
      * Remove a ChildTemplate object to this object
      * through the attribute_template cross reference table.
      *
-     * @param  ChildTemplate  $template The ChildAttributeTemplate object to relate
+     * @param ChildTemplate $template The ChildAttributeTemplate object to relate
      * @return ChildAttribute The current object (for fluent API support)
      */
     public function removeTemplate(ChildTemplate $template)
@@ -2508,7 +2524,7 @@ abstract class Attribute implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param boolean $deep Whether to also clear the references on all referrer objects.
+     * @param      boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -2566,7 +2582,7 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return ChildAttribute The current object (for fluent API support)
+     * @return     ChildAttribute The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
@@ -2580,9 +2596,9 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Sets the locale for translations
      *
-     * @param string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
      *
-     * @return ChildAttribute The current object (for fluent API support)
+     * @return    ChildAttribute The current object (for fluent API support)
      */
     public function setLocale($locale = 'en_US')
     {
@@ -2594,7 +2610,7 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Gets the locale for translations
      *
-     * @return string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
      */
     public function getLocale()
     {
@@ -2604,8 +2620,8 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Returns the current translation for a given locale
      *
-     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param ConnectionInterface $con    an optional connection object
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildAttributeI18n */
     public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
@@ -2638,10 +2654,10 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Remove the translation for a given locale
      *
-     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param ConnectionInterface $con    an optional connection object
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     ConnectionInterface $con an optional connection object
      *
-     * @return ChildAttribute The current object (for fluent API support)
+     * @return    ChildAttribute The current object (for fluent API support)
      */
     public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
@@ -2666,13 +2682,14 @@ abstract class Attribute implements ActiveRecordInterface
     /**
      * Returns the current translation
      *
-     * @param ConnectionInterface $con an optional connection object
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildAttributeI18n */
     public function getCurrentTranslation(ConnectionInterface $con = null)
     {
         return $this->getTranslation($this->getLocale(), $con);
     }
+
 
         /**
          * Get the [title] column value.
@@ -2683,6 +2700,7 @@ abstract class Attribute implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getTitle();
     }
+
 
         /**
          * Set the value of [title] column.
@@ -2696,6 +2714,7 @@ abstract class Attribute implements ActiveRecordInterface
         return $this;
     }
 
+
         /**
          * Get the [description] column value.
          *
@@ -2705,6 +2724,7 @@ abstract class Attribute implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getDescription();
     }
+
 
         /**
          * Set the value of [description] column.
@@ -2718,6 +2738,7 @@ abstract class Attribute implements ActiveRecordInterface
         return $this;
     }
 
+
         /**
          * Get the [chapo] column value.
          *
@@ -2727,6 +2748,7 @@ abstract class Attribute implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getChapo();
     }
+
 
         /**
          * Set the value of [chapo] column.
@@ -2740,6 +2762,7 @@ abstract class Attribute implements ActiveRecordInterface
         return $this;
     }
 
+
         /**
          * Get the [postscriptum] column value.
          *
@@ -2749,6 +2772,7 @@ abstract class Attribute implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getPostscriptum();
     }
+
 
         /**
          * Set the value of [postscriptum] column.
@@ -2837,6 +2861,7 @@ abstract class Attribute implements ActiveRecordInterface
     {
 
     }
+
 
     /**
      * Derived method to catches calls to undefined methods.

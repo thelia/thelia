@@ -39,7 +39,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
  * @package Thelia\Tests\Action
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class MessageTest extends \PHPUnit_Framework_TestCase
+class Message extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var ContainerBuilder $container

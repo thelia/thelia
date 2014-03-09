@@ -28,7 +28,6 @@ use Thelia\Model\Newsletter as NewsletterModel;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Model\NewsletterQuery;
 
-
 /**
  * Class NewsletterTest
  * @package Thelia\Tests\Action
@@ -110,4 +109,4 @@ class NewsletterTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Thelia\Model\Newsletter', $deletedNewsletter);
         $this->assertTrue($deletedNewsletter->isDeleted());
     }
-} 
+}

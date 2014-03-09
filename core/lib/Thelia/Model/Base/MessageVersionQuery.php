@@ -91,9 +91,9 @@ abstract class MessageVersionQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\MessageVersionQuery object.
      *
-     * @param string $dbName     The database name
-     * @param string $modelName  The phpName of a model, e.g. 'Book'
-     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param     string $dbName The database name
+     * @param     string $modelName The phpName of a model, e.g. 'Book'
+     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\MessageVersion', $modelAlias = null)
     {
@@ -103,8 +103,8 @@ abstract class MessageVersionQuery extends ModelCriteria
     /**
      * Returns a new ChildMessageVersionQuery object.
      *
-     * @param string   $modelAlias The alias of a model in the query
-     * @param Criteria $criteria   Optional Criteria to build the query from
+     * @param     string $modelAlias The alias of a model in the query
+     * @param     Criteria $criteria Optional Criteria to build the query from
      *
      * @return ChildMessageVersionQuery
      */
@@ -164,10 +164,10 @@ abstract class MessageVersionQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param mixed               $key Primary key to use for the query
-     * @param ConnectionInterface $con A connection object
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildMessageVersion A model object, or null if the key is not found
+     * @return   ChildMessageVersion A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -195,8 +195,8 @@ abstract class MessageVersionQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param mixed               $key Primary key to use for the query
-     * @param ConnectionInterface $con A connection object
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
      *
      * @return ChildMessageVersion|array|mixed the result, formatted by the current formatter
      */
@@ -216,8 +216,8 @@ abstract class MessageVersionQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
      * </code>
-     * @param array               $keys Primary keys to use for the query
-     * @param ConnectionInterface $con  an optional connection object
+     * @param     array $keys Primary keys to use for the query
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -238,7 +238,7 @@ abstract class MessageVersionQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param mixed $key Primary key to use for the query
+     * @param     mixed $key Primary key to use for the query
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -253,7 +253,7 @@ abstract class MessageVersionQuery extends ModelCriteria
     /**
      * Filter the query by a list of primary keys
      *
-     * @param array $keys The list of primary key to use for the query
+     * @param     array $keys The list of primary key to use for the query
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -284,11 +284,11 @@ abstract class MessageVersionQuery extends ModelCriteria
      *
      * @see       filterByMessage()
      *
-     * @param mixed  $id         The value to use as filter.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -324,9 +324,9 @@ abstract class MessageVersionQuery extends ModelCriteria
      * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
      * </code>
      *
-     * @param string $name       The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $name The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -354,11 +354,11 @@ abstract class MessageVersionQuery extends ModelCriteria
      * $query->filterBySecured(array('min' => 12)); // WHERE secured > 12
      * </code>
      *
-     * @param mixed  $secured    The value to use as filter.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $secured The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -394,9 +394,9 @@ abstract class MessageVersionQuery extends ModelCriteria
      * $query->filterByTextLayoutFileName('%fooValue%'); // WHERE text_layout_file_name LIKE '%fooValue%'
      * </code>
      *
-     * @param string $textLayoutFileName The value to use as filter.
-     *                                   Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison         Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $textLayoutFileName The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -423,9 +423,9 @@ abstract class MessageVersionQuery extends ModelCriteria
      * $query->filterByTextTemplateFileName('%fooValue%'); // WHERE text_template_file_name LIKE '%fooValue%'
      * </code>
      *
-     * @param string $textTemplateFileName The value to use as filter.
-     *                                     Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison           Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $textTemplateFileName The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -452,9 +452,9 @@ abstract class MessageVersionQuery extends ModelCriteria
      * $query->filterByHtmlLayoutFileName('%fooValue%'); // WHERE html_layout_file_name LIKE '%fooValue%'
      * </code>
      *
-     * @param string $htmlLayoutFileName The value to use as filter.
-     *                                   Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison         Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $htmlLayoutFileName The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -481,9 +481,9 @@ abstract class MessageVersionQuery extends ModelCriteria
      * $query->filterByHtmlTemplateFileName('%fooValue%'); // WHERE html_template_file_name LIKE '%fooValue%'
      * </code>
      *
-     * @param string $htmlTemplateFileName The value to use as filter.
-     *                                     Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison           Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $htmlTemplateFileName The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -511,13 +511,13 @@ abstract class MessageVersionQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param mixed  $createdAt  The value to use as filter.
-     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
-     *                           Empty strings are treated as NULL.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -554,13 +554,13 @@ abstract class MessageVersionQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param mixed  $updatedAt  The value to use as filter.
-     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
-     *                           Empty strings are treated as NULL.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -597,11 +597,11 @@ abstract class MessageVersionQuery extends ModelCriteria
      * $query->filterByVersion(array('min' => 12)); // WHERE version > 12
      * </code>
      *
-     * @param mixed  $version    The value to use as filter.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $version The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -638,13 +638,13 @@ abstract class MessageVersionQuery extends ModelCriteria
      * $query->filterByVersionCreatedAt(array('max' => 'yesterday')); // WHERE version_created_at > '2011-03-13'
      * </code>
      *
-     * @param mixed  $versionCreatedAt The value to use as filter.
-     *                                 Values can be integers (unix timestamps), DateTime objects, or strings.
-     *                                 Empty strings are treated as NULL.
-     *                                 Use scalar values for equality.
-     *                                 Use array values for in_array() equivalent.
-     *                                 Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison       Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $versionCreatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -680,9 +680,9 @@ abstract class MessageVersionQuery extends ModelCriteria
      * $query->filterByVersionCreatedBy('%fooValue%'); // WHERE version_created_by LIKE '%fooValue%'
      * </code>
      *
-     * @param string $versionCreatedBy The value to use as filter.
-     *                                 Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison       Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $versionCreatedBy The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -703,8 +703,8 @@ abstract class MessageVersionQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Message object
      *
-     * @param \Thelia\Model\Message|ObjectCollection $message    The related object(s) to use as filter
-     * @param string                                 $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Message|ObjectCollection $message The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -728,8 +728,8 @@ abstract class MessageVersionQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Message relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -762,11 +762,11 @@ abstract class MessageVersionQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\MessageQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\MessageQuery A secondary query class using the current class as primary query
      */
     public function useMessageQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -778,7 +778,7 @@ abstract class MessageVersionQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param ChildMessageVersion $messageVersion Object to remove from the list of results
+     * @param   ChildMessageVersion $messageVersion Object to remove from the list of results
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
@@ -796,8 +796,8 @@ abstract class MessageVersionQuery extends ModelCriteria
     /**
      * Deletes all rows from the message_version table.
      *
-     * @param  ConnectionInterface $con the connection to use
-     * @return int                 The number of affected rows (if supported by underlying database driver).
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -828,13 +828,13 @@ abstract class MessageVersionQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildMessageVersion or Criteria object OR a primary key value.
      *
-     * @param  mixed               $values Criteria or ChildMessageVersion object or primary key or array of primary keys
-     *                                     which is used to create the DELETE statement
-     * @param  ConnectionInterface $con    the connection to use
-     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                                    if supported by native driver or if emulated using Propel.
-     * @throws PropelException     Any exceptions caught during processing will be
-     *                                    rethrown wrapped into a PropelException.
+     * @param mixed               $values Criteria or ChildMessageVersion object or primary key or array of primary keys
+     *              which is used to create the DELETE statement
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
+     * @throws PropelException Any exceptions caught during processing will be
+     *         rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -853,6 +853,7 @@ abstract class MessageVersionQuery extends ModelCriteria
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
+
 
         MessageVersionTableMap::removeInstanceFromPool($criteria);
 

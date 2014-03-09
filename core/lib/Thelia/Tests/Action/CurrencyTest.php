@@ -30,7 +30,6 @@ use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
 use Thelia\Model\CurrencyQuery;
 
-
 /**
  * Class CurrencyTest
  * @package Thelia\Tests\Action
@@ -39,7 +38,7 @@ use Thelia\Model\CurrencyQuery;
 class CurrencyTest extends \PHPUnit_Framework_TestCase
 {
 
-    protected  $dispatcher;
+    protected $dispatcher;
 
     public function setUp()
     {

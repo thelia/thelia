@@ -2,8 +2,6 @@
 
 namespace Thelia\Tests\Core\HttpFoundation;
 
-
-
 /**
  * the the helpers addinf in Request class
  *
