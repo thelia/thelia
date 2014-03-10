@@ -35,10 +35,10 @@ abstract class AbstractSmartyPlugin
     /**
      * Explode a comma separated list in a array, trimming all array elements
      *
-     * @param  unknown    $commaSeparatedValues
-     * @return multitype:
+     * @param  mixed    $commaSeparatedValues
+     * @return mixed:
      */
-    protected function _explode($commaSeparatedValues)
+    protected function explode($commaSeparatedValues)
     {
         if (null === $commaSeparatedValues) {
             return array();

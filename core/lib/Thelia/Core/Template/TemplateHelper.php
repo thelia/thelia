@@ -139,7 +139,7 @@ class TemplateHelper
         }
     }
 
-    protected function normalize_path($path)
+    protected function normalizePath($path)
     {
         $path = str_replace(
             str_replace('\\', '/', THELIA_ROOT),
@@ -203,7 +203,7 @@ class TemplateHelper
 
                         if ($content = file_get_contents($fileInfo->getPathName())) {
 
-                            $short_path = $this->normalize_path($fileInfo->getPathName());
+                            $short_path = $this->normalizePath($fileInfo->getPathName());
 
                             Tlog::getInstance()->debug("Examining file $short_path\n");
 
@@ -249,7 +249,7 @@ class TemplateHelper
     }
 
 
-    public function write_translation($file, $texts, $translations)
+    public function writeTranslation($file, $texts, $translations)
     {
         if ($fp = @fopen($file, 'w')) {
 

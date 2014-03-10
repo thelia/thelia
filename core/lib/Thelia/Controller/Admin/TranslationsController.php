@@ -117,7 +117,7 @@ class TranslationsController extends BaseAdminController
 
                             $translations = $this->getRequest()->get('translation', array());
 
-                            TemplateHelper::getInstance()->write_translation($file, $texts, $translations);
+                            TemplateHelper::getInstance()->writeTranslation($file, $texts, $translations);
 
                             if ($save_mode == 'stay')
                                 $this->redirectToRoute("admin.configuration.translations", $templateArguments);
