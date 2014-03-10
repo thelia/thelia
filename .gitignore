@@ -21,7 +21,6 @@ web/cache/*
 web/tinymce
 web/media
 phpdoc*.log
-php-cs
 xhprof/
 phpunit.phar
 .DS_Store
