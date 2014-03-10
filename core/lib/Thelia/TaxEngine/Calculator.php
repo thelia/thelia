@@ -216,31 +216,6 @@ class Calculator
         $untaxedPrice -= $currentFixTax;
         $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);
 
-        /*do {
-
-            $taxType = $taxRule->getTypeInstance();
-            $taxType->loadRequirements( $taxRule->getRequirements() );
-
-            $untaxedPrice -= $taxType->fixAmountRetriever();
-
-        } while ($taxRule = $this->taxRulesCollection->getPrevious());
-
-        $taxRule = $this->taxRulesCollection->getLast();
-
-        $currentTaxFactor = 0;
-        do {
-
-            $taxType = $taxRule->getTypeInstance();
-            $taxType->loadRequirements( $taxRule->getRequirements() );
-
-            $currentTaxFactor += $taxType->pricePercentRetriever($untaxedPrice);
-
-            $toto = true;
-
-        } while ($taxRule = $this->taxRulesCollection->getPrevious());
-
-        $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);*/
-
         return $untaxedPrice;
     }
 }

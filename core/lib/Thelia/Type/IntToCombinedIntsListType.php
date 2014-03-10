@@ -89,7 +89,8 @@ class IntToCombinedIntsListType extends BaseType
         $openingParenthesesCount = 0;
         $closingParenthesesCount = 0;
 
-        for ($i=0; $i<strlen($noSpaceString); $i++) {
+        $length = strlen($noSpaceString);
+        for ($i=0; $i< $length; $i++) {
             $char = $noSpaceString[$i];
             if ($char == '(') {
                 /* must be :

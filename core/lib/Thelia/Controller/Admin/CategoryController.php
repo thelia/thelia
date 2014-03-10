@@ -340,24 +340,6 @@ class CategoryController extends AbstractSeoCrudController
             return $response;
         }
 
-//        $content_id = intval($this->getRequest()->get('content_id'));
-//
-//        if ($content_id > 0) {
-//
-//            $event = new CategoryAddContentEvent(
-//                $this->getExistingObject(),
-//                $content_id
-//            );
-//
-//            try {
-//                $this->dispatch(TheliaEvents::CATEGORY_ADD_CONTENT, $event);
-//            }
-//            catch (\Exception $ex) {
-//                // Any error
-//                return $this->errorPage($ex);
-//            }
-//        }
-
         $this->redirectToEditionTemplate();
     }
 

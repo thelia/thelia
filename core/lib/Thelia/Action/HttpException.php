@@ -91,8 +91,6 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         // Define the template thant shoud be used
         $this->parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveFrontTemplate());
 
-        //$event->getRequest()->attributes->set('_view', ConfigQuery::getPageNotFoundView());
-
         $response = new Response($this->parser->render(ConfigQuery::getPageNotFoundView()), 404);
 
         $event->setResponse($response);

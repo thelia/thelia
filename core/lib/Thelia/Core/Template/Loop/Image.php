@@ -180,8 +180,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $source_id = $this->getSourceId();
             $id = $this->getId();
 
-            //echo "source = ".$this->getSourceId()."source_id=$source_id, id=$id<br />";
-
             if (is_null($source_id) && is_null($id)) {
                 throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }
@@ -235,7 +233,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         if (!is_null($exclude))
             $search->filterById($exclude, Criteria::NOT_IN);
 
-        // echo "sql=".$search->toString();
         return $search;
 
     }
@@ -273,10 +270,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         foreach ($loopResult->getResultDataCollection() as $result) {
-            // Create image processing event
-
-            // ERO : following is duplicated, guess it's useless at this point
-            //$event = new ImageEvent($this->request);
 
             // Setup required transformations
             if (! is_null($width)) $event->setWidth($width);

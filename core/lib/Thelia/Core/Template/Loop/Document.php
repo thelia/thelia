@@ -165,8 +165,6 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             $source_id = $this->getSourceId();
             $id = $this->getId();
 
-            // echo "source = ".$this->getSource().", id=".$source_id." - ".$this->getArg('source_id')->getValue()."<br />";
-
             if (is_null($source_id) && is_null($id)) {
                             throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }

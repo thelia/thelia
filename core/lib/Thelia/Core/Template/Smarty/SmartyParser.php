@@ -82,8 +82,6 @@ class SmartyParser extends Smarty implements ParserInterface
             $this->setForceCompile(false);
         }
 
-        //$this->enableSecurity();
-
         // The default HTTP status
         $this->status = 200;
 

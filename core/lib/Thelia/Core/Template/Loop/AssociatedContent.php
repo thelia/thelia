@@ -31,7 +31,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\CategoryAssociatedContentQuery;
-use Thelia\Type;
 
 /**
  *

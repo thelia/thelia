@@ -79,7 +79,6 @@ class TheliaHttpKernel extends HttpKernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        //$request->headers->set('X-Php-Ob-Level', ob_get_level());
         if ($type == HttpKernelInterface::MASTER_REQUEST) {
             $request = $this->initSession($request);
             $this->initParam($request);

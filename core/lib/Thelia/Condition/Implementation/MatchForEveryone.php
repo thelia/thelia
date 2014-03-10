@@ -23,7 +23,6 @@
 
 namespace Thelia\Condition\Implementation;
 
-use InvalidArgumentException;
 
 /**
  * Allow every one, perform no check

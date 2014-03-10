@@ -22,7 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\FeatureProduct;
-use Thelia\Model\FeatureProduct;
+
 
 class FeatureProductUpdateEvent extends FeatureProductEvent
 {

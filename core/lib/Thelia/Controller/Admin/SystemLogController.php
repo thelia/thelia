@@ -83,26 +83,12 @@ class SystemLogController extends BaseAdminController
         }
     }
 
+    /**
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     */
     public function defaultAction()
     {
         if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, array(), AccessManager::VIEW)) return $response;
-
-        /*
-        const VAR_LEVEL 		= "tlog_level";
-        const VAR_DESTINATIONS 	= "tlog_destinations";
-        const VAR_PREFIXE 		= "tlog_prefix";
-        const VAR_FILES 		= "tlog_files";
-        const VAR_IP                = "tlog_ip";
-        const VAR_SHOW_REDIRECT     = "tlog_show_redirect";
-
-        const DEFAULT_LEVEL     	= self::DEBUG;
-        const DEFAUT_DESTINATIONS   = "Thelia\Log\Destination\TlogDestinationFile";
-        const DEFAUT_PREFIXE 	= "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: ";
-        const DEFAUT_FILES 		= "*";
-        const DEFAUT_IP 		= "";
-        const DEFAUT_SHOW_REDIRECT  = 0;
-
-        */
 
         // Hydrate the general configuration form
         $systemLogForm = new SystemLogConfigurationForm($this->getRequest(), 'form', array(

@@ -22,9 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Core\Event\Customer;
 
-use Symfony\Component\EventDispatcher\Event;
-use Thelia\Model\Customer;
-
 /**
  * Class CustomerCreateOrUpdateEvent
  * @package Thelia\Core\Event

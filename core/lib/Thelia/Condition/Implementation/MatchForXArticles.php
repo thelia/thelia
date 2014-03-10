@@ -23,8 +23,6 @@
 
 namespace Thelia\Condition\Implementation;
 
-use InvalidArgumentException;
-
 use Thelia\Condition\Operators;
 use Thelia\Exception\InvalidConditionOperatorException;
 use Thelia\Exception\InvalidConditionValueException;
