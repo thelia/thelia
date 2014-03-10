@@ -46,9 +46,6 @@ class FeatureCreationForm extends BaseForm
                 ))
             )
             ->add("add_to_all"   , "checkbox"  , array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
                 "label" => Translator::getInstance()->trans("Add to all product templates"),
                 "label_attr" => array(
                     "for" => "add_to_all"
