@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Customer;
 
-
 class CustomerLoginEvent extends CustomerEvent
 {
     // Nothing specific :)

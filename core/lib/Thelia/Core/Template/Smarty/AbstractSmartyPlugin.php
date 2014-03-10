@@ -35,7 +35,7 @@ abstract class AbstractSmartyPlugin
     /**
      * Explode a comma separated list in a array, trimming all array elements
      *
-     * @param  mixed    $commaSeparatedValues
+     * @param  mixed  $commaSeparatedValues
      * @return mixed:
      */
     protected function explode($commaSeparatedValues)

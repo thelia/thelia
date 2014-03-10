@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\FeatureProduct;
 
-
 class FeatureProductUpdateEvent extends FeatureProductEvent
 {
     protected $product_id;

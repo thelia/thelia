@@ -23,7 +23,6 @@
 
 namespace Thelia\Condition\Implementation;
 
-
 /**
  * Allow every one, perform no check
  *
