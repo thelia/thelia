@@ -41,18 +41,6 @@ class TemplateModificationForm extends TemplateCreationForm
                         )
                     )
             ))
-/*
-            ->add('attributes', 'collection', array(
-                    'type'   => 'text',
-                    'options'  => array('required'  => false)
-            ))
-*/
-/* FIXME: doesn't work
-            ->add('features', 'collection', array(
-                    'type'   => 'text',
-                    'options'  => array('required'  => false)
-            ))
-*/
             ;
     }
 

@@ -49,7 +49,6 @@ class MoneyFormat extends NumberFormat
         $number = parent::format($number, $decimals, $decPoint, $thousandsSep);
 
         if ($symbol !== null) {
-            // FIXME: should be a parameter related to i18n configuration
             $number = $number . ' ' . $symbol;
         }
 

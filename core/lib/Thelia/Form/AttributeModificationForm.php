@@ -39,12 +39,6 @@ class AttributeModificationForm extends AttributeCreationForm
                         )
                     )
             ))
-/* FIXME: doesn't work
-            ->add('attribute_values', 'collection', array(
-                    'type'   => 'text',
-                    'options'  => array('required'  => false)
-            ))
-*/
         ;
 
         // Add standard description fields

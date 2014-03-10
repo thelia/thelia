@@ -35,7 +35,5 @@ class Redirect
 
             $response->send();
         }
-
-        exit;
     }
 }

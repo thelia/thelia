@@ -39,13 +39,7 @@ class FeatureModificationForm extends FeatureCreationForm
                         )
                     )
             ))
-/* FIXME: doesn't work
-            ->add('feature_values', 'collection', array(
-                    'type'   => 'text',
-                    'options'  => array('required'  => false)
-            ))
-*/
-        ;
+     ;
 
         // Add standard description fields
         $this->addStandardDescFields();

@@ -188,7 +188,6 @@ class TheliaHttpKernel extends HttpKernel
                     // TODO : search if http status 302 is the good one.
                     $redirect = new RedirectResponse($lang->getUrl(), 302);
                     $redirect->send();
-                    exit;
                 } else {
                     //the user is actually on the good domain, nothing to change
                     return null;

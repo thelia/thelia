@@ -449,7 +449,6 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Update object position (only for objects whichsupport that)
      *
-     * FIXME: integrate with genericUpdatePositionAction
      */
     public function updatePositionAction()
     {

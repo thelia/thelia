@@ -171,16 +171,6 @@ class AsseticAssetManager implements AssetManagerInterface
 
             $fs = new Filesystem();
 
-            // FIXME: locking or not locking ?
-            /*
-                        $lock_file = "$web_assets_directory_base/assets-".md5($source_assets_directory)."-generation-lock.txt";
-
-                        if (! $fp = fopen($lock_file, "w")) {
-                            throw new IOException(sprintf('Failed to open lock file %s', $lock_file));
-                        }
-
-                        if (flock($fp, LOCK_EX|LOCK_NB)) { // do an exclusive lock
-            */
             $tmp_dir = "$to_directory.tmp";
 
             $fs->remove($tmp_dir);

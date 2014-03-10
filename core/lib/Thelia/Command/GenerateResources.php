@@ -61,8 +61,7 @@ class GenerateResources extends ContainerAwareCommand
         $constants = $class->getConstants();
 
         if (count($constants) == 0) {
-            $output->writeln('No resources found');
-            exit;
+            throw new \RuntimeException('No resources found');
         }
 
         switch ($input->getOption("output")) {
