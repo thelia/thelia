@@ -495,22 +495,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             // Find previous and next product, in the default category.
             $default_category_id = $product->getDefaultCategoryId();
 
-            $previous = ProductQuery::create()
-                ->joinProductCategory()
-                ->where('ProductCategory.category_id = ?', $default_category_id)
-                ->filterByPosition($product->getPosition(), Criteria::LESS_THAN)
-                ->orderByPosition(Criteria::DESC)
-                ->findOne()
-            ;
-
-            $next = ProductQuery::create()
-                ->joinProductCategory()
-                ->where('ProductCategory.category_id = ?', $default_category_id)
-                ->filterByPosition($product->getPosition(), Criteria::GREATER_THAN)
-                ->orderByPosition(Criteria::ASC)
-                ->findOne()
-            ;
-
             $loopResultRow
                 ->set("ID"                      , $product->getId())
                 ->set("REF"                     , $product->getRef())
@@ -542,14 +526,36 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("POSITION"                , $product->getPosition())
                 ->set("VISIBLE"                 , $product->getVisible() ? "1" : "0")
                 ->set("TEMPLATE"                , $product->getTemplateId())
-                ->set("HAS_PREVIOUS"            , $previous != null ? 1 : 0)
-                ->set("HAS_NEXT"                , $next != null ? 1 : 0)
-                ->set("PREVIOUS"                , $previous != null ? $previous->getId() : -1)
-                ->set("NEXT"                    , $next != null ? $next->getId() : -1)
                 ->set("DEFAULT_CATEGORY"        , $default_category_id)
                 ->set("TAX_RULE_ID"             , $product->getTaxRuleId())
 
             ;
+
+            if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
+                // Find previous and next category
+                $previous = ProductQuery::create()
+                    ->joinProductCategory()
+                    ->where('ProductCategory.category_id = ?', $default_category_id)
+                    ->filterByPosition($product->getPosition(), Criteria::LESS_THAN)
+                    ->orderByPosition(Criteria::DESC)
+                    ->findOne()
+                ;
+
+                $next = ProductQuery::create()
+                    ->joinProductCategory()
+                    ->where('ProductCategory.category_id = ?', $default_category_id)
+                    ->filterByPosition($product->getPosition(), Criteria::GREATER_THAN)
+                    ->orderByPosition(Criteria::ASC)
+                    ->findOne()
+                ;
+
+                $loopResultRow
+                    ->set("HAS_PREVIOUS"     , $previous != null ? 1 : 0)
+                    ->set("HAS_NEXT"         , $next != null ? 1 : 0)
+                    ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)
+                    ->set("NEXT"             , $next != null ? $next->getId() : -1)
+                ;
+            }
 
             $loopResult->addRow($loopResultRow);
         }
