@@ -26,7 +26,7 @@ phpunit.phar
 .DS_Store
 phpmyadmin
 composer.phar
-web/.
+web/.htaccess
 
 # Ignore everything in the "modules" directory, except the "default modules"
 local/modules/*
