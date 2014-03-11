@@ -496,18 +496,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $default_category_id = $product->getDefaultCategoryId();
 
             $loopResultRow
-                ->set("ID"                      , $product->getId())
-                ->set("REF"                     , $product->getRef())
-                ->set("IS_TRANSLATED"           , $product->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"                  , $this->locale)
-                ->set("TITLE"                   , $product->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO"                   , $product->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION"             , $product->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM"            , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL"                     , $product->getUrl($this->locale))
-                ->set("META_TITLE"              , $product->getVirtualColumn('i18n_META_TITLE'))
-                ->set("META_DESCRIPTION"        , $product->getVirtualColumn('i18n_META_DESCRIPTION'))
-                ->set("META_KEYWORDS"            , $product->getVirtualColumn('i18n_META_KEYWORDS'))
+                ->set("WEIGHT"                  , $product->getVirtualColumn('weight'))
+                ->set("QUANTITY"                , $product->getVirtualColumn('quantity'))
+                ->set("EAN_CODE"                , $product->getVirtualColumn('ean_code'))
                 ->set("BEST_PRICE"              , $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
                 ->set("BEST_PRICE_TAX"          , $taxedPrice - $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
                 ->set("BEST_TAXED_PRICE"        , $product->getVirtualColumn('is_promo') ? $taxedPromoPrice : $taxedPrice)
@@ -517,47 +508,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("PROMO_PRICE"             , $promoPrice)
                 ->set("PROMO_PRICE_TAX"         , $taxedPromoPrice - $promoPrice)
                 ->set("TAXED_PROMO_PRICE"       , $taxedPromoPrice)
-                ->set("PRODUCT_SALE_ELEMENT"    , $product->getVirtualColumn('pse_id'))
-                ->set("WEIGHT"                  , $product->getVirtualColumn('weight'))
-                ->set("QUANTITY"                , $product->getVirtualColumn('quantity'))
-                ->set("EAN_CODE"                , $product->getVirtualColumn('ean_code'))
                 ->set("IS_PROMO"                , $product->getVirtualColumn('is_promo'))
                 ->set("IS_NEW"                  , $product->getVirtualColumn('is_new'))
-                ->set("POSITION"                , $product->getPosition())
-                ->set("VISIBLE"                 , $product->getVisible() ? "1" : "0")
-                ->set("TEMPLATE"                , $product->getTemplateId())
-                ->set("DEFAULT_CATEGORY"        , $default_category_id)
-                ->set("TAX_RULE_ID"             , $product->getTaxRuleId())
 
             ;
 
-            if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
-                // Find previous and next category
-                $previous = ProductQuery::create()
-                    ->joinProductCategory()
-                    ->where('ProductCategory.category_id = ?', $default_category_id)
-                    ->filterByPosition($product->getPosition(), Criteria::LESS_THAN)
-                    ->orderByPosition(Criteria::DESC)
-                    ->findOne()
-                ;
 
-                $next = ProductQuery::create()
-                    ->joinProductCategory()
-                    ->where('ProductCategory.category_id = ?', $default_category_id)
-                    ->filterByPosition($product->getPosition(), Criteria::GREATER_THAN)
-                    ->orderByPosition(Criteria::ASC)
-                    ->findOne()
-                ;
-
-                $loopResultRow
-                    ->set("HAS_PREVIOUS"     , $previous != null ? 1 : 0)
-                    ->set("HAS_NEXT"         , $next != null ? 1 : 0)
-                    ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)
-                    ->set("NEXT"             , $next != null ? $next->getId() : -1)
-                ;
-            }
-
-            $loopResult->addRow($loopResultRow);
+            $loopResult->addRow($this->associateValues($loopResultRow, $product, $default_category_id));
         }
 
         return $loopResult;
@@ -1012,62 +969,72 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $default_category_id = $product->getDefaultCategoryId();
 
             $loopResultRow
-                ->set("ID"               , $product->getId())
-                ->set("REF"              , $product->getRef())
-                ->set("IS_TRANSLATED"    , $product->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"           , $this->locale)
-                ->set("TITLE"            , $product->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO"            , $product->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION"      , $product->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM"     , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL"              , $product->getUrl($this->locale))
-                ->set("META_TITLE"       , $product->getVirtualColumn('i18n_META_TITLE'))
-                ->set("META_DESCRIPTION" , $product->getVirtualColumn('i18n_META_DESCRIPTION'))
-                ->set("META_KEYWORDS"     , $product->getVirtualColumn('i18n_META_KEYWORDS'))
                 ->set("BEST_PRICE"       , $price)
                 ->set("BEST_PRICE_TAX"   , $taxedPrice - $price)
                 ->set("BEST_TAXED_PRICE" , $taxedPrice)
-                ->set("IS_PROMO"         , $product->getVirtualColumn('main_product_is_promo'))
-                ->set("IS_NEW"           , $product->getVirtualColumn('main_product_is_new'))
-                ->set("POSITION"         , $product->getPosition())
-                ->set("VISIBLE"          , $product->getVisible() ? "1" : "0")
-                ->set("TEMPLATE"         , $product->getTemplateId())
-                ->set("DEFAULT_CATEGORY" , $default_category_id)
-                ->set("TAX_RULE_ID"      , $product->getTaxRuleId())
-
+                ->set("IS_PROMO"                , $product->getVirtualColumn('is_promo'))
+                ->set("IS_NEW"                  , $product->getVirtualColumn('is_new'))
             ;
 
 
-            if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
-                // Find previous and next category
-                $previous = ProductQuery::create()
-                    ->joinProductCategory()
-                    ->where('ProductCategory.category_id = ?', $default_category_id)
-                    ->filterByPosition($product->getPosition(), Criteria::LESS_THAN)
-                    ->orderByPosition(Criteria::DESC)
-                    ->findOne()
-                ;
-
-                $next = ProductQuery::create()
-                    ->joinProductCategory()
-                    ->where('ProductCategory.category_id = ?', $default_category_id)
-                    ->filterByPosition($product->getPosition(), Criteria::GREATER_THAN)
-                    ->orderByPosition(Criteria::ASC)
-                    ->findOne()
-                ;
-
-                $loopResultRow
-                    ->set("HAS_PREVIOUS"     , $previous != null ? 1 : 0)
-                    ->set("HAS_NEXT"         , $next != null ? 1 : 0)
-                    ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)
-                    ->set("NEXT"             , $next != null ? $next->getId() : -1)
-                ;
-            }
-
-            $loopResult->addRow($loopResultRow);
+            $loopResult->addRow($this->associateValues($loopResultRow, $product, $default_category_id));
         }
 
         return $loopResult;
+    }
+
+    private function associateValues($loopResultRow, $product, $default_category_id)
+    {
+        $loopResultRow
+            ->set("ID"                      , $product->getId())
+            ->set("REF"                     , $product->getRef())
+            ->set("IS_TRANSLATED"           , $product->getVirtualColumn('IS_TRANSLATED'))
+            ->set("LOCALE"                  , $this->locale)
+            ->set("TITLE"                   , $product->getVirtualColumn('i18n_TITLE'))
+            ->set("CHAPO"                   , $product->getVirtualColumn('i18n_CHAPO'))
+            ->set("DESCRIPTION"             , $product->getVirtualColumn('i18n_DESCRIPTION'))
+            ->set("POSTSCRIPTUM"            , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
+            ->set("URL"                     , $product->getUrl($this->locale))
+            ->set("META_TITLE"              , $product->getVirtualColumn('i18n_META_TITLE'))
+            ->set("META_DESCRIPTION"        , $product->getVirtualColumn('i18n_META_DESCRIPTION'))
+            ->set("META_KEYWORDS"            , $product->getVirtualColumn('i18n_META_KEYWORDS'))
+            ->set("PRODUCT_SALE_ELEMENT"    , $product->getVirtualColumn('pse_id'))
+            ->set("POSITION"                , $product->getPosition())
+            ->set("VISIBLE"                 , $product->getVisible() ? "1" : "0")
+            ->set("TEMPLATE"                , $product->getTemplateId())
+            ->set("DEFAULT_CATEGORY"        , $default_category_id)
+            ->set("TAX_RULE_ID"             , $product->getTaxRuleId())
+
+        ;
+
+
+        if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
+            // Find previous and next category
+            $previous = ProductQuery::create()
+                ->joinProductCategory()
+                ->where('ProductCategory.category_id = ?', $default_category_id)
+                ->filterByPosition($product->getPosition(), Criteria::LESS_THAN)
+                ->orderByPosition(Criteria::DESC)
+                ->findOne()
+            ;
+
+            $next = ProductQuery::create()
+                ->joinProductCategory()
+                ->where('ProductCategory.category_id = ?', $default_category_id)
+                ->filterByPosition($product->getPosition(), Criteria::GREATER_THAN)
+                ->orderByPosition(Criteria::ASC)
+                ->findOne()
+            ;
+
+            $loopResultRow
+                ->set("HAS_PREVIOUS"     , $previous != null ? 1 : 0)
+                ->set("HAS_NEXT"         , $next != null ? 1 : 0)
+                ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)
+                ->set("NEXT"             , $next != null ? $next->getId() : -1)
+            ;
+        }
+
+        return $loopResultRow;
     }
 
     protected function manageFeatureAv(&$search, $feature_availability)
