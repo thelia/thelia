@@ -25,9 +25,6 @@ namespace Front\Controller;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Cart\CartTrait;
 use Thelia\Controller\Front\BaseFrontController;
-use Thelia\Core\Event\PdfEvent;
-use Thelia\Core\HttpFoundation\Response;
-use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
@@ -202,7 +199,7 @@ class OrderController extends BaseFrontController
 
         if (null !== $placedOrder && null !== $placedOrder->getId()) {
             /* order has been placed */
-            if($orderEvent->hasResponse()) {
+            if ($orderEvent->hasResponse()) {
                 return $orderEvent->getResponse();
             } else {
                 $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute('order.placed', array('order_id' => $orderEvent->getPlacedOrder()->getId()))));
@@ -263,6 +260,7 @@ class OrderController extends BaseFrontController
     {
         /* check customer */
         $this->checkAuth();
+
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
     }
 
@@ -270,6 +268,7 @@ class OrderController extends BaseFrontController
     {
         /* check customer */
         $this->checkAuth();
+
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
     }
 
@@ -285,6 +284,5 @@ class OrderController extends BaseFrontController
 
         return $this->render('ajax/order-delivery-module-list', $args);
     }
-
 
 }
