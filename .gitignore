@@ -25,7 +25,19 @@ xhprof/
 phpunit.phar
 .DS_Store
 phpmyadmin
-templates/default-esi
-local/modules/TemplateEsiModule
 composer.phar
-web/.htaccess
+web/.
+
+# Ignore everything in the "modules" directory, except the "default modules"
+local/modules/*
+!local/modules/Cheque/
+!local/modules/Front/
+!local/modules/TheliaDebugBar/
+!local/modules/Tinymce/
+
+# Ignore everything in the "templates" directory, except the "default template"
+templates/*
+!templates/backOffice/
+!templates/email/
+!templates/frontOffice/
+!templates/pdf/
