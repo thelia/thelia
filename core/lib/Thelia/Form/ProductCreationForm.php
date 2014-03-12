@@ -83,7 +83,6 @@ class ProductCreationForm extends BaseForm
                     "label_attr" => array("for" => "tax_rule_field")
                 ))
                 ->add("weight", "number", array(
-                    "constraints" => array(new NotBlank()),
                     "label"      => Translator::getInstance()->trans("Weight *"),
                     "label_attr" => array("for" => "weight_field")
                 ))
