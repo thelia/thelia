@@ -32,8 +32,13 @@ if (isset($_POST['host']) && isset($_POST['username'])  && isset($_POST['passwor
     $_SESSION['install']['port'] = $_POST['port'];
 
     $checkConnection = new \Thelia\Install\CheckDatabaseConnection($_POST['host'], $_POST['username'], $_POST['password'], $_POST['port']);
+    if(!$checkConnection->exec()) {
+        header('location: connection.php?err=1');
+        exit;
+    }
     $databases = $checkConnection->getConnection()->query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
-    if(! $checkConnection->exec() || $databases === false){
+
+    if(false === $databases){
         header('location: connection.php?err=1');
         exit;
     }
