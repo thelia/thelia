@@ -53,6 +53,11 @@ trait ModelEventDispatcherTrait
         return $this->dispatcher;
     }
 
+    public function clearDispatcher()
+    {
+        $this->dispatcher = null;
+    }
+
     protected function dispatchEvent($eventName, ActionEvent $event)
     {
         if (!is_null($this->dispatcher)) {
