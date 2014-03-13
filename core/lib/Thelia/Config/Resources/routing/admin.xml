@@ -340,6 +340,10 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::priceCaclulator</default>
     </route>
 
+    <route id="admin.product.calculate-raw-price" path="/admin/product/calculate-raw-price">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::calculatePrice</default>
+    </route>
+
     <route id="admin.product.load-converted-prices" path="/admin/product/load-converted-prices">
         <default key="_controller">Thelia\Controller\Admin\ProductController::loadConvertedPrices</default>
     </route>

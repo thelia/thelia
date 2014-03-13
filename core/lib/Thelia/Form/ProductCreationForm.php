@@ -70,8 +70,12 @@ class ProductCreationForm extends BaseForm
                 ->add("price", "number", array(
                     "constraints" => array(new NotBlank()),
                     "label"      => Translator::getInstance()->trans("Product base price excluding taxes *"),
-                    "label_attr" => array("for" => "price_field")
+                    "label_attr" => array("for" => "price_without_tax")
                 ))
+               ->add("tax_price", "number", array(
+                       "label"      => Translator::getInstance()->trans("Product base price with taxes"),
+                       "label_attr" => array("for" => "price_with_tax")
+                   ))
                 ->add("currency", "integer", array(
                     "constraints" => array(new NotBlank()),
                     "label"      => Translator::getInstance()->trans("Price currency *"),
@@ -83,7 +87,7 @@ class ProductCreationForm extends BaseForm
                     "label_attr" => array("for" => "tax_rule_field")
                 ))
                 ->add("weight", "number", array(
-                    "label"      => Translator::getInstance()->trans("Weight *"),
+                    "label"      => Translator::getInstance()->trans("Weight"),
                     "label_attr" => array("for" => "weight_field")
                 ))
             ;

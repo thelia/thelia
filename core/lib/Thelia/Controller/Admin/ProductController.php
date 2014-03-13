@@ -73,6 +73,7 @@ use Thelia\Form\ProductSaleElementUpdateForm;
 use Thelia\Form\ProductDefaultSaleElementUpdateForm;
 use Thelia\Form\ProductCombinationGenerationForm;
 
+use Thelia\Model\TaxRuleQuery;
 use Thelia\TaxEngine\Calculator;
 use Thelia\Tools\NumberFormat;
 
@@ -1155,10 +1156,10 @@ class ProductController extends AbstractSeoCrudController
     {
         $return_price = 0;
 
-        $price      = floatval($this->getRequest()->get('price', 0));
-        $product_id = intval($this->getRequest()->get('product_id', 0));
-        $action     = $this->getRequest()->get('action', ''); // With ot without tax
-        $convert    = intval($this->getRequest()->get('convert_from_default_currency', 0));
+        $price      = floatval($this->getRequest()->query->get('price', 0));
+        $product_id = intval($this->getRequest()->query->get('product_id', 0));
+        $action     = $this->getRequest()->query->get('action', ''); // With ot without tax
+        $convert    = intval($this->getRequest()->query->get('convert_from_default_currency', 0));
 
         if (null !== $product = ProductQuery::create()->findPk($product_id)) {
 
@@ -1171,7 +1172,46 @@ class ProductController extends AbstractSeoCrudController
             }
 
             if ($convert != 0) {
-                $return_price = $prix * Currency::getDefaultCurrency()->getRate();
+                $return_price = $price * Currency::getDefaultCurrency()->getRate();
+            }
+        }
+
+        return new JsonResponse(array('result' => $return_price));
+    }
+
+    /**
+     *
+     * Calculate tax or untax price for a non existing product.
+     *
+     * For an existing product, use self::priceCaclulator
+     *
+     * @return JsonResponse
+     */
+    public function calculatePrice()
+    {
+        $return_price = 0;
+
+        $price      = floatval($this->getRequest()->query->get('price'));
+        $tax_rule_id = intval($this->getRequest()->query->get('tax_rule'));
+        $action     = $this->getRequest()->query->get('action'); // With ot without tax
+
+        $taxRule = TaxRuleQuery::create()->findPk($tax_rule_id);
+
+        if (null !== $price && null !== $taxRule) {
+
+            $calculator = new Calculator();
+
+            $calculator->loadTaxRuleWithoutProduct(
+                $taxRule,
+                Country::getShopLocation()
+            );
+
+            if ($action == 'to_tax') {
+                $return_price = $calculator->getTaxedPrice($price);
+            } elseif ($action == 'from_tax') {
+                $return_price = $calculator->getUntaxedPrice($price);
+            } else {
+                $return_price = $price;
             }
         }
 
@@ -1251,7 +1291,7 @@ class ProductController extends AbstractSeoCrudController
         }
 
         if ($convert != 0) {
-            $return_price = $prix * Currency::getDefaultCurrency()->getRate();
+            $return_price = $price * Currency::getDefaultCurrency()->getRate();
         }
 
         // Format the number using '.', to perform further calculation
