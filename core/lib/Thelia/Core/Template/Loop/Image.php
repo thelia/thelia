@@ -316,7 +316,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResult->addRow($loopResultRow);
             } catch (\Exception $ex) {
                 // Ignore the result and log an error
-                Tlog::getInstance()->addError("Failed to process image in image loop: ", $this->args);
+                Tlog::getInstance()->addError("Failed to process image in image loop: ", $ex->getMessage(), ", loop arguments: ", $this->args);
             }
         }
 
