@@ -262,7 +262,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResult->addRow($loopResultRow);
             } catch (\Exception $ex) {
                 // Ignore the result and log an error
-                Tlog::getInstance()->addError("Failed to process document in document loop: ", $ex->getMessage(), ", loop arguments: ", $this->args);
+                Tlog::getInstance()->addError(sprintf("Failed to process document in document loop: %s", $ex->getMessage()));
             }
         }
 
