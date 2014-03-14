@@ -91,13 +91,10 @@ class ProductSaleElementUpdateForm extends BaseForm
             ))
             ->add('weight', 'collection', array(
                 'type'         => 'number',
-                'label'        => Translator::getInstance()->trans('Weight *'),
+                'label'        => Translator::getInstance()->trans('Weight'),
                 'label_attr'   => array('for' => 'weight_field'),
                 'allow_add'    => true,
-                'allow_delete' => true,
-                'options'      => array(
-                    'constraints' => array(new NotBlank()),
-                )
+                'allow_delete' => true
             ))
             ->add('quantity', 'collection', array(
                 'type'         => 'number',
