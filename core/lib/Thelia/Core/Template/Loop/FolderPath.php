@@ -75,7 +75,6 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntTypeArgument('folder', null, true),
             Argument::createIntTypeArgument('depth'),
-            Argument::createIntTypeArgument('level'),
             Argument::createBooleanOrBothTypeArgument('visible', true, false)
         );
     }
