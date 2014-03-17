@@ -92,7 +92,7 @@ GNU General Public License : http://www.gnu.org/licenses/
             <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="{intl l="Main Navigation"}">
                 {nocache}
                 <ul class="nav navbar-nav navbar-cart navbar-right">
-                    {loop type="auth" name="customer_info_block" role="CUSTOMER" context="front"}
+                    {loop type="auth" name="customer_info_block" role="CUSTOMER"}
                         <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
                         <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
                     {/loop}
@@ -256,7 +256,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                 {loop name="footer_links" type="content" folder="2"}
                                     <li><a href="{$URL}">{$TITLE}</a></li>
                                 {/loop}
-                                {loop type="auth" name="customer_is_logged" role="CUSTOMER" context="front"}
+                                {loop type="auth" name="customer_is_logged" role="CUSTOMER"}
                                     <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
                                     <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
                                 {/loop}

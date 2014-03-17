@@ -71,8 +71,7 @@ class Auth extends BaseLoop implements ArraySearchLoopInterface
                 new TypeCollection(
                     new EnumListType(array(AccessManager::VIEW, AccessManager::CREATE, AccessManager::UPDATE, AccessManager::DELETE))
                 )
-            ),
-            Argument::createAnyTypeArgument('context', 'front', false)
+            )
          );
     }
 
