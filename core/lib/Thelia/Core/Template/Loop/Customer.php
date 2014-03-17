@@ -67,19 +67,26 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             Argument::createBooleanTypeArgument('reseller'),
             Argument::createIntTypeArgument('sponsor'),
             new Argument(
-                    'order',
-                    new TypeCollection(
-                            new Type\EnumListType(array(
-                                    'id', 'id_reverse',
-                                    'reference', 'reference_reverse',
-                                    'firstname', 'firstname_reverse',
-                                    'lastname', 'lastname_reverse',
-                                    'last_order', 'last_order_reverse',
-                                    'order_amount', 'order_amount_reverse',
-                                    'registration_date', 'registration_date_reverse'
-                            ))
-                    ),
-                    'lastname'
+                'order',
+                new TypeCollection(
+                    new Type\EnumListType(array(
+                        'id',
+                        'id_reverse',
+                        'reference',
+                        'reference_reverse',
+                        'firstname',
+                        'firstname_reverse',
+                        'lastname',
+                        'lastname_reverse',
+                        'last_order',
+                        'last_order_reverse',
+                        'order_amount',
+                        'order_amount_reverse',
+                        'registration_date',
+                        'registration_date_reverse'
+                    ))
+                ),
+                'lastname'
             )
         );
     }
@@ -166,7 +173,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             $search->filterBySponsor($sponsor, Criteria::EQUAL);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
@@ -219,19 +226,15 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             $loopResultRow = new LoopResultRow($customer);
 
             $loopResultRow
-                ->set("ID"        , $customer->getId())
-                ->set("REF"       , $customer->getRef())
-                ->set("TITLE"     , $customer->getTitleId())
-                ->set("FIRSTNAME" , $customer->getFirstname())
-                ->set("LASTNAME"  , $customer->getLastname())
-                ->set("EMAIL"     , $customer->getEmail())
-                ->set("RESELLER"  , $customer->getReseller())
-                ->set("SPONSOR"   , $customer->getSponsor())
-                ->set("DISCOUNT"  , $customer->getDiscount())
-
-                ->set("LAST_ORDER_DATE"     , $lastOrder != null ? $lastOrder->getCreatedAt() : '')
-                ->set("LAST_ORDER_AMOUNT"   , $lastOrder != null ? $lastOrder->getCreatedAt() : '')
-                ->set("LAST_ORDER_CURRENCY" , $lastOrder != null ? $lastOrder->getCreatedAt() : '')
+                ->set("ID", $customer->getId())
+                ->set("REF", $customer->getRef())
+                ->set("TITLE", $customer->getTitleId())
+                ->set("FIRSTNAME", $customer->getFirstname())
+                ->set("LASTNAME", $customer->getLastname())
+                ->set("EMAIL", $customer->getEmail())
+                ->set("RESELLER", $customer->getReseller())
+                ->set("SPONSOR", $customer->getSponsor())
+                ->set("DISCOUNT", $customer->getDiscount())
             ;
 
             $loopResult->addRow($loopResultRow);
