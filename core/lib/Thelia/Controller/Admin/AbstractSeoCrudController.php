@@ -166,7 +166,6 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             return $response;
         }
 
-
         // Error (Default: false)
         $error_msg = false;
 
