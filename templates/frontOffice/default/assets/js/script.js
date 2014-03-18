@@ -26,7 +26,8 @@
         // Display loader if we do ajax call
         $(document)
             .ajaxStart(function () { $loader.show(); })
-            .ajaxStop(function () { $loader.hide(); });
+            .ajaxStop(function () { $loader.hide(); })
+            .ajaxError(function () { $loader.hide(); });
 
         // Main Navigation Hover
         $('.nav-main')
