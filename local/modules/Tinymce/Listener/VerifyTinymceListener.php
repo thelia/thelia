@@ -54,7 +54,6 @@ class VerifyTinymceListener implements EventSubscriberInterface
     public function clearCache(CacheEvent $event)
     {
         if (true === file_exists(THELIA_WEB_DIR . '/tinymce')) {
-            echo "toto";
             $fs = new Filesystem();
 
             $directory = new \DirectoryIterator(THELIA_WEB_DIR . '/tinymce');
