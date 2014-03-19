@@ -213,6 +213,7 @@ class Customer extends BaseCustomer implements UserInterface
     public function eraseCredentials()
     {
         parent::setPassword(null);
+        $this->resetModified();
     }
 
     /**
