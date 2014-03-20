@@ -168,6 +168,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
 
         // Error (Default: false)
         $error_msg = false;
+        $ex = new \Exception();
 
         // Create the Form from the request
         $updateSeoForm = $this->getUpdateSeoForm($this->getRequest());
