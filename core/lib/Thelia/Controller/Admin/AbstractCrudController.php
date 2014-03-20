@@ -287,6 +287,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
         // Error (Default: false)
         $error_msg = false;
+        $ex = new \Exception();
 
         // Create the Creation Form
         $creationForm = $this->getCreationForm($this->getRequest());
@@ -384,6 +385,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
         // Error (Default: false)
         $error_msg = false;
+        $ex = new \Exception();
 
         // Create the Form from the request
         $changeForm = $this->getUpdateForm($this->getRequest());
