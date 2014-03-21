@@ -30,7 +30,6 @@ use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeAv as AttributeAvModel;
 
-
 /**
  * Class AttributeAvTest
  * @package Thelia\Tests\Action

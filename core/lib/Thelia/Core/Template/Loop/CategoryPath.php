@@ -65,7 +65,6 @@ class CategoryPath extends BaseI18nLoop  implements ArraySearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntTypeArgument('category', null, true),
             Argument::createIntTypeArgument('depth'),
-            Argument::createIntTypeArgument('level'),
             Argument::createBooleanOrBothTypeArgument('visible', true, false)
         );
     }

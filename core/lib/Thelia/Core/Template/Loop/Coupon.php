@@ -36,7 +36,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon as MCoupon;
 use Thelia\Model\CouponQuery;
-use Thelia\Type;
 
 /**
  * Coupon Loop

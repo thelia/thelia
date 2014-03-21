@@ -106,6 +106,7 @@ CREATE TABLE `country`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_country_area_id` (`area_id`),
+    INDEX `idx_country_by_default` (`by_default`),
     CONSTRAINT `fk_country_area_id`
         FOREIGN KEY (`area_id`)
         REFERENCES `area` (`id`)
@@ -162,6 +163,7 @@ CREATE TABLE `tax_rule_country`
     INDEX `idx_tax_rule_country_tax_id` (`tax_id`),
     INDEX `idx_tax_rule_country_tax_rule_id` (`tax_rule_id`),
     INDEX `idx_tax_rule_country_country_id` (`country_id`),
+    INDEX `idx_tax_rule_country_tax_rule_id_country_id_position` (`tax_rule_id`, `country_id`, `position`),
     CONSTRAINT `fk_tax_rule_country_tax_id`
         FOREIGN KEY (`tax_id`)
         REFERENCES `tax` (`id`)
@@ -237,6 +239,7 @@ CREATE TABLE `feature_product`
     INDEX `idx_feature_prod_product_id` (`product_id`),
     INDEX `idx_feature_prod_feature_id` (`feature_id`),
     INDEX `idx_feature_prod_feature_av_id` (`feature_av_id`),
+    INDEX `idx_feature_product_product_id_feature_id_position` (`product_id`, `feature_id`, `position`),
     CONSTRAINT `fk_feature_prod_product_id`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
@@ -271,6 +274,7 @@ CREATE TABLE `feature_template`
     PRIMARY KEY (`id`),
     INDEX `idx_feature_template_id` (`feature_id`),
     INDEX `fk_feature_template_idx` (`template_id`),
+    INDEX `idx_feature_template_template_id_position` (`template_id`, `position`),
     CONSTRAINT `fk_feature_template_id`
         FOREIGN KEY (`feature_id`)
         REFERENCES `feature` (`id`)
@@ -373,6 +377,7 @@ CREATE TABLE `product_sale_elements`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_product_sale_element_product_id` (`product_id`),
+    INDEX `idx_product_elements_product_id_promo_is_default` (`product_id`, `promo`, `is_default`),
     INDEX `ref` (`ref`),
     CONSTRAINT `fk_product_sale_element_product_id`
         FOREIGN KEY (`product_id`)
@@ -547,7 +552,8 @@ CREATE TABLE `lang`
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    INDEX `idx_lang_by_default` (`by_default`)
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -605,6 +611,7 @@ CREATE TABLE `product_image`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_product_image_product_id` (`product_id`),
+    INDEX `idx_product_image_product_id_position` (`product_id`, `position`),
     CONSTRAINT `fk_product_image_product_id`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
@@ -730,7 +737,9 @@ CREATE TABLE `currency`
     `by_default` TINYINT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    INDEX `idx_currency_by_default` (`by_default`),
+    INDEX `idx_currency_code` (`code`)
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -1291,6 +1300,7 @@ CREATE TABLE `category_image`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_category_image_category_id` (`category_id`),
+    INDEX `idx_category_image_category_id_position` (`category_id`, `position`),
     CONSTRAINT `fk_category_image_category_id`
         FOREIGN KEY (`category_id`)
         REFERENCES `category` (`id`)
@@ -1314,6 +1324,7 @@ CREATE TABLE `folder_image`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_folder_image_folder_id` (`folder_id`),
+    INDEX `idx_folder_image_folder_id_position` (`folder_id`, `position`),
     CONSTRAINT `fk_folder_image_folder_id`
         FOREIGN KEY (`folder_id`)
         REFERENCES `folder` (`id`)
@@ -1337,6 +1348,7 @@ CREATE TABLE `content_image`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_content_image_content_id` (`content_id`),
+    INDEX `idx_content_image_content_id_position` (`content_id`, `position`),
     CONSTRAINT `fk_content_image_content_id`
         FOREIGN KEY (`content_id`)
         REFERENCES `content` (`id`)
@@ -1489,8 +1501,9 @@ CREATE TABLE `rewriting_url`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `url_UNIQUE` (`url`),
-    INDEX `idx_view_id` (`view_id`),
     INDEX `idx_rewriting_url_redirected` (`redirected`),
+    INDEX `idx_rewriting_url_view_updated_at` (`view`, `updated_at`),
+    INDEX `idx_rewriting_url_view_id_view_view_locale_updated_at` (`view_id`, `view`, `view_locale`, `updated_at`),
     CONSTRAINT `fk_rewriting_url_redirected`
         FOREIGN KEY (`redirected`)
         REFERENCES `rewriting_url` (`id`)
@@ -1550,6 +1563,7 @@ CREATE TABLE `module_image`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_module_image_module_id` (`module_id`),
+    INDEX `idx_module_image_module_id_position` (`module_id`, `position`),
     CONSTRAINT `fk_module_image_module_id`
         FOREIGN KEY (`module_id`)
         REFERENCES `module` (`id`)

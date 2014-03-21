@@ -250,7 +250,14 @@ class Session extends BaseSession
      */
     public function getOrder()
     {
-        return $this->get("thelia.order");
+        $order = $this->get("thelia.order");
+
+        if (null === $order) {
+            $order = new Order();
+            $this->setOrder($order);
+        }
+
+        return $order;
     }
 
     /**

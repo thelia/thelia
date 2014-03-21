@@ -47,6 +47,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
 
     public function fixAmountRetriever(Product $product)
     {
+        $taxAmount = 0;
         $featureId = $this->getRequirement("feature");
 
         $query = FeatureProductQuery::create()
@@ -54,14 +55,17 @@ class FeatureFixAmountTaxType extends BaseTaxType
             ->filterByFeatureId($featureId)
             ->findOne();
 
-        $taxAmount = $query->getFreeTextValue();
+        if (null !== $query) {
+            $taxAmount = $query->getFreeTextValue();
 
-        $testInt = new FloatType();
-        if (!$testInt->isValid($taxAmount)) {
-            throw new TaxEngineException(
+            $testInt = new FloatType();
+            if (!$testInt->isValid($taxAmount)) {
+                throw new TaxEngineException(
                     Translator::getInstance()->trans('Feature value does not match FLOAT format'),
                     TaxEngineException::FEATURE_BAD_EXPECTED_VALUE
-            );
+                );
+            }
+
         }
 
         return $taxAmount;

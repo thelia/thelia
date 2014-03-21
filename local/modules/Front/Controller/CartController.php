@@ -154,11 +154,11 @@ class CartController extends BaseFrontController
     {
         /* recalculate postage amount */
         $order = $this->getSession()->getOrder();
-        if(null !== $order) {
+        if (null !== $order) {
             $deliveryModule = $order->getModuleRelatedByDeliveryModuleId();
             $deliveryAddress = AddressQuery::create()->findPk($order->chosenDeliveryAddress);
 
-            if(null !== $deliveryModule && null !== $deliveryAddress) {
+            if (null !== $deliveryModule && null !== $deliveryAddress) {
                 $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
                 $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
 
@@ -169,6 +169,5 @@ class CartController extends BaseFrontController
             }
         }
     }
-
 
 }

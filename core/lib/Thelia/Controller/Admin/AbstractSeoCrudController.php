@@ -157,13 +157,14 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     /**
      * Update SEO modification, and either go back to the object list, or stay on the edition page.
      *
-     * @return Thelia\Core\HttpFoundation\Response the response
+     * @return \Thelia\Core\HttpFoundation\Response the response
      */
     public function processUpdateSeoAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
             return $response;
+        }
 
         // Error (Default: false)
         $error_msg = false;

@@ -23,19 +23,14 @@
 
 namespace Thelia\Tests\Action;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Routing\Router;
 use Thelia\Action\Category;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
-use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\Category as CategoryModel;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Model\CategoryQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
-use Thelia\Tools\URL;
-
 
 /**
  * Class CategoryTest

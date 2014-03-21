@@ -620,7 +620,7 @@ class Tlog Implements LoggerInterface
                     // we are sometimes in functions = no class available: avoid php warning here
                     $className = $hop['class'];
 
-                    if (! empty($className) and ($className == ltrim(__CLASS__,'\\') or strtolower(get_parent_class($className)) == ltrim(__CLASS__,'\\'))) {
+                    if (! empty($className) && ($className == ltrim(__CLASS__,'\\') || strtolower(get_parent_class($className)) == ltrim(__CLASS__,'\\'))) {
                             $origine['line'] = $hop['line'];
                             $origine['file'] = $hop['file'];
                             break;
@@ -632,10 +632,10 @@ class Tlog Implements LoggerInterface
 
             $origine['class'] = isset($prevHop['class']) ? $prevHop['class'] : 'main';
 
-            if(isset($prevHop['function']) and
-                $prevHop['function'] !== 'include' and
-                $prevHop['function'] !== 'include_once' and
-                $prevHop['function'] !== 'require' and
+            if(isset($prevHop['function']) &&
+                $prevHop['function'] !== 'include' &&
+                $prevHop['function'] !== 'include_once' &&
+                $prevHop['function'] !== 'require' &&
                 $prevHop['function'] !== 'require_once') {
 
                 $origine['function'] = $prevHop['function'];

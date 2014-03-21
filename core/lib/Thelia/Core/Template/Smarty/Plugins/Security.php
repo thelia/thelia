@@ -53,16 +53,16 @@ class Security extends AbstractSmartyPlugin
      */
     public function checkAuthFunction($params, &$smarty)
     {
-        $roles = $this->_explode($this->getParam($params, 'role'));
-        $resources = $this->_explode($this->getParam($params, 'resource'));
-        $modules = $this->_explode($this->getParam($params, 'module'));
-        $accesses = $this->_explode($this->getParam($params, 'access'));
+        $roles = $this->explode($this->getParam($params, 'role'));
+        $resources = $this->explode($this->getParam($params, 'resource'));
+        $modules = $this->explode($this->getParam($params, 'module'));
+        $accesses = $this->explode($this->getParam($params, 'access'));
 
         if (! $this->securityContext->isGranted($roles, $resources, $modules, $accesses)) {
 
             $ex = new AuthenticationException(
-                sprintf("User not granted for roles '%s', to access resources '%s' with %s in context '%s'.",
-                    implode(',', $roles), implode(',', $resources), implode(',', $accesses), $context
+                sprintf("User not granted for roles '%s', to access resources '%s' with %s.",
+                    implode(',', $roles), implode(',', $resources), implode(',', $accesses)
                 )
             );
 

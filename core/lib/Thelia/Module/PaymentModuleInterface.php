@@ -27,14 +27,18 @@ use Thelia\Model\Order;
 
 interface PaymentModuleInterface extends BaseModuleInterface
 {
-    const NOT_PAID = 1;
-    const PAID = 2;
-    const PROCESSING = 3;
-    const SENT = 4;
-    const CANCELED = 5;
-
     /**
-     * @return mixed
+     *
+     *  Method used by payment gateway.
+     *
+     *  If this method return a \Thelia\Core\HttpFoundation\Response instance, this response is send to the
+     *  browser.
+     *
+     *  In many cases, it's necessary to send a form to the payment gateway. On your response you can return this form already
+     *  completed, ready to be sent
+     *
+     * @param  \Thelia\Model\Order                       $order processed order
+     * @return null|\Thelia\Core\HttpFoundation\Response
      */
     public function pay(Order $order);
 

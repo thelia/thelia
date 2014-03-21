@@ -48,9 +48,12 @@ class Order extends BaseOrder
     /**
      * Compute this order amount.
      *
-     * @param  float $tax             (output only) returns the tax amount for this order
-     * @param  bool  $includePostage  if true, the postage cost is included to the total
-     * @param  bool  $includeDiscount if true, the discount will be included to the total
+     * The order amount amount is only avaible once the order is persisted in database.
+     * Duting invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
+     *
+     * @param  float|int $tax             (output only) returns the tax amount for this order
+     * @param  bool      $includePostage  if true, the postage cost is included to the total
+     * @param  bool      $includeDiscount if true, the discount will be included to the total
      * @return float
      */
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)

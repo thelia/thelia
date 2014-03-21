@@ -27,7 +27,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Action\Cache;
 use Thelia\Core\Event\Cache\CacheEvent;
 
-
 /**
  * Class CacheTest
  * @package Thelia\Tests\Action\assets
@@ -56,4 +55,4 @@ class CacheTest extends \PHPUnit_Framework_TestCase
         $fs = new Filesystem();
         $this->assertFalse($fs->exists($this->dir));
     }
-} 
+}

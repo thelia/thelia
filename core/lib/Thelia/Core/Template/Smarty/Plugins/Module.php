@@ -63,7 +63,7 @@ class Module extends AbstractSmartyPlugin
     public function theliaModule($params, \Smarty_Internal_Template $template)
     {
         $content = null;
-
+        $count = 0;
         if (false !== $location = $this->getParam($params, 'location', false)) {
 
             if ($this->debug === true && $this->request->get('SHOW_INCLUDE')) {
@@ -73,8 +73,6 @@ class Module extends AbstractSmartyPlugin
             $moduleLimit = $this->getParam($params, 'module', null);
 
             $modules = ModuleQuery::getActivated();
-
-            $count = 0;
 
             foreach ($modules as $module) {
 
@@ -92,12 +90,12 @@ class Module extends AbstractSmartyPlugin
             }
         }
 
-        if (! empty($content)) {
-            return $template->fetch(sprintf("string:%s", $content));
-        }
-
         if (false !== $countvarname = $this->getParam($params, 'countvar', false)) {
             $template->assign($countvarname, $count);
+        }
+
+        if (! empty($content)) {
+            return $template->fetch(sprintf("string:%s", $content));
         }
 
         return "";

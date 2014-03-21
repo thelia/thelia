@@ -31,7 +31,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\CategoryAssociatedContentQuery;
-use Thelia\Type;
 
 /**
  *
@@ -57,8 +56,8 @@ class AssociatedContent extends Content
         $argumentCollection
             ->addArgument(Argument::createIntTypeArgument('product'))
             ->addArgument(Argument::createIntTypeArgument('category'))
-            ->addArgument(Argument::createIntTypeArgument('exclude_product'))
-            ->addArgument(Argument::createIntTypeArgument('exclude_category'))
+            ->addArgument(Argument::createIntListTypeArgument('exclude_product'))
+            ->addArgument(Argument::createIntListTypeArgument('exclude_category'))
             ;
 
         $argumentCollection->get('order')->default = "associated_content";

@@ -122,7 +122,7 @@ class SessionController extends BaseAdminController
             $this->applyUserLocale($user);
 
             /**
-             * FIXME: we have tou find a way to send cookie
+             * we have tou find a way to send cookie
              */
             if (intval($adminLoginForm->getForm()->get('remember_me')->getData()) > 0) {
                 // If a remember me field if present and set in the form, create

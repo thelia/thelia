@@ -30,7 +30,6 @@ use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
 use Thelia\Model\FeatureAv as FeatureAvModel;
 use Thelia\Model\FeatureQuery;
 
-
 /**
  * Class FeatureAvTest
  * @package Thelia\Tests\Action
@@ -137,4 +136,4 @@ class FeatureAvTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($deletedFeatureAv->isDeleted());
     }
-} 
+}

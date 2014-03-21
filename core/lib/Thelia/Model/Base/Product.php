@@ -55,6 +55,7 @@ abstract class Product implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\ProductTableMap';
 
+
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -264,6 +265,7 @@ abstract class Product implements ActiveRecordInterface
     protected $currentTranslations;
 
     // versionable behavior
+
 
     /**
      * @var bool
@@ -578,9 +580,9 @@ abstract class Product implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed  $parser A AbstractParser instance,
+     * @param mixed $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data   The source data to import from
+     * @param string $data The source data to import from
      *
      * @return Product The current object, for fluid interface
      */
@@ -630,60 +632,66 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getId()
     {
+
         return $this->id;
     }
 
     /**
      * Get the [tax_rule_id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getTaxRuleId()
     {
+
         return $this->tax_rule_id;
     }
 
     /**
      * Get the [ref] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getRef()
     {
+
         return $this->ref;
     }
 
     /**
      * Get the [visible] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getVisible()
     {
+
         return $this->visible;
     }
 
     /**
      * Get the [position] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getPosition()
     {
+
         return $this->position;
     }
 
     /**
      * Get the [template_id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getTemplateId()
     {
+
         return $this->template_id;
     }
 
@@ -691,8 +699,8 @@ abstract class Product implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -711,8 +719,8 @@ abstract class Product implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -730,10 +738,11 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Get the [version] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getVersion()
     {
+
         return $this->version;
     }
 
@@ -741,8 +750,8 @@ abstract class Product implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [version_created_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -760,18 +769,19 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Get the [version_created_by] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getVersionCreatedBy()
     {
+
         return $this->version_created_by;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param  int                   $v new value
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -784,14 +794,15 @@ abstract class Product implements ActiveRecordInterface
             $this->modifiedColumns[ProductTableMap::ID] = true;
         }
 
+
         return $this;
     } // setId()
 
     /**
      * Set the value of [tax_rule_id] column.
      *
-     * @param  int                   $v new value
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function setTaxRuleId($v)
     {
@@ -808,14 +819,15 @@ abstract class Product implements ActiveRecordInterface
             $this->aTaxRule = null;
         }
 
+
         return $this;
     } // setTaxRuleId()
 
     /**
      * Set the value of [ref] column.
      *
-     * @param  string                $v new value
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function setRef($v)
     {
@@ -828,14 +840,15 @@ abstract class Product implements ActiveRecordInterface
             $this->modifiedColumns[ProductTableMap::REF] = true;
         }
 
+
         return $this;
     } // setRef()
 
     /**
      * Set the value of [visible] column.
      *
-     * @param  int                   $v new value
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function setVisible($v)
     {
@@ -848,14 +861,15 @@ abstract class Product implements ActiveRecordInterface
             $this->modifiedColumns[ProductTableMap::VISIBLE] = true;
         }
 
+
         return $this;
     } // setVisible()
 
     /**
      * Set the value of [position] column.
      *
-     * @param  int                   $v new value
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function setPosition($v)
     {
@@ -868,14 +882,15 @@ abstract class Product implements ActiveRecordInterface
             $this->modifiedColumns[ProductTableMap::POSITION] = true;
         }
 
+
         return $this;
     } // setPosition()
 
     /**
      * Set the value of [template_id] column.
      *
-     * @param  int                   $v new value
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function setTemplateId($v)
     {
@@ -892,15 +907,16 @@ abstract class Product implements ActiveRecordInterface
             $this->aTemplate = null;
         }
 
+
         return $this;
     } // setTemplateId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                 $v string, integer (timestamp), or \DateTime value.
-     *                                  Empty strings are treated as NULL.
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -912,15 +928,16 @@ abstract class Product implements ActiveRecordInterface
             }
         } // if either are not null
 
+
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                 $v string, integer (timestamp), or \DateTime value.
-     *                                  Empty strings are treated as NULL.
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -932,14 +949,15 @@ abstract class Product implements ActiveRecordInterface
             }
         } // if either are not null
 
+
         return $this;
     } // setUpdatedAt()
 
     /**
      * Set the value of [version] column.
      *
-     * @param  int                   $v new value
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function setVersion($v)
     {
@@ -952,15 +970,16 @@ abstract class Product implements ActiveRecordInterface
             $this->modifiedColumns[ProductTableMap::VERSION] = true;
         }
 
+
         return $this;
     } // setVersion()
 
     /**
      * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                 $v string, integer (timestamp), or \DateTime value.
-     *                                  Empty strings are treated as NULL.
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function setVersionCreatedAt($v)
     {
@@ -972,14 +991,15 @@ abstract class Product implements ActiveRecordInterface
             }
         } // if either are not null
 
+
         return $this;
     } // setVersionCreatedAt()
 
     /**
      * Set the value of [version_created_by] column.
      *
-     * @param  string                $v new value
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function setVersionCreatedBy($v)
     {
@@ -991,6 +1011,7 @@ abstract class Product implements ActiveRecordInterface
             $this->version_created_by = $v;
             $this->modifiedColumns[ProductTableMap::VERSION_CREATED_BY] = true;
         }
+
 
         return $this;
     } // setVersionCreatedBy()
@@ -1042,6 +1063,7 @@ abstract class Product implements ActiveRecordInterface
     public function hydrate($row, $startcol = 0, $rehydrate = false, $indexType = TableMap::TYPE_NUM)
     {
         try {
+
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProductTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
@@ -1127,10 +1149,10 @@ abstract class Product implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
-     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
+     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
+     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -1192,7 +1214,7 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param  ConnectionInterface $con
+     * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see Product::setDeleted()
@@ -1235,8 +1257,8 @@ abstract class Product implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -1309,8 +1331,8 @@ abstract class Product implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -1628,7 +1650,7 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1742,7 +1764,7 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1758,12 +1780,12 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param  string $name name
-     * @param  string $type The type of fieldname the $name is of:
-     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                      Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed  Value of field.
+     * @param      string $name name
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1777,7 +1799,7 @@ abstract class Product implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos position in xml schema
+     * @param      int $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1828,12 +1850,12 @@ abstract class Product implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                                        Defaults to TableMap::TYPE_PHPNAME.
-     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
-     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                    Defaults to TableMap::TYPE_PHPNAME.
+     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1910,12 +1932,12 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param  string $name
-     * @param  mixed  $value field value
-     * @param  string $type  The type of fieldname the $name is of:
-     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                       Defaults to TableMap::TYPE_PHPNAME.
+     * @param      string $name
+     * @param      mixed  $value field value
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1929,8 +1951,8 @@ abstract class Product implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos   position in xml schema
-     * @param  mixed $value field value
+     * @param      int $pos position in xml schema
+     * @param      mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1985,8 +2007,8 @@ abstract class Product implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param  array  $arr     An array to populate the object from.
-     * @param  string $keyType The type of keys the array uses.
+     * @param      array  $arr     An array to populate the object from.
+     * @param      string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -2026,6 +2048,7 @@ abstract class Product implements ActiveRecordInterface
         if ($this->isColumnModified(ProductTableMap::VERSION)) $criteria->add(ProductTableMap::VERSION, $this->version);
         if ($this->isColumnModified(ProductTableMap::VERSION_CREATED_AT)) $criteria->add(ProductTableMap::VERSION_CREATED_AT, $this->version_created_at);
         if ($this->isColumnModified(ProductTableMap::VERSION_CREATED_BY)) $criteria->add(ProductTableMap::VERSION_CREATED_BY, $this->version_created_by);
+
         return $criteria;
     }
 
@@ -2047,7 +2070,7 @@ abstract class Product implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return int
+     * @return   int
      */
     public function getPrimaryKey()
     {
@@ -2057,7 +2080,7 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param  int  $key Primary key.
+     * @param       int $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -2071,6 +2094,7 @@ abstract class Product implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
+
         return null === $this->getId();
     }
 
@@ -2080,9 +2104,9 @@ abstract class Product implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  object          $copyObj  An object of \Thelia\Model\Product (or compatible) type.
-     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
+     * @param      object $copyObj An object of \Thelia\Model\Product (or compatible) type.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -2185,8 +2209,8 @@ abstract class Product implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  boolean               $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Thelia\Model\Product Clone of current object.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return                 \Thelia\Model\Product Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -2202,8 +2226,8 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildTaxRule object.
      *
-     * @param  ChildTaxRule          $v
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param                  ChildTaxRule $v
+     * @return                 \Thelia\Model\Product The current object (for fluent API support)
      * @throws PropelException
      */
     public function setTaxRule(ChildTaxRule $v = null)
@@ -2222,6 +2246,7 @@ abstract class Product implements ActiveRecordInterface
             $v->addProduct($this);
         }
 
+
         return $this;
     }
 
@@ -2229,8 +2254,8 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Get the associated ChildTaxRule object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildTaxRule        The associated ChildTaxRule object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildTaxRule The associated ChildTaxRule object.
      * @throws PropelException
      */
     public function getTaxRule(ConnectionInterface $con = null)
@@ -2252,8 +2277,8 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildTemplate object.
      *
-     * @param  ChildTemplate         $v
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param                  ChildTemplate $v
+     * @return                 \Thelia\Model\Product The current object (for fluent API support)
      * @throws PropelException
      */
     public function setTemplate(ChildTemplate $v = null)
@@ -2272,6 +2297,7 @@ abstract class Product implements ActiveRecordInterface
             $v->addProduct($this);
         }
 
+
         return $this;
     }
 
@@ -2279,8 +2305,8 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Get the associated ChildTemplate object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildTemplate       The associated ChildTemplate object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildTemplate The associated ChildTemplate object.
      * @throws PropelException
      */
     public function getTemplate(ConnectionInterface $con = null)
@@ -2305,7 +2331,7 @@ abstract class Product implements ActiveRecordInterface
      * Avoids crafting an 'init[$relationName]s' method name
      * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param  string $relationName The name of the relation to initialize
+     * @param      string $relationName The name of the relation to initialize
      * @return void
      */
     public function initRelation($relationName)
@@ -2374,8 +2400,8 @@ abstract class Product implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -2397,8 +2423,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                          $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface               $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildProductCategory[] List of ChildProductCategory objects
      * @throws PropelException
      */
@@ -2454,13 +2480,14 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $productCategories A Propel collection.
-     * @param  ConnectionInterface $con               Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param      Collection $productCategories A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProduct The current object (for fluent API support)
      */
     public function setProductCategories(Collection $productCategories, ConnectionInterface $con = null)
     {
         $productCategoriesToDelete = $this->getProductCategories(new Criteria(), $con)->diff($productCategories);
+
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
@@ -2485,10 +2512,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Returns the number of related ProductCategory objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related ProductCategory objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProductCategory objects.
      * @throws PropelException
      */
     public function countProductCategories(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2520,8 +2547,8 @@ abstract class Product implements ActiveRecordInterface
      * Method called to associate a ChildProductCategory object to this object
      * through the ChildProductCategory foreign key attribute.
      *
-     * @param  ChildProductCategory  $l ChildProductCategory
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param    ChildProductCategory $l ChildProductCategory
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function addProductCategory(ChildProductCategory $l)
     {
@@ -2548,7 +2575,7 @@ abstract class Product implements ActiveRecordInterface
 
     /**
      * @param  ProductCategory $productCategory The productCategory object to remove.
-     * @return ChildProduct    The current object (for fluent API support)
+     * @return ChildProduct The current object (for fluent API support)
      */
     public function removeProductCategory($productCategory)
     {
@@ -2565,6 +2592,7 @@ abstract class Product implements ActiveRecordInterface
         return $this;
     }
 
+
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2576,9 +2604,9 @@ abstract class Product implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Product.
      *
-     * @param  Criteria                          $criteria     optional Criteria object to narrow the query
-     * @param  ConnectionInterface               $con          optional connection object
-     * @param  string                            $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildProductCategory[] List of ChildProductCategory objects
      */
     public function getProductCategoriesJoinCategory($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2618,8 +2646,8 @@ abstract class Product implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -2641,8 +2669,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                         $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface              $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildFeatureProduct[] List of ChildFeatureProduct objects
      * @throws PropelException
      */
@@ -2698,13 +2726,14 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $featureProducts A Propel collection.
-     * @param  ConnectionInterface $con             Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param      Collection $featureProducts A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProduct The current object (for fluent API support)
      */
     public function setFeatureProducts(Collection $featureProducts, ConnectionInterface $con = null)
     {
         $featureProductsToDelete = $this->getFeatureProducts(new Criteria(), $con)->diff($featureProducts);
+
 
         $this->featureProductsScheduledForDeletion = $featureProductsToDelete;
 
@@ -2726,10 +2755,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Returns the number of related FeatureProduct objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related FeatureProduct objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related FeatureProduct objects.
      * @throws PropelException
      */
     public function countFeatureProducts(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2761,8 +2790,8 @@ abstract class Product implements ActiveRecordInterface
      * Method called to associate a ChildFeatureProduct object to this object
      * through the ChildFeatureProduct foreign key attribute.
      *
-     * @param  ChildFeatureProduct   $l ChildFeatureProduct
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param    ChildFeatureProduct $l ChildFeatureProduct
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function addFeatureProduct(ChildFeatureProduct $l)
     {
@@ -2789,7 +2818,7 @@ abstract class Product implements ActiveRecordInterface
 
     /**
      * @param  FeatureProduct $featureProduct The featureProduct object to remove.
-     * @return ChildProduct   The current object (for fluent API support)
+     * @return ChildProduct The current object (for fluent API support)
      */
     public function removeFeatureProduct($featureProduct)
     {
@@ -2806,6 +2835,7 @@ abstract class Product implements ActiveRecordInterface
         return $this;
     }
 
+
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2817,9 +2847,9 @@ abstract class Product implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Product.
      *
-     * @param  Criteria                         $criteria     optional Criteria object to narrow the query
-     * @param  ConnectionInterface              $con          optional connection object
-     * @param  string                           $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildFeatureProduct[] List of ChildFeatureProduct objects
      */
     public function getFeatureProductsJoinFeature($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2830,6 +2860,7 @@ abstract class Product implements ActiveRecordInterface
         return $this->getFeatureProducts($query, $con);
     }
 
+
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -2841,9 +2872,9 @@ abstract class Product implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Product.
      *
-     * @param  Criteria                         $criteria     optional Criteria object to narrow the query
-     * @param  ConnectionInterface              $con          optional connection object
-     * @param  string                           $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildFeatureProduct[] List of ChildFeatureProduct objects
      */
     public function getFeatureProductsJoinFeatureAv($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -2883,8 +2914,8 @@ abstract class Product implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -2906,8 +2937,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                              $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface                   $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildProductSaleElements[] List of ChildProductSaleElements objects
      * @throws PropelException
      */
@@ -2963,13 +2994,14 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $productSaleElementss A Propel collection.
-     * @param  ConnectionInterface $con                  Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param      Collection $productSaleElementss A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProduct The current object (for fluent API support)
      */
     public function setProductSaleElementss(Collection $productSaleElementss, ConnectionInterface $con = null)
     {
         $productSaleElementssToDelete = $this->getProductSaleElementss(new Criteria(), $con)->diff($productSaleElementss);
+
 
         $this->productSaleElementssScheduledForDeletion = $productSaleElementssToDelete;
 
@@ -2991,10 +3023,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Returns the number of related ProductSaleElements objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related ProductSaleElements objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProductSaleElements objects.
      * @throws PropelException
      */
     public function countProductSaleElementss(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -3026,8 +3058,8 @@ abstract class Product implements ActiveRecordInterface
      * Method called to associate a ChildProductSaleElements object to this object
      * through the ChildProductSaleElements foreign key attribute.
      *
-     * @param  ChildProductSaleElements $l ChildProductSaleElements
-     * @return \Thelia\Model\Product    The current object (for fluent API support)
+     * @param    ChildProductSaleElements $l ChildProductSaleElements
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function addProductSaleElements(ChildProductSaleElements $l)
     {
@@ -3054,7 +3086,7 @@ abstract class Product implements ActiveRecordInterface
 
     /**
      * @param  ProductSaleElements $productSaleElements The productSaleElements object to remove.
-     * @return ChildProduct        The current object (for fluent API support)
+     * @return ChildProduct The current object (for fluent API support)
      */
     public function removeProductSaleElements($productSaleElements)
     {
@@ -3100,8 +3132,8 @@ abstract class Product implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -3123,8 +3155,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                       $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface            $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildProductImage[] List of ChildProductImage objects
      * @throws PropelException
      */
@@ -3180,13 +3212,14 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $productImages A Propel collection.
-     * @param  ConnectionInterface $con           Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param      Collection $productImages A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProduct The current object (for fluent API support)
      */
     public function setProductImages(Collection $productImages, ConnectionInterface $con = null)
     {
         $productImagesToDelete = $this->getProductImages(new Criteria(), $con)->diff($productImages);
+
 
         $this->productImagesScheduledForDeletion = $productImagesToDelete;
 
@@ -3208,10 +3241,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Returns the number of related ProductImage objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related ProductImage objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProductImage objects.
      * @throws PropelException
      */
     public function countProductImages(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -3243,8 +3276,8 @@ abstract class Product implements ActiveRecordInterface
      * Method called to associate a ChildProductImage object to this object
      * through the ChildProductImage foreign key attribute.
      *
-     * @param  ChildProductImage     $l ChildProductImage
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param    ChildProductImage $l ChildProductImage
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function addProductImage(ChildProductImage $l)
     {
@@ -3317,8 +3350,8 @@ abstract class Product implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -3340,8 +3373,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                          $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface               $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildProductDocument[] List of ChildProductDocument objects
      * @throws PropelException
      */
@@ -3397,13 +3430,14 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $productDocuments A Propel collection.
-     * @param  ConnectionInterface $con              Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param      Collection $productDocuments A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProduct The current object (for fluent API support)
      */
     public function setProductDocuments(Collection $productDocuments, ConnectionInterface $con = null)
     {
         $productDocumentsToDelete = $this->getProductDocuments(new Criteria(), $con)->diff($productDocuments);
+
 
         $this->productDocumentsScheduledForDeletion = $productDocumentsToDelete;
 
@@ -3425,10 +3459,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Returns the number of related ProductDocument objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related ProductDocument objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProductDocument objects.
      * @throws PropelException
      */
     public function countProductDocuments(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -3460,8 +3494,8 @@ abstract class Product implements ActiveRecordInterface
      * Method called to associate a ChildProductDocument object to this object
      * through the ChildProductDocument foreign key attribute.
      *
-     * @param  ChildProductDocument  $l ChildProductDocument
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param    ChildProductDocument $l ChildProductDocument
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function addProductDocument(ChildProductDocument $l)
     {
@@ -3488,7 +3522,7 @@ abstract class Product implements ActiveRecordInterface
 
     /**
      * @param  ProductDocument $productDocument The productDocument object to remove.
-     * @return ChildProduct    The current object (for fluent API support)
+     * @return ChildProduct The current object (for fluent API support)
      */
     public function removeProductDocument($productDocument)
     {
@@ -3534,8 +3568,8 @@ abstract class Product implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -3557,8 +3591,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                    $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface         $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildAccessory[] List of ChildAccessory objects
      * @throws PropelException
      */
@@ -3614,13 +3648,14 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $accessoriesRelatedByProductId A Propel collection.
-     * @param  ConnectionInterface $con                           Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param      Collection $accessoriesRelatedByProductId A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProduct The current object (for fluent API support)
      */
     public function setAccessoriesRelatedByProductId(Collection $accessoriesRelatedByProductId, ConnectionInterface $con = null)
     {
         $accessoriesRelatedByProductIdToDelete = $this->getAccessoriesRelatedByProductId(new Criteria(), $con)->diff($accessoriesRelatedByProductId);
+
 
         $this->accessoriesRelatedByProductIdScheduledForDeletion = $accessoriesRelatedByProductIdToDelete;
 
@@ -3642,10 +3677,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Returns the number of related Accessory objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related Accessory objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Accessory objects.
      * @throws PropelException
      */
     public function countAccessoriesRelatedByProductId(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -3677,8 +3712,8 @@ abstract class Product implements ActiveRecordInterface
      * Method called to associate a ChildAccessory object to this object
      * through the ChildAccessory foreign key attribute.
      *
-     * @param  ChildAccessory        $l ChildAccessory
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param    ChildAccessory $l ChildAccessory
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function addAccessoryRelatedByProductId(ChildAccessory $l)
     {
@@ -3705,7 +3740,7 @@ abstract class Product implements ActiveRecordInterface
 
     /**
      * @param  AccessoryRelatedByProductId $accessoryRelatedByProductId The accessoryRelatedByProductId object to remove.
-     * @return ChildProduct                The current object (for fluent API support)
+     * @return ChildProduct The current object (for fluent API support)
      */
     public function removeAccessoryRelatedByProductId($accessoryRelatedByProductId)
     {
@@ -3751,8 +3786,8 @@ abstract class Product implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -3774,8 +3809,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                    $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface         $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildAccessory[] List of ChildAccessory objects
      * @throws PropelException
      */
@@ -3831,13 +3866,14 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $accessoriesRelatedByAccessory A Propel collection.
-     * @param  ConnectionInterface $con                           Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param      Collection $accessoriesRelatedByAccessory A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProduct The current object (for fluent API support)
      */
     public function setAccessoriesRelatedByAccessory(Collection $accessoriesRelatedByAccessory, ConnectionInterface $con = null)
     {
         $accessoriesRelatedByAccessoryToDelete = $this->getAccessoriesRelatedByAccessory(new Criteria(), $con)->diff($accessoriesRelatedByAccessory);
+
 
         $this->accessoriesRelatedByAccessoryScheduledForDeletion = $accessoriesRelatedByAccessoryToDelete;
 
@@ -3859,10 +3895,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Returns the number of related Accessory objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related Accessory objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Accessory objects.
      * @throws PropelException
      */
     public function countAccessoriesRelatedByAccessory(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -3894,8 +3930,8 @@ abstract class Product implements ActiveRecordInterface
      * Method called to associate a ChildAccessory object to this object
      * through the ChildAccessory foreign key attribute.
      *
-     * @param  ChildAccessory        $l ChildAccessory
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param    ChildAccessory $l ChildAccessory
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function addAccessoryRelatedByAccessory(ChildAccessory $l)
     {
@@ -3922,7 +3958,7 @@ abstract class Product implements ActiveRecordInterface
 
     /**
      * @param  AccessoryRelatedByAccessory $accessoryRelatedByAccessory The accessoryRelatedByAccessory object to remove.
-     * @return ChildProduct                The current object (for fluent API support)
+     * @return ChildProduct The current object (for fluent API support)
      */
     public function removeAccessoryRelatedByAccessory($accessoryRelatedByAccessory)
     {
@@ -3968,8 +4004,8 @@ abstract class Product implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -3991,8 +4027,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                   $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface        $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildCartItem[] List of ChildCartItem objects
      * @throws PropelException
      */
@@ -4048,13 +4084,14 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $cartItems A Propel collection.
-     * @param  ConnectionInterface $con       Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param      Collection $cartItems A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProduct The current object (for fluent API support)
      */
     public function setCartItems(Collection $cartItems, ConnectionInterface $con = null)
     {
         $cartItemsToDelete = $this->getCartItems(new Criteria(), $con)->diff($cartItems);
+
 
         $this->cartItemsScheduledForDeletion = $cartItemsToDelete;
 
@@ -4076,10 +4113,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Returns the number of related CartItem objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related CartItem objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CartItem objects.
      * @throws PropelException
      */
     public function countCartItems(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -4111,8 +4148,8 @@ abstract class Product implements ActiveRecordInterface
      * Method called to associate a ChildCartItem object to this object
      * through the ChildCartItem foreign key attribute.
      *
-     * @param  ChildCartItem         $l ChildCartItem
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param    ChildCartItem $l ChildCartItem
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function addCartItem(ChildCartItem $l)
     {
@@ -4138,7 +4175,7 @@ abstract class Product implements ActiveRecordInterface
     }
 
     /**
-     * @param  CartItem     $cartItem The cartItem object to remove.
+     * @param  CartItem $cartItem The cartItem object to remove.
      * @return ChildProduct The current object (for fluent API support)
      */
     public function removeCartItem($cartItem)
@@ -4156,6 +4193,7 @@ abstract class Product implements ActiveRecordInterface
         return $this;
     }
 
+
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -4167,9 +4205,9 @@ abstract class Product implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Product.
      *
-     * @param  Criteria                   $criteria     optional Criteria object to narrow the query
-     * @param  ConnectionInterface        $con          optional connection object
-     * @param  string                     $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildCartItem[] List of ChildCartItem objects
      */
     public function getCartItemsJoinCart($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -4180,6 +4218,7 @@ abstract class Product implements ActiveRecordInterface
         return $this->getCartItems($query, $con);
     }
 
+
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -4191,9 +4230,9 @@ abstract class Product implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Product.
      *
-     * @param  Criteria                   $criteria     optional Criteria object to narrow the query
-     * @param  ConnectionInterface        $con          optional connection object
-     * @param  string                     $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildCartItem[] List of ChildCartItem objects
      */
     public function getCartItemsJoinProductSaleElements($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -4233,8 +4272,8 @@ abstract class Product implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -4256,8 +4295,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                                   $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface                        $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildProductAssociatedContent[] List of ChildProductAssociatedContent objects
      * @throws PropelException
      */
@@ -4313,13 +4352,14 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $productAssociatedContents A Propel collection.
-     * @param  ConnectionInterface $con                       Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param      Collection $productAssociatedContents A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProduct The current object (for fluent API support)
      */
     public function setProductAssociatedContents(Collection $productAssociatedContents, ConnectionInterface $con = null)
     {
         $productAssociatedContentsToDelete = $this->getProductAssociatedContents(new Criteria(), $con)->diff($productAssociatedContents);
+
 
         $this->productAssociatedContentsScheduledForDeletion = $productAssociatedContentsToDelete;
 
@@ -4341,10 +4381,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Returns the number of related ProductAssociatedContent objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related ProductAssociatedContent objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProductAssociatedContent objects.
      * @throws PropelException
      */
     public function countProductAssociatedContents(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -4376,8 +4416,8 @@ abstract class Product implements ActiveRecordInterface
      * Method called to associate a ChildProductAssociatedContent object to this object
      * through the ChildProductAssociatedContent foreign key attribute.
      *
-     * @param  ChildProductAssociatedContent $l ChildProductAssociatedContent
-     * @return \Thelia\Model\Product         The current object (for fluent API support)
+     * @param    ChildProductAssociatedContent $l ChildProductAssociatedContent
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function addProductAssociatedContent(ChildProductAssociatedContent $l)
     {
@@ -4404,7 +4444,7 @@ abstract class Product implements ActiveRecordInterface
 
     /**
      * @param  ProductAssociatedContent $productAssociatedContent The productAssociatedContent object to remove.
-     * @return ChildProduct             The current object (for fluent API support)
+     * @return ChildProduct The current object (for fluent API support)
      */
     public function removeProductAssociatedContent($productAssociatedContent)
     {
@@ -4421,6 +4461,7 @@ abstract class Product implements ActiveRecordInterface
         return $this;
     }
 
+
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
@@ -4432,9 +4473,9 @@ abstract class Product implements ActiveRecordInterface
      * api reasonable.  You can provide public methods for those you
      * actually need in Product.
      *
-     * @param  Criteria                                   $criteria     optional Criteria object to narrow the query
-     * @param  ConnectionInterface                        $con          optional connection object
-     * @param  string                                     $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildProductAssociatedContent[] List of ChildProductAssociatedContent objects
      */
     public function getProductAssociatedContentsJoinContent($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
@@ -4474,8 +4515,8 @@ abstract class Product implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -4497,8 +4538,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                      $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface           $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildProductI18n[] List of ChildProductI18n objects
      * @throws PropelException
      */
@@ -4554,13 +4595,14 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $productI18ns A Propel collection.
-     * @param  ConnectionInterface $con          Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param      Collection $productI18ns A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProduct The current object (for fluent API support)
      */
     public function setProductI18ns(Collection $productI18ns, ConnectionInterface $con = null)
     {
         $productI18nsToDelete = $this->getProductI18ns(new Criteria(), $con)->diff($productI18ns);
+
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
@@ -4585,10 +4627,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Returns the number of related ProductI18n objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related ProductI18n objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProductI18n objects.
      * @throws PropelException
      */
     public function countProductI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -4620,8 +4662,8 @@ abstract class Product implements ActiveRecordInterface
      * Method called to associate a ChildProductI18n object to this object
      * through the ChildProductI18n foreign key attribute.
      *
-     * @param  ChildProductI18n      $l ChildProductI18n
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param    ChildProductI18n $l ChildProductI18n
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function addProductI18n(ChildProductI18n $l)
     {
@@ -4651,7 +4693,7 @@ abstract class Product implements ActiveRecordInterface
     }
 
     /**
-     * @param  ProductI18n  $productI18n The productI18n object to remove.
+     * @param  ProductI18n $productI18n The productI18n object to remove.
      * @return ChildProduct The current object (for fluent API support)
      */
     public function removeProductI18n($productI18n)
@@ -4698,8 +4740,8 @@ abstract class Product implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -4721,8 +4763,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                         $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface              $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildProductVersion[] List of ChildProductVersion objects
      * @throws PropelException
      */
@@ -4778,13 +4820,14 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $productVersions A Propel collection.
-     * @param  ConnectionInterface $con             Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param      Collection $productVersions A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProduct The current object (for fluent API support)
      */
     public function setProductVersions(Collection $productVersions, ConnectionInterface $con = null)
     {
         $productVersionsToDelete = $this->getProductVersions(new Criteria(), $con)->diff($productVersions);
+
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
@@ -4809,10 +4852,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Returns the number of related ProductVersion objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related ProductVersion objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProductVersion objects.
      * @throws PropelException
      */
     public function countProductVersions(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -4844,8 +4887,8 @@ abstract class Product implements ActiveRecordInterface
      * Method called to associate a ChildProductVersion object to this object
      * through the ChildProductVersion foreign key attribute.
      *
-     * @param  ChildProductVersion   $l ChildProductVersion
-     * @return \Thelia\Model\Product The current object (for fluent API support)
+     * @param    ChildProductVersion $l ChildProductVersion
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
     public function addProductVersion(ChildProductVersion $l)
     {
@@ -4872,7 +4915,7 @@ abstract class Product implements ActiveRecordInterface
 
     /**
      * @param  ProductVersion $productVersion The productVersion object to remove.
-     * @return ChildProduct   The current object (for fluent API support)
+     * @return ChildProduct The current object (for fluent API support)
      */
     public function removeProductVersion($productVersion)
     {
@@ -4929,8 +4972,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param Criteria            $criteria Optional query object to filter the query
-     * @param ConnectionInterface $con      Optional connection object
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
      *
      * @return ObjectCollection|ChildCategory[] List of ChildCategory objects
      */
@@ -4960,9 +5003,9 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $categories A Propel collection.
-     * @param  ConnectionInterface $con        Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param  Collection $categories A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return ChildProduct The current object (for fluent API support)
      */
     public function setCategories(Collection $categories, ConnectionInterface $con = null)
     {
@@ -4986,9 +5029,9 @@ abstract class Product implements ActiveRecordInterface
      * Gets the number of ChildCategory objects related by a many-to-many relationship
      * to the current object by way of the product_category cross-reference table.
      *
-     * @param Criteria            $criteria Optional query object to filter the query
-     * @param boolean             $distinct Set to true to force count distinct
-     * @param ConnectionInterface $con      Optional connection object
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
      *
      * @return int the number of related ChildCategory objects
      */
@@ -5017,7 +5060,7 @@ abstract class Product implements ActiveRecordInterface
      * through the product_category cross reference table.
      *
      * @param  ChildCategory $category The ChildProductCategory object to relate
-     * @return ChildProduct  The current object (for fluent API support)
+     * @return ChildProduct The current object (for fluent API support)
      */
     public function addCategory(ChildCategory $category)
     {
@@ -5034,7 +5077,7 @@ abstract class Product implements ActiveRecordInterface
     }
 
     /**
-     * @param Category $category The category object to add.
+     * @param    Category $category The category object to add.
      */
     protected function doAddCategory($category)
     {
@@ -5053,8 +5096,8 @@ abstract class Product implements ActiveRecordInterface
      * Remove a ChildCategory object to this object
      * through the product_category cross reference table.
      *
-     * @param  ChildCategory $category The ChildProductCategory object to relate
-     * @return ChildProduct  The current object (for fluent API support)
+     * @param ChildCategory $category The ChildProductCategory object to relate
+     * @return ChildProduct The current object (for fluent API support)
      */
     public function removeCategory(ChildCategory $category)
     {
@@ -5112,8 +5155,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param Criteria            $criteria Optional query object to filter the query
-     * @param ConnectionInterface $con      Optional connection object
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
      *
      * @return ObjectCollection|ChildProduct[] List of ChildProduct objects
      */
@@ -5143,9 +5186,9 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $productsRelatedByAccessory A Propel collection.
-     * @param  ConnectionInterface $con                        Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param  Collection $productsRelatedByAccessory A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return ChildProduct The current object (for fluent API support)
      */
     public function setProductsRelatedByAccessory(Collection $productsRelatedByAccessory, ConnectionInterface $con = null)
     {
@@ -5169,9 +5212,9 @@ abstract class Product implements ActiveRecordInterface
      * Gets the number of ChildProduct objects related by a many-to-many relationship
      * to the current object by way of the accessory cross-reference table.
      *
-     * @param Criteria            $criteria Optional query object to filter the query
-     * @param boolean             $distinct Set to true to force count distinct
-     * @param ConnectionInterface $con      Optional connection object
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
      *
      * @return int the number of related ChildProduct objects
      */
@@ -5217,7 +5260,7 @@ abstract class Product implements ActiveRecordInterface
     }
 
     /**
-     * @param ProductRelatedByAccessory $productRelatedByAccessory The productRelatedByAccessory object to add.
+     * @param    ProductRelatedByAccessory $productRelatedByAccessory The productRelatedByAccessory object to add.
      */
     protected function doAddProductRelatedByAccessory($productRelatedByAccessory)
     {
@@ -5236,7 +5279,7 @@ abstract class Product implements ActiveRecordInterface
      * Remove a ChildProduct object to this object
      * through the accessory cross reference table.
      *
-     * @param  ChildProduct $product The ChildAccessory object to relate
+     * @param ChildProduct $product The ChildAccessory object to relate
      * @return ChildProduct The current object (for fluent API support)
      */
     public function removeProductRelatedByAccessory(ChildProduct $product)
@@ -5295,8 +5338,8 @@ abstract class Product implements ActiveRecordInterface
      * If this ChildProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param Criteria            $criteria Optional query object to filter the query
-     * @param ConnectionInterface $con      Optional connection object
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
      *
      * @return ObjectCollection|ChildProduct[] List of ChildProduct objects
      */
@@ -5326,9 +5369,9 @@ abstract class Product implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $productsRelatedByProductId A Propel collection.
-     * @param  ConnectionInterface $con                        Optional connection object
-     * @return ChildProduct        The current object (for fluent API support)
+     * @param  Collection $productsRelatedByProductId A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return ChildProduct The current object (for fluent API support)
      */
     public function setProductsRelatedByProductId(Collection $productsRelatedByProductId, ConnectionInterface $con = null)
     {
@@ -5352,9 +5395,9 @@ abstract class Product implements ActiveRecordInterface
      * Gets the number of ChildProduct objects related by a many-to-many relationship
      * to the current object by way of the accessory cross-reference table.
      *
-     * @param Criteria            $criteria Optional query object to filter the query
-     * @param boolean             $distinct Set to true to force count distinct
-     * @param ConnectionInterface $con      Optional connection object
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
      *
      * @return int the number of related ChildProduct objects
      */
@@ -5400,7 +5443,7 @@ abstract class Product implements ActiveRecordInterface
     }
 
     /**
-     * @param ProductRelatedByProductId $productRelatedByProductId The productRelatedByProductId object to add.
+     * @param    ProductRelatedByProductId $productRelatedByProductId The productRelatedByProductId object to add.
      */
     protected function doAddProductRelatedByProductId($productRelatedByProductId)
     {
@@ -5419,7 +5462,7 @@ abstract class Product implements ActiveRecordInterface
      * Remove a ChildProduct object to this object
      * through the accessory cross reference table.
      *
-     * @param  ChildProduct $product The ChildAccessory object to relate
+     * @param ChildProduct $product The ChildAccessory object to relate
      * @return ChildProduct The current object (for fluent API support)
      */
     public function removeProductRelatedByProductId(ChildProduct $product)
@@ -5469,7 +5512,7 @@ abstract class Product implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param boolean $deep Whether to also clear the references on all referrer objects.
+     * @param      boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -5583,7 +5626,7 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return ChildProduct The current object (for fluent API support)
+     * @return     ChildProduct The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
@@ -5597,9 +5640,9 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Sets the locale for translations
      *
-     * @param string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
      *
-     * @return ChildProduct The current object (for fluent API support)
+     * @return    ChildProduct The current object (for fluent API support)
      */
     public function setLocale($locale = 'en_US')
     {
@@ -5611,7 +5654,7 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Gets the locale for translations
      *
-     * @return string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
      */
     public function getLocale()
     {
@@ -5621,8 +5664,8 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Returns the current translation for a given locale
      *
-     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param ConnectionInterface $con    an optional connection object
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildProductI18n */
     public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
@@ -5655,10 +5698,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Remove the translation for a given locale
      *
-     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param ConnectionInterface $con    an optional connection object
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     ConnectionInterface $con an optional connection object
      *
-     * @return ChildProduct The current object (for fluent API support)
+     * @return    ChildProduct The current object (for fluent API support)
      */
     public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
@@ -5683,13 +5726,14 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Returns the current translation
      *
-     * @param ConnectionInterface $con an optional connection object
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildProductI18n */
     public function getCurrentTranslation(ConnectionInterface $con = null)
     {
         return $this->getTranslation($this->getLocale(), $con);
     }
+
 
         /**
          * Get the [title] column value.
@@ -5700,6 +5744,7 @@ abstract class Product implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getTitle();
     }
+
 
         /**
          * Set the value of [title] column.
@@ -5713,6 +5758,7 @@ abstract class Product implements ActiveRecordInterface
         return $this;
     }
 
+
         /**
          * Get the [description] column value.
          *
@@ -5722,6 +5768,7 @@ abstract class Product implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getDescription();
     }
+
 
         /**
          * Set the value of [description] column.
@@ -5735,6 +5782,7 @@ abstract class Product implements ActiveRecordInterface
         return $this;
     }
 
+
         /**
          * Get the [chapo] column value.
          *
@@ -5744,6 +5792,7 @@ abstract class Product implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getChapo();
     }
+
 
         /**
          * Set the value of [chapo] column.
@@ -5757,6 +5806,7 @@ abstract class Product implements ActiveRecordInterface
         return $this;
     }
 
+
         /**
          * Get the [postscriptum] column value.
          *
@@ -5766,6 +5816,7 @@ abstract class Product implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getPostscriptum();
     }
+
 
         /**
          * Set the value of [postscriptum] column.
@@ -5779,6 +5830,7 @@ abstract class Product implements ActiveRecordInterface
         return $this;
     }
 
+
         /**
          * Get the [meta_title] column value.
          *
@@ -5788,6 +5840,7 @@ abstract class Product implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getMetaTitle();
     }
+
 
         /**
          * Set the value of [meta_title] column.
@@ -5801,6 +5854,7 @@ abstract class Product implements ActiveRecordInterface
         return $this;
     }
 
+
         /**
          * Get the [meta_description] column value.
          *
@@ -5810,6 +5864,7 @@ abstract class Product implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getMetaDescription();
     }
+
 
         /**
          * Set the value of [meta_description] column.
@@ -5823,6 +5878,7 @@ abstract class Product implements ActiveRecordInterface
         return $this;
     }
 
+
         /**
          * Get the [meta_keywords] column value.
          *
@@ -5832,6 +5888,7 @@ abstract class Product implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getMetaKeywords();
     }
+
 
         /**
          * Set the value of [meta_keywords] column.
@@ -5862,7 +5919,7 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Checks whether the current state must be recorded as a version
      *
-     * @return boolean
+     * @return  boolean
      */
     public function isVersioningNecessary($con = null)
     {
@@ -5884,9 +5941,9 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Creates a version of the current object and saves it.
      *
-     * @param ConnectionInterface $con the connection to use
+     * @param   ConnectionInterface $con the connection to use
      *
-     * @return ChildProductVersion A version object
+     * @return  ChildProductVersion A version object
      */
     public function addVersion($con = null)
     {
@@ -5913,10 +5970,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Sets the properties of the current object to the value they had at a specific version
      *
-     * @param integer             $versionNumber The version number to read
-     * @param ConnectionInterface $con           The connection to use
+     * @param   integer $versionNumber The version number to read
+     * @param   ConnectionInterface $con The connection to use
      *
-     * @return ChildProduct The current object (for fluent API support)
+     * @return  ChildProduct The current object (for fluent API support)
      */
     public function toVersion($versionNumber, $con = null)
     {
@@ -5932,9 +5989,9 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Sets the properties of the current object to the value they had at a specific version
      *
-     * @param ChildProductVersion $version       The version object to use
-     * @param ConnectionInterface $con           the connection to use
-     * @param array               $loadedObjects objects that been loaded in a chain of populateFromVersion calls on referrer or fk objects.
+     * @param ChildProductVersion $version The version object to use
+     * @param ConnectionInterface   $con the connection to use
+     * @param array                 $loadedObjects objects that been loaded in a chain of populateFromVersion calls on referrer or fk objects.
      *
      * @return ChildProduct The current object (for fluent API support)
      */
@@ -5959,9 +6016,9 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Gets the latest persisted version number for the current object
      *
-     * @param ConnectionInterface $con the connection to use
+     * @param   ConnectionInterface $con the connection to use
      *
-     * @return integer
+     * @return  integer
      */
     public function getLastVersionNumber($con = null)
     {
@@ -5979,9 +6036,9 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Checks whether the current object is the latest one
      *
-     * @param ConnectionInterface $con the connection to use
+     * @param   ConnectionInterface $con the connection to use
      *
-     * @return Boolean
+     * @return  Boolean
      */
     public function isLastVersion($con = null)
     {
@@ -5991,10 +6048,10 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Retrieves a version object for this entity and a version number
      *
-     * @param integer             $versionNumber The version number to read
-     * @param ConnectionInterface $con           the connection to use
+     * @param   integer $versionNumber The version number to read
+     * @param   ConnectionInterface $con the connection to use
      *
-     * @return ChildProductVersion A version object
+     * @return  ChildProductVersion A version object
      */
     public function getOneVersion($versionNumber, $con = null)
     {
@@ -6007,9 +6064,9 @@ abstract class Product implements ActiveRecordInterface
     /**
      * Gets all the versions of this object, in incremental order
      *
-     * @param ConnectionInterface $con the connection to use
+     * @param   ConnectionInterface $con the connection to use
      *
-     * @return ObjectCollection A list of ChildProductVersion objects
+     * @return  ObjectCollection A list of ChildProductVersion objects
      */
     public function getAllVersions($con = null)
     {
@@ -6029,12 +6086,12 @@ abstract class Product implements ActiveRecordInterface
      * );
      * </code>
      *
-     * @param integer             $versionNumber
-     * @param string              $keys           Main key used for the result diff (versions|columns)
-     * @param ConnectionInterface $con            the connection to use
-     * @param array               $ignoredColumns The columns to exclude from the diff.
+     * @param   integer             $versionNumber
+     * @param   string              $keys Main key used for the result diff (versions|columns)
+     * @param   ConnectionInterface $con the connection to use
+     * @param   array               $ignoredColumns  The columns to exclude from the diff.
      *
-     * @return array A list of differences
+     * @return  array A list of differences
      */
     public function compareVersion($versionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
     {
@@ -6054,13 +6111,13 @@ abstract class Product implements ActiveRecordInterface
      * );
      * </code>
      *
-     * @param integer             $fromVersionNumber
-     * @param integer             $toVersionNumber
-     * @param string              $keys              Main key used for the result diff (versions|columns)
-     * @param ConnectionInterface $con               the connection to use
-     * @param array               $ignoredColumns    The columns to exclude from the diff.
+     * @param   integer             $fromVersionNumber
+     * @param   integer             $toVersionNumber
+     * @param   string              $keys Main key used for the result diff (versions|columns)
+     * @param   ConnectionInterface $con the connection to use
+     * @param   array               $ignoredColumns  The columns to exclude from the diff.
      *
-     * @return array A list of differences
+     * @return  array A list of differences
      */
     public function compareVersions($fromVersionNumber, $toVersionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
     {
@@ -6080,12 +6137,12 @@ abstract class Product implements ActiveRecordInterface
      * );
      * </code>
      *
-     * @param array  $fromVersion    An array representing the original version.
-     * @param array  $toVersion      An array representing the destination version.
-     * @param string $keys           Main key used for the result diff (versions|columns).
-     * @param array  $ignoredColumns The columns to exclude from the diff.
+     * @param   array     $fromVersion     An array representing the original version.
+     * @param   array     $toVersion       An array representing the destination version.
+     * @param   string    $keys            Main key used for the result diff (versions|columns).
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
      *
-     * @return array A list of differences
+     * @return  array A list of differences
      */
     protected function computeDiff($fromVersion, $toVersion, $keys = 'columns', $ignoredColumns = array())
     {
@@ -6122,7 +6179,7 @@ abstract class Product implements ActiveRecordInterface
     /**
      * retrieve the last $number versions.
      *
-     * @param  Integer                $number the number of record to return.
+     * @param Integer $number the number of record to return.
      * @return PropelCollection|array \Thelia\Model\ProductVersion[] List of \Thelia\Model\ProductVersion objects
      */
     public function getLastVersions($number = 10, $criteria = null, $con = null)
@@ -6208,6 +6265,7 @@ abstract class Product implements ActiveRecordInterface
     {
 
     }
+
 
     /**
      * Derived method to catches calls to undefined methods.

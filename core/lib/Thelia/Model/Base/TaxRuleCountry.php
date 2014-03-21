@@ -33,6 +33,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\TaxRuleCountryTableMap';
 
+
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -327,9 +328,9 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed  $parser A AbstractParser instance,
+     * @param mixed $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data   The source data to import from
+     * @param string $data The source data to import from
      *
      * @return TaxRuleCountry The current object, for fluid interface
      */
@@ -379,40 +380,44 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Get the [tax_rule_id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getTaxRuleId()
     {
+
         return $this->tax_rule_id;
     }
 
     /**
      * Get the [country_id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getCountryId()
     {
+
         return $this->country_id;
     }
 
     /**
      * Get the [tax_id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getTaxId()
     {
+
         return $this->tax_id;
     }
 
     /**
      * Get the [position] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getPosition()
     {
+
         return $this->position;
     }
 
@@ -420,8 +425,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -440,8 +445,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -459,8 +464,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Set the value of [tax_rule_id] column.
      *
-     * @param  int                          $v new value
-     * @return \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
      */
     public function setTaxRuleId($v)
     {
@@ -477,14 +482,15 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
             $this->aTaxRule = null;
         }
 
+
         return $this;
     } // setTaxRuleId()
 
     /**
      * Set the value of [country_id] column.
      *
-     * @param  int                          $v new value
-     * @return \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
      */
     public function setCountryId($v)
     {
@@ -501,14 +507,15 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
             $this->aCountry = null;
         }
 
+
         return $this;
     } // setCountryId()
 
     /**
      * Set the value of [tax_id] column.
      *
-     * @param  int                          $v new value
-     * @return \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
      */
     public function setTaxId($v)
     {
@@ -525,14 +532,15 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
             $this->aTax = null;
         }
 
+
         return $this;
     } // setTaxId()
 
     /**
      * Set the value of [position] column.
      *
-     * @param  int                          $v new value
-     * @return \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
      */
     public function setPosition($v)
     {
@@ -545,15 +553,16 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
             $this->modifiedColumns[TaxRuleCountryTableMap::POSITION] = true;
         }
 
+
         return $this;
     } // setPosition()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                        $v string, integer (timestamp), or \DateTime value.
-     *                                         Empty strings are treated as NULL.
-     * @return \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -565,15 +574,16 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
             }
         } // if either are not null
 
+
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                        $v string, integer (timestamp), or \DateTime value.
-     *                                         Empty strings are treated as NULL.
-     * @return \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -584,6 +594,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
                 $this->modifiedColumns[TaxRuleCountryTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
+
 
         return $this;
     } // setUpdatedAt()
@@ -694,10 +705,10 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
-     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
+     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
+     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -735,7 +746,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param  ConnectionInterface $con
+     * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see TaxRuleCountry::setDeleted()
@@ -778,8 +789,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -840,8 +851,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -898,7 +909,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -907,6 +918,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     {
         $modifiedColumns = array();
         $index = 0;
+
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(TaxRuleCountryTableMap::TAX_RULE_ID)) {
@@ -970,7 +982,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -986,12 +998,12 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param  string $name name
-     * @param  string $type The type of fieldname the $name is of:
-     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                      Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed  Value of field.
+     * @param      string $name name
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1005,7 +1017,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos position in xml schema
+     * @param      int $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1041,12 +1053,12 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                                        Defaults to TableMap::TYPE_PHPNAME.
-     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
-     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                    Defaults to TableMap::TYPE_PHPNAME.
+     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1088,12 +1100,12 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param  string $name
-     * @param  mixed  $value field value
-     * @param  string $type  The type of fieldname the $name is of:
-     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                       Defaults to TableMap::TYPE_PHPNAME.
+     * @param      string $name
+     * @param      mixed  $value field value
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1107,8 +1119,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos   position in xml schema
-     * @param  mixed $value field value
+     * @param      int $pos position in xml schema
+     * @param      mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1148,8 +1160,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param  array  $arr     An array to populate the object from.
-     * @param  string $keyType The type of keys the array uses.
+     * @param      array  $arr     An array to populate the object from.
+     * @param      string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1179,6 +1191,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
         if ($this->isColumnModified(TaxRuleCountryTableMap::POSITION)) $criteria->add(TaxRuleCountryTableMap::POSITION, $this->position);
         if ($this->isColumnModified(TaxRuleCountryTableMap::CREATED_AT)) $criteria->add(TaxRuleCountryTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(TaxRuleCountryTableMap::UPDATED_AT)) $criteria->add(TaxRuleCountryTableMap::UPDATED_AT, $this->updated_at);
+
         return $criteria;
     }
 
@@ -1218,7 +1231,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Set the [composite] primary key.
      *
-     * @param  array $keys The elements of the composite key (order must match the order in XML file).
+     * @param      array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
     public function setPrimaryKey($keys)
@@ -1234,6 +1247,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
+
         return (null === $this->getTaxRuleId()) && (null === $this->getCountryId()) && (null === $this->getTaxId());
     }
 
@@ -1243,9 +1257,9 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  object          $copyObj  An object of \Thelia\Model\TaxRuleCountry (or compatible) type.
-     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
+     * @param      object $copyObj An object of \Thelia\Model\TaxRuleCountry (or compatible) type.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1269,8 +1283,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  boolean                      $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Thelia\Model\TaxRuleCountry Clone of current object.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return                 \Thelia\Model\TaxRuleCountry Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1286,8 +1300,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildTax object.
      *
-     * @param  ChildTax                     $v
-     * @return \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
+     * @param                  ChildTax $v
+     * @return                 \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
      * @throws PropelException
      */
     public function setTax(ChildTax $v = null)
@@ -1306,6 +1320,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
             $v->addTaxRuleCountry($this);
         }
 
+
         return $this;
     }
 
@@ -1313,8 +1328,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Get the associated ChildTax object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildTax            The associated ChildTax object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildTax The associated ChildTax object.
      * @throws PropelException
      */
     public function getTax(ConnectionInterface $con = null)
@@ -1336,8 +1351,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildTaxRule object.
      *
-     * @param  ChildTaxRule                 $v
-     * @return \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
+     * @param                  ChildTaxRule $v
+     * @return                 \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
      * @throws PropelException
      */
     public function setTaxRule(ChildTaxRule $v = null)
@@ -1356,6 +1371,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
             $v->addTaxRuleCountry($this);
         }
 
+
         return $this;
     }
 
@@ -1363,8 +1379,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Get the associated ChildTaxRule object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildTaxRule        The associated ChildTaxRule object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildTaxRule The associated ChildTaxRule object.
      * @throws PropelException
      */
     public function getTaxRule(ConnectionInterface $con = null)
@@ -1386,8 +1402,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildCountry object.
      *
-     * @param  ChildCountry                 $v
-     * @return \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
+     * @param                  ChildCountry $v
+     * @return                 \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCountry(ChildCountry $v = null)
@@ -1406,6 +1422,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
             $v->addTaxRuleCountry($this);
         }
 
+
         return $this;
     }
 
@@ -1413,8 +1430,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Get the associated ChildCountry object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildCountry        The associated ChildCountry object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCountry The associated ChildCountry object.
      * @throws PropelException
      */
     public function getCountry(ConnectionInterface $con = null)
@@ -1458,7 +1475,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param boolean $deep Whether to also clear the references on all referrer objects.
+     * @param      boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -1485,7 +1502,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return ChildTaxRuleCountry The current object (for fluent API support)
+     * @return     ChildTaxRuleCountry The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {

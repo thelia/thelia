@@ -8,6 +8,13 @@ use Thelia\Model\Base\Cart as BaseCart;
 
 class Cart extends BaseCart
 {
+    /**
+     * Duplicate the current existing cart. Only the token is changed
+     *
+     * @param $token
+     * @param  Customer $customer
+     * @return Cart
+     */
     public function duplicate($token, Customer $customer = null)
     {
         $cartItems = $this->getCartItems();
@@ -62,6 +69,11 @@ class Cart extends BaseCart
         return $cart;
     }
 
+    /**
+     * Retrieve the last item added in the cart
+     *
+     * @return CartItem
+     */
     public function getLastCartItemAdded()
     {
         return CartItemQuery::create()
@@ -71,6 +83,18 @@ class Cart extends BaseCart
         ;
     }
 
+    /**
+     *
+     * Retrieve the total taxed amount.
+     *
+     * By default, the total include the discount
+     *
+     * /!\ The postage amount is not available so it's the total with or without discount an without postage
+     *
+     * @param  Country   $country
+     * @param  bool      $discount
+     * @return float|int
+     */
     public function getTaxedAmount(Country $country, $discount = true)
     {
         $total = 0;
@@ -86,7 +110,13 @@ class Cart extends BaseCart
         return $total;
     }
 
-    public function getTotalAmount()
+    /**
+     *
+     * @see getTaxedAmount same as this method but the amount is without taxes
+     * @param  bool      $discount
+     * @return float|int
+     */
+    public function getTotalAmount($discount = true)
     {
         $total = 0;
 
@@ -97,11 +127,18 @@ class Cart extends BaseCart
             $total += $subtotal;
         }
 
-        $total -= $this->getDiscount();
+        if ($discount) {
+            $total -= $this->getDiscount();
+        }
 
         return $total;
     }
 
+    /**
+     * Retrieve the total weight for all products in cart
+     *
+     * @return float|int
+     */
     public function getWeight()
     {
         $weight = 0;

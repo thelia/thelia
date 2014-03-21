@@ -35,7 +35,7 @@ use Symfony\Component\Filesystem\Filesystem;
  * @package Thelia\Tests\Command
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CacheClearTest extends \PHPUnit_Framework_TestCase
+class CacheClearTestSaved extends \PHPUnit_Framework_TestCase
 {
 
     public $cache_dir;

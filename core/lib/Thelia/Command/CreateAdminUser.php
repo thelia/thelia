@@ -83,7 +83,7 @@ class CreateAdminUser extends ContainerAwareCommand
     {
         $output->writeln('Please enter the admin user information:');
 
-        $admin = $this->getAdminInfo($input, $output); // new Admin();
+        $admin = $this->getAdminInfo($input, $output);
 
         $admin->save();
 

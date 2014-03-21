@@ -163,11 +163,7 @@ class Install extends ContainerAwareCommand
         }
 
         if (false === $isValid) {
-            $output->writeln(array(
-                "",
-                "<error>Please put correct permissions and reload install process</error>"
-            ));
-            exit;
+            throw new \RuntimeException('Please put correct permissions and reload install process');
         }
     }
 
@@ -197,9 +193,6 @@ class Install extends ContainerAwareCommand
         );
 
         file_put_contents($configFile, $configContent);
-
-        // FA - no, as no further install will be possible
-        // $fs->remove($sampleConfigFile);
 
         $fs->remove($this->getContainer()->getParameter("kernel.cache_dir"));
 

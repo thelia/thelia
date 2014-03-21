@@ -29,7 +29,6 @@ use Thelia\Core\Event\Attribute\AttributeUpdateEvent;
 use Thelia\Model\Attribute as AttributeModel;
 use Thelia\Core\Event\Attribute\AttributeCreateEvent;
 
-
 /**
  * Class AttributeTest
  * @package Thelia\Tests\Action
@@ -108,4 +107,4 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($deletedAttribute->isDeleted());
     }
 
-} 
+}

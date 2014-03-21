@@ -66,8 +66,8 @@ class Database
                 );
             }
         }
-
-        for ($i = 0; $i < count($sql); $i ++) {
+        $size = count($sql);
+        for ($i = 0; $i < $size; $i ++) {
             if (!empty($sql[$i])) {
                 $this->connection->query($sql[$i]);
             }
@@ -87,8 +87,8 @@ class Database
         $query = array();
 
         $tab = explode(";\n", $sql);
-
-        for ($i=0; $i<count($tab); $i++) {
+        $size = count($tab);
+        for ($i=0; $i<$size; $i++) {
             $queryTemp = str_replace("-CODE-", ";',", $tab[$i]);
             $queryTemp = str_replace("|", ";", $queryTemp);
             $query[] = $queryTemp;

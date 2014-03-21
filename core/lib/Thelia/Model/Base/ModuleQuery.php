@@ -96,9 +96,9 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\ModuleQuery object.
      *
-     * @param string $dbName     The database name
-     * @param string $modelName  The phpName of a model, e.g. 'Book'
-     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param     string $dbName The database name
+     * @param     string $modelName The phpName of a model, e.g. 'Book'
+     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Module', $modelAlias = null)
     {
@@ -108,8 +108,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Returns a new ChildModuleQuery object.
      *
-     * @param string   $modelAlias The alias of a model in the query
-     * @param Criteria $criteria   Optional Criteria to build the query from
+     * @param     string $modelAlias The alias of a model in the query
+     * @param     Criteria $criteria Optional Criteria to build the query from
      *
      * @return ChildModuleQuery
      */
@@ -138,7 +138,7 @@ abstract class ModuleQuery extends ModelCriteria
      * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param mixed               $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildModule|array|mixed the result, formatted by the current formatter
@@ -169,10 +169,10 @@ abstract class ModuleQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param mixed               $key Primary key to use for the query
-     * @param ConnectionInterface $con A connection object
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildModule A model object, or null if the key is not found
+     * @return   ChildModule A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -199,8 +199,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param mixed               $key Primary key to use for the query
-     * @param ConnectionInterface $con A connection object
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
      *
      * @return ChildModule|array|mixed the result, formatted by the current formatter
      */
@@ -220,8 +220,8 @@ abstract class ModuleQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
-     * @param array               $keys Primary keys to use for the query
-     * @param ConnectionInterface $con  an optional connection object
+     * @param     array $keys Primary keys to use for the query
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -242,24 +242,26 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param mixed $key Primary key to use for the query
+     * @param     mixed $key Primary key to use for the query
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
+
         return $this->addUsingAlias(ModuleTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
      * Filter the query by a list of primary keys
      *
-     * @param array $keys The list of primary key to use for the query
+     * @param     array $keys The list of primary key to use for the query
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
+
         return $this->addUsingAlias(ModuleTableMap::ID, $keys, Criteria::IN);
     }
 
@@ -273,11 +275,11 @@ abstract class ModuleQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @param mixed  $id         The value to use as filter.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -313,9 +315,9 @@ abstract class ModuleQuery extends ModelCriteria
      * $query->filterByCode('%fooValue%'); // WHERE code LIKE '%fooValue%'
      * </code>
      *
-     * @param string $code       The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $code The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -343,11 +345,11 @@ abstract class ModuleQuery extends ModelCriteria
      * $query->filterByType(array('min' => 12)); // WHERE type > 12
      * </code>
      *
-     * @param mixed  $type       The value to use as filter.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $type The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -384,11 +386,11 @@ abstract class ModuleQuery extends ModelCriteria
      * $query->filterByActivate(array('min' => 12)); // WHERE activate > 12
      * </code>
      *
-     * @param mixed  $activate   The value to use as filter.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $activate The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -425,11 +427,11 @@ abstract class ModuleQuery extends ModelCriteria
      * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
      * </code>
      *
-     * @param mixed  $position   The value to use as filter.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $position The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -465,9 +467,9 @@ abstract class ModuleQuery extends ModelCriteria
      * $query->filterByFullNamespace('%fooValue%'); // WHERE full_namespace LIKE '%fooValue%'
      * </code>
      *
-     * @param string $fullNamespace The value to use as filter.
-     *                              Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison    Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $fullNamespace The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -495,13 +497,13 @@ abstract class ModuleQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param mixed  $createdAt  The value to use as filter.
-     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
-     *                           Empty strings are treated as NULL.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -538,13 +540,13 @@ abstract class ModuleQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param mixed  $updatedAt  The value to use as filter.
-     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
-     *                           Empty strings are treated as NULL.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -574,8 +576,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Order object
      *
-     * @param \Thelia\Model\Order|ObjectCollection $order      the related object to use as filter
-     * @param string                               $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Order|ObjectCollection $order  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -597,8 +599,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the OrderRelatedByPaymentModuleId relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -631,11 +633,11 @@ abstract class ModuleQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\OrderQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\OrderQuery A secondary query class using the current class as primary query
      */
     public function useOrderRelatedByPaymentModuleIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -647,8 +649,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Order object
      *
-     * @param \Thelia\Model\Order|ObjectCollection $order      the related object to use as filter
-     * @param string                               $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Order|ObjectCollection $order  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -670,8 +672,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the OrderRelatedByDeliveryModuleId relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -704,11 +706,11 @@ abstract class ModuleQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\OrderQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\OrderQuery A secondary query class using the current class as primary query
      */
     public function useOrderRelatedByDeliveryModuleIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -720,8 +722,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\AreaDeliveryModule object
      *
-     * @param \Thelia\Model\AreaDeliveryModule|ObjectCollection $areaDeliveryModule the related object to use as filter
-     * @param string                                            $comparison         Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\AreaDeliveryModule|ObjectCollection $areaDeliveryModule  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -743,8 +745,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the AreaDeliveryModule relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -777,11 +779,11 @@ abstract class ModuleQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\AreaDeliveryModuleQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\AreaDeliveryModuleQuery A secondary query class using the current class as primary query
      */
     public function useAreaDeliveryModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -793,8 +795,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\ProfileModule object
      *
-     * @param \Thelia\Model\ProfileModule|ObjectCollection $profileModule the related object to use as filter
-     * @param string                                       $comparison    Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\ProfileModule|ObjectCollection $profileModule  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -816,8 +818,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ProfileModule relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -850,11 +852,11 @@ abstract class ModuleQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\ProfileModuleQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProfileModuleQuery A secondary query class using the current class as primary query
      */
     public function useProfileModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -866,8 +868,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\ModuleImage object
      *
-     * @param \Thelia\Model\ModuleImage|ObjectCollection $moduleImage the related object to use as filter
-     * @param string                                     $comparison  Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\ModuleImage|ObjectCollection $moduleImage  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -889,8 +891,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ModuleImage relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -923,11 +925,11 @@ abstract class ModuleQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\ModuleImageQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ModuleImageQuery A secondary query class using the current class as primary query
      */
     public function useModuleImageQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -939,8 +941,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\ModuleI18n object
      *
-     * @param \Thelia\Model\ModuleI18n|ObjectCollection $moduleI18n the related object to use as filter
-     * @param string                                    $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\ModuleI18n|ObjectCollection $moduleI18n  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -962,8 +964,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ModuleI18n relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -996,11 +998,11 @@ abstract class ModuleQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\ModuleI18nQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ModuleI18nQuery A secondary query class using the current class as primary query
      */
     public function useModuleI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
@@ -1012,7 +1014,7 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param ChildModule $module Object to remove from the list of results
+     * @param   ChildModule $module Object to remove from the list of results
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
@@ -1028,8 +1030,8 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Deletes all rows from the module table.
      *
-     * @param  ConnectionInterface $con the connection to use
-     * @return int                 The number of affected rows (if supported by underlying database driver).
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -1060,13 +1062,13 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildModule or Criteria object OR a primary key value.
      *
-     * @param  mixed               $values Criteria or ChildModule object or primary key or array of primary keys
-     *                                     which is used to create the DELETE statement
-     * @param  ConnectionInterface $con    the connection to use
-     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                                    if supported by native driver or if emulated using Propel.
-     * @throws PropelException     Any exceptions caught during processing will be
-     *                                    rethrown wrapped into a PropelException.
+     * @param mixed               $values Criteria or ChildModule object or primary key or array of primary keys
+     *              which is used to create the DELETE statement
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
+     * @throws PropelException Any exceptions caught during processing will be
+     *         rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -1086,6 +1088,7 @@ abstract class ModuleQuery extends ModelCriteria
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
+
         ModuleTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
@@ -1104,9 +1107,9 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param int $nbDays Maximum age of the latest update in days
+     * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return ChildModuleQuery The current query, for fluid interface
+     * @return     ChildModuleQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
@@ -1116,9 +1119,9 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Filter by the latest created
      *
-     * @param int $nbDays Maximum age of in days
+     * @param      int $nbDays Maximum age of in days
      *
-     * @return ChildModuleQuery The current query, for fluid interface
+     * @return     ChildModuleQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
@@ -1128,7 +1131,7 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Order by update date desc
      *
-     * @return ChildModuleQuery The current query, for fluid interface
+     * @return     ChildModuleQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
@@ -1138,7 +1141,7 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Order by update date asc
      *
-     * @return ChildModuleQuery The current query, for fluid interface
+     * @return     ChildModuleQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
@@ -1148,7 +1151,7 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Order by create date desc
      *
-     * @return ChildModuleQuery The current query, for fluid interface
+     * @return     ChildModuleQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
@@ -1158,7 +1161,7 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Order by create date asc
      *
-     * @return ChildModuleQuery The current query, for fluid interface
+     * @return     ChildModuleQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
@@ -1170,11 +1173,11 @@ abstract class ModuleQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the i18n relation
      *
-     * @param string $locale        Locale to use for the join condition, e.g. 'fr_FR'
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return ChildModuleQuery The current query, for fluid interface
+     * @return    ChildModuleQuery The current query, for fluid interface
      */
     public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -1189,10 +1192,10 @@ abstract class ModuleQuery extends ModelCriteria
      * Adds a JOIN clause to the query and hydrates the related I18n object.
      * Shortcut for $c->joinI18n($locale)->with()
      *
-     * @param string $locale   Locale to use for the join condition, e.g. 'fr_FR'
-     * @param string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return ChildModuleQuery The current query, for fluid interface
+     * @return    ChildModuleQuery The current query, for fluid interface
      */
     public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
@@ -1209,11 +1212,11 @@ abstract class ModuleQuery extends ModelCriteria
      *
      * @see       useQuery()
      *
-     * @param string $locale        Locale to use for the join condition, e.g. 'fr_FR'
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return ChildModuleI18nQuery A secondary query class using the current class as primary query
+     * @return    ChildModuleI18nQuery A secondary query class using the current class as primary query
      */
     public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {

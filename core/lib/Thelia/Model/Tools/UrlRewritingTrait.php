@@ -91,8 +91,6 @@ trait UrlRewritingTrait
 
         $urlFilePart = rtrim($cleanString, '.-~_') . ".html";
 
-        // TODO :
-        // check if URL url already exists, and add a numeric suffix, or the like
         try {
             $i=0;
             while (URL::getInstance()->resolve($urlFilePart)) {

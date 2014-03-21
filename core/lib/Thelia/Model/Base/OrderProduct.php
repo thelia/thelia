@@ -34,6 +34,7 @@ abstract class OrderProduct implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\OrderProductTableMap';
 
+
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -426,9 +427,9 @@ abstract class OrderProduct implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed  $parser A AbstractParser instance,
+     * @param mixed $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data   The source data to import from
+     * @param string $data The source data to import from
      *
      * @return OrderProduct The current object, for fluid interface
      */
@@ -478,180 +479,198 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getId()
     {
+
         return $this->id;
     }
 
     /**
      * Get the [order_id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getOrderId()
     {
+
         return $this->order_id;
     }
 
     /**
      * Get the [product_ref] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getProductRef()
     {
+
         return $this->product_ref;
     }
 
     /**
      * Get the [product_sale_elements_ref] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getProductSaleElementsRef()
     {
+
         return $this->product_sale_elements_ref;
     }
 
     /**
      * Get the [title] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getTitle()
     {
+
         return $this->title;
     }
 
     /**
      * Get the [chapo] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getChapo()
     {
+
         return $this->chapo;
     }
 
     /**
      * Get the [description] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getDescription()
     {
+
         return $this->description;
     }
 
     /**
      * Get the [postscriptum] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getPostscriptum()
     {
+
         return $this->postscriptum;
     }
 
     /**
      * Get the [quantity] column value.
      *
-     * @return double
+     * @return   double
      */
     public function getQuantity()
     {
+
         return $this->quantity;
     }
 
     /**
      * Get the [price] column value.
      *
-     * @return double
+     * @return   double
      */
     public function getPrice()
     {
+
         return $this->price;
     }
 
     /**
      * Get the [promo_price] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getPromoPrice()
     {
+
         return $this->promo_price;
     }
 
     /**
      * Get the [was_new] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getWasNew()
     {
+
         return $this->was_new;
     }
 
     /**
      * Get the [was_in_promo] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getWasInPromo()
     {
+
         return $this->was_in_promo;
     }
 
     /**
      * Get the [weight] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getWeight()
     {
+
         return $this->weight;
     }
 
     /**
      * Get the [ean_code] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getEanCode()
     {
+
         return $this->ean_code;
     }
 
     /**
      * Get the [tax_rule_title] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getTaxRuleTitle()
     {
+
         return $this->tax_rule_title;
     }
 
     /**
      * Get the [tax_rule_description] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getTaxRuleDescription()
     {
+
         return $this->tax_rule_description;
     }
 
     /**
      * Get the [parent] column value.
      * not managed yet
-     * @return int
+     * @return   int
      */
     public function getParent()
     {
+
         return $this->parent;
     }
 
@@ -659,8 +678,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -679,8 +698,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -698,8 +717,8 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Set the value of [id] column.
      *
-     * @param  int                        $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -712,14 +731,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::ID] = true;
         }
 
+
         return $this;
     } // setId()
 
     /**
      * Set the value of [order_id] column.
      *
-     * @param  int                        $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setOrderId($v)
     {
@@ -736,14 +756,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->aOrder = null;
         }
 
+
         return $this;
     } // setOrderId()
 
     /**
      * Set the value of [product_ref] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setProductRef($v)
     {
@@ -756,14 +777,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::PRODUCT_REF] = true;
         }
 
+
         return $this;
     } // setProductRef()
 
     /**
      * Set the value of [product_sale_elements_ref] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setProductSaleElementsRef($v)
     {
@@ -776,14 +798,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF] = true;
         }
 
+
         return $this;
     } // setProductSaleElementsRef()
 
     /**
      * Set the value of [title] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setTitle($v)
     {
@@ -796,14 +819,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::TITLE] = true;
         }
 
+
         return $this;
     } // setTitle()
 
     /**
      * Set the value of [chapo] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setChapo($v)
     {
@@ -816,14 +840,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::CHAPO] = true;
         }
 
+
         return $this;
     } // setChapo()
 
     /**
      * Set the value of [description] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setDescription($v)
     {
@@ -836,14 +861,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::DESCRIPTION] = true;
         }
 
+
         return $this;
     } // setDescription()
 
     /**
      * Set the value of [postscriptum] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setPostscriptum($v)
     {
@@ -856,14 +882,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::POSTSCRIPTUM] = true;
         }
 
+
         return $this;
     } // setPostscriptum()
 
     /**
      * Set the value of [quantity] column.
      *
-     * @param  double                     $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      double $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setQuantity($v)
     {
@@ -876,14 +903,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::QUANTITY] = true;
         }
 
+
         return $this;
     } // setQuantity()
 
     /**
      * Set the value of [price] column.
      *
-     * @param  double                     $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      double $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setPrice($v)
     {
@@ -896,14 +924,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::PRICE] = true;
         }
 
+
         return $this;
     } // setPrice()
 
     /**
      * Set the value of [promo_price] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setPromoPrice($v)
     {
@@ -916,14 +945,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::PROMO_PRICE] = true;
         }
 
+
         return $this;
     } // setPromoPrice()
 
     /**
      * Set the value of [was_new] column.
      *
-     * @param  int                        $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setWasNew($v)
     {
@@ -936,14 +966,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::WAS_NEW] = true;
         }
 
+
         return $this;
     } // setWasNew()
 
     /**
      * Set the value of [was_in_promo] column.
      *
-     * @param  int                        $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setWasInPromo($v)
     {
@@ -956,14 +987,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::WAS_IN_PROMO] = true;
         }
 
+
         return $this;
     } // setWasInPromo()
 
     /**
      * Set the value of [weight] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setWeight($v)
     {
@@ -976,14 +1008,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::WEIGHT] = true;
         }
 
+
         return $this;
     } // setWeight()
 
     /**
      * Set the value of [ean_code] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setEanCode($v)
     {
@@ -996,14 +1029,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::EAN_CODE] = true;
         }
 
+
         return $this;
     } // setEanCode()
 
     /**
      * Set the value of [tax_rule_title] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setTaxRuleTitle($v)
     {
@@ -1016,14 +1050,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::TAX_RULE_TITLE] = true;
         }
 
+
         return $this;
     } // setTaxRuleTitle()
 
     /**
      * Set the value of [tax_rule_description] column.
      *
-     * @param  string                     $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setTaxRuleDescription($v)
     {
@@ -1036,14 +1071,15 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::TAX_RULE_DESCRIPTION] = true;
         }
 
+
         return $this;
     } // setTaxRuleDescription()
 
     /**
      * Set the value of [parent] column.
      * not managed yet
-     * @param  int                        $v new value
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setParent($v)
     {
@@ -1056,15 +1092,16 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->modifiedColumns[OrderProductTableMap::PARENT] = true;
         }
 
+
         return $this;
     } // setParent()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                      $v string, integer (timestamp), or \DateTime value.
-     *                                       Empty strings are treated as NULL.
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -1076,15 +1113,16 @@ abstract class OrderProduct implements ActiveRecordInterface
             }
         } // if either are not null
 
+
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                      $v string, integer (timestamp), or \DateTime value.
-     *                                       Empty strings are treated as NULL.
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -1095,6 +1133,7 @@ abstract class OrderProduct implements ActiveRecordInterface
                 $this->modifiedColumns[OrderProductTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
+
 
         return $this;
     } // setUpdatedAt()
@@ -1241,10 +1280,10 @@ abstract class OrderProduct implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
-     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
+     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
+     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -1284,7 +1323,7 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param  ConnectionInterface $con
+     * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see OrderProduct::setDeleted()
@@ -1327,8 +1366,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -1389,8 +1428,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -1467,7 +1506,7 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1635,7 +1674,7 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1651,12 +1690,12 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param  string $name name
-     * @param  string $type The type of fieldname the $name is of:
-     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                      Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed  Value of field.
+     * @param      string $name name
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1670,7 +1709,7 @@ abstract class OrderProduct implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos position in xml schema
+     * @param      int $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1748,12 +1787,12 @@ abstract class OrderProduct implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                                        Defaults to TableMap::TYPE_PHPNAME.
-     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
-     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                    Defaults to TableMap::TYPE_PHPNAME.
+     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1809,12 +1848,12 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param  string $name
-     * @param  mixed  $value field value
-     * @param  string $type  The type of fieldname the $name is of:
-     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                       Defaults to TableMap::TYPE_PHPNAME.
+     * @param      string $name
+     * @param      mixed  $value field value
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1828,8 +1867,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos   position in xml schema
-     * @param  mixed $value field value
+     * @param      int $pos position in xml schema
+     * @param      mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1911,8 +1950,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param  array  $arr     An array to populate the object from.
-     * @param  string $keyType The type of keys the array uses.
+     * @param      array  $arr     An array to populate the object from.
+     * @param      string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1970,6 +2009,7 @@ abstract class OrderProduct implements ActiveRecordInterface
         if ($this->isColumnModified(OrderProductTableMap::PARENT)) $criteria->add(OrderProductTableMap::PARENT, $this->parent);
         if ($this->isColumnModified(OrderProductTableMap::CREATED_AT)) $criteria->add(OrderProductTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(OrderProductTableMap::UPDATED_AT)) $criteria->add(OrderProductTableMap::UPDATED_AT, $this->updated_at);
+
         return $criteria;
     }
 
@@ -1991,7 +2031,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return int
+     * @return   int
      */
     public function getPrimaryKey()
     {
@@ -2001,7 +2041,7 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param  int  $key Primary key.
+     * @param       int $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -2015,6 +2055,7 @@ abstract class OrderProduct implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
+
         return null === $this->getId();
     }
 
@@ -2024,9 +2065,9 @@ abstract class OrderProduct implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  object          $copyObj  An object of \Thelia\Model\OrderProduct (or compatible) type.
-     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
+     * @param      object $copyObj An object of \Thelia\Model\OrderProduct (or compatible) type.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -2084,8 +2125,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  boolean                    $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Thelia\Model\OrderProduct Clone of current object.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return                 \Thelia\Model\OrderProduct Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -2101,8 +2142,8 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildOrder object.
      *
-     * @param  ChildOrder                 $v
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param                  ChildOrder $v
+     * @return                 \Thelia\Model\OrderProduct The current object (for fluent API support)
      * @throws PropelException
      */
     public function setOrder(ChildOrder $v = null)
@@ -2121,6 +2162,7 @@ abstract class OrderProduct implements ActiveRecordInterface
             $v->addOrderProduct($this);
         }
 
+
         return $this;
     }
 
@@ -2128,8 +2170,8 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Get the associated ChildOrder object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildOrder          The associated ChildOrder object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildOrder The associated ChildOrder object.
      * @throws PropelException
      */
     public function getOrder(ConnectionInterface $con = null)
@@ -2154,7 +2196,7 @@ abstract class OrderProduct implements ActiveRecordInterface
      * Avoids crafting an 'init[$relationName]s' method name
      * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param  string $relationName The name of the relation to initialize
+     * @param      string $relationName The name of the relation to initialize
      * @return void
      */
     public function initRelation($relationName)
@@ -2196,8 +2238,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -2219,8 +2261,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      * If this ChildOrderProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                                           $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface                                $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildOrderProductAttributeCombination[] List of ChildOrderProductAttributeCombination objects
      * @throws PropelException
      */
@@ -2276,13 +2318,14 @@ abstract class OrderProduct implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $orderProductAttributeCombinations A Propel collection.
-     * @param  ConnectionInterface $con                               Optional connection object
-     * @return ChildOrderProduct   The current object (for fluent API support)
+     * @param      Collection $orderProductAttributeCombinations A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildOrderProduct The current object (for fluent API support)
      */
     public function setOrderProductAttributeCombinations(Collection $orderProductAttributeCombinations, ConnectionInterface $con = null)
     {
         $orderProductAttributeCombinationsToDelete = $this->getOrderProductAttributeCombinations(new Criteria(), $con)->diff($orderProductAttributeCombinations);
+
 
         $this->orderProductAttributeCombinationsScheduledForDeletion = $orderProductAttributeCombinationsToDelete;
 
@@ -2304,10 +2347,10 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Returns the number of related OrderProductAttributeCombination objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related OrderProductAttributeCombination objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related OrderProductAttributeCombination objects.
      * @throws PropelException
      */
     public function countOrderProductAttributeCombinations(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2339,8 +2382,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      * Method called to associate a ChildOrderProductAttributeCombination object to this object
      * through the ChildOrderProductAttributeCombination foreign key attribute.
      *
-     * @param  ChildOrderProductAttributeCombination $l ChildOrderProductAttributeCombination
-     * @return \Thelia\Model\OrderProduct            The current object (for fluent API support)
+     * @param    ChildOrderProductAttributeCombination $l ChildOrderProductAttributeCombination
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function addOrderProductAttributeCombination(ChildOrderProductAttributeCombination $l)
     {
@@ -2367,7 +2410,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
     /**
      * @param  OrderProductAttributeCombination $orderProductAttributeCombination The orderProductAttributeCombination object to remove.
-     * @return ChildOrderProduct                The current object (for fluent API support)
+     * @return ChildOrderProduct The current object (for fluent API support)
      */
     public function removeOrderProductAttributeCombination($orderProductAttributeCombination)
     {
@@ -2413,8 +2456,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -2436,8 +2479,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      * If this ChildOrderProduct is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                          $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface               $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildOrderProductTax[] List of ChildOrderProductTax objects
      * @throws PropelException
      */
@@ -2493,13 +2536,14 @@ abstract class OrderProduct implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $orderProductTaxes A Propel collection.
-     * @param  ConnectionInterface $con               Optional connection object
-     * @return ChildOrderProduct   The current object (for fluent API support)
+     * @param      Collection $orderProductTaxes A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildOrderProduct The current object (for fluent API support)
      */
     public function setOrderProductTaxes(Collection $orderProductTaxes, ConnectionInterface $con = null)
     {
         $orderProductTaxesToDelete = $this->getOrderProductTaxes(new Criteria(), $con)->diff($orderProductTaxes);
+
 
         $this->orderProductTaxesScheduledForDeletion = $orderProductTaxesToDelete;
 
@@ -2521,10 +2565,10 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Returns the number of related OrderProductTax objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related OrderProductTax objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related OrderProductTax objects.
      * @throws PropelException
      */
     public function countOrderProductTaxes(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2556,8 +2600,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      * Method called to associate a ChildOrderProductTax object to this object
      * through the ChildOrderProductTax foreign key attribute.
      *
-     * @param  ChildOrderProductTax       $l ChildOrderProductTax
-     * @return \Thelia\Model\OrderProduct The current object (for fluent API support)
+     * @param    ChildOrderProductTax $l ChildOrderProductTax
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function addOrderProductTax(ChildOrderProductTax $l)
     {
@@ -2583,7 +2627,7 @@ abstract class OrderProduct implements ActiveRecordInterface
     }
 
     /**
-     * @param  OrderProductTax   $orderProductTax The orderProductTax object to remove.
+     * @param  OrderProductTax $orderProductTax The orderProductTax object to remove.
      * @return ChildOrderProduct The current object (for fluent API support)
      */
     public function removeOrderProductTax($orderProductTax)
@@ -2640,7 +2684,7 @@ abstract class OrderProduct implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param boolean $deep Whether to also clear the references on all referrer objects.
+     * @param      boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -2677,7 +2721,7 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return ChildOrderProduct The current object (for fluent API support)
+     * @return     ChildOrderProduct The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
@@ -2761,6 +2805,7 @@ abstract class OrderProduct implements ActiveRecordInterface
     {
 
     }
+
 
     /**
      * Derived method to catches calls to undefined methods.

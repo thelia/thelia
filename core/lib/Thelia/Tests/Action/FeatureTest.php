@@ -29,7 +29,6 @@ use Thelia\Core\Event\Feature\FeatureUpdateEvent;
 use Thelia\Model\Feature as FeatureModel;
 use Thelia\Core\Event\Feature\FeatureCreateEvent;
 
-
 /**
  * Class FeatureTest
  * @package Thelia\Tests\Action
@@ -121,4 +120,4 @@ class FeatureTest extends \PHPUnit_Framework_TestCase
 
     }
 
-} 
+}

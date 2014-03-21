@@ -78,19 +78,11 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
         /** @var OrderCoupon $orderCoupon */
         foreach ($loopResult->getResultDataCollection() as $orderCoupon) {
             $loopResultRow = new LoopResultRow($orderCoupon);
-            /*$conditions = $conditionFactory->unserializeConditionCollection(
-                $orderCoupon->getSerializedConditions()
-            );*/
 
             $now = time();
             $datediff = $orderCoupon->getExpirationDate()->getTimestamp() - $now;
             $daysLeftBeforeExpiration = floor($datediff/(60*60*24));
 
-            /*$cleanedConditions = array();
-
-            foreach ($conditions->getConditions() as $condition) {
-                $cleanedConditions[] = $condition->getToolTip();
-            }*/
             $loopResultRow->set("ID", $orderCoupon->getId())
                 ->set("CODE", $orderCoupon->getCode())
                 ->set("TITLE", $orderCoupon->getTitle())
@@ -100,8 +92,6 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
                 ->set("IS_CUMULATIVE", $orderCoupon->getIsCumulative())
                 ->set("IS_REMOVING_POSTAGE", $orderCoupon->getIsRemovingPostage())
                 ->set("IS_AVAILABLE_ON_SPECIAL_OFFERS", $orderCoupon->getIsAvailableOnSpecialOffers())
-                //->set("AMOUNT", $orderCoupon->getAmount())
-                //->set("APPLICATION_CONDITIONS", $cleanedConditions)
                 ->set("DAY_LEFT_BEFORE_EXPIRATION", $daysLeftBeforeExpiration)
             ;
             $loopResult->addRow($loopResultRow);

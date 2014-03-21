@@ -43,7 +43,7 @@ class AdminUtilities extends AbstractSmartyPlugin
         $this->securityContext = $securityContext;
     }
 
-    protected function fetch_snippet($smarty, $templateName, $variablesArray)
+    protected function fetchSnippet($smarty, $templateName, $variablesArray)
     {
         $data = '';
 
@@ -97,7 +97,7 @@ class AdminUtilities extends AbstractSmartyPlugin
                 $module === null ? array() : array($module),
                 array($access))
         ) {
-            return $this->fetch_snippet($smarty, 'includes/admin-utilities-position-block', array(
+            return $this->fetchSnippet($smarty, 'includes/admin-utilities-position-block', array(
                     'admin_utilities_go_up_url'           => URL::getInstance()->absoluteUrl($path, array('mode' => 'up', $url_parameter => $id)),
                     'admin_utilities_in_place_edit_class' => $in_place_edit_class,
                     'admin_utilities_object_id'           => $id,
@@ -146,7 +146,7 @@ class AdminUtilities extends AbstractSmartyPlugin
             $order_change = $order;
         }
 
-        return $this->fetch_snippet($smarty, 'includes/admin-utilities-sortable-column-header', array(
+        return $this->fetchSnippet($smarty, 'includes/admin-utilities-sortable-column-header', array(
                 'admin_utilities_sort_direction' => $sort_direction,
                 'admin_utilities_sorting_url'    => URL::getInstance()->absoluteUrl($path, array($request_parameter_name => $order_change)),
                 'admin_utilities_header_text'    => $label

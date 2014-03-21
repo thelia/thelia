@@ -31,6 +31,7 @@ use Thelia\Core\Template\ParserInterface;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\MessageQuery;
+use Thelia\Model\OrderStatus;
 use Thelia\Module\PaymentModuleInterface;
 
 
@@ -57,7 +58,7 @@ class SendMail implements EventSubscriberInterface
         $order = $event->getOrder();
         $colissimo = new Colissimo();
 
-        if ($order->getStatusId() == PaymentModuleInterface::SENT && $order->getDeliveryModuleId() == $colissimo->getModuleModel()->getId()) {
+        if ($order->getStatusId() == OrderStatus::CODE_SENT && $order->getDeliveryModuleId() == $colissimo->getModuleModel()->getId()) {
             $contact_email = ConfigQuery::read('store_email');
 
             if ($contact_email) {

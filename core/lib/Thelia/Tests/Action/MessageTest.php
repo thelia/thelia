@@ -30,7 +30,6 @@ use Thelia\Model\Message as MessageModel;
 use Thelia\Core\Event\Message\MessageCreateEvent;
 use Thelia\Model\MessageQuery;
 
-
 /**
  * Class MessageTest
  * @package Thelia\Tests\Action
@@ -70,7 +69,6 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Thelia\Model\Message', $createdMessage);
         $this->assertFalse($createdMessage->isNew());
-
 
         $this->assertEquals('test', $createdMessage->getName());
         $this->assertEquals('en_US', $createdMessage->getLocale());
@@ -138,4 +136,4 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Thelia\Model\Message', $deletedMessage);
         $this->assertTrue($deletedMessage->isDeleted());
     }
-} 
+}

@@ -30,5 +30,6 @@ return array(
 'Welcome' => 'Bienvenue',
 'Welcome in the Thelia installation wizard.' => 'Bienvenue dans le gestionnaire d\'installation de Thélia.',
 'We will guide you throughout this process to install any application on your system.' => 'Nous allons vous guidez pour installer Thélia sur votre système.',
-'Wrong connection information' => 'Mauvaise information de connexion'
+'Wrong connection information' => 'Mauvaise information de connexion',
+'Administrator preferred locale :' => 'Langue par défaut de l\'adminisrateur'
 );

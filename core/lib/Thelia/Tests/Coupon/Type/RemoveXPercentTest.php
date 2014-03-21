@@ -63,8 +63,6 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-
-
         $currencies = CurrencyQuery::create()->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')

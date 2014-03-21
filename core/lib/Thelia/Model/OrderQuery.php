@@ -5,7 +5,6 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 
-use Propel\Runtime\Propel;
 use Thelia\Model\Base\OrderQuery as BaseOrderQuery;
 
 use Thelia\Model\Map\OrderProductTableMap;

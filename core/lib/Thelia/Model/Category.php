@@ -36,6 +36,8 @@ class Category extends BaseCategory
      *
      * count all products for current category and sub categories
      *
+     * /!\ the number of queries is exponential, use it with caution
+     *
      * @return int
      */
     public function countAllProducts()

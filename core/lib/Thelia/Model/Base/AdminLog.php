@@ -9,6 +9,7 @@ use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
@@ -25,6 +26,7 @@ abstract class AdminLog implements ActiveRecordInterface
      * TableMap class name
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\AdminLogTableMap';
+
 
     /**
      * attribute to determine if this object has previously been saved.
@@ -329,9 +331,9 @@ abstract class AdminLog implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed  $parser A AbstractParser instance,
+     * @param mixed $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data   The source data to import from
+     * @param string $data The source data to import from
      *
      * @return AdminLog The current object, for fluid interface
      */
@@ -381,80 +383,88 @@ abstract class AdminLog implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getId()
     {
+
         return $this->id;
     }
 
     /**
      * Get the [admin_login] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getAdminLogin()
     {
+
         return $this->admin_login;
     }
 
     /**
      * Get the [admin_firstname] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getAdminFirstname()
     {
+
         return $this->admin_firstname;
     }
 
     /**
      * Get the [admin_lastname] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getAdminLastname()
     {
+
         return $this->admin_lastname;
     }
 
     /**
      * Get the [resource] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getResource()
     {
+
         return $this->resource;
     }
 
     /**
      * Get the [action] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getAction()
     {
+
         return $this->action;
     }
 
     /**
      * Get the [message] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getMessage()
     {
+
         return $this->message;
     }
 
     /**
      * Get the [request] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getRequest()
     {
+
         return $this->request;
     }
 
@@ -462,8 +472,8 @@ abstract class AdminLog implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -482,8 +492,8 @@ abstract class AdminLog implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -501,8 +511,8 @@ abstract class AdminLog implements ActiveRecordInterface
     /**
      * Set the value of [id] column.
      *
-     * @param  int                    $v new value
-     * @return \Thelia\Model\AdminLog The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\AdminLog The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -515,14 +525,15 @@ abstract class AdminLog implements ActiveRecordInterface
             $this->modifiedColumns[AdminLogTableMap::ID] = true;
         }
 
+
         return $this;
     } // setId()
 
     /**
      * Set the value of [admin_login] column.
      *
-     * @param  string                 $v new value
-     * @return \Thelia\Model\AdminLog The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\AdminLog The current object (for fluent API support)
      */
     public function setAdminLogin($v)
     {
@@ -535,14 +546,15 @@ abstract class AdminLog implements ActiveRecordInterface
             $this->modifiedColumns[AdminLogTableMap::ADMIN_LOGIN] = true;
         }
 
+
         return $this;
     } // setAdminLogin()
 
     /**
      * Set the value of [admin_firstname] column.
      *
-     * @param  string                 $v new value
-     * @return \Thelia\Model\AdminLog The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\AdminLog The current object (for fluent API support)
      */
     public function setAdminFirstname($v)
     {
@@ -555,14 +567,15 @@ abstract class AdminLog implements ActiveRecordInterface
             $this->modifiedColumns[AdminLogTableMap::ADMIN_FIRSTNAME] = true;
         }
 
+
         return $this;
     } // setAdminFirstname()
 
     /**
      * Set the value of [admin_lastname] column.
      *
-     * @param  string                 $v new value
-     * @return \Thelia\Model\AdminLog The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\AdminLog The current object (for fluent API support)
      */
     public function setAdminLastname($v)
     {
@@ -575,14 +588,15 @@ abstract class AdminLog implements ActiveRecordInterface
             $this->modifiedColumns[AdminLogTableMap::ADMIN_LASTNAME] = true;
         }
 
+
         return $this;
     } // setAdminLastname()
 
     /**
      * Set the value of [resource] column.
      *
-     * @param  string                 $v new value
-     * @return \Thelia\Model\AdminLog The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\AdminLog The current object (for fluent API support)
      */
     public function setResource($v)
     {
@@ -595,14 +609,15 @@ abstract class AdminLog implements ActiveRecordInterface
             $this->modifiedColumns[AdminLogTableMap::RESOURCE] = true;
         }
 
+
         return $this;
     } // setResource()
 
     /**
      * Set the value of [action] column.
      *
-     * @param  string                 $v new value
-     * @return \Thelia\Model\AdminLog The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\AdminLog The current object (for fluent API support)
      */
     public function setAction($v)
     {
@@ -615,14 +630,15 @@ abstract class AdminLog implements ActiveRecordInterface
             $this->modifiedColumns[AdminLogTableMap::ACTION] = true;
         }
 
+
         return $this;
     } // setAction()
 
     /**
      * Set the value of [message] column.
      *
-     * @param  string                 $v new value
-     * @return \Thelia\Model\AdminLog The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\AdminLog The current object (for fluent API support)
      */
     public function setMessage($v)
     {
@@ -635,14 +651,15 @@ abstract class AdminLog implements ActiveRecordInterface
             $this->modifiedColumns[AdminLogTableMap::MESSAGE] = true;
         }
 
+
         return $this;
     } // setMessage()
 
     /**
      * Set the value of [request] column.
      *
-     * @param  string                 $v new value
-     * @return \Thelia\Model\AdminLog The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\AdminLog The current object (for fluent API support)
      */
     public function setRequest($v)
     {
@@ -655,15 +672,16 @@ abstract class AdminLog implements ActiveRecordInterface
             $this->modifiedColumns[AdminLogTableMap::REQUEST] = true;
         }
 
+
         return $this;
     } // setRequest()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                  $v string, integer (timestamp), or \DateTime value.
-     *                                   Empty strings are treated as NULL.
-     * @return \Thelia\Model\AdminLog The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\AdminLog The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -675,15 +693,16 @@ abstract class AdminLog implements ActiveRecordInterface
             }
         } // if either are not null
 
+
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                  $v string, integer (timestamp), or \DateTime value.
-     *                                   Empty strings are treated as NULL.
-     * @return \Thelia\Model\AdminLog The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\AdminLog The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -694,6 +713,7 @@ abstract class AdminLog implements ActiveRecordInterface
                 $this->modifiedColumns[AdminLogTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
+
 
         return $this;
     } // setUpdatedAt()
@@ -807,10 +827,10 @@ abstract class AdminLog implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
-     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
+     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
+     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -845,7 +865,7 @@ abstract class AdminLog implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param  ConnectionInterface $con
+     * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see AdminLog::setDeleted()
@@ -888,8 +908,8 @@ abstract class AdminLog implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -950,8 +970,8 @@ abstract class AdminLog implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -982,7 +1002,7 @@ abstract class AdminLog implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1090,7 +1110,7 @@ abstract class AdminLog implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1106,12 +1126,12 @@ abstract class AdminLog implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param  string $name name
-     * @param  string $type The type of fieldname the $name is of:
-     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                      Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed  Value of field.
+     * @param      string $name name
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1125,7 +1145,7 @@ abstract class AdminLog implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos position in xml schema
+     * @param      int $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1173,11 +1193,11 @@ abstract class AdminLog implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                                        Defaults to TableMap::TYPE_PHPNAME.
-     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
+     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                    Defaults to TableMap::TYPE_PHPNAME.
+     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1205,18 +1225,19 @@ abstract class AdminLog implements ActiveRecordInterface
             $result[$key] = $virtualColumn;
         }
 
+
         return $result;
     }
 
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param  string $name
-     * @param  mixed  $value field value
-     * @param  string $type  The type of fieldname the $name is of:
-     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                       Defaults to TableMap::TYPE_PHPNAME.
+     * @param      string $name
+     * @param      mixed  $value field value
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1230,8 +1251,8 @@ abstract class AdminLog implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos   position in xml schema
-     * @param  mixed $value field value
+     * @param      int $pos position in xml schema
+     * @param      mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1283,8 +1304,8 @@ abstract class AdminLog implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param  array  $arr     An array to populate the object from.
-     * @param  string $keyType The type of keys the array uses.
+     * @param      array  $arr     An array to populate the object from.
+     * @param      string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1322,6 +1343,7 @@ abstract class AdminLog implements ActiveRecordInterface
         if ($this->isColumnModified(AdminLogTableMap::REQUEST)) $criteria->add(AdminLogTableMap::REQUEST, $this->request);
         if ($this->isColumnModified(AdminLogTableMap::CREATED_AT)) $criteria->add(AdminLogTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(AdminLogTableMap::UPDATED_AT)) $criteria->add(AdminLogTableMap::UPDATED_AT, $this->updated_at);
+
         return $criteria;
     }
 
@@ -1343,7 +1365,7 @@ abstract class AdminLog implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return int
+     * @return   int
      */
     public function getPrimaryKey()
     {
@@ -1353,7 +1375,7 @@ abstract class AdminLog implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param  int  $key Primary key.
+     * @param       int $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -1367,6 +1389,7 @@ abstract class AdminLog implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
+
         return null === $this->getId();
     }
 
@@ -1376,9 +1399,9 @@ abstract class AdminLog implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  object          $copyObj  An object of \Thelia\Model\AdminLog (or compatible) type.
-     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
+     * @param      object $copyObj An object of \Thelia\Model\AdminLog (or compatible) type.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1406,8 +1429,8 @@ abstract class AdminLog implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  boolean                $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Thelia\Model\AdminLog Clone of current object.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return                 \Thelia\Model\AdminLog Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1449,7 +1472,7 @@ abstract class AdminLog implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param boolean $deep Whether to also clear the references on all referrer objects.
+     * @param      boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -1473,7 +1496,7 @@ abstract class AdminLog implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return ChildAdminLog The current object (for fluent API support)
+     * @return     ChildAdminLog The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {

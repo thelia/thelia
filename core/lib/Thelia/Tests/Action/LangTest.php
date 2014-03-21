@@ -31,7 +31,6 @@ use Thelia\Model\LangQuery;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Core\Event\Lang\LangCreateEvent;
 
-
 /**
  * Class LangTest
  * @package Thelia\Tests\Action
@@ -170,4 +169,4 @@ class LangTest extends \PHPUnit_Framework_TestCase
             ->update(array('ByDefault' => true));
     }
 
-} 
+}

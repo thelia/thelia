@@ -71,9 +71,9 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\AttributeCombinationQuery object.
      *
-     * @param string $dbName     The database name
-     * @param string $modelName  The phpName of a model, e.g. 'Book'
-     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param     string $dbName The database name
+     * @param     string $modelName The phpName of a model, e.g. 'Book'
+     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\AttributeCombination', $modelAlias = null)
     {
@@ -83,8 +83,8 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Returns a new ChildAttributeCombinationQuery object.
      *
-     * @param string   $modelAlias The alias of a model in the query
-     * @param Criteria $criteria   Optional Criteria to build the query from
+     * @param     string $modelAlias The alias of a model in the query
+     * @param     Criteria $criteria Optional Criteria to build the query from
      *
      * @return ChildAttributeCombinationQuery
      */
@@ -144,10 +144,10 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param mixed               $key Primary key to use for the query
-     * @param ConnectionInterface $con A connection object
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildAttributeCombination A model object, or null if the key is not found
+     * @return   ChildAttributeCombination A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -176,8 +176,8 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param mixed               $key Primary key to use for the query
-     * @param ConnectionInterface $con A connection object
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
      *
      * @return ChildAttributeCombination|array|mixed the result, formatted by the current formatter
      */
@@ -197,8 +197,8 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
      * </code>
-     * @param array               $keys Primary keys to use for the query
-     * @param ConnectionInterface $con  an optional connection object
+     * @param     array $keys Primary keys to use for the query
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -219,7 +219,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param mixed $key Primary key to use for the query
+     * @param     mixed $key Primary key to use for the query
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -235,7 +235,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Filter the query by a list of primary keys
      *
-     * @param array $keys The list of primary key to use for the query
+     * @param     array $keys The list of primary key to use for the query
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -268,11 +268,11 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      *
      * @see       filterByAttribute()
      *
-     * @param mixed  $attributeId The value to use as filter.
-     *                            Use scalar values for equality.
-     *                            Use array values for in_array() equivalent.
-     *                            Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison  Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $attributeId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -311,11 +311,11 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      *
      * @see       filterByAttributeAv()
      *
-     * @param mixed  $attributeAvId The value to use as filter.
-     *                              Use scalar values for equality.
-     *                              Use array values for in_array() equivalent.
-     *                              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison    Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $attributeAvId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -354,11 +354,11 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      *
      * @see       filterByProductSaleElements()
      *
-     * @param mixed  $productSaleElementsId The value to use as filter.
-     *                                      Use scalar values for equality.
-     *                                      Use array values for in_array() equivalent.
-     *                                      Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison            Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $productSaleElementsId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -395,13 +395,13 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param mixed  $createdAt  The value to use as filter.
-     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
-     *                           Empty strings are treated as NULL.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -438,13 +438,13 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param mixed  $updatedAt  The value to use as filter.
-     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
-     *                           Empty strings are treated as NULL.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -474,8 +474,8 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Filter the query by a related \Thelia\Model\Attribute object
      *
-     * @param \Thelia\Model\Attribute|ObjectCollection $attribute  The related object(s) to use as filter
-     * @param string                                   $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param \Thelia\Model\Attribute|ObjectCollection $attribute The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -499,8 +499,8 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Attribute relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -533,11 +533,11 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\AttributeQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\AttributeQuery A secondary query class using the current class as primary query
      */
     public function useAttributeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -550,7 +550,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      * Filter the query by a related \Thelia\Model\AttributeAv object
      *
      * @param \Thelia\Model\AttributeAv|ObjectCollection $attributeAv The related object(s) to use as filter
-     * @param string                                     $comparison  Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -574,8 +574,8 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the AttributeAv relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -608,11 +608,11 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\AttributeAvQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\AttributeAvQuery A secondary query class using the current class as primary query
      */
     public function useAttributeAvQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -625,7 +625,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      * Filter the query by a related \Thelia\Model\ProductSaleElements object
      *
      * @param \Thelia\Model\ProductSaleElements|ObjectCollection $productSaleElements The related object(s) to use as filter
-     * @param string                                             $comparison          Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -649,8 +649,8 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ProductSaleElements relation
      *
-     * @param string $relationAlias optional alias for the relation
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -683,11 +683,11 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param string $relationAlias optional alias for the relation,
-     *                              to be used as main alias in the secondary query
-     * @param string $joinType      Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\ProductSaleElementsQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProductSaleElementsQuery A secondary query class using the current class as primary query
      */
     public function useProductSaleElementsQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -699,7 +699,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param ChildAttributeCombination $attributeCombination Object to remove from the list of results
+     * @param   ChildAttributeCombination $attributeCombination Object to remove from the list of results
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
@@ -718,8 +718,8 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Deletes all rows from the attribute_combination table.
      *
-     * @param  ConnectionInterface $con the connection to use
-     * @return int                 The number of affected rows (if supported by underlying database driver).
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -750,13 +750,13 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildAttributeCombination or Criteria object OR a primary key value.
      *
-     * @param  mixed               $values Criteria or ChildAttributeCombination object or primary key or array of primary keys
-     *                                     which is used to create the DELETE statement
-     * @param  ConnectionInterface $con    the connection to use
-     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                                    if supported by native driver or if emulated using Propel.
-     * @throws PropelException     Any exceptions caught during processing will be
-     *                                    rethrown wrapped into a PropelException.
+     * @param mixed               $values Criteria or ChildAttributeCombination object or primary key or array of primary keys
+     *              which is used to create the DELETE statement
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
+     * @throws PropelException Any exceptions caught during processing will be
+     *         rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -776,6 +776,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
+
         AttributeCombinationTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
@@ -794,9 +795,9 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param int $nbDays Maximum age of the latest update in days
+     * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return ChildAttributeCombinationQuery The current query, for fluid interface
+     * @return     ChildAttributeCombinationQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
@@ -806,9 +807,9 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Filter by the latest created
      *
-     * @param int $nbDays Maximum age of in days
+     * @param      int $nbDays Maximum age of in days
      *
-     * @return ChildAttributeCombinationQuery The current query, for fluid interface
+     * @return     ChildAttributeCombinationQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
@@ -818,7 +819,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Order by update date desc
      *
-     * @return ChildAttributeCombinationQuery The current query, for fluid interface
+     * @return     ChildAttributeCombinationQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
@@ -828,7 +829,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Order by update date asc
      *
-     * @return ChildAttributeCombinationQuery The current query, for fluid interface
+     * @return     ChildAttributeCombinationQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
@@ -838,7 +839,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Order by create date desc
      *
-     * @return ChildAttributeCombinationQuery The current query, for fluid interface
+     * @return     ChildAttributeCombinationQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
@@ -848,7 +849,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     /**
      * Order by create date asc
      *
-     * @return ChildAttributeCombinationQuery The current query, for fluid interface
+     * @return     ChildAttributeCombinationQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {

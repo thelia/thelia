@@ -21,7 +21,6 @@ if (!file_exists(THELIA_CONF_DIR . 'database.yml') && !defined('THELIA_INSTALL_M
         define('THELIA_INSTALL_MODE', true);
     } else {
         $request = \Thelia\Core\HttpFoundation\Request::createFromGlobals();
-        header('location: '.$request->getUriForPath() . '/install');
-        exit;
+        header('location: '.$request->getUriForPath('/install'));
     }
 }

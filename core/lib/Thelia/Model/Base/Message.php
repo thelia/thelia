@@ -33,6 +33,7 @@ abstract class Message implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\MessageTableMap';
 
+
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -167,6 +168,7 @@ abstract class Message implements ActiveRecordInterface
     protected $currentTranslations;
 
     // versionable behavior
+
 
     /**
      * @var bool
@@ -407,9 +409,9 @@ abstract class Message implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed  $parser A AbstractParser instance,
+     * @param mixed $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data   The source data to import from
+     * @param string $data The source data to import from
      *
      * @return Message The current object, for fluid interface
      */
@@ -459,70 +461,77 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getId()
     {
+
         return $this->id;
     }
 
     /**
      * Get the [name] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getName()
     {
+
         return $this->name;
     }
 
     /**
      * Get the [secured] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getSecured()
     {
+
         return $this->secured;
     }
 
     /**
      * Get the [text_layout_file_name] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getTextLayoutFileName()
     {
+
         return $this->text_layout_file_name;
     }
 
     /**
      * Get the [text_template_file_name] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getTextTemplateFileName()
     {
+
         return $this->text_template_file_name;
     }
 
     /**
      * Get the [html_layout_file_name] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getHtmlLayoutFileName()
     {
+
         return $this->html_layout_file_name;
     }
 
     /**
      * Get the [html_template_file_name] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getHtmlTemplateFileName()
     {
+
         return $this->html_template_file_name;
     }
 
@@ -530,8 +539,8 @@ abstract class Message implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -550,8 +559,8 @@ abstract class Message implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -569,10 +578,11 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Get the [version] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getVersion()
     {
+
         return $this->version;
     }
 
@@ -580,8 +590,8 @@ abstract class Message implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [version_created_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -599,18 +609,19 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Get the [version_created_by] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getVersionCreatedBy()
     {
+
         return $this->version_created_by;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param  int                   $v new value
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -623,14 +634,15 @@ abstract class Message implements ActiveRecordInterface
             $this->modifiedColumns[MessageTableMap::ID] = true;
         }
 
+
         return $this;
     } // setId()
 
     /**
      * Set the value of [name] column.
      *
-     * @param  string                $v new value
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function setName($v)
     {
@@ -643,14 +655,15 @@ abstract class Message implements ActiveRecordInterface
             $this->modifiedColumns[MessageTableMap::NAME] = true;
         }
 
+
         return $this;
     } // setName()
 
     /**
      * Set the value of [secured] column.
      *
-     * @param  int                   $v new value
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function setSecured($v)
     {
@@ -663,14 +676,15 @@ abstract class Message implements ActiveRecordInterface
             $this->modifiedColumns[MessageTableMap::SECURED] = true;
         }
 
+
         return $this;
     } // setSecured()
 
     /**
      * Set the value of [text_layout_file_name] column.
      *
-     * @param  string                $v new value
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function setTextLayoutFileName($v)
     {
@@ -683,14 +697,15 @@ abstract class Message implements ActiveRecordInterface
             $this->modifiedColumns[MessageTableMap::TEXT_LAYOUT_FILE_NAME] = true;
         }
 
+
         return $this;
     } // setTextLayoutFileName()
 
     /**
      * Set the value of [text_template_file_name] column.
      *
-     * @param  string                $v new value
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function setTextTemplateFileName($v)
     {
@@ -703,14 +718,15 @@ abstract class Message implements ActiveRecordInterface
             $this->modifiedColumns[MessageTableMap::TEXT_TEMPLATE_FILE_NAME] = true;
         }
 
+
         return $this;
     } // setTextTemplateFileName()
 
     /**
      * Set the value of [html_layout_file_name] column.
      *
-     * @param  string                $v new value
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function setHtmlLayoutFileName($v)
     {
@@ -723,14 +739,15 @@ abstract class Message implements ActiveRecordInterface
             $this->modifiedColumns[MessageTableMap::HTML_LAYOUT_FILE_NAME] = true;
         }
 
+
         return $this;
     } // setHtmlLayoutFileName()
 
     /**
      * Set the value of [html_template_file_name] column.
      *
-     * @param  string                $v new value
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function setHtmlTemplateFileName($v)
     {
@@ -743,15 +760,16 @@ abstract class Message implements ActiveRecordInterface
             $this->modifiedColumns[MessageTableMap::HTML_TEMPLATE_FILE_NAME] = true;
         }
 
+
         return $this;
     } // setHtmlTemplateFileName()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                 $v string, integer (timestamp), or \DateTime value.
-     *                                  Empty strings are treated as NULL.
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -763,15 +781,16 @@ abstract class Message implements ActiveRecordInterface
             }
         } // if either are not null
 
+
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                 $v string, integer (timestamp), or \DateTime value.
-     *                                  Empty strings are treated as NULL.
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -783,14 +802,15 @@ abstract class Message implements ActiveRecordInterface
             }
         } // if either are not null
 
+
         return $this;
     } // setUpdatedAt()
 
     /**
      * Set the value of [version] column.
      *
-     * @param  int                   $v new value
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function setVersion($v)
     {
@@ -803,15 +823,16 @@ abstract class Message implements ActiveRecordInterface
             $this->modifiedColumns[MessageTableMap::VERSION] = true;
         }
 
+
         return $this;
     } // setVersion()
 
     /**
      * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                 $v string, integer (timestamp), or \DateTime value.
-     *                                  Empty strings are treated as NULL.
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function setVersionCreatedAt($v)
     {
@@ -823,14 +844,15 @@ abstract class Message implements ActiveRecordInterface
             }
         } // if either are not null
 
+
         return $this;
     } // setVersionCreatedAt()
 
     /**
      * Set the value of [version_created_by] column.
      *
-     * @param  string                $v new value
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function setVersionCreatedBy($v)
     {
@@ -842,6 +864,7 @@ abstract class Message implements ActiveRecordInterface
             $this->version_created_by = $v;
             $this->modifiedColumns[MessageTableMap::VERSION_CREATED_BY] = true;
         }
+
 
         return $this;
     } // setVersionCreatedBy()
@@ -885,6 +908,7 @@ abstract class Message implements ActiveRecordInterface
     public function hydrate($row, $startcol = 0, $rehydrate = false, $indexType = TableMap::TYPE_NUM)
     {
         try {
+
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : MessageTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
@@ -967,10 +991,10 @@ abstract class Message implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
-     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
+     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
+     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -1009,7 +1033,7 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param  ConnectionInterface $con
+     * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see Message::setDeleted()
@@ -1052,8 +1076,8 @@ abstract class Message implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -1126,8 +1150,8 @@ abstract class Message implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -1192,7 +1216,7 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1312,7 +1336,7 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1328,12 +1352,12 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param  string $name name
-     * @param  string $type The type of fieldname the $name is of:
-     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                      Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed  Value of field.
+     * @param      string $name name
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1347,7 +1371,7 @@ abstract class Message implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos position in xml schema
+     * @param      int $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1401,12 +1425,12 @@ abstract class Message implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                                        Defaults to TableMap::TYPE_PHPNAME.
-     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
-     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                    Defaults to TableMap::TYPE_PHPNAME.
+     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1451,12 +1475,12 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param  string $name
-     * @param  mixed  $value field value
-     * @param  string $type  The type of fieldname the $name is of:
-     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                       Defaults to TableMap::TYPE_PHPNAME.
+     * @param      string $name
+     * @param      mixed  $value field value
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1470,8 +1494,8 @@ abstract class Message implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos   position in xml schema
-     * @param  mixed $value field value
+     * @param      int $pos position in xml schema
+     * @param      mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1529,8 +1553,8 @@ abstract class Message implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param  array  $arr     An array to populate the object from.
-     * @param  string $keyType The type of keys the array uses.
+     * @param      array  $arr     An array to populate the object from.
+     * @param      string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1572,6 +1596,7 @@ abstract class Message implements ActiveRecordInterface
         if ($this->isColumnModified(MessageTableMap::VERSION)) $criteria->add(MessageTableMap::VERSION, $this->version);
         if ($this->isColumnModified(MessageTableMap::VERSION_CREATED_AT)) $criteria->add(MessageTableMap::VERSION_CREATED_AT, $this->version_created_at);
         if ($this->isColumnModified(MessageTableMap::VERSION_CREATED_BY)) $criteria->add(MessageTableMap::VERSION_CREATED_BY, $this->version_created_by);
+
         return $criteria;
     }
 
@@ -1593,7 +1618,7 @@ abstract class Message implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return int
+     * @return   int
      */
     public function getPrimaryKey()
     {
@@ -1603,7 +1628,7 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param  int  $key Primary key.
+     * @param       int $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -1617,6 +1642,7 @@ abstract class Message implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
+
         return null === $this->getId();
     }
 
@@ -1626,9 +1652,9 @@ abstract class Message implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  object          $copyObj  An object of \Thelia\Model\Message (or compatible) type.
-     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
+     * @param      object $copyObj An object of \Thelia\Model\Message (or compatible) type.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1678,8 +1704,8 @@ abstract class Message implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  boolean               $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Thelia\Model\Message Clone of current object.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return                 \Thelia\Model\Message Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1692,12 +1718,13 @@ abstract class Message implements ActiveRecordInterface
         return $copyObj;
     }
 
+
     /**
      * Initializes a collection based on the name of a relation.
      * Avoids crafting an 'init[$relationName]s' method name
      * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param  string $relationName The name of the relation to initialize
+     * @param      string $relationName The name of the relation to initialize
      * @return void
      */
     public function initRelation($relationName)
@@ -1739,8 +1766,8 @@ abstract class Message implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -1762,8 +1789,8 @@ abstract class Message implements ActiveRecordInterface
      * If this ChildMessage is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                      $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface           $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildMessageI18n[] List of ChildMessageI18n objects
      * @throws PropelException
      */
@@ -1819,9 +1846,9 @@ abstract class Message implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $messageI18ns A Propel collection.
-     * @param  ConnectionInterface $con          Optional connection object
-     * @return ChildMessage        The current object (for fluent API support)
+     * @param      Collection $messageI18ns A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildMessage The current object (for fluent API support)
      */
     public function setMessageI18ns(Collection $messageI18ns, ConnectionInterface $con = null)
     {
@@ -1851,10 +1878,10 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Returns the number of related MessageI18n objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related MessageI18n objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related MessageI18n objects.
      * @throws PropelException
      */
     public function countMessageI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -1886,8 +1913,8 @@ abstract class Message implements ActiveRecordInterface
      * Method called to associate a ChildMessageI18n object to this object
      * through the ChildMessageI18n foreign key attribute.
      *
-     * @param  ChildMessageI18n      $l ChildMessageI18n
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param    ChildMessageI18n $l ChildMessageI18n
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function addMessageI18n(ChildMessageI18n $l)
     {
@@ -1917,7 +1944,7 @@ abstract class Message implements ActiveRecordInterface
     }
 
     /**
-     * @param  MessageI18n  $messageI18n The messageI18n object to remove.
+     * @param  MessageI18n $messageI18n The messageI18n object to remove.
      * @return ChildMessage The current object (for fluent API support)
      */
     public function removeMessageI18n($messageI18n)
@@ -1964,8 +1991,8 @@ abstract class Message implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -1987,8 +2014,8 @@ abstract class Message implements ActiveRecordInterface
      * If this ChildMessage is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                         $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface              $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildMessageVersion[] List of ChildMessageVersion objects
      * @throws PropelException
      */
@@ -2044,9 +2071,9 @@ abstract class Message implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $messageVersions A Propel collection.
-     * @param  ConnectionInterface $con             Optional connection object
-     * @return ChildMessage        The current object (for fluent API support)
+     * @param      Collection $messageVersions A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildMessage The current object (for fluent API support)
      */
     public function setMessageVersions(Collection $messageVersions, ConnectionInterface $con = null)
     {
@@ -2076,10 +2103,10 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Returns the number of related MessageVersion objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related MessageVersion objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related MessageVersion objects.
      * @throws PropelException
      */
     public function countMessageVersions(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -2111,8 +2138,8 @@ abstract class Message implements ActiveRecordInterface
      * Method called to associate a ChildMessageVersion object to this object
      * through the ChildMessageVersion foreign key attribute.
      *
-     * @param  ChildMessageVersion   $l ChildMessageVersion
-     * @return \Thelia\Model\Message The current object (for fluent API support)
+     * @param    ChildMessageVersion $l ChildMessageVersion
+     * @return   \Thelia\Model\Message The current object (for fluent API support)
      */
     public function addMessageVersion(ChildMessageVersion $l)
     {
@@ -2139,7 +2166,7 @@ abstract class Message implements ActiveRecordInterface
 
     /**
      * @param  MessageVersion $messageVersion The messageVersion object to remove.
-     * @return ChildMessage   The current object (for fluent API support)
+     * @return ChildMessage The current object (for fluent API support)
      */
     public function removeMessageVersion($messageVersion)
     {
@@ -2188,7 +2215,7 @@ abstract class Message implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param boolean $deep Whether to also clear the references on all referrer objects.
+     * @param      boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -2228,7 +2255,7 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return ChildMessage The current object (for fluent API support)
+     * @return     ChildMessage The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
@@ -2242,9 +2269,9 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Sets the locale for translations
      *
-     * @param string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
      *
-     * @return ChildMessage The current object (for fluent API support)
+     * @return    ChildMessage The current object (for fluent API support)
      */
     public function setLocale($locale = 'en_US')
     {
@@ -2256,7 +2283,7 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Gets the locale for translations
      *
-     * @return string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
      */
     public function getLocale()
     {
@@ -2266,8 +2293,8 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Returns the current translation for a given locale
      *
-     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param ConnectionInterface $con    an optional connection object
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildMessageI18n */
     public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
@@ -2300,10 +2327,10 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Remove the translation for a given locale
      *
-     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param ConnectionInterface $con    an optional connection object
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     ConnectionInterface $con an optional connection object
      *
-     * @return ChildMessage The current object (for fluent API support)
+     * @return    ChildMessage The current object (for fluent API support)
      */
     public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
@@ -2328,7 +2355,7 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Returns the current translation
      *
-     * @param ConnectionInterface $con an optional connection object
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildMessageI18n */
     public function getCurrentTranslation(ConnectionInterface $con = null)
@@ -2449,7 +2476,7 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Checks whether the current state must be recorded as a version
      *
-     * @return boolean
+     * @return  boolean
      */
     public function isVersioningNecessary($con = null)
     {
@@ -2471,9 +2498,9 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Creates a version of the current object and saves it.
      *
-     * @param ConnectionInterface $con the connection to use
+     * @param   ConnectionInterface $con the connection to use
      *
-     * @return ChildMessageVersion A version object
+     * @return  ChildMessageVersion A version object
      */
     public function addVersion($con = null)
     {
@@ -2501,10 +2528,10 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Sets the properties of the current object to the value they had at a specific version
      *
-     * @param integer             $versionNumber The version number to read
-     * @param ConnectionInterface $con           The connection to use
+     * @param   integer $versionNumber The version number to read
+     * @param   ConnectionInterface $con The connection to use
      *
-     * @return ChildMessage The current object (for fluent API support)
+     * @return  ChildMessage The current object (for fluent API support)
      */
     public function toVersion($versionNumber, $con = null)
     {
@@ -2520,9 +2547,9 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Sets the properties of the current object to the value they had at a specific version
      *
-     * @param ChildMessageVersion $version       The version object to use
-     * @param ConnectionInterface $con           the connection to use
-     * @param array               $loadedObjects objects that been loaded in a chain of populateFromVersion calls on referrer or fk objects.
+     * @param ChildMessageVersion $version The version object to use
+     * @param ConnectionInterface   $con the connection to use
+     * @param array                 $loadedObjects objects that been loaded in a chain of populateFromVersion calls on referrer or fk objects.
      *
      * @return ChildMessage The current object (for fluent API support)
      */
@@ -2548,9 +2575,9 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Gets the latest persisted version number for the current object
      *
-     * @param ConnectionInterface $con the connection to use
+     * @param   ConnectionInterface $con the connection to use
      *
-     * @return integer
+     * @return  integer
      */
     public function getLastVersionNumber($con = null)
     {
@@ -2568,9 +2595,9 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Checks whether the current object is the latest one
      *
-     * @param ConnectionInterface $con the connection to use
+     * @param   ConnectionInterface $con the connection to use
      *
-     * @return Boolean
+     * @return  Boolean
      */
     public function isLastVersion($con = null)
     {
@@ -2580,10 +2607,10 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Retrieves a version object for this entity and a version number
      *
-     * @param integer             $versionNumber The version number to read
-     * @param ConnectionInterface $con           the connection to use
+     * @param   integer $versionNumber The version number to read
+     * @param   ConnectionInterface $con the connection to use
      *
-     * @return ChildMessageVersion A version object
+     * @return  ChildMessageVersion A version object
      */
     public function getOneVersion($versionNumber, $con = null)
     {
@@ -2596,9 +2623,9 @@ abstract class Message implements ActiveRecordInterface
     /**
      * Gets all the versions of this object, in incremental order
      *
-     * @param ConnectionInterface $con the connection to use
+     * @param   ConnectionInterface $con the connection to use
      *
-     * @return ObjectCollection A list of ChildMessageVersion objects
+     * @return  ObjectCollection A list of ChildMessageVersion objects
      */
     public function getAllVersions($con = null)
     {
@@ -2618,12 +2645,12 @@ abstract class Message implements ActiveRecordInterface
      * );
      * </code>
      *
-     * @param integer             $versionNumber
-     * @param string              $keys           Main key used for the result diff (versions|columns)
-     * @param ConnectionInterface $con            the connection to use
-     * @param array               $ignoredColumns The columns to exclude from the diff.
+     * @param   integer             $versionNumber
+     * @param   string              $keys Main key used for the result diff (versions|columns)
+     * @param   ConnectionInterface $con the connection to use
+     * @param   array               $ignoredColumns  The columns to exclude from the diff.
      *
-     * @return array A list of differences
+     * @return  array A list of differences
      */
     public function compareVersion($versionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
     {
@@ -2643,13 +2670,13 @@ abstract class Message implements ActiveRecordInterface
      * );
      * </code>
      *
-     * @param integer             $fromVersionNumber
-     * @param integer             $toVersionNumber
-     * @param string              $keys              Main key used for the result diff (versions|columns)
-     * @param ConnectionInterface $con               the connection to use
-     * @param array               $ignoredColumns    The columns to exclude from the diff.
+     * @param   integer             $fromVersionNumber
+     * @param   integer             $toVersionNumber
+     * @param   string              $keys Main key used for the result diff (versions|columns)
+     * @param   ConnectionInterface $con the connection to use
+     * @param   array               $ignoredColumns  The columns to exclude from the diff.
      *
-     * @return array A list of differences
+     * @return  array A list of differences
      */
     public function compareVersions($fromVersionNumber, $toVersionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
     {
@@ -2669,12 +2696,12 @@ abstract class Message implements ActiveRecordInterface
      * );
      * </code>
      *
-     * @param array  $fromVersion    An array representing the original version.
-     * @param array  $toVersion      An array representing the destination version.
-     * @param string $keys           Main key used for the result diff (versions|columns).
-     * @param array  $ignoredColumns The columns to exclude from the diff.
+     * @param   array     $fromVersion     An array representing the original version.
+     * @param   array     $toVersion       An array representing the destination version.
+     * @param   string    $keys            Main key used for the result diff (versions|columns).
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
      *
-     * @return array A list of differences
+     * @return  array A list of differences
      */
     protected function computeDiff($fromVersion, $toVersion, $keys = 'columns', $ignoredColumns = array())
     {
@@ -2711,7 +2738,7 @@ abstract class Message implements ActiveRecordInterface
     /**
      * retrieve the last $number versions.
      *
-     * @param  Integer                $number the number of record to return.
+     * @param Integer $number the number of record to return.
      * @return PropelCollection|array \Thelia\Model\MessageVersion[] List of \Thelia\Model\MessageVersion objects
      */
     public function getLastVersions($number = 10, $criteria = null, $con = null)

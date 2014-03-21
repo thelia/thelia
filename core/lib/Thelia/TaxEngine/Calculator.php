@@ -100,6 +100,27 @@ class Calculator
         return $this;
     }
 
+    public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country)
+    {
+        $this->product = null;
+        $this->country = null;
+        $this->taxRulesCollection = null;
+
+        if ($taxRule->getId() === null) {
+            throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
+        }
+        if ($country->getId() === null) {
+            throw new TaxEngineException('Country id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_COUNTRY);
+        }
+
+        $this->country = $country;
+        $this->product = new Product();
+
+        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($taxRule, $country);
+
+        return $this;
+    }
+
     public function getTaxAmountFromUntaxedPrice($untaxedPrice, &$taxCollection = null)
     {
         return $this->getTaxedPrice($untaxedPrice, $taxCollection) - $untaxedPrice;
@@ -215,31 +236,6 @@ class Calculator
 
         $untaxedPrice -= $currentFixTax;
         $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);
-
-        /*do {
-
-            $taxType = $taxRule->getTypeInstance();
-            $taxType->loadRequirements( $taxRule->getRequirements() );
-
-            $untaxedPrice -= $taxType->fixAmountRetriever();
-
-        } while ($taxRule = $this->taxRulesCollection->getPrevious());
-
-        $taxRule = $this->taxRulesCollection->getLast();
-
-        $currentTaxFactor = 0;
-        do {
-
-            $taxType = $taxRule->getTypeInstance();
-            $taxType->loadRequirements( $taxRule->getRequirements() );
-
-            $currentTaxFactor += $taxType->pricePercentRetriever($untaxedPrice);
-
-            $toto = true;
-
-        } while ($taxRule = $this->taxRulesCollection->getPrevious());
-
-        $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);*/
 
         return $untaxedPrice;
     }

@@ -73,7 +73,8 @@ class Update
         $logger->debug("begin transaction");
         $database = new Database($con->getWrappedConnection());
         try {
-            for ($i = ++$index; $i < count(self::$version); $i++) {
+            $size = count(self::$version);
+            for ($i = ++$index; $i < $size; $i++) {
                 $this->updateToVersion(self::$version[$i], $database, $logger);
                 $updatedVersions[] = self::$version[$i];
             }

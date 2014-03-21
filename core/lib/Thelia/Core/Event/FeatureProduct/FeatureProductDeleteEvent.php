@@ -22,7 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\FeatureProduct;
-use Thelia\Model\FeatureProduct;
 
 class FeatureProductDeleteEvent extends FeatureProductEvent
 {

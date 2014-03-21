@@ -183,7 +183,6 @@ class AddressController extends BaseFrontController
 
         \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during address deletion : %s', $error_message));
 
-
         // If Ajax Request
         if ($this->getRequest()->isXmlHttpRequest()) {
             if ($error_message) {

@@ -32,7 +32,7 @@ use Thelia\Core\Template\Loop\ProductSaleElements;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class ProductSaleElementsTest extends BaseLoopTestor
+class ProductSaleElementTest extends BaseLoopTestor
 {
     public function getTestedClassName()
     {

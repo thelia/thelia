@@ -30,6 +30,7 @@ abstract class Config implements ActiveRecordInterface
      */
     const TABLE_MAP = '\\Thelia\\Model\\Map\\ConfigTableMap';
 
+
     /**
      * attribute to determine if this object has previously been saved.
      * @var boolean
@@ -357,9 +358,9 @@ abstract class Config implements ActiveRecordInterface
      * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed  $parser A AbstractParser instance,
+     * @param mixed $parser A AbstractParser instance,
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data   The source data to import from
+     * @param string $data The source data to import from
      *
      * @return Config The current object, for fluid interface
      */
@@ -409,50 +410,55 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Get the [id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getId()
     {
+
         return $this->id;
     }
 
     /**
      * Get the [name] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getName()
     {
+
         return $this->name;
     }
 
     /**
      * Get the [value] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getValue()
     {
+
         return $this->value;
     }
 
     /**
      * Get the [secured] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getSecured()
     {
+
         return $this->secured;
     }
 
     /**
      * Get the [hidden] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getHidden()
     {
+
         return $this->hidden;
     }
 
@@ -460,8 +466,8 @@ abstract class Config implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -480,8 +486,8 @@ abstract class Config implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param string $format The date/time format string (either date()-style or strftime()-style).
-     *                       If format is NULL, then the raw \DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
      * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
@@ -499,8 +505,8 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Set the value of [id] column.
      *
-     * @param  int                  $v new value
-     * @return \Thelia\Model\Config The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Config The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -513,14 +519,15 @@ abstract class Config implements ActiveRecordInterface
             $this->modifiedColumns[ConfigTableMap::ID] = true;
         }
 
+
         return $this;
     } // setId()
 
     /**
      * Set the value of [name] column.
      *
-     * @param  string               $v new value
-     * @return \Thelia\Model\Config The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\Config The current object (for fluent API support)
      */
     public function setName($v)
     {
@@ -533,14 +540,15 @@ abstract class Config implements ActiveRecordInterface
             $this->modifiedColumns[ConfigTableMap::NAME] = true;
         }
 
+
         return $this;
     } // setName()
 
     /**
      * Set the value of [value] column.
      *
-     * @param  string               $v new value
-     * @return \Thelia\Model\Config The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\Config The current object (for fluent API support)
      */
     public function setValue($v)
     {
@@ -553,14 +561,15 @@ abstract class Config implements ActiveRecordInterface
             $this->modifiedColumns[ConfigTableMap::VALUE] = true;
         }
 
+
         return $this;
     } // setValue()
 
     /**
      * Set the value of [secured] column.
      *
-     * @param  int                  $v new value
-     * @return \Thelia\Model\Config The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Config The current object (for fluent API support)
      */
     public function setSecured($v)
     {
@@ -573,14 +582,15 @@ abstract class Config implements ActiveRecordInterface
             $this->modifiedColumns[ConfigTableMap::SECURED] = true;
         }
 
+
         return $this;
     } // setSecured()
 
     /**
      * Set the value of [hidden] column.
      *
-     * @param  int                  $v new value
-     * @return \Thelia\Model\Config The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\Config The current object (for fluent API support)
      */
     public function setHidden($v)
     {
@@ -593,15 +603,16 @@ abstract class Config implements ActiveRecordInterface
             $this->modifiedColumns[ConfigTableMap::HIDDEN] = true;
         }
 
+
         return $this;
     } // setHidden()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                $v string, integer (timestamp), or \DateTime value.
-     *                                 Empty strings are treated as NULL.
-     * @return \Thelia\Model\Config The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\Config The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -613,15 +624,16 @@ abstract class Config implements ActiveRecordInterface
             }
         } // if either are not null
 
+
         return $this;
     } // setCreatedAt()
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed                $v string, integer (timestamp), or \DateTime value.
-     *                                 Empty strings are treated as NULL.
-     * @return \Thelia\Model\Config The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\Config The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -632,6 +644,7 @@ abstract class Config implements ActiveRecordInterface
                 $this->modifiedColumns[ConfigTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
+
 
         return $this;
     } // setUpdatedAt()
@@ -679,6 +692,7 @@ abstract class Config implements ActiveRecordInterface
     public function hydrate($row, $startcol = 0, $rehydrate = false, $indexType = TableMap::TYPE_NUM)
     {
         try {
+
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ConfigTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
@@ -743,10 +757,10 @@ abstract class Config implements ActiveRecordInterface
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param  boolean             $deep (optional) Whether to also de-associated any related objects.
-     * @param  ConnectionInterface $con  (optional) The ConnectionInterface connection to use.
+     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
+     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException     - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
      */
     public function reload($deep = false, ConnectionInterface $con = null)
     {
@@ -783,7 +797,7 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param  ConnectionInterface $con
+     * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
      * @see Config::setDeleted()
@@ -826,8 +840,8 @@ abstract class Config implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see doSave()
      */
@@ -888,8 +902,8 @@ abstract class Config implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param  ConnectionInterface $con
-     * @return int                 The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @param      ConnectionInterface $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
      * @throws PropelException
      * @see save()
      */
@@ -937,7 +951,7 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Insert the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @throws PropelException
      * @see doSave()
@@ -1027,7 +1041,7 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param ConnectionInterface $con
+     * @param      ConnectionInterface $con
      *
      * @return Integer Number of updated rows
      * @see doSave()
@@ -1043,12 +1057,12 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param  string $name name
-     * @param  string $type The type of fieldname the $name is of:
-     *                      one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                      TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                      Defaults to TableMap::TYPE_PHPNAME.
-     * @return mixed  Value of field.
+     * @param      string $name name
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @return mixed Value of field.
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1062,7 +1076,7 @@ abstract class Config implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos position in xml schema
+     * @param      int $pos position in xml schema
      * @return mixed Value of field at $pos
      */
     public function getByPosition($pos)
@@ -1101,12 +1115,12 @@ abstract class Config implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param string  $keyType                (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
-     *                                        TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                                        Defaults to TableMap::TYPE_PHPNAME.
-     * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
-     * @param boolean $includeForeignObjects  (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
+     *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                    Defaults to TableMap::TYPE_PHPNAME.
+     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
@@ -1143,12 +1157,12 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param  string $name
-     * @param  mixed  $value field value
-     * @param  string $type  The type of fieldname the $name is of:
-     *                       one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
-     *                       TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                       Defaults to TableMap::TYPE_PHPNAME.
+     * @param      string $name
+     * @param      mixed  $value field value
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
      * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
@@ -1162,8 +1176,8 @@ abstract class Config implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int   $pos   position in xml schema
-     * @param  mixed $value field value
+     * @param      int $pos position in xml schema
+     * @param      mixed $value field value
      * @return void
      */
     public function setByPosition($pos, $value)
@@ -1206,8 +1220,8 @@ abstract class Config implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param  array  $arr     An array to populate the object from.
-     * @param  string $keyType The type of keys the array uses.
+     * @param      array  $arr     An array to populate the object from.
+     * @param      string $keyType The type of keys the array uses.
      * @return void
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
@@ -1239,6 +1253,7 @@ abstract class Config implements ActiveRecordInterface
         if ($this->isColumnModified(ConfigTableMap::HIDDEN)) $criteria->add(ConfigTableMap::HIDDEN, $this->hidden);
         if ($this->isColumnModified(ConfigTableMap::CREATED_AT)) $criteria->add(ConfigTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ConfigTableMap::UPDATED_AT)) $criteria->add(ConfigTableMap::UPDATED_AT, $this->updated_at);
+
         return $criteria;
     }
 
@@ -1260,7 +1275,7 @@ abstract class Config implements ActiveRecordInterface
 
     /**
      * Returns the primary key for this object (row).
-     * @return int
+     * @return   int
      */
     public function getPrimaryKey()
     {
@@ -1270,7 +1285,7 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param  int  $key Primary key.
+     * @param       int $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
@@ -1284,6 +1299,7 @@ abstract class Config implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
+
         return null === $this->getId();
     }
 
@@ -1293,9 +1309,9 @@ abstract class Config implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  object          $copyObj  An object of \Thelia\Model\Config (or compatible) type.
-     * @param  boolean         $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param  boolean         $makeNew  Whether to reset autoincrement PKs and make the object new.
+     * @param      object $copyObj An object of \Thelia\Model\Config (or compatible) type.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
@@ -1334,8 +1350,8 @@ abstract class Config implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  boolean              $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Thelia\Model\Config Clone of current object.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return                 \Thelia\Model\Config Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1354,7 +1370,7 @@ abstract class Config implements ActiveRecordInterface
      * Avoids crafting an 'init[$relationName]s' method name
      * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param  string $relationName The name of the relation to initialize
+     * @param      string $relationName The name of the relation to initialize
      * @return void
      */
     public function initRelation($relationName)
@@ -1393,8 +1409,8 @@ abstract class Config implements ActiveRecordInterface
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                  the collection even if it is not empty
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
      *
      * @return void
      */
@@ -1416,8 +1432,8 @@ abstract class Config implements ActiveRecordInterface
      * If this ChildConfig is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param  Criteria                     $criteria optional Criteria object to narrow the query
-     * @param  ConnectionInterface          $con      optional connection object
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
      * @return Collection|ChildConfigI18n[] List of ChildConfigI18n objects
      * @throws PropelException
      */
@@ -1473,13 +1489,14 @@ abstract class Config implements ActiveRecordInterface
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection          $configI18ns A Propel collection.
-     * @param  ConnectionInterface $con         Optional connection object
-     * @return ChildConfig         The current object (for fluent API support)
+     * @param      Collection $configI18ns A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildConfig The current object (for fluent API support)
      */
     public function setConfigI18ns(Collection $configI18ns, ConnectionInterface $con = null)
     {
         $configI18nsToDelete = $this->getConfigI18ns(new Criteria(), $con)->diff($configI18ns);
+
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
@@ -1504,10 +1521,10 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Returns the number of related ConfigI18n objects.
      *
-     * @param  Criteria            $criteria
-     * @param  boolean             $distinct
-     * @param  ConnectionInterface $con
-     * @return int                 Count of related ConfigI18n objects.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ConfigI18n objects.
      * @throws PropelException
      */
     public function countConfigI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
@@ -1539,8 +1556,8 @@ abstract class Config implements ActiveRecordInterface
      * Method called to associate a ChildConfigI18n object to this object
      * through the ChildConfigI18n foreign key attribute.
      *
-     * @param  ChildConfigI18n      $l ChildConfigI18n
-     * @return \Thelia\Model\Config The current object (for fluent API support)
+     * @param    ChildConfigI18n $l ChildConfigI18n
+     * @return   \Thelia\Model\Config The current object (for fluent API support)
      */
     public function addConfigI18n(ChildConfigI18n $l)
     {
@@ -1570,7 +1587,7 @@ abstract class Config implements ActiveRecordInterface
     }
 
     /**
-     * @param  ConfigI18n  $configI18n The configI18n object to remove.
+     * @param  ConfigI18n $configI18n The configI18n object to remove.
      * @return ChildConfig The current object (for fluent API support)
      */
     public function removeConfigI18n($configI18n)
@@ -1615,7 +1632,7 @@ abstract class Config implements ActiveRecordInterface
      * objects with circular references (even in PHP 5.3). This is currently necessary
      * when using Propel in certain daemon or large-volume/high-memory operations.
      *
-     * @param boolean $deep Whether to also clear the references on all referrer objects.
+     * @param      boolean $deep Whether to also clear the references on all referrer objects.
      */
     public function clearAllReferences($deep = false)
     {
@@ -1649,7 +1666,7 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return ChildConfig The current object (for fluent API support)
+     * @return     ChildConfig The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
@@ -1663,9 +1680,9 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Sets the locale for translations
      *
-     * @param string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
      *
-     * @return ChildConfig The current object (for fluent API support)
+     * @return    ChildConfig The current object (for fluent API support)
      */
     public function setLocale($locale = 'en_US')
     {
@@ -1677,7 +1694,7 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Gets the locale for translations
      *
-     * @return string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
      */
     public function getLocale()
     {
@@ -1687,8 +1704,8 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Returns the current translation for a given locale
      *
-     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param ConnectionInterface $con    an optional connection object
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildConfigI18n */
     public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
@@ -1721,10 +1738,10 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Remove the translation for a given locale
      *
-     * @param string              $locale Locale to use for the translation, e.g. 'fr_FR'
-     * @param ConnectionInterface $con    an optional connection object
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     ConnectionInterface $con an optional connection object
      *
-     * @return ChildConfig The current object (for fluent API support)
+     * @return    ChildConfig The current object (for fluent API support)
      */
     public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
@@ -1749,13 +1766,14 @@ abstract class Config implements ActiveRecordInterface
     /**
      * Returns the current translation
      *
-     * @param ConnectionInterface $con an optional connection object
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildConfigI18n */
     public function getCurrentTranslation(ConnectionInterface $con = null)
     {
         return $this->getTranslation($this->getLocale(), $con);
     }
+
 
         /**
          * Get the [title] column value.
@@ -1766,6 +1784,7 @@ abstract class Config implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getTitle();
     }
+
 
         /**
          * Set the value of [title] column.
@@ -1779,6 +1798,7 @@ abstract class Config implements ActiveRecordInterface
         return $this;
     }
 
+
         /**
          * Get the [description] column value.
          *
@@ -1788,6 +1808,7 @@ abstract class Config implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getDescription();
     }
+
 
         /**
          * Set the value of [description] column.
@@ -1801,6 +1822,7 @@ abstract class Config implements ActiveRecordInterface
         return $this;
     }
 
+
         /**
          * Get the [chapo] column value.
          *
@@ -1810,6 +1832,7 @@ abstract class Config implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getChapo();
     }
+
 
         /**
          * Set the value of [chapo] column.
@@ -1823,6 +1846,7 @@ abstract class Config implements ActiveRecordInterface
         return $this;
     }
 
+
         /**
          * Get the [postscriptum] column value.
          *
@@ -1832,6 +1856,7 @@ abstract class Config implements ActiveRecordInterface
         {
         return $this->getCurrentTranslation()->getPostscriptum();
     }
+
 
         /**
          * Set the value of [postscriptum] column.
@@ -1920,6 +1945,7 @@ abstract class Config implements ActiveRecordInterface
     {
 
     }
+
 
     /**
      * Derived method to catches calls to undefined methods.

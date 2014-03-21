@@ -29,7 +29,6 @@ use Thelia\Model\Profile as ProfileModel;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Model\ProfileQuery;
 
-
 /**
  * Class ProfileTest
  * @package Thelia\Tests\Action
@@ -151,4 +150,4 @@ class ProfileTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($accessManager->can(AccessManager::CREATE));
     }
 
-} 
+}

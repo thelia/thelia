@@ -79,7 +79,6 @@ class TheliaHttpKernel extends HttpKernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        //$request->headers->set('X-Php-Ob-Level', ob_get_level());
         if ($type == HttpKernelInterface::MASTER_REQUEST) {
             $request = $this->initSession($request);
             $this->initParam($request);
@@ -189,7 +188,6 @@ class TheliaHttpKernel extends HttpKernel
                     // TODO : search if http status 302 is the good one.
                     $redirect = new RedirectResponse($lang->getUrl(), 302);
                     $redirect->send();
-                    exit;
                 } else {
                     //the user is actually on the good domain, nothing to change
                     return null;

@@ -30,7 +30,6 @@ use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Model\Config as ConfigModel;
 use Thelia\Model\ConfigQuery;
 
-
 /**
  * Class ConfigTest
  * @package Thelia\Tests\Action
@@ -38,7 +37,7 @@ use Thelia\Model\ConfigQuery;
  */
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
-    protected  $dispatcher;
+    protected $dispatcher;
 
     public static function setUpBeforeClass()
     {

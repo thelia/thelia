@@ -76,9 +76,9 @@ abstract class AdminLogQuery extends ModelCriteria
     /**
      * Initializes internal state of \Thelia\Model\Base\AdminLogQuery object.
      *
-     * @param string $dbName     The database name
-     * @param string $modelName  The phpName of a model, e.g. 'Book'
-     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param     string $dbName The database name
+     * @param     string $modelName The phpName of a model, e.g. 'Book'
+     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\AdminLog', $modelAlias = null)
     {
@@ -88,8 +88,8 @@ abstract class AdminLogQuery extends ModelCriteria
     /**
      * Returns a new ChildAdminLogQuery object.
      *
-     * @param string   $modelAlias The alias of a model in the query
-     * @param Criteria $criteria   Optional Criteria to build the query from
+     * @param     string $modelAlias The alias of a model in the query
+     * @param     Criteria $criteria Optional Criteria to build the query from
      *
      * @return ChildAdminLogQuery
      */
@@ -118,7 +118,7 @@ abstract class AdminLogQuery extends ModelCriteria
      * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param mixed               $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildAdminLog|array|mixed the result, formatted by the current formatter
@@ -149,10 +149,10 @@ abstract class AdminLogQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param mixed               $key Primary key to use for the query
-     * @param ConnectionInterface $con A connection object
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildAdminLog A model object, or null if the key is not found
+     * @return   ChildAdminLog A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
@@ -179,8 +179,8 @@ abstract class AdminLogQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param mixed               $key Primary key to use for the query
-     * @param ConnectionInterface $con A connection object
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
      *
      * @return ChildAdminLog|array|mixed the result, formatted by the current formatter
      */
@@ -200,8 +200,8 @@ abstract class AdminLogQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
-     * @param array               $keys Primary keys to use for the query
-     * @param ConnectionInterface $con  an optional connection object
+     * @param     array $keys Primary keys to use for the query
+     * @param     ConnectionInterface $con an optional connection object
      *
      * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
      */
@@ -222,24 +222,26 @@ abstract class AdminLogQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param mixed $key Primary key to use for the query
+     * @param     mixed $key Primary key to use for the query
      *
      * @return ChildAdminLogQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
+
         return $this->addUsingAlias(AdminLogTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
      * Filter the query by a list of primary keys
      *
-     * @param array $keys The list of primary key to use for the query
+     * @param     array $keys The list of primary key to use for the query
      *
      * @return ChildAdminLogQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
+
         return $this->addUsingAlias(AdminLogTableMap::ID, $keys, Criteria::IN);
     }
 
@@ -253,11 +255,11 @@ abstract class AdminLogQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @param mixed  $id         The value to use as filter.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAdminLogQuery The current query, for fluid interface
      */
@@ -293,9 +295,9 @@ abstract class AdminLogQuery extends ModelCriteria
      * $query->filterByAdminLogin('%fooValue%'); // WHERE admin_login LIKE '%fooValue%'
      * </code>
      *
-     * @param string $adminLogin The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $adminLogin The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAdminLogQuery The current query, for fluid interface
      */
@@ -322,9 +324,9 @@ abstract class AdminLogQuery extends ModelCriteria
      * $query->filterByAdminFirstname('%fooValue%'); // WHERE admin_firstname LIKE '%fooValue%'
      * </code>
      *
-     * @param string $adminFirstname The value to use as filter.
-     *                               Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison     Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $adminFirstname The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAdminLogQuery The current query, for fluid interface
      */
@@ -351,9 +353,9 @@ abstract class AdminLogQuery extends ModelCriteria
      * $query->filterByAdminLastname('%fooValue%'); // WHERE admin_lastname LIKE '%fooValue%'
      * </code>
      *
-     * @param string $adminLastname The value to use as filter.
-     *                              Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison    Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $adminLastname The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAdminLogQuery The current query, for fluid interface
      */
@@ -380,9 +382,9 @@ abstract class AdminLogQuery extends ModelCriteria
      * $query->filterByResource('%fooValue%'); // WHERE resource LIKE '%fooValue%'
      * </code>
      *
-     * @param string $resource   The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $resource The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAdminLogQuery The current query, for fluid interface
      */
@@ -409,9 +411,9 @@ abstract class AdminLogQuery extends ModelCriteria
      * $query->filterByAction('%fooValue%'); // WHERE action LIKE '%fooValue%'
      * </code>
      *
-     * @param string $action     The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $action The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAdminLogQuery The current query, for fluid interface
      */
@@ -438,9 +440,9 @@ abstract class AdminLogQuery extends ModelCriteria
      * $query->filterByMessage('%fooValue%'); // WHERE message LIKE '%fooValue%'
      * </code>
      *
-     * @param string $message    The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $message The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAdminLogQuery The current query, for fluid interface
      */
@@ -467,9 +469,9 @@ abstract class AdminLogQuery extends ModelCriteria
      * $query->filterByRequest('%fooValue%'); // WHERE request LIKE '%fooValue%'
      * </code>
      *
-     * @param string $request    The value to use as filter.
-     *                           Accepts wildcards (* and % trigger a LIKE)
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     string $request The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAdminLogQuery The current query, for fluid interface
      */
@@ -497,13 +499,13 @@ abstract class AdminLogQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param mixed  $createdAt  The value to use as filter.
-     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
-     *                           Empty strings are treated as NULL.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAdminLogQuery The current query, for fluid interface
      */
@@ -540,13 +542,13 @@ abstract class AdminLogQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param mixed  $updatedAt  The value to use as filter.
-     *                           Values can be integers (unix timestamps), DateTime objects, or strings.
-     *                           Empty strings are treated as NULL.
-     *                           Use scalar values for equality.
-     *                           Use array values for in_array() equivalent.
-     *                           Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAdminLogQuery The current query, for fluid interface
      */
@@ -576,7 +578,7 @@ abstract class AdminLogQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param ChildAdminLog $adminLog Object to remove from the list of results
+     * @param   ChildAdminLog $adminLog Object to remove from the list of results
      *
      * @return ChildAdminLogQuery The current query, for fluid interface
      */
@@ -592,8 +594,8 @@ abstract class AdminLogQuery extends ModelCriteria
     /**
      * Deletes all rows from the admin_log table.
      *
-     * @param  ConnectionInterface $con the connection to use
-     * @return int                 The number of affected rows (if supported by underlying database driver).
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).
      */
     public function doDeleteAll(ConnectionInterface $con = null)
     {
@@ -624,13 +626,13 @@ abstract class AdminLogQuery extends ModelCriteria
     /**
      * Performs a DELETE on the database, given a ChildAdminLog or Criteria object OR a primary key value.
      *
-     * @param  mixed               $values Criteria or ChildAdminLog object or primary key or array of primary keys
-     *                                     which is used to create the DELETE statement
-     * @param  ConnectionInterface $con    the connection to use
-     * @return int                 The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                                    if supported by native driver or if emulated using Propel.
-     * @throws PropelException     Any exceptions caught during processing will be
-     *                                    rethrown wrapped into a PropelException.
+     * @param mixed               $values Criteria or ChildAdminLog object or primary key or array of primary keys
+     *              which is used to create the DELETE statement
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
+     * @throws PropelException Any exceptions caught during processing will be
+     *         rethrown wrapped into a PropelException.
      */
      public function delete(ConnectionInterface $con = null)
      {
@@ -650,6 +652,7 @@ abstract class AdminLogQuery extends ModelCriteria
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
+
         AdminLogTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
@@ -668,9 +671,9 @@ abstract class AdminLogQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param int $nbDays Maximum age of the latest update in days
+     * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return ChildAdminLogQuery The current query, for fluid interface
+     * @return     ChildAdminLogQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
@@ -680,9 +683,9 @@ abstract class AdminLogQuery extends ModelCriteria
     /**
      * Filter by the latest created
      *
-     * @param int $nbDays Maximum age of in days
+     * @param      int $nbDays Maximum age of in days
      *
-     * @return ChildAdminLogQuery The current query, for fluid interface
+     * @return     ChildAdminLogQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
@@ -692,7 +695,7 @@ abstract class AdminLogQuery extends ModelCriteria
     /**
      * Order by update date desc
      *
-     * @return ChildAdminLogQuery The current query, for fluid interface
+     * @return     ChildAdminLogQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
@@ -702,7 +705,7 @@ abstract class AdminLogQuery extends ModelCriteria
     /**
      * Order by update date asc
      *
-     * @return ChildAdminLogQuery The current query, for fluid interface
+     * @return     ChildAdminLogQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
@@ -712,7 +715,7 @@ abstract class AdminLogQuery extends ModelCriteria
     /**
      * Order by create date desc
      *
-     * @return ChildAdminLogQuery The current query, for fluid interface
+     * @return     ChildAdminLogQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
@@ -722,7 +725,7 @@ abstract class AdminLogQuery extends ModelCriteria
     /**
      * Order by create date asc
      *
-     * @return ChildAdminLogQuery The current query, for fluid interface
+     * @return     ChildAdminLogQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {

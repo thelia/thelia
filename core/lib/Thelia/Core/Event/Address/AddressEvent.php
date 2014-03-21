@@ -22,7 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Address;
-use Symfony\Component\EventDispatcher\Event;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Address;
 

@@ -112,8 +112,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             throw new \InvalidArgumentException("Cache sub-directory and source file path cannot be null");
         }
 
-        // echo basename($source_file).": ";
-
         // Find cached file path
         $cacheFilePath = $this->getCacheFilePath($subdir, $source_file, $event->isOriginalImage(), $event->getOptionsHash());
 
@@ -390,8 +388,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             }
 
             $image->resize(new Box($next_width, $next_height));
-
-            // echo "w=$dest_width, h=$dest_height, nw=$next_width, nh=$next_height, dx=$delta_x, dy=$delta_y, bw=$border_width, bh=$border_height\n";
 
             if ($resize_mode == self::EXACT_RATIO_WITH_BORDERS) {
 

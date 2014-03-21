@@ -32,7 +32,6 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
-use Thelia\Exception\RedirectException;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\Redirect;
@@ -161,7 +160,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      *
      * @throws \Exception|\Thelia\Exception\UrlRewritingException
      * @throws \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     * @throws \Thelia\Exception\RedirectException
      * @return array                                                          An array of parameters
      *
      */

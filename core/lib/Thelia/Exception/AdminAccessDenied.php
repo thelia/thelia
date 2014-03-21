@@ -20,53 +20,15 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Thelia\Core\Factory\ActionEventFactory;
-use Thelia\Core\Template\ParserContext;
+namespace Thelia\Exception;
 
 /**
- *
- * Action are dispatched here.
- *
- * A factory is used for creating appropriate action object
- *
- * Class ControllerListener
- * @package Thelia\Core\EventListener
+ * Class AdminAccessDenied
+ * @package Thelia\Exception
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ControllerListener implements EventSubscriberInterface
+class AdminAccessDenied extends \RuntimeException
 {
-    /**
-     * @var ParserContext the parser context
-     */
-    protected $parserContext;
 
-    public function __construct(ParserContext $parserContext)
-    {
-        $this->parserContext = $parserContext;
-    }
-
-    public function onKernelController(FilterControllerEvent $event)
-    {
-        $dispatcher = $event->getDispatcher();
-        $request = $event->getRequest();
-
-        if (false !== $action = $request->get("action")) {
-           //search corresponding action
-            $event = new ActionEventFactory($request, $action, $event->getKernel()->getContainer()->getParameter("thelia.actionEvent"));
-            $actionEvent = $event->createActionEvent();
-            $dispatcher->dispatch("action.".$action, $actionEvent);
-         }
-    }
-
-   public static function getSubscribedEvents()
-   {
-        return array(
-            KernelEvents::CONTROLLER => array('onKernelController', 0)
-        );
-   }
 }

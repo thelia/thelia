@@ -82,7 +82,7 @@ class Feed extends BaseLoop  implements ArraySearchLoopInterface
                 ->set("TITLE"       , $item->get_title())
                 ->set("AUTHOR"      , $item->get_author())
                 ->set("DESCRIPTION" , $item->get_description())
-                ->set("DATE"        , $item->get_date('U')) // FIXME - date format should be an intl parameter
+                ->set("DATE"        , $item->get_date('U'))
             ;
 
             $loopResult->addRow($loopResultRow);
