@@ -168,7 +168,6 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
 
         // Error (Default: false)
         $error_msg = false;
-        $ex = new \Exception();
 
         // Create the Form from the request
         $updateSeoForm = $this->getUpdateSeoForm($this->getRequest());
@@ -222,15 +221,17 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             // Pass it to the parser
             $this->getParserContext()->addForm($changeForm);
         }
-
-        $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj SEO modification", array('%obj' => $this->objectName)),
-            $error_msg,
-            $updateSeoForm,
-            $ex
-        );
-
-        // At this point, the form has errors, and should be redisplayed.
-        return $this->renderEditionTemplate();
+        
+        if (false !=== $error_msg) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("%obj SEO modification", array('%obj' => $this->objectName)),
+                $error_msg,
+                $updateSeoForm,
+                $ex
+            );
+    
+            // At this point, the form has errors, and should be redisplayed.
+            return $this->renderEditionTemplate();
+        }
     }
 }
