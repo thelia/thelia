@@ -753,6 +753,7 @@ return array(
     'Sorry, variable ID=%id was not found.' => 'Sorry, variable ID=%id was not found.',
     'Source IP' => 'Source IP',
     'Source IP :' => 'Source IP :',
+    'Stats on %month/%year' => 'Stats on %month/%year',
     'Status' => 'Status',
     'Stock' => 'Stock',
     'Store' => 'Store',

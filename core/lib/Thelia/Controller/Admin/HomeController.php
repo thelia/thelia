@@ -45,7 +45,7 @@ class HomeController extends BaseAdminController
 
         $data = new \stdClass();
 
-        $data->title = "Stats on " . $this->getRequest()->query->get('month', date('m')) . "/" . $this->getRequest()->query->get('year', date('Y'));
+        $data->title = $this->getTranslator()->trans("Stats on %month/%year", array('%month' => $this->getRequest()->query->get('month', date('m')), '%year' => $this->getRequest()->query->get('year', date('Y'))));
 
         /* sales */
         $saleSeries = new \stdClass();
