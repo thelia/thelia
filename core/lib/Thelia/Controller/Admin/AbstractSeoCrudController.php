@@ -222,7 +222,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             $this->getParserContext()->addForm($changeForm);
         }
         
-        if (false !=== $error_msg) {
+        if (false !== $error_msg) {
             $this->setupFormErrorContext(
                 $this->getTranslator()->trans("%obj SEO modification", array('%obj' => $this->objectName)),
                 $error_msg,
