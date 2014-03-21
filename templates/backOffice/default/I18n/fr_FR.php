@@ -752,6 +752,7 @@ return array(
     'Sorry, variable ID=%id was not found.' => 'Désolé, la variable ID=%id n\'a pas été trouvé',
     'Source IP' => 'IP source',
     'Source IP :' => 'IP source : ',
+    'Stats on %month/%year' => 'Statistiques du %month/%year',
     'Status' => 'Etat',
     'Stock' => 'Stock',
     'Store' => 'Information boutique',
