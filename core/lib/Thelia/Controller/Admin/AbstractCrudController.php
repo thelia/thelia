@@ -287,7 +287,6 @@ abstract class AbstractCrudController extends BaseAdminController
 
         // Error (Default: false)
         $error_msg = false;
-        $ex = new \Exception();
 
         // Create the Creation Form
         $creationForm = $this->getCreationForm($this->getRequest());
@@ -336,15 +335,17 @@ abstract class AbstractCrudController extends BaseAdminController
             $error_msg = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj creation", array('%obj' => $this->objectName)),
-            $error_msg,
-            $creationForm,
-            $ex
-        );
+        if (false !=== $error_msg) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("%obj creation", array('%obj' => $this->objectName)),
+                $error_msg,
+                $creationForm,
+                $ex
+            );
 
-        // At this point, the form has error, and should be redisplayed.
-        return $this->renderList();
+            // At this point, the form has error, and should be redisplayed.
+            return $this->renderList();
+        }
     }
 
     /**
@@ -385,7 +386,6 @@ abstract class AbstractCrudController extends BaseAdminController
 
         // Error (Default: false)
         $error_msg = false;
-        $ex = new \Exception();
 
         // Create the Form from the request
         $changeForm = $this->getUpdateForm($this->getRequest());
@@ -437,15 +437,17 @@ abstract class AbstractCrudController extends BaseAdminController
             $error_msg = $ex->getMessage();*/
         }
 
-        // At this point, the form has errors, and should be redisplayed.
-        $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)),
-            $error_msg,
-            $changeForm,
-            $ex
-        );
+        if (false !=== $error_msg) {
+            // At this point, the form has errors, and should be redisplayed.
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)),
+                $error_msg,
+                $changeForm,
+                $ex
+            );
 
-        return $this->renderEditionTemplate();
+            return $this->renderEditionTemplate();
+        }
     }
 
     /**
