@@ -335,7 +335,7 @@ abstract class AbstractCrudController extends BaseAdminController
             $error_msg = $ex->getMessage();
         }
 
-        if (false !=== $error_msg) {
+        if (false !== $error_msg) {
             $this->setupFormErrorContext(
                 $this->getTranslator()->trans("%obj creation", array('%obj' => $this->objectName)),
                 $error_msg,
@@ -437,7 +437,7 @@ abstract class AbstractCrudController extends BaseAdminController
             $error_msg = $ex->getMessage();*/
         }
 
-        if (false !=== $error_msg) {
+        if (false !== $error_msg) {
             // At this point, the form has errors, and should be redisplayed.
             $this->setupFormErrorContext(
                 $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)),
