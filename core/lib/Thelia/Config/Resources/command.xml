@@ -12,7 +12,7 @@
         <command class="Thelia\Command\ModuleGenerateModelCommand"/>
         <command class="Thelia\Command\ModuleGenerateSqlCommand"/>
         <command class="Thelia\Command\ModuleActivateCommand"/>
-        <command class="Thelia\Command\ModuleDeActivateCommand"/>
+        <command class="Thelia\Command\ModuleDeactivateCommand"/>
         <command class="Thelia\Command\CreateAdminUser"/>
         <command class="Thelia\Command\ReloadDatabaseCommand"/>
         <command class="Thelia\Command\GenerateResources"/>

@@ -30,7 +30,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Model\ModuleQuery;
 
 /**
- * DeActivates a module
+ * Deactivates a module
  *
  * Class ModuleDeactivateCommand
  * @package Thelia\Command
