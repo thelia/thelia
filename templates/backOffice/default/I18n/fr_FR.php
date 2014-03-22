@@ -47,7 +47,7 @@ return array(
     'Additional categories' => 'Rubriques supplémentaires',
     'Address' => 'Adresse',
     'Administration logs' => 'Journal des logs',
-    'Administration profiles' => 'Gestion des administrateurs',
+    'Administration profiles' => 'Gestion des profils',
     'Administrators' => 'Administrateurs',
     'All orders' => 'Toutes les commandes',
     'Alpha code 2' => 'Code alpha 2',
