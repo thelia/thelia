@@ -42,11 +42,11 @@ class ModuleDeactivateCommandTest extends \PHPUnit_Framework_TestCase
 
         if (null !== $module) {
 
-            $prev_activation_status = $module->getDeactivate();
+            $prev_activation_status = $module->getActivate();
 
             $application = new Application($this->getKernel());
 
-            $module->setDeactivate(BaseModule::IS_NOT_ACTIVATED);
+            $module->setActivate(BaseModule::IS_ACTIVATED);
             $module->save();
 
             $moduleDeactivate = new ModuleDeactivateCommand();
@@ -61,12 +61,12 @@ class ModuleDeactivateCommandTest extends \PHPUnit_Framework_TestCase
                 "module" => $module->getCode(),
             ));
 
-            $deactivated = ModuleQuery::create()->findPk($module->getId())->getDeactivate();
+            $deactivated = ModuleQuery::create()->findPk($module->getId())->getActivate();
 
             // Restore activation status
-            $module->setDeactivate($prev_activation_status)->save();
+            $module->setActivate($prev_activation_status)->save();
 
-            $this->assertEquals(BaseModule::IS_ACTIVATED, $deactivated);
+            $this->assertEquals(BaseModule::IS_NOT_ACTIVATED, $deactivated);
         }
     }
 
