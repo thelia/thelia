@@ -88,6 +88,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         try {
             $skeletonDir = str_replace("/", DIRECTORY_SEPARATOR, THELIA_ROOT . "/core/lib/Thelia/Command/Skeleton/Module/");
 
+            // config.xml file
             $fs->copy($skeletonDir . "config.xml", $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "config.xml");
 
             $moduleContent = file_get_contents($skeletonDir . "module.xml");
@@ -97,6 +98,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
             file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "module.xml", $moduleContent);
 
+            // PHP Class template
             $classContent = file_get_contents($skeletonDir . "Class.php.template");
 
             $classContent = str_replace("%%CLASSNAME%%", $this->module, $classContent);
@@ -104,11 +106,31 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
             file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . $this->module.".php", $classContent);
 
+            // schema.xml file
             $schemaContent = file_get_contents($skeletonDir . "schema.xml");
 
             $schemaContent = str_replace("%%NAMESPACE%%", $this->module, $schemaContent);
 
             file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "schema.xml", $schemaContent);
+
+            // routing.xml file
+            $routingContent = file_get_contents($skeletonDir . "routing.xml");
+
+            $routingContent = str_replace("%%NAMESPACE%%", $this->module, $routingContent);
+            $routingContent = str_replace("%%CLASSNAME_LOWER%%", strtolower($this->module), $routingContent);
+
+            file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "routing.xml", $routingContent);
+
+            // I18n sample files
+            $fs->copy(
+                $skeletonDir . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "fr_FR.php",
+                $this->moduleDirectory . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "fr_FR.php"
+            );
+
+            $fs->copy(
+                $skeletonDir . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "en_US.php",
+                $this->moduleDirectory . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "en_US.php"
+            );
         } catch (\Exception $ex) {
             $fs->remove($this->moduleDirectory);
 
