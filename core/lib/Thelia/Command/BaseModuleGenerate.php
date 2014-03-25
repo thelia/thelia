@@ -42,6 +42,10 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
          'Config',
          'Model',
          'Loop',
+         'Command',
+         'Controller',
+         'EventListeners',
+         'I18n',
          'AdminIncludes',
          'templates',
      );
