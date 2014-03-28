@@ -40,6 +40,8 @@ class OrderEvent extends ActionEvent
     protected $status = null;
     protected $deliveryRef = null;
 
+    protected $cartItemId = null;
+
     /**
      * @var Response
      */
@@ -60,6 +62,26 @@ class OrderEvent extends ActionEvent
     {
         $this->order = $order;
     }
+
+    /**
+     * @param null $cartItemId
+     */
+    public function setCartItemId($cartItemId)
+    {
+        $this->cartItemId = $cartItemId;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getCartItemId()
+    {
+        return $this->cartItemId;
+    }
+
+
 
     /**
      * @param Order $order
