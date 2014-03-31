@@ -53,6 +53,12 @@ class CacheClear extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 "do not clear the assets cache in the web space"
             )
+            ->addOption(
+                'with-images',
+                null,
+                InputOption::VALUE_NONE,
+                'clear images generated in web/cache directory'
+            )
         ;
     }
 
@@ -62,9 +68,13 @@ class CacheClear extends ContainerAwareCommand
         $cacheDir = $this->getContainer()->getParameter("kernel.cache_dir");
 
         $this->clearCache($cacheDir, $output);
-        $this->clearCache(THELIA_WEB_DIR . "cache", $output);
+
         if (!$input->getOption("without-assets")) {
             $this->clearCache(THELIA_WEB_DIR . "assets", $output);
+        }
+
+        if ($input->getOption('with-images')) {
+            $this->clearCache(THELIA_WEB_DIR . "cache", $output);
         }
 
     }
