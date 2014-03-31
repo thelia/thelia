@@ -241,7 +241,7 @@
 
 
             // Switch Quantity in product page
-            $("select", $(".product-options")).change(function(){
+            $("select", $(".product-options")).change(function() {
                 $select_quantity        = $(this).find(":selected").attr("data-quantity");
                 var $old_price          = $(this).find(":selected").attr("data-old-price");
 

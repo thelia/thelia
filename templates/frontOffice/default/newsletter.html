@@ -6,35 +6,34 @@
 {/block}
 
 {block name="main-content"}
-    <div class="main">
-        <article class="col-main" role="main" aria-labelledby="main-label">
-            <h1 id="main-label" class="page-header">{intl l="Newsletter Subscription"}</h1>
+                    <div class="main">
+                        <article class="col-main" aria-labelledby="main-label" role="main">
+                            <h1 class="page-header" id="main-label">{intl l="Newsletter Subscription"}</h1>
 
-            {form name="thelia.front.newsletter"}
-                <form id="form-newsletter" action="{url path="/newsletter"}" method="post">
-                    {form_hidden_fields form=$form}
-                    <p>{intl l="You want to subscribe to the newsletter? Please enter your email address below."}</p>
-                    {form_field form=$form field="email"}
-                        <div class="form-group group-email {if $error}has-error{elseif !$error && $value != ""}has-success{/if}">
-                            <label for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
-                            <div class="control-input">
-                                <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" maxlength="255" {if $required} aria-required="true" required{/if} autofocus>
-                                {if $error}
-                                    <span class="help-block">{$message}</span>
-                                {elseif !$error && $value != ""}
-                                    <span class="help-block"><span class="icon-ok"></span> {intl l="Thanks for signing up! We'll keep you posted whenever we have any new updates."}</span>
-                                {/if}
-                            </div>
-                        </div>
-                    {/form_field}
+                            {form name="thelia.front.newsletter"}
+                            <form id="form-newsletter" action="{url path="/newsletter"}" method="post">
+                                {form_hidden_fields form=$form}
 
-                    <div class="form-group group-btn">
-                        <div class="control-btn">
-                            <button type="submit" class="btn btn-submit">{intl l="Subscribe"}</button>
-                        </div>
-                    </div><!--/.form-group-->
-                </form>
-            {/form}
-        </article>
-    </div>
+                                <p>{intl l="You want to subscribe to the newsletter? Please enter your email address below."}</p>
+                                {form_field form=$form field="email"}
+                                <div class="form-group group-email {if $error}has-error{elseif !$error and $value != ""}has-success{/if}">
+                                    <label for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                                    <div class="control-input">
+                                        <input class="form-control" id="{$label_attr.for}" name="{$name}" type="email" value="{$value}" maxlength="255"{if $required} aria-required="true" required{/if} autofocus>
+                                        {if $error}<span class="help-block">{$message}</span>
+                                        {elseif !$error and $value != ""}<span class="help-block"><span class="icon-ok"></span> {intl l="Thanks for signing up! We'll keep you posted whenever we have any new updates."}</span>{/if}
+                                    </div>
+                                </div><!-- /.form-group -->
+                                {/form_field}
+
+                                <div class="form-group group-btn">
+                                    <div class="control-btn">
+                                        <button class="btn btn-submit" type="submit">{intl l="Subscribe"}</button>
+                                    </div>
+                                </div><!-- /.form-group .group-btn -->
+
+                            </form>
+                            {/form}
+                        </article>
+                    </div>
 {/block}
