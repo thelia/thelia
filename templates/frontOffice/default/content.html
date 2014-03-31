@@ -6,15 +6,15 @@
 {* Page Title *}
 {block name='no-return-functions' append}
     {loop name="content.seo.title" type="content" id="{content attr="id"}"}
-    {$page_title = {$META_TITLE}}
+        {$page_title = {$META_TITLE}}
     {/loop}
 {/block}
 
 {* Meta *}
 {block name="meta"}
     {loop name="content.seo.meta" type="content" id="{content attr="id"}"}
-    {if $META_DESCRIPTION}<meta name="description" content="{$META_DESCRIPTION}">{/if}
-    {if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
+        {if $META_DESCRIPTION}<meta name="description" content="{$META_DESCRIPTION}">{/if}
+        {if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
     {/loop}
 {/block}
 
@@ -30,32 +30,20 @@
 {/block}
 
 {block name="main-content"}
-    <div class="main layout-col-2-left">
+                    <div class="main layout-col-2-left">
 
-        <article class="col-main" role="main" aria-labelledby="main-label">
-            {loop name="blog.content"  type="content" current="yes"}
-                <h1 id="main-label" class="page-header">{$TITLE}</h1>
-                {if $CHAPO}
-                    <div class="chapo">
-                        {$CHAPO}
-                    </div>
-                {/if}
-                {if $DESCRIPTION}
-                    <div class="description">
-                        {$DESCRIPTION nofilter}
-                    </div>
-                {/if}
-                {if $POSTSCRIPTUM}
-                    <small class="postscriptum">
-                        {$POSTSCRIPTUM}
-                    </small>
-                {/if}
-            {/loop}
-        </article>
+                        <article class="col-main" aria-labelledby="main-label" role="main">
+                            {loop name="blog.content" type="content" current="yes"}
+                                <h1 id="main-label" class="page-header">{$TITLE}</h1>
+                                {if $CHAPO}<div class="chapo">{$CHAPO}</div>{/if}
+                                {if $DESCRIPTION}<div class="description">{$DESCRIPTION nofilter}</div>{/if}
+                                {if $POSTSCRIPTUM}<small class="postscriptum">{$POSTSCRIPTUM}</small>{/if}
+                            {/loop}
+                        </article>
 
-        <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
-            {include file="includes/asides/articles.html"}
-        </aside>
+                        <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
+                            {include file="includes/asides/articles.html"}
+                        </aside>
 
-    </div><!-- /.layout -->
+                    </div><!-- /.main -->
 {/block}
