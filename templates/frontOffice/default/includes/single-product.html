@@ -1,138 +1,113 @@
 <li class="item">
-    {assign var="hasSubmit" value = false}
-    {assign var="productTitle" value="{$TITLE}"}
-	{if not $product_id}
-	{assign var="$product_id" value=$ID}
-	{/if}
-    <article itemscope itemtype="http://schema.org/Product">
-        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
-        {loop name="brand.feature" type="feature" product=$product_id title="brand"}
-        {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
-            <meta itemprop="brand" content="{$TITLE}">
-        {/loop}
-        {/loop}
-        {loop name="brand.feature" type="feature" product=$product_id title="isbn"}
-        {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
-            <meta itemprop="productID" content="isbn:{$TITLE}">
-        {/loop}
-        {/loop}
+                                    {assign var="hasSubmit" value = false}
+                                    {assign var="productTitle" value="{$TITLE}"}
+                                    {if not $product_id}{assign var="$product_id" value=$ID}{/if}
 
-        <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
-            {loop name="product_thumbnail" type="image" product=$product_id width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
-                <img itemprop="image" src="{$IMAGE_URL}" alt="{$productTitle}">
-            {/loop}
-            {elseloop rel="product_thumbnail"}
-                {images file='../assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="{$productTitle}">{/images}
-            {/elseloop}
-            <span class="mask"></span>
-        </a>
-
-        <div class="product-info">
-            <h3 class="name"><a href="{$URL}"><span itemprop="name">{$productTitle}</span></a></h3>
-            {if $hasDescription}
-            <div class="description" itemprop="description">
-                <p>{$DESCRIPTION}</p>
-            </div>
-            {/if}
-        </div>
-
-        <div class="product-price">
-            <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-                <meta itemprop="category" content="{category attr="title"}">
-                <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
-                <meta itemprop="priceCurrency" content="{currency attr="symbol"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
-                <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
-                <!-- List of availibility :
-                    out_of_stock : http://schema.org/OutOfStock
-                    in_stock : http://schema.org/InStock
-                    instore_only : http://schema.org/InStoreOnly
-                    preorder : http://schema.org/PreOrder
-                    online_only : http://schema.org/OnlineOnly
-                -->
-                {if $IS_PROMO }
-                    {loop name="productSaleElements_promo" type="product_sale_elements" product=$product_id limit="1" order="min_price"}
-                    {assign var="default_product_sale_elements" value=$ID}
-                        <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number=$TAXED_PROMO_PRICE} {currency attr="symbol"}</span></span>
-                        <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number=$TAXED_PRICE} {currency attr="symbol"}</span></span>
-                    {/loop}
-                {else}
-                    <span class="regular-price"><span itemprop="price" class="price">{format_number number=$BEST_TAXED_PRICE} {currency attr="symbol"}</span></span>
-                {/if}
-
-            </div>
-            {if $hasBtn == true}
-            {form name="thelia.cart.add" }
-            <form id="form-product-details" action="{url path="/cart/add" }" method="post" class="form-product">
-                {form_hidden_fields form=$form}
-                <input type="hidden" name="view" value="product">
-                <input type="hidden" name="product_id" value="{$product_id}">
-
-                {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
-
-                {form_field form=$form field='product_sale_elements_id'}
-                {if $default_product_sale_elements }
-                    <input type="hidden" name="{$name}" value="{$default_product_sale_elements}" {$attr}>
-                {else}
-                    {loop name="productSaleElements_promo" type="product_sale_elements" product="{$product_id}" limit="1"}
-                        <input type="hidden" name="{$name}" value="{$ID}" {$attr}>
-                    {/loop}
-                {/if}
-                {/form_field}
-                {form_field form=$form field="product"}
-                    <input id="{$label_attr.for}" type="hidden" name="{$name}" value="{$product_id}" {$attr} >
-                {/form_field}
-
-                <fieldset class="product-options hide">
-                    {ifloop rel="stock"}
-                        <div class="option">
-                            <label for="options" class="option-heading">Options</label>
-                            <div class="option-content">
-                                <select name="options" class="form-control">
-                                    {loop name="stock" type="product_sale_elements" product="$product_id" order="min_price"}
-                                    {if $LOOP_TOTAL == 1}
-                                        {assign var="hasSubmit" value = true}
-                                    {/if}
-                                    {loop name="combi" type="attribute_combination" product_sale_elements="$product_id" order="alpha"}
-                                            <option value="{$ID}" data-quantity="{$QUANTITY}" data-price="{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}" data-old-price="{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}">{$ATTRIBUTE_AVAILABILITY_TITLE}</small></option>
+                                    <article itemscope itemtype="http://schema.org/Product">
+                                    {* <!-- Use the meta tag to specify content that is not visible on the page in any way --> *}
+                                    {loop name="brand.feature" type="feature" product=$product_id title="brand"}
+                                        {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
+                                        <meta itemprop="brand" content="{$TITLE}">
                                         {/loop}
                                     {/loop}
-                                </select>
-                            </div>
-                        </div>
-                    {/ifloop}
-                </fieldset>
-                <fieldset class="product-cart form-inline">
-                    {form_field form=$form field='quantity'}
-                        <div class="form-group group-qty hide {if $error}has-error{elseif $value != "" && !$error}has-success{/if}">
-                            <label for="{$label_attr.for}">{$label}</label>
-                            <input type="number" name="{$name}" id="{$label_attr.for}" class="form-control" value="{$value|default:1}" min="0" required>
-                            {if $error }
-                                <span class="help-block"><i class="icon-remove"></i> {$message}</span>
-                            {elseif $value != "" && !$error}
-                                <span class="help-block"><i class="icon-ok"></i></span>
-                            {/if}
-                        </div>
-                    {/form_field}
+                                    {loop name="brand.feature" type="feature" product=$product_id title="isbn"}
+                                        {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
+                                        <meta itemprop="productID" content="isbn:{$TITLE}">
+                                        {/loop}
+                                    {/loop}
 
-                    <div class="form-group group-btn">
+                                        <a class="product-image" href="{$URL}" itemprop="url" tabindex="-1">
+                                            {loop name="product_thumbnail" type="image" product=$product_id width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
+                                            <img itemprop="image" src="{$IMAGE_URL}" alt="{$productTitle}">
+                                            {/loop}
+                                            {elseloop rel="product_thumbnail"}{images file='../assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="{$productTitle}">{/images}{/elseloop}
+                                            <span class="mask"></span>
+                                        </a>
 
-                    </div>
-                    <div>
-                        <div class="product-btn">
+                                        <div class="product-info">
+                                            <h3 class="name"><a href="{$URL}"><span itemprop="name">{$productTitle}</span></a></h3>
+                                            {if $hasDescription}<div class="description" itemprop="description"><p>{$DESCRIPTION}</p></div>{/if}
+                                        </div>
 
-                                {if $hasSubmit == true}
-                                    <button type="submit" class="btn btn-cart">{intl l="Add to cart"}</button>
-                                {else}
-                                    <a href="{$URL}" class="btn btn-cart">{intl l="View product"}</a>
-                                {/if}
+                                        <div class="product-price">
+                                            <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                                <meta itemprop="category" content="{category attr="title"}">
+                                                <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition">
+                                                {* <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition --> *}
+                                                <meta itemprop="priceCurrency" content="{currency attr="symbol"}">
+                                                {* <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. --> *}
+                                                <link itemprop="availability" href="http://schema.org/InStock" content="in_stock"/>
+                                                {* <!-- List of availibility :
+                                                    out_of_stock : http://schema.org/OutOfStock
+                                                    in_stock : http://schema.org/InStock
+                                                    instore_only : http://schema.org/InStoreOnly
+                                                    preorder : http://schema.org/PreOrder
+                                                    online_only : http://schema.org/OnlineOnly
+                                                --> *}
+                                            {if $IS_PROMO }
+                                                {loop name="productSaleElements_promo" type="product_sale_elements" product=$product_id limit="1" order="min_price"}
+                                                    {assign var="default_product_sale_elements" value=$ID}
+                                                    <span class="special-price"><span class="price-label" itemprop="price">{intl l="Special Price:"} </span><span class="price">{format_number number=$TAXED_PROMO_PRICE} {currency attr="symbol"}</span></span>
+                                                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number=$TAXED_PRICE} {currency attr="symbol"}</span></span>
+                                                {/loop}
+                                            {else}
+                                                <span class="regular-price"><span itemprop="price" class="price">{format_number number=$BEST_TAXED_PRICE} {currency attr="symbol"}</span></span>
+                                            {/if}
+                                            </div><!-- /.product-price -->
 
-                        </div>
-                    </div>
+                                            {if $hasBtn == true}
+                                                {form name="thelia.cart.add" }
+                                                <form id="form-product-details" action="{url path="/cart/add" }" method="post" class="form-product">
+                                                    {form_hidden_fields form=$form}
+                                                    <input name="view" type="hidden" value="product">
+                                                    <input name="product_id" type="hidden" value="{$product_id}">
+                                                    {form_field form=$form field="product"}<input id="{$label_attr.for}" name="{$name}" type="hidden" value="{$product_id}" {$attr}>{/form_field}
+                                                    {form_field form=$form field='product_sale_elements_id'}
+                                                        {if $default_product_sale_elements }<input name="{$name}" type="hidden" value="{$default_product_sale_elements}" {$attr}>
+                                                        {else}{loop name="productSaleElements_promo" type="product_sale_elements" product="{$product_id}" limit="1"}<input name="{$name}" type="hidden" value="{$ID}" {$attr}>{/loop}{/if}
+                                                    {/form_field}
 
-                </fieldset>
-            </form>
-            {/form}
-            {/if}
-        </div>
-    </article><!-- /product -->
-</li>
+                                                    {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
+
+                                                    <fieldset class="product-options hide">
+                                                        {ifloop rel="stock"}
+                                                        <div class="option">
+                                                            <label for="options" class="option-heading">Options</label>
+                                                            <div class="option-content">
+                                                                <select class="form-control" id="options" name="options">
+                                                                {loop name="stock" type="product_sale_elements" product="$product_id" order="min_price"}
+                                                                    {if $LOOP_TOTAL == 1}{assign var="hasSubmit" value = true}{/if}
+                                                                    {loop name="combi" type="attribute_combination" product_sale_elements="$product_id" order="alpha"}
+                                                                        <option data-quantity="{$QUANTITY}" data-price="{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}" data-old-price="{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}" value="{$ID}">{$ATTRIBUTE_AVAILABILITY_TITLE}</option>
+                                                                    {/loop}
+                                                                {/loop}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        {/ifloop}
+                                                    </fieldset>
+
+                                                    <fieldset class="product-cart form-inline">
+                                                        {form_field form=$form field='quantity'}
+                                                        <div class="form-group group-qty hide {if $error}has-error{elseif $value != "" && !$error}has-success{/if}">
+                                                              <label for="{$label_attr.for}">{$label}</label>
+                                                              <input class="form-control" id="{$label_attr.for}" name="{$name}" type="number" value="{$value|default:1}" min="0" required>
+                                                              {if $error }<span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                                              {elseif $value != "" && !$error}<span class="help-block"><i class="icon-ok"></i></span>{/if}
+                                                        </div><!-- /.form-group -->
+                                                        {/form_field}
+
+                                                        <div class="form-group group-btn"></div>
+                                                        <div>
+                                                            <div class="product-btn">
+                                                                {if $hasSubmit == true}<button class="btn btn-cart" type="submit">{intl l="Add to cart"}</button>
+                                                                {else}<a href="{$URL}" class="btn btn-cart">{intl l="View product"}</a>{/if}
+                                                            </div>
+                                                        </div>
+                                                    </fieldset>
+                                                </form>
+                                                {/form}
+                                            {/if}
+                                        </div>
+                                    </article><!-- /product -->
+                                </li>

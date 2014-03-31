@@ -20,304 +20,243 @@
 
 
 {block name="main-content"}
-    <div class="main">
-        <article class="col-main" role="main" aria-labelledby="main-label">
+                    <div class="main">
+                        <article class="col-main" aria-labelledby="main-label" role="main">
 
-            <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
+                            <h1 class="page-header" id="main-label">{intl l="Your Cart"}</h1>
 
-            {include file="misc/checkout-progress.tpl"  step="invoice"}
+                            {include file="misc/checkout-progress.tpl" step="invoice"}
 
-            {form name="thelia.order.coupon"}
+                            {form name="thelia.order.coupon"}
+                            <form id="form-coupon" action="{url path="/order/coupon"}" method="post" {form_enctype form=$form}>
+                                {form_hidden_fields form=$form}
 
-            <form id="form-coupon" action="{url path="/order/coupon"}" method="post" {form_enctype form=$form}>
+                                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                {form_hidden_fields form=$form}
+                                <table class="table table-cart">
+                                    <colgroup>
+                                        <col width="150">
+                                        <col>
+                                        <col width="200">
+                                        <col width="250">
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th class="image">&nbsp;</th>
+                                            <th class="product">
+                                                <span class="hidden-xs">{intl l="Product Name"}</span>
+                                                <span class="visible-xs">{intl l="Name"}</span>
+                                            </th>
+                                            <th class="unitprice">
+                                                <span class="hidden-xs">{intl l="Unit Price"}</span>
+                                                <span class="visible-xs">{intl l="Price"}</span>
+                                            </th>
+                                            <th class="qty">
+                                                <span class="hidden-xs">{intl l="Quantity"}</span>
+                                                <span class="visible-xs">{intl l="Qty"}</span>
+                                            </th>
+                                            <th class="subprice">
+                                                <span class="hidden-xs">{intl l="Total"}</span>
+                                                <span class="visible-xs">{intl l="Total"}</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {loop type="cart" name="cartloop"}
+                                        <tr>
+                                            <td class="image">
+                                                {assign "cart_count" $LOOP_COUNT}
+                                                {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}<img src="{$IMAGE_URL}" alt="Product #{$cart_count}">{/loop}
+                                                {elseloop rel="product-image"}{images file='assets/img/product/1/118x85.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{$cart_count}">{/images}{/elseloop}
+                                            </td>
+                                            <td class="product">
+                                                <h3 class="name">{$TITLE}</h3>
+                                                <div class="product-options">
+                                                    <dl class="dl-horizontal">
+                                                        <dt>{intl l="Available"} :</dt>
+                                                        {if $STOCK > 0}<dd>{intl l="In Stock"}</dd>
+                                                        {else}<dd>{intl l="Out of Stock"}</dd>{/if}
+                                                        <dt>{intl l="No."}</dt>
+                                                        <dd>{$REF}</dd>
+                                                        {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
+                                                        <dt>{$ATTRIBUTE_TITLE}</dt>
+                                                        <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
+                                                        {/loop}
+                                                    </dl>
+                                                </div>
+                                            </td>
+                                            <td class="unitprice">
+                                                {if $IS_PROMO == 1}
+                                                {assign "real_price" $PROMO_TAXED_PRICE}
+                                                <div class="special-price"><span class="price">{$PROMO_TAXED_PRICE} {currency attr="symbol"}</span></div>
+                                                <small class="old-price">{intl l="instead of"} <span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></small>
+                                                {else}
+                                                {assign "real_price" $TAXED_PRICE}
+                                                <div class="special-price"><span class="price">{$TAXED_PRICE} {currency attr="symbol"} </span></div>
+                                                {/if}
+                                            </td>
+                                            <td class="qty"><span class="price">{$QUANTITY}</span></td>
+                                            <td class="subprice"><span class="price">{$real_price * $QUANTITY} {currency attr="symbol"}</span></td>
+                                        </tr>
+                                        {/loop}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td class="empty" rowspan="4" colspan="3">&nbsp;</td>
+                                            <th class="shipping">{intl l="Discount"}</th>
+                                            <td class="shipping"><div class="shipping-price"><span class="price">{order attr="discount"} {currency attr="symbol"}</span></div></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="shipping">{intl l="Shipping Tax"}</th>
+                                            <td class="shipping"><div class="shipping-price"><span class="price">{order attr="postage"} {currency attr="symbol"}</span></div></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
+                                            <td class="coupon">
+                                                {form_field form=$form field='success_url'}<input type="hidden" name="{$name}" value="{url path="/order/invoice"}">{/form_field}
+                                                {form_field form=$form field='coupon-code'}
+                                                <div class="{if $error}has-error{/if}">
+                                                    <div class="input-group">
+                                                        <label class="control-label sr-only" for="coupon">{intl l='Code :'}</label>
+                                                        <input class="form-control" id="coupon" name="{$name}" type="text" value="{$value}" placeholder="{intl l='Coupon code'}" required>
+                                                        <span class="input-group-btn"><button class="btn btn-coupon" type="submit">{intl l="Ok"}</button></span>
+                                                    </div>
+                                                    {if $error}<span class="help-block">{$message}</span>{/if}
+                                                </div><!-- /input-group -->
+                                                {/form_field}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="total">{intl l="Total"}</th>
+                                            <td class="total">
+                                                <div class="total-price">
+                                                    <span class="price">{{cart attr="total_taxed_price"} + {order attr="postage"}} {currency attr="symbol"}</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </form>
+                            {/form}
 
-                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+                            {form name="thelia.order.payment"}
+                            {assign var="isPost" value="{$smarty.post|count}"}
+                            <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" {form_enctype form=$form}>
+                                {form_hidden_fields form=$form}
 
-                <table class="table table-cart">
-                    <colgroup>
-                        <col width="150">
-                        <col>
-                        <col width="200">
-                        <col width="250">
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th class="image">&nbsp;</th>
-                        <th class="product">
-                            <span class="hidden-xs">{intl l="Product Name"}</span>
-                            <span class="visible-xs">{intl l="Name"}</span>
-                        </th>
-                        <th class="unitprice">
-                            <span class="hidden-xs">{intl l="Unit Price"}</span>
-                            <span class="visible-xs">{intl l="Price"}</span>
-                        </th>
-                        <th class="qty">
-                            <span class="hidden-xs">{intl l="Quantity"}</span>
-                            <span class="visible-xs">{intl l="Qty"}</span>
-                        </th>
-                        <th class="subprice">
-                            <span class="hidden-xs">{intl l="Total"}</span>
-                            <span class="visible-xs">{intl l="Total"}</span>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
+                                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                    {loop type="cart" name="cartloop"}
-                    <tr>
-                        <td class="image">
-
-                            {assign "cart_count" $LOOP_COUNT}
-                            {ifloop rel='product-image'}
-                                {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
-                                    <img src="{$IMAGE_URL}" alt="Product #{$cart_count}">
-                                {/loop}
-                            {/ifloop}
-                            {elseloop rel="product-image"}
-                                {images file='assets/img/product/1/118x85.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{$cart_count}">{/images}
-                            {/elseloop}
-                        </td>
-                        <td class="product" >
-                            <h3 class="name">
-                                {$TITLE}
-                            </h3>
-                            <div class="product-options">
-                                <dl class="dl-horizontal">
-                                    <dt>{intl l="Available"} :</dt>
-                                    {if $STOCK > 0}
-                                        <dd>{intl l="In Stock"}</dd>
-                                    {else}
-                                        <dd>{intl l="Out of Stock"}</dd>
-                                    {/if}
-                                    <dt>{intl l="No."}</dt>
-                                    <dd>{$REF}</dd>
-                                    {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
-                                        <dt>{$ATTRIBUTE_TITLE}</dt>
-                                        <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
-                                    {/loop}
-                                </dl>
-                            </div>
-                        </td>
-                        <td class="unitprice">
-                            {if $IS_PROMO == 1}
-                                {assign "real_price" $PROMO_TAXED_PRICE}
-                                <div class="special-price"><span class="price">{$PROMO_TAXED_PRICE} {currency attr="symbol"}</span></div>
-                                <small class="old-price">{intl l="instead of"} <span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></small>
-                            {else}
-                                {assign "real_price" $TAXED_PRICE}
-                                <div class="special-price"><span class="price">{$TAXED_PRICE} {currency attr="symbol"} </span></div>
-                            {/if}
-                        </td>
-                        <td class="qty">
-                            <span class="price">{$QUANTITY}</span>
-                        </td>
-                        <td class="subprice">
-                            <span class="price">{$real_price * $QUANTITY} {currency attr="symbol"}</span>
-                        </td>
-                    </tr>
-
-                    {/loop}
-
-                    </tbody>
-                    <tfoot>
-
-                    <tr >
-                        <td rowspan="4" colspan="3" class="empty">&nbsp;</td>
-                        <th class="shipping">{intl l="Discount"}</th>
-                        <td class="shipping">
-                            <div class="shipping-price">
-                                <span class="price">{order attr="discount"} {currency attr="symbol"}</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr >
-                        <th class="shipping">{intl l="Shipping Tax"}</th>
-                        <td class="shipping">
-                            <div class="shipping-price">
-                                <span class="price">{order attr="postage"} {currency attr="symbol"}</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr >
-                        <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
-                        <td class="coupon">
-                            {form_field form=$form field='success_url'}
-                                <input type="hidden" name="{$name}" value="{url path="/order/invoice"}" />
-                            {/form_field}
-                            {form_field form=$form field='coupon-code'}
-                                <div class="{if $error}has-error{/if}">
-                                    <div class="input-group">
-                                        <label class="control-label sr-only" for="code">{intl l='Code :'}</label>
-                                        <input id="coupon" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='Coupon code'}" required>
-                                        <span class="input-group-btn">
-                                            <button type="submit" class="btn btn-coupon">{intl l="Ok"}</button>
-                                        </span>
-                                    </div>
-                                    {if $error}<span class="help-block">{$message}</span>{/if}
-                                </div>
-                            {/form_field}
-                            <!-- /input-group -->
-                        </td>
-                    </tr>
-                    <tr >
-                        <th class="total">{intl l="Total"}</th>
-                        <td class="total">
-                            <div class="total-price">
-                                <span class="price">{{cart attr="total_taxed_price"} + {order attr="postage"}} {currency attr="symbol"}</span>
-                            </div>
-                        </td>
-                    </tr>
-                    </tfoot>
-                </table>
-                </form>
-            {/form}
-            {form name="thelia.order.payment"}
-            {assign var="isPost" value="{$smarty.post|count}"}
-            <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" {form_enctype form=$form}>
-
-                {form_hidden_fields form=$form}
-
-                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-                <div id="cart-address">
-                    <div class="panel">
-                        {loop type="address" name="delivery-address" id={order attr="delivery_address"}}
-                        <div class="panel-heading">{intl l="Delivery address"}</div>
-                        <div class="panel-body">
-                            <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
-                            <span class="org">{$COMPANY}</span>
-                            <address class="adr">
-                                <span class="street-address">{$ADDRESS1}</span><br>
-                                {if $ADDRESS2 != ""}
-                                    <span class="street-address">{$ADDRESS2}</span><br>
-                                {/if}
-                                {if $ADDRESS3 != ""}
-                                    <span class="street-address">{$ADDRESS3}</span><br>
-                                {/if}
-                                <span class="postal-code">{$ZIPCODE}</span>
-                                <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
-                            </address>
-                        </div>
-                        {/loop}
-                    </div>
-
-                    {form_field form=$form field='invoice-address'}
-                    <div class="panel">
-                        <div class="panel-heading">{intl l="Billing address"}</div>
-
-                        {if $error}
-                            <span class="help-block"><span class="icon-remove"></span> {$message}</span>
-                        {/if}
-
-                        <div class="panel-body">
-
-                        {loop type="address" name="invoice-address"}
-                            {assign var="isInvoiceAddressChecked" value="0"}
-                            {if $isPost}
-                                {if $value == $ID}
-                                    {assign var="isInvoiceAddressChecked" value="1"}
-                                {/if}
-                            {elseif $DEFAULT}
-                                {assign var="isInvoiceAddressChecked" value="1"}
-                            {/if}
-
-                            <div class="radio">
-                                <label for="invoice-address_{$ID}">
-                                    <input type="radio" name="{$name}" id="invoice-address_{$ID}" value="{$ID}"{if $isInvoiceAddressChecked} checked="checked"{/if}>
-                                    <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
-                                    <span class="org">{$COMPANY}</span>
-                                    <address class="adr">
-                                        <span class="street-address">{$ADDRESS1}</span><br>
-                                        {if $ADDRESS2 != ""}
-                                            <span class="street-address">{$ADDRESS2}</span><br>
-                                        {/if}
-                                        {if $ADDRESS3 != ""}
-                                            <span class="street-address">{$ADDRESS3}</span><br>
-                                        {/if}
-                                        <span class="postal-code">{$ZIPCODE}</span>
-                                        <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
-                                    </address>
-                                </label>
-                            </div>
-                        {/loop}
-
-                            <a href="#" class="btn btn-change-address hidden">{intl l="Change address"}</a>
-
-                        </div>
-
-                    </div>
-                </div>
-
-                {/form_field}
-
-                {form_field form=$form field='payment-module'}
-
-                <div id="payment-method" class="panel">
-                    <div class="panel-heading">{intl l="Choose your payment method"}</div>
-
-                    {if $error}
-                        <span class="help-block"><span class="icon-remove"></span> {$message}</span>
-                    {/if}
-
-                    <div class="panel-body">
-                        <ul class="list-payment">
-
-                            {loop type="payment" name="payments" force_return="true"}
-
-                                {assign "paymentModuleId" $ID}
-                                {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
-
-                                    <li>
-                                        <div class="radio">
-                                            <label for="payment_{$paymentModuleId}_{$ID}">
-                                                <input type="radio" name="{$name}" id="payment_{$paymentModuleId}_{$ID}" value="{$paymentModuleId}">
-                                                <img src="{$IMAGE_URL}">
-                                            </label>
+                                <div id="cart-address">
+                                    <div class="panel">
+                                        {loop type="address" name="delivery-address" id={order attr="delivery_address"}}
+                                        <div class="panel-heading">{intl l="Delivery address"}</div>
+                                        <div class="panel-body">
+                                            <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
+                                            <span class="org">{$COMPANY}</span>
+                                            <address class="adr">
+                                                <span class="street-address">{$ADDRESS1}</span><br>
+                                                {if $ADDRESS2 != ""}<span class="street-address">{$ADDRESS2}</span><br>{/if}
+                                                {if $ADDRESS3 != ""}<span class="street-address">{$ADDRESS3}</span><br>{/if}
+                                                <span class="postal-code">{$ZIPCODE}</span>
+                                                <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                            </address>
                                         </div>
-                                    </li>
+                                        {/loop}
+                                    </div>
 
-                                {/loop}
+                                    {form_field form=$form field='invoice-address'}
+                                    <div class="panel">
+                                        <div class="panel-heading">{intl l="Billing address"}</div>
 
-                            {/loop}
+                                        {if $error}<span class="help-block"><span class="icon-remove"></span> {$message}</span>{/if}
 
+                                        <div class="panel-body">
+                                            {loop type="address" name="invoice-address"}
+                                            {assign var="isInvoiceAddressChecked" value="0"}
+                                            {if $isPost}
+                                                {if $value == $ID}{assign var="isInvoiceAddressChecked" value="1"}{/if}
+                                            {elseif $DEFAULT}
+                                                {assign var="isInvoiceAddressChecked" value="1"}
+                                            {/if}
+
+                                            <div class="radio">
+                                                <label for="invoice-address_{$ID}">
+                                                    <input id="invoice-address_{$ID}" name="{$name}" type="radio" value="{$ID}"{if $isInvoiceAddressChecked} checked{/if}>
+                                                    <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
+                                                    <span class="org">{$COMPANY}</span>
+                                                    <address class="adr">
+                                                        <span class="street-address">{$ADDRESS1}</span><br>
+                                                        {if $ADDRESS2 != ""}<span class="street-address">{$ADDRESS2}</span><br>{/if}
+                                                        {if $ADDRESS3 != ""}<span class="street-address">{$ADDRESS3}</span><br>{/if}
+                                                        <span class="postal-code">{$ZIPCODE}</span>
+                                                        <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                                    </address>
+                                                </label>
+                                            </div>
+                                            {/loop}
+                                            <a class="btn btn-change-address hidden" href="#">{intl l="Change address"}</a>
+                                        </div><!-- /.panel-body -->
+                                    </div><!-- /.panel -->
+                                    {/form_field}
+
+                                </div><!-- /#cart-address -->
+
+
+                                {form_field form=$form field='payment-module'}
+                                <div class="panel" id="payment-method">
+                                    <div class="panel-heading">{intl l="Choose your payment method"}</div>
+
+                                    {if $error}<span class="help-block"><span class="icon-remove"></span> {$message}</span>{/if}
+
+                                    <div class="panel-body">
+                                        <ul class="list-payment">
+                                        {loop type="payment" name="payments" force_return="true"}
+                                            {assign "paymentModuleId" $ID}
+                                            <li>
+                                                <div class="radio">
+                                                    <label for="payment_{$paymentModuleId}_{$ID}">
+                                                        <input id="payment_{$paymentModuleId}_{$ID}" name="{$name}" type="radio" value="{$paymentModuleId}">
+                                                        {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72" limit=1}<img src="{$IMAGE_URL}">{/loop}
+                                                        {elseloop rel="paymentspicture"}{$TITLE}{/elseloop}
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        {/loop}
+                                        </ul>
+                                    </div><!-- /.panel-body -->
+                                </div><!-- /.panel -->
+                                {/form_field}
+
+                                <a class="btn btn-back" href="{url path="/order/delivery"}" role="button"><span>{intl l="Back"}</span></a>
+                                <button class="btn btn-checkout-next" type="submit"><span>{intl l="Next Step"}</span></button>
+
+                            </form>
+                            {/form}
+                        </article>
                     </div>
-                </div>
-
-                {/form_field}
-
-                <a href="{url path="/order/delivery"}" role="button" class="btn btn-back"><span>{intl l="Back"}</span></a>
-                <button type="submit" class="btn btn-checkout-next"><span>{intl l="Next Step"}</span></button>
-            </form>
-
-            {/form}
-
-
-        </article>
-
-
-
-    </div>
 {/block}
 
 {block name="javascript-initialization"}
-<script type="text/javascript">
-jQuery(function($) {
-    $('#cart-address').each(function(){
-        var $radio = $('.radio', this),
-            $btn = $('.btn-change-address');
+<script>
+    jQuery(function ($) {
+        $('#cart-address').each(function() {
+            var $radio = $('.radio', this),
+                $btn = $('.btn-change-address');
 
-        // Hide other invoice address
-        $radio.filter( function(){ return !$(this).find(':radio').is(':checked'); }).hide();
-        $btn
-            .removeClass('hidden')
-            .bind('click.btn-change-address', function(){
-                $radio.show();
-                $(this).hide();
+            // Hide other invoice address
+            $radio.filter(function () {
+                return !$(this).find(':radio').is(':checked');
+            }).hide();
 
-                return false;
-            });
+            $btn
+                .removeClass('hidden')
+                .bind('click.btn-change-address', function() {
+                    $radio.show();
+                    $(this).hide();
+
+                    return false;
+                });
+        });
     });
-});
 </script>
 {/block}

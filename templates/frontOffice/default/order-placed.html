@@ -18,40 +18,37 @@
 
 
 {block name="main-content"}
-    <div class="main">
-        <article class="col-main clearfix" role="main" aria-labelledby="main-label">
+                    <div class="main">
+                        <article class="col-main clearfix" aria-labelledby="main-label" role="main">
 
-            <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
+                            <h1 class="page-header" id="main-label">{intl l="Your Cart"}</h1>
 
-            {include file="misc/checkout-progress.tpl" step="last"}
+                            {include file="misc/checkout-progress.tpl" step="last"}
 
-            {loop type="order" name="placed-order" id=$placed_order_id}
+                            {loop type="order" name="placed-order" id=$placed_order_id}
+                            <div class="panel" id="payment-success">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
+                                </div>
+                                <div class="panel-body">
+                                    <h3>{intl l="Thank you for the trust you place in us."}</h3>
+                                    <p>{intl l="A summary of your order email has been sent to the following address"} : {customer attr="email"}</p>
+                                    <p>{intl l="Your order will be confirmed by us upon receipt of your payment."}</p>
 
-            <div id="payment-success" class="panel">
-                <div class="panel-heading">
-                    <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
-                </div>
-                <div class="panel-body">
-                    <h3>{intl l="Thank you for the trust you place in us."}</h3>
-                    <p>{intl l="A summary of your order email has been sent to the following address"} : {customer attr="email"}</p>
-                    <p>{intl l="Your order will be confirmed by us upon receipt of your payment."}</p>
+                                    <dl class="dl-horizontal">
+                                        <dt>{intl l="Order number"} :</dt>
+                                        <dd>{$REF}</dd>
+                                        <dt>{intl l="Date"} :</dt>
+                                        <dd>{format_date date=$CREATE_DATE output="date"}</dd>
+                                        <dt>{intl l="Total"} :</dt>
+                                        <dd>{$TOTAL_TAXED_AMOUNT} {loop type="currency" name="order-currency" id=$CURRENCY}{$SYMBOL}{/loop}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            {/loop}
 
-                    <dl class="dl-horizontal">
-                        <dt>{intl l="Order number"} : </dt>
-                        <dd>{$REF}</dd>
-                        <dt>{intl l="Date"} : </dt>
-                        <dd>{format_date date=$CREATE_DATE output="date"}</dd>
-                        <dt>{intl l="Total"} : </dt>
-                        <dd>{$TOTAL_TAXED_AMOUNT} {loop type="currency" name="order-currency" id=$CURRENCY}{$SYMBOL}{/loop}</dd>
-                    </dl>
-                </div>
-            </div>
+                            <a class="btn btn-checkout-home" href="{navigate to="index"}" role="button"><span>{intl l="Go home"}</span></a>
 
-            {/loop}
-
-            <a href="{navigate to="index"}" role="button" class="btn btn-checkout-home"><span>{intl l="Go home"}</span></a>
-
-        </article>
-
-    </div>
+                        </article>
+                    </div><!-- /.main -->
 {/block}
