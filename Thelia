@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
-
+if (php_sapi_name() != 'cli') {
+    throw new \Exception('this script can only be launched with cli sapi');
+}
 set_time_limit(0);
 
 require __DIR__ . '/core/bootstrap.php';

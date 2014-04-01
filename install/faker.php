@@ -10,6 +10,10 @@ use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\Type\RemoveXAmount;
 use Thelia\Coupon\Type\RemoveXPercent;
 
+if (php_sapi_name() != 'cli') {
+    throw new \Exception('this script can only be launched with cli sapi');
+}
+
 require __DIR__ . '/../core/bootstrap.php';
 
 $thelia = new Thelia\Core\Thelia("dev", true);

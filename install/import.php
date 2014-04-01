@@ -20,7 +20,9 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-
+if (php_sapi_name() != 'cli') {
+    throw new \Exception('this script can only be launched with cli sapi');
+}
 require __DIR__ . '/../core/bootstrap.php';
 
 $thelia = new Thelia\Core\Thelia("dev", true);
