@@ -1,4 +1,4 @@
-<section id="categories" class="block block-nav" role="navigation" aria-labelledby="categories-label">
+<section class="block block-nav" id="categories" aria-labelledby="categories-label" role="navigation">
     <div class="block-heading"><h3 class="block-title" id="categories-label">{intl l="Categories"}</h3></div>
     <div class="block-content">
         <nav class="nav-categories">
@@ -8,32 +8,19 @@
             {/loop}
             {* define the function *}
             {function menu level=0}
-                {if $level == 0}
-                    <ul  id="category" class="accordion">
-                    {else}
-                        {if $parent == $current_category_id}
-                            <ul id="collapse{$parent}" class="in">
-                            {else}
-                            <ul id="collapse{$parent}" class="collapse">
-                        {/if}
-                {/if}
-
-                    {loop name="cat-parent-$level" type="category" parent=$parent need_count_child=1}
-
-                            {if $CHILD_COUNT> 0}
-                                <li><a href="{$URL}#collapse{$ID}" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#collapse{$ID}">{$TITLE}</a>
-                                {menu parent=$ID level=$level+1}
-                                </li>
-                            {else}
-                                <li><a href="{$URL}">{$TITLE} ({count type="product" category="{$ID}"})</a></li>
-                            {/if}
-                    {/loop}
-
-                </ul>
+            {if $level == 0}<ul class="accordion" id="category">
+            {else}<ul class="{if $parent == $current_category_id}in{else}collapse{/if}" id="collapse{$parent}">{/if}
+            {loop name="cat-parent-$level" type="category" parent=$parent need_count_child=1}
+                {if $CHILD_COUNT> 0}
+                <li>
+                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#collapse{$ID}" href="{$URL}#collapse{$ID}">{$TITLE}</a>
+                    {menu parent=$ID level=$level+1}
+                </li>
+                {else}<li><a href="{$URL}">{$TITLE} ({count type="product" category="{$ID}"})</a></li>{/if}
+            {/loop}
+            </ul>
             {/function}
-
             {menu parent='0'}
-
         </nav>
     </div>
 </section>
