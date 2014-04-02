@@ -332,6 +332,8 @@
                 </div>
             {/form_field}
 
+            {module_include location='customer_create_form'}
+
         {/capture}
 
         {include
@@ -355,6 +357,8 @@
     {capture "delete_customer_dialog"}
         <input type="hidden" name="page" value="{$page}">
         <input type="hidden" name="customer_id" id="delete_customer_id">
+
+        {module_include location='customer_delete_form'}
     {/capture}
 
     {include
