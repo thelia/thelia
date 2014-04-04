@@ -98,18 +98,14 @@ class Currency extends BaseAction implements EventSubscriberInterface
     {
 
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
+            // Reset default status
+            CurrencyQuery::create()->filterByByDefault(true)->update(array('ByDefault' => false));
 
-            if ($currency->getByDefault() != $event->getIsDefault()) {
-
-                // Reset default status
-                CurrencyQuery::create()->filterByByDefault(true)->update(array('ByDefault' => false));
-
-                $currency
-                    ->setDispatcher($event->getDispatcher())
-                    ->setByDefault($event->getIsDefault())
-                    ->save()
-                ;
-            }
+            $currency
+                ->setDispatcher($event->getDispatcher())
+                ->setByDefault($event->getIsDefault())
+                ->save()
+            ;
 
             $event->setCurrency($currency);
         }

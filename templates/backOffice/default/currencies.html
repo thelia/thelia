@@ -347,6 +347,9 @@
             {* Change default status *}
 
             $('.change-default').change(function(ev) {
+                var $loader = $('<div class="loader"></div>');
+                $('body').append($loader);
+                $loader.show();
                 var url = "{url path='/admin/configuration/currencies/set-default' currency_id='__ID__'}";
 
                 // Perform ID subtitutions
