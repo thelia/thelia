@@ -33,6 +33,7 @@ use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\Map\ModuleImageTableMap;
 use Thelia\Model\ModuleI18n;
+use Thelia\Model\Order;
 use Thelia\Tools\Image;
 use Thelia\Exception\ModuleException;
 use Thelia\Model\Module;
@@ -260,6 +261,30 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         }
 
         return basename(dirname($this->reflected->getFileName()));
+    }
+
+    /**
+     * Check if this module is the payment module for a given order
+     *
+     * @param Order $order an order
+     * @return bool true if this module is the payment module for the given order.
+     */
+    public function isPaymentModuleFor(Order $order) {
+        $model = $this->getModuleModel();
+
+        return $order->getPaymentModuleId() == $model->getId();
+    }
+
+    /**
+     * Check if this module is the delivery module for a given order
+     *
+     * @param Order $order an order
+     * @return bool true if this module is the delivery module for the given order.
+     */
+    public function isDeliveryModuleFor(Order $order) {
+        $model = $this->getModuleModel();
+
+        return $order->getDeliveryModuleId() == $model->getId();
     }
 
     /**
