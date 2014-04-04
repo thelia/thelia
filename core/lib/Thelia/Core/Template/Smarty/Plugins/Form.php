@@ -134,6 +134,9 @@ class Form extends AbstractSmartyPlugin
         $template->assign("value", $fieldValue);
 
         $template->assign("checked", isset($fieldVars['checked']) ? $fieldVars['checked'] : false);
+        $template->assign("choices", isset($fieldVars['choices']) ? $fieldVars['choices'] : false);
+        $template->assign("multiple", isset($fieldVars['multiple']) ? $fieldVars['multiple'] : false);
+
 
         //data
         $template->assign("data", $fieldVars['data']);
