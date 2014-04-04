@@ -62,8 +62,8 @@ interface ParserInterface
     /**
      * Create a variable that will be available in the templates
      *
-     * @param $variable the vatiable name
-     * @param $value the value of the variable
+     * @param string $variable the variable name
+     * @param mixed $value the value of the variable
      */
     public function assign($variable, $value);
 }
