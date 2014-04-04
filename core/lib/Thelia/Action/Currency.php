@@ -26,6 +26,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Currency as CurrencyModel;
 
@@ -134,7 +135,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updateRates(EventDispatcherInterface $dispatcher)
+    public function updateRates(ActionEvent $event)
     {
         $rates_url = ConfigQuery::read('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml');
 
@@ -148,7 +149,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
                 if (null !== $currency = CurrencyQuery::create()->findOneByCode($code)) {
                     $currency
-                        ->setDispatcher($dispatcher)
+                        ->setDispatcher($event->getDispatcher())
                         ->setRate($rate)
                         ->save()
                     ;
