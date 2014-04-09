@@ -29,11 +29,15 @@ use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Model\Cart;
+use Thelia\Model\Country;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\Map\ModuleImageTableMap;
 use Thelia\Model\ModuleI18n;
 use Thelia\Model\Order;
+use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\Image;
 use Thelia\Exception\ModuleException;
 use Thelia\Model\Module;
@@ -125,6 +129,11 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         $this->request = $request;
     }
 
+    /**
+     * @return \Thelia\Core\HttpFoundation\Request the request.
+     *
+     * @throws \RuntimeException
+     */
     public function getRequest()
     {
         if ($this->hasRequest() === false) {
@@ -285,6 +294,43 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         $model = $this->getModuleModel();
 
         return $order->getDeliveryModuleId() == $model->getId();
+    }
+
+    /**
+     * A convenient method to get the current order total, with or without tax, discount or postage.
+     * This method operates on the order currently in the user's session, and should not be used to
+     * get the total amount of an order already stored in the database. For such orders, use
+     * Order::getTotalAmount() method.
+     *
+     * @param bool $with_tax if true, to total price will include tax amount
+     * @param bool $with_discount if true, the total price will include discount, if any
+     * @param bool $with_postage if true, the total price will include the delivery costs, if any.
+     *
+     * @return float|int the current order amount.
+     */
+    public function getCurrentOrderTotalAmount($with_tax = true, $with_discount = true, $with_postage = true) {
+
+        /** @var Session $session */
+        $session = $this->getRequest()->getSession();
+
+        /** @var Cart $cart */
+        $cart = $session->getCart();
+
+        /** @var Order $order */
+        $order = $session->getOrder();
+
+        /** @var TaxEngine $taxEngine */
+        $taxEngine = $this->container->get("thelia.taxengine");
+
+        /** @var Country $country */
+        $country = $taxEngine->getDeliveryCountry();
+
+        $amount = $with_tax ? $cart->getTaxedAmount($country, $with_discount) : $cart->getTotalAmount($with_discount);
+
+        if ($with_postage)
+            $$order->getPostage();
+
+        return $cart->getTaxedAmount($country) + $order->getPostage();
     }
 
     /**
