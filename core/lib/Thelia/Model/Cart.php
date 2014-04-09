@@ -4,6 +4,9 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Cart\CartItemDuplicationItem;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Cart as BaseCart;
 
 class Cart extends BaseCart
@@ -15,7 +18,7 @@ class Cart extends BaseCart
      * @param  Customer $customer
      * @return Cart
      */
-    public function duplicate($token, Customer $customer = null)
+    public function duplicate($token, Customer $customer = null, EventDispatcherInterface $dispatcher)
     {
         $cartItems = $this->getCartItems();
 
@@ -62,6 +65,7 @@ class Cart extends BaseCart
                         ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30));
                 }
                 $item->save();
+                $dispatcher->dispatch(TheliaEvents::CART_ITEM_DUPLICATE, new CartItemDuplicationItem($item, $cartItem));
             }
 
         }

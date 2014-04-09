@@ -342,6 +342,8 @@ final class TheliaEvents
      */
     const CART_DUPLICATE = "cart.duplicate";
 
+    const CART_ITEM_DUPLICATE = "cart.item.duplicate";
+
     /**
      * sent when a new item is added to current cart
      */
