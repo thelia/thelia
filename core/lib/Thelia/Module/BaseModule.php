@@ -137,6 +137,11 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     public function getRequest()
     {
         if ($this->hasRequest() === false) {
+            // Try to get request from container.
+            $this->setRequest($this->container->get('request'));
+        }
+
+        if ($this->hasRequest() === false) {
             throw new \RuntimeException("Sorry, the request is not available in this context");
         }
 
@@ -162,6 +167,12 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         return $this->dispatcher;
     }
 
+    /**
+     * Sets a module titles for various languages
+     *
+     * @param Module $module the module.
+     * @param $titles an associative array of locale => title_string
+     */
     public function setTitle(Module $module, $titles)
     {
         if (is_array($titles)) {
@@ -183,6 +194,20 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         }
     }
 
+    /**
+     * Ensure the proper deployment of the module's images.
+     *
+     * TODO : clarify the purpose of ModuleImage. How this table will be used elswhere in Thelia ?
+     * TODO : this method doesn't take care of internationalization. This is a bug.
+     *
+     * @param Module $module the module
+     * @param string $folderPath the image folder path
+     * @param ConnectionInterface $con
+     *
+     * @throws \Thelia\Exception\ModuleException
+     * @throws \Exception
+     * @throws \UnexpectedValueException
+     */
     public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null)
     {
         try {
@@ -191,7 +216,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
             throw $e;
         }
         if (null === $con) {
-            $con = \Propel\Runtime\Propel::getConnection(
+            $con = Propel::getConnection(
                 ModuleImageTableMap::DATABASE_NAME
             );
         }
@@ -327,10 +352,11 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
 
         $amount = $with_tax ? $cart->getTaxedAmount($country, $with_discount) : $cart->getTotalAmount($with_discount);
 
-        if ($with_postage)
-            $$order->getPostage();
+        if ($with_postage) {
+            $amount += $order->getPostage();
+        }
 
-        return $cart->getTaxedAmount($country) + $order->getPostage();
+        return $amount;
     }
 
     /**
@@ -373,33 +399,69 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         return array();
     }
 
+    /**
+     * This method is called when the plugin is installed for the first time, using
+     * zip upload method.
+     *
+     * @param ConnectionInterface $con
+     */
     public function install(ConnectionInterface $con = null)
     {
         // Implement this method to do something useful.
     }
 
+    /**
+     * This method is called before the module activation, and may prevent it by returning false.
+     *
+     * @param ConnectionInterface $con
+     *
+     * @return bool true to continue module activation, false to prevent it.
+     */
     public function preActivation(ConnectionInterface $con = null)
     {
+        // Override this method to do something useful.
+
         return true;
     }
 
+    /**
+     * This method is called just after the module was successfully activated.
+     *
+     * @param ConnectionInterface $con
+     */
     public function postActivation(ConnectionInterface $con = null)
     {
-        // Implement this method to do something useful.
+        // Override this method to do something useful.
     }
 
+    /**
+     * This method is called before the module de-activation, and may prevent it by returning false.
+     *
+     * @param ConnectionInterface $con
+     * @return bool true to continue module de-activation, false to prevent it.
+     */
     public function preDeactivation(ConnectionInterface $con = null)
     {
+        // Override this method to do something useful.
+
         return true;
     }
+
 
     public function postDeactivation(ConnectionInterface $con = null)
     {
-        // Implement this method to do something useful.
+        // Override this method to do something useful.
     }
 
+    /**
+     * This method is called just before the deletion of the module, giving the module an opportunity
+     * to delete its data.
+     *
+     * @param ConnectionInterface $con
+     * @param bool $deleteModuleData if true, the module should remove all its data from the system.
+     */
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
     {
-        // Implement this method to do something useful.
+        // Override this method to do something useful.
     }
 }
