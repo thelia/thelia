@@ -173,8 +173,9 @@
                 </table>
                 </form>
             {/form}
+            
             {form name="thelia.order.payment"}
-            {assign var="isPost" value="{$smarty.post|count}"}
+            {assign var="isPost" value=$smarty.post|count}
             <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" {form_enctype form=$form}>
 
                 {form_hidden_fields form=$form}
@@ -262,25 +263,25 @@
 
                     <div class="panel-body">
                         <ul class="list-payment">
-
                             {loop type="payment" name="payments" force_return="true"}
-
                                 {assign "paymentModuleId" $ID}
-                                {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
+                                <li>
+                                    <div class="radio">
+                                        <label for="payment_{$paymentModuleId}">
+                                            <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}">
 
-                                    <li>
-                                        <div class="radio">
-                                            <label for="payment_{$paymentModuleId}_{$ID}">
-                                                <input type="radio" name="{$name}" id="payment_{$paymentModuleId}_{$ID}" value="{$paymentModuleId}">
-                                                <img src="{$IMAGE_URL}">
-                                            </label>
-                                        </div>
-                                    </li>
+                                            {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
+                                                <img src="{$IMAGE_URL}" alt="{intl l="Pay with %module_title" module_title=$TITLE}">
+                                            {/loop}
 
-                                {/loop}
-
+                                            {elseloop rel="paymentspicture"}
+                                                {intl l="Pay with %module_title" module_title=$TITLE}
+                                            {/elseloop}
+                                        </label>
+                                    </div>
+                                </li>
                             {/loop}
-
+                        </ul>
                     </div>
                 </div>
 
@@ -289,14 +290,8 @@
                 <a href="{url path="/order/delivery"}" role="button" class="btn btn-back"><span>{intl l="Back"}</span></a>
                 <button type="submit" class="btn btn-checkout-next"><span>{intl l="Next Step"}</span></button>
             </form>
-
             {/form}
-
-
         </article>
-
-
-
     </div>
 {/block}
 
