@@ -221,7 +221,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             // Pass it to the parser
             $this->getParserContext()->addForm($changeForm);
         }
-        
+
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
                 $this->getTranslator()->trans("%obj SEO modification", array('%obj' => $this->objectName)),
@@ -229,7 +229,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
                 $updateSeoForm,
                 $ex
             );
-    
+
             // At this point, the form has errors, and should be redisplayed.
             return $this->renderEditionTemplate();
         }

@@ -81,8 +81,6 @@ class OrderEvent extends ActionEvent
         return $this->cartItemId;
     }
 
-
-
     /**
      * @param Order $order
      */

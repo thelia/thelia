@@ -26,7 +26,6 @@ namespace Thelia\Core\Event\Cart;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\CartItem;
 
-
 /**
  * Class CartItemDuplicationItem
  * @package Thelia\Core\Event\Cart
@@ -44,7 +43,7 @@ class CartItemDuplicationItem extends ActionEvent
      */
     protected $newItem;
 
-    function __construct(CartItem $newItem, CartItem $oldItem)
+    public function __construct(CartItem $newItem, CartItem $oldItem)
     {
         $this->newItem = $newItem;
         $this->oldItem = $oldItem;
@@ -65,6 +64,5 @@ class CartItemDuplicationItem extends ActionEvent
     {
         return $this->oldItem;
     }
-
 
 }

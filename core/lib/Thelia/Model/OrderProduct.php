@@ -31,8 +31,6 @@ class OrderProduct extends BaseOrderProduct
         return $this->cartIemId;
     }
 
-
-
     /**
      * {@inheritDoc}
      */

@@ -200,8 +200,8 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      * TODO : clarify the purpose of ModuleImage. How this table will be used elswhere in Thelia ?
      * TODO : this method doesn't take care of internationalization. This is a bug.
      *
-     * @param Module $module the module
-     * @param string $folderPath the image folder path
+     * @param Module              $module     the module
+     * @param string              $folderPath the image folder path
      * @param ConnectionInterface $con
      *
      * @throws \Thelia\Exception\ModuleException
@@ -300,10 +300,11 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     /**
      * Check if this module is the payment module for a given order
      *
-     * @param Order $order an order
-     * @return bool true if this module is the payment module for the given order.
+     * @param  Order $order an order
+     * @return bool  true if this module is the payment module for the given order.
      */
-    public function isPaymentModuleFor(Order $order) {
+    public function isPaymentModuleFor(Order $order)
+    {
         $model = $this->getModuleModel();
 
         return $order->getPaymentModuleId() == $model->getId();
@@ -312,10 +313,11 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     /**
      * Check if this module is the delivery module for a given order
      *
-     * @param Order $order an order
-     * @return bool true if this module is the delivery module for the given order.
+     * @param  Order $order an order
+     * @return bool  true if this module is the delivery module for the given order.
      */
-    public function isDeliveryModuleFor(Order $order) {
+    public function isDeliveryModuleFor(Order $order)
+    {
         $model = $this->getModuleModel();
 
         return $order->getDeliveryModuleId() == $model->getId();
@@ -327,14 +329,14 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      * get the total amount of an order already stored in the database. For such orders, use
      * Order::getTotalAmount() method.
      *
-     * @param bool $with_tax if true, to total price will include tax amount
+     * @param bool $with_tax      if true, to total price will include tax amount
      * @param bool $with_discount if true, the total price will include discount, if any
-     * @param bool $with_postage if true, the total price will include the delivery costs, if any.
+     * @param bool $with_postage  if true, the total price will include the delivery costs, if any.
      *
      * @return float|int the current order amount.
      */
-    public function getCurrentOrderTotalAmount($with_tax = true, $with_discount = true, $with_postage = true) {
-
+    public function getCurrentOrderTotalAmount($with_tax = true, $with_discount = true, $with_postage = true)
+    {
         /** @var Session $session */
         $session = $this->getRequest()->getSession();
 
@@ -420,7 +422,6 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     public function preActivation(ConnectionInterface $con = null)
     {
         // Override this method to do something useful.
-
         return true;
     }
 
@@ -437,16 +438,14 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     /**
      * This method is called before the module de-activation, and may prevent it by returning false.
      *
-     * @param ConnectionInterface $con
-     * @return bool true to continue module de-activation, false to prevent it.
+     * @param  ConnectionInterface $con
+     * @return bool                true to continue module de-activation, false to prevent it.
      */
     public function preDeactivation(ConnectionInterface $con = null)
     {
         // Override this method to do something useful.
-
         return true;
     }
-
 
     public function postDeactivation(ConnectionInterface $con = null)
     {
@@ -458,7 +457,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      * to delete its data.
      *
      * @param ConnectionInterface $con
-     * @param bool $deleteModuleData if true, the module should remove all its data from the system.
+     * @param bool                $deleteModuleData if true, the module should remove all its data from the system.
      */
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
     {
