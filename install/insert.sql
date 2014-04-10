@@ -1323,7 +1323,9 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (23, 'en_US', 'Configuration / Template'),
 (23, 'fr_FR', 'Configuration / Template'),
 (24, 'en_US', 'Configuration / System Log'),
-(24, 'fr_FR', 'Configuration / Logs système');
+(24, 'fr_FR', 'Configuration / Logs système'),
+(25, 'en_US', 'Configuration / Cache'),
+(25, 'fr_FR', 'Configuration / Cache');
 
 
 INSERT INTO `message` (`id`, `name`, `secured`, `created_at`, `updated_at`, `version`, `version_created_at`, `version_created_by`) VALUES

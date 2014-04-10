@@ -28,4 +28,14 @@ ALTER TABLE `feature_template` ADD INDEX `idx_feature_template_template_id_posit
 
 ALTER TABLE `currency` ADD INDEX `idx_currency_code` (`code`);
 
+SELECT @max := MAX(`id`) FROM `resource`;
+SET @max := @max+1;
+
+INSERT INTO `resource` (`id`, `code`, `created_at`, `updated_at`) VALUES
+(@max, 'admin.cache', NOW(), NOW());
+
+INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
+(@max, 'en_US', 'Configuration / Cache'),
+(@max, 'fr_FR', 'Configuration / Cache');
+
 SET FOREIGN_KEY_CHECKS = 1;
