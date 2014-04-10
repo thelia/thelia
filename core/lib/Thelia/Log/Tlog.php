@@ -125,9 +125,9 @@ class Tlog Implements LoggerInterface
     }
 
     /**
-     * Create a new Tlog instance, than t will not interfere with the "Main" instance
-     * 
-     * @return Tlog a new Tlog instance
+     * Create a new Tlog instance, that could be configured without interfering with the "main" instance
+     *
+     * @return Tlog a new Tlog instance.
      */
     public static function getNewInstance() {
         $instance = new Tlog();
