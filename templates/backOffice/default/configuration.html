@@ -178,6 +178,12 @@
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/system-logs'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
+                                {loop type="auth" name="pcc9" role="ADMIN" resource="admin.configuration.cache" access="VIEW"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/cache'}">{intl l='Cache'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/cache'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
                                 {module_include location='system_configuration_bottom'}
                             </table>
                         </div>

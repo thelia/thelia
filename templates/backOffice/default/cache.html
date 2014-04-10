@@ -1,0 +1,31 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Cache'}{/block}
+
+{block name="check-resource"}admin.cache{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+    <div class="variables edit-variable">
+
+        <div id="wrapper" class="container">
+
+            <ul class="breadcrumb">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                <li>{intl l="Cache"}</li>
+            </ul>
+
+            <div class="row">
+                <div class="col-md-12">
+                    {form name="thelia.cache.flush"}
+                    <form method="post" action="{url path="/admin/cache/flush"}">
+                        {form_hidden_fields form=$form}
+                        <button type="submit" class="btn btn-danger btn-lg btn-block">{intl l="Flush the cache"}</button>
+                    </form>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}

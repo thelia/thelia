@@ -60,6 +60,8 @@ final class AdminResources
 
     const ATTRIBUTE = "admin.configuration.attribute";
 
+    const CACHE = "admin.cache";
+
     const CATEGORY = "admin.category";
 
     const CONFIG = "admin.configuration";
