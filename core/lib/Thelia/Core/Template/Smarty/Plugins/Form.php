@@ -127,19 +127,24 @@ class Form extends AbstractSmartyPlugin
         }
     }
 
-    protected function assignFieldValues($template, $fieldName, $fieldValue, $fieldVars, $total_value_count = 1)
+    protected function assignFieldValues(
+        $template,
+        $fieldName,
+        $fieldValue,
+        $fieldType,
+        $fieldVars,
+        $total_value_count = 1
+    )
     {
         $template->assign("name", $fieldName);
-
         $template->assign("value", $fieldValue);
+        $template->assign("data", $fieldVars['data']);
+
+        $template->assign("type", $fieldType);
 
         $template->assign("checked", isset($fieldVars['checked']) ? $fieldVars['checked'] : false);
         $template->assign("choices", isset($fieldVars['choices']) ? $fieldVars['choices'] : false);
         $template->assign("multiple", isset($fieldVars['multiple']) ? $fieldVars['multiple'] : false);
-
-
-        //data
-        $template->assign("data", $fieldVars['data']);
 
         $template->assign("label", $fieldVars["label"]);
         $template->assign("label_attr", $fieldVars["label_attr"]);
@@ -214,6 +219,8 @@ class Form extends AbstractSmartyPlugin
             $formFieldView = $this->getFormFieldView($params);
             $formFieldConfig = $this->getFormFieldConfig($params);
 
+            $formFieldType = $formFieldConfig->getType()->getName();
+
             $this->assignFormTypeValues($template, $formFieldConfig, $formFieldView);
 
             $value = $formFieldView->vars["value"];
@@ -233,9 +240,22 @@ class Form extends AbstractSmartyPlugin
 
                 $val = $value[$key];
 
-                $this->assignFieldValues($template, $name, $val, $formFieldView->vars, count($formFieldView->children));
+                $this->assignFieldValues(
+                    $template,
+                    $name,
+                    $val,
+                    $formFieldType,
+                    $formFieldView->vars,
+                    count($formFieldView->children)
+                );
             } else {
-                $this->assignFieldValues($template, $formFieldView->vars["full_name"], $formFieldView->vars["value"], $formFieldView->vars);
+                $this->assignFieldValues(
+                    $template,
+                    $formFieldView->vars["full_name"],
+                    $formFieldView->vars["value"],
+                    $formFieldType,
+                    $formFieldView->vars
+                );
             }
 
             $formFieldView->setRendered();
@@ -254,16 +274,20 @@ class Form extends AbstractSmartyPlugin
         }
 
         if (isset(self::$taggedFieldsStack[self::$taggedFieldsStackPosition])) {
+
+            $field = self::$taggedFieldsStack[self::$taggedFieldsStackPosition];
+
             $this->assignFieldValues(
                 $template,
-                self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['view']->vars["full_name"],
-                self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['view']->vars["value"],
-                self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['view']->vars
+                $field['view']->vars["full_name"],
+                $field['view']->vars["value"],
+                $field['config']->getType()->getName(),
+                $field['view']->vars
             );
 
-            $this->assignFormTypeValues($template, self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['config'], self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['view']);
+            $this->assignFormTypeValues($template, $field['config'], $field['view']);
 
-            self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['view']->setRendered();
+            $field['view']->setRendered();
 
             $repeat = true;
         }
