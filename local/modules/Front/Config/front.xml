@@ -158,6 +158,11 @@
         <default key="_controller">Front\Controller\OrderController::orderPlaced</default>
         <default key="_view">order-placed</default>
     </route>
+
+    <route id="order.failed" path="/order/failed/{order_id}/{message}">
+        <default key="_controller">Front\Controller\OrderController::orderFailed</default>
+        <default key="_view">order-failed</default>
+    </route>
     <!-- end order management process -->
 
     <!-- contact management -->

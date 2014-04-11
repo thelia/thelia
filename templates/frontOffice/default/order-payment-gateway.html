@@ -1,0 +1,76 @@
+{extends file="layout.tpl"}
+
+{* Security *}
+{block name="no-return-functions" prepend}
+    {check_auth role="CUSTOMER" login_tpl="login"}
+{/block}
+
+{* Body Class *}
+{block name="body-class"}page-order-payment{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['title' => {intl l="Cart"}, 'url'=>{url path="/cart"}],
+        ['title' => {intl l="Secure Payment"}, 'url'=>{url path="/order/pay"}]
+    ]}
+{/block}
+
+
+{block name="main-content"}
+    <div class="main">
+        <article class="col-main clearfix" role="main" aria-labelledby="main-label">
+
+            <h1 id="main-label" class="page-header">{intl l="Secure payment"}</h1>
+
+            {include file="misc/checkout-progress.tpl"  step="last"}
+
+            {loop type="order" name="placed-order" id=$order_id}
+
+            <div id="payment-success" class="panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
+                </div>
+
+                <div class="panel-body">
+                    {if $cart_count > 0}
+                        <div class="panel-heading clearfix">
+                            {intl l="Connecting to the secure payment server, please wait a few seconds..."}
+                        </div>
+
+                        <div class="panel-body">
+
+                            <form action="{$gateway_url}" method="post" id="payement_gateway_form">
+                                {foreach from=$payment_form_data key='name' item='value'}
+                                    <input type="hidden" name="{$name}" value="{$value}" />
+                                {/foreach}
+
+                                <p>{intl l='If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.'}</p>
+                            </form>
+                        </div>
+                    {else}
+                        {intl l="Sorry, your cart is empty. There's nothing to pay."}
+                    {/if}
+                </div>
+            </div>
+            {/loop}
+        </article>
+
+    </div>
+{/block}
+
+{block name="javascript-initialization"}
+    <script type="text/javascript">
+        jQuery(function($) {
+            $('#payement_gateway_form').submit();
+
+            $('#force-submit-payment-form').click(function(ev) {
+                $('#payement_gateway_form').submit();
+
+                ev.preventDefault();
+            });
+        });
+     </script>
+{/block}
+
+

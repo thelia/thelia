@@ -39,6 +39,13 @@ interface ParserInterface
     public function setStatus($status);
 
     /**
+     * Setup the parser with a template definition, which provides a template description.
+     *
+     * @param TemplateDefinition $templateDefinition
+     */
+    public function setTemplateDefinition(TemplateDefinition $templateDefinition);
+
+    /**
      * Add a template directory to the current template list
      *
      * @param unknown $templateType the template type (
@@ -54,7 +61,7 @@ interface ParserInterface
      * Return the registeted template directories for a givent template type
      *
      * @param  unknown                  $templateType
-     * @throws InvalidArgumentException if the tempmateType is not defined
+     * @throws \InvalidArgumentException if the templateType is not defined
      * @return array:                   an array of defined templates directories for the given template type
      */
     public function getTemplateDirectories($templateType);
