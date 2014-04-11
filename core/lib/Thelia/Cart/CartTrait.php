@@ -86,7 +86,7 @@ trait CartTrait
             //le cookie de panier n'existe pas, il va falloir le créer et faire un enregistrement en base.
             $cart = $this->createCart($session);
         }
-
+        $session->setCart($cart->getId());
         return $cart;
     }
 
