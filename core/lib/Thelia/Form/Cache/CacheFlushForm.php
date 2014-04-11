@@ -25,7 +25,6 @@ namespace Thelia\Form\Cache;
 
 use Thelia\Form\BaseForm;
 
-
 /**
  * Class CacheFlushForm
  * @package Thelia\Form\Cache

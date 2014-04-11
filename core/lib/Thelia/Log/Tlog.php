@@ -129,7 +129,8 @@ class Tlog Implements LoggerInterface
      *
      * @return Tlog a new Tlog instance.
      */
-    public static function getNewInstance() {
+    public static function getNewInstance()
+    {
         $instance = new Tlog();
 
         $instance->init();

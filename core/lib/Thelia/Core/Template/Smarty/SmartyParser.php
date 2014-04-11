@@ -116,7 +116,7 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Return the registeted template directories for a givent template type
      *
-     * @param  int  $templateType
+     * @param  int                      $templateType
      * @throws InvalidArgumentException
      * @return mixed:
      */

@@ -60,9 +60,9 @@ interface ParserInterface
     /**
      * Return the registeted template directories for a givent template type
      *
-     * @param  unknown                  $templateType
+     * @param  unknown                   $templateType
      * @throws \InvalidArgumentException if the templateType is not defined
-     * @return array:                   an array of defined templates directories for the given template type
+     * @return array:                    an array of defined templates directories for the given template type
      */
     public function getTemplateDirectories($templateType);
 

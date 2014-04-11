@@ -40,7 +40,7 @@ class Order extends BaseOrder
 
     public function postSave(ConnectionInterface $con = null)
     {
-        if($this->isPaid() && null === $this->getInvoiceDate()) {
+        if ($this->isPaid() && null === $this->getInvoiceDate()) {
             $this
                 ->setInvoiceDate(time())
                 ->save($con);

@@ -27,7 +27,6 @@ use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelper;
-use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;
 
@@ -42,7 +41,7 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      * In many cases, it's necessary to send a form to the payment gateway. On your response you can return this form already
      * completed, ready to be sent, instead of redirecting. The generateGatewayFormResponse() may help you in this case :)
      *
-     * @param  Order $order processed order
+     * @param  Order         $order processed order
      * @return null|Response
      */
     abstract public function pay(Order $order);
@@ -57,13 +56,12 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      */
     abstract public function isValidPayment();
 
-
     /**
      * Render the payment gateway template. The module should provide the gateway URL and the form fields names and values.
      *
-     * @param Order $order the order
+     * @param Order  $order       the order
      * @param string $gateway_url the payment gateway URL
-     * @param array $form_data an associative array of form data, that will be rendered as hiddent fields
+     * @param array  $form_data   an associative array of form data, that will be rendered as hiddent fields
      *
      * @return Response the HTTP response.
      */
@@ -90,7 +88,7 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
     /**
      * Return the order payment success page URL
      *
-     * @param int $order_id the order ID
+     * @param  int    $order_id the order ID
      * @return string the order payment success page URL
      */
     public function getPayementSuccessPageUrl($order_id)
@@ -109,8 +107,8 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
     /**
      * Redirect the customer to the failure payment page. if $message is null, a generic message is displayed.
      *
-     * @param int $order_id the order ID
-     * @param string|null $message an error message.
+     * @param int         $order_id the order ID
+     * @param string|null $message  an error message.
      *
      * @return string the order payment failure page URL
      */

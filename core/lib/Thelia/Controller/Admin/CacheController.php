@@ -30,7 +30,6 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Cache\CacheFlushForm;
 use Thelia\Form\Exception\FormValidationException;
 
-
 /**
  * Class CacheController
  * @package Thelia\Controller\Admin
