@@ -92,11 +92,11 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Add a template directory to the current template list
      *
-     * @param unknown $templateType      the template type (a TemplateDefinition type constant)
+     * @param int     $templateType      the template type (a TemplateDefinition type constant)
      * @param string  $templateName      the template name
      * @param string  $templateDirectory path to the template dirtectory
      * @param unknown $key               ???
-     * @param string  $unshift           ??? Etienne ?
+     * @param boolean $unshift           ??? Etienne ?
      */
     public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false)
     {
@@ -116,9 +116,9 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Return the registeted template directories for a givent template type
      *
-     * @param  unknown                  $templateType
+     * @param  int  $templateType
      * @throws InvalidArgumentException
-     * @return multitype:
+     * @return mixed:
      */
     public function getTemplateDirectories($templateType)
     {
