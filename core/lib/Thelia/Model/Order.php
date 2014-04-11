@@ -38,6 +38,15 @@ class Order extends BaseOrder
         $this->dispatchEvent(TheliaEvents::ORDER_AFTER_CREATE, new OrderEvent($this));
     }
 
+    public function postSave(ConnectionInterface $con = null)
+    {
+        if($this->isPaid() && null === $this->getInvoiceDate()) {
+            $this
+                ->setInvoiceDate(time())
+                ->save($con);
+        }
+    }
+
     public function generateRef()
     {
         /* order addresses are unique */
