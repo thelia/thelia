@@ -234,6 +234,29 @@ class OrderController extends BaseFrontController
         $this->getParserContext()->set("placed_order_id", $placedOrder->getId());
     }
 
+    public function orderFailed($order_id, $message)
+    {
+        /* check if the placed order matched the customer */
+        $failedOrder = OrderQuery::create()->findPk(
+            $this->getRequest()->attributes->get('order_id')
+        );
+
+        if (null === $failedOrder) {
+            throw new TheliaProcessException("No failed order", TheliaProcessException::NO_PLACED_ORDER, $failedOrder);
+        }
+
+        $customer = $this->getSecurityContext()->getCustomerUser();
+
+        if (null === $customer || $failedOrder->getCustomerId() !== $customer->getId()) {
+            throw new TheliaProcessException("Received failed order id does not belong to the current customer", TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER, $placedOrder);
+        }
+
+        $this->getParserContext()
+            ->set("failed_order_id", $failedOrder->getId())
+            ->set("failed_order_message", $message)
+        ;
+    }
+
     protected function getOrderEvent()
     {
         $order = $this->getOrder($this->getRequest());
