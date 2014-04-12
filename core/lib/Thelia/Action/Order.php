@@ -206,7 +206,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $placedOrder->setInvoiceOrderAddressId($invoiceOrderAddress->getId());
 
         $placedOrder->setStatusId(
-                OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_NOT_PAID)->getId()
+                OrderStatusQuery::getNotPaidStatus()->getId()
         );
 
         /* memorize discount */
