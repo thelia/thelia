@@ -145,8 +145,8 @@ class URL
 
             $base_url = $this->getBaseUrl($hasSubdirectory);
 
-            // TODO fix this ugly patch
             /* Seems no longer required
+            // TODO fix this ugly patch
             if (strpos($path, "index_dev.php")) {
                 $path = str_replace('index_dev.php', '', $path);
             }
