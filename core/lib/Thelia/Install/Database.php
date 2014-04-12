@@ -41,7 +41,7 @@ class Database
 
     /**
      * Create a new instance, using the provided connection information, either none for
-     * automatically a connection, a ConnectionWrapper instance or a PDo connection.
+     * automatically a connection, a ConnectionWrapper instance or a PDO connection.
      *
      * @param ConnectionWrapper|\PDO|null $connection the connection object
      * @throws \InvalidArgumentException if $connection is not of the suitable type.
