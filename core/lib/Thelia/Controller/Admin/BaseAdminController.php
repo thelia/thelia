@@ -266,9 +266,9 @@ class BaseAdminController extends BaseController
     /**
      * Redirect to à route ID related URL
      *
-     * @param unknown                                $routeId         the route ID, as found in Config/Resources/routing/admin.xml
-     * @param array|\Thelia\Controller\Admin\unknown $urlParameters   the URL parametrs, as a var/value pair array
-     * @param array                                  $routeParameters
+     * @param string $routeId         the route ID, as found in Config/Resources/routing/admin.xml
+     * @param array  $urlParameters   the URL parameters, as a var/value pair array
+     * @param array  $routeParameters
      */
     public function redirectToRoute($routeId, array $urlParameters = array(), array $routeParameters = array())
     {
