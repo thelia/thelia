@@ -138,7 +138,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param $status
+     * @param int $status
      */
     public function setStatus($status)
     {
