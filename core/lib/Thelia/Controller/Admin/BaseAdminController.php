@@ -405,9 +405,9 @@ class BaseAdminController extends BaseController
     /**
      * Render the given template, and returns the result as an Http Response.
      *
-     * @param $templateName the complete template name, with extension
-     * @param  array                                $args   the template arguments
-     * @param  int                                  $status http code status
+     * @param string $templateName the complete template name, with extension
+     * @param array $args the template arguments
+     * @param int $status http code status
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function render($templateName, $args = array(), $status = 200)
