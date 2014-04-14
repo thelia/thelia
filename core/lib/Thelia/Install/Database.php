@@ -23,6 +23,7 @@
 
 namespace Thelia\Install;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
@@ -41,9 +42,9 @@ class Database
 
     /**
      * Create a new instance, using the provided connection information, either none for
-     * automatically a connection, a ConnectionWrapper instance or a PDO connection.
+     * automatically a connection, a ConnectionWrapper instance (through ConnectionInterface) or a PDO connection.
      *
-     * @param ConnectionWrapper|\PDO|null $connection the connection object
+     * @param ConnectionInterface|\PDO|null $connection the connection object
      * @throws \InvalidArgumentException if $connection is not of the suitable type.
      */
     public function __construct($connection = null)
@@ -58,7 +59,7 @@ class Database
             $connection = $connection->getWrappedConnection();
 
         if (! $connection instanceof \PDO) {
-            throw new \InvalidArgumentException("A PDO connextion shoud be provided");
+            throw new \InvalidArgumentException("A PDO connection shoud be provided");
         }
 
         $this->connection = $connection;
@@ -108,7 +109,7 @@ class Database
      * @param array $args SQL request parameters (PDO style)
      */
     public function execute($sql, $args = array()) {
-        $this->connection->exec($sql, $args);
+        $this->connection->query($sql, $args);
     }
 
     /**
