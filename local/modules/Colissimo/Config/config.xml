@@ -7,10 +7,12 @@
     <loops>
         <loop class="Colissimo\Loop\Price" name="colissimo"/>
         <loop class="Colissimo\Loop\CheckRightsLoop" name="colissimo.check.rights" />
+        <loop class="Colissimo\Loop\NotSendLoop" name="colissimo.notsend.loop" />
     </loops>
 
     <forms>
         <form name="colissimo.freeshipping.form" class="Colissimo\Form\FreeShipping" />
+        <form name="colissimo.export.form" class="Colissimo\Form\Export" />
     </forms>
 
     <commands>
