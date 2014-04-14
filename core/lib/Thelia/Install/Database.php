@@ -55,10 +55,11 @@ class Database
         }
 
         // Get the PDO connection from an
-        if ($connection instanceof ConnectionWrapper)
+        if ($connection instanceof ConnectionWrapper) {
             $connection = $connection->getWrappedConnection();
+        }
 
-        if (! $connection instanceof \PDO) {
+        if (!$connection instanceof \PDO) {
             throw new \InvalidArgumentException("A PDO connection shoud be provided");
         }
 
@@ -69,8 +70,8 @@ class Database
      * Insert all sql needed in database
      * Default insert /install/thelia.sql and /install/insert.sql
      *
-     * @param string $dbName        Database name
-     * @param array  $extraSqlFiles SQL Files uri to insert
+     * @param string $dbName Database name
+     * @param array $extraSqlFiles SQL Files uri to insert
      */
     public function insertSql($dbName = null, array $extraSqlFiles = null)
     {
@@ -95,7 +96,7 @@ class Database
             }
         }
         $size = count($sql);
-        for ($i = 0; $i < $size; $i ++) {
+        for ($i = 0; $i < $size; $i++) {
             if (!empty($sql[$i])) {
                 $this->execute($sql[$i]);
             }
@@ -108,7 +109,8 @@ class Database
      * @param string $sql SQL query
      * @param array $args SQL request parameters (PDO style)
      */
-    public function execute($sql, $args = array()) {
+    public function execute($sql, $args = array())
+    {
         $this->connection->query($sql, $args);
     }
 
@@ -126,7 +128,7 @@ class Database
 
         $tab = explode(";\n", $sql);
         $size = count($tab);
-        for ($i=0; $i<$size; $i++) {
+        for ($i = 0; $i < $size; $i++) {
             $queryTemp = str_replace("-CODE-", ";',", $tab[$i]);
             $queryTemp = str_replace("|", ";", $queryTemp);
             $query[] = $queryTemp;
