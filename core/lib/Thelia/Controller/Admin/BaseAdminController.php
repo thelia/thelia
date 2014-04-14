@@ -266,9 +266,9 @@ class BaseAdminController extends BaseController
     /**
      * Redirect to à route ID related URL
      *
-     * @param unknown                                $routeId         the route ID, as found in Config/Resources/routing/admin.xml
-     * @param array|\Thelia\Controller\Admin\unknown $urlParameters   the URL parametrs, as a var/value pair array
-     * @param array                                  $routeParameters
+     * @param string $routeId         the route ID, as found in Config/Resources/routing/admin.xml
+     * @param array  $urlParameters   the URL parameters, as a var/value pair array
+     * @param array  $routeParameters
      */
     public function redirectToRoute($routeId, array $urlParameters = array(), array $routeParameters = array())
     {
@@ -405,9 +405,9 @@ class BaseAdminController extends BaseController
     /**
      * Render the given template, and returns the result as an Http Response.
      *
-     * @param $templateName the complete template name, with extension
-     * @param  array                                $args   the template arguments
-     * @param  int                                  $status http code status
+     * @param string $templateName the complete template name, with extension
+     * @param array $args the template arguments
+     * @param int $status http code status
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function render($templateName, $args = array(), $status = 200)

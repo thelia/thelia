@@ -1,0 +1,198 @@
+<?php
+/*************************************************************************************/
+/*                                                                                   */
+/*      Thelia	                                                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : info@thelia.net                                                      */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      This program is free software; you can redistribute it and/or modify         */
+/*      it under the terms of the GNU General Public License as published by         */
+/*      the Free Software Foundation; either version 3 of the License                */
+/*                                                                                   */
+/*      This program is distributed in the hope that it will be useful,              */
+/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
+/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
+/*      GNU General Public License for more details.                                 */
+/*                                                                                   */
+/*      You should have received a copy of the GNU General Public License            */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*                                                                                   */
+/*************************************************************************************/
+
+namespace Thelia\Module;
+
+use Symfony\Component\Routing\Router;
+use Thelia\Controller\Front\BaseFrontController;
+use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
+use Thelia\Log\Tlog;
+use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
+
+/**
+ * This class implement the minimum
+ *
+ * @package Paypal\Controller
+ * @author Thelia <info@thelia.net>
+ */
+abstract class BasePaymentModuleController extends BaseFrontController
+{
+    protected $log = null;
+
+    /**
+     * Return a module identifier used to calculate the name of the log file,
+     * and in the log messages.
+     *
+     * @return string the module code
+     */
+    protected abstract function getModuleCode();
+
+    /**
+     * Initialize a module-specific logger.
+     *
+     * @return Tlog a Tlog instance
+     */
+    protected function getLog() {
+
+        if ($this->log == null) {
+            $this->log = Tlog::getNewInstance();
+
+            $logFilePath = sprintf(THELIA_ROOT."log".DS."%s.log", strtolower($this->getModuleCode()));
+
+            $this->log->setPrefix("#LEVEL: #DATE #HOUR: ");
+            $this->log->setDestinations("\\Thelia\\Log\\Destination\\TlogDestinationFile");
+            $this->log->setConfig("\\Thelia\\Log\\Destination\\TlogDestinationFile", 0, $logFilePath);
+        }
+
+        return $this->log;
+    }
+
+    /**
+     * Process the confirmation of an order. This method should be  called
+     * once the module has performed the required checks to confirm a valid payment.
+     *
+     * @param int $order_id the order ID
+     */
+    public function confirmPayment($order_id)
+    {
+        try {
+            $order_id = intval($order_id);
+
+            if (null !== $order = $this->getOrder($order_id)) {
+
+                $this->getLog()->addInfo(
+                    $this->getTranslator()->trans("Processing confirmation of order ref. %ref, ID %id",
+                    array('%ref' => $order->getRef(), '%id' => $order->getId()))
+                );
+
+                $event = new OrderEvent($order);
+
+                $event->setStatus(OrderStatusQuery::getPaidStatus()->getId());
+
+                $this->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
+
+                $this->getLog()->addInfo(
+                    $this->getTranslator()->trans("Order ref. %ref, ID %id has been successfully paid.",
+                        array('%ref' => $order->getRef(), '%id' => $order->getId()))
+                );
+            }
+        }
+        catch (\Exception $ex) {
+            $this->getLog()->addError(
+                $this->getTranslator()->trans("Error occured while processing order ref. %ref, ID %id: %err",
+                    array(
+                        '%err' => $ex->getMessage(),
+                        '%ref' => ! isset($order) ? "?" : $order->getRef(),
+                        '%id' => ! isset($order) ? "?" : $order->getId()
+                    )
+                )
+            );
+
+            throw $ex;
+        }
+    }
+
+    /**
+     * Process the cancelation of a payment on the payment gateway. The order will go back to the
+     * "not paid" status.
+     *
+     * @param int $order_id the order ID
+     */
+    public function cancelPayment($order_id)
+    {
+        $order_id = intval($order_id);
+
+        if (null !== $order = $this->getOrder($order_id)) {
+            $this->getLog()->addInfo(
+                $this->getTranslator()->trans("Processing cancelation of payment for order ref. %ref",
+                    array('%ref' => $order->getRef()))
+            );
+
+            $event = new OrderEvent($order);
+
+            $event->setStatus(OrderStatus::CODE_NOT_PAID);
+
+            $this->getLog()->addInfo(
+                $this->getTranslator()->trans("Order ref. %ref is now unpaid.",
+                    array('%ref' => $order->getRef()))
+            );
+
+            $this->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
+        }
+    }
+
+    /**
+     * Get an order and issue a log message if not found.
+     * @param $order_id
+     * @return null|\Thelia\Model\Order
+     */
+    protected function getOrder($order_id)
+    {
+        if (null == $order = OrderQuery::create()->findPk($order_id)) {
+            $this->getLog()->addError($this->getTranslator()->trans("Unknown order ID:  %id", array('%id' => $order_id)));
+        }
+
+        return $order;
+    }
+    /**
+     * Redirect the customer to the successful payment page.
+     *
+     * @param int $order_id the order ID
+     */
+    public function redirectToSuccessPage($order_id) {
+
+        $this->getLog()->addInfo("Redirecting customer to payment success page");
+
+        $this->redirectToRoute(
+            'order.placed',
+            array(
+                'order_id' => $order_id
+            ),
+            Router::ABSOLUTE_PATH
+        );
+    }
+
+    /**
+     * Redirect the customer to the failure payment page. if $message is null, a generic message is displayed.
+     *
+     * @param int $order_id the order ID
+     * @param string|null $message an error message.
+     */
+    public function redirectToFailurePage($order_id, $message = null) {
+
+        $this->getLog()->addInfo("Redirecting customer to payment failure page");
+
+        $this->redirectToRoute(
+            'order.failed',
+            array(
+                'order_id' => $order_id,
+                'message' => $message
+            ),
+            Router::ABSOLUTE_PATH
+        );
+    }
+}

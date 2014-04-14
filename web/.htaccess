@@ -1,9 +1,13 @@
-Options +FollowSymlinks -Indexes
+#Options +FollowSymlinks -Indexes
 
 AddDefaultCharset UTF-8
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # If thelia is installed in a subdirectory (e.g., thelia2)
+    # define the RewriteBase below to get a proper URL rewriting
+    # RewriteBase /thelia2
 
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d

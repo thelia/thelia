@@ -23,6 +23,7 @@
 
 namespace Thelia\Tools;
 
+use Symfony\Component\Routing\RequestContext;
 use Thelia\Model\ConfigQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Rewriting\RewritingRetriever;
@@ -32,9 +33,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class URL
 {
+    /** @var RewritingResolver $resolver */
     protected $resolver = null;
+
+    /** @var RewritingRetriever $retriever */
     protected $retriever = null;
 
+    /** @var  RequestContext $requestContext */
     protected $requestContext;
 
     const PATH_TO_FILE = true;
@@ -42,10 +47,13 @@ class URL
 
     protected static $instance = null;
 
+    /** @var string $baseUrlScheme a cache for the base URL scheme  */
+    private $baseUrlScheme = null;
+
     public function __construct(ContainerInterface $container = null)
     {
-        // Allow singleton style calls once intanciated.
-        // For this to work, the URL service has to be instanciated very early. This is done manually
+        // Allow singleton style calls once instantiated.
+        // For this to work, the URL service has to be instantiated very early. This is done manually
         // in TheliaHttpKernel, by calling $this->container->get('thelia.url.manager');
         self::$instance = $this;
 
@@ -72,26 +80,34 @@ class URL
      * Return the base URL, either the base_url defined in Config, or the URL
      * of the current language, if 'one_domain_foreach_lang' is enabled.
      *
+     * @param bool $scheme_only if true, only the scheme will be returned. If false, the complete base URL, including path, is returned.
+     *
      * @return string the base URL, with a trailing '/'
      */
-    public function getBaseUrl()
+    public function getBaseUrl($scheme_only = false)
     {
-        if ($host = $this->requestContext->getHost()) {
+        if (null === $this->baseUrlScheme) {
 
-            $scheme = $this->requestContext->getScheme();
+            $scheme = "http";
+            $port = 80;
 
-            $port = '';
+            if ($host = $this->requestContext->getHost()) {
 
-            if ('http' === $scheme && 80 != $this->requestContext->getHttpPort()) {
-                $port = ':'.$this->requestContext->getHttpPort();
-            } elseif ('https' === $scheme && 443 != $this->requestContext->getHttpsPort()) {
-                $port = ':'.$this->requestContext->getHttpsPort();
+                $scheme = $this->requestContext->getScheme();
+
+                $port = '';
+
+                if ('http' === $scheme && 80 != $this->requestContext->getHttpPort()) {
+                    $port = ':'.$this->requestContext->getHttpPort();
+                } elseif ('https' === $scheme && 443 != $this->requestContext->getHttpsPort()) {
+                    $port = ':'.$this->requestContext->getHttpsPort();
+                }
             }
 
-            $schemeAuthority = "$scheme://$host"."$port";
+            $this->baseUrlScheme = "$scheme://$host"."$port";
         }
 
-        return $schemeAuthority.$this->requestContext->getBaseUrl();
+        return $scheme_only ? $this->baseUrlScheme : $this->baseUrlScheme . $this->requestContext->getBaseUrl();
     }
 
     /**
@@ -119,17 +135,25 @@ class URL
          // Already absolute ?
         if (substr($path, 0, 4) != 'http') {
 
-            $base_url = $this->getBaseUrl();
+            // Prevent duplication of the subdirectory name when Thelia is installed in a subdirectory.
+            // This happens when $path was calculated with Router::generate(), which returns an absolute URL,
+            // starting at web server root. For example, if Thelia is installed in /thelia2, we got something like /thelia2/my/path
+            // As base URL also contains /thelia2 (e.g. http://some.server.com/thelia2), we end up with
+            // http://some.server.com/thelia2/thelia2/my/path, instead of http://some.server.com/thelia2/my/path
+            // We have to compensate for this.
+            $hasSubdirectory = 0 === strpos($path, $this->requestContext->getBaseUrl());
 
+            $base_url = $this->getBaseUrl($hasSubdirectory);
+
+            /* Seems no longer required
             // TODO fix this ugly patch
             if (strpos($path, "index_dev.php")) {
                 $path = str_replace('index_dev.php', '', $path);
             }
+            */
 
             // If only a path is requested, be sure to remove the script name (index.php or index_dev.php), if any.
             if ($path_only == self::PATH_TO_FILE) {
-
-                // As the base_url always ends with '/', if we don't find / at the end, we have a script.
                 if (substr($base_url, -3) == 'php') $base_url = dirname($base_url);
             }
 

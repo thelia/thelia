@@ -23,6 +23,11 @@
 
 namespace Thelia\Install;
 
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Connection\ConnectionWrapper;
+use Propel\Runtime\Propel;
+use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
+
 /**
  * Class Database
  * @package Thelia\Install
@@ -30,10 +35,34 @@ namespace Thelia\Install;
  */
 class Database
 {
-    public $connection;
+    /**
+     * @var \PDO
+     */
+    protected $connection;
 
-    public function __construct(\PDO $connection)
+    /**
+     * Create a new instance, using the provided connection information, either none for
+     * automatically a connection, a ConnectionWrapper instance (through ConnectionInterface) or a PDO connection.
+     *
+     * @param ConnectionInterface|\PDO|null $connection the connection object
+     * @throws \InvalidArgumentException if $connection is not of the suitable type.
+     */
+    public function __construct($connection = null)
     {
+        // Get a connection from Propel if we don't have one
+        if (null == $connection) {
+            $connection = Propel::getConnection(ServiceContainerInterface::CONNECTION_WRITE);
+        }
+
+        // Get the PDO connection from an
+        if ($connection instanceof ConnectionWrapper) {
+            $connection = $connection->getWrappedConnection();
+        }
+
+        if (!$connection instanceof \PDO) {
+            throw new \InvalidArgumentException("A PDO connection shoud be provided");
+        }
+
         $this->connection = $connection;
     }
 
@@ -41,8 +70,8 @@ class Database
      * Insert all sql needed in database
      * Default insert /install/thelia.sql and /install/insert.sql
      *
-     * @param string $dbName        Database name
-     * @param array  $extraSqlFiles SQL Files uri to insert
+     * @param string $dbName Database name
+     * @param array $extraSqlFiles SQL Files uri to insert
      */
     public function insertSql($dbName = null, array $extraSqlFiles = null)
     {
@@ -67,10 +96,32 @@ class Database
             }
         }
         $size = count($sql);
-        for ($i = 0; $i < $size; $i ++) {
+        for ($i = 0; $i < $size; $i++) {
             if (!empty($sql[$i])) {
-                $this->connection->query($sql[$i]);
+                $this->execute($sql[$i]);
             }
+        }
+    }
+
+    /**
+     * A simple wrapper around PDO::exec
+     *
+     * @param string $sql SQL query
+     * @param array $args SQL request parameters (PDO style)
+     * @throws \RuntimeException|\PDOException if something goes wrong.
+     */
+    public function execute($sql, $args = array())
+    {
+        $stmt = $this->connection->prepare($sql);
+
+        if ($stmt === false) {
+            throw new \RuntimeException("Failed to prepare statement for $sql: " . print_r($this->connection->errorInfo(), 1));
+        }
+
+        $success = $stmt->execute($args);
+
+        if ($success === false || $stmt->errorCode() != 0) {
+            throw new \RuntimeException("Failed to execute SQL '$sql', arguments:" . print_r($args,1).", error:".print_r($stmt->errorInfo(), 1));
         }
     }
 
@@ -88,7 +139,7 @@ class Database
 
         $tab = explode(";\n", $sql);
         $size = count($tab);
-        for ($i=0; $i<$size; $i++) {
+        for ($i = 0; $i < $size; $i++) {
             $queryTemp = str_replace("-CODE-", ";',", $tab[$i]);
             $queryTemp = str_replace("|", ";", $queryTemp);
             $query[] = $queryTemp;
@@ -104,7 +155,7 @@ class Database
      */
     public function createDatabase($dbName)
     {
-        $this->connection->exec(
+        $this->execute(
             sprintf(
                 "CREATE DATABASE IF NOT EXISTS %s CHARACTER SET utf8",
                 $dbName
