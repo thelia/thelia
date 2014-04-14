@@ -108,10 +108,21 @@ class Database
      *
      * @param string $sql SQL query
      * @param array $args SQL request parameters (PDO style)
+     * @throws \RuntimeException|\PDOException if something goes wrong.
      */
     public function execute($sql, $args = array())
     {
-        $this->connection->query($sql, $args);
+        $stmt = $this->connection->prepare($sql);
+
+        if ($stmt === false) {
+            throw new \RuntimeException("Failed to prepare statement for $sql: " . print_r($this->connection->errorInfo(), 1));
+        }
+
+        $success = $stmt->execute($args);
+
+        if ($success === false || $stmt->errorCode() != 0) {
+            throw new \RuntimeException("Failed to execute SQL '$sql', arguments:" . print_r($args,1).", error:".print_r($stmt->errorInfo(), 1));
+        }
     }
 
     /**
