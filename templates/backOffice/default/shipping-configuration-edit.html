@@ -14,21 +14,28 @@
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
             <li><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l="Shipping configuration"}</a></li>
-            <li>{intl l='Editing shipping configuration "%name"' name="{$NAME}"}</li>
+            <li>{intl l='Editing shipping zone "%name"' name="{$NAME}"}</li>
         </ul>
 
         <div class="row">
             <div class="col-md-12">
                 <div class="general-block-decorator">
-                    
-                    <div class="col-md-12 title title-without-tabs">
-                        {intl l='Edit shipping configuration %title' title=$NAME}
+
+                    <div class="title title-without-tabs">
+                        <div class="row">
+                            <div class="col-md-10">
+                                {intl l='Shipping zone "%title"' title=$NAME}
+                            </div>
+                            <div class="col-md-2 text-right">
+                                <a href="{url path='/admin/configuration/shipping_configuration'}" class="btn btn-sm btn-default">{intl l='Close'} <span class="glyphicon glyphicon-remove"></span></a>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-container clearfix">
                         <div class="col-md-4">
                             
-                            
+                            {ifloop rel="country-without-area"}
                             {form name="thelia.admin.area.country"}
                             <form method="POST" action="{url path="/admin/configuration/shipping_configuration/country/add"}">
                                 {form_hidden_fields form=$form}
@@ -41,7 +48,7 @@
                                     <input type="hidden" name="{$name}" value="{$area_id}">
                                 {/form_field}
                                 {form_field form=$form field='country_id'}
-                                <label class="control-label" for="{$label_attr.for}">{intl l="Country"}</label>
+                                <label class="control-label" for="{$label_attr.for}">{intl l="Unassigned countries"}</label>
 
                                 <div class="input-group">                                                            
                                     <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
@@ -56,6 +63,12 @@
                                 {/form_field}
                             </form>
                             {/form}
+                            {/ifloop}
+                            {elseloop rel="country-without-area"}
+                                <div class="alert alert-info">
+                                    {intl l="All countries are assigned to a shipping zone."}
+                                </div>
+                            {/elseloop}
                         </div>
 
                         <div class="col-md-8">
@@ -63,21 +76,26 @@
                                 <table class="table table-striped table-condensed">
                                     <thead>
                                         <tr>
-                                            <th>{intl l="Country"}</th>
-                                            <th>{intl l="Actions"}</th>
+                                            <th>{intl l="Countries assigned to this zone"}</th>
+                                            <th class="text-center">{intl l="Actions"}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {loop name="country-area" type="country" area=$area_id backend_context="1"}
                                         <tr>
                                             <td>{$TITLE}</td>
-                                            <td>
+                                            <td class="text-center">
                                                 <a class="btn btn-default btn-xs btn-delete-country" title="{intl l='Delete this country'}"  href="#delete_country_dialog" data-id="{$ID}" data-toggle="modal">
                                                     <span class="glyphicon glyphicon-trash"></span>
                                                 </a>
                                             </td>
                                         </tr>
                                         {/loop}
+                                        {elseloop rel="country-area"}
+                                            <td colspan="2">
+                                                {intl l="This shipping zone does not contains any country."}
+                                            </td>
+                                        {/elseloop}
                                     </tbody>
                                     {module_include location='shipping-configuration-edit'}
                                 </table>
@@ -112,7 +130,7 @@
 
         dialog_id       = "delete_country_dialog"
         dialog_title    = {intl l="Remove country"}
-        dialog_message  = {intl l="Do you really want to remove this country ?"}
+        dialog_message  = {intl l="Do you really want to remove this country from this shipping zone ?"}
 
         form_action     = {url path='/admin/configuration/shipping_configuration/country/remove'}
         form_content    = {$smarty.capture.delete_country_dialog nofilter}

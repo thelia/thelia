@@ -13,7 +13,7 @@
         <ul class="breadcrumb">
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
-            <li><a href="{url path='/admin/configuration/shipping_zones'}">{intl l="Shipping configuration"}</a></li>
+            <li><a href="{url path='/admin/configuration/shipping_zones'}">{intl l="Shipping zones"}</a></li>
         </ul>
 
         {module_include location='shipping_zones_top'}
@@ -22,6 +22,7 @@
             <div class="col-md-12">
                 <div class="general-block-decorator">
 
+                    {ifloop rel="area-not-attached"}
                     <div class="row">
                         <div class="col-md-12">
                             <div class="alert alert-warning">
@@ -32,12 +33,13 @@
                             </div>
                         </div>
                     </div>
+                    {/ifloop}
 
                     <div class="table-responsive">
                         <table class="table table-striped table-condensed table-left-aligned">
 
                             <caption>
-                               {intl l='Shipping configuration'}
+                               {intl l='Shipping zones'}
                             </caption>
 
                             <thead>
