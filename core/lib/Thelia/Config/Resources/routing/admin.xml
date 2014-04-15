@@ -771,9 +771,9 @@
         <default key="_controller">Thelia\Controller\Admin\ShippingZoneController::indexAction</default>
     </route>
 
-    <route id="admin.configuration.shipping-zones.update.view" path="/admin/configuration/shipping_zones/update/{shipping_zones_id}" methods="get">
+    <route id="admin.configuration.shipping-zones.update.view" path="/admin/configuration/shipping_zones/update/{delivery_module_id}" methods="get">
         <default key="_controller">Thelia\Controller\Admin\ShippingZoneController::updateAction</default>
-        <requirement key="shipping_zones_id">\d+</requirement>
+        <requirement key="delivery_module_id">\d+</requirement>
     </route>
 
     <route id="admin.configuration.shipping-zones.area.add" path="/admin/configuration/shipping_zones/area/add" methods="post">
