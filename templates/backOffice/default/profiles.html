@@ -45,14 +45,27 @@
 
                                 {loop type="profile" name="profiles" backend_context="1"}
 
+                                {$can_change = false}
+                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.profile" access="UPDATE"}
+                                {$can_change = true}
+                                {/loop}
+
                                 <tr>
-                                    <td>{$TITLE}</td>
+                                    <td>
+                                        {if $can_change}
+                                            <a title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/$ID"}">
+                                                 {$TITLE}
+                                            </a>
+                                        {else}
+                                            {$TITLE}
+                                        {/if}
+                                    </td>
                                     <td>{$DESCRIPTION}</td>
                                     <td>
                                         <div class="btn-group">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.profile" access="UPDATE"}
+                                            {if $can_change}
                                                 <a class="btn btn-default btn-xs" title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
+                                            {/if}
 
                                             {assign linkedAdminCount {count name="linked-admin" type="admin" profile=$ID}}
 
@@ -93,9 +106,16 @@
 
     {form_hidden_fields form=$form}
 
-    {form_field form=$form field='locale'}
-        <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
-    {/form_field}
+    {loop type="lang" name="current-edit-lang" default_only="1"}
+        <div class="text-center well well-sm">
+            <img src="{image file="assets/img/flags/$CODE.png"}" alt="{intl l=$TITLE}" />
+            {intl l="Enter information in the default language (%title)" title=$TITLE}
+        </div>
+
+        {form_field form=$form field='locale'}
+            <input type="hidden" name="{$name}" value="{$LOCALE}" />
+        {/form_field}
+    {/loop}
 
     {form_field form=$form field='code'}
         <div class="form-group {if $error}has-error{/if}">
