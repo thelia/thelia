@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\OrderQuery;
@@ -37,6 +38,26 @@ class HomeController extends BaseAdminController
 
         // Render the edition template.
         return $this->render('home');
+    }
+
+    /**
+     * Get the latest available Thelia version from the Thelia web site.
+     *
+     * @return Thelia\Core\HttpFoundation\Response the response
+     */
+    public function getLatestTheliaVersion()
+    {
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
+
+        // get the latest version
+        $version = @file_get_contents("http://thelia.net/version.php");
+
+        if ($version === false)
+            $version = $this->getTranslator()->trans("Not found");
+        else if (! preg_match("/^[0-9.]*$/", $version))
+            $version = $this->getTranslator()->trans("Unavailable");
+
+        return Response::create($version);
     }
 
     public function loadStatsAjaxAction()
