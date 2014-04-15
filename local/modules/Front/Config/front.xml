@@ -55,7 +55,7 @@
     </route>
 
     <route id="customer.password.change.view" path="/account/password" methods="get">
-        <default key="_controller">Front\Controller\DefaultController::noAction</default>
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">account-password</default>
     </route>
 
