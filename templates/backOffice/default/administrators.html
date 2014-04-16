@@ -48,15 +48,27 @@
 
                                 {loop type="admin" name="administrators" backend_context="1"}
 
+                                {* the current current admin can always update its own profile *}
+                                {$can_update = $ID == {admin attr="id"}}
+                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.administrator" access="UPDATE"}
+                                    {$can_update = true}
+                                {/loop}
+
                                 <tr>
-                                    <td data-field-class="js-login">{$LOGIN}</td>
+                                    <td data-field-class="js-login">
+                                        {if $can_update}
+                                            <a class="js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal">{$LOGIN}</a>
+                                        {else}
+                                            {$LOGIN}
+                                        {/if}
+                                    </td>
                                     <td data-field-class="js-firstname">{$FIRSTNAME}</td>
                                     <td data-field-class="js-lastname">{$LASTNAME}</td>
                                     <td data-field-class="js-locale">{$LOCALE}</td>
                                     <td data-field-class="js-profile" data-value="{$PROFILE}">
-                                        {if $PROFILE}
+                                       {if $PROFILE}
                                             {loop type="profile" name="admin-profile" id=$PROFILE}
-                                                {$TITLE}
+                                                <a title="{intl l='Afficher ce profil'}" href="{url path="/admin/configuration/profiles/update/$ID"}">{$TITLE}</a>
                                             {/loop}
                                         {else}
                                             {intl l='Superadministrator'}
@@ -68,12 +80,11 @@
                                                 - can UPDATE anyway
                                                 - cannot delete himself
                                             *}
-                                            {if $ID == {admin attr="id"}}
+                                            {if $can_update}
                                                 <a class="btn btn-default btn-xs js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {else}
-                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.administrator" access="UPDATE"}
-                                                    <a class="btn btn-default btn-xs js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
-                                                {/loop}
+                                            {/if}
+
+                                            {if $ID != {admin attr="id"}}
                                                 {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.administrator" access="DELETE"}
                                                     <a class="btn btn-default btn-xs js-delete-administrator" title="{intl l='Delete this administrator'}" href="#administrator_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                                 {/loop}

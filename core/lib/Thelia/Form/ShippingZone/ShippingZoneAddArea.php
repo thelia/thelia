@@ -65,7 +65,7 @@ class ShippingZoneAddArea extends BaseForm
                     new GreaterThan(array('value' => 0))
                 ),
                 'label_attr' => array('for' => 'shipping_area'),
-                'label' => Translator::getInstance()->trans('Area')
+                'label' => Translator::getInstance()->trans('Available shipping zones')
             ))
             ->add('shipping_zone_id', 'integer', array(
                 'constraints' => array(

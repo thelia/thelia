@@ -62,7 +62,7 @@ class AreaCreateForm extends BaseForm
                     new NotBlank()
                 ),
                 'label_attr' => array('for' => 'shipping_name'),
-                'label' => Translator::getInstance()->trans('shipping area name')
+                'label' => Translator::getInstance()->trans('Shipping zone name')
             ))
 
         ;

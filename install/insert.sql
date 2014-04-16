@@ -1270,7 +1270,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (22, 'admin.configuration.tax', NOW(), NOW()),
 (23, 'admin.configuration.template', NOW(), NOW()),
 (24, 'admin.configuration.system-log', NOW(), NOW()),
-(25, 'admin.cache', NOW(), NOW());
+(25, 'admin.cache', NOW(), NOW()),
+(26, 'admin.home', NOW(), NOW());
 
 /**
 generated with command : php Thelia thelia:generate-resources --output sql-i18n
@@ -1325,8 +1326,9 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (24, 'en_US', 'Configuration / System Log'),
 (24, 'fr_FR', 'Configuration / Logs système'),
 (25, 'en_US', 'Configuration / Cache'),
-(25, 'fr_FR', 'Configuration / Cache');
-
+(25, 'fr_FR', 'Configuration / Cache'),
+(26, 'en_US', 'Back-office home page'),
+(26, 'fr_FR', 'Page d''acceuil de l''administration');
 
 INSERT INTO `message` (`id`, `name`, `secured`, `created_at`, `updated_at`, `version`, `version_created_at`, `version_created_by`) VALUES
 (1, 'order_confirmation', NULL, NOW(), NOW(), 2, NOW(), NULL),

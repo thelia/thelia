@@ -17,7 +17,7 @@ ALTER TABLE `product_image` ADD INDEX `idx_product_image_product_id_position` (`
 ALTER TABLE `category_image` ADD INDEX `idx_category_image_category_id_position` (`category_id`, `position`);
 ALTER TABLE `content_image` ADD INDEX `idx_content_image_content_id_position` (`content_id`, `position`);
 ALTER TABLE `folder_image` ADD INDEX `idx_folder_image_folder_id_position` (`folder_id`, `position`);
-ALTER TABLE `module_image` ADD INDEX `idx_module_image_module_id_position` (`module_id`, `position`)
+ALTER TABLE `module_image` ADD INDEX `idx_module_image_module_id_position` (`module_id`, `position`);
 
 ALTER TABLE `rewriting_url` ADD INDEX `idx_rewriting_url_view_updated_at` (`view`, `updated_at`);
 ALTER TABLE `rewriting_url` ADD INDEX `idx_rewriting_url_view_id_view_view_locale_updated_at` (`view_id`, `view`, `view_locale`, `updated_at`);
@@ -37,5 +37,14 @@ INSERT INTO `resource` (`id`, `code`, `created_at`, `updated_at`) VALUES
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max, 'en_US', 'Configuration / Cache'),
 (@max, 'fr_FR', 'Configuration / Cache');
+
+SET @max := @max+1;
+
+INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
+(@max, 'admin.cache', NOW(), NOW());
+
+INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
+(@max, 'en_US', 'Back-office home page'),
+(@max, 'fr_FR', 'Page d''acceuil de l''administration');
 
 SET FOREIGN_KEY_CHECKS = 1;

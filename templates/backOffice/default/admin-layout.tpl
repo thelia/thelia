@@ -190,7 +190,7 @@
                             </li>
                             {/loop}
 
-                            {loop name="menu-auth-config" type="auth" role="ADMIN" resource="admin.config"  access="VIEW"}
+                            {loop name="menu-auth-config" type="auth" role="ADMIN" resource="admin.configuration.area"  access="VIEW"}
                             <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
                                 <a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a>
                             </li>

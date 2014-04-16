@@ -80,6 +80,8 @@ final class AdminResources
 
     const FOLDER = "admin.folder";
 
+    const HOME = "admin.home";
+
     const LANGUAGE = "admin.configuration.language";
 
     const MAILING_SYSTEM = "admin.configuration.mailing-system";
