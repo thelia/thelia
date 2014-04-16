@@ -152,13 +152,7 @@
                                     }
                                 </div>
 
-                                {module_include location='folder-edit' countvar='module_count'}
-
-                                {if $module_count == 0}
-                                    <div class="alert alert-info">
-                                        {intl l="There is currently no active module here."}
-                                    </div>
-                                {/if}
+                                {include file="includes/module-tab-content.html" location="folder-edit"}
 		                    </div>
 		                 </div>
                     </div>

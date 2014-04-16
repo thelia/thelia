@@ -67,7 +67,7 @@ class Module extends AbstractSmartyPlugin
         if (false !== $location = $this->getParam($params, 'location', false)) {
 
             if ($this->debug === true && $this->request->get('SHOW_INCLUDE')) {
-                echo sprintf('<div style="background-color: #C82D26; border-color: #000000; border: solid;">%s</div>', $location);
+                echo sprintf('<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">%s</div>', $location);
             }
 
             $moduleLimit = $this->getParam($params, 'module', null);
@@ -83,9 +83,14 @@ class Module extends AbstractSmartyPlugin
                 $file = sprintf("%s/AdminIncludes/%s.html", $module->getAbsoluteBaseDir(), $location);
 
                 if (file_exists($file)) {
-                    $content .= file_get_contents($file);
 
-                    $count++;
+                    $output = trim(file_get_contents($file));
+
+                    if (! empty($output)) {
+                        $content .= $output;
+
+                        $count++;
+                    }
                 }
             }
         }
