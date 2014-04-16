@@ -63,6 +63,11 @@
         <default key="_controller">Front\Controller\OrderController::generateDeliveryPdf</default>
         <requirement key="order_id">\d+</requirement>
     </route>
+
+    <route id="customer.order.pdf.invoice" path="/account/order/pdf/invoice/{order_id}">
+        <default key="_controller">Front\Controller\OrderController::generateInvoicePdf</default>
+        <requirement key="order_id">\d+</requirement>
+    </route>
     <!-- end customer routes -->
 
     <!-- customer address routes -->
