@@ -215,11 +215,11 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
         <script src="{$asset_url}"></script>
     {/javascripts}
     <script>
-        $(function () {
+        $(function() {
             $.imageUploadManager.initImageDropZone();
             $.documentUploadManager.initDocumentDropZone();
 
-            $('.use_default_rewriten_url').click(function (ev) {
+            $('.use_default_rewriten_url').click(function(ev) {
                 alert("Not functionnal");
 
                 ev.preventDefault();
@@ -230,28 +230,28 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
             $('#tabbed-menu a[href="#{$current_tab}"]').tab('show')
             {/if}
 
-            $('a.delete-folder').click(function (e) {
+            $('a.delete-folder').click(function(e) {
                 $('#additional_folder_delete_id').val($(this).data('id'));
             });
 
             // Set proper content ID in delete content from
-            $('a.delete-content').click(function (ev) {
+            $('a.delete-content').click(function(ev) {
                 $('#content_delete_id').val($(this).data('id'));
                 $('#folder_delete_id').val($('#folder_id').val());
             });
 
             // Load content on folder selection
-            $('#folder_id').change(function (event) {
+            $('#folder_id').change(function(event) {
                 $.ajax({
                     url: '{url path="/admin/folder/$folder_id/available-related-content/"}' + $(this).val() + '.xml',
                     type: 'get',
                     dataType: 'json',
-                    success: function (json) {
+                    success: function(json) {
                         $('#content_id :not(:first-child)').remove();
 
                         var have_content = false;
 
-                        $.each(json, function (idx, value) {
+                        $.each(json, function(idx, value) {
                             $('#content_id').append($('<option>').text(value.title).attr('value', value.id));
 
                             have_content = true; // Lame...
@@ -267,7 +267,9 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
             });
 
             // Initialize folder (id=
-            {$folder_id}) select value
+            {$folder_id})
+            select
+            value
             {if $folder_id != 0}
             $('#folder_id').val("{$folder_id}").change();
             {/if}
