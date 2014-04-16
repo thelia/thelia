@@ -141,7 +141,7 @@ class AttributeAvController extends AbstractCrudController
         ->findOneById($this->getRequest()->get('attributeav_id', 0));
 
         if (null !== $attributeAv) {
-            $attribute->setLocale($this->getCurrentEditionLocale());
+            $attributeAv->setLocale($this->getCurrentEditionLocale());
         }
 
         return $attributeAv;

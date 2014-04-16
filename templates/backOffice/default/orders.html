@@ -33,13 +33,23 @@
 	                        <thead>
 		                        <tr>
                                     <th class="object-title">
+                                        {admin_sortable_header
+                                        current_order=$orders_order
+                                        order='id'
+                                        reverse_order='id-reverse'
+                                        path={url path='/admin/orders'}
+                                        request_parameter_name='orders_order'
+                                        label="{intl l='ID'}"
+                                    } </th>
+
+                                    <th class="object-title">
                                     {admin_sortable_header
                                         current_order=$orders_order
                                         order='reference'
                                         reverse_order='reference-reverse'
                                         path={url path='/admin/orders'}
                                         request_parameter_name='orders_order'
-                                        label="{intl l='Order #'}"
+                                        label="{intl l='Reference'}"
                                     } </th>
 
                                     <th class="object-title">
@@ -111,6 +121,7 @@
 
 		                            <tr>
 
+                                        <td><a href="{url path="/admin/order/update/$ID"}">{$ID}</a></td>
 		                               	<td><a href="{url path="/admin/order/update/$ID"}">{$REF}</a></td>
 		                               	<td>{format_date date=$CREATE_DATE}</td>
 		                               	<td>{$orderInvoiceCompany}</td>

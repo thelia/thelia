@@ -271,13 +271,8 @@
                                         }
                                     </div>
 
-                                    {module_include location='category-edit' countvar='module_count'}
+                                    {include file="includes/module-tab-content.html" location="category-edit"}
 
-                                    {if $module_count == 0}
-                                        <div class="alert alert-info">
-                                            {intl l="There is currently no active module here."}
-                                        </div>
-                                    {/if}
                                 </div>
                              </div>
                         </div>

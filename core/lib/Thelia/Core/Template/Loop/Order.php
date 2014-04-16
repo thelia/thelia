@@ -92,11 +92,11 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
     public function getSearchIn()
     {
         return array(
-            "ref",
-            "customer_ref",
-            "customer_firstname",
-            "customer_lastname",
-            "customer_email",
+            'ref',
+            'customer_ref',
+            'customer_firstname',
+            'customer_lastname',
+            'customer_email',
         );
     }
 
@@ -115,25 +115,25 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 $search->_or();
             }
             switch ($searchInElement) {
-                case "ref":
+                case 'ref':
                     $search->filterByRef($searchTerm, $searchCriteria);
                     break;
-                case "customer_ref":
+                case 'customer_ref':
                     $search->filterByCustomer(
                         CustomerQuery::create()->filterByRef($searchTerm, $searchCriteria)->find()
                     );
                     break;
-                case "customer_firstname":
+                case 'customer_firstname':
                     $search->filterByOrderAddressRelatedByInvoiceOrderAddressId(
                         OrderAddressQuery::create()->filterByFirstname($searchTerm, $searchCriteria)->find()
                     );
                     break;
-                case "customer_lastname":
+                case 'customer_lastname':
                     $search->filterByOrderAddressRelatedByInvoiceOrderAddressId(
                         OrderAddressQuery::create()->filterByLastname($searchTerm, $searchCriteria)->find()
                     );
                     break;
-                case "customer_email":
+                case 'customer_email':
                     $search->filterByCustomer(
                         CustomerQuery::create()->filterByEmail($searchTerm, $searchCriteria)->find()
                     );
@@ -178,28 +178,28 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case 'id_reverse':
+                case 'id-reverse':
                     $search->orderById(Criteria::DESC);
                     break;
 
                 case 'reference':
                     $search->orderByRef(Criteria::ASC);
                     break;
-                case 'reference_reverse':
+                case 'reference-reverse':
                     $search->orderByRef(Criteria::DESC);
                     break;
 
-                case "create-date":
+                case 'create-date':
                     $search->orderByCreatedAt(Criteria::ASC);
                     break;
-                case "create-date-reverse":
+                case 'create-date-reverse':
                     $search->orderByCreatedAt(Criteria::DESC);
                     break;
 
-                case "status":
+                case 'status':
                     $search->orderByStatusId(Criteria::ASC);
                     break;
-                case "status":
+                case 'status-reverse':
                     $search->orderByStatusId(Criteria::DESC);
                     break;
 
@@ -210,7 +210,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                         ->orderBy('company', Criteria::ASC)
                     ;
                     break;
-                case 'companyreverse' :
+                case 'company-reverse' :
                     $search
                         ->joinOrderAddressRelatedByDeliveryOrderAddressId()
                         ->withColumn(OrderAddressTableMap::COMPANY, 'company')
@@ -244,31 +244,32 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
 
     public function parseResults(LoopResult $loopResult)
     {
+        /**  @var \Thelia\Model\Order $order */
         foreach ($loopResult->getResultDataCollection() as $order) {
             $tax = 0;
             $amount = $order->getTotalAmount($tax);
             $loopResultRow = new LoopResultRow($order);
             $loopResultRow
-                ->set("ID", $order->getId())
-                ->set("REF", $order->getRef())
-                ->set("CUSTOMER", $order->getCustomerId())
-                ->set("DELIVERY_ADDRESS", $order->getDeliveryOrderAddressId())
-                ->set("INVOICE_ADDRESS", $order->getInvoiceOrderAddressId())
-                ->set("INVOICE_DATE", $order->getInvoiceDate())
-                ->set("CURRENCY", $order->getCurrencyId())
-                ->set("CURRENCY_RATE", $order->getCurrencyRate())
-                ->set("TRANSACTION_REF", $order->getTransactionRef())
-                ->set("DELIVERY_REF", $order->getDeliveryRef())
-                ->set("INVOICE_REF", $order->getInvoiceRef())
-                ->set("POSTAGE", $order->getPostage())
-                ->set("PAYMENT_MODULE", $order->getPaymentModuleId())
-                ->set("DELIVERY_MODULE", $order->getDeliveryModuleId())
-                ->set("STATUS", $order->getStatusId())
-                ->set("LANG", $order->getLangId())
-                ->set("DISCOUNT", $order->getDiscount())
-                ->set("TOTAL_TAX", $tax)
-                ->set("TOTAL_AMOUNT", $amount - $tax)
-                ->set("TOTAL_TAXED_AMOUNT", $amount)
+                ->set('ID', $order->getId())
+                ->set('REF', $order->getRef())
+                ->set('CUSTOMER', $order->getCustomerId())
+                ->set('DELIVERY_ADDRESS', $order->getDeliveryOrderAddressId())
+                ->set('INVOICE_ADDRESS', $order->getInvoiceOrderAddressId())
+                ->set('INVOICE_DATE', $order->getInvoiceDate())
+                ->set('CURRENCY', $order->getCurrencyId())
+                ->set('CURRENCY_RATE', $order->getCurrencyRate())
+                ->set('TRANSACTION_REF', $order->getTransactionRef())
+                ->set('DELIVERY_REF', $order->getDeliveryRef())
+                ->set('INVOICE_REF', $order->getInvoiceRef())
+                ->set('POSTAGE', $order->getPostage())
+                ->set('PAYMENT_MODULE', $order->getPaymentModuleId())
+                ->set('DELIVERY_MODULE', $order->getDeliveryModuleId())
+                ->set('STATUS', $order->getStatusId())
+                ->set('LANG', $order->getLangId())
+                ->set('DISCOUNT', $order->getDiscount())
+                ->set('TOTAL_TAX', $tax)
+                ->set('TOTAL_AMOUNT', $amount - $tax)
+                ->set('TOTAL_TAXED_AMOUNT', $amount)
             ;
 
             $loopResult->addRow($loopResultRow);
