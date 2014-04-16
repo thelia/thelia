@@ -141,7 +141,9 @@ class URL
             // As base URL also contains /thelia2 (e.g. http://some.server.com/thelia2), we end up with
             // http://some.server.com/thelia2/thelia2/my/path, instead of http://some.server.com/thelia2/my/path
             // We have to compensate for this.
-            $hasSubdirectory = 0 === strpos($path, $this->requestContext->getBaseUrl());
+            $rcbu = $this->requestContext->getBaseUrl();
+
+            $hasSubdirectory = ! empty($rcbu) && (0 === strpos($path, $rcbu));
 
             $base_url = $this->getBaseUrl($hasSubdirectory);
 
