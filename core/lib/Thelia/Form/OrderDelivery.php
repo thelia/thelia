@@ -83,13 +83,13 @@ class OrderDelivery extends BaseForm
 
         if (null === $module) {
             $context->addViolation(Translator::getInstance()->trans("Delivery module ID not found"));
-        }
-
-        $moduleReflection = new \ReflectionClass($module->getFullNamespace());
-        if ($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
-            $context->addViolation(
-                sprintf(Translator::getInstance()->trans("delivery module %s is not a Thelia\Module\DeliveryModuleInterface"), $module->getCode())
-            );
+        } else {
+            $moduleReflection = new \ReflectionClass($module->getFullNamespace());
+            if ($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
+                $context->addViolation(
+                    sprintf(Translator::getInstance()->trans("delivery module %s is not a Thelia\Module\DeliveryModuleInterface"), $module->getCode())
+                );
+            }
         }
     }
 
