@@ -93,9 +93,9 @@ class Update
 
     protected function updateToVersion($version, Database $database,Tlog $logger)
     {
-        if (file_exists(THELIA_ROOT . '/install/update/'.$version.'.sql')) {
+        if (file_exists(THELIA_ROOT . '/setup/update/'.$version.'.sql')) {
             $logger->debug(sprintf('inserting file %s', $version.'$sql'));
-            $database->insertSql(null, array(THELIA_ROOT . '/install/update/'.$version.'.sql'));
+            $database->insertSql(null, array(THELIA_ROOT . '/setup/update/'.$version.'.sql'));
             $logger->debug(sprintf('end inserting file %s', $version.'$sql'));
         }
 

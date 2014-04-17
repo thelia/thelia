@@ -21,15 +21,15 @@ echo -e "\n\033[01;34m[INFO] Building Models file\033[00m\n"
 ../../bin/propel build -v --output-dir=../../core/lib/ --enable-identifier-quoting
 
 echo -e "\n\033[01;34m[INFO] Building SQL CREATE file\033[00m\n"
-../../bin/propel sql:build -v --output-dir=../../install/
+../../bin/propel sql:build -v --output-dir=../../setup/
 
 echo -e "\n\033[01;34m[INFO] Reloading Thelia2 database\033[00m\n"
 cd ../..
-rm install/sqldb.map
+rm setup/sqldb.map
 php Thelia thelia:dev:reloadDB
 
 echo -e "\n\033[01;34m[INFO] Installing fixtures\033[00m\n"
-php install/faker.php
+php setup/faker.php
 
 echo -e "\n\033[01;34m[INFO] Adding admin\033[00m\n"
 php Thelia admin:create --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2

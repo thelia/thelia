@@ -83,7 +83,7 @@ function createProduct($faker, $categories, $template, $attribute, $feature, $co
 {
     echo "start creating products\n";
     $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
-    if (($handle = fopen(THELIA_ROOT . '/install/import/products.csv', "r")) !== FALSE) {
+    if (($handle = fopen(THELIA_ROOT . '/setup/import/products.csv', "r")) !== FALSE) {
         $row=0;
         while (($data = fgetcsv($handle, 100000, ";")) !== FALSE) {
             $row++;
@@ -134,7 +134,7 @@ function createProduct($faker, $categories, $template, $attribute, $feature, $co
                     ->setProduct($product)
                     ->setFile($image)
                     ->save($con);
-                $fileSystem->copy(THELIA_ROOT . 'install/import/images/'.$image, THELIA_ROOT . 'local/media/images/product/'.$image, true);
+                $fileSystem->copy(THELIA_ROOT . 'setup/import/images/'.$image, THELIA_ROOT . 'local/media/images/product/'.$image, true);
             }
 
             $pses = explode(";", $data[12]);
@@ -199,7 +199,7 @@ function createProduct($faker, $categories, $template, $attribute, $feature, $co
 function createBrand($con)
 {
     echo "start creating brands feature\n";
-    if (($handle = fopen(THELIA_ROOT . '/install/import/brand.csv', "r")) !== FALSE) {
+    if (($handle = fopen(THELIA_ROOT . '/setup/import/brand.csv', "r")) !== FALSE) {
         $row=0;
         $feature = new \Thelia\Model\Feature();
         $feature
@@ -232,7 +232,7 @@ function createCategories($con)
 {
     echo "start creating categories\n";
     $categories = array();
-    if (($handle = fopen(THELIA_ROOT . '/install/import/categories.csv', "r")) !== FALSE) {
+    if (($handle = fopen(THELIA_ROOT . '/setup/import/categories.csv', "r")) !== FALSE) {
         $row=0;
         while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
             $row++;
@@ -259,7 +259,7 @@ function createCategories($con)
 function createColors($con)
 {
     echo "start creating colors attributes\n";
-    if (($handle = fopen(THELIA_ROOT . '/install/import/colors.csv', "r")) !== FALSE) {
+    if (($handle = fopen(THELIA_ROOT . '/setup/import/colors.csv', "r")) !== FALSE) {
         $row=0;
         $attribute = new \Thelia\Model\Attribute();
         $attribute

@@ -22,16 +22,16 @@ if exist local\config\database.yml (
     ..\..\bin\propel build -v --output-dir=../../core/lib/ --enable-identifier-quoting
 
     echo [INFO] Building SQL CREATE file
-    ..\..\bin\propel sql:build -v --output-dir=..\..\install
+    ..\..\bin\propel sql:build -v --output-dir=..\..\setup
 
 
     echo [INFO] Reloading Thelia2 database
     cd ..\..
-    del install\sqldb.map
+    del setup\sqldb.map
     php Thelia thelia:dev:reloadDB
 
     echo [INFO] Installing fixtures
-    php install\faker.php
+    php setup\faker.php
 
     echo [INFO] Clearing caches
     php Thelia cache:clear
