@@ -30,6 +30,7 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
+use Thelia\Module\Exception\DeliveryException;
 
 /**
  * Class Delivery
@@ -76,7 +77,7 @@ class Delivery extends BaseSpecificModule
 
             try {
                 // Check if module is valid, by calling isValidDelivery(),
-                // or catching a DELIVERY_MODULE_UNAVAILABLE OrderException.
+                // or catching a DeliveryException.
 
                 if ($moduleInstance->isValidDelivery($country)) {
 
@@ -93,11 +94,8 @@ class Delivery extends BaseSpecificModule
 
                     $loopResult->addRow($loopResultRow);
                 }
-            } catch (OrderException $ex) {
-                // Re-throw an unknown exception
-                if ($ex->getCode() !== OrderException::DELIVERY_MODULE_UNAVAILABLE) {
-                    throw $ex;
-                }
+            } catch (DeliveryException $ex) {
+                // Module is not available
             }
         }
 

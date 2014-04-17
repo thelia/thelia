@@ -24,6 +24,7 @@
 namespace Thelia\Module;
 
 use Thelia\Model\Country;
+use Thelia\Module\Exception\DeliveryException;
 
 abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModuleInterface
 {
@@ -46,6 +47,7 @@ abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModu
      * @param Country $country the country to deliver to.
      *
      * @return float the delivery price
+     * @throws DeliveryException if the postage price cannot be calculated.
      */
     public abstract function getPostage(Country $country);
 }

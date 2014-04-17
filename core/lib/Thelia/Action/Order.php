@@ -106,7 +106,14 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $order = $event->getOrder();
 
-        $order->setDeliveryModuleId($event->getDeliveryModule());
+        $deliveryModuleId = $event->getDeliveryModule();
+
+        $order->setDeliveryModuleId($deliveryModuleId);
+
+        // Reset postage cost if the delivery module had been removed
+        if ($deliveryModuleId <= 0) {
+            $this->setPostage(0);
+        }
 
         $event->setOrder($order);
     }
