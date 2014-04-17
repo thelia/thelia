@@ -31,7 +31,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Form\CartAdd;
 use Thelia\Model\AddressQuery;
-use Thelia\Module\Exception\DeliveryException;
 
 class CartController extends BaseFrontController
 {
@@ -161,23 +160,12 @@ class CartController extends BaseFrontController
 
             if (null !== $deliveryModule && null !== $deliveryAddress) {
                 $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
+                $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
 
                 $orderEvent = new OrderEvent($order);
+                $orderEvent->setPostage($postage);
 
-                try {
-                    $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
-
-                    $orderEvent->setPostage($postage);
-
-                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
-                }
-                catch (DeliveryException $ex) {
-                    // The postage has been chosen, but changes in the cart causes an exception.
-                    // Reset the postage data in the order
-                    $orderEvent->setDeliveryModule(0);
-
-                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
-                }
+                $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
             }
         }
     }
