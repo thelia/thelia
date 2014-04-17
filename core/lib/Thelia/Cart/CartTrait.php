@@ -97,7 +97,7 @@ trait CartTrait
     protected function createCart(Session $session)
     {
         $cart = new CartModel();
-        $cart->setToken($this->generateCookie());
+        $cart->setToken($this->generateCookie($session));
 
         if (null !== $customer = $session->getCustomerUser()) {
             $cart->setCustomer($customer);
@@ -120,7 +120,7 @@ trait CartTrait
      */
     protected function duplicateCart(EventDispatcherInterface $dispatcher, CartModel $cart, Session $session, Customer $customer = null)
     {
-        $newCart = $cart->duplicate($this->generateCookie(), $customer, $dispatcher);
+        $newCart = $cart->duplicate($this->generateCookie($session), $customer, $dispatcher);
         $session->setCart($newCart->getId());
 
         $cartEvent = new CartEvent($newCart);
@@ -130,11 +130,13 @@ trait CartTrait
         return $cartEvent->getCart();
     }
 
-    protected function generateCookie()
+    protected function generateCookie(Session $session)
     {
         $id = null;
         if (ConfigQuery::read("cart.session_only", 0) == 0) {
             $id = uniqid('', true);
+            $session->set('cart_use_cookie', $id);
+
             setcookie(
                 "thelia_cart",
                 $id,
