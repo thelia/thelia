@@ -189,7 +189,7 @@ abstract class BaseForm
     /**
      * Set the error message related to global form error
      *
-     * @param unknown $message
+     * @param string $message
      */
     public function setErrorMessage($message)
     {
