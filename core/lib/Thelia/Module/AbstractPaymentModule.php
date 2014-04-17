@@ -33,7 +33,7 @@ use Thelia\Tools\URL;
 abstract class AbstractPaymentModule extends BaseModule implements PaymentModuleInterface
 {
     /**
-     *  This method is called when the payement gateway needs to be invoked.
+     *  This method is called when the payment gateway needs to be invoked.
      *
      * If this method return a Response instance, this response is sent to the browser. Return null if you don't want to
      * send a response and process the payment yourself.
@@ -91,9 +91,9 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      * @param  int    $order_id the order ID
      * @return string the order payment success page URL
      */
-    public function getPayementSuccessPageUrl($order_id)
+    public function getPaymentSuccessPageUrl($order_id)
     {
-        $frontOfficeRouter = $this->container->get('router.front');
+        $frontOfficeRouter = $this->getContainer()->get('router.front');
 
         return URL::getInstance()->absoluteUrl(
             $frontOfficeRouter->generate(
@@ -112,9 +112,9 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      *
      * @return string the order payment failure page URL
      */
-    public function getPayementFailurePageUrl($order_id, $message)
+    public function getPaymentFailurePageUrl($order_id, $message)
     {
-        $frontOfficeRouter = $this->container->get('router.front');
+        $frontOfficeRouter = $this->getContainer()->get('router.front');
 
         return URL::getInstance()->absoluteUrl(
             $frontOfficeRouter->generate(
