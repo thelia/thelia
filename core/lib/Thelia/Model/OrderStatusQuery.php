@@ -17,25 +17,29 @@ use Thelia\Model\Base\OrderStatusQuery as BaseOrderStatusQuery;
 class OrderStatusQuery extends BaseOrderStatusQuery
 {
 
-    public static function getNotPaidStatus() {
+    public static function getNotPaidStatus()
+    {
         return OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_NOT_PAID);
     }
 
-    public static function getPaidStatus() {
+    public static function getPaidStatus()
+    {
         return OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_PAID);
     }
 
-    public static function getProcessingStatus() {
+    public static function getProcessingStatus()
+    {
         return OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_PROCESSING);
     }
 
-    public static function getSentStatus() {
+    public static function getSentStatus()
+    {
         return OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_SENT);
     }
 
-    public static function getCancelledStatus() {
+    public static function getCancelledStatus()
+    {
         return OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED);
     }
-
 
 } // OrderStatusQuery

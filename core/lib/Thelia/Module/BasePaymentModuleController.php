@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Module;
@@ -27,7 +16,6 @@ use Symfony\Component\Routing\Router;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
 use Thelia\Log\Tlog;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
@@ -49,15 +37,15 @@ abstract class BasePaymentModuleController extends BaseFrontController
      *
      * @return string the module code
      */
-    protected abstract function getModuleCode();
+    abstract protected function getModuleCode();
 
     /**
      * Initialize a module-specific logger.
      *
      * @return Tlog a Tlog instance
      */
-    protected function getLog() {
-
+    protected function getLog()
+    {
         if ($this->log == null) {
             $this->log = Tlog::getNewInstance();
 
@@ -100,8 +88,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
                         array('%ref' => $order->getRef(), '%id' => $order->getId()))
                 );
             }
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             $this->getLog()->addError(
                 $this->getTranslator()->trans("Error occured while processing order ref. %ref, ID %id: %err",
                     array(
@@ -163,8 +150,8 @@ abstract class BasePaymentModuleController extends BaseFrontController
      *
      * @param int $order_id the order ID
      */
-    public function redirectToSuccessPage($order_id) {
-
+    public function redirectToSuccessPage($order_id)
+    {
         $this->getLog()->addInfo("Redirecting customer to payment success page");
 
         $this->redirectToRoute(
@@ -179,11 +166,11 @@ abstract class BasePaymentModuleController extends BaseFrontController
     /**
      * Redirect the customer to the failure payment page. if $message is null, a generic message is displayed.
      *
-     * @param int $order_id the order ID
-     * @param string|null $message an error message.
+     * @param int         $order_id the order ID
+     * @param string|null $message  an error message.
      */
-    public function redirectToFailurePage($order_id, $message = null) {
-
+    public function redirectToFailurePage($order_id, $message = null)
+    {
         $this->getLog()->addInfo("Redirecting customer to payment failure page");
 
         $this->redirectToRoute(

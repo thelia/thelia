@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Install;
@@ -44,8 +33,8 @@ class Database
      * Create a new instance, using the provided connection information, either none for
      * automatically a connection, a ConnectionWrapper instance (through ConnectionInterface) or a PDO connection.
      *
-     * @param ConnectionInterface|\PDO|null $connection the connection object
-     * @throws \InvalidArgumentException if $connection is not of the suitable type.
+     * @param  ConnectionInterface|\PDO|null $connection the connection object
+     * @throws \InvalidArgumentException     if $connection is not of the suitable type.
      */
     public function __construct($connection = null)
     {
@@ -70,8 +59,8 @@ class Database
      * Insert all sql needed in database
      * Default insert /install/thelia.sql and /install/insert.sql
      *
-     * @param string $dbName Database name
-     * @param array $extraSqlFiles SQL Files uri to insert
+     * @param string $dbName        Database name
+     * @param array  $extraSqlFiles SQL Files uri to insert
      */
     public function insertSql($dbName = null, array $extraSqlFiles = null)
     {
@@ -106,8 +95,8 @@ class Database
     /**
      * A simple wrapper around PDO::exec
      *
-     * @param string $sql SQL query
-     * @param array $args SQL request parameters (PDO style)
+     * @param  string                          $sql  SQL query
+     * @param  array                           $args SQL request parameters (PDO style)
      * @throws \RuntimeException|\PDOException if something goes wrong.
      */
     public function execute($sql, $args = array())
