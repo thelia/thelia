@@ -30,19 +30,19 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Exception\ModuleException;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
-use Thelia\Model\Map\ModuleTableMap;
-use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\Map\ModuleImageTableMap;
+use Thelia\Model\Map\ModuleTableMap;
+use Thelia\Model\Module;
 use Thelia\Model\ModuleI18n;
+use Thelia\Model\ModuleI18nQuery;
+use Thelia\Model\ModuleImage;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\Image;
-use Thelia\Exception\ModuleException;
-use Thelia\Model\Module;
-use Thelia\Model\ModuleImage;
-use Thelia\Model\ModuleQuery;
 
 class BaseModule extends ContainerAware implements BaseModuleInterface
 {
@@ -138,7 +138,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     {
         if ($this->hasRequest() === false) {
             // Try to get request from container.
-            $this->setRequest($this->container->get('request'));
+            $this->setRequest($this->getContainer()->get('request'));
         }
 
         if ($this->hasRequest() === false) {
@@ -171,7 +171,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      * Sets a module titles for various languages
      *
      * @param Module $module the module.
-     * @param $titles an associative array of locale => title_string
+     * @param array $titles an associative array of locale => title_string
      */
     public function setTitle(Module $module, $titles)
     {
@@ -197,8 +197,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     /**
      * Ensure the proper deployment of the module's images.
      *
-     * TODO : clarify the purpose of ModuleImage. How this table will be used elswhere in Thelia ?
-     * TODO : this method doesn't take care of internationalization. This is a bug.
+     * TODO : this method does not take care of internationalization. This is a bug.
      *
      * @param Module              $module     the module
      * @param string              $folderPath the image folder path
@@ -223,6 +222,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
 
         /* browse the directory */
         $imagePosition = 1;
+        /** @var \DirectoryIterator $directoryContent */
         foreach ($directoryBrowser as $directoryContent) {
             /* is it a file ? */
             if ($directoryContent->isFile()) {
@@ -347,7 +347,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         $order = $session->getOrder();
 
         /** @var TaxEngine $taxEngine */
-        $taxEngine = $this->container->get("thelia.taxengine");
+        $taxEngine = $this->getContainer()->get("thelia.taxengine");
 
         /** @var Country $country */
         $country = $taxEngine->getDeliveryCountry();
@@ -363,7 +363,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
 
     /**
      *
-     * This method allow adding new compilers to Thelia container
+     * This method adds new compilers to Thelia container
      *
      * You must return an array. This array can contain :
      *  - arrays
@@ -409,7 +409,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      */
     public function install(ConnectionInterface $con = null)
     {
-        // Implement this method to do something useful.
+        // Override this method to do something useful.
     }
 
     /**
