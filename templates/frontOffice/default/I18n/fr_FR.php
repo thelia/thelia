@@ -8,7 +8,7 @@ return array(
     '404' => '404',
     '<strong>Sorry!</strong> We are not able to give you a delivery method for your order.' => '<strong>Désolé !</strong>Nous ne pouvons pas trouver de mode de livraison pour votre commande.',
     'A problem occured' => 'Un problème est survenu',
-    'A summary of your order email has been sent to the following address' => 'Un récapitulatif de commande vows a été envoyé par e-mail à l\'adresse suivante : ',
+    'A summary of your order email has been sent to the following address' => 'Un récapitulatif de commande vous a été envoyé par e-mail à l\'adresse suivante : ',
     'Account' => 'Mon compte',
     'Add a new address' => 'Ajouter une nouvelle adresse',
     'Add to cart' => 'Ajouter au panier',
