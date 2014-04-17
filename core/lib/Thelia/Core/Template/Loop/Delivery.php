@@ -27,10 +27,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Exception\OrderException;
 use Thelia\Model\CountryQuery;
-use Thelia\Model\Module;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
-use Thelia\Module\Exception\DeliveryException;
 
 /**
  * Class Delivery
@@ -64,11 +62,9 @@ class Delivery extends BaseSpecificModule
             $country = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
         }
 
-        /** @var Module $deliveryModule */
         foreach ($loopResult->getResultDataCollection() as $deliveryModule) {
             $loopResultRow = new LoopResultRow($deliveryModule);
 
-            /** @var DeliveryModuleInterface $moduleInstance */
             $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
 
             if (false === $moduleInstance instanceof DeliveryModuleInterface) {
@@ -76,27 +72,28 @@ class Delivery extends BaseSpecificModule
             }
 
             try {
-                // Check if module is valid, by calling isValidDelivery(),
-                // or catching a DeliveryException.
-
-                if ($moduleInstance->isValidDelivery($country)) {
-
-                    $postage = $moduleInstance->getPostage($country);
-
-                    $loopResultRow
-                        ->set('ID', $deliveryModule->getId())
-                        ->set('TITLE', $deliveryModule->getVirtualColumn('i18n_TITLE'))
-                        ->set('CHAPO', $deliveryModule->getVirtualColumn('i18n_CHAPO'))
-                        ->set('DESCRIPTION', $deliveryModule->getVirtualColumn('i18n_DESCRIPTION'))
-                        ->set('POSTSCRIPTUM', $deliveryModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                        ->set('POSTAGE', $postage)
-                    ;
-
-                    $loopResult->addRow($loopResultRow);
+                $postage = $moduleInstance->getPostage($country);
+            } catch (OrderException $e) {
+                switch ($e->getCode()) {
+                    case OrderException::DELIVERY_MODULE_UNAVAILABLE:
+                        /* do not show this delivery module */
+                        continue(2);
+                        break;
+                    default:
+                        throw $e;
                 }
-            } catch (DeliveryException $ex) {
-                // Module is not available
             }
+
+            $loopResultRow
+                ->set('ID', $deliveryModule->getId())
+                ->set('TITLE', $deliveryModule->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $deliveryModule->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $deliveryModule->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $deliveryModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set('POSTAGE', $postage)
+            ;
+
+            $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
