@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "92d99dbb21763697accf7050ded155b6",
+    "hash": "ec2ab661a3ce5fdb2390b9237081e929",
     "packages": [
         {
             "name": "ensepar/html2pdf",
@@ -512,24 +512,47 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "3.1.14",
+            "version": "v3.1.14",
             "source": {
                 "type": "svn",
-                "url": "http://smarty-php.googlecode.com/svn/",
-                "reference": "tags/Smarty_3_1_14/distribution/"
+                "url": "http://smarty-php.googlecode.com/svn",
+                "reference": "/tags/v3.1.14/@4752"
             },
-            "dist": {
-                "type": "zip",
-                "url": "http://www.smarty.net/files/Smarty-3.1.14.zip",
-                "reference": null,
-                "shasum": null
+            "require": {
+                "php": ">=5.2"
             },
             "type": "library",
             "autoload": {
                 "classmap": [
-                    "libs/"
+                    "distribution/libs/Smarty.class.php",
+                    "distribution/libs/SmartyBC.class.php",
+                    "distribution/libs/sysplugins/smarty_security.php"
                 ]
-            }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Monte Ohrt",
+                    "email": "monte@ohrt.com"
+                },
+                {
+                    "name": "Uwe Tews",
+                    "email": "uwe.tews@googlemail.com"
+                },
+                {
+                    "name": "Rodney Rehm",
+                    "email": "rodney.rehm@medialize.de"
+                }
+            ],
+            "description": "Smarty - the compiling PHP template engine",
+            "homepage": "http://www.smarty.net",
+            "keywords": [
+                "templating"
+            ],
+            "time": "2013-07-02 16:38:47"
         },
         {
             "name": "swiftmailer/swiftmailer",
