@@ -262,23 +262,19 @@
                     {/if}
 
                     <div class="panel-body">
-                        <ul class="list-payment">
+                        <ul class="list-group">
                             {loop type="payment" name="payments" force_return="true"}
                                 {assign "paymentModuleId" $ID}
-                                <li>
-                                    <div class="radio">
+                                <li class="list-group-item text-left">
                                         <label for="payment_{$paymentModuleId}">
-                                            <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}">
+                                            <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}" {if $LOOP_TOTAL ==1 && $LOOP_COUNT == 1}checked{/if}>
 
                                             {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
                                                 <img src="{$IMAGE_URL}" alt="{intl l="Pay with %module_title" module_title={$TITLE}}">
                                             {/loop}
 
-                                            {elseloop rel="paymentspicture"}
                                                 {intl l="Pay with %module_title" module_title={$TITLE}}
-                                            {/elseloop}
                                         </label>
-                                    </div>
                                 </li>
                             {/loop}
                         </ul>
