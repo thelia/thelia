@@ -21,7 +21,7 @@ Parameters:
                 {else}
                     {$lang_url = {url path={$page_url|default:$current_url nofilter} edit_language_id=$ID}}
                 {/if}
-		        <a class="language-change-button" data-language-id="{$ID}" href="{$lang_url nofilter}" title="{intl l='Edit information in %lng' lng=$TITLE}">
+		        <a class="language-change-button" data-language-id="{$ID}" href="{$lang_url nofilter}" title="{intl l='Edit information in %lng' lng={$TITLE}}">
 		            <img src="{image file="../assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" />
 		        </a>
 		    </li>
@@ -36,7 +36,7 @@ Parameters:
             <div class="col-md-12">
                 <div class="button-group">
                     {loop name="currency_list" type="currency"}
-                        <a class="btn btn-sm {if $ID == $edit_currency_id}btn-primary{else}btn-default{/if}" href="{url noamp=1 path='/admin/products/update' edit_currency_id=$ID product_id=$product_id current_tab='details'}" title="{intl l='Edit prices in %curr' curr=$NAME}">
+                        <a class="btn btn-sm {if $ID == $edit_currency_id}btn-primary{else}btn-default{/if}" href="{url noamp=1 path='/admin/products/update' edit_currency_id=$ID product_id=$product_id current_tab='details'}" title="{intl l='Edit prices in %curr' curr={$NAME}}">
                             {$SYMBOL}
                         </a>
                     {/loop}

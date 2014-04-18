@@ -271,11 +271,11 @@
                                             <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}">
 
                                             {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
-                                                <img src="{$IMAGE_URL}" alt="{intl l="Pay with %module_title" module_title=$TITLE}">
+                                                <img src="{$IMAGE_URL}" alt="{intl l="Pay with %module_title" module_title={$TITLE}}">
                                             {/loop}
 
                                             {elseloop rel="paymentspicture"}
-                                                {intl l="Pay with %module_title" module_title=$TITLE}
+                                                {intl l="Pay with %module_title" module_title={$TITLE}}
                                             {/elseloop}
                                         </label>
                                     </div>

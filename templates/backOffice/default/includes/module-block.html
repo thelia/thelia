@@ -91,9 +91,9 @@
                         </div>
                         <noscript>
                             {if $ACTIVE}
-                                <a title="{intl l="Deactivate %title module" title=$TITLE}" href="{url path="/admin/module/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
+                                <a title="{intl l="Deactivate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
                             {else}
-                                <a title="{intl l="activate %title module" title=$TITLE}" href="{url path="/admin/module/toggle-activation/{$ID}"}">{intl l="activation"}</a>
+                                <a title="{intl l="activate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/{$ID}"}">{intl l="activation"}</a>
                             {/if}
                         </noscript>
                     </td>

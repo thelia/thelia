@@ -162,9 +162,9 @@
                                         {loop name="order-status-list" type="order-status"}
                                             {assign "orderStatusLabel" "order_$CODE"}
                                             <li role="menuitem">
-                                                <a class="clearfix" data-target="{url path="admin/orders/$LABEL"}" href="{url path="admin/orders" status=$ID}">
+                                                <a class="clearfix" data-target="{url path="admin/orders/$LABEL"}" href="{url path="admin/orders" status={$ID}}">
                                                     <span class="pull-left">{$TITLE}</span>
-                                                    <span class="label label-{#$orderStatusLabel#} pull-right">{count type="order" customer="*" backend_context="1" status=$ID}</span>
+                                                    <span class="label label-{#$orderStatusLabel#} pull-right">{count type="order" customer="*" backend_context="1" status={$ID}}</span>
                                                 </a>
                                             </li>
                                         {/loop}

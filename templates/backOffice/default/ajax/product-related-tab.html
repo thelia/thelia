@@ -266,7 +266,7 @@
 	                    <p class="title title-without-tabs">{intl l='Additional categories'}</p>
 	                    <p>{intl l='A product could be attached to more than one category. Select here the additional categories for this product.'}
 	                    {loop name="default_category" type="category" id=$DEFAULT_CATEGORY}
-	                        {intl l='You can change the default category (%title) in the "General" tab.' title=$TITLE}
+	                        {intl l='You can change the default category (%title) in the "General" tab.' title={$TITLE}}
 	                    {/loop}
 
 	                    {$exclude_from_tree = "-1"}

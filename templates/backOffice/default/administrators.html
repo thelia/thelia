@@ -67,7 +67,7 @@
                                     <td data-field-class="js-locale">{$LOCALE}</td>
                                     <td data-field-class="js-profile" data-value="{$PROFILE}">
                                        {if $PROFILE}
-                                            {loop type="profile" name="admin-profile" id=$PROFILE}
+                                            {loop type="profile" name="admin-profile" id={$PROFILE}}
                                                 <a title="{intl l='Afficher ce profil'}" href="{url path="/admin/configuration/profiles/update/$ID"}">{$TITLE}</a>
                                             {/loop}
                                         {else}
@@ -125,21 +125,21 @@
 
     {form_field form=$form field='login'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Login'}" placeholder="{intl l='Login'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
     {form_field form=$form field='firstname'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='FirstName'}" placeholder="{intl l='FirstName'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
     {form_field form=$form field='lastname'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='LastName'}" placeholder="{intl l='LastName'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
@@ -150,21 +150,21 @@
 
     {form_field form=$form field='password'}
         <div class="form-group {if $passwordError}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="password" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Password'}" class="form-control">
         </div>
     {/form_field}
 
     {form_field form=$form field='password_confirm'}
         <div class="form-group {if $passwordError}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="password" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Password'}" class="form-control">
         </div>
     {/form_field}
 
     {form_field form=$form field='locale'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
             <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker">
                 {loop name='lang-admin' type="lang"}
@@ -177,7 +177,7 @@
 
     {form_field form=$form field='profile'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
             <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker">
                 {foreach $choices as $choice}
@@ -229,21 +229,21 @@
 
     {form_field form=$form field='login'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Login'}" placeholder="{intl l='Login'}" class="form-control js-login" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
     {form_field form=$form field='firstname'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='FirstName'}" placeholder="{intl l='FirstName'}" class="form-control js-firstname" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
     {form_field form=$form field='lastname'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='LastName'}" placeholder="{intl l='LastName'}" class="form-control js-lastname" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
@@ -254,21 +254,21 @@
 
     {form_field form=$form field='password'}
         <div class="form-group {if $passwordError}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="password" id="{$label_attr.for}" name="{$name}" title="{intl l='Password'}" placeholder="{intl l='Leave empty to keep current password'}" class="form-control">
         </div>
     {/form_field}
 
     {form_field form=$form field='password_confirm'}
         <div class="form-group {if $passwordError}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="password" id="{$label_attr.for}" name="{$name}" title="{intl l='Password'}" placeholder="{intl l='Leave empty to keep current password'}" class="form-control">
         </div>
     {/form_field}
 
     {form_field form=$form field='locale'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label}: </label>
+            <label for="{$label_attr.for}" class="control-label">{$label}: </label>
 
             <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker">
                 {loop name='lang-admin' type="lang"}
@@ -281,7 +281,7 @@
 
     {form_field form=$form field='profile'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
             <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker" class="js-profile">
                 {foreach $choices as $choice}

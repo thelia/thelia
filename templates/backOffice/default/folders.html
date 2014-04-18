@@ -22,7 +22,7 @@
                         <caption>
                             {* display parent folder name, and get current folder ID *}
                             {loop name="folder_title" type="folder" visible="*" id=$parent}
-                                {intl l="Folders in %fold" fold=$TITLE}
+                                {intl l="Folders in %fold" fold={$TITLE}}
                                 {$fold_id = $ID}
                             {/loop}
                             {elseloop rel="folder_title"}
@@ -191,7 +191,7 @@
                         <caption>
                             {* display parent folder name *}
                             {loop name="folder_title" type="folder" visible="*" id=$parent}
-                            {intl l="Contents in %fold" fold=$TITLE}
+                            {intl l="Contents in %fold" fold={$TITLE}}
                             {/loop}
 
                             {elseloop rel="folder_title"}

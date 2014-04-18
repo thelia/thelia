@@ -59,7 +59,7 @@
                                             {/loop}
                                             {$countries = ltrim($countries, ', ')}
 
-                                            <span class="badge" title="{$countries}">{intl l="%count more..." count=$ctry_count}</span>
+                                            <span class="badge" title="{$countries}">{intl l="%count more..." count={$ctry_count}}</span>
                                         {/ifloop}
                                     </td>
 

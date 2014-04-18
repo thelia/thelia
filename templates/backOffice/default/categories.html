@@ -22,7 +22,7 @@
                              <caption>
                                  {* display parent category name, and get current cat ID *}
                                  {loop name="category_title" type="category" visible="*" id=$category_id}
-                                     {intl l="Categories in %cat" cat=$TITLE}
+                                     {intl l="Categories in %cat" cat={$TITLE}}
                                      {$cat_id = $ID}
                                  {/loop}
                                  {elseloop rel="category_title"}
@@ -192,7 +192,7 @@
                      <caption>
                          {* display parent category name *}
                          {loop name="category_title" type="category" visible="*" id=$category_id}
-                             {intl l="Products in %cat" cat=$TITLE}
+                             {intl l="Products in %cat" cat={$TITLE}}
                          {/loop}
 
                          {elseloop rel="category_title"}
@@ -505,7 +505,7 @@
 					    </div>
 					</div>
 
-					<div class="help-block">{intl l='Enter here the product price in %title' title=$NAME}</div>
+					<div class="help-block">{intl l='Enter here the product price in %title' title={$NAME}}</div>
 
 			        {form_field form=$form field='currency'}
 			            <input type="hidden" name="{$name}" value="{$ID}" />
@@ -529,7 +529,7 @@
 					    </div>
 					</div>
 
-					<div class="help-block">{intl l='Enter here the product tax price in %title' title=$NAME}</div>
+					<div class="help-block">{intl l='Enter here the product tax price in %title' title={$NAME}}</div>
 				{/loop}
             </div>
         {/form_field}
