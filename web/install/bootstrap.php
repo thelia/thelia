@@ -23,5 +23,9 @@
 define('THELIA_INSTALL_MODE', true);
 include __DIR__ . "/../../core/bootstrap.php";
 
+if (file_exists(THELIA_ROOT . '/local/config/database.yml')) {
+    throw new \Thelia\Install\Exception\AlreadyInstallException("Thelia is already installed");
+}
+
 $thelia = new \Thelia\Core\Thelia("install", false);
 $thelia->boot();
