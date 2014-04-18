@@ -23,6 +23,7 @@
 namespace Front\Controller;
 
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Cart\CartTrait;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Translation\Translator;
@@ -36,7 +37,7 @@ use Thelia\Form\OrderPayment;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
-use Thelia\Model\Base\OrderQuery;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
@@ -281,18 +282,39 @@ class OrderController extends BaseFrontController
 
     public function generateInvoicePdf($order_id)
     {
-        /* check customer */
-        $this->checkAuth();
+        $this->checkOrderCustomer($order_id);
+
 
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
     }
 
     public function generateDeliveryPdf($order_id)
     {
-        /* check customer */
-        $this->checkAuth();
+        $this->checkOrderCustomer($order_id);
 
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
+    }
+
+    private function checkOrderCustomer($order_id)
+    {
+        $this->checkAuth();
+
+        $order = OrderQuery::create()->findPk($order_id);
+        $valid = true;
+        if ($order) {
+            $customerOrder = $order->getCustomer();
+            $customer = $this->getSecurityContext()->getCustomerUser();
+
+            if ($customerOrder->getId() != $customer->getId()) {
+                $valid = false;
+            }
+        } else {
+            $valid = false;
+        }
+
+        if (false === $valid) {
+            throw new AccessDeniedHttpException();
+        }
     }
 
     public function getDeliveryModuleListAjaxAction()
