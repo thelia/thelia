@@ -25,15 +25,14 @@ namespace Colissimo;
 
 use Colissimo\Model\ColissimoFreeshippingQuery;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\OrderException;
 use Thelia\Install\Database;
 use Thelia\Model\Country;
-use Thelia\Module\BaseModule;
-use Thelia\Module\DeliveryModuleInterface;
+use Thelia\Module\AbstractDeliveryModule;
+use Thelia\Module\Exception\DeliveryException;
 
-class Colissimo extends BaseModule implements DeliveryModuleInterface
+class Colissimo extends AbstractDeliveryModule
 {
     protected $request;
     protected $dispatcher;
@@ -44,11 +43,36 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
 
     public static function getPrices()
     {
-        if(null === self::$prices) {
+        if (null === self::$prices) {
             self::$prices = json_decode(file_get_contents(sprintf('%s%s', __DIR__, self::JSON_PRICE_RESOURCE)), true);
         }
 
         return self::$prices;
+    }
+
+    public function isValidDelivery(Country $country) {
+
+        $areaId = $country->getAreaId();
+
+        $prices = self::getPrices();
+
+        /* Check if Colissimo delivers the area */
+        if (isset($prices[$areaId]) && isset($prices[$areaId]["slices"])) {
+
+            // Yes ! Check if the cart weight is below slice limit
+            $areaPrices = $prices[$areaId]["slices"];
+            ksort($areaPrices);
+
+            /* Check cart weight is below the maximum weight */
+            end($areaPrices);
+            $maxWeight = key($areaPrices);
+
+            $cartWeight = $this->getRequest()->getSession()->getCart()->getWeight();
+
+            if ($cartWeight <= $maxWeight) return true;
+        }
+
+        return false;
     }
 
     /**
@@ -61,29 +85,36 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
     public static function getPostageAmount($areaId, $weight)
     {
         $freeshipping = ColissimoFreeshippingQuery::create()->getLast();
-        $postage=0;
-        if(!$freeshipping) {
+        $postage = 0;
+        if (!$freeshipping) {
             $prices = self::getPrices();
 
             /* check if Colissimo delivers the asked area */
-            if(!isset($prices[$areaId]) || !isset($prices[$areaId]["slices"])) {
-                throw new OrderException("Colissimo delivery unavailable for the chosen delivery country", OrderException::DELIVERY_MODULE_UNAVAILABLE);
+            if (!isset($prices[$areaId]) || !isset($prices[$areaId]["slices"])) {
+                throw new DeliveryException(
+                    Translator::getInstance()->trans("Colissimo delivery unavailable for the delivery country")
+                );
             }
 
             $areaPrices = $prices[$areaId]["slices"];
             ksort($areaPrices);
 
-            /* check this weight is not too much */
+            /* Check cart weight is below the maximum weight */
             end($areaPrices);
             $maxWeight = key($areaPrices);
-            if($weight > $maxWeight) {
-                throw new OrderException(sprintf("Colissimo delivery unavailable for this cart weight (%s kg)", $weight), OrderException::DELIVERY_MODULE_UNAVAILABLE);
+            if ($weight > $maxWeight) {
+                throw new DeliveryException(
+                    Translator::getInstance()->trans(
+                        "Colissimo delivery unavailable for this cart weight (%weight kg)",
+                        array("%weight" => $weight)
+                    )
+                );
             }
 
             $postage = current($areaPrices);
 
-            while(prev($areaPrices)) {
-                if($weight > key($areaPrices)) {
+            while (prev($areaPrices)) {
+                if ($weight > key($areaPrices)) {
                     break;
                 }
 
@@ -94,29 +125,9 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
 
     }
 
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
-    }
-
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
     public function postActivation(ConnectionInterface $con = null)
     {
-        $database = new Database($con->getWrappedConnection());
+        $database = new Database($con);
 
         $database->insertSql(null, array(__DIR__ . '/Config/thelia.sql'));
     }
@@ -131,7 +142,7 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
      */
     public function getPostage(Country $country)
     {
-        $cartWeight = $this->getContainer()->get('request')->getSession()->getCart()->getWeight();
+        $cartWeight = $this->getRequest()->getSession()->getCart()->getWeight();
 
         $postage = self::getPostageAmount(
             $country->getAreaId(),
@@ -140,10 +151,4 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
 
         return $postage;
     }
-
-    public function getCode()
-    {
-        return 'Colissimo';
-    }
-
 }
