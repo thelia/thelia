@@ -1,0 +1,52 @@
+#########################################################################
+#
+#	Pathfile 
+#
+#	Liste fichiers parametres utilises par le module de paiement
+#
+#########################################################################
+#
+#
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+#
+####NE PAS TOUCHER QUOI QUIL EN SOIT
+DEBUG!YES!
+#
+# ------------------------------------------------------------------------
+# Chemin vers le repertoire des logos depuis le web alias  
+# Exemple pour le repertoire www.merchant.com/e-transactions/payment/logo/
+# indiquer: Attention vous devriez uploader les images dans le repertoire
+# en question, les images sont disponibles dans le repertoire logo du
+# module, je vous conseil de ne rien toucher et de juste uploader le
+# repertoire logo directement dans la racine du dossier web /web par default
+# ------------------------------------------------------------------------
+#
+D_LOGO!/logo/!
+#
+# --------------------------------------------------------------------------
+#  Fichiers parametres lies a l'api ATOS
+# --------------------------------------------------------------------------
+#
+# fichier des  parametres ATOS il suffit de saisir le CHEMIN ABSOLU
+# je dis bien absolue , ce qui veut dire que vous devez utiliser la fonction
+# phpinfo() si vous avez pas de serveur dedie cela vous permetra de connaitre
+# le chemin absolu /local/modules/Cbatos.... ne change pas vous devez juste
+# renseigner le chemin absolu jusquau repertoire local
+# le fichier dans cette exemple et pour etransaction du credit agricole
+# mais generalement cest universelle
+#
+F_DEFAULT!/home/knjhairf/public_html/local/modules/Cbatos/parm/parmcom.e-transactions!
+#
+# fichier parametre commercantn pareil que au dessus
+#
+F_PARAM!/home/knjhairf/public_html/local/modules/Cbatos/parm/parmcom!
+#
+# certificat du commercant
+# pareil la encore mais cela concerne votre certificat que la banque vous donne
+# il faut luploader dans le repertoire parm du module
+F_CERTIFICATE!/home/knjhairf/public_html/local/modules/Cbatos/parm/certif!
+#
+# --------------------------------------------------------------------------
+# 	end of file
+# --------------------------------------------------------------------------

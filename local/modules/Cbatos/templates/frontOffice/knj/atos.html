@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+{extends file="layout.tpl"}
+{* Body Class *}
+{block name="body-class"}body-background2 content-font dark-color{/block}
+* Page Title *}
+{block name='no-return-functions' append}
+    {loop name="product.seo.title" type="product" id="{product attr="id"}"}
+    {$page_title = {intl l="Payment by Credit cards"}}
+    {/loop}
+{/block}
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['title' => {intl l="Your method of the payment"}, 'url'=>{url path="/cbatos/paid"}]
+    ]}
+{/block}
+
+{block name="main-content"} 
+       <a id="top"></a>
+       
+       
+       
+       
+       
+       
+       
+       <section class="page-content">
+           
+           
+           
+           <!-- Page block content  -->
+           <div class="page-block page-block-bottom cream-bg grid-container">
+
+
+{$error nofilter}
+{$formulaire nofilter}
+
+</div></section>
+{/block}

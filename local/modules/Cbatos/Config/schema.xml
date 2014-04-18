@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database defaultIdMethod="native" name="thelia" namespace="Cbatos\Model">
+
+
+<table name="atos_log">
+        <column name="id" primaryKey="true" autoIncrement="true" required="true" type="INTEGER" />
+        <column name="contenu" required="true" type="TEXT" />
+        <behavior name="timestampable" />
+    </table>
+
+<table name="atos_config">
+<column name="id" primaryKey="true" autoIncrement="true" required="true" type="INTEGER" />
+<column name="merchantidcontract" required="true" type="TEXT" />
+<column name="banking" required="true" type="TEXT" />
+</table>
+
+
+
+    <!--
+    See propel documentation on http://propelorm.org for all information about schema file
+    -->
+    <external-schema filename="local/config/schema.xml" referenceOnly="true" />
+</database>

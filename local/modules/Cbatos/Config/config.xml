@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <loops>
+<loop name="cbatos.check.rights" class="Cbatos\Loop\CheckRightsLoop" />
+        <!-- sample definition
+        <loop name="MySuperLoop" class="MyModule\Loop\MySuperLoop" />
+        -->
+    </loops>
+
+    <forms>
+<form name="cbatos.configure" class="Cbatos\Form\ConfigureCbatos"/>
+        <!--
+        <form name="MyFormName" class="MyModule\Form\MySuperForm" />
+        -->
+    </forms>
+
+    <commands>
+        <!--
+        <command class="MyModule\Command\MySuperCommand" />
+        -->
+    </commands>
+
+<services>
+        <service id="send.cbatos.mail" class="Cbatos\Listener\SendEMail" scope="request">
+            <argument type="service" id="thelia.parser" />
+            <argument type="service" id="mailer"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+    </services>
+</config>

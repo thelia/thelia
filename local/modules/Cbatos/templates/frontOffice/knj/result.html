@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+{extends file="layout.tpl"}
+{* Body Class *}
+{block name="body-class"}body-background2 content-font dark-color{/block}
+{* Security *}
+{block name="no-return-functions" prepend}
+{/block}
+{* Page Title *}
+{block name='no-return-functions' append}
+    {loop name="product.seo.title" type="product" id="{product attr="id"}"}
+    {$page_title = {intl l="Payment by Credit cards"}}
+    {/loop}
+{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+{$breadcrumbs = [
+['title' => {intl l="Redirect to bank service"}]
+]}
+{/block}
+
+{block name="main-content"} 
+       <a id="top"></a>
+       
+       
+       
+       
+       
+       
+       
+       <section class="page-content">
+           
+           
+           
+           <!-- Page block content  -->
+           <div class="page-block page-block-bottom cream-bg grid-container">
+<br>
+
+{if $codebanqueb}
+<center><H2 style="color:red;">{$msg}</h2></center>
+<br>
+<br>
+<span style="color:red;">{intl l="Your bank avec declined your transaction because said"} : <b>{$codebanqueb}</b></span>
+<br>
+<br>
+<b>{intl l="Please try again or call your customer sale to 090909000009"}</b>
+{/if}
+{if !$codebanqueb}
+<center><h2 style="color:green;">{$msg}</h2></center>
+<br><br><br>
+
+{loop name="badresponseorder" type="order" id={$order_id}}
+{intl l="Your order is register"}<br>
+{intl l="Your order number is :"} {$REF}
+            {/loop}
+<br>
+<br>
+{intl l="Thanks your for"}
+{/if}
+
+</div></section>
+{/block}

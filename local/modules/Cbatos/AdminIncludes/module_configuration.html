@@ -1,0 +1,156 @@
+<div class="row">
+    <!-- Errors -->
+    {loop name="checkrights" type="cbatos.check.rights"}
+    <div class="alert alert-danger">
+        <p>{$ERRMES}  {$ERRFILE} | {intl l="Please change the access rights"}.</p>
+    </div>
+    {/loop}
+</div>
+{elseloop rel="checkrights"}
+<h2>{intl l="Configuration de Atos"}</h2>
+<div class="form-container general-block-decorator">
+{form name="cbatos.configure"}
+	<form action="{url path="/admin/module/Cbatos/saveconfig"}" method="POST" {form_enctype form=$form}>
+		{form_hidden_fields form=$form}
+
+        {form_field form=$form field="MerchantId"}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">
+                {$label} :
+            </label>
+
+            <input type="text" id="{$label_attr.for}" name="{$name}" value="{$value}" placeholder="{intl l="Your Merchant Id"}" class="form-control" />
+        </div>
+        {/form_field}
+	{form_field form=$form field="Urlretour"}
+	<div class="form-group {if $error}has-error{/if}">
+	<label for="{$label_attr.for}" class="control-label">
+{$label} :
+</label>
+	    <input type="text" id="{$label_attr.for}" name="{$name}" value="{$value}" placeholder="{intl l="Url return back Atos"}" class="form-control" />
+</div>	
+{/form_field}
+
+{form_field form=$form field="Urlautomatic"}
+        <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">
+{$label} :
+</label>
+            <input type="text" id="{$label_attr.for}" name="{$name}" value="{$value}" placeholder="{intl l="Url return automatic Atos"}" class="form-control" />
+</div>
+{/form_field}
+
+{form_field form=$form field="Capturedays"}
+        <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">
+{$label} :
+</label>
+
+<select name="{$name}" id="{$label_attr.for}" class="form-control">
+  <option value="00" {if $value eq "00"}slected="selected"{/if}>{intl l="Immediate charge"}</option>
+  <option value="1" {if $value eq "1"}selected="selected"{/if}>1 {intl l="day"}</option>
+  <option value="2" {if $value eq "2"}selected="selected"{/if}>2 {intl l="days"}</option>
+<option value="3" {if $value eq "3"}selected="selected"{/if}>3 {intl l="days"}</option>
+<option value="4" {if $value eq "4"}selected="selected"{/if}>4 {intl l="days"}</option>
+<option value="5" {if $value eq "5"}selected="selected"{/if}>5 {intl l="days"}</option>
+
+</select>
+</div>
+{/form_field}
+
+{form_field form=$form field="Devises"}
+        <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">
+{$label} :
+</label>
+
+<select name="{$name}" id="{$label_attr.for}" class="form-control">
+  <option value="978" {if $value eq "978"}selected="selected"{/if}>{intl l="EUR"}</option>
+  <option value="840" {if $value eq "840"}selected="selected"{/if}>{intl l="USD"}</option>
+
+</select>
+</div>
+{/form_field}
+
+
+
+
+{form_field form=$form field="Customermail"}
+        <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">
+{$label} :
+</label>
+
+<select name="{$name}" id="{$label_attr.for}" class="form-control">
+  <option value="1" {if $value eq "1"}selected="selected"{/if}>{intl l="NON"}</option>
+  <option value="2" {if $value eq "2"}selected="selected"{/if}>{intl l="OUI"}</option>
+
+</select>
+</div>
+{/form_field}
+
+
+{form_field form=$form field="Customerid"}
+        <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">
+{$label} :
+</label>
+
+<select name="{$name}" id="{$label_attr.for}" class="form-control">
+  <option value="1" {if $value eq "1"}selected="selected"{/if}>{intl l="NON"}</option>
+  <option value="2" {if $value eq "2"}selected="selected"{/if}>{intl l="OUI"}</option>
+
+</select>
+</div>
+{/form_field}
+
+
+{form_field form=$form field="Customerip"}
+        <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">
+{$label} :
+</label>
+
+<select name="{$name}" id="{$label_attr.for}" class="form-control">
+  <option value="1" {if $value eq "1"}selected="selected"{/if}>{intl l="NON"}</option>
+  <option value="2" {if $value eq "2"}selected="selected"{/if}>{intl l="OUI"}</option>
+
+</select>
+</div>
+{/form_field}
+
+ {form_field form=$form field="PathBin"}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">
+                {$label} :
+            </label>
+
+            <input type="text" id="{$label_attr.for}" name="{$name}" value="{$value}" placeholder="{intl l="Your Path File Bin Request and Responses"}" class="form-control" />
+        </div>
+        {/form_field}
+
+
+{form_field form=$form field="Modedebug"}
+        <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">
+{$label} :
+</label>
+
+<select name="{$name}" id="{$label_attr.for}" class="form-control">
+  <option value="1" {if $value eq "1"}selected="selected"{/if}>{intl l="NON"}</option>
+  <option value="2" {if $value eq "2"}selected="selected"{/if}>{intl l="OUI"}</option>
+
+</select>
+</div>
+{/form_field}
+
+
+
+
+		<div class="form-group">
+			<button type="submit" name="save_mode" value="stay" class="form-submit-button btn btn-sm btn-default btn-success" title="{intl l="Save"}">{intl l="Save"} <span class="glyphicon glyphicon-ok"></span></button>
+		</div>
+	</form>
+{/form}
+</div>
+{/elseloop}
