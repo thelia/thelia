@@ -120,7 +120,7 @@
                                     </thead>
 
                                     <tbody>
-                                    {loop name="customer_list" type="customer" current="false" visible="*" order=$customer_order backend_context="1" page=$page limit=$display_customer}
+                                    {loop name="customer_list" type="customer" current="false" visible="*" order=$customer_order backend_context="1" page=$page limit=#max_displayed_customers#}
                                         {assign "lastOrderDate" ''}
                                         {assign "lastOrderAmount" ''}
                                         {assign "lastOrderCurrency" ''}
@@ -179,34 +179,13 @@
                                     <tfoot>
                                         <tr>
                                             <td colspan="6">
+                                                {include
+                                                    file = "includes/pagination.html"
 
-                                                <div class="text-center">
-                                                    <ul class="pagination pagination-centered">
-
-                                                    {if $page != 1}
-                                                        <li><a href="{url path="/admin/customers" page="1"}">&laquo;</a></li>
-                                                    {/if}
-                                                    {pageloop rel="customer_list" numPage="20"}
-                                                        {if $PAGE == $CURRENT && $PAGE > 2}
-                                                            <li><a href="{url path="/admin/customers" page=$PREV}">&lsaquo;</a></li>
-                                                        {/if}
-
-                                                        {if $PAGE != $CURRENT}
-                                                            <li><a href="{url path="/admin/customers" page="{$PAGE}"}">{$PAGE}</a></li>
-
-                                                        {else}
-                                                            <li class="active"><a href="#">{$PAGE}</a></li>
-                                                        {/if}
-
-                                                        {if $PAGE == $END && $PAGE < $LAST}
-                                                            <li><a href="{url path="/admin/customers" page=$NEXT}">&rsaquo;</a></li>
-                                                        {/if}
-                                                    {/pageloop}
-                                                        {if $LAST > $CURRENT}
-                                                            <li><a href="{url path="/admin/customers" page="$LAST"}">&raquo;</a></li>
-                                                        {/if}
-                                                    </ul>
-                                                </div>
+                                                    loop_ref       = "customer_list"
+                                                    max_page_count = 10
+                                                    page_url       = "{url path="/admin/customers" customer_order=$customer_order}"
+                                                }
 
                                             </td>
                                         </tr>
