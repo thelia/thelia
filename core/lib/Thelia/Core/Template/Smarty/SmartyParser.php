@@ -239,11 +239,27 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function render($realTemplateName, array $parameters = array())
     {
-        if (false === $this->templateExists($realTemplateName)) {
+        if (false === $this->templateExists($realTemplateName) || false === $this->checkTemplate($realTemplateName)) {
             throw new ResourceNotFoundException(Translator::getInstance()->trans("Template file %file cannot be found.", array('%file' => $realTemplateName)));
         }
-
         return $this->internalRenderer('file', $realTemplateName, $parameters);
+
+    }
+
+    private function checkTemplate($fileName)
+    {
+        $templates = $this->getTemplateDir();
+
+        $found = true;
+        foreach ($templates as $key => $value) {
+            $absolutePath = rtrim(realpath(dirname($value.$fileName)), "/");
+            $templateDir =  rtrim(realpath($value), "/");
+            if (!empty($absolutePath) && strpos($absolutePath, $templateDir) !== 0) {
+                $found = false;
+            }
+        }
+
+       return $found;
     }
 
     /**
