@@ -33,30 +33,6 @@ use Thelia\Tools\URL;
 abstract class AbstractPaymentModule extends BaseModule implements PaymentModuleInterface
 {
     /**
-     *  This method is called when the payment gateway needs to be invoked.
-     *
-     * If this method return a Response instance, this response is sent to the browser. Return null if you don't want to
-     * send a response and process the payment yourself.
-     *
-     * In many cases, it's necessary to send a form to the payment gateway. On your response you can return this form already
-     * completed, ready to be sent, instead of redirecting. The generateGatewayFormResponse() may help you in this case :)
-     *
-     * @param  Order         $order processed order
-     * @return null|Response
-     */
-    abstract public function pay(Order $order);
-
-    /**
-     * This method is called by the Payment loop, to check if the current module has to be displayed to the customer
-     *
-     * If you return true, the payment method will de displayed to the customed
-     * If you return false, the payment method will not be displayed
-     *
-     * @return boolean
-     */
-    abstract public function isValidPayment();
-
-    /**
      * Render the payment gateway template. The module should provide the gateway URL and the form fields names and values.
      *
      * @param Order  $order       the order
