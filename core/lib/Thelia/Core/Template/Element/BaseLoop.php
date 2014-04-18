@@ -14,10 +14,13 @@ namespace Thelia\Core\Template\Element;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Collection\ObjectCollection;
+use Propel\Runtime\Util\PropelModelPager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\LoopException;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Translation\Translator;
 use Thelia\Type\EnumListType;
 use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
@@ -53,8 +56,11 @@ abstract class BaseLoop
     protected $timestampable = false;
     protected $versionable = false;
 
-    private static $cacheLoopResult = array();
-    private static $cacheCount = array();
+    /** @var Translator  */
+    protected $translator = null;
+
+    private static $cacheLoopResult = [];
+    private static $cacheCount = [];
 
     /**
      * Create a new Loop
@@ -70,6 +76,7 @@ abstract class BaseLoop
         $this->request = $container->get('request');
         $this->dispatcher = $container->get('event_dispatcher');
         $this->securityContext = $container->get('thelia.securityContext');
+        $this->translator = $container->get("thelia.translator");
 
         $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
     }
@@ -81,53 +88,54 @@ abstract class BaseLoop
      */
     protected function getDefaultArgs()
     {
-        $defaultArgs = array(
+        $defaultArgs = [
             Argument::createBooleanTypeArgument('backend_context', false),
             Argument::createBooleanTypeArgument('force_return', false),
             Argument::createAnyTypeArgument('type'),
-        );
+        ];
 
         if (true === $this->countable) {
-            $defaultArgs = array_merge($defaultArgs, array(
-                Argument::createIntTypeArgument('offset', 0),
-                Argument::createIntTypeArgument('page'),
-                Argument::createIntTypeArgument('limit', PHP_INT_MAX),
-            ));
+            $defaultArgs = array_merge($defaultArgs, [
+                    Argument::createIntTypeArgument('offset', 0),
+                    Argument::createIntTypeArgument('page'),
+                    Argument::createIntTypeArgument('limit', PHP_INT_MAX),
+                ]);
         }
 
         if ($this instanceof SearchLoopInterface) {
-            $defaultArgs = array_merge($defaultArgs, array(
-                Argument::createAnyTypeArgument('search_term'),
-                new Argument(
-                    'search_in',
-                    new TypeCollection(
-                        new EnumListType($this->getSearchIn())
-                    )
-                ),
-                new Argument(
-                    'search_mode',
-                    new TypeCollection(
-                        new EnumType(array(
-                            SearchLoopInterface::MODE_ANY_WORD,
-                            SearchLoopInterface::MODE_SENTENCE,
-                            SearchLoopInterface::MODE_STRICT_SENTENCE,
-                        ))
+
+            $defaultArgs = array_merge($defaultArgs, [
+                    Argument::createAnyTypeArgument('search_term'),
+                    new Argument(
+                        'search_in',
+                        new TypeCollection(
+                            new EnumListType($this->getSearchIn())
+                        )
                     ),
-                    SearchLoopInterface::MODE_STRICT_SENTENCE
-                )
-            ));
+                    new Argument(
+                        'search_mode',
+                        new TypeCollection(
+                            new EnumType([
+                                SearchLoopInterface::MODE_ANY_WORD,
+                                SearchLoopInterface::MODE_SENTENCE,
+                                SearchLoopInterface::MODE_STRICT_SENTENCE,
+                            ])
+                        ),
+                        SearchLoopInterface::MODE_STRICT_SENTENCE
+                    )
+                ]);
         }
 
         return $defaultArgs;
     }
 
     /**
-     * Provides a getter to loop parameters
+     * Provides a getter to loop parameter values
      *
-     * @param string $name the methode name (only getArgname is supported)
-     * @param $arguments this parameter is ignored
+     * @param string $name     the method name (only getArgname is supported)
+     * @param mixed $arguments this parameter is ignored
      *
-     * @return null
+     * @return mixed the argument value
      * @throws \InvalidArgumentException if the parameter is unknown or the method name is not supported.
      */
     public function __call($name, $arguments)
@@ -137,10 +145,12 @@ abstract class BaseLoop
             // camelCase to underscore: getNotEmpty -> not_empty
             $argName = strtolower(preg_replace('/([^A-Z])([A-Z])/', "$1_$2", substr($name, 3)));
 
-            return $this->getArg($argName)->getValue();
+            return $this->getArgValue($argName);
         }
 
-        throw new \InvalidArgumentException(sprintf("Unsupported magic method %s. only getArgname() is supported.", $name));
+        throw new \InvalidArgumentException(
+            $this->translator->trans("Unsupported magic method %name. only getArgname() is supported.", ['%name' => $name])
+        );
     }
 
     /**
@@ -148,12 +158,12 @@ abstract class BaseLoop
      *
      * @param array $nameValuePairs a array of name => value pairs. The name is the name of the argument.
      *
-     * @throws \InvalidArgumentException if somùe argument values are missing, or invalid
+     * @throws \InvalidArgumentException if some argument values are missing, or invalid
      */
     public function initializeArgs(array $nameValuePairs)
     {
-        $faultActor = array();
-        $faultDetails = array();
+        $faultActor = [];
+        $faultDetails = [];
 
         $loopType = isset($nameValuePairs['type']) ? $nameValuePairs['type'] : "undefined";
         $loopName = isset($nameValuePairs['name']) ? $nameValuePairs['name'] : "undefined";
@@ -167,19 +177,38 @@ abstract class BaseLoop
             /* check if mandatory */
             if ($value === null && $argument->mandatory) {
                 $faultActor[] = $argument->name;
-                $faultDetails[] = sprintf('"%s" parameter is missing in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
+                $faultDetails[] = $this->translator->trans(
+                    '"%param" parameter is missing in loop type: %type, name: %name', [
+                        '%param' => $argument->name,
+                        '%type' => $loopType,
+                        '%name' => $loopName
+                    ]
+                );
             } else  if ($value === '') {
                 if (!$argument->empty) {
                     /* check if empty */
                     $faultActor[] = $argument->name;
-                    $faultDetails[] = sprintf('"%s" parameter cannot be empty in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
+                    $faultDetails[] = $this->translator->trans(
+                        '"%param" parameter cannot be empty in loop type: %type, name: %name', [
+                            '%param' => $argument->name,
+                            '%type' => $loopType,
+                            '%name' => $loopName
+                        ]
+                    );
                 }
             } elseif ($value !== null && !$argument->type->isValid($value)) {
                 /* check type */
                 $faultActor[] = $argument->name;
-                $faultDetails[] = sprintf('Invalid value "%s" for "%s" argument in loop type: %s, name: %s', $value, $argument->name, $loopType, $loopName);
+                $faultDetails[] = $this->translator->trans(
+                    'Invalid value "%value" for "%param" parameter in loop type: %type, name: %name', [
+                        '%value' => $value,
+                        '%param' => $argument->name,
+                        '%type' => $loopType,
+                        '%name' => $loopName
+                    ]
+                );
             } else {
-                /* set default */
+                /* set default value */
                 /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */
                 if ($value === null) {
                     $value = $argument->default;
@@ -189,9 +218,9 @@ abstract class BaseLoop
             }
         }
 
-        if (!empty($faultActor)) {
-
+        if (! empty($faultActor)) {
             $complement = sprintf('[%s]', implode(', ', $faultDetails));
+
             throw new \InvalidArgumentException($complement);
         }
     }
@@ -201,15 +230,17 @@ abstract class BaseLoop
      *
      * @param string $argumentName the argument name
      *
+     * @return Argument the loop argument.
      * @throws \InvalidArgumentException if argument is not found in loop argument list
-     * @return Argument                  the loop argument.
      */
     protected function getArg($argumentName)
     {
         $arg = $this->args->get($argumentName);
 
         if ($arg === null)
-            throw new \InvalidArgumentException("Undefined loop argument '$argumentName'");
+            throw new \InvalidArgumentException(
+                $this->translator->trans('Undefined loop argument "%name"', ['%name' => $argumentName])
+            );
 
         return $arg;
     }
@@ -220,7 +251,7 @@ abstract class BaseLoop
      * @param string $argumentName the argument name
      *
      * @throws \InvalidArgumentException if argument is not found in loop argument list
-     * @return Argument                  the loop argument.
+     * @return mixed the loop argument value
      */
     protected function getArgValue($argumentName)
     {
@@ -228,20 +259,24 @@ abstract class BaseLoop
     }
 
     /**
-     * @param ModelCriteria $search
-     * @param null          $pagination
+     * @param ModelCriteria    $search     the search request
+     * @param PropelModelPager $pagination the pagination part
      *
-     * @return array|mixed|\PropelModelPager|\PropelObjectCollection
+     * @return array|PropelModelPager|ObjectCollection
+     * @throws \InvalidArgumentException if the search mode is undefined.
      */
     protected function search(ModelCriteria $search, &$pagination = null)
     {
         if (false === $this->countable) {
             return $search->find();
         }
+
         if ($this instanceof SearchLoopInterface) {
-            $searchTerm = $this->getSearch_term();
-            $searchIn = $this->getSearch_in();
-            $searchMode = $this->getSearch_mode();
+
+            $searchTerm = $this->getArgValue('search_term');
+            $searchIn   = $this->getArgValue('search_in');
+            $searchMode = $this->getArgValue('search_mode');
+
             if (null !== $searchTerm && null !== $searchIn) {
 
                 switch ($searchMode) {
@@ -256,6 +291,10 @@ abstract class BaseLoop
                     case SearchLoopInterface::MODE_STRICT_SENTENCE:
                         $searchCriteria = Criteria::EQUAL;
                         break;
+                    default:
+                        throw new \InvalidArgumentException(
+                            $this->translator->trans("Undefined search mode '%mode'", ['%mode' => $searchMode])
+                        );
                 }
 
                 $this->doSearch($search, $searchTerm, $searchIn, $searchCriteria);
@@ -269,24 +308,31 @@ abstract class BaseLoop
         }
     }
 
-    protected function searchArray(array $search, &$pagination = null)
+    protected function searchArray(array $search)
     {
         if (false === $this->countable) {
             return $search;
         }
+
+        $limit  = intval($this->getArgValue('limit'));
+        $offset = intval($this->getArgValue('offset'));
+
         if ($this->getArgValue('page') !== null) {
 
-            $nbPage = ceil(count($search)/$this->getArgValue('limit'));
-            if ($this->getArgValue('page') > $nbPage || $this->getArgValue('page') <= 0) {
-                return array();
+            $pageNum = intval($this->getArgValue('page'));
+
+            $totalPageCount = ceil(count($search) / $limit);
+
+            if ($pageNum > $totalPageCount || $pageNum <= 0) {
+                return [];
             }
 
-            $firstItem = ($this->getArgValue('page')-1) * $this->getArgValue('limit') + 1;
+            $firstItem = ($pageNum - 1) * $limit + 1;
 
-            return array_slice($search, $firstItem, $firstItem + $this->getArgValue('limit'), false);
+            return array_slice($search, $firstItem, $firstItem + $limit, false);
 
         } else {
-            return array_slice($search, $this->getArgValue('offset'), $this->getArgValue('limit'), false);
+            return array_slice($search, $offset, $limit, false);
 
         }
     }
@@ -294,30 +340,36 @@ abstract class BaseLoop
     /**
      * @param ModelCriteria $search
      *
-     * @return array|mixed|\PropelObjectCollection
+     * @return ObjectCollection
      */
     protected function searchWithOffset(ModelCriteria $search)
     {
-        if ($this->getArgValue('limit') >= 0) {
-            $search->limit($this->getArgValue('limit'));
+        $limit = intval($this->getArgValue('limit'));
+
+        if ($limit >= 0) {
+            $search->limit($limit);
         }
-        $search->offset($this->getArgValue('offset'));
+
+        $search->offset(intval($this->getArgValue('offset')));
 
         return $search->find();
     }
 
     /**
      * @param ModelCriteria $search
-     * @param               $pagination
+     * @param PropelModelPager $pagination
      *
-     * @return array|\Propel\Runtime\Util\PropelModelPager
+     * @return array|PropelModelPager
      */
     protected function searchWithPagination(ModelCriteria $search, &$pagination)
     {
-        $pagination = $search->paginate($this->getArgValue('page'), $this->getArgValue('limit'));
+        $page  = intval($this->getArgValue('page'));
+        $limit = intval($this->getArgValue('limit'));
 
-        if ($this->getArgValue('page') > $pagination->getLastPage()) {
-            return array();
+        $pagination = $search->paginate($page, $limit);
+
+        if ($page > $pagination->getLastPage()) {
+            return [];
         } else {
             return $pagination;
         }
@@ -350,18 +402,21 @@ abstract class BaseLoop
     }
 
     /**
-     * @param $pagination
+     * @param PropelModelPager $pagination
+     *
      * @return LoopResult
      */
     public function exec(&$pagination)
     {
         $hash = $this->args->getHash();
         if (false === isset(self::$cacheLoopResult[$hash])) {
+
+            $results = [];
+
             if ($this instanceof PropelSearchLoopInterface) {
                 $searchModelCriteria = $this->buildModelCriteria();
-                if (null === $searchModelCriteria) {
-                    $results = array();
-                } else {
+
+                if (null !== $searchModelCriteria) {
                     $results = $this->search(
                         $searchModelCriteria,
                         $pagination
@@ -369,13 +424,9 @@ abstract class BaseLoop
                 }
             } elseif ($this instanceof ArraySearchLoopInterface) {
                 $searchArray = $this->buildArray();
-                if (null === $searchArray) {
-                    $results = array();
-                } else {
-                    $results = $this->searchArray(
-                        $searchArray,
-                        $pagination
-                    );
+
+                if (null !== $searchArray) {
+                    $results = $this->searchArray($searchArray);
                 }
             }
 
@@ -405,30 +456,49 @@ abstract class BaseLoop
          *  - ArraySearchLoopInterface
         */
         $searchInterface = false;
+
         if ($this instanceof PropelSearchLoopInterface) {
             if (true === $searchInterface) {
-                throw new LoopException('Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`', LoopException::MULTIPLE_SEARCH_INTERFACE);
+                throw new LoopException(
+                    $this->translator->trans(
+                        'Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'
+                    ),
+                    LoopException::MULTIPLE_SEARCH_INTERFACE);
             }
             $searchInterface = true;
         }
+
         if ($this instanceof ArraySearchLoopInterface) {
             if (true === $searchInterface) {
-                throw new LoopException('Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`', LoopException::MULTIPLE_SEARCH_INTERFACE);
+                throw new LoopException(
+                    $this->translator->trans(
+                        'Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'
+                    ),
+                    LoopException::MULTIPLE_SEARCH_INTERFACE);
             }
             $searchInterface = true;
         }
 
         if (false === $searchInterface) {
-            throw new LoopException('Loop must implements one of the following interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`', LoopException::SEARCH_INTERFACE_NOT_FOUND);
+            throw new LoopException(
+                $this->translator->trans(
+                    'Loop must implements one of the following interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'
+                ),
+                LoopException::SEARCH_INTERFACE_NOT_FOUND);
         }
 
         /* Only PropelSearch allows timestamp and version */
         if (!$this instanceof PropelSearchLoopInterface) {
             if (true === $this->timestampable) {
-                throw new LoopException("Loop must implements 'PropelSearchLoopInterface' to be timestampable", LoopException::NOT_TIMESTAMPED);
+                throw new LoopException(
+                    $this->translator->trans("Loop must implements 'PropelSearchLoopInterface' to be timestampable"),
+                    LoopException::NOT_TIMESTAMPED);
             }
+
             if (true === $this->versionable) {
-                throw new LoopException("Loop must implements 'PropelSearchLoopInterface' to be versionable", LoopException::NOT_VERSIONED);
+                throw new LoopException(
+                    $this->translator->trans("Loop must implements 'PropelSearchLoopInterface' to be versionable"),
+                    LoopException::NOT_VERSIONED);
             }
         }
     }
@@ -441,15 +511,14 @@ abstract class BaseLoop
     abstract public function parseResults(LoopResult $loopResult);
 
     /**
-     *
-     * define all args used in your loop
-     *
+     * Definition of loop arguments
      *
      * example :
      *
      * public function getArgDefinitions()
      * {
      *  return new ArgumentCollection(
+     *
      *       Argument::createIntListTypeArgument('id'),
      *           new Argument(
      *           'ref',
@@ -459,14 +528,7 @@ abstract class BaseLoop
      *       ),
      *       Argument::createIntListTypeArgument('category'),
      *       Argument::createBooleanTypeArgument('new'),
-     *       Argument::createBooleanTypeArgument('promo'),
-     *       Argument::createFloatTypeArgument('min_price'),
-     *       Argument::createFloatTypeArgument('max_price'),
-     *       Argument::createIntTypeArgument('min_stock'),
-     *       Argument::createFloatTypeArgument('min_weight'),
-     *       Argument::createFloatTypeArgument('max_weight'),
-     *       Argument::createBooleanTypeArgument('current'),
-     *
+     *       ...
      *   );
      * }
      *
