@@ -512,47 +512,24 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v3.1.14",
+            "version": "3.1.14",
             "source": {
                 "type": "svn",
-                "url": "http://smarty-php.googlecode.com/svn",
-                "reference": "/tags/v3.1.14/@4752"
+                "url": "http://smarty-php.googlecode.com/svn/",
+                "reference": "tags/Smarty_3_1_14/distribution/"
             },
-            "require": {
-                "php": ">=5.2"
+            "dist": {
+                "type": "zip",
+                "url": "http://www.smarty.net/files/Smarty-3.1.14.zip",
+                "reference": null,
+                "shasum": null
             },
             "type": "library",
             "autoload": {
                 "classmap": [
-                    "distribution/libs/Smarty.class.php",
-                    "distribution/libs/SmartyBC.class.php",
-                    "distribution/libs/sysplugins/smarty_security.php"
+                    "libs/"
                 ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-3.0"
-            ],
-            "authors": [
-                {
-                    "name": "Monte Ohrt",
-                    "email": "monte@ohrt.com"
-                },
-                {
-                    "name": "Uwe Tews",
-                    "email": "uwe.tews@googlemail.com"
-                },
-                {
-                    "name": "Rodney Rehm",
-                    "email": "rodney.rehm@medialize.de"
-                }
-            ],
-            "description": "Smarty - the compiling PHP template engine",
-            "homepage": "http://www.smarty.net",
-            "keywords": [
-                "templating"
-            ],
-            "time": "2013-07-02 16:38:47"
+            }
         },
         {
             "name": "swiftmailer/swiftmailer",
