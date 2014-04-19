@@ -12,10 +12,8 @@
 
 namespace Thelia\Module;
 
-use Thelia\Model\Country;
-use Thelia\Module\Exception\DeliveryException;
-
 abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModuleInterface
 {
-
+    // This class is the base class for delivery modules
+    // It may contains common methods in the future.
 }

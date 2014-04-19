@@ -150,32 +150,13 @@
                             <tfoot>
                                 <tr>
                                     <td colspan="7">
+                                        {include
+                                            file = "includes/pagination.html"
 
-                                        <div class="text-center">
-                                            <ul class="pagination pagination-centered">
-                                                {if $order_page != 1}
-                                                    <li><a href="{url path="/admin/orders" page=1 orders_order=$orders_order}">&laquo;</a></li>
-                                                {else}
-                                                    <li class="disabled"><a href="#">&laquo;</a></li>
-                                                {/if}
-
-                                                {pageloop rel="order-list"}
-                                                {if $PAGE != $CURRENT}
-                                                    <li><a href="{url path="/admin/orders" page=$PAGE orders_order=$orders_order}">{$PAGE}</a></li>
-
-                                                {else}
-                                                    <li class="active"><a href="#">{$PAGE}</a></li>
-                                                {/if}
-
-
-                                                {/pageloop}
-                                                {if $PAGE == $LAST && $LAST != $CURRENT}
-                                                    <li><a href="{url path="/admin/orders" page=$PAGE orders_order=$orders_order}">&raquo;</a></li>
-                                                {else}
-                                                    <li class="disabled"><a href="#">&raquo;</a></li>
-                                                {/if}
-                                            </ul>
-                                        </div>
+                                            loop_ref       = "order-list"
+                                            max_page_count = 10
+                                            page_url       = "{url path="/admin/orders" orders_order=$orders_order}"
+                                        }
 
                                     </td>
                                 </tr>
