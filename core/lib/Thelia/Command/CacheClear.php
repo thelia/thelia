@@ -63,7 +63,7 @@ class CacheClear extends ContainerAwareCommand
         }
 
         if ($input->getOption('with-images')) {
-            $this->clearCache(THELIA_WEB_DIR . "cache", $output);
+            $this->clearCache(THELIA_CACHE_DIR, $output);
         }
 
     }
