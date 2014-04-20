@@ -174,7 +174,7 @@ class TemplateHelper
 
             $allowed_exts = array('php');
         } elseif ($walkMode == self::WALK_MODE_TEMPLATE) {
-            $prefix = "\\{intl(?:.*?)l=";
+            $prefix = '\{intl(?:.*?)l=[\s]*';
 
             $allowed_exts = array('html', 'tpl', 'xml');
         } else {
