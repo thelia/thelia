@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Template;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Model\ConfigQuery;
 use Thelia\Log\Tlog;
 use Thelia\Core\Translation\Translator;
@@ -96,9 +97,10 @@ class TemplateHelper
      * Return a list of existing templates for a given template type
      *
      * @param  int $templateType the template type
-     * @return An  array of \Thelia\Core\Template\TemplateDefinition
+     * @param string the template base (module or core, default to core).
+     * @return TemplateDefinition[] of \Thelia\Core\Template\TemplateDefinition
      */
-    public function getList($templateType)
+    public function getList($templateType, $base = THELIA_TEMPLATE_DIR)
     {
         $list = $exclude = array();
 
@@ -108,24 +110,29 @@ class TemplateHelper
 
             if ($templateType == $type) {
 
-                $baseDir = THELIA_TEMPLATE_DIR.$subdir;
+                $baseDir = rtrim($base, DS).DS.$subdir;
 
-                // Every subdir of the basedir is supposed to be a template.
-                $di = new \DirectoryIterator($baseDir);
+                try {
+                    // Every subdir of the basedir is supposed to be a template.
+                    $di = new \DirectoryIterator($baseDir);
 
-                foreach ($di as $file) {
-                // Ignore 'dot' elements
-                if ($file->isDot() || ! $file->isDir()) continue;
+                    foreach ($di as $file) {
+                        // Ignore 'dot' elements
+                        if ($file->isDot() || ! $file->isDir()) continue;
 
-                    // Ignore reserved directory names
-                    if (in_array($file->getFilename(), $exclude)) continue;
+                        // Ignore reserved directory names
+                        if (in_array($file->getFilename(), $exclude)) continue;
 
-                    $list[] = new TemplateDefinition($file->getFilename(), $templateType);
+                        $list[] = new TemplateDefinition($file->getFilename(), $templateType);
+                    }
                 }
-
-                return $list;
+                catch (\UnexpectedValueException $ex) {
+                    // Ignore the exception and continue
+                }
             }
         }
+
+        return $list;
     }
 
     protected function normalizePath($path)
@@ -152,11 +159,12 @@ class TemplateHelper
      * @param  string                              $walkMode      type of file scanning: WALK_MODE_PHP or WALK_MODE_TEMPLATE
      * @param  \Thelia\Core\Translation\Translator $translator    the current translator
      * @param  string                              $currentLocale the current locale
+     * @param  string                              $domain        the translation domain (fontoffice, backoffice, module, etc...)
      * @param  array                               $strings       the list of strings
      * @throws \InvalidArgumentException           if $walkMode contains an invalid value
      * @return number                              the total number of translatable texts
      */
-    public function walkDir($directory, $walkMode, Translator $translator, $currentLocale, &$strings)
+    public function walkDir($directory, $walkMode, Translator $translator, $currentLocale, $domain, &$strings)
     {
         $num_texts = 0;
 
@@ -165,7 +173,7 @@ class TemplateHelper
 
             $allowed_exts = array('php');
         } elseif ($walkMode == self::WALK_MODE_TEMPLATE) {
-            $prefix = '\{intl[\s]l=';
+            $prefix = "\\{intl(?:.*?)l=";
 
             $allowed_exts = array('html', 'tpl', 'xml');
         } else {
@@ -178,11 +186,12 @@ class TemplateHelper
 
             Tlog::getInstance()->debug("Walking in $directory, in mode $walkMode");
 
+            /** @var \DirectoryIterator $fileInfo */
             foreach (new \DirectoryIterator($directory) as $fileInfo) {
 
                 if ($fileInfo->isDot()) continue;
 
-                if ($fileInfo->isDir()) $num_texts += $this->walkDir($fileInfo->getPathName(), $walkMode, $translator, $currentLocale, $strings);
+                if ($fileInfo->isDir()) $num_texts += $this->walkDir($fileInfo->getPathName(), $walkMode, $translator, $currentLocale, $domain, $strings);
 
                 if ($fileInfo->isFile()) {
 
@@ -219,7 +228,7 @@ class TemplateHelper
                                         $strings[$hash] = array(
                                                 'files'   => array($short_path),
                                                 'text'  => $match,
-                                                'translation' => $translator->trans($match, array(), 'messages', $currentLocale, false),
+                                                'translation' => $translator->trans($match, array(), $domain, $currentLocale, false),
                                                 'dollar'  => strstr($match, '$') !== false
                                         );
                                     }
@@ -233,13 +242,24 @@ class TemplateHelper
             return $num_texts;
 
         } catch (\UnexpectedValueException $ex) {
-            echo $ex;
+            // Directory does not exists => ignore/
         }
     }
 
 
-    public function writeTranslation($file, $texts, $translations)
+    public function writeTranslation($file, $texts, $translations, $createIfNotExists = false)
     {
+        $fs = new Filesystem();
+
+        if (! $fs->exists($file) && true === $createIfNotExists) {
+
+            $dir = dirname($file);
+
+            if (! $fs->exists($file)) {
+                $fs->mkdir($dir);
+            }
+        }
+
         if ($fp = @fopen($file, 'w')) {
 
             fwrite($fp, '<' . "?php\n\n");

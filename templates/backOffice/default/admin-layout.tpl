@@ -10,6 +10,9 @@
 {* -- Declare assets directory, relative to template base directory --------- *}
 {declare_assets directory='assets'}
 
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
+
 <!DOCTYPE html>
 <html lang="{$lang_code}">
 <head>

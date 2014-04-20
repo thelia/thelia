@@ -63,13 +63,14 @@ class Module extends AbstractSmartyPlugin
 
             $modules = ModuleQuery::getActivated();
 
+            /** @var \Thelia\Model\Module $module */
             foreach ($modules as $module) {
 
                 if (null !== $moduleLimit && $moduleLimit != $module->getCode()) {
                     continue;
                 }
 
-                $file = sprintf("%s/AdminIncludes/%s.html", $module->getAbsoluteBaseDir(), $location);
+                $file = $module->getAbsoluteAdminIncludesPath() . DS . $location . '.html';
 
                 if (file_exists($file)) {
 

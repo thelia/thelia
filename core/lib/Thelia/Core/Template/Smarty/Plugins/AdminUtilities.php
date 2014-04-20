@@ -80,8 +80,8 @@ class AdminUtilities extends AbstractSmartyPlugin
         <a href="{url path='/admin/configuration/currencies/positionDown' currency_id=$ID}"><i class="icon-arrow-down"></i></a>
         */
 
-        if ($permissions == null || $this->securityContext->isGranted(
-                "ADMIN",
+        if ($this->securityContext->isGranted(
+                array("ADMIN"),
                 $resource === null ? array() : array($resource),
                 $module === null ? array() : array($module),
                 array($access))

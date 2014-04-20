@@ -39,7 +39,7 @@
 	                                <div class="row">
 	                                    <div class="col-md-4">
 			                                <div class="form-group">
-												<label class="control-label" for="item_to_translate">{intl l='Select which items you want to translate'}</label>
+												<label class="control-label" for="item_to_translate">{intl l='Items to translate'}</label>
 
 												<select id="item_to_translate" required="required" name="item_to_translate" class="submit-on-change form-control">
 	                                                <option value="">{intl l='Please select items to translate'}</option>
@@ -47,8 +47,8 @@
                                                     <option value="pf" {if $item_to_translate=='pf'}selected="selected"{/if}>{intl l='PDF templates'}</option>
                                                     <option value="ma" {if $item_to_translate=='ma'}selected="selected"{/if}>{intl l='E-mail templates'}</option>
 			                                        <option value="bo" {if $item_to_translate=='bo'}selected="selected"{/if}>{intl l='Back-office templates'}</option>
-			                                        <option value="mo" {if $item_to_translate=='mo'}selected="selected"{/if}>{intl l='Modules'}</option>
-	                                                <option value="co" {if $item_to_translate=='co'}selected="selected"{/if}>{intl l='Thelia core'}</option>
+                                                    <option value="mo" {if $item_to_translate=='mo'}selected="selected"{/if}>{intl l='Modules'}</option>
+                                                   <option value="co" {if $item_to_translate=='co'}selected="selected"{/if}>{intl l='Thelia core'}</option>
 												</select>
 			                                </div>
 		                                </div>
@@ -56,12 +56,12 @@
 	                                    {if $item_to_translate == 'mo'}
 		                                    <div class="col-md-4 item-id-selector">
 		                                        <div class="form-group">
-		                                            <label class="control-label" for="item_id">{intl l='Select the module you want to translate'}</label>
+		                                            <label class="control-label" for="item_name">{intl l='Module you want to translate'}</label>
 
-		                                            <select id="item_id" required="required" name="item_id" class="submit-on-change form-control">
+		                                            <select id="item_name" required="required" name="item_name" class="submit-on-change form-control">
 		                                                <option value="">{intl l='Please select the module to translate'}</option>
 					                                    {loop type="module" name="translate-module" backend_context=1}
-					                                        <option value="{$ID}" {if $item_id == $ID}selected="selected"{/if}>{$TITLE}</option>
+					                                        <option value="{$ID}" {if $item_name == $ID}selected="selected"{/if}>{$TITLE}</option>
 					                                    {/loop}
 					                                </select>
 					                            </div>
@@ -69,12 +69,12 @@
 	                                    {else if $item_to_translate == 'fo'}
 	                                        <div class="col-md-4 item-id-selector">
 	                                            <div class="form-group">
-	                                                <label class="control-label" for="item_id">{intl l='Select the front-office template you want to translate'}</label>
+	                                                <label class="control-label" for="item_name">{intl l='Front-office template you want to translate'}</label>
 
-	                                                <select id="item_id" required="required" name="item_id" class="submit-on-change form-control">
+	                                                <select id="item_name" required="required" name="item_name" class="submit-on-change form-control">
 	                                                    <option value="">{intl l='Please select the F.O. template to translate'}</option>
 	                                                    {loop type="template" name="translate-fo-template" template-type="front-office" backend_context=1}
-	                                                        <option value="{$NAME}" {if $item_id == $NAME}selected="selected"{/if}>{$NAME}</option>
+	                                                        <option value="{$NAME}" {if $item_name == $NAME}selected="selected"{/if}>{$NAME}</option>
 	                                                    {/loop}
 	                                                </select>
 	                                            </div>
@@ -82,12 +82,12 @@
 	                                    {else if $item_to_translate == 'bo'}
 	                                        <div class="col-md-4 item-id-selector">
 	                                            <div class="form-group">
-	                                                <label class="control-label" for="item_id">{intl l='Select the back-office template you want to translate'}</label>
+	                                                <label class="control-label" for="item_name">{intl l='Back-office template you want to translate'}</label>
 
-	                                                <select id="item_id" required="required" name="item_id" class="submit-on-change form-control">
+	                                                <select id="item_name" required="required" name="item_name" class="submit-on-change form-control">
 	                                                    <option value="">{intl l='Please select the B.O. template to translate'}</option>
 	                                                    {loop type="template" name="translate-fo-template" template-type="back-office" backend_context=1}
-	                                                        <option value="{$NAME}" {if $item_id == $NAME}selected="selected"{/if}>{$NAME}</option>
+	                                                        <option value="{$NAME}" {if $item_name == $NAME}selected="selected"{/if}>{$NAME}</option>
 	                                                    {/loop}
 	                                                </select>
 	                                            </div>
@@ -95,12 +95,12 @@
                                         {else if $item_to_translate == 'ma'}
                                             <div class="col-md-4 item-id-selector">
                                                 <div class="form-group">
-                                                    <label class="control-label" for="item_id">{intl l='Select the E-mail template you want to translate'}</label>
+                                                    <label class="control-label" for="item_name">{intl l='E-mail template you want to translate'}</label>
 
-                                                    <select id="item_id" required="required" name="item_id" class="submit-on-change form-control">
+                                                    <select id="item_name" required="required" name="item_name" class="submit-on-change form-control">
                                                         <option value="">{intl l='Please select the E-mail template to translate'}</option>
                                                         {loop type="template" name="translate-fo-template" template-type="email" backend_context=1}
-                                                            <option value="{$NAME}" {if $item_id == $NAME}selected="selected"{/if}>{$NAME}</option>
+                                                            <option value="{$NAME}" {if $item_name == $NAME}selected="selected"{/if}>{$NAME}</option>
                                                         {/loop}
                                                     </select>
                                                 </div>
@@ -108,28 +108,50 @@
 	                                    {else if $item_to_translate == 'pf'}
 	                                        <div class="col-md-4 item-id-selector">
 	                                            <div class="form-group">
-	                                                <label class="control-label" for="item_id">{intl l='Select the PDF template you want to translate'}</label>
+	                                                <label class="control-label" for="item_name">{intl l='PDF template you want to translate'}</label>
 
-	                                                <select id="item_id" required="required" name="item_id" class="submit-on-change form-control">
+	                                                <select id="item_name" required="required" name="item_name" class="submit-on-change form-control">
 	                                                    <option value="">{intl l='Please select the PDF template to translate'}</option>
 	                                                    {loop type="template" name="translate-pdf-template" template-type="pdf" backend_context=1}
-	                                                        <option value="{$NAME}" {if $item_id == $NAME}selected="selected"{/if}>{$NAME}</option>
+	                                                        <option value="{$NAME}" {if $item_name == $NAME}selected="selected"{/if}>{$NAME}</option>
 	                                                    {/loop}
 	                                                </select>
 	                                            </div>
 	                                        </div>
 	                                    {/if}
 
+                                        {if $item_to_translate == 'mo' && $item_name != ''}
+                                        <div class="col-md-4 item-id-selector">
+                                            <div class="form-group">
+                                                <label class="control-label" for="module_part">{intl l='Module component'}</label>
 
-	                                    <div class="col-md-4">
-			                                <div class="form-group">
-			                                    <label class="control-label">&nbsp;</label>
-			                                    <label class="checkbox control-label">
-			                                       <input class="submit-on-change" type="checkbox" name="view_missing_traductions_only" value="1" {if $view_missing_traductions_only}checked="checked"{/if}> {intl l='View only missing translations'}
-			                                    </label>
-			                                </div>
-	                                    </div>
+                                                <select id="module_part" required="required" name="module_part" class="submit-on-change form-control">
+                                                    <option value="">{intl l='Please select the module component'}</option>
+                                                    <option value="core" {if $module_part == 'core'}selected="selected"{/if}>Core files</option>
+                                                    <option value="admin-includes" {if $module_part == 'admin-includes'}selected="selected"{/if}>Administration includes template</option>
+                                                    {foreach $back_office_templates as $template}
+                                                        {$option_value = "bo.{$template}"}
+                                                        <option value="{$option_value}" {if $module_part == $option_value}selected="selected"{/if}>Back-office template "{$template}"</option>
+                                                    {/foreach}
+                                                    {foreach $front_office_templates as $template}
+                                                        {$option_value = "fo.{$template}"}
+                                                        <option value="{$option_value}" {if $module_part == $option_value}selected="selected"{/if}>Front-office template "{$template}"</option>
+                                                    {/foreach}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        {/if}
 	                                </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="checkbox control-label">
+                                                    <input class="submit-on-change" type="checkbox" name="view_missing_traductions_only" value="1" {if $view_missing_traductions_only}checked="checked"{/if}> {intl l='View only missing translations.'}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </fieldset>
 
                                 {* -- STRINGS TO TRANSLATE --------------------------------------------- *}
@@ -266,9 +288,14 @@
         var translation_changed = false;
 
         $('#item_to_translate').change(function() {
-        	$('#item-id').val('');
-        	$('.item-id-selector').hide();
+            $('#item-id').val('');
+            $('.item-id-selector').hide();
         });
+
+        $('#item_name').change(function() {
+            $('#module_part').val('');
+        });
+
 
         $('.submit-on-change').change(function() {
             $('#translation_form').submit();

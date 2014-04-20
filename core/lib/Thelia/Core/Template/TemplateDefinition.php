@@ -46,6 +46,8 @@ class TemplateDefinition
      */
     protected $type;
 
+    protected $translationDomainPrefix;
+
     public function __construct($name, $type)
     {
         $this->name = $name;
@@ -54,20 +56,29 @@ class TemplateDefinition
         switch ($type) {
             case TemplateDefinition::FRONT_OFFICE:
                 $this->path = self::FRONT_OFFICE_SUBDIR . DS . $name;
+                $this->translationDomainPrefix = 'fo.';
                 break;
             case TemplateDefinition::BACK_OFFICE:
                 $this->path = self::BACK_OFFICE_SUBDIR . DS . $name;
+                $this->translationDomainPrefix = 'bo.';
                 break;
             case TemplateDefinition::PDF:
                 $this->path = self::PDF_SUBDIR . DS . $name;
+                $this->translationDomainPrefix = 'pdf.';
                 break;
             case TemplateDefinition::EMAIL:
                 $this->path = self::EMAIL_SUBDIR . DS . $name;
+                $this->translationDomainPrefix = 'email.';
                 break;
             default:
                 $this->path = $name;
+                $this->translationDomainPrefix = 'generic.';
                 break;
         }
+    }
+
+    public function getTranslationDomain() {
+        return $this->translationDomainPrefix . strtolower($this->getName());
     }
 
     public function getName()
