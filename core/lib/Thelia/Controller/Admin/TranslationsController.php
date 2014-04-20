@@ -40,6 +40,7 @@ class TranslationsController extends BaseAdminController
         );
     }
 
+
     protected function getModuleTemplateNames(Module $module, $template_type) {
         $templates =
             TemplateHelper::getInstance()->getList(
@@ -119,16 +120,16 @@ class TranslationsController extends BaseAdminController
                         else {
                             throw new \InvalidArgumentException("Undefined module template type: '$type'.");
                         }
-                        $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
 
+                        $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
                     }
 
                     // List front and back office templates defined by this module
                     $templateArguments['back_office_templates'] =
-                        $this->getModuleTemplateNames($module, TemplateDefinition::BACK_OFFICE);
+                        implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::BACK_OFFICE));
 
                     $templateArguments['front_office_templates'] =
-                        $this->getModuleTemplateNames($module, TemplateDefinition::FRONT_OFFICE);
+                        implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::FRONT_OFFICE));
 
                     break;
 

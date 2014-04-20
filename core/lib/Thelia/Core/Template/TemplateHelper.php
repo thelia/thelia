@@ -116,6 +116,7 @@ class TemplateHelper
                     // Every subdir of the basedir is supposed to be a template.
                     $di = new \DirectoryIterator($baseDir);
 
+                    /** @var \DirectoryIterator $file */
                     foreach ($di as $file) {
                         // Ignore 'dot' elements
                         if ($file->isDot() || ! $file->isDir()) continue;
@@ -169,7 +170,7 @@ class TemplateHelper
         $num_texts = 0;
 
         if ($walkMode == self::WALK_MODE_PHP) {
-            $prefix = '\-\>[\s]*trans[\s]*\(';
+            $prefix = '\-\>[\s]*trans[\s]*\([\s]*';
 
             $allowed_exts = array('php');
         } elseif ($walkMode == self::WALK_MODE_TEMPLATE) {

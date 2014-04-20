@@ -60,7 +60,7 @@
 
 		                                            <select id="item_name" required="required" name="item_name" class="submit-on-change form-control">
 		                                                <option value="">{intl l='Please select the module to translate'}</option>
-					                                    {loop type="module" name="translate-module" backend_context=1}
+					                                    {loop type="module" name="translate-module" active="1" backend_context=1}
 					                                        <option value="{$ID}" {if $item_name == $ID}selected="selected"{/if}>{$TITLE}</option>
 					                                    {/loop}
 					                                </select>
@@ -129,14 +129,21 @@
                                                     <option value="">{intl l='Please select the module component'}</option>
                                                     <option value="core" {if $module_part == 'core'}selected="selected"{/if}>Core files</option>
                                                     <option value="admin-includes" {if $module_part == 'admin-includes'}selected="selected"{/if}>Administration includes template</option>
-                                                    {foreach $back_office_templates as $template}
-                                                        {$option_value = "bo.{$template}"}
-                                                        <option value="{$option_value}" {if $module_part == $option_value}selected="selected"{/if}>Back-office template "{$template}"</option>
-                                                    {/foreach}
-                                                    {foreach $front_office_templates as $template}
-                                                        {$option_value = "fo.{$template}"}
-                                                        <option value="{$option_value}" {if $module_part == $option_value}selected="selected"{/if}>Front-office template "{$template}"</option>
-                                                    {/foreach}
+
+                                                    {if $back_office_templates != ''}
+                                                        {foreach explode(',', $back_office_templates) as $template}
+                                                            {$option_value = "bo.{$template}"}
+                                                            <option value="{$option_value}" {if $module_part == $option_value}selected="selected"{/if}>Back-office template "{$template}"</option>
+                                                        {/foreach}
+                                                    {/if}
+
+                                                    {if $front_office_templates != ''}
+                                                        {foreach explode(',', $front_office_templates) as $template}
+                                                            {$option_value = "fo.{$template}"}
+                                                            <option value="{$option_value}" {if $module_part == $option_value}selected="selected"{/if}>Front-office template "{$template}"</option>
+                                                        {/foreach}
+                                                    {/if}
+
                                                 </select>
                                             </div>
                                         </div>
