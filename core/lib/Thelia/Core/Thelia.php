@@ -200,8 +200,6 @@ class Thelia extends Kernel
                     $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
                     $loader->load("config.xml");
 
-                    $moduleDomain = strtolower($module->getCode());
-
                     // Core module translation
                     if (is_dir($dir = $module->getAbsoluteI18nPath())) {
                         $translationDirs[$module->getTranslationDomain()] = $dir;
@@ -212,6 +210,29 @@ class Thelia extends Kernel
                         $translationDirs[$module->getAdminIncludesTranslationDomain()] = $dir;
                     }
 
+                    // Module back-office template, if any
+                    $templates =
+                        TemplateHelper::getInstance()->getList(
+                            TemplateDefinition::BACK_OFFICE,
+                            $module->getAbsoluteTemplateBasePath()
+                        );
+
+                    foreach($templates as $template) {
+                        $translationDirs[$module->getBackOfficeTemplateTranslationDomain($template->getName())] =
+                            $module->getAbsoluteBackOfficeI18nTemplatePath($template->getName());
+                    }
+
+                    // Module front-office template, if any
+                    $templates =
+                        TemplateHelper::getInstance()->getList(
+                            TemplateDefinition::FRONT_OFFICE,
+                            $module->getAbsoluteTemplateBasePath()
+                        );
+
+                    foreach($templates as $template) {
+                        $translationDirs[$module->getFrontOfficeTemplateTranslationDomain($template->getName())] =
+                            $module->getAbsoluteFrontOfficeI18nTemplatePath($template->getName());
+                    }
                     $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
 
                 } catch (\InvalidArgumentException $e) {
@@ -220,7 +241,7 @@ class Thelia extends Kernel
             }
 
             // Load core translation
-            $translationDirs['core'] = THELIA_ROOT . "core/lib/Thelia/Config/I18n";
+            $translationDirs['core'] = THELIA_ROOT . 'core'.DS.'lib'.DS.'Thelia'.DS.'Config'.DS.'I18n';
 
             // Standard templates (front, back, pdf, mail)
             $th = TemplateHelper::getInstance();
@@ -244,16 +265,22 @@ class Thelia extends Kernel
 
         foreach ($dirs as $domain => $dir) {
 
-            $finder = Finder::create()
-                ->files()
-                ->depth(0)
-                ->in($dir);
+            try {
+                $finder = Finder::create()
+                    ->files()
+                    ->depth(0)
+                    ->in($dir);
 
-            /** @var \DirectoryIterator $file */
-            foreach ($finder as $file) {
-                list($locale, $format) = explode('.', $file->getBaseName(), 2);
+                /** @var \DirectoryIterator $file */
+                foreach ($finder as $file) {
+                    list($locale, $format) = explode('.', $file->getBaseName(), 2);
 
-                $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
+                    $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
+                }
+            }
+            catch (\InvalidArgumentException $ex) {
+                // Ignore missing I18n directories
+                Tlog::getInstance()->addWarning("loadTranslation: missing $dir directory");
             }
         }
     }
@@ -304,7 +331,7 @@ class Thelia extends Kernel
     public function getCacheDir()
     {
         if (defined('THELIA_ROOT')) {
-            return THELIA_ROOT.'cache/'.$this->environment;
+            return THELIA_CACHE_DIR.$this->environment;
         } else {
             return parent::getCacheDir();
         }
@@ -321,7 +348,7 @@ class Thelia extends Kernel
     public function getLogDir()
     {
         if (defined('THELIA_ROOT')) {
-            return THELIA_ROOT.'log/';
+            return THELIA_LOG_DIR;
         } else {
             return parent::getLogDir();
         }
