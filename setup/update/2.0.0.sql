@@ -28,6 +28,10 @@ ALTER TABLE `feature_template` ADD INDEX `idx_feature_template_template_id_posit
 
 ALTER TABLE `currency` ADD INDEX `idx_currency_code` (`code`);
 
+ALTER TABLE `customer` CHANGE `ref` `ref` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL ;
+
+ALTER TABLE `order` CHANGE `ref` `ref` VARCHAR( 45 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL ;
+
 SELECT @max := MAX(`id`) FROM `resource`;
 SET @max := @max+1;
 
