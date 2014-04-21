@@ -166,6 +166,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\Module $module */
         foreach ($loopResult->getResultDataCollection() as $module) {
             $loopResultRow = new LoopResultRow($module);
             $loopResultRow->set("ID", $module->getId())
@@ -199,13 +200,13 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
                 /* if not ; test if it uses admin inclusion : module_configuration.html */
                 if (false === $hasConfigurationInterface) {
-                    if (file_exists( sprintf("%s/AdminIncludes/%s.html", $module->getAbsoluteBaseDir(), "module_configuration"))) {
+                    if (file_exists($module->getAbsoluteAdminIncludesPath() . DS . "module_configuration.html")) {
                         $hasConfigurationInterface = true;
                     }
                 }
             } else {
                 // Make a quick and dirty test on the module's routing.xml file
-                $routing = @file_get_contents($module->getAbsoluteBaseDir() . DS . "Config" . DS . "routing.xml");
+                $routing = @file_get_contents($module->getAbsoluteConfigPath() . DS . "routing.xml");
 
                 if ($routing && strpos($routing, '/admin/module/') !== false) {
                     $hasConfigurationInterface = true;

@@ -1,16 +1,19 @@
-{assign var="order_id" value=1}
 {loop name="order.invoice" type="order" id=$order_id customer="*"}
-    {loop name="currency.order" type="currency" id=$CURRENCY}
-        {assign "orderCurrency" $CODE}
-    {/loop}
+{loop name="currency.order" type="currency" id=$CURRENCY}
+    {assign "orderCurrency" $CODE}
+{/loop}
+{intl l="Confirmation de la commande %ref du %date" ref={$REF} date={format_date date=$INVOICE_DATE}}\r\n\r\n
+
+{intl l="Votre adresse de livraison"}\r\n
 {loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
 {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}\r\n
 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}\r\n
 {$ZIPCODE} {$CITY}\r\n
 {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}\r\n
 {/loop}
-Confirmation de commande {$REF} du {format_date date=$INVOICE_DATE}\r\n\r\n
-Les articles commandés:\r\n
+
+{intl l="Articles commandés:"}\r\n
+
 {loop type="order_product" name="order-products" order=$ID}
 {if $WAS_IN_PROMO == 1}
     {assign "realPrice" $PROMO_PRICE}
@@ -22,19 +25,19 @@ Les articles commandés:\r\n
     {assign "realTaxedPrice" $TAXED_PRICE}
 {/if}
     \r\n
-    Article : {$TITLE}
+    {intl l="Article : %item" item=$TITLE}
 {ifloop rel="combinations"}
     {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
     {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}\r\n
 {/loop}
 {/ifloop}\r\n
-    Quantité : {$QUANTITY}\r\n
-    Prix unitaire TTC : {$realTaxedPrice} {$orderCurrency}\r\n
+    {intl l="Quantité : %qy" qty=$QUANTITY}\r\n
+    {intl l="Prix unitaire TTC : %amout %currency" amount=$realTaxedPrice currency=$orderCurrency}\r\n
 {/loop}
 \r\n-----------------------------------------\r\n
-Montant total TTC :    {$TOTAL_TAXED_AMOUNT - $POSTAGE} {$orderCurrency} \r\n
-Frais de port TTC :    {$POSTAGE} {$orderCurrency} \r\n
-Somme totale:            {$TOTAL_TAXED_AMOUNT} {$orderCurrency} \r\n
+{intl l="Montant total TTC :    %amout %currency" amount={$TOTAL_TAXED_AMOUNT - $POSTAGE} currency=$orderCurrency}\r\n
+{intl l="Frais de port TTC :    %amout %currency" amount={$POSTAGE} currency=$orderCurrency} \r\n
+{intl l="Somme totale      :    %amout %currency" amount={$TOTAL_TAXED_AMOUNT} currency=$orderCurrency} \r\n
 ==================================\r\n\r\n
-Votre facture est disponible dans la rubrique mon compte sur {config key="url_site"}
+{intl l="Votre facture est disponible dans la rubrique mon compte sur %url" url={config key="url_site"}}
 {/loop}

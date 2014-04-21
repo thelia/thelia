@@ -34,6 +34,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
+use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
@@ -43,6 +44,7 @@ use Propel\Runtime\Propel;
 use Propel\Runtime\Connection\ConnectionManagerSingle;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Log\Tlog;
+use Thelia\Model\Module;
 
 class Thelia extends Kernel
 {
@@ -71,7 +73,7 @@ class Thelia extends Kernel
         $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
         $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
         if ($this->isDebug()) {
-            $serviceContainer->setLogger('defaultLogger', \Thelia\Log\Tlog::getInstance());
+            $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
             $con->useDebug(true);
         }
 
@@ -93,8 +95,8 @@ class Thelia extends Kernel
     /**
      * Add all module's standard templates to the parser environment
      *
-     * @param TheliaParser $parser the parser
-     * @param Module       $module the Module.
+     * @param ParserInterface $parser the parser
+     * @param Module          $module the Module.
      */
     protected function addStandardModuleTemplatesToParserEnvironment($parser, $module)
     {
@@ -108,10 +110,10 @@ class Thelia extends Kernel
     /**
      * Add a module template directory to the parser environment
      *
-     * @param TheliaParser $parser             the parser
-     * @param Module       $module             the Module.
-     * @param string       $templateType       the template type (one of the TemplateDefinition type constants)
-     * @param string       $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
+     * @param ParserInterface $parser             the parser
+     * @param Module          $module             the Module.
+     * @param string          $templateType       the template type (one of the TemplateDefinition type constants)
+     * @param string          $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
      */
     protected function addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName)
     {
@@ -168,8 +170,11 @@ class Thelia extends Kernel
             $modules = \Thelia\Model\ModuleQuery::getActivated();
 
             $translationDirs = array();
+
+            /** @var ParserInterface $parser */
             $parser = $container->getDefinition('thelia.parser');
 
+            /** @var Module $module */
             foreach ($modules as $module) {
 
                 try {
@@ -190,33 +195,63 @@ class Thelia extends Kernel
                         } else {
                             $container->addCompilerPass($compiler);
                         }
-
                     }
 
                     $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
                     $loader->load("config.xml");
 
+                    // Core module translation
                     if (is_dir($dir = $module->getAbsoluteI18nPath())) {
-                        $translationDirs[] = $dir;
+                        $translationDirs[$module->getTranslationDomain()] = $dir;
                     }
 
+                    // Admin includes translation
+                    if (is_dir($dir = $module->getAbsoluteAdminIncludesI18nPath())) {
+                        $translationDirs[$module->getAdminIncludesTranslationDomain()] = $dir;
+                    }
+
+                    // Module back-office template, if any
+                    $templates =
+                        TemplateHelper::getInstance()->getList(
+                            TemplateDefinition::BACK_OFFICE,
+                            $module->getAbsoluteTemplateBasePath()
+                        );
+
+                    foreach($templates as $template) {
+                        $translationDirs[$module->getBackOfficeTemplateTranslationDomain($template->getName())] =
+                            $module->getAbsoluteBackOfficeI18nTemplatePath($template->getName());
+                    }
+
+                    // Module front-office template, if any
+                    $templates =
+                        TemplateHelper::getInstance()->getList(
+                            TemplateDefinition::FRONT_OFFICE,
+                            $module->getAbsoluteTemplateBasePath()
+                        );
+
+                    foreach($templates as $template) {
+                        $translationDirs[$module->getFrontOfficeTemplateTranslationDomain($template->getName())] =
+                            $module->getAbsoluteFrontOfficeI18nTemplatePath($template->getName());
+                    }
                     $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
 
                 } catch (\InvalidArgumentException $e) {
-                    Tlog::getInstance()->addError(sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()), $e);
+                    Tlog::getInstance()->addError(
+                        sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()), $e
+                    );
                 }
             }
 
-            // Load translation from templates
-            // core translation
-            $translationDirs[] = THELIA_ROOT . "core/lib/Thelia/Config/I18n";
+            // Load core translation
+            $translationDirs['core'] = THELIA_ROOT . 'core'.DS.'lib'.DS.'Thelia'.DS.'Config'.DS.'I18n';
 
             // Standard templates (front, back, pdf, mail)
             $th = TemplateHelper::getInstance();
 
+            /** @var TemplateDefinition $templateDefinition */
             foreach ($th->getStandardTemplateDefinitions() as $templateDefinition) {
                 if (is_dir($dir = $templateDefinition->getAbsoluteI18nPath())) {
-                    $translationDirs[] = $dir;
+                    $translationDirs[$templateDefinition->getTranslationDomain()] = $dir;
                 }
             }
 
@@ -230,14 +265,25 @@ class Thelia extends Kernel
     {
         $translator = $container->getDefinition('thelia.translator');
 
-        $finder = Finder::create()
-            ->files()
-            ->depth(0)
-            ->in($dirs);
+        foreach ($dirs as $domain => $dir) {
 
-        foreach ($finder as $file) {
-            list($locale, $format) = explode('.', $file->getBaseName(), 2);
-            $translator->addMethodCall('addResource', array($format, (string) $file, $locale));
+            try {
+                $finder = Finder::create()
+                    ->files()
+                    ->depth(0)
+                    ->in($dir);
+
+                /** @var \DirectoryIterator $file */
+                foreach ($finder as $file) {
+                    list($locale, $format) = explode('.', $file->getBaseName(), 2);
+
+                    $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
+                }
+            }
+            catch (\InvalidArgumentException $ex) {
+                // Ignore missing I18n directories
+                Tlog::getInstance()->addWarning("loadTranslation: missing $dir directory");
+            }
         }
     }
 
@@ -287,7 +333,7 @@ class Thelia extends Kernel
     public function getCacheDir()
     {
         if (defined('THELIA_ROOT')) {
-            return THELIA_ROOT.'cache/'.$this->environment;
+            return THELIA_CACHE_DIR.'cache/'.$this->environment;
         } else {
             return parent::getCacheDir();
         }
@@ -304,7 +350,7 @@ class Thelia extends Kernel
     public function getLogDir()
     {
         if (defined('THELIA_ROOT')) {
-            return THELIA_ROOT.'log/';
+            return THELIA_LOG_DIR;
         } else {
             return parent::getLogDir();
         }

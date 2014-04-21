@@ -19,6 +19,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class Translation extends AbstractSmartyPlugin
 {
     protected $translator;
+    protected $defaultTranslationDomain = '';
 
     public function __construct(TranslatorInterface $translator)
     {
@@ -26,34 +27,51 @@ class Translation extends AbstractSmartyPlugin
     }
 
     /**
+     * Set the default translation domain
+     *
+     * @param  array $params
+     * @param  \Smarty_Internal_Template $smarty
+     * @return string
+     */
+    public function setDefaultTranslationDomain($params, &$smarty)
+    {
+        $this->defaultTranslationDomain = $this->getParam($params, 'domain');
+    }
+
+    /**
      * Process translate function
      *
-     * @param  unknown $params
-     * @param  unknown $smarty
+     * @param  array $params
+     * @param  \Smarty_Internal_Template $smarty
      * @return string
      */
     public function translate($params, &$smarty)
     {
-        // All parameters other than 'l' are supposed to be variables. Build an array of var => value pairs
+        // All parameters other than 'l' and 'd' are supposed to be variables. Build an array of var => value pairs
         // and pass it to the translator
         $vars = array();
 
         foreach ($params as $name => $value) {
-            if ($name != 'l') $vars["%$name"] = $value;
+            if ($name != 'l' && $name != 'd') $vars["%$name"] = $value;
         }
 
-        return $this->translator->trans($this->getParam($params, 'l'), $vars);
-    }
+        return $this->translator->trans(
+            $this->getParam($params, 'l'),
+            $vars,
+            $this->getParam($params, 'd', $this->defaultTranslationDomain)
+        );
+}
 
     /**
-     * Define the various smarty plugins hendled by this class
+     * Define the various smarty plugins handled by this class
      *
-     * @return an array of smarty plugin descriptors
+     * @return SmartyPluginDescriptor[] an array of smarty plugin descriptors
      */
     public function getPluginDescriptors()
     {
         return array(
             new SmartyPluginDescriptor('function', 'intl', $this, 'translate'),
+            new SmartyPluginDescriptor('function', 'default_translation_domain', $this, 'setDefaultTranslationDomain'),
         );
     }
 }

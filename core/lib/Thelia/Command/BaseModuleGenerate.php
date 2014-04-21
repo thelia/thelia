@@ -12,6 +12,8 @@
 
 namespace Thelia\Command;
 
+use Thelia\Model\Module;
+
 /**
  * base class for module commands
  *
@@ -36,7 +38,7 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
          'Controller',
          'EventListeners',
          'I18n',
-         'AdminIncludes',
+         Module::ADMIN_INCLUDES_DIRECTORY_NAME,
          'templates',
      );
 
