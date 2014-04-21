@@ -1,3 +1,4 @@
+{default_translation_domain domain='email.default'}
 {declare_assets directory='assets'}
 {assign var="url_site" value="{config key="url_site"}"}
 {assign var="company_name" value="{config key="store_name"}"}
