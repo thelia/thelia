@@ -221,6 +221,8 @@
             </div>
         {/form_tagged_fields}
 
+        {module_include location='tax_create_form'}
+
     {/capture}
 
         {include
@@ -297,7 +299,7 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
                 <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $error}{$value}{/if}</textarea>
             </div>
         {/form_field}
-
+        {module_include location='tax_rule_create_form'}
     {/capture}
 
         {include

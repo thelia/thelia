@@ -259,6 +259,8 @@
 {capture "delete_dialog"}
     <input type="hidden" name="attribute_id" value="{$attribute_id}" />
     <input type="hidden" name="attributeav_id" id="value_delete_id" value="" />
+
+    {module_include location='attribute_id_delete_form'}
 {/capture}
 
 {include

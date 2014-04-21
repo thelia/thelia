@@ -123,6 +123,8 @@
     {capture "delete_country_dialog"}
         <input type="hidden" name="area_id" value="{$area_id}">
         <input type="hidden" name="country_id" id="delete-country-id" value="">
+
+        {module_include location='shipping_configuration_delete_form'}
     {/capture}
 
     {include

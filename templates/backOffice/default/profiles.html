@@ -165,7 +165,7 @@
             <input type="text" id="{$label_attr.for}" name="{$name}" title="{intl l='Postscriptum'}" placeholder="{intl l='Postscriptum'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
-
+    {module_include location='profile_create_form'}
 {/capture}
 
     {include
