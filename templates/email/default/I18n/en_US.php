@@ -1,4 +1,27 @@
 <?php
 
 return array(
+    'All rights reserved.' => 'All rights reserved.',
+    'Billing address:' => 'Billing address:',
+    'Copyright' => 'Copyright',
+    'Delivery address:' => 'Delivery address:',
+    'Delivery method:' => 'Delivery method:',
+    'Email not displaying correctly?' => 'Email not displaying correctly?',
+    'For any questions, or concerns, feel free to contact <a href="mailto:%mail" style="color:#3c69c1;text-decoration:none" target="_blank">%mail</a>.' => 'For any questions, or concerns, feel free to contact <a href="mailto:%mail" style="color:#3c69c1;text-decoration:none" target="_blank">%mail</a>.',
+    'Here are the details of your purchase:' => 'Here are the details of your purchase:',
+    'Order Number:' => 'Order Number:',
+    'Order Total' => 'Order Total',
+    'Order Total:' => 'Order Total:',
+    'Our contact us at:' => 'Our contact us at:',
+    'Our mailing address is:' => 'Our mailing address is:',
+    'Paid With:' => 'Paid With:',
+    'Purchase Date:' => 'Purchase Date:',
+    'Shipping:' => 'Shipping:',
+    'Support' => 'Support',
+    'Thank you for your order!' => 'Thank you for your order!',
+    'Thanks' => 'Thanks',
+    'Thelia V2' => 'Thelia V2',
+    'Total' => 'Total',
+    'View it in your browser' => 'View it in your browser',
+    'Your order confirmation Nº %ref' => 'Your order confirmation Nº %ref',
 );
