@@ -81,7 +81,7 @@ class Translator extends BaseTranslator
         if ($this->catalogues[$locale]->has((string) $id, $domain)) {
             return parent::trans($id, $parameters, $domain, $locale);
         } else {
-            Tlog::getInstance()->addWarning("Undefined translation: locale: $locale, domain: $domain, ID: $id");
+            //Tlog::getInstance()->addWarning("Undefined translation: locale: $locale, domain: $domain, ID: $id");
 
             if ($return_default_if_not_available)
                 return strtr($id, $parameters);
