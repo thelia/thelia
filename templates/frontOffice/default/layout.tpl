@@ -21,6 +21,10 @@ GNU General Public License : http://www.gnu.org/licenses/
 {declare_assets directory='assets'}
 {* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
 {default_translation_domain domain='fo.default'}
+
+{* -- Define some stuff for Smarty ------------------------------------------ *}
+{config_load file='variables.conf'}
+
 {block name="no-return-functions"}{/block}
 {assign var="store_name" value="{config key="store_name"}"}
 {if not $store_name}{assign var="store_name" value="{intl l='Thelia V2'}"}{/if}

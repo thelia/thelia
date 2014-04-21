@@ -333,7 +333,7 @@ class Thelia extends Kernel
     public function getCacheDir()
     {
         if (defined('THELIA_ROOT')) {
-            return THELIA_CACHE_DIR.'cache/'.$this->environment;
+            return THELIA_CACHE_DIR.DS.$this->environment;
         } else {
             return parent::getCacheDir();
         }
