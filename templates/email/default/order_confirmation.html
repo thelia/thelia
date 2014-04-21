@@ -4,10 +4,10 @@
 {block name="browser"}{/block}
 
 {* Subject  *}
-{block name="email-subject"}Your order confirmation Nº {$order_ref}{/block}
+{block name="email-subject"}{intl l="Your order confirmation Nº %ref" ref={$order_ref}}{/block}
 
 {* Title  *}
-{block name="email-title"}Thank you for your order!{/block}
+{block name="email-title"}{intl l="Thank you for your order!"}{/block}
 
 {* Content  *}
 {block name="email-content"}
@@ -21,12 +21,12 @@
             {assign var="customerRef" value=$REF}
         {/loop}
 
-        Here are the details of your purchase:<br /><br />
+        {intl l="Here are the details of your purchase:"}<br /><br />
 
         <table width="100%" border="0" cellpadding="0" cellspacing="0">
             <tr>
                 <td valign="top" width="55%">
-                    <strong>Delivery address:</strong><br>
+                    <strong>{intl l="Delivery address:"}</strong><br>
                     {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
                     {$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1}<br>
@@ -37,7 +37,7 @@
                     {/loop}
                 </td>
                 <td valign="top">
-                    <strong>Billing address:</strong><br />
+                    <strong>{intl l="Billing address:"}</strong><br />
                     {loop type="order_address" name="invoice_address" id=$INVOICE_ADDRESS}
                     {$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1}<br>
@@ -53,11 +53,11 @@
         <br />
 
         <p>
-            Order Total: {$TOTAL_TAXED_AMOUNT} {$orderCurrencySymbol} <span style="font-size:90%;color:#777">{$orderCurrencyIsoCode}</span><br />
-            Order Number: {$REF}<br />
-            Paid With: {loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}<br />
-            Purchase Date: {format_date date=$CREATE_DATE output="date"}<br />
-            Delivery method: {loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}<br />
+            {intl l="Order Total:"} {$TOTAL_TAXED_AMOUNT} {$orderCurrencySymbol} <span style="font-size:90%;color:#777">{$orderCurrencyIsoCode}</span><br />
+            {intl l="Order Number:"} {$REF}<br />
+            {intl l="Paid With:"} {loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}<br />
+            {intl l="Purchase Date:"} {format_date date=$CREATE_DATE output="date"}<br />
+            {intl l="Delivery method:"} {loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}<br />
         </p>
 
         <table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size:13px;line-height:2em">
@@ -90,15 +90,15 @@
                 </tr>
             {/loop}
             <tr>
-                <td align="right" style="text-align:right">Total</td>
+                <td align="right" style="text-align:right">{intl l="Total"}</td>
                 <td align="right" style="text-align:right">{$TOTAL_TAXED_AMOUNT - $POSTAGE} {$orderCurrencySymbol}</td>
             </tr>
             <tr>
-                <td align="right" style="text-align:right">Shipping:</td>
+                <td align="right" style="text-align:right">{intl l="Shipping:"}</td>
                 <td align="right" style="text-align:right">{$POSTAGE} {$orderCurrencySymbol}</td>
             </tr>
             <tr>
-                <td align="right" style="text-align:right"><strong>Order Total</strong></td>
+                <td align="right" style="text-align:right"><strong>{intl l="Order Total"}</strong></td>
                 <td align="right" style="text-align:right"><strong>{$TOTAL_TAXED_AMOUNT} {$orderCurrencySymbol}</strong></td>
             </tr>
         </table>
@@ -106,16 +106,17 @@
 
     <br />
 
-    <h2>Support</h2>
-    For any questions, or concerns, feel free to contact <a href="mailto:support@yourdomain.com" style="color:#3c69c1;text-decoration:none" target="_blank">support@yourdomain.com</a>.<br /><br />
-    <b>Our contact us at:</b> <br />
-    Thelia V2<br>
-    Street name of my business<br />
-    City<br />
-    75000, France
+    <h2>{intl l="Support"}</h2>
+    {intl l='For any questions, or concerns, feel free to contact <a href="mailto:%mail" style="color:#3c69c1;text-decoration:none" target="_blank">%mail</a>.' ref={config key="store_email"}}<br /><br />
+    <b>{intl l="Our contact us at:"}</b> <br />
+    {config key="store_name"}<br>
+    {config key="store_address1"}<br />
+    {config key="store_zipcode"}, {config key="store_city"}<br />
+    {loop type="country" name="store_country" id={config key="store_country"}}
+        {$TITLE}
+    {/loop}
 
     <br />
     <br />
-    Thanks,<br />
-    The Thelia V2 team
+    {intl l="Thanks"}<br />
 {/block}
