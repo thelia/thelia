@@ -73,7 +73,7 @@ class Thelia extends Kernel
         $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
         $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
         if ($this->isDebug()) {
-            $serviceContainer->setLogger('defaultLogger', \Thelia\Log\Tlog::getInstance());
+            $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
             $con->useDebug(true);
         }
 
@@ -236,7 +236,9 @@ class Thelia extends Kernel
                     $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
 
                 } catch (\InvalidArgumentException $e) {
-                    Tlog::getInstance()->addError(sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()), $e);
+                    Tlog::getInstance()->addError(
+                        sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()), $e
+                    );
                 }
             }
 
@@ -331,7 +333,7 @@ class Thelia extends Kernel
     public function getCacheDir()
     {
         if (defined('THELIA_ROOT')) {
-            return THELIA_CACHE_DIR.$this->environment;
+            return THELIA_CACHE_DIR.'cache/'.$this->environment;
         } else {
             return parent::getCacheDir();
         }
