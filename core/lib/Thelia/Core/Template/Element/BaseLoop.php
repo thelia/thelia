@@ -132,10 +132,10 @@ abstract class BaseLoop
     /**
      * Provides a getter to loop parameter values
      *
-     * @param string $name     the method name (only getArgname is supported)
-     * @param mixed $arguments this parameter is ignored
+     * @param string $name      the method name (only getArgname is supported)
+     * @param mixed  $arguments this parameter is ignored
      *
-     * @return mixed the argument value
+     * @return mixed                     the argument value
      * @throws \InvalidArgumentException if the parameter is unknown or the method name is not supported.
      */
     public function __call($name, $arguments)
@@ -230,7 +230,7 @@ abstract class BaseLoop
      *
      * @param string $argumentName the argument name
      *
-     * @return Argument the loop argument.
+     * @return Argument                  the loop argument.
      * @throws \InvalidArgumentException if argument is not found in loop argument list
      */
     protected function getArg($argumentName)
@@ -251,7 +251,7 @@ abstract class BaseLoop
      * @param string $argumentName the argument name
      *
      * @throws \InvalidArgumentException if argument is not found in loop argument list
-     * @return mixed the loop argument value
+     * @return mixed                     the loop argument value
      */
     protected function getArgValue($argumentName)
     {
@@ -263,7 +263,7 @@ abstract class BaseLoop
      * @param PropelModelPager $pagination the pagination part
      *
      * @return array|PropelModelPager|ObjectCollection
-     * @throws \InvalidArgumentException if the search mode is undefined.
+     * @throws \InvalidArgumentException               if the search mode is undefined.
      */
     protected function search(ModelCriteria $search, &$pagination = null)
     {
@@ -356,7 +356,7 @@ abstract class BaseLoop
     }
 
     /**
-     * @param ModelCriteria $search
+     * @param ModelCriteria    $search
      * @param PropelModelPager $pagination
      *
      * @return array|PropelModelPager

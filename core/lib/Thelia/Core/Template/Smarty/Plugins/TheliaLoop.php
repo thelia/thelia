@@ -59,7 +59,7 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
-     * @param string $loopName
+     * @param  string                    $loopName
      * @return PropelModelPager
      * @throws \InvalidArgumentException if no pagination was found for loop
      */
@@ -77,10 +77,10 @@ class TheliaLoop extends AbstractSmartyPlugin
     /**
      * Process the count function: executes a loop and return the number of items found
      *
-     * @param array $params parameters array
+     * @param array                     $params   parameters array
      * @param \Smarty_Internal_Template $template
      *
-     * @return int the item count
+     * @return int                       the item count
      * @throws \InvalidArgumentException if a parameter is missing
      *
      */
@@ -104,10 +104,10 @@ class TheliaLoop extends AbstractSmartyPlugin
     /**
      * Process {loop name="loop name" type="loop type" ... } ... {/loop} block
      *
-     * @param  array $params
-     * @param  string $content
-     * @param  \Smarty_Internal_Template $template
-     * @param  boolean $repeat
+     * @param array                     $params
+     * @param string                    $content
+     * @param \Smarty_Internal_Template $template
+     * @param boolean                   $repeat
      *
      * @throws \InvalidArgumentException
      *
@@ -209,11 +209,11 @@ class TheliaLoop extends AbstractSmartyPlugin
     /**
      * Process {elseloop rel="loopname"} ... {/elseloop} block
      *
-     * @param  array  $params loop parameters
-     * @param  string  $content loop text content
+     * @param  array                     $params   loop parameters
+     * @param  string                    $content  loop text content
      * @param  \Smarty_Internal_Template $template the Smarty object
-     * @param  boolean  $repeat repeat indicator (see Smarty doc.)
-     * @return string the loop output
+     * @param  boolean                   $repeat   repeat indicator (see Smarty doc.)
+     * @return string                    the loop output
      */
     public function theliaElseloop($params, $content, /** @noinspection PhpUnusedParameterInspection */ $template, &$repeat)
     {
@@ -228,11 +228,11 @@ class TheliaLoop extends AbstractSmartyPlugin
     /**
      * Process {ifloop rel="loopname"} ... {/ifloop} block
      *
-     * @param  array  $params loop parameters
-     * @param  string  $content loop text content
+     * @param  array                     $params   loop parameters
+     * @param  string                    $content  loop text content
      * @param  \Smarty_Internal_Template $template the Smarty object
-     * @param  boolean  $repeat repeat indicator (see Smarty doc.)
-     * @return string the loop output
+     * @param  boolean                   $repeat   repeat indicator (see Smarty doc.)
+     * @return string                    the loop output
      */
     public function theliaIfLoop($params, $content, /** @noinspection PhpUnusedParameterInspection */ $template, &$repeat)
     {
@@ -247,11 +247,11 @@ class TheliaLoop extends AbstractSmartyPlugin
     /**
      * Process {pageloop rel="loopname"} ... {/pageloop} block
      *
-     * @param  array  $params loop parameters
-     * @param  string  $content loop text content
+     * @param  array                     $params   loop parameters
+     * @param  string                    $content  loop text content
      * @param  \Smarty_Internal_Template $template the Smarty object
-     * @param  boolean  $repeat repeat indicator (see Smarty doc.)
-     * @return string the loop output
+     * @param  boolean                   $repeat   repeat indicator (see Smarty doc.)
+     * @return string                    the loop output
      * @throws \InvalidArgumentException
      */
     public function theliaPageLoop($params, $content, $template, &$repeat)
@@ -337,9 +337,9 @@ class TheliaLoop extends AbstractSmartyPlugin
      * Check if a loop has returned results. The loop shoud have been executed before, or an
      * InvalidArgumentException is thrown
      *
-     * @param  array $params
+     * @param array $params
      *
-     * @return boolean true if the loop is empty
+     * @return boolean                   true if the loop is empty
      * @throws \InvalidArgumentException
      */
     protected function checkEmptyLoop($params)

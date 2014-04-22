@@ -96,7 +96,7 @@ class TemplateHelper
     /**
      * Return a list of existing templates for a given template type
      *
-     * @param  int $templateType the template type
+     * @param  int                  $templateType the template type
      * @param string the template base (module or core, default to core).
      * @return TemplateDefinition[] of \Thelia\Core\Template\TemplateDefinition
      */
@@ -126,8 +126,7 @@ class TemplateHelper
 
                         $list[] = new TemplateDefinition($file->getFilename(), $templateType);
                     }
-                }
-                catch (\UnexpectedValueException $ex) {
+                } catch (\UnexpectedValueException $ex) {
                     // Ignore the exception and continue
                 }
             }

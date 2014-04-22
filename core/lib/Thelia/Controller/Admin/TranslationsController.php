@@ -27,11 +27,12 @@ use Thelia\Tools\URL;
 class TranslationsController extends BaseAdminController
 {
     /**
-     * @param string $item_name the modume code
-     * @return Module the module object
+     * @param  string                    $item_name the modume code
+     * @return Module                    the module object
      * @throws \InvalidArgumentException if module was not found
      */
-    protected function getModule($item_name) {
+    protected function getModule($item_name)
+    {
         if (null !== $module = ModuleQuery::create()->findPk($item_name))
             return $module;
 
@@ -40,8 +41,8 @@ class TranslationsController extends BaseAdminController
         );
     }
 
-
-    protected function getModuleTemplateNames(Module $module, $template_type) {
+    protected function getModuleTemplateNames(Module $module, $template_type)
+    {
         $templates =
             TemplateHelper::getInstance()->getList(
                 $template_type,
@@ -96,14 +97,12 @@ class TranslationsController extends BaseAdminController
                         $domain = $module->getTranslationDomain();
                         $i18n_directory = $module->getAbsoluteI18nPath();
                         $walkMode = TemplateHelper::WALK_MODE_PHP;
-                    }
-                    else if ($module_part == 'admin-includes') {
+                    } elseif ($module_part == 'admin-includes') {
                         $directory = $module->getAbsoluteAdminIncludesPath();
                         $domain = $module->getAdminIncludesTranslationDomain();
                         $i18n_directory = $module->getAbsoluteAdminIncludesI18nPath();
                         $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
-                    }
-                    else if (! empty($module_part)) {
+                    } elseif (! empty($module_part)) {
                         // Front or back office template, form of $module_part is [bo|fo].subdir-name
                         list($type, $subdir) = explode('.', $module_part);
 
@@ -111,13 +110,11 @@ class TranslationsController extends BaseAdminController
                             $directory = $module->getAbsoluteBackOfficeTemplatePath($subdir);
                             $domain = $module->getBackOfficeTemplateTranslationDomain($subdir);
                             $i18n_directory = $module->getAbsoluteBackOfficeI18nTemplatePath($subdir);
-                        }
-                        else if ($type == 'fo') {
+                        } elseif ($type == 'fo') {
                             $directory = $module->getAbsoluteFrontOfficeTemplatePath($subdir);
                             $domain = $module->getFrontOfficeTemplateTranslationDomain($subdir);
                             $i18n_directory = $module->getAbsoluteFrontOfficeI18nTemplatePath($subdir);
-                        }
-                        else {
+                        } else {
                             throw new \InvalidArgumentException("Undefined module template type: '$type'.");
                         }
 
@@ -171,7 +168,7 @@ class TranslationsController extends BaseAdminController
 
             if ($template) {
                 $directory = $template->getAbsolutePath();
-                
+
                 $i18n_directory = $template->getAbsoluteI18nPath();
 
                 $domain = $template->getTranslationDomain();

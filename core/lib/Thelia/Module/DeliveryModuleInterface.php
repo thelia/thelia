@@ -35,7 +35,7 @@ interface DeliveryModuleInterface extends BaseModuleInterface
      *
      * @param Country $country the country to deliver to.
      *
-     * @return float the delivery price
+     * @return float             the delivery price
      * @throws DeliveryException if the postage price cannot be calculated.
      */
     public function getPostage(Country $country);

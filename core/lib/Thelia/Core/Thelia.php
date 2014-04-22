@@ -217,7 +217,7 @@ class Thelia extends Kernel
                             $module->getAbsoluteTemplateBasePath()
                         );
 
-                    foreach($templates as $template) {
+                    foreach ($templates as $template) {
                         $translationDirs[$module->getBackOfficeTemplateTranslationDomain($template->getName())] =
                             $module->getAbsoluteBackOfficeI18nTemplatePath($template->getName());
                     }
@@ -229,7 +229,7 @@ class Thelia extends Kernel
                             $module->getAbsoluteTemplateBasePath()
                         );
 
-                    foreach($templates as $template) {
+                    foreach ($templates as $template) {
                         $translationDirs[$module->getFrontOfficeTemplateTranslationDomain($template->getName())] =
                             $module->getAbsoluteFrontOfficeI18nTemplatePath($template->getName());
                     }
@@ -279,8 +279,7 @@ class Thelia extends Kernel
 
                     $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
                 }
-            }
-            catch (\InvalidArgumentException $ex) {
+            } catch (\InvalidArgumentException $ex) {
                 // Ignore missing I18n directories
                 Tlog::getInstance()->addWarning("loadTranslation: missing $dir directory");
             }

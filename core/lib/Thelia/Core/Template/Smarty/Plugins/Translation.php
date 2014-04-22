@@ -29,7 +29,7 @@ class Translation extends AbstractSmartyPlugin
     /**
      * Set the default translation domain
      *
-     * @param  array $params
+     * @param  array                     $params
      * @param  \Smarty_Internal_Template $smarty
      * @return string
      */
@@ -41,7 +41,7 @@ class Translation extends AbstractSmartyPlugin
     /**
      * Process translate function
      *
-     * @param  array $params
+     * @param  array                     $params
      * @param  \Smarty_Internal_Template $smarty
      * @return string
      */

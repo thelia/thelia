@@ -77,7 +77,8 @@ class TemplateDefinition
         }
     }
 
-    public function getTranslationDomain() {
+    public function getTranslationDomain()
+    {
         return $this->translationDomainPrefix . strtolower($this->getName());
     }
 

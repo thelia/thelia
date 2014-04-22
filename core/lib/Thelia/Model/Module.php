@@ -16,17 +16,18 @@ class Module extends BaseModule
 
     const ADMIN_INCLUDES_DIRECTORY_NAME = "AdminIncludes";
 
-
     public function postSave(ConnectionInterface $con = null)
     {
         ModuleQuery::resetActivated();
     }
 
-    public function getTranslationDomain() {
+    public function getTranslationDomain()
+    {
         return strtolower($this->getCode());
     }
 
-    public function getAdminIncludesTranslationDomain() {
+    public function getAdminIncludesTranslationDomain()
+    {
         return $this->getTranslationDomain().'.ai';
     }
 
@@ -48,7 +49,8 @@ class Module extends BaseModule
         );
     }
 
-    public function getBackOfficeTemplateTranslationDomain($templateName) {
+    public function getBackOfficeTemplateTranslationDomain($templateName)
+    {
         return $this->getTranslationDomain(). '.bo.' . $templateName;
     }
 
@@ -70,7 +72,8 @@ class Module extends BaseModule
         );
     }
 
-    public function getFrontOfficeTemplateTranslationDomain($templateName) {
+    public function getFrontOfficeTemplateTranslationDomain($templateName)
+    {
         return $this->getTranslationDomain(). '.fo.' . $templateName;
     }
 
@@ -151,7 +154,7 @@ class Module extends BaseModule
     /**
      * Return the absolute path to one of the module's template directories
      *
-     * @param int $templateSubdirName the name of the, probably one of TemplateDefinition::xxx_SUBDIR constants
+     * @param  int    $templateSubdirName the name of the, probably one of TemplateDefinition::xxx_SUBDIR constants
      * @return string a path
      */
     public function getAbsoluteTemplateDirectoryPath($templateSubdirName)

@@ -159,7 +159,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      * Sets a module titles for various languages
      *
      * @param Module $module the module.
-     * @param array $titles an associative array of locale => title_string
+     * @param array  $titles an associative array of locale => title_string
      */
     public function setTitle(Module $module, $titles)
     {
