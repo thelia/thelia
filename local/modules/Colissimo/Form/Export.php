@@ -69,7 +69,7 @@ class Export extends BaseForm
                         )
                     ))
                 ],
-                'label' => Translator::getInstance()->trans('Modify status export after export'),
+                'label' => Translator::getInstance()->trans('Modify status export after export', [], Colissimo::MESSAGE_DOMAIN),
                 'label_attr' => [
                     'for' => 'status_id'
                 ]
@@ -87,7 +87,7 @@ class Export extends BaseForm
     public function verifyValue($value, ExecutionContextInterface $context)
     {
         if (!preg_match("#^nochange|processing|sent$#",$value)) {
-            $context->addViolation(Translator::getInstance()->trans('select a valid status'));
+            $context->addViolation(Translator::getInstance()->trans('select a valid status', [], Colissimo::MESSAGE_DOMAIN));
         }
     }
 

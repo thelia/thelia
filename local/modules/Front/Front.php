@@ -27,9 +27,5 @@ use Thelia\Module\BaseModule;
 
 class Front extends BaseModule
 {
-    /**
-     * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
-     * Like install and destroy
-     */
-
+    const MESSAGE_DOMAIN = 'front';
 }

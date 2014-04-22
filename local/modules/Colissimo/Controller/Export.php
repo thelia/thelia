@@ -12,6 +12,7 @@
 
 namespace Colissimo\Controller;
 
+use Colissimo\Colissimo;
 use Colissimo\Model\ColissimoQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Controller\Admin\BaseAdminController;
@@ -139,7 +140,7 @@ class Export extends BaseAdminController
 
         } catch (FormValidationException $e) {
             $this->setupFormErrorContext(
-                Translator::getInstance()->trans("colissimo expeditor export"),
+                Translator::getInstance()->trans("colissimo expeditor export", [], Colissimo::MESSAGE_DOMAIN),
                 $e->getMessage(),
                 $form,
                 $e
