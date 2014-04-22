@@ -15,6 +15,8 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\Finder\Finder;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Translation\Translator;
+use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Core\Template\TemplateHelper;
@@ -122,6 +124,12 @@ class TranslationsController extends BaseAdminController
                         $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
                     }
 
+                    // If the module is not active, load the translation file,
+                    // as it is not already loaded in Thelia.php
+                    if (! empty ($domain) && ! $module->getActivate()) {
+                        $this->loadTranslation($i18n_directory, $domain);
+                    }
+
                     // List front and back office templates defined by this module
                     $templateArguments['back_office_templates'] =
                         implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::BACK_OFFICE));
@@ -190,10 +198,16 @@ class TranslationsController extends BaseAdminController
                 $i18n_directory = $template->getAbsoluteI18nPath();
 
                 $domain = $template->getTranslationDomain();
+
+                // Load translations files is this template is not the current template
+                // as it is not loaded in Thelia.php
+                if (! TemplateHelper::getInstance()->isActive($template)) {
+                    $this->loadTranslation($i18n_directory, $domain);
+                }
             }
 
             // Load strings to translate
-            if ($directory) {
+            if ($directory && ! empty($domain)) {
 
                 // Save the string set, if the form was submitted
                 if ($i18n_directory) {
@@ -257,4 +271,24 @@ class TranslationsController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
         return $this->renderTemplate();
     }
+
+    private function loadTranslation($directory, $domain)
+    {
+        try {
+            $finder = Finder::create()
+                ->files()
+                ->depth(0)
+                ->in($directory);
+
+            /** @var \DirectoryIterator $file */
+            foreach ($finder as $file) {
+                list($locale, $format) = explode('.', $file->getBaseName(), 2);
+
+                Translator::getInstance()->addResource($format, $file->getPathname(), $locale, $domain);
+            }
+        } catch (\InvalidArgumentException $ex) {
+            // Ignore missing I18n directories
+        }
+    }
+
 }
