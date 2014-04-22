@@ -45,7 +45,7 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 SET @max := @max+1;
 
 INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
-(@max, 'admin.cache', NOW(), NOW());
+(@max, 'admin.home', NOW(), NOW());
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max, 'en_US', 'Back-office home page'),
