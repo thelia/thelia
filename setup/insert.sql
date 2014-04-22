@@ -39,11 +39,11 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('store_name','', 0, 1, NOW(), NOW()),
 ('store_email','', 0, 1, NOW(), NOW()),
 ('one_domain_foreach_lang','0', 1, 1, NOW(), NOW()),
-('thelia_version','2.0.0-RC1', 1, 1, NOW(), NOW()),
+('thelia_version','2.0.0', 1, 1, NOW(), NOW()),
 ('thelia_major_version','2', 1, 1, NOW(), NOW()),
 ('thelia_minus_version','0', 1, 1, NOW(), NOW()),
 ('thelia_release_version','0', 1, 1, NOW(), NOW()),
-('thelia_extra_version','RC1', 1, 1, NOW(), NOW());
+('thelia_extra_version','', 1, 1, NOW(), NOW());
 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES

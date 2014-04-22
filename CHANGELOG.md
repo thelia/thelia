@@ -1,25 +1,25 @@
 #2.0.0
-- coupons effect are recalculated after each product's cart modification
+- Coupons values are re-evaluated when a product quantity is changed in the shopping cart
 - You can declare new compilerPass in modules. See Thelia\Module\BaseModule::getCompilers phpDoc
 - Add ability to load assets from another template. See https://gist.github.com/lunika/9365180
 - allow possibility to use Dependency Injection compiler in Thelia modules
 - Add Deactivate Module Command Line
-- add indexes on database for improving performance
-- Change order and customer ref
+- Add indexes to  database to improve performance
+- Order and customer references are more human readable than before
 - Refactor intl process. A domain is created for each templates and modules :
     - core => for thelia core translations
     - bo.template_name (eg : bo.default) => for each backoffice template
     - fo.template_name (eg : fo.default) => for each frontoffice template
     - pdf.template_name (eg : pdf.default) => for each pdf template
-    - email.template_name (eg : emai.default) => for each email template
+    - email.template_name (eg : email.default) => for each email template
     - modules :
         - module_code (eg : paypal) => fore module core translations
         - module_code.ai (eg : paypal.ai) => used in AdminIncludes templates
         - bo.module_code.template_name (eg : bo.paypal.default) => used in back office template
         - fo.module_code.template_name (eg : fo.paypal.default) => used in front office template
 - new parameter for smarty ```intl``` function. The parameter ```d``` allow you to specify the translation domain (as explain before). This parameter is optional
-- the ```d``` can be omitted if you use ```{default_translation_domain domain='bo.default'}``` in your layout. If you use this smarty function, the ```d``` parameter is automatically to the domain specify in ```default_translation_domain``` function
-- We changed Thelia's license. Now Thelia use LGPL 3.0+ License
+- the ```d``` can be omitted if you use ```{default_translation_domain domain='bo.default'}``` in your layout. If you use this smarty function, the ```d``` parameter is automatically set with the domain specify in ```default_translation_domain``` function
+- We changed Thelia's license. Thelia is published  under the LGPL 3.0+ License
 
 
 #2.0.0-RC1

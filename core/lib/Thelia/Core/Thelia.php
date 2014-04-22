@@ -49,7 +49,7 @@ use Thelia\Model\Module;
 class Thelia extends Kernel
 {
 
-    const THELIA_VERSION = '2.0.0-RC1';
+    const THELIA_VERSION = '2.0.0';
 
     public function init()
     {
