@@ -102,11 +102,11 @@ class OrderController extends BaseFrontController
             $this->redirectToRoute("order.invoice");
 
         } catch (FormValidationException $e) {
-            $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
+            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
-            $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
+            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
 
         if ($message !== false) {
@@ -158,11 +158,11 @@ class OrderController extends BaseFrontController
             $this->redirectToRoute("order.payment.process");
 
         } catch (FormValidationException $e) {
-            $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
+            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
-            $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
+            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
 
         if ($message !== false) {
