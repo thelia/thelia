@@ -129,7 +129,7 @@ class Customer extends BaseCustomer implements UserInterface
 
     protected function generateRef()
     {
-        return uniqid(substr($this->getLastname(), 0, (strlen($this->getLastname()) >= 3) ? 3 : strlen($this->getLastname())), true);
+        return sprintf('CUS%s', str_pad($this->getId(), 12, 0, STR_PAD_LEFT));
     }
 
     /**
@@ -164,7 +164,7 @@ class Customer extends BaseCustomer implements UserInterface
 
         return $this;
     }
-
+/*
     public function setRef($ref)
     {
         if (null === $ref && null === $this->ref) {
@@ -174,7 +174,7 @@ class Customer extends BaseCustomer implements UserInterface
         }
 
         return $this;
-    }
+    }*/
 
     public function setEmail($email, $force = false)
     {
@@ -273,10 +273,6 @@ class Customer extends BaseCustomer implements UserInterface
         // Set the serial number (for auto-login)
         $this->setRememberMeSerial(uniqid());
 
-        if (null === $this->ref) {
-            $this->setRef($this->generateRef());
-        }
-
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECUSTOMER, new CustomerEvent($this));
 
         return true;
@@ -287,6 +283,11 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        if (null === $this->getRef()) {
+            $this->setRef($this->generateRef())
+                ->save($con);
+        }
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATECUSTOMER, new CustomerEvent($this));
     }
 

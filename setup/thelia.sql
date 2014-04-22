@@ -441,7 +441,7 @@ DROP TABLE IF EXISTS `customer`;
 CREATE TABLE `customer`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `ref` VARCHAR(50) NOT NULL,
+    `ref` VARCHAR(50),
     `title_id` INTEGER NOT NULL,
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
@@ -651,7 +651,7 @@ DROP TABLE IF EXISTS `order`;
 CREATE TABLE `order`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `ref` VARCHAR(45) NOT NULL,
+    `ref` VARCHAR(45),
     `customer_id` INTEGER NOT NULL,
     `invoice_order_address_id` INTEGER NOT NULL,
     `delivery_order_address_id` INTEGER NOT NULL,

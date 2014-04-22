@@ -375,7 +375,7 @@
   </table>
   <table name="customer" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="ref" required="true" size="50" type="VARCHAR" />
+    <column name="ref" size="50" type="VARCHAR" />
     <column name="title_id" required="true" type="INTEGER" />
     <column name="firstname" required="true" size="255" type="VARCHAR" />
     <column name="lastname" required="true" size="255" type="VARCHAR" />
@@ -553,7 +553,7 @@
   </table>
   <table name="order" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="ref" required="true" size="45" type="VARCHAR" />
+    <column name="ref" size="45" type="VARCHAR" />
     <column name="customer_id" required="true" type="INTEGER" />
     <column name="invoice_order_address_id" required="true" type="INTEGER" />
     <column name="delivery_order_address_id" required="true" type="INTEGER" />
