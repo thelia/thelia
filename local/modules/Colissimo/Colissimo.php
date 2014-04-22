@@ -31,6 +31,8 @@ class Colissimo extends AbstractDeliveryModule
 
     const JSON_PRICE_RESOURCE = "/Config/prices.json";
 
+    const MESSAGE_DOMAIN = 'colissimo';
+
     public static function getPrices()
     {
         if (null === self::$prices) {
@@ -82,7 +84,7 @@ class Colissimo extends AbstractDeliveryModule
             /* check if Colissimo delivers the asked area */
             if (!isset($prices[$areaId]) || !isset($prices[$areaId]["slices"])) {
                 throw new DeliveryException(
-                    Translator::getInstance()->trans("Colissimo delivery unavailable for the delivery country")
+                    Translator::getInstance()->trans("Colissimo delivery unavailable for the delivery country", [], self::MESSAGE_DOMAIN)
                 );
             }
 
@@ -96,7 +98,8 @@ class Colissimo extends AbstractDeliveryModule
                 throw new DeliveryException(
                     Translator::getInstance()->trans(
                         "Colissimo delivery unavailable for this cart weight (%weight kg)",
-                        array("%weight" => $weight)
+                        array("%weight" => $weight),
+                        self::MESSAGE_DOMAIN
                     )
                 );
             }

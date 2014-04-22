@@ -13,6 +13,7 @@
 namespace Colissimo\Form;
 
 
+use Colissimo\Colissimo;
 use Colissimo\Model\ColissimoFreeshippingQuery;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
@@ -44,7 +45,7 @@ class FreeShipping extends BaseForm {
         $this->formBuilder
             ->add("freeshipping", "checkbox", array(
                 'data'=>$freeshipping,
-                'label'=>Translator::getInstance()->trans("Activate free shipping: ")
+                'label'=>Translator::getInstance()->trans("Activate free shipping: ", [], Colissimo::MESSAGE_DOMAIN)
             ))
         ;
     }
