@@ -264,7 +264,7 @@ class AreaController extends AbstractCrudController
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
         $request = $this->getRequest();
-        $removeCountryEvent = new AreaRemoveCountryEvent($request->request->get('areai_id', 0), $request->request->get('country_id', 0));
+        $removeCountryEvent = new AreaRemoveCountryEvent($request->request->get('area_id', 0), $request->request->get('country_id', 0));
 
         $this->dispatch(TheliaEvents::AREA_REMOVE_COUNTRY, $removeCountryEvent);
 
