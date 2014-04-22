@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Finder\Finder;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Model\Module;
@@ -127,6 +128,23 @@ class TranslationsController extends BaseAdminController
 
                     $templateArguments['front_office_templates'] =
                         implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::FRONT_OFFICE));
+
+                    // Check if we have admin-include files
+                    try {
+                        $finder = Finder::create()
+                                    ->files()
+                                    ->depth(0)
+                                    ->in($module->getAbsoluteAdminIncludesPath())
+                                    ->name('/\.html$/i')
+                        ;
+
+                        $hasAdminIncludes = $finder->count() > 0;
+                    }
+                    catch (\InvalidArgumentException $ex) {
+                        $hasAdminIncludes = false;
+                    }
+
+                    $templateArguments['has_admin_includes'] = $hasAdminIncludes;
 
                     break;
 

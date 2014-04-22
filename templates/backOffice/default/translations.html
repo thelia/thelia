@@ -128,7 +128,10 @@
                                                 <select id="module_part" required="required" name="module_part" class="submit-on-change form-control">
                                                     <option value="">{intl l='Please select the module component'}</option>
                                                     <option value="core" {if $module_part == 'core'}selected="selected"{/if}>Core files</option>
-                                                    <option value="admin-includes" {if $module_part == 'admin-includes'}selected="selected"{/if}>Administration includes template</option>
+
+                                                    {if $has_admin_includes}
+                                                        <option value="admin-includes" {if $module_part == 'admin-includes'}selected="selected"{/if}>Administration includes template</option>
+                                                    {/if}
 
                                                     {if $back_office_templates != ''}
                                                         {foreach explode(',', $back_office_templates) as $template}
