@@ -48,6 +48,31 @@ class TemplateHelper
     }
 
     /**
+     * Check if a template definition is the current active template
+     *
+     * @param TemplateDefinition $tplDefinition
+     * @return bool true is the given template is the active template
+     */
+    public function isActive(TemplateDefinition $tplDefinition) {
+
+        switch ($tplDefinition->getType()) {
+            case TemplateDefinition::FRONT_OFFICE:
+                $tplVar = 'active-front-template';
+                break;
+             case TemplateDefinition::BACK_OFFICE:
+                 $tplVar = 'active-front-template';
+                 break;
+            case TemplateDefinition::PDF:
+                 $tplVar = 'active-front-template';
+                 break;
+            case TemplateDefinition::EMAIL:
+                $tplVar = 'active-front-template';
+                break;
+        }
+
+        return $tplDefinition->getName() == ConfigQuery::read($tplVar, 'default');
+    }
+    /**
      * @return TemplateDefinition
      */
     public function getActivePdfTemplate()
