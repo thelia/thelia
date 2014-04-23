@@ -156,9 +156,10 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
         $this->redirectToRoute(
             'order.placed',
-            array(
+            [],
+            [
                 'order_id' => $order_id
-            ),
+            ],
             Router::ABSOLUTE_PATH
         );
     }
@@ -169,16 +170,17 @@ abstract class BasePaymentModuleController extends BaseFrontController
      * @param int         $order_id the order ID
      * @param string|null $message  an error message.
      */
-    public function redirectToFailurePage($order_id, $message = null)
+    public function redirectToFailurePage($order_id, $message)
     {
         $this->getLog()->addInfo("Redirecting customer to payment failure page");
 
         $this->redirectToRoute(
             'order.failed',
-            array(
+            [],
+            [
                 'order_id' => $order_id,
                 'message' => $message
-            ),
+            ],
             Router::ABSOLUTE_PATH
         );
     }

@@ -42,9 +42,9 @@ class BaseFrontController extends BaseController
      * @param array  $urlParameters the URL parametrs, as a var/value pair array
      * @param bool   $referenceType
      */
-    public function redirectToRoute($routeId, $urlParameters = array(), $referenceType = Router::ABSOLUTE_PATH)
+    public function redirectToRoute($routeId, array $urlParameters = [], array $routeParameters = [], $referenceType = Router::ABSOLUTE_PATH)
     {
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, array(), $referenceType), $urlParameters));
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, $routeParameters, $referenceType), $urlParameters));
     }
 
     public function checkAuth()
