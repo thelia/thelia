@@ -180,6 +180,8 @@ class Module extends BaseAction implements EventSubscriberInterface
     public function updatePosition(UpdatePositionEvent $event)
     {
         $this->genericUpdatePosition(ModuleQuery::create(), $event);
+
+        $this->cacheClear($event->getDispatcher());
     }
 
     protected function cacheClear(EventDispatcherInterface $dispatcher)

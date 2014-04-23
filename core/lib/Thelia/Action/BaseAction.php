@@ -27,7 +27,7 @@ class BaseAction
      * @param ModelCriteria       $query
      * @param UpdatePositionEvent $event
      *
-     * @return mixed
+     * @return null
      */
     protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event)
     {
