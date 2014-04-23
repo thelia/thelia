@@ -728,6 +728,9 @@
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
     <column name="full_namespace" size="255" type="VARCHAR" />
+    <index name="idx_module_position">
+      <index-column name="position" />
+    </index>
     <unique name="code_UNIQUE">
       <unique-column name="code" />
     </unique>

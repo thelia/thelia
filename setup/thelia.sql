@@ -866,7 +866,8 @@ CREATE TABLE `module`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `code_UNIQUE` (`code`)
+    UNIQUE INDEX `code_UNIQUE` (`code`),
+    INDEX `idx_module_position` (`position`)
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
