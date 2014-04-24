@@ -236,6 +236,8 @@ class TemplateHelper
 
                                 Tlog::getInstance()->debug("Strings found: ", $matches[2]);
 
+                                $idx = 0;
+
                                 foreach ($matches[2] as $match) {
 
                                     $hash = md5($match);
@@ -247,8 +249,12 @@ class TemplateHelper
                                     } else {
                                         $num_texts++;
 
-                                        // remove \'
-                                        $match = str_replace("\\'", "'", $match);
+                                        // remove \' (or \"), that will prevent the translator to work properly, as
+                                        // "abc \def\" ghi" will be passed as abc "def" ghi to the translator.
+
+                                        $quote = $matches[1][$idx];
+
+                                        $match = str_replace("\\$quote", $quote, $match);
 
                                         $strings[$hash] = array(
                                                 'files'   => array($short_path),
@@ -257,6 +263,8 @@ class TemplateHelper
                                                 'dollar'  => strstr($match, '$') !== false
                                         );
                                     }
+
+                                    $idx++;
                                 }
                             }
                         }
