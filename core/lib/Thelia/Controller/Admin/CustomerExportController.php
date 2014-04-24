@@ -25,22 +25,35 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Model\CustomerQuery;
+use Thelia\Model\NewsletterQuery;
 
 
 /**
- * Class ExportController
+ * Class CustomerExportController
  * @package Thelia\Controller\Admin
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ExportController extends BaseAdminController
+class CustomerExportController extends BaseAdminController
 {
 
-    public function indexAction()
+    public function NewsletterExportAction()
     {
-        if (null !== $response = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::VIEW])) {
+        if (null !== $response = $this->checkAuth([AdminResources::EXPORT_CUSTOMER_NEWSLETTER], [], [AccessManager::VIEW])) {
             return $response;
         }
 
-        return $this->render('export');
+        $data = NewsletterQuery::create()
+            ->select([
+                    'email',
+                    'firstname',
+                    'lastname',
+                    'locale'
+                ])
+            ->find();
+
+
+
     }
+
 }
