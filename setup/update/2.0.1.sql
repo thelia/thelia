@@ -12,6 +12,7 @@ ALTER TABLE `module` ADD INDEX `idx_module_activate` (`activate`);
 SELECT @max := MAX(`id`) FROM `resource`;
 SET @max := @max+1;
 
+
 INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (@max, 'admin.configuration.store', NOW(), NOW());
 
@@ -63,5 +64,35 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
   (@max, 'en_US', 'Translations'),
   (@max, 'fr_FR', 'Traductions');
+
+SET @max := @max+1;
+
+INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
+(@max, 'admin.tools', NOW(), NOW());
+
+INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
+(@max, 'en_US', 'Tools panel'),
+(@max, 'fr_FR', 'Outils');
+
+SET @max := @max+1;
+
+INSERT INTO `resource` (`id`, `code`, `created_at`, `updated_at`) VALUES
+(@max, 'admin.export', NOW(), NOW());
+
+INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
+(@max, 'en_US', 'Back-office export management'),
+(@max, 'fr_FR', 'gestion des exports');
+
+
+SET @max := @max+1;
+
+INSERT INTO `resource` (`id`, `code`, `created_at`, `updated_at`) VALUES
+(@max, 'admin.export.customer.newsletter', NOW(), NOW());
+
+INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
+(@max, 'en_US', 'export of newsletter subscribers'),
+(@max, 'fr_FR', 'export des inscrits à la newsletter');
+
+
 
 SET FOREIGN_KEY_CHECKS = 1;
