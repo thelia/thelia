@@ -187,14 +187,8 @@
                             </li>
                             {/loop}
 
-                            {loop name="menu-auth-coupon" type="auth" role="ADMIN" resource="admin.coupon"  access="VIEW"}
-                            <li class="{if $admin_current_location == 'coupon'}active{/if}" id="coupon_menu">
-                                <a href="{url path='/admin/coupon'}">{intl l="Coupons"}</a>
-                            </li>
-                            {/loop}
-
                             {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools"  access="VIEW"}
-                            <li class="{if $admin_current_location == 'home'}active{/if}" id="home_menu">
+                            <li class="{if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
                                 <a href="{url path='/admin/tools'}">{intl l="Tools"}</a>
                             </li>
                             {/loop}
