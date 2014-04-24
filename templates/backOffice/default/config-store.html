@@ -143,7 +143,7 @@
                                                     <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
                                                     <select name="{$name}" id="{$label_attr.for}" class="form-control"{if $required} aria-required="true" required{/if}>
                                                         {loop type="country" name="country1"}
-                                                            <option value="{$ID}" {if {$value} == $ID}selected{/if}>{$TITLE}</option>
+                                                            <option value="{$ID}" {if {$value} == $ID || (empty($value) && $IS_DEFAULT)}selected{/if}>{$TITLE}</option>
                                                         {/loop}
                                                     </select>
                                                 </div>
