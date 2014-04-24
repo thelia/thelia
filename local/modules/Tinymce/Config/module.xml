@@ -2,10 +2,10 @@
 <module>
     <fullnamespace>Tinymce\Tinymce</fullnamespace>
     <descriptive locale="en_US">
-        <title>Tinymce wysiwyg editor</title>
+        <title>TinyMCE WYSIWYG editor</title>
     </descriptive>
     <descriptive locale="fr_FR">
-        <title>éditeur wysiwyg Tinymce</title>
+        <title>Editeur visuel TinyMCE</title>
     </descriptive>
     <version>0.1</version>
     <author>
