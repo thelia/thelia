@@ -13,15 +13,14 @@
 namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Model\AdminLogQuery;
 
 class AdminLogsController extends BaseAdminController
 {
-    const RESOURCE_CODE = "admin.admin-logs";
-
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ADMIN_LOG, array(), AccessManager::VIEW)) return $response;
 
         // Render the edition template.
         return $this->render('admin-logs');
