@@ -100,4 +100,8 @@ final class AdminResources
     const TRANSLATIONS = "admin.configuration.translations";
 
     const UPDATE = "admin.configuration.update";
+
+    const EXPORT = "admin.export";
+
+    const TOOLS = "admin.tools";
 }

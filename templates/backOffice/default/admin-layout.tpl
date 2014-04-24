@@ -193,20 +193,28 @@
                             </li>
                             {/loop}
 
+                            {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools"  access="VIEW"}
+                            <li class="{if $admin_current_location == 'home'}active{/if}" id="home_menu">
+                                <a href="{url path='/admin/tools'}">{intl l="Tools"}</a>
+                            </li>
+                            {/loop}
+
+                            {loop name="menu-auth-modules" type="auth" role="ADMIN" resource="admin.module"  access="VIEW"}
+                                <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
+                                    <a href="{url path='/admin/modules'}">{intl l="Modules"}</a>
+                                </li>
+                            {/loop}
+
                             {loop name="menu-auth-config" type="auth" role="ADMIN" resource="admin.configuration"  access="VIEW"}
                             <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
                                 <a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a>
                             </li>
                             {/loop}
 
-                            {loop name="menu-auth-modules" type="auth" role="ADMIN" resource="admin.module"  access="VIEW"}
-                            <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
-                                <a href="{url path='/admin/modules'}">{intl l="Modules"}</a>
-                            </li>
 
                             {module_include location='in_top_menu_items'}
 
-                            {/loop}
+
                         </ul>
 
                         {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}

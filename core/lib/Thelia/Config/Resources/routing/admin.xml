@@ -549,6 +549,10 @@
 
     <!-- Routes to the Config (system variables) controller -->
 
+    <route id="admin.configuration.inedx" path="/admin/configuration">
+        <default key="_controller">Thelia\Controller\Admin\ConfigurationController::indexAction</default>
+    </route>
+
     <route id="admin.configuration.variables.default" path="/admin/configuration/variables">
         <default key="_controller">Thelia\Controller\Admin\ConfigController::defaultAction</default>
     </route>
@@ -1148,6 +1152,12 @@
 
     <route id="admin.configuration.translations.update" path="/admin/configuration/translations/update">
         <default key="_controller">Thelia\Controller\Admin\TranslationsController::updateAction</default>
+    </route>
+
+    <!-- export management -->
+
+    <route id="export.customer.newsletter" path="/admin/export/customer/newsletter">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::customerNewsletterAction</default>
     </route>
 
     <!-- The default route, to display a template -->
