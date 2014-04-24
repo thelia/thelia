@@ -9,7 +9,7 @@
 
 	    <div class="input-group">
 	        <select required="required" name="feature_id" id="feature_id" class="form-control">
-		        <option value="">{intl l='Select an feature...'}</option>
+		        <option value="">{intl l='Select a feature...'}</option>
 		        {loop name="free_features" type="feature" exclude_template="$template_id" backend_context="1" lang="$edit_language_id"}
 		            <option value="{$ID}">{$TITLE}</option>
 		        {/loop}
@@ -19,12 +19,12 @@
 		    </span>
 	    </div>
 
-	    <span class="help-block">{intl l='Select an feature and click (+) to add it to this template'}</span>
+	    <span class="help-block">{intl l='Select a feature and click (+) to add it to this template'}</span>
     </form>
 
     {/ifloop}
     {elseloop rel="free_features"}
-    <div class="alert alert-info">There is currently no available features.</div>
+    <div class="alert alert-info">{intl l="There is currently no available features."}</div>
     {/elseloop}
 </div>
 
