@@ -385,7 +385,7 @@ jQuery(function($) {
                 var fieldValue = $(v).text();
             }
 
-            $('.' + $(v).data('field-class')).val(fieldValue);
+            $('.' + $(v).data('field-class')).val($.trim(fieldValue));
             if($('.' + $(v).data('field-class')).is('select')) {
                 $('.' + $(v).data('field-class')).selectpicker('refresh');
             }
