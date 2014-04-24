@@ -992,12 +992,12 @@
     <!-- end feature and feature routes  management -->
 
     <!-- cache route management -->
-    <route id="admin.configuration.cache" path="/admin/configuration/cache">
-        <default key="_controller">Thelia\Controller\Admin\CacheController::defaultAction</default>
+    <route id="admin.configuration.advanced" path="/admin/configuration/advanced">
+        <default key="_controller">Thelia\Controller\Admin\AdvancedConfigurationController::defaultAction</default>
     </route>
 
-    <route id="admin.configuration.cache.flush" path="/admin/cache/flush">
-        <default key="_controller">Thelia\Controller\Admin\CacheController::flushAction</default>
+    <route id="admin.configuration.advanced.flush-cache" path="/admin/configuration/advanced/flush-cache">
+        <default key="_controller">Thelia\Controller\Admin\AdvancedConfigurationController::flushCacheAction</default>
     </route>
 
     <!-- and cache route management -->

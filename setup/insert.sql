@@ -1271,7 +1271,13 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (23, 'admin.configuration.template', NOW(), NOW()),
 (24, 'admin.configuration.system-log', NOW(), NOW()),
 (25, 'admin.cache', NOW(), NOW()),
-(26, 'admin.home', NOW(), NOW());
+(26, 'admin.home', NOW(), NOW()),
+(27, 'admin.configuration.store', NOW(), NOW()),
+(28, 'admin.configuration.variable', NOW(), NOW()),
+(29, 'admin.configuration.admin-logs', NOW(), NOW()),
+(30, 'admin.configuration.system-logs', NOW(), NOW()),
+(31, 'admin.configuration.advanced', NOW(), NOW()),
+(32, 'admin.configuration.translations', NOW(), NOW());
 
 /**
 generated with command : php Thelia thelia:generate-resources --output sql-i18n
@@ -1328,7 +1334,19 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (25, 'en_US', 'Configuration / Cache'),
 (25, 'fr_FR', 'Configuration / Cache'),
 (26, 'en_US', 'Back-office home page'),
-(26, 'fr_FR', 'Page d''acceuil de l''administration');
+(26, 'fr_FR', 'Page d''acceuil de l''administration'),
+(27, 'en_US', 'Store information configuration'),
+(27, 'fr_FR', 'Informations sur la boutique'),
+(28, 'en_US', 'Configuration variables'),
+(28, 'fr_FR', 'Variables de configuration'),
+(29, 'en_US', 'View administration logs'),
+(29, 'fr_FR', 'Consulter les logs d''administration'),
+(30, 'en_US', 'Logging system configuration'),
+(30, 'fr_FR', 'Configuration du système de log'),
+(31, 'en_US', 'Advanced configuration'),
+(31, 'fr_FR', 'Configuration avancée'),
+(32, 'en_US', 'Translations'),
+(32, 'fr_FR', 'Traductions');
 
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES

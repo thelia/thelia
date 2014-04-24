@@ -45,11 +45,11 @@ final class AdminResources
 
     const ADMINISTRATOR = "admin.configuration.administrator";
 
+    const ADVANCED_CONFIGURATION = "admin.configuration.advanced";
+
     const AREA = "admin.configuration.area";
 
     const ATTRIBUTE = "admin.configuration.attribute";
-
-    const CACHE = "admin.cache";
 
     const CATEGORY = "admin.category";
 
@@ -91,7 +91,9 @@ final class AdminResources
 
     const TEMPLATE = "admin.configuration.template";
 
-    const SYSTEM_LOG = "admin.configuration.system-log";
+    const SYSTEM_LOG = "admin.configuration.system-logs";
+
+    const ADMIN_LOG = "admin.configuration.admin-logs";
 
     const STORE = "admin.configuration.store";
 
