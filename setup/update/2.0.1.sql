@@ -6,7 +6,7 @@ UPDATE `config` SET `value`='2.0.1' WHERE `name`='thelia_version';
 UPDATE `config` SET `value`='' WHERE `name`='thelia_extra_version';
 
 
-ALTER TABLE `module` ADD INDEX `idx_module_position` (`position`);
+ALTER TABLE `module` ADD INDEX `idx_module_activate` (`activate`);
 
 
 SET FOREIGN_KEY_CHECKS = 1;
