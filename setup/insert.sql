@@ -1334,7 +1334,7 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (25, 'en_US', 'Configuration / Cache'),
 (25, 'fr_FR', 'Configuration / Cache'),
 (26, 'en_US', 'Back-office home page'),
-(26, 'fr_FR', 'Page d''acceuil de l''administration')
+(26, 'fr_FR', 'Page d''acceuil de l''administration'),
 (27, 'en_US', 'Store information configuration'),
 (27, 'fr_FR', 'Informations sur la boutique'),
 (28, 'en_US', 'Configuration variables'),
