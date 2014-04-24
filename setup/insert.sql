@@ -1348,7 +1348,7 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (31, 'en_US', 'Advanced configuration'),
 (31, 'fr_FR', 'Configuration avancée'),
 (32, 'en_US', 'Translations'),
-(32, 'fr_FR', 'Traductions');
+(32, 'fr_FR', 'Traductions'),
 (33, 'en_US', 'Back-office export management'),
 (33, 'fr_FR', 'gestion des exports'),
 (34, 'en_US', 'Tools panel'),
