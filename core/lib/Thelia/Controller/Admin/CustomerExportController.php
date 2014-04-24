@@ -23,11 +23,11 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\NewsletterQuery;
-
 
 /**
  * Class CustomerExportController
@@ -52,7 +52,26 @@ class CustomerExportController extends BaseAdminController
                 ])
             ->find();
 
+        $handle = fopen('php://memory', 'r+');
 
+        fputcsv($handle, ['email','firstname','lastname','locale'], ';', '"');
+
+        foreach ($data->toArray() as $customer) {
+            fputcsv($handle, $customer, ';', '"');
+        }
+
+        rewind($handle);
+        $content = stream_get_contents($handle);
+        fclose($handle);
+
+        return Response::create(
+            $content,
+            200,
+            array(
+                "Content-Type"=>"application/csv-tab-delimited-table",
+                "Content-disposition"=>"filename=export_customer_newsletter.csv"
+            )
+        );
 
     }
 
