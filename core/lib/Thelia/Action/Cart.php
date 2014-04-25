@@ -15,7 +15,12 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cart\CartEvent;
+use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Log\Tlog;
+use Thelia\Model\Currency;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\CartItem;
@@ -32,6 +37,7 @@ use Thelia\Model\ConfigQuery;
  */
 class Cart extends BaseAction implements EventSubscriberInterface
 {
+
     /**
      *
      * add an article in the current cart
@@ -44,19 +50,41 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $newness = $event->getNewness();
         $append = $event->getAppend();
         $quantity = $event->getQuantity();
+        $currency = $cart->getCurrency();
+        $defaultCurrency = Currency::getDefaultCurrency();
 
         $productSaleElementsId = $event->getProductSaleElementsId();
         $productId = $event->getProduct();
 
         $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
 
+        $price = 0.0;
+        $promoPrice = 0.0;
+
         if ($cartItem === null || $newness) {
+
             $productPrice = ProductPriceQuery::create()
                 ->filterByProductSaleElementsId($productSaleElementsId)
+                ->filterByCurrencyId($cart->getCurrencyId())
                 ->findOne();
 
+            if (null === $productPrice || $productPrice->getFromDefaultCurrency()) {
+                // need to calculate the prices
+                $productPrice = ProductPriceQuery::create()
+                    ->filterByProductSaleElementsId($productSaleElementsId)
+                    ->filterByCurrencyId($defaultCurrency->getId())
+                    ->findOne();
+                if (null !== $productPrice) {
+                    $price = $productPrice->getPrice() * $currency->getRate();
+                    $promoPrice = $productPrice->getPromoPrice() * $currency->getRate();
+                }
+            } else {
+                $price = $productPrice->getPrice();
+                $promoPrice = $productPrice->getPromoPrice();
+            }
+
             $event->setCartItem(
-                $this->doAddItem($event->getDispatcher(), $cart, $productId, $productPrice->getProductSaleElements(), $quantity, $productPrice)
+                $this->doAddItem($event->getDispatcher(), $cart, $productId, $productPrice->getProductSaleElements(), $quantity, $price, $promoPrice)
             );
         }
 
@@ -125,6 +153,87 @@ class Cart extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function updateCart(CurrencyChangeEvent $event)
+    {
+        $session = $event->getRequest()->getSession();
+        $cart = $session->getCart();
+        if (null !== $cart) {
+            $this->updateCartPrices($cart, $event->getCurrency());
+        }
+    }
+
+    /**
+     *
+     * Refresh article's price
+     *
+     * @param \Thelia\Model\Base\Cart     $cart
+     * @param \Thelia\Model\Base\Currency $currency
+     */
+    public function updateCartPrices(\Thelia\Model\Base\Cart $cart, Currency $currency)
+    {
+
+        // get default currency
+        $defaultCurrency = Currency::getDefaultCurrency();
+
+        $rate = 1.0;
+        if ($currency !== $defaultCurrency) {
+            $rate = $currency->getRate();
+        }
+
+        //Tlog::getInstance()->addDebug("UPDATE_CURRENCY : " . $rate . ' :: ' . $currency->getId() . ' :: ' . $defaultCurrency->getId() );
+
+        $price = 0.0;
+        $promoPrice = 0.0;
+
+        // cart item
+        foreach ($cart->getCartItems() as $cartItem) {
+            $productSaleElementsId = $cartItem->getProductSaleElementsId();
+            $productPrice = ProductPriceQuery::create()
+                ->filterByCurrencyId($currency->getId())
+                ->filterByProductSaleElementsId($productSaleElementsId)
+                ->findOne();
+
+            if (null === $productPrice || $productPrice->getFromDefaultCurrency()) {
+                // we take the default currency and apply the taxe rate
+                $productPrice = ProductPriceQuery::create()
+                    ->filterByCurrencyId($defaultCurrency->getId())
+                    ->filterByProductSaleElementsId($productSaleElementsId)
+                    ->findOne();
+
+                if (null === $productPrice) {
+                    //Tlog::getInstance()->addDebug("BOOM");
+                    continue;
+                }
+                //Tlog::getInstance()->addDebug("UPDATE_CURRENCY DYNAMIC ");
+                $price = $productPrice->getPrice() * $rate;
+                $promoPrice = $productPrice->getPromoPrice() * $rate;
+
+            } else {
+                // product price for default currency or manual price for other currency
+                //Tlog::getInstance()->addDebug("UPDATE_CURRENCY REAL ");
+                $price = $productPrice->getPrice();
+                $promoPrice = $productPrice->getPromoPrice();
+            }
+
+            //Tlog::getInstance()->addDebug("UPDATE_CURRENCY : " . $price . " :: " . $promoPrice);
+
+            // We have
+            $cartItem
+                ->setPrice($price)
+                ->setPromoPrice($promoPrice);
+
+            $cartItem->save();
+
+        }
+
+        // update the currency cart
+        $cart->setCurrencyId($currency->getId());
+        $cart->save();
+
+
+    }
+
+
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
@@ -152,6 +261,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_DELETEITEM => array("deleteItem", 128),
             TheliaEvents::CART_UPDATEITEM => array("changeItem", 128),
             TheliaEvents::CART_CLEAR => array("clear", 128),
+            TheliaEvents::CHANGE_DEFAULT_CURRENCY => array("updateCart", 128),
         );
     }
 
@@ -179,11 +289,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * @param int                               $productId
      * @param \Thelia\Model\ProductSaleElements $productSaleElements
      * @param float                             $quantity
-     * @param ProductPrice                      $productPrice
+     * @param float                             $price
+     * @param float                             $promoPrice
      *
      * @return CartItem
      */
-    protected function doAddItem(EventDispatcherInterface $dispatcher, \Thelia\Model\Cart $cart, $productId, \Thelia\Model\ProductSaleElements $productSaleElements, $quantity, ProductPrice $productPrice)
+    protected function doAddItem(EventDispatcherInterface $dispatcher, \Thelia\Model\Cart $cart, $productId, \Thelia\Model\ProductSaleElements $productSaleElements, $quantity, $price, $promoPrice)
     {
         $cartItem = new CartItem();
         $cartItem->setDisptacher($dispatcher);
@@ -192,8 +303,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->setProductId($productId)
             ->setProductSaleElementsId($productSaleElements->getId())
             ->setQuantity($quantity)
-            ->setPrice($productPrice->getPrice())
-            ->setPromoPrice($productPrice->getPromoPrice())
+            ->setPrice($price)
+            ->setPromoPrice($promoPrice)
             ->setPromo($productSaleElements->getPromo())
             ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30))
             ->save();
@@ -217,6 +328,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->filterByProductId($productId)
             ->filterByProductSaleElementsId($productSaleElementsId)
             ->findOne();
+    }
+
+    /**
+     * Returns the session from the current request
+     *
+     * @return \Thelia\Core\HttpFoundation\Session\Session
+     */
+    protected function getSession()
+    {
+        return $this->request->getSession();
     }
 
 }

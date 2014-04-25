@@ -50,11 +50,11 @@ class TemplateHelper
     /**
      * Check if a template definition is the current active template
      *
-     * @param TemplateDefinition $tplDefinition
-     * @return bool true is the given template is the active template
+     * @param  TemplateDefinition $tplDefinition
+     * @return bool               true is the given template is the active template
      */
-    public function isActive(TemplateDefinition $tplDefinition) {
-
+    public function isActive(TemplateDefinition $tplDefinition)
+    {
         switch ($tplDefinition->getType()) {
             case TemplateDefinition::FRONT_OFFICE:
                 $tplVar = 'active-front-template';

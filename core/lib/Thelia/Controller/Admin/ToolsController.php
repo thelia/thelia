@@ -15,7 +15,6 @@ namespace Thelia\Controller\Admin;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 
-
 /**
  * Class ToolsController
  * @package Thelia\Controller\Admin

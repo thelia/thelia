@@ -214,6 +214,7 @@ class Product extends BaseProduct
             ->setPromoPrice($salePrice)
             ->setPrice($basePrice)
             ->setCurrencyId($currencyId)
+            ->setFromDefaultCurrency(false)
             ->save($con)
         ;
 

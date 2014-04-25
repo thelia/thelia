@@ -16,7 +16,6 @@ use Symfony\Component\Finder\Finder;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Core\Template\TemplateHelper;
@@ -147,8 +146,7 @@ class TranslationsController extends BaseAdminController
                         ;
 
                         $hasAdminIncludes = $finder->count() > 0;
-                    }
-                    catch (\InvalidArgumentException $ex) {
+                    } catch (\InvalidArgumentException $ex) {
                         $hasAdminIncludes = false;
                     }
 
