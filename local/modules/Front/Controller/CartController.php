@@ -23,6 +23,7 @@
 namespace Front\Controller;
 
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Cart\CartEvent;
@@ -32,7 +33,9 @@ use Thelia\Form\CartAdd;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Module\Exception\DeliveryException;
+use Thelia\Tools\URL;
 
 class CartController extends BaseFrontController
 {
@@ -114,6 +117,19 @@ class CartController extends BaseFrontController
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 
+    }
+
+    public function changeCountry()
+    {
+        $redirectUrl = URL::getInstance()->absoluteUrl("/cart");
+        $deliveryId = $this->getRequest()->get("country");
+        $cookieName = ConfigQuery::read('front_cart_country_cookie_name', 'fcccn');
+        $cookieExpires = ConfigQuery::read('front_cart_country_cookie_expires', 2592000);
+        $cookieExpires = intval($cookieExpires) ?: 2592000;
+
+        $cookie = new Cookie($cookieName, $deliveryId, time() + $cookieExpires, '/');
+
+        $this->redirect($redirectUrl, 302, array($cookie));
     }
 
     /**
