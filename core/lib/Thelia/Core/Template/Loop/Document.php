@@ -72,7 +72,8 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                                 new EnumType($this->possible_sources)
                         )
                 ),
-                Argument::createIntTypeArgument('source_id')
+                Argument::createIntTypeArgument('source_id'),
+                Argument::createBooleanTypeArgument('force_return', true)
         );
 
         // Add possible document sources
