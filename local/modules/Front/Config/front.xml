@@ -123,6 +123,11 @@
         <default key="_controller">Front\Controller\CartController::changeItem</default>
         <default key="_view">cart</default>
     </route>
+
+    <route id="cart.update.country" path="/cart/country">
+        <default key="_controller">Front\Controller\CartController::changeCountry</default>
+        <default key="_view">cart</default>
+    </route>
     <!-- end cart routes -->
 
     <!-- order management process -->

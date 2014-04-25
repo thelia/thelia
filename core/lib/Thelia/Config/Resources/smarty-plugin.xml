@@ -38,6 +38,11 @@
             </call>
         </service>
 
+        <service id="smarty.plugin.cartpostage" class="Thelia\Core\Template\Smarty\Plugins\CartPostage" scope="request">
+            <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="service_container" />
+        </service>
+
         <service id="smarty.plugin.type" class="Thelia\Core\Template\Smarty\Plugins\Type" scope="request">
             <tag name="thelia.parser.register_plugin"/>
         </service>
