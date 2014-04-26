@@ -163,6 +163,34 @@ class Module extends BaseModule
     }
 
     /**
+     * @return true if this module is a delivery module
+     */
+    public function isDeliveryModule() {
+        $moduleReflection = new \ReflectionClass($this->getFullNamespace());
+
+        return $moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface");
+    }
+
+    /**
+     * @return true if this module is a payment module
+     */
+    public function isPayementModule() {
+        $moduleReflection = new \ReflectionClass($this->getFullNamespace());
+
+        return $moduleReflection->isSubclassOf("Thelia\Module\PaymentModuleInterface");
+    }
+
+
+    /**
+     * @return BaseModule a new module instance.
+     */
+    public function createInstance() {
+        $moduleClass = new \ReflectionClass($this->getFullNamespace());
+
+        return $moduleClass->newInstance();
+    }
+
+    /**
      * Calculate next position relative to module type
      */
     protected function addCriteriaToPositionQuery($query)
