@@ -52,9 +52,7 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
         }
 
         try {
-            $moduleReflection = new \ReflectionClass($module->getFullNamespace());
-
-            $moduleInstance = $moduleReflection->newInstance();
+            $moduleInstance = $module->createInstance();
 
             $moduleInstance->deActivate();
         } catch (\Exception $e) {
