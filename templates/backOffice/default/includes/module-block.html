@@ -79,54 +79,63 @@
 
             <tbody>
             {loop type="module" name="module.{$module_type}" module_type={$module_type|default:1} order=$module_order backend_context=1}
-                <tr>
+                <tr {if ! $EXISTS}class="warning"{/if}>
                     <td>{$ID}</td>
                     <td>{$TITLE}</td>
                     <td>{$CODE}</td>
                     <td>{$CHAPO}</td>
 
-                    <td class="text-center">
-                        <div class="make-switch switch-small module-activation" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
-                            <input type="checkbox" {if $ACTIVE}checked{/if}>
-                        </div>
-                        <noscript>
-                            {if $ACTIVE}
-                                <a title="{intl l="Deactivate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
-                            {else}
-                                <a title="{intl l="activate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/{$ID}"}">{intl l="activation"}</a>
-                            {/if}
-                        </noscript>
-                    </td>
+                    {if $EXISTS}
+                        <td class="text-center">
+                            <div class="make-switch switch-small module-activation" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                                <input type="checkbox" {if $ACTIVE}checked{/if}>
+                            </div>
+                            <noscript>
+                                {if $ACTIVE}
+                                    <a title="{intl l="Deactivate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
+                                {else}
+                                    <a title="{intl l="activate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/{$ID}"}">{intl l="activation"}</a>
+                                {/if}
+                            </noscript>
+                        </td>
 
-                    <td class="text-center">
-                        {admin_position_block
-                            resource="admin.modules"
-                            access="UPDATE"
-                            path={url path="admin/module/update-position"}
-                            url_parameter="module_id"
-                            in_place_edit_class="modulePositionChange"
-                            position=$POSITION
-                            id=$ID
-                        }
-                    </td>
+                        <td class="text-center">
+                            {admin_position_block
+                                resource="admin.modules"
+                                access="UPDATE"
+                                path={url path="admin/module/update-position"}
+                                url_parameter="module_id"
+                                in_place_edit_class="modulePositionChange"
+                                position=$POSITION
+                                id=$ID
+                            }
+                        </td>
+                    {else}
+                        <td colspan="2" class="text-left">
+                            <span class="label label-warning">Warning</span>
+                            {intl l="This module cannot be started, some files are probably missing."}
+                        </td>
+                    {/if}
 
                     {module_include location='modules_table_row'}
 
                     <td class="text-right">
                         <div class="btn-group">
-                            {if $CONFIGURABLE == 1}
-                                {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
-                                    <a class="{if ! $ACTIVE}disabled {/if} btn btn-primary btn-xs" id="config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/$CODE"}">{intl l="Configure"}</a>
+                            {if $EXISTS}
+                                {if $CONFIGURABLE == 1}
+                                    {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
+                                        <a class="{if ! $ACTIVE}disabled {/if} btn btn-primary btn-xs" id="config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/$CODE"}">{intl l="Configure"}</a>
+                                    {/loop}
+                                {/if}
+
+                                {*loop type="auth" name="can_change" role="ADMIN" resource="admin.modules" access="VIEW"}
+                                    <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"><span class="glyphicon glyphicon-book"></span></a>
+                                {/loop*}
+
+                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.module" access="UPDATE"}
+                                    <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
                                 {/loop}
                             {/if}
-
-                            {*loop type="auth" name="can_change" role="ADMIN" resource="admin.modules" access="VIEW"}
-                                <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"><span class="glyphicon glyphicon-book"></span></a>
-                            {/loop*}
-
-                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.module" access="UPDATE"}
-                                <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
-                            {/loop}
 
                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.module" access="DELETE"}
                                 <a class="btn btn-default btn-xs module-delete-action" title="{intl l='Delete this module'}" href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
