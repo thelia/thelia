@@ -1000,6 +1000,14 @@
         <default key="_controller">Thelia\Controller\Admin\AdvancedConfigurationController::flushCacheAction</default>
     </route>
 
+    <route id="admin.configuration.advanced.flush-assets" path="/admin/configuration/advanced/flush-assets">
+        <default key="_controller">Thelia\Controller\Admin\AdvancedConfigurationController::flushAssetsAction</default>
+    </route>
+
+    <route id="admin.configuration.advanced.flush-images-and-documents" path="/admin/configuration/advanced/flush-images-and-documents">
+        <default key="_controller">Thelia\Controller\Admin\AdvancedConfigurationController::flushImagesAndDocumentsAction</default>
+    </route>
+
     <!-- and cache route management -->
 
     <!-- Modules rule management -->

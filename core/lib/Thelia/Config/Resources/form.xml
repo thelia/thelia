@@ -124,6 +124,9 @@
         <form name="thelia.admin.module.modification" class="Thelia\Form\ModuleModificationForm"/>
 
         <form name="thelia.cache.flush" class="Thelia\Form\Cache\CacheFlushForm"/>
+        <form name="thelia.assets.flush" class="Thelia\Form\Cache\AssetsFlushForm"/>
+        <form name="thelia.images-and-documents-cache.flush" class="Thelia\Form\Cache\ImagesAndDocumentsCacheFlushForm"/>
+
     </forms>
 
 </config>

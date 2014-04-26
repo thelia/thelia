@@ -19,7 +19,7 @@ use Thelia\Form\BaseForm;
  * @package Thelia\Form\Cache
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CacheFlushForm extends BaseForm
+class AssetsFlushForm extends BaseForm
 {
 
     /**
@@ -35,6 +35,6 @@ class CacheFlushForm extends BaseForm
      */
     public function getName()
     {
-        return "cache_flush";
+        return "assets_flush";
     }
 }
