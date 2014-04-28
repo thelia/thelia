@@ -22,10 +22,8 @@ class Redirect
     {
         if (false == Tlog::getInstance()->showRedirect($url)) {
             $response = new RedirectResponse($url, $status);
-            foreach ($cookies as $cookie)
-            {
-                if (!$cookie instanceof Cookie)
-                {
+            foreach ($cookies as $cookie) {
+                if (!$cookie instanceof Cookie) {
                     throw new \InvalidArgumentException(sprintf('Third parameter is not a valid Cookie object.'));
                 }
                 $response->headers->setCookie($cookie);

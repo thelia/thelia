@@ -15,15 +15,10 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Util\PropelModelPager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Core\Template\Element\BaseLoop;
-use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 
-use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
-use Thelia\Core\Template\Element\Exception\InvalidElementException;
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
@@ -45,13 +40,11 @@ class CartPostage extends AbstractSmartyPlugin
 
     protected $loopDefinition = array();
 
-
     /** @var \Thelia\Core\HttpFoundation\Request The Request */
     protected $request;
 
     /** @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher The Dispatcher */
     protected $dispatcher;
-
 
     /** @var \Thelia\Core\Security\SecurityContext The Security Context */
     protected $securityContext;
@@ -74,7 +67,6 @@ class CartPostage extends AbstractSmartyPlugin
     /** @var boolean $isCustomizable indicate if customer can change the country */
     protected $isCustomizable = true;
 
-
     /**
      * @param ContainerInterface $container
      */
@@ -87,7 +79,6 @@ class CartPostage extends AbstractSmartyPlugin
         //$this->securityContext = $container->get('thelia.securityContext');
         $this->translator = $container->get("thelia.translator");
     }
-
 
     /**
      * Get postage amount for cart
@@ -103,7 +94,7 @@ class CartPostage extends AbstractSmartyPlugin
     public function postage($params, $content, $template, &$repeat)
     {
 
-        if ( ! $repeat) {
+        if (! $repeat) {
             return $content;
         }
 
@@ -122,28 +113,27 @@ class CartPostage extends AbstractSmartyPlugin
         $template->assign('is_customizable', $this->isCustomizable);
     }
 
-
     /**
      * Retrieve the delivery country for a customer
      *
      * The rules :
-     *  - the country of the delivery address of the customer related to the 
+     *  - the country of the delivery address of the customer related to the
      *      cart if it exists
-     *  - the country saved in cookie if customer have changed 
+     *  - the country saved in cookie if customer have changed
      *      the default country
      *  - the default country for the shop if exists
      *  - the country related to the customer based on browser preferences
      *  - default country
      *
      *
-     * @param \Thelia\Model\Customer $customer
+     * @param  \Thelia\Model\Customer $customer
      * @return \Thelia\Model\Country
      */
     protected function getDeliveryCountry(Customer $customer = null)
     {
 
         // get country from customer addresses
-        if (null !== $customer){
+        if (null !== $customer) {
             $address = AddressQuery::create()
                 ->filterByCustomerId($customer->getId())
                 ->filterByIsDefault(1)
@@ -152,6 +142,7 @@ class CartPostage extends AbstractSmartyPlugin
 
             if (null !== $address) {
                 $this->isCustomizable = false;
+
                 return $address->getCountry();
             }
         }
@@ -160,20 +151,20 @@ class CartPostage extends AbstractSmartyPlugin
         $cookieName = ConfigQuery::read('front_cart_country_cookie_name', 'fcccn');
         if ($this->request->cookies->has($cookieName)) {
             $cookieVal = $this->request->cookies->getInt($cookieName, 0);
-            if (0 !== $cookieVal){
+            if (0 !== $cookieVal) {
                 $country = CountryQuery::create()->findPk($cookieVal);
-                if (null !== $country){
+                if (null !== $country) {
                     return $country;
                 }
             }
         }
 
         // get default country for store.
-        try{
+        try {
             $country = Country::getDefaultCountry();
+
             return $country;
-        }
-        catch (\LogicException $e) {
+        } catch (\LogicException $e) {
             ;
         }
 
@@ -191,11 +182,10 @@ class CartPostage extends AbstractSmartyPlugin
 
     }
 
-
     /**
      * Retrieve the cheapest delivery for country
      *
-     * @param \Thelia\Model\Country $country
+     * @param  \Thelia\Model\Country   $country
      * @return DeliveryModuleInterface
      */
     protected function getCheapestDelivery(Country $country)
@@ -207,7 +197,7 @@ class CartPostage extends AbstractSmartyPlugin
             ->find();
         ;
 
-        foreach ($deliveryModules as $deliveryModule){
+        foreach ($deliveryModules as $deliveryModule) {
 
             /** @var DeliveryModuleInterface $moduleInstance */
             $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
@@ -222,7 +212,7 @@ class CartPostage extends AbstractSmartyPlugin
                 if ($moduleInstance->isValidDelivery($country)) {
 
                     $postage = $moduleInstance->getPostage($country);
-                    if ( null === $this->postage || $this->postage > $postage) {
+                    if (null === $this->postage || $this->postage > $postage) {
                         $this->postage = $postage;
                         $this->deliveryId = $deliveryModule->getId();
                     }
@@ -234,7 +224,6 @@ class CartPostage extends AbstractSmartyPlugin
         }
 
     }
-
 
     /**
      * Defines the various smarty plugins handled by this class
