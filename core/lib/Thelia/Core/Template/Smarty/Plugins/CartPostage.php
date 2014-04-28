@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 
-use Thelia\Core\Translation\Translator;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
@@ -43,15 +42,6 @@ class CartPostage extends AbstractSmartyPlugin
     /** @var \Thelia\Core\HttpFoundation\Request The Request */
     protected $request;
 
-    /** @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher The Dispatcher */
-    protected $dispatcher;
-
-    /** @var \Thelia\Core\Security\SecurityContext The Security Context */
-    protected $securityContext;
-
-    /** @var Translator */
-    protected $translator;
-
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
@@ -75,9 +65,6 @@ class CartPostage extends AbstractSmartyPlugin
         $this->container = $container;
 
         $this->request = $container->get('request');
-        //$this->dispatcher = $container->get('event_dispatcher');
-        //$this->securityContext = $container->get('thelia.securityContext');
-        $this->translator = $container->get("thelia.translator");
     }
 
     /**
