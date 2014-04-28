@@ -50,9 +50,8 @@ class Module extends BaseAction implements EventSubscriberInterface
     public function toggleActivation(ModuleToggleActivationEvent $event)
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
-            $moduleClass = new \ReflectionClass($module->getFullNamespace());
 
-            $moduleInstance = $moduleClass->newInstance();
+            $moduleInstance = $module->createInstance();
 
             if ( method_exists($moduleInstance, 'setContainer')) {
                 $moduleInstance->setContainer($this->container);
@@ -85,12 +84,11 @@ class Module extends BaseAction implements EventSubscriberInterface
                 }
 
                 try {
-                    $reflected = new \ReflectionClass($module->getFullNamespace());
+                    $instance = $module->createInstance();
 
-                    $instance = $reflected->newInstance();
                     $instance->setContainer($this->container);
 
-                    $path = dirname($reflected->getFileName());
+                    $path = $module->getAbsoluteBaseDir();
 
                     $instance->destroy($con, $event->getDeleteData());
 

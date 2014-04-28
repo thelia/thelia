@@ -75,8 +75,7 @@ class OrderPayment extends BaseForm
             $context->addViolation("Payment module ID not found");
         }
 
-        $moduleReflection = new \ReflectionClass($module->getFullNamespace());
-        if ($moduleReflection->isSubclassOf("Thelia\Module\PaymentModuleInterface") === false) {
+        if (! $module->isPayementModule()) {
             $context->addViolation(
                 sprintf(Translator::getInstance()->trans("payment module %s is not a Thelia\Module\PaymentModuleInterface"), $module->getCode())
             );

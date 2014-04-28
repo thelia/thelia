@@ -168,64 +168,80 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         /** @var \Thelia\Model\Module $module */
         foreach ($loopResult->getResultDataCollection() as $module) {
-            $loopResultRow = new LoopResultRow($module);
-            $loopResultRow->set("ID", $module->getId())
-                ->set("IS_TRANSLATED",$module->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("TITLE",$module->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $module->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $module->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $module->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("CODE", $module->getCode())
-                ->set("TYPE", $module->getType())
-                ->set("ACTIVE", $module->getActivate())
-                ->set("CLASS", $module->getFullNamespace())
-                ->set("POSITION", $module->getPosition());
 
-            $hasConfigurationInterface = false;
+            try {
+                new \ReflectionClass($module->getFullNamespace());
 
-            /* first test if module defines it's own config route  */
-            if ($module->getActivate()) {
-                // Works only fo activated modules - see Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass
-                $routerId = "router." . $module->getBaseDir();
-                if ($this->container->has($routerId)) {
-                    try {
-                        if ($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
+                $exists = true;
+            }
+            catch(\ReflectionException $ex) {
+                $exists = false;
+            }
+
+            if ($exists || $this->getBackendContext()) {
+                $loopResultRow = new LoopResultRow($module);
+
+                $loopResultRow
+                    ->set("ID"           , $module->getId())
+                    ->set("IS_TRANSLATED", $module->getVirtualColumn('IS_TRANSLATED'))
+                    ->set("LOCALE"       , $this->locale)
+                    ->set("TITLE"        , $module->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO"        , $module->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION"  , $module->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("POSTSCRIPTUM" , $module->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set("CODE"         , $module->getCode())
+                    ->set("TYPE"         , $module->getType())
+                    ->set("ACTIVE"       , $module->getActivate())
+                    ->set("CLASS"        , $module->getFullNamespace())
+                    ->set("POSITION"     , $module->getPosition())
+                    ->set("EXISTS"       , $exists)
+                ;
+
+                $hasConfigurationInterface = false;
+
+                /* first test if module defines it's own config route  */
+                if ($module->getActivate()) {
+                    // Works only fo activated modules - see Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass
+                    $routerId = "router." . $module->getBaseDir();
+                    if ($this->container->has($routerId)) {
+                        try {
+                            if ($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
+                                $hasConfigurationInterface = true;
+                            }
+                        } catch (ResourceNotFoundException $e) {
+                            /* $hasConfigurationInterface stays false */
+                        }
+                    }
+
+                    /* if not ; test if it uses admin inclusion : module_configuration.html */
+                    if (false === $hasConfigurationInterface) {
+                        if (file_exists($module->getAbsoluteAdminIncludesPath() . DS . "module_configuration.html")) {
                             $hasConfigurationInterface = true;
                         }
-                    } catch (ResourceNotFoundException $e) {
-                        /* $hasConfigurationInterface stays false */
                     }
-                }
+                } else {
+                    // Make a quick and dirty test on the module's routing.xml file
+                    $routing = @file_get_contents($module->getAbsoluteConfigPath() . DS . "routing.xml");
 
-                /* if not ; test if it uses admin inclusion : module_configuration.html */
-                if (false === $hasConfigurationInterface) {
-                    if (file_exists($module->getAbsoluteAdminIncludesPath() . DS . "module_configuration.html")) {
+                    if ($routing && strpos($routing, '/admin/module/') !== false) {
                         $hasConfigurationInterface = true;
                     }
                 }
-            } else {
-                // Make a quick and dirty test on the module's routing.xml file
-                $routing = @file_get_contents($module->getAbsoluteConfigPath() . DS . "routing.xml");
 
-                if ($routing && strpos($routing, '/admin/module/') !== false) {
-                    $hasConfigurationInterface = true;
+                $loopResultRow->set("CONFIGURABLE", $hasConfigurationInterface ? 1 : 0);
+
+                if (null !== $this->getProfile()) {
+                    $accessValue = $module->getVirtualColumn('access');
+                    $manager = new AccessManager($accessValue);
+
+                    $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW)? 1 : 0)
+                        ->set("CREATABLE", $manager->can(AccessManager::CREATE) ? 1 : 0)
+                        ->set("UPDATABLE", $manager->can(AccessManager::UPDATE)? 1 : 0)
+                        ->set("DELETABLE", $manager->can(AccessManager::DELETE)? 1 : 0);
                 }
+
+                $loopResult->addRow($loopResultRow);
             }
-
-            $loopResultRow->set("CONFIGURABLE", $hasConfigurationInterface ? 1 : 0);
-
-            if (null !== $this->getProfile()) {
-                $accessValue = $module->getVirtualColumn('access');
-                $manager = new AccessManager($accessValue);
-
-                $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW)? 1 : 0)
-                    ->set("CREATABLE", $manager->can(AccessManager::CREATE) ? 1 : 0)
-                    ->set("UPDATABLE", $manager->can(AccessManager::UPDATE)? 1 : 0)
-                    ->set("DELETABLE", $manager->can(AccessManager::DELETE)? 1 : 0);
-            }
-
-            $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
