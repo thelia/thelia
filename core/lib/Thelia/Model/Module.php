@@ -168,7 +168,7 @@ class Module extends BaseModule
     public function isDeliveryModule() {
         $moduleReflection = new \ReflectionClass($this->getFullNamespace());
 
-        return $moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface");
+        return $moduleReflection->implementsInterface("Thelia\Module\DeliveryModuleInterface");
     }
 
     /**
@@ -177,7 +177,7 @@ class Module extends BaseModule
     public function isPayementModule() {
         $moduleReflection = new \ReflectionClass($this->getFullNamespace());
 
-        return $moduleReflection->isSubclassOf("Thelia\Module\PaymentModuleInterface");
+        return $moduleReflection->implementsInterface("Thelia\Module\PaymentModuleInterface");
     }
 
 
