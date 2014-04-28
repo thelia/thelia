@@ -90,6 +90,7 @@ class CustomerController extends AbstractCrudController
                 'lastname'  => $object->getLastname(),
                 'email'     => $object->getEmail(),
                 'title'     => $object->getTitleId(),
+                'discount'  => $object->getDiscount(),
         );
 
         if ($address !== null) {

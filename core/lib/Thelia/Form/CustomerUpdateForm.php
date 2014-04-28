@@ -158,6 +158,12 @@ class CustomerUpdateForm extends BaseForm
                     "for" => "title"
                 )
             ))
+            ->add('discount', 'text', array(
+                'label' => Translator::getInstance()->trans('permanent discount'),
+                'label_attr' => array(
+                    'for' => 'discount'
+                )
+            ))
         ;
     }
 

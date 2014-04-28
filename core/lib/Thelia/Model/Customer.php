@@ -143,6 +143,15 @@ class Customer extends BaseCustomer implements UserInterface
             ->findOne();
     }
 
+    public function setRef($v)
+    {
+        if (null !== $v) {
+            parent::setRef($v);
+        }
+
+        return $this;
+    }
+
     /**
      * create hash for plain password and set it in Customer object
      *
