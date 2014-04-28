@@ -184,7 +184,7 @@ abstract class BaseLoop
                         '%name' => $loopName
                     ]
                 );
-            } else  if ($value === '') {
+            } elseif ($value === '') {
                 if (!$argument->empty) {
                     /* check if empty */
                     $faultActor[] = $argument->name;

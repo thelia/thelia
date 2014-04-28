@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session;
 
-use Thelia\Core\Event\Currency\CurrencyEvent;
+use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model;
 
@@ -142,7 +142,7 @@ class TheliaHttpKernel extends HttpKernel
         if ($request->query->has("currency")) {
             $currency = Model\CurrencyQuery::create()->findOneByCode($request->query->get("currency"));
             if ($currency) {
-                $this->container->get("event_dispatcher")->dispatch(TheliaEvents::CHANGE_DEFAULT_CURRENCY, new CurrencyEvent($currency));
+                $this->container->get("event_dispatcher")->dispatch(TheliaEvents::CHANGE_DEFAULT_CURRENCY, new CurrencyChangeEvent($currency, $request));
             }
         } else {
             $currency = $request->getSession()->getCurrency(false);

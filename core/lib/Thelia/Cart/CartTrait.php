@@ -89,6 +89,7 @@ trait CartTrait
     {
         $cart = new CartModel();
         $cart->setToken($this->generateCookie($session));
+        $cart->setCurrency($session->getCurrency(true));
 
         if (null !== $customer = $session->getCustomerUser()) {
             $cart->setCustomer($customer);

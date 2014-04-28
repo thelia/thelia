@@ -15,7 +15,6 @@ namespace Thelia\Controller\Admin;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Model\CustomerQuery;
 use Thelia\Model\NewsletterQuery;
 
 /**

@@ -10,25 +10,43 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
+namespace Thelia\Core\Event\Currency;
 
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Model\Currency;
 
 /**
- * Class ExportController
- * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * Class CurrencyChangeEvent
+ * @package Thelia\Core\Event\Currency
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ExportController extends BaseAdminController
+class CurrencyChangeEvent extends CurrencyEvent
 {
+    /** @var Request $request */
+    protected $request;
 
-    public function indexAction()
+    public function __construct(Currency $currency = null, Request $request = null)
     {
-        if (null !== $response = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::VIEW])) {
-            return $response;
-        }
-
-        return $this->render('export');
+        parent::__construct($currency);
+        $this->setRequest($request);
     }
+
+    /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request)
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
 }

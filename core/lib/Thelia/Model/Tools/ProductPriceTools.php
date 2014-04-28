@@ -10,25 +10,51 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
-
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
+namespace Thelia\Model\Tools;
 
 /**
- * Class ExportController
- * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * Utility class used to store price and promo price for a carte item.
+ *
+ * Class ProductPriceTools
+ * @package Thelia\Model\Tools
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ExportController extends BaseAdminController
+class ProductPriceTools
 {
+    /**
+     * The value for the price field.
+     *
+     * @var        double
+     */
+    protected $price;
 
-    public function indexAction()
+    /**
+     * The value for the promoPrice field.
+     *
+     * @var        double
+     */
+    protected $promoPrice;
+
+    public function __construct($price, $promoPrice)
     {
-        if (null !== $response = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::VIEW])) {
-            return $response;
-        }
-
-        return $this->render('export');
+        $this->price = $price;
+        $this->promoPrice = $promoPrice;
     }
+
+    /**
+     * @return float
+     */
+    public function getPrice()
+    {
+        return $this->price;
+    }
+
+    /**
+     * @return float
+     */
+    public function getPromoPrice()
+    {
+        return $this->promoPrice;
+    }
+
 }
