@@ -17,15 +17,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Log\Tlog;
+use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\Currency;
-use Thelia\Model\ProductPrice;
-use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Tools\ProductPriceTools;
 
 /**
  *
@@ -51,41 +48,23 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $append = $event->getAppend();
         $quantity = $event->getQuantity();
         $currency = $cart->getCurrency();
-        $defaultCurrency = Currency::getDefaultCurrency();
 
         $productSaleElementsId = $event->getProductSaleElementsId();
         $productId = $event->getProduct();
 
         $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
 
-        $price = 0.0;
-        $promoPrice = 0.0;
-
         if ($cartItem === null || $newness) {
 
-            $productPrice = ProductPriceQuery::create()
-                ->filterByProductSaleElementsId($productSaleElementsId)
-                ->filterByCurrencyId($cart->getCurrencyId())
-                ->findOne();
+            $productSaleElements = ProductSaleElementsQuery::create()
+                ->findPk($productSaleElementsId);
 
-            if (null === $productPrice || $productPrice->getFromDefaultCurrency()) {
-                // need to calculate the prices
-                $productPrice = ProductPriceQuery::create()
-                    ->filterByProductSaleElementsId($productSaleElementsId)
-                    ->filterByCurrencyId($defaultCurrency->getId())
-                    ->findOne();
-                if (null !== $productPrice) {
-                    $price = $productPrice->getPrice() * $currency->getRate();
-                    $promoPrice = $productPrice->getPromoPrice() * $currency->getRate();
-                }
-            } else {
-                $price = $productPrice->getPrice();
-                $promoPrice = $productPrice->getPromoPrice();
+            if (null !== $productSaleElements) {
+                $productPrices = $productSaleElements->getPricesByCurrency($currency);
+                $event->setCartItem(
+                    $this->doAddItem($event->getDispatcher(), $cart, $productId, $productSaleElements, $quantity, $productPrices)
+                );
             }
-
-            $event->setCartItem(
-                $this->doAddItem($event->getDispatcher(), $cart, $productId, $productPrice->getProductSaleElements(), $quantity, $price, $promoPrice)
-            );
         }
 
         if ($append && $cartItem !== null) {
@@ -166,70 +145,28 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * Refresh article's price
      *
-     * @param \Thelia\Model\Base\Cart     $cart
-     * @param \Thelia\Model\Base\Currency $currency
+     * @param \Thelia\Model\Cart     $cart
+     * @param \Thelia\Model\Currency $currency
      */
-    public function updateCartPrices(\Thelia\Model\Base\Cart $cart, Currency $currency)
+    public function updateCartPrices(\Thelia\Model\Cart $cart, Currency $currency)
     {
-
-        // get default currency
-        $defaultCurrency = Currency::getDefaultCurrency();
-
-        $rate = 1.0;
-        if ($currency !== $defaultCurrency) {
-            $rate = $currency->getRate();
-        }
-
-        //Tlog::getInstance()->addDebug("UPDATE_CURRENCY : " . $rate . ' :: ' . $currency->getId() . ' :: ' . $defaultCurrency->getId() );
-
-        $price = 0.0;
-        $promoPrice = 0.0;
 
         // cart item
         foreach ($cart->getCartItems() as $cartItem) {
-            $productSaleElementsId = $cartItem->getProductSaleElementsId();
-            $productPrice = ProductPriceQuery::create()
-                ->filterByCurrencyId($currency->getId())
-                ->filterByProductSaleElementsId($productSaleElementsId)
-                ->findOne();
+            $productSaleElements = $cartItem->getProductSaleElements();
 
-            if (null === $productPrice || $productPrice->getFromDefaultCurrency()) {
-                // we take the default currency and apply the taxe rate
-                $productPrice = ProductPriceQuery::create()
-                    ->filterByCurrencyId($defaultCurrency->getId())
-                    ->filterByProductSaleElementsId($productSaleElementsId)
-                    ->findOne();
+            $productPrice = $productSaleElements->getPricesByCurrency($currency);
 
-                if (null === $productPrice) {
-                    //Tlog::getInstance()->addDebug("BOOM");
-                    continue;
-                }
-                //Tlog::getInstance()->addDebug("UPDATE_CURRENCY DYNAMIC ");
-                $price = $productPrice->getPrice() * $rate;
-                $promoPrice = $productPrice->getPromoPrice() * $rate;
-
-            } else {
-                // product price for default currency or manual price for other currency
-                //Tlog::getInstance()->addDebug("UPDATE_CURRENCY REAL ");
-                $price = $productPrice->getPrice();
-                $promoPrice = $productPrice->getPromoPrice();
-            }
-
-            //Tlog::getInstance()->addDebug("UPDATE_CURRENCY : " . $price . " :: " . $promoPrice);
-
-            // We have
             $cartItem
-                ->setPrice($price)
-                ->setPromoPrice($promoPrice);
+                ->setPrice($productPrice->getPrice())
+                ->setPromoPrice($productPrice->getPromoPrice());
 
             $cartItem->save();
-
         }
 
         // update the currency cart
         $cart->setCurrencyId($currency->getId());
         $cart->save();
-
 
     }
 
@@ -285,16 +222,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * try to attach a new item to an existing cart
      *
-     * @param \Thelia\Model\Cart                $cart
-     * @param int                               $productId
-     * @param \Thelia\Model\ProductSaleElements $productSaleElements
-     * @param float                             $quantity
-     * @param float                             $price
-     * @param float                             $promoPrice
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     * @param \Thelia\Model\Cart                                          $cart
+     * @param int                                                         $productId
+     * @param \Thelia\Model\ProductSaleElements                           $productSaleElements
+     * @param float                                                       $quantity
+     * @param ProductPriceTools                                           $productPrices
      *
      * @return CartItem
      */
-    protected function doAddItem(EventDispatcherInterface $dispatcher, \Thelia\Model\Cart $cart, $productId, \Thelia\Model\ProductSaleElements $productSaleElements, $quantity, $price, $promoPrice)
+    protected function doAddItem(EventDispatcherInterface $dispatcher, \Thelia\Model\Cart $cart, $productId, \Thelia\Model\ProductSaleElements $productSaleElements, $quantity, $productPrices)
     {
         $cartItem = new CartItem();
         $cartItem->setDisptacher($dispatcher);
@@ -303,8 +240,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->setProductId($productId)
             ->setProductSaleElementsId($productSaleElements->getId())
             ->setQuantity($quantity)
-            ->setPrice($price)
-            ->setPromoPrice($promoPrice)
+            ->setPrice($productPrices->getPrice())
+            ->setPromoPrice($productPrices->getPromoPrice())
             ->setPromo($productSaleElements->getPromo())
             ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30))
             ->save();
@@ -328,16 +265,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->filterByProductId($productId)
             ->filterByProductSaleElementsId($productSaleElementsId)
             ->findOne();
-    }
-
-    /**
-     * Returns the session from the current request
-     *
-     * @return \Thelia\Core\HttpFoundation\Session\Session
-     */
-    protected function getSession()
-    {
-        return $this->request->getSession();
     }
 
 }
