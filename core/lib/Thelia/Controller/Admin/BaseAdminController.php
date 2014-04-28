@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -402,7 +403,15 @@ class BaseAdminController extends BaseController
      */
     protected function render($templateName, $args = array(), $status = 200)
     {
-        return Response::create($this->renderRaw($templateName, $args), $status);
+        try {
+            $response = Response::create($this->renderRaw($templateName, $args), $status);
+        } catch (AuthenticationException $ex) {
+            // User is not authenticated, and templates requires authentication -> redirect to login page
+            // We user login_tpl as a path, not a template.
+            $response = RedirectResponse::create(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
+        }
+
+        return $response;
     }
 
     /**
@@ -453,10 +462,6 @@ class BaseAdminController extends BaseController
             $data = $this->getParser($templateDir)->render($templateName, $args);
 
             return $data;
-        } catch (AuthenticationException $ex) {
-            // User is not authenticated, and templates requires authentication -> redirect to login page
-            // We user login_tpl as a path, not a template.
-            Redirect::exec(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
         } catch (AuthorizationException $ex) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.
             return $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."), 403);
