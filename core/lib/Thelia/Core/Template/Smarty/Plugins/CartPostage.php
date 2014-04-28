@@ -13,7 +13,6 @@
 namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Util\PropelModelPager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
@@ -34,11 +33,6 @@ use Thelia\Module\Exception\DeliveryException;
  */
 class CartPostage extends AbstractSmartyPlugin
 {
-    /** @var PropelModelPager[] */
-    protected static $pagination = null;
-
-    protected $loopDefinition = array();
-
     /** @var \Thelia\Core\HttpFoundation\Request The Request */
     protected $request;
 
