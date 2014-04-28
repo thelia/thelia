@@ -457,12 +457,19 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
+        /** @var \Thelia\Core\Security\SecurityContext $securityContext */
+        $securityContext = $this->container->get('thelia.securityContext');
 
         foreach ($loopResult->getResultDataCollection() as $product) {
 
             $loopResultRow = new LoopResultRow($product);
 
             $price = $product->getVirtualColumn('price');
+
+            if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+                $price = $price * (1-($securityContext->getCustomerUser()->getDiscount()/100));
+            }
+
             try {
                 $taxedPrice = $product->getTaxedPrice(
                     $taxCountry,
@@ -472,6 +479,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 $taxedPrice = null;
             }
             $promoPrice = $product->getVirtualColumn('promo_price');
+
+            if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+                $promoPrice = $promoPrice * (1-($securityContext->getCustomerUser()->getDiscount()/100));
+            }
             try {
                 $taxedPromoPrice = $product->getTaxedPromoPrice(
                     $taxCountry,
@@ -938,6 +949,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $loopResult = new LoopResult($results);
 
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
+        /** @var \Thelia\Core\Security\SecurityContext $securityContext */
+        $securityContext = $this->container->get('thelia.securityContext');
 
         foreach ($loopResult->getResultDataCollection() as $product) {
 
@@ -945,10 +958,14 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             $price = $product->getRealLowestPrice();
 
+           if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+                $price = $price * (1-($securityContext->getCustomerUser()->getDiscount()/100));
+            }
+
             try {
                 $taxedPrice = $product->getTaxedPrice(
                     $taxCountry,
-                    $product->getRealLowestPrice()
+                    $price
                 );
             } catch (TaxEngineException $e) {
                 $taxedPrice = null;

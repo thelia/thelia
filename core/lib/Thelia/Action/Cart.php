@@ -48,6 +48,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $append = $event->getAppend();
         $quantity = $event->getQuantity();
         $currency = $cart->getCurrency();
+        $customer = $cart->getCustomer();
+        $discount = 0;
+
+        if(null !== $customer && $customer->getDiscount() > 0) {
+            $discount = $customer->getDiscount();
+        }
 
         $productSaleElementsId = $event->getProductSaleElementsId();
         $productId = $event->getProduct();
@@ -60,7 +66,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 ->findPk($productSaleElementsId);
 
             if (null !== $productSaleElements) {
-                $productPrices = $productSaleElements->getPricesByCurrency($currency);
+                $productPrices = $productSaleElements->getPricesByCurrency($currency, $discount);
                 $event->setCartItem(
                     $this->doAddItem($event->getDispatcher(), $cart, $productId, $productSaleElements, $quantity, $productPrices)
                 );
@@ -151,11 +157,18 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public function updateCartPrices(\Thelia\Model\Cart $cart, Currency $currency)
     {
 
+        $customer = $cart->getCustomer();
+        $discount = 0;
+
+        if(null !== $customer && $customer->getDiscount() > 0) {
+            $discount = $customer->getDiscount();
+        }
+
         // cart item
         foreach ($cart->getCartItems() as $cartItem) {
             $productSaleElements = $cartItem->getProductSaleElements();
 
-            $productPrice = $productSaleElements->getPricesByCurrency($currency);
+            $productPrice = $productSaleElements->getPricesByCurrency($currency, $discount);
 
             $cartItem
                 ->setPrice($productPrice->getPrice())
