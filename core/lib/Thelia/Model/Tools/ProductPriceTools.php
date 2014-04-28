@@ -42,27 +42,11 @@ class ProductPriceTools
     }
 
     /**
-     * @param float $price
-     */
-    public function setPrice($price)
-    {
-        $this->price = $price;
-    }
-
-    /**
      * @return float
      */
     public function getPrice()
     {
         return $this->price;
-    }
-
-    /**
-     * @param float $promoPrice
-     */
-    public function setPromoPrice($promoPrice)
-    {
-        $this->promoPrice = $promoPrice;
     }
 
     /**

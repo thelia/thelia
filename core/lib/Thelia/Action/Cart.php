@@ -231,7 +231,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @return CartItem
      */
-    protected function doAddItem(EventDispatcherInterface $dispatcher, \Thelia\Model\Cart $cart, $productId, \Thelia\Model\ProductSaleElements $productSaleElements, $quantity, $productPrices)
+    protected function doAddItem(EventDispatcherInterface $dispatcher, \Thelia\Model\Cart $cart, $productId, \Thelia\Model\ProductSaleElements $productSaleElements, $quantity, ProductPriceTools $productPrices)
     {
         $cartItem = new CartItem();
         $cartItem->setDisptacher($dispatcher);

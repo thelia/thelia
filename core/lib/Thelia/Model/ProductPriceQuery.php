@@ -17,18 +17,4 @@ use Thelia\Model\Base\ProductPriceQuery as BaseProductPriceQuery;
 class ProductPriceQuery extends BaseProductPriceQuery
 {
 
-    public function findByCurrencyAndProductSaleElements($currencyId, $productSaleElementsId)
-    {
-        ArticleQuery::create()->select(array('Id', 'Name'))->find();
-
-        $currencyId = $this->getCurrency();
-        if (null !== $currencyId) {
-            $currency = CurrencyQuery::create()->findOneById($currencyId);
-            if (null === $currency) {
-                throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
-            }
-        }
-
-    }
-
 } // ProductPriceQuery
