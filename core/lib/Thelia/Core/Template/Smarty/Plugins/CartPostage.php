@@ -76,7 +76,7 @@ class CartPostage extends AbstractSmartyPlugin
     {
 
         if (! $repeat) {
-            return $content;
+            return (null !== $this->countryId) ? $content : "";
         }
 
         $customer = $this->request->getSession()->getCustomerUser();
@@ -102,9 +102,7 @@ class CartPostage extends AbstractSmartyPlugin
      *      cart if it exists
      *  - the country saved in cookie if customer have changed
      *      the default country
-     *  - the default country for the shop if exists
-     *  - the country related to the customer based on browser preferences
-     *  - default country
+     *  - the default country for the shop if it exists
      *
      *
      * @param  \Thelia\Model\Customer $customer
@@ -147,16 +145,6 @@ class CartPostage extends AbstractSmartyPlugin
             return $country;
         } catch (\LogicException $e) {
             ;
-        }
-
-        // get browser lang
-        $lang_code= $this->request->getSession()->getLang()->getCode();
-        if ($lang_code) {
-            $country = CountryQuery::create()
-                ->findOneByIsoalpha2(strtoupper($lang_code));
-            if (null !== $country) {
-                return $country;
-            }
         }
 
         return null;
