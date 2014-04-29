@@ -38,6 +38,9 @@
                             <ul class="list-info">
                                 <li>
                                     <address class="adr">
+                                        {if $COMPANY}
+                                          <span class="org">{$COMPANY}</span><br>
+                                        {/if}
                                         <span class="street-address">{$ADDRESS1}</span><br>
                                         {if $ADDRESS2 != ""}
                                             <span class="extended-address">{$ADDRESS2}</span><br>
