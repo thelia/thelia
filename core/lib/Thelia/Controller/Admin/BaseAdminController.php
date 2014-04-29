@@ -403,12 +403,10 @@ class BaseAdminController extends BaseController
      */
     protected function render($templateName, $args = array(), $status = 200)
     {
-        try {
-            $response = Response::create($this->renderRaw($templateName, $args), $status);
-        } catch (AuthenticationException $ex) {
-            // User is not authenticated, and templates requires authentication -> redirect to login page
-            // We user login_tpl as a path, not a template.
-            $response = RedirectResponse::create(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
+        $response = $this->renderRaw($templateName, $args);
+
+        if (!$response instanceof \Symfony\Component\HttpFoundation\Response) {
+            $response = Response::create($response, $status);
         }
 
         return $response;
@@ -421,7 +419,7 @@ class BaseAdminController extends BaseController
      * @param array $args        the template arguments
      * @param null  $templateDir
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return string|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function renderRaw($templateName, $args = array(), $templateDir = null)
     {
@@ -459,12 +457,17 @@ class BaseAdminController extends BaseController
 
         // Render the template.
         try {
-            $data = $this->getParser($templateDir)->render($templateName, $args);
+            $content = $this->getParser($templateDir)->render($templateName, $args);
 
-            return $data;
+        } catch (AuthenticationException $ex) {
+            // User is not authenticated, and templates requires authentication -> redirect to login page
+            // We user login_tpl as a path, not a template.
+            $content = RedirectResponse::create(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
         } catch (AuthorizationException $ex) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.
-            return $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."), 403);
+            $content = $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."), 403);
         }
+
+        return $content;
     }
 }
