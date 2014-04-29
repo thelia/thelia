@@ -1,3 +1,9 @@
+#2.0.1
+- possibility to apply a permanent discount on a customer
+- display estimated shipping on cart page
+- export newsletter subscribers list
+- Fix redirect issues
+
 #2.0.0
 - Coupons values are re-evaluated when a product quantity is changed in the shopping cart
 - You can declare new compilerPass in modules. See Thelia\Module\BaseModule::getCompilers phpDoc
