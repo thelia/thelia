@@ -58,7 +58,7 @@
 
                     {form_field form=$form field="title"}
                         <div class="form-group group-title{if $error} has-error{/if}">
-                            <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                            <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
                             <div class="control-input">
                                 <select name="{$name}" id="{$label_attr.for}" class="form-control"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                                     <option value="">-- {intl l="Select Title"} --</option>
@@ -107,7 +107,7 @@
 
                     {form_field form=$form field="company"}
                       <div class="form-group group-company{if $error} has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
                           <div class="control-input">
                             <input type="text" name="{$name}" value="{$value}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder company"}" value="{$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
@@ -180,7 +180,7 @@
 
                     {form_field form=$form field="country"}
                         <div class="form-group group-country {if $error}has-error{/if}">
-                            <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                            <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
                             <div class="control-input">
                                 <select name="{$name}" id="{$label_attr.for}" class="form-control"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                                     <option value="">-- {intl l="Select Country"} --</option>
