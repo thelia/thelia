@@ -10,6 +10,8 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('front_cart_country_cookie_name','fcccn', 1, 1, NOW(), NOW());
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 ('front_cart_country_cookie_expires','2592000', 1, 1, NOW(), NOW());
+INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+('sitemap_ttl','7200', 1, 1, NOW(), NOW());
 
 ALTER TABLE `module` ADD INDEX `idx_module_activate` (`activate`);
 
