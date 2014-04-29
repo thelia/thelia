@@ -23,6 +23,7 @@
 namespace Front\Controller;
 
 use Front\Front;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
@@ -308,7 +309,9 @@ class CustomerController extends BaseFrontController
 
                         $this->processLogin($customer);
 
-                        $this->redirectSuccess($customerLoginForm);
+                        $successUrl = $customerLoginForm->getSuccessUrl();
+
+                        return RedirectResponse::create($successUrl);
 
                     } catch (UsernameNotFoundException $e) {
                         $message = "Wrong email or password. Please try again";
@@ -346,7 +349,7 @@ class CustomerController extends BaseFrontController
         }
 
         // Redirect to home page
-        $this->redirect(URL::getInstance()->getIndexPage());
+        return RedirectResponse::create(URL::getInstance()->getIndexPage());
     }
 
     /**
