@@ -51,7 +51,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $customer = $cart->getCustomer();
         $discount = 0;
 
-        if(null !== $customer && $customer->getDiscount() > 0) {
+        if (null !== $customer && $customer->getDiscount() > 0) {
             $discount = $customer->getDiscount();
         }
 
@@ -160,7 +160,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $customer = $cart->getCustomer();
         $discount = 0;
 
-        if(null !== $customer && $customer->getDiscount() > 0) {
+        if (null !== $customer && $customer->getDiscount() > 0) {
             $discount = $customer->getDiscount();
         }
 

@@ -168,7 +168,6 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
                 $taxedPromoPrice = null;
             }
 
-
             $loopResultRow
                 ->set("ID"                , $PSEValue->getId())
                 ->set("QUANTITY"          , $PSEValue->getQuantity())
