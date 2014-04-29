@@ -13,28 +13,13 @@
 
 namespace Front\Controller;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Serializer;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Log\Tlog;
-use Thelia\Model\CategoryQuery;
-use Thelia\Model\Category;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Content;
-use Thelia\Model\ContentQuery;
-use Thelia\Model\Folder;
-use Thelia\Model\FolderQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Lang;
-use Thelia\Model\Product;
-use Thelia\Model\ProductQuery;
-use Thelia\Model\Tools\SitemapURL;
-use Thelia\Tools\SitemapURLNormalizer;
-use Thelia\Tools\URL;
 
 
 /**
@@ -51,46 +36,9 @@ class SitemapController  extends BaseFrontController {
     const SITEMAP_DIR = "sitemap";
 
     /**
-     * String array of active locals : fr_FR, en_US, ...
-     *
-     * @var array
+     * Folder name for sitemap cache
      */
-    protected $locales = array();
-
-    /**
-     * Array of ` Thelia\Model\Tools\SitemapURL` object for categories
-     *
-     * @var array
-     */
-    protected $categoryUrls = array();
-
-    /**
-     * Array of ` Thelia\Model\Tools\SitemapURL` object for products
-     *
-     * @var array
-     */
-    protected $productUrls = array();
-
-    /**
-     * Array of ` Thelia\Model\Tools\SitemapURL` object for folders
-     *
-     * @var array
-     */
-    protected $folderUrls = array();
-
-    /**
-     * Array of ` Thelia\Model\Tools\SitemapURL` object for contents
-     *
-     * @var array
-     */
-    protected $contentUrls = array();
-
-    /**
-     * Array of ` Thelia\Model\Tools\SitemapURL` object for static contents
-     *
-     * @var array
-     */
-    protected $staticUrls = array();
+    const SITEMAP_FILE = "sitemap";
 
     /**
      * @return Response
@@ -101,33 +49,16 @@ class SitemapController  extends BaseFrontController {
         // check if already cached
         /** @var Request $request */
         $request = $this->getRequest();
-        $locale = $request->query->get("locale");
-        // todo: implement contextual sitemap : product, category, cms
         $context = $request->query->get("context", "");
         $flush = $request->query->get("flush", "");
         $expire = ConfigQuery::read("sitemap_ttl", '7200');
 
-        // load locals
-        $langs = LangQuery::create()->find();
-        /** @var Lang $lang */
-        foreach ($langs AS $lang){
-            if (null !== $locale) {
-                if ($locale === $lang->getLocale()){
-                    $this->locales[] = $lang->getLocale();
-                    break;
-                }
-            }
-            else {
-                $this->locales[] = $lang->getLocale();
-            }
-        }
-
         // check if sitemap already in cache
         $cacheDir = $this->getCacheDir();
-        $sitemapHash = md5("sitemap." . implode($this->locales) . "." . $context);
+        $cacheFileURL = $cacheDir . self::SITEMAP_FILE . '.xml';
         $expire = intval($expire) ?: 7200;
-        $cacheFileURL = $cacheDir . $sitemapHash . '.xml';
         $cacheContent = null;
+        
         if (!($this->checkAdmin() && "" !== $flush)){
             try {
                 $cacheContent = $this->getCache($cacheFileURL, $expire);
@@ -138,25 +69,9 @@ class SitemapController  extends BaseFrontController {
         }
 
         if (null === $cacheContent){
-            $encoders = array(new XmlEncoder("urlset"), new JsonEncoder());
-            $normalizers = array(new SitemapURLNormalizer());
-            $serializer = new Serializer($normalizers, $encoders);
 
-            $this->findStaticUrls();
-            $this->findCategoryUrls();
-            $this->findFolderUrls();
-
-            $map = array();
-            $map['@xmlns'] = "http://www.sitemaps.org/schemas/sitemap/0.9";
-            $map['url'] = array_merge(
-                $this->staticUrls,
-                $this->categoryUrls,
-                $this->productUrls,
-                $this->folderUrls,
-                $this->contentUrls
-            );
-
-            $cacheContent = $serializer->serialize($map, 'xml');
+            // render the view
+            $cacheContent = $this->renderRaw("sitemap");
 
             // save cache
             try {
@@ -174,118 +89,6 @@ class SitemapController  extends BaseFrontController {
 
         return $response;
     }
-
-
-    /**
-     * Get all static URLs
-     *
-     * @param int $parent Parent category id
-     */
-    protected function findStaticUrls()
-    {
-        $url = URL::getInstance()->getIndexPage();
-        $home = new SitemapURL($url);
-        $home->setPriotity(1.0);
-        $this->staticUrls[] = $home;
-    }
-
-    /**
-     * Get all child visible categories of category id `$parent`
-     * This function is recursive and is called for all child categories
-     *
-     * @param int $parent Parent category id
-     */
-    protected function findCategoryUrls($parent = 0)
-    {
-        $categoryQuery = CategoryQuery::create();
-        $categoryQuery->filterByParent($parent);
-        $categoryQuery->filterByVisible(true, Criteria::EQUAL);
-        $categories = $categoryQuery->find();
-
-        /** @var Category $category */
-        foreach($categories AS $category){
-            foreach ($this->locales AS $local){
-                $loc = $category->getUrl($local);
-                $this->categoryUrls[] = new SitemapURL($loc, $category->getUpdatedAt("c"));
-            }
-            // call sub categories
-            $this->findCategoryUrls($category->getId());
-            // call products
-            $this->findProductUrls($category);
-        }
-    }
-
-    /**
-     * Get all visible product which have `category` as default category
-     *
-     * @param Category $category
-     */
-    protected function findProductUrls(Category $category = null)
-    {
-        $products = ProductQuery::create()
-            //->filterByCategory($category)
-            ->filterByVisible(true, Criteria::EQUAL)
-            ->joinProductCategory()
-            ->where('ProductCategory.default_category' . Criteria::EQUAL . '1')
-            ->where('ProductCategory.category_id = ?', $category->getId())
-            ->find();
-
-        /** @var Product $product */
-        foreach($products AS $product){
-            foreach ($this->locales AS $local){
-                $loc = $product->getUrl($local);
-                $this->productUrls[] = new SitemapURL($loc, $product->getUpdatedAt("c"));
-            }
-        }
-    }
-
-    /**
-     * Get all child visible folders of folder id `$parent`
-     * This function is recursive and is called for all child folders
-     *
-     * @param int $parent Parent folder id
-     */
-    protected function findFolderUrls($parent = 0)
-    {
-        $folderQuery = FolderQuery::create();
-        $folderQuery->filterByParent($parent);
-        $folderQuery->filterByVisible(true, Criteria::EQUAL);
-        $folders = $folderQuery->find();
-
-        /** @var Folder $folders */
-        foreach($folders AS $folder){
-            foreach ($this->locales AS $local){
-                $loc = $folder->getUrl($local);
-                $this->folderUrls[] = new SitemapURL($loc, $folder->getUpdatedAt("c"));
-            }
-            // call sub folders
-            $this->findFolderUrls($folder->getId());
-            // call contents
-            $this->findContentUrls($folder);
-        }
-    }
-
-    /**
-     * Get all visible content which have in `$folder` folder
-     *
-     * @param Folder $folder
-     */
-    protected function findContentUrls(Folder $folder=null)
-    {
-        $contents = ContentQuery::create()
-            ->filterByVisible(true, Criteria::EQUAL)
-            ->filterByFolder($folder)
-            ->find();
-
-        /** @var Content $content */
-        foreach($contents AS $content){
-            foreach ($this->locales AS $local){
-                $loc = $content->getUrl($local);
-                $this->contentUrls[] = new SitemapURL($loc, $content->getUpdatedAt("c"));
-            }
-        }
-    }
-
 
     /**
      * Check if current user has ADMIN role
@@ -334,7 +137,6 @@ class SitemapController  extends BaseFrontController {
         }
     }
 
-
     /**
      * Retrieve the cache dir used for sitemaps
      *
@@ -343,7 +145,7 @@ class SitemapController  extends BaseFrontController {
      */
     protected function getCacheDir()
     {
-        $cacheDir = $this->container->getParameter("kernel.cache_dir") .
+        $cacheDir = $this->container->getParameter("kernel.cache_dir");
         $cacheDir = rtrim($cacheDir, '/');
         $cacheDir .= '/' . self::SITEMAP_DIR . '/';
         if (! is_dir($cacheDir)){
