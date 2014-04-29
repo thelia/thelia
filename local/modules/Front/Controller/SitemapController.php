@@ -18,16 +18,17 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\LangQuery;
-use Thelia\Model\Lang;
-
 
 /**
- * Class SitemapController
+ * Controller uses to generate sitemap.xml
+ *
+ * A default cache of 2 hours is used to avoid attack. You can flush cache if you have `ADMIN` role and pass flush=1 in
+ * query parameter.
+ *
  * @package Front\Controller
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class SitemapController  extends BaseFrontController {
+class SitemapController extends BaseFrontController {
 
 
     /**
@@ -46,10 +47,8 @@ class SitemapController  extends BaseFrontController {
     public function generateAction()
     {
 
-        // check if already cached
         /** @var Request $request */
         $request = $this->getRequest();
-        $context = $request->query->get("context", "");
         $flush = $request->query->get("flush", "");
         $expire = ConfigQuery::read("sitemap_ttl", '7200');
 
@@ -58,7 +57,7 @@ class SitemapController  extends BaseFrontController {
         $cacheFileURL = $cacheDir . self::SITEMAP_FILE . '.xml';
         $expire = intval($expire) ?: 7200;
         $cacheContent = null;
-        
+
         if (!($this->checkAdmin() && "" !== $flush)){
             try {
                 $cacheContent = $this->getCache($cacheFileURL, $expire);
@@ -69,7 +68,6 @@ class SitemapController  extends BaseFrontController {
         }
 
         if (null === $cacheContent){
-
             // render the view
             $cacheContent = $this->renderRaw("sitemap");
 
