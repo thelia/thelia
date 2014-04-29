@@ -8,10 +8,14 @@ use Thelia\TaxEngine\Calculator;
 
 class ProductSaleElements extends BaseProductSaleElements
 {
-    public function getPrice($virtualColumnName = 'price_PRICE')
+    public function getPrice($virtualColumnName = 'price_PRICE', $discount = 0)
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
+
+            if ($discount > 0) {
+                $amount = $amount * (1-($discount/100));
+            }
         } catch (PropelException $e) {
             throw new PropelException("Virtual column `$virtualColumnName` does not exist in ProductSaleElements::getPrice");
         }
@@ -19,10 +23,14 @@ class ProductSaleElements extends BaseProductSaleElements
         return $amount;
     }
 
-    public function getPromoPrice($virtualColumnName = 'price_PROMO_PRICE')
+    public function getPromoPrice($virtualColumnName = 'price_PROMO_PRICE', $discount = 0)
     {
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
+
+            if ($discount > 0) {
+                $amount = $amount * (1-($discount/100));
+            }
         } catch (PropelException $e) {
             throw new PropelException("Virtual column `$virtualColumnName` does not exist in ProductSaleElements::getPromoPrice");
         }
@@ -30,18 +38,18 @@ class ProductSaleElements extends BaseProductSaleElements
         return $amount;
     }
 
-    public function getTaxedPrice(Country $country)
+    public function getTaxedPrice(Country $country , $virtualColumnName = 'price_PRICE', $discount = 0)
     {
         $taxCalculator = new Calculator();
 
-        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice()), 2);
+        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice($virtualColumnName, $discount)), 2);
     }
 
-    public function getTaxedPromoPrice(Country $country)
+    public function getTaxedPromoPrice(Country $country, $virtualColumnName = 'price_PROMO_PRICE', $discount = 0)
     {
         $taxCalculator = new Calculator();
 
-        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice()), 2);
+        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice($virtualColumnName, $discount)), 2);
     }
 
     /**
@@ -56,7 +64,7 @@ class ProductSaleElements extends BaseProductSaleElements
      * @return ProductPriceTools
      * @throws \RuntimeException
      */
-    public function getPricesByCurrency($currency)
+    public function getPricesByCurrency(Currency $currency, $discount = 0)
     {
         $defaultCurrency = Currency::getDefaultCurrency();
 
@@ -83,6 +91,11 @@ class ProductSaleElements extends BaseProductSaleElements
         } else {
             $price = $productPrice->getPrice();
             $promoPrice = $productPrice->getPromoPrice();
+        }
+
+        if ($discount > 0) {
+            $price = $price * (1-($discount/100));
+            $promoPrice = $promoPrice * (1-($discount/100));
         }
 
         $productPriceTools = new ProductPriceTools($price, $promoPrice);

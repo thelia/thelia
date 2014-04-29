@@ -173,8 +173,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 new \ReflectionClass($module->getFullNamespace());
 
                 $exists = true;
-            }
-            catch(\ReflectionException $ex) {
+            } catch (\ReflectionException $ex) {
                 $exists = false;
             }
 

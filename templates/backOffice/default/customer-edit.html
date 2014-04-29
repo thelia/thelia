@@ -22,7 +22,7 @@
         				<div class="row">
 
         					<div class="col-md-12 title title-without-tabs">
-                                {intl l="Edit customer %firstname %lastname" firstname={$FIRSTNAME} lastname={$LASTNAME}}
+                                {intl l="Edit customer %firstname %lastname (Ref : %ref)" firstname={$FIRSTNAME} lastname={$LASTNAME} ref={$REF}}
         					</div>
 
                             <div class="form-container">
@@ -80,7 +80,14 @@
                                                 {form_field form=$form field='email'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Lastname'}">
+                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Email'}">
+                                                    </div>
+                                                {/form_field}
+
+                                                {form_field form=$form field='discount'}
+                                                    <div class="form-group {if $error}has-error{/if}">
+                                                        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='permanent discount'}">
                                                     </div>
                                                 {/form_field}
 

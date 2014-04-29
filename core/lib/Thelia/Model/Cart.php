@@ -18,7 +18,7 @@ class Cart extends BaseCart
      * @param  Customer $customer
      * @return Cart
      */
-    public function duplicate($token, Customer $customer = null, EventDispatcherInterface $dispatcher)
+    public function duplicate($token, Customer $customer = null, Currency $currency = null, EventDispatcherInterface $dispatcher)
     {
         $cartItems = $this->getCartItems();
 
@@ -26,11 +26,21 @@ class Cart extends BaseCart
         $cart->setAddressDeliveryId($this->getAddressDeliveryId());
         $cart->setAddressInvoiceId($this->getAddressInvoiceId());
         $cart->setToken($token);
-        // TODO : set current Currency
-        $cart->setCurrencyId($this->getCurrencyId());
+        $discount = 0;
+
+        if (null === $currency) {
+            $currencyQuery = CurrencyQuery::create();
+            $currency = $currencyQuery->findPk($this->getCurrencyId()) ?: $currencyQuery->findOneByByDefault(1);
+        }
+
+        $cart->setCurrency($currency);
 
         if ($customer) {
             $cart->setCustomer($customer);
+
+            if ($customer->getDiscount() > 0) {
+                $discount = $customer->getDiscount();
+            }
         }
 
         $cart->save();
@@ -50,25 +60,18 @@ class Cart extends BaseCart
                 $item->setProductId($cartItem->getProductId());
                 $item->setQuantity($cartItem->getQuantity());
                 $item->setProductSaleElements($productSaleElements);
-                if ($currentDateTime <= $cartItem->getPriceEndOfLife()) {
-                    $item->setPrice($cartItem->getPrice())
-                        ->setPromoPrice($cartItem->getPromoPrice())
-                        ->setPromo($productSaleElements->getPromo())
-                    // TODO : new price EOF or duplicate current priceEOF from $cartItem ?
-                        ->setPriceEndOfLife($cartItem->getPriceEndOfLife());
-                } else {
-                    $productPrices = ProductPriceQuery::create()->filterByProductSaleElements($productSaleElements)->findOne();
+                $prices = $productSaleElements->getPricesByCurrency($currency, $discount);
+                $item
+                    ->setPrice($prices->getPrice())
+                    ->setPromoPrice($prices->getPromoPrice())
+                    ->setPromo($productSaleElements->getPromo());
 
-                    $item->setPrice($productPrices->getPrice())
-                        ->setPromoPrice($productPrices->getPromoPrice())
-                        ->setPromo($productSaleElements->getPromo())
-                        ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30));
-                }
                 $item->save();
                 $dispatcher->dispatch(TheliaEvents::CART_ITEM_DUPLICATE, new CartItemDuplicationItem($item, $cartItem));
             }
 
         }
+        $this->delete();
 
         return $cart;
     }

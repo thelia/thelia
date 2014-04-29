@@ -19,7 +19,6 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Cache\AssetsFlushForm;
 use Thelia\Form\Cache\CacheFlushForm;
 use Thelia\Form\Cache\ImagesAndDocumentsCacheFlushForm;
-use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 

@@ -299,6 +299,7 @@ return array(
     'password confirmation is not the same as password field' => 'le mot de passe de confirmation n\'est pas le même que le champ mot de passe',
     'password must be composed of at least 4 characters' => 'le mot de passe doit être composé d\'au moins 4 caractères',
     'payment module %s is not a Thelia\Module\PaymentModuleInterface' => 'Le module de paiement %s n\'est pas une instance de Thelia\Module\PaymentModuleInterface ',
+    'permanent discount (in percent)' => 'Remise permanente (en pourcentage)',
     'quantity value is not valid' => 'la valeur de la quantité n\'est pas valide',
     'superior or equal to' => 'supérieur ou égal à',
     'superior to' => 'supérieur à',

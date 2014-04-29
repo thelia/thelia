@@ -112,7 +112,8 @@ trait CartTrait
      */
     protected function duplicateCart(EventDispatcherInterface $dispatcher, CartModel $cart, Session $session, Customer $customer = null)
     {
-        $newCart = $cart->duplicate($this->generateCookie($session), $customer, $dispatcher);
+        $currency = $session->getCurrency();
+        $newCart = $cart->duplicate($this->generateCookie($session), $customer, $currency, $dispatcher);
         $session->setCart($newCart->getId());
 
         $cartEvent = new CartEvent($newCart);
