@@ -194,6 +194,12 @@
     </route>
     <!-- end newsletter management -->
 
+    <!-- sitemap generator -->
+    <route id="sitemap.process" path="/sitemap">
+        <default key="_controller">Front\Controller\SitemapController::generateAction</default>
+    </route>
+    <!-- end sitemap generator -->
+
     <!-- Default Route -->
     <route id="default" path="/{_view}">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
