@@ -78,7 +78,7 @@ class FileController extends BaseAdminController
                     ->trans(
                         'File is too heavy, please retry with a file having a size less than %size%.',
                         array('%size%' => ini_get('upload_max_filesize')),
-                        'image'
+                        'core'
                     );
 
                     return new ResponseRest($message, 'text', 403);
