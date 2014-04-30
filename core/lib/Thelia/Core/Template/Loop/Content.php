@@ -202,6 +202,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\Content $content */
         foreach ($loopResult->getResultDataCollection() as $content) {
             $loopResultRow = new LoopResultRow($content);
 
@@ -224,14 +225,19 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
 
 
             if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
+                $defaultFolderId = $content->getDefaultFolderId();
                 // Find previous and next category
                 $previous = ContentQuery::create()
+                    ->joinContentFolder()
+                    ->where('ContentFolder.folder_id = ?', $defaultFolderId)
                     ->filterByPosition($content->getPosition(), Criteria::LESS_THAN)
                     ->orderByPosition(Criteria::DESC)
                     ->findOne()
                 ;
 
                 $next = ContentQuery::create()
+                    ->joinContentFolder()
+                    ->where('ContentFolder.folder_id = ?', $defaultFolderId)
                     ->filterByPosition($content->getPosition(), Criteria::GREATER_THAN)
                     ->orderByPosition(Criteria::ASC)
                     ->findOne()
