@@ -77,7 +77,7 @@ class FileController extends BaseAdminController
                     $message = $this->getTranslator()
                     ->trans(
                         'File is too heavy, please retry with a file having a size less than %size%.',
-                        array('%size%' => ini_get('post_max_size')),
+                        array('%size%' => ini_get('upload_max_filesize')),
                         'image'
                     );
 

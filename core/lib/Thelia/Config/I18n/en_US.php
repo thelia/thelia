@@ -67,6 +67,7 @@ return array(
     'Failed to update language definition: %ex' => 'Failed to update language definition: %ex',
     'Fax' => 'Fax',
     'Feature value does not match FLOAT format' => 'Feature value does not match FLOAT format',
+    'File is too heavy, please retry with a file having a size less than %size%.' => 'File is too Large, please retry with a file having a size less than %size%.',
     'First Name' => 'First Name',
     'Firstname' => 'Firstname',
     'Folder title *' => 'Folder title *',
