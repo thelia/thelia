@@ -216,6 +216,8 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
     {/javascripts}
     <script>
         $(function() {
+            // Load active tab
+
             $.imageUploadManager.initImageDropZone();
             $.documentUploadManager.initDocumentDropZone();
 
@@ -227,7 +229,7 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
 
             // Show proper tab, if defined
             {if ! empty($current_tab)}
-            $('#tabbed-menu a[href="#{$current_tab}"]').tab('show')
+                $('.nav-tabs a[href="#{$current_tab}"]').trigger("click");
             {/if}
 
             $('a.delete-folder').click(function(e) {
@@ -267,9 +269,6 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
             });
 
             // Initialize folder (id=
-            {$folder_id})
-            select
-            value
             {if $folder_id != 0}
             $('#folder_id').val("{$folder_id}").change();
             {/if}
