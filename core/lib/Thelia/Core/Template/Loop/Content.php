@@ -53,6 +53,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('folder_default'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('current_folder'),
+            Argument::createBooleanTypeArgument('with_prev_next_info', false),
             Argument::createIntTypeArgument('depth', 1),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createAnyTypeArgument('title'),
@@ -220,6 +221,29 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
 
                 ->set("VISIBLE"                 , $content->getVisible())
             ;
+
+
+            if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
+                // Find previous and next category
+                $previous = ContentQuery::create()
+                    ->filterByPosition($content->getPosition(), Criteria::LESS_THAN)
+                    ->orderByPosition(Criteria::DESC)
+                    ->findOne()
+                ;
+
+                $next = ContentQuery::create()
+                    ->filterByPosition($content->getPosition(), Criteria::GREATER_THAN)
+                    ->orderByPosition(Criteria::ASC)
+                    ->findOne()
+                ;
+
+                $loopResultRow
+                    ->set("HAS_PREVIOUS"     , $previous != null ? 1 : 0)
+                    ->set("HAS_NEXT"         , $next != null ? 1 : 0)
+                    ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)
+                    ->set("NEXT"             , $next != null ? $next->getId() : -1)
+                ;
+            }
 
             $loopResult->addRow($loopResultRow);
         }
