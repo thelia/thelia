@@ -8,6 +8,8 @@ $(function($){
     $.imageUploadManager.initImageDropZone = function() {
 
         $.imageUploadManager.onClickDeleteImage();
+        $.imageUploadManager.onClickModal();
+        $.imageUploadManager.onModalHidden();
         $.imageUploadManager.sortImage();
 
         var imageDropzone = new Dropzone("#images-dropzone", {
@@ -73,7 +75,26 @@ $(function($){
     $.imageUploadManager.onClickDeleteImage = function() {
         $('.image-manager .image-delete-btn').on('click', function (e) {
             e.preventDefault();
-            var $this = $(this);
+            $("#submit-delete-image").data("element-id", $(this).attr("id"));
+            $('#image_delete_dialog').modal("show");
+
+            return false;
+        });
+
+
+    };
+
+    $.imageUploadManager.onModalHidden = function() {
+        $("#image_delete_dialog").on('hidden.bs.modal', function (e) {
+            $("#submit-delete-image").data("element-id", "");
+        });
+    };
+
+    $.imageUploadManager.onClickModal = function() {
+        $("#submit-delete-image").on('click', function(e){
+
+            var $id= $(this).data("element-id");
+            var $this = $("#"+$id);
             var $parent = $this.parent();
             var $greatParent = $parent.parent();
 
@@ -92,6 +113,8 @@ $(function($){
                     }
                 }
             }).done(function(data) {
+                $('#image_delete_dialog').modal("hide");
+                $("#submit-delete-image").data("element-id", "");
                 $greatParent.remove();
                 $(".image-manager .message").html(
                     data
@@ -101,8 +124,12 @@ $(function($){
                 $( "#js-sort-image").children('li').each(function(position, element) {
                     $(element).find('.js-sorted-position').html(position + 1);
                 });
-            });
-            return false;
+            }).fail(function(){
+                $('#image_delete_dialog').modal("hide");
+                $("#submit-delete-image").data("element-id", "");
+            })
+
+            ;
         });
     };
 
