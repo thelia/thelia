@@ -44,13 +44,11 @@ trait SeoFieldsTrait
         if (! in_array('meta_title', $exclude))
             $this->formBuilder
                 ->add('meta_title', 'text', array(
-                    'constraints' => array(
-                        new NotBlank()
-                    ),
                     'label' => Translator::getInstance()->trans('Page Title'),
                     'label_attr' => array(
                         'for' => 'meta_title'
-                    )
+                    ),
+                    'required' => false
                 )
             );
 
