@@ -29,7 +29,7 @@ return array(
     'Change address' => 'Changer d\'adresse',
     'Change my account information' => 'Modifier mes informations personnelles',
     'Change my password' => 'Changer mon mot de passe',
-    'Check my order' => 'Vérifier ma commmande',
+    'Check my order' => 'Vérifier ma commande',
     'Checkout' => 'Commande',
     'Choose your delivery address' => 'Choisissez une adresse de livraison',
     'Choose your delivery method' => 'Choisissez votre moyen de livraison',
