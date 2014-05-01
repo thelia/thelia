@@ -33,6 +33,8 @@
         "leafo/lessphp": "0.4.*",
         "ptachoire/cssembed": "1.0.*",
 
+        "doctrine/cache": "v1.3.0",
+
         "simplepie/simplepie": "dev-master",
 
         "imagine/imagine": "0.*",
