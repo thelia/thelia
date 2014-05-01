@@ -73,6 +73,8 @@ class CouponController extends BaseAdminController
             Router::ABSOLUTE_URL
         );
 
+        $args['coupon_order'] = $this->getListOrderFromSession('coupon', 'coupon_order', 'code');
+
         return $this->render('coupon-list', $args);
     }
 
@@ -856,5 +858,4 @@ class CouponController extends BaseAdminController
             )
         );
     }
-
 }
