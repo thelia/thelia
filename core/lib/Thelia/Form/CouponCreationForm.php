@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
+use Thelia\Coupon\ExpirationDateTransformer;
 
 /**
  * Allow to build a form Coupon
@@ -90,14 +91,16 @@ class CouponCreationForm extends BaseForm
                 array()
             )
             ->add(
-                'expirationDate',
-                'text',
-                array(
-                    'constraints' => array(
-                        new NotBlank(),
-                        new Date()
+                $this->formBuilder->create(
+                    'expirationDate',
+                    'text',
+                    array(
+                        'constraints' => array(
+                            new NotBlank(),
+                            //new Date()
+                        )
                     )
-                )
+                )->addViewTransformer(new ExpirationDateTransformer())
             )
             ->add(
                 'isCumulative',
