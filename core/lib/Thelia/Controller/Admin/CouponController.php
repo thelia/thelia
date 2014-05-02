@@ -53,56 +53,13 @@ class CouponController extends BaseAdminController
      */
     public function browseAction()
     {
-        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
-
-        $args['urlReadCoupon'] = $this->getRoute(
-            'admin.coupon.read',
-            array('couponId' => 0),
-            Router::ABSOLUTE_URL
-        );
-
-        $args['urlEditCoupon'] = $this->getRoute(
-            'admin.coupon.update',
-            array('couponId' => 0),
-            Router::ABSOLUTE_URL
-        );
-
-        $args['urlCreateCoupon'] = $this->getRoute(
-            'admin.coupon.create',
-            array(),
-            Router::ABSOLUTE_URL
-        );
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW)) {
+            return $response;
+        }
 
         $args['coupon_order'] = $this->getListOrderFromSession('coupon', 'coupon_order', 'code');
 
         return $this->render('coupon-list', $args);
-    }
-
-    /**
-     * Manage Coupons read display
-     *
-     * @param int $couponId Coupon Id
-     *
-     * @return \Thelia\Core\HttpFoundation\Response
-     */
-    public function readAction($couponId)
-    {
-        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
-
-        $coupon = CouponQuery::create()->findPk($couponId);
-
-        if ($coupon === null) {
-            return $this->pageNotFound();
-        }
-
-        $args['couponId'] = $couponId;
-        $args['urlEditCoupon'] = $this->getRoute(
-            'admin.coupon.update',
-            array('couponId' => $couponId),
-            Router::ABSOLUTE_URL
-        );
-
-        return $this->render('coupon-read', $args);
     }
 
     /**
@@ -112,9 +69,7 @@ class CouponController extends BaseAdminController
      */
     public function createAction()
     {
-        // Check current user authorization
-        $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::CREATE);
-        if ($response !==  null) {
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::CREATE)) {
             return $response;
         }
 
@@ -165,9 +120,7 @@ class CouponController extends BaseAdminController
      */
     public function updateAction($couponId)
     {
-        // Check current user authorization
-        $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::UPDATE);
-        if ($response !==  null) {
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -342,7 +295,9 @@ class CouponController extends BaseAdminController
      */
     public function getConditionToUpdateInputAjaxAction($couponId, $conditionIndex)
     {
-        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW)) {
+            return $response;
+        }
 
         $this->checkXmlHttpRequest();
 
@@ -396,7 +351,9 @@ class CouponController extends BaseAdminController
      */
     public function saveConditionsAction($couponId)
     {
-        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $this->checkXmlHttpRequest();
 
@@ -443,7 +400,9 @@ class CouponController extends BaseAdminController
      */
     public function deleteConditionsAction($couponId, $conditionIndex)
     {
-        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $this->checkXmlHttpRequest();
 
@@ -681,7 +640,10 @@ class CouponController extends BaseAdminController
      */
     public function getBackOfficeInputsAjaxAction($couponServiceId)
     {
-        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW)) {
+            return $response;
+        }
+
         $this->checkXmlHttpRequest();
 
         /** @var CouponInterface $coupon */
@@ -706,7 +668,10 @@ class CouponController extends BaseAdminController
      */
     public function getBackOfficeConditionSummariesAjaxAction($couponId)
     {
-        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW)) {
+            return $response;
+        }
+
         $this->checkXmlHttpRequest();
 
         /** @var Coupon $coupon */
