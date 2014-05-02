@@ -127,8 +127,8 @@ class MatchForXArticles extends ConditionAbstract
     public function getName()
     {
         return $this->translator->trans(
-            'By number of articles in cart',
-            array(),
+            'Cart item count condition',
+            [],
             'condition'
         );
     }
@@ -142,8 +142,8 @@ class MatchForXArticles extends ConditionAbstract
     public function getToolTip()
     {
         $toolTip = $this->translator->trans(
-            'Check the amount of product in the Cart',
-            array(),
+            'The cart item count should match the condition',
+            [],
             'condition'
         );
 
@@ -163,7 +163,7 @@ class MatchForXArticles extends ConditionAbstract
         );
 
         $toolTip = $this->translator->trans(
-            'If cart products quantity is <strong>%operator%</strong> %quantity%',
+            'If cart item count is <strong>%operator%</strong> %quantity%',
             array(
                 '%operator%' => $i18nOperator,
                 '%quantity%' => $this->values[self::INPUT1]
@@ -200,7 +200,7 @@ class MatchForXArticles extends ConditionAbstract
     {
         $labelQuantity = $this->facade
             ->getTranslator()
-            ->trans('Quantity', array(), 'condition');
+            ->trans('Cart item count is', [], 'condition');
 
         $html = $this->drawBackOfficeBaseInputsText($labelQuantity, self::INPUT1);
 
@@ -218,24 +218,11 @@ class MatchForXArticles extends ConditionAbstract
      */
     protected function drawBackOfficeBaseInputsText($label, $inputKey)
     {
-        $operatorSelectHtml = $this->drawBackOfficeInputOperators($inputKey);
-        $quantitySelectHtml = $this->drawBackOfficeInputQuantityValues($inputKey, 20, 1);
-
-        $html = '
-                <div id="condition-add-operators-values" class="form-group col-md-6">
-                    <label for="operator">' . $label . '</label>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            ' . $operatorSelectHtml . '
-                        </div>
-                        <div class="input-group col-lg-6">
-                            ' . $quantitySelectHtml . '
-                        </div>
-                    </div>
-                </div>
-            ';
-
-        return $html;
+        return $this->facade->getParser()->render('coupon/condition-fragments/cart-item-count-condition.html', [
+                'label'              => $label,
+                'operatorSelectHtml' => $this->drawBackOfficeInputOperators($inputKey),
+                'quantitySelectHtml' => $this->drawBackOfficeInputQuantityValues($inputKey, 20, 1)
+            ]
+        );
     }
-
 }

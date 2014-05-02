@@ -27,7 +27,7 @@ use Thelia\Condition\Implementation\ConditionInterface;
 class ConditionCollection implements Iterator, Countable, ArrayAccess
 {
     /** @var array Array of ConditionInterface */
-    protected $conditions = array();
+    protected $conditions = [];
 
     /**
      * (PHP 5 &gt;= 5.0.0)
@@ -180,7 +180,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
      */
     public function __toString()
     {
-        $arrayToSerialize = array();
+        $arrayToSerialize = [];
         /** @var ConditionInterface $condition */
         foreach ($this as $condition) {
             $arrayToSerialize[] = $condition->getSerializableCondition();

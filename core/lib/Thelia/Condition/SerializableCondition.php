@@ -25,9 +25,9 @@ class SerializableCondition
     public $conditionServiceId = null;
 
     /** @var array Operators set by Admin for this Condition */
-    public $operators = array();
+    public $operators = [];
 
     /** @var array Values set by Admin for this Condition */
-    public $values = array();
+    public $values = [];
 
 }
