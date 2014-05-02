@@ -26,11 +26,21 @@
 
                 {if !$noConditions}
                     {include
-                    file = "includes/inner-form-toolbar.html"
-                    hide_submit_buttons = false
+                        file = "includes/inner-form-toolbar.html"
+                        hide_submit_buttons = false
 
-                    page_url  = {url path=$formAction}
-                    close_url = {url path='/admin/coupon'}
+                        page_url  = {url path=$formAction}
+                        close_url = {url path='/admin/coupon'}
+                    }
+                {else}
+                    {include
+                        file = "includes/inner-form-toolbar.html"
+                        hide_submit_buttons = false
+                        hide_save_and_close_button = true
+                        hide_flags = true
+
+                        page_url  = {url path=$formAction}
+                        close_url = {url path='/admin/coupon'}
                     }
                 {/if}
 
@@ -88,11 +98,12 @@
                         {form_field form=$form field='expirationDate'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="expiration-date" class="control-label">{intl l='Expiration date :'}</label>
-                                <div class="input-append date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
-                                    <input type="text" id="expiration-date" name="{$name}" class="form-control datepicker" data-date-format="yyyy-mm-dd" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}" placeholder="{intl l='yyyy-mm-dd'}">
+
+                                <div class="input-group date" data-date="12/02/2012" data-date-format="{$dateFormat}">
+                                    <input type="date" id="expiration-date" name="{$name}" class="form-control datepicker" data-date-format="{$dateFormat}" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}" placeholder="{$dateFormat}">
                                     {if $error}{$message}{/if}
-                                    <span class="add-on"><span class="icon-th"></span></span>
                                 </div>
+
                             </div>
                         {/form_field}
 
