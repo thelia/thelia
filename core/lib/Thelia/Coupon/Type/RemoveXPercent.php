@@ -145,17 +145,12 @@ class RemoveXPercent extends CouponAbstract
      */
     public function drawBackOfficeInputs()
     {
-        $labelPercentage = $this->getInputName();
-
-        $html = '
-                <input type="hidden" name="thelia_coupon_creation[' . self::INPUT_AMOUNT_NAME . ']" value="0"/>
-                <div class="form-group input-' . self::INPUT_PERCENTAGE_NAME . '">
-                    <label for="' . self::INPUT_PERCENTAGE_NAME . '" class="control-label">' . $labelPercentage . '</label>
-                    <input id="' . self::INPUT_PERCENTAGE_NAME . '" class="form-control" name="' . self::INPUT_EXTENDED__NAME . '[' . self::INPUT_PERCENTAGE_NAME . ']' . '" type="text" value="' . $this->percentage . '"/>
-                </div>
-            ';
-
-        return $html;
+        return $this->facade->getParser()->render('coupon/type-fragments/remove-x-percent.html', [
+            'label'     => $this->getInputName(),
+            'typeKey'   => self::INPUT_AMOUNT_NAME,
+            'fieldId'   => self::INPUT_PERCENTAGE_NAME,
+            'fieldName' => self::INPUT_EXTENDED__NAME,
+            'value'     => $this->percentage
+        ]);
     }
-
 }

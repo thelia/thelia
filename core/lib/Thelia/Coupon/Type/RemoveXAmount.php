@@ -65,4 +65,13 @@ class RemoveXAmount extends CouponAbstract
 
         return $toolTip;
     }
+
+    public function drawBackOfficeInputs()
+    {
+        return $this->facade->getParser()->render('coupon/type-fragments/remove-x-amount.html', [
+                'label'     => $this->getInputName(),
+                'fieldName' => self::INPUT_AMOUNT_NAME,
+                'value'     => $this->amount
+            ]);
+    }
 }
