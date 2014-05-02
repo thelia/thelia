@@ -127,11 +127,7 @@ class CouponCreationForm extends BaseForm
                 array(
                     'constraints' => array(
                         new NotBlank(),
-                        new GreaterThanOrEqual(
-                            array(
-                                'value' => -1
-                            )
-                        )
+                        new GreaterThanOrEqual(['value' => -1])
                     )
                 )
             )
