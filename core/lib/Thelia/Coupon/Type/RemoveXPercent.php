@@ -116,7 +116,7 @@ class RemoveXPercent extends CouponAbstract
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Percentage removed from the cart', array(), 'coupon');
+            ->trans('Percent Discount', array(), 'coupon');
     }
 
     /**
@@ -129,7 +129,7 @@ class RemoveXPercent extends CouponAbstract
         $toolTip = $this->facade
             ->getTranslator()
             ->trans(
-                'This coupon will remove the entered percentage to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.',
+                'This coupon will offert a flat percentage off a shopper\'s entire order (not applied to shipping costs or tax rates). If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
                 array(),
                 'coupon'
             );

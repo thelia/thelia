@@ -33,7 +33,7 @@ class RemoveXAmount extends CouponAbstract
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Remove X amount to total cart', array(), 'coupon');
+            ->trans('Fixed Amount Discount', array(), 'coupon');
     }
 
     /**
@@ -45,7 +45,7 @@ class RemoveXAmount extends CouponAbstract
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Amount removed from the cart', array(), 'coupon');
+            ->trans('Discount amount', array(), 'coupon');
     }
 
     /**
@@ -58,7 +58,7 @@ class RemoveXAmount extends CouponAbstract
         $toolTip = $this->facade
             ->getTranslator()
             ->trans(
-                'This coupon will remove the entered amount to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.',
+                'This coupon will subtracts a set amount from the total cost of an order. If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
                 array(),
                 'coupon'
             );

@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Template\ParserInterface;
 use Thelia\Model\Coupon;
 
 /**
@@ -129,6 +130,12 @@ interface FacadeInterface
      * @return TranslatorInterface
      */
     public function getTranslator();
+    /**
+     * Return platform ParserInterface
+     *
+     * @return ParserInterface
+     */
+    public function getParser();
 
     /**
      * Return the main currency
