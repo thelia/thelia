@@ -56,7 +56,7 @@ $(function($){
                     $('#condition-list').html($.couponManager.intlPleaseSelectAnotherCondition);
                 }
             }
-        }).done(function(data) {
+        }).done(function() {
             // Reload condition summaries ajax
             $.couponManager.displayConditionsSummary();
         });
@@ -207,24 +207,9 @@ $(function($){
     };
 
 
-
-
     // ***********************************************
     // *************** Manager Coupon ****************
     // ***********************************************
-    // Reload effect inputs when changing effect
-    $.couponManager.onEffectChange = function() {
-        var mainDiv = $('#coupon-type');
-        var optionSelected = mainDiv.find('#type option:selected');
-        mainDiv.find('.typeToolTip').html(optionSelected.data('description'));
-
-        mainDiv.find('#type').on('change', function () {
-            var optionSelected = $('option:selected', this);
-            $.couponManager.displayEfffect(optionSelected);
-
-        });
-    };
-    $.couponManager.onEffectChange();
 
     $.couponManager.displayEfffect = function(optionSelected) {
         var mainDiv = $('#coupon-type');
@@ -250,6 +235,20 @@ $(function($){
             inputsDiv.html(data);
         });
     };
+
+    // Reload effect inputs when changing effect
+    $.couponManager.onEffectChange = function() {
+        var mainDiv = $('#coupon-type');
+        var optionSelected = mainDiv.find('#type option:selected');
+        mainDiv.find('.typeToolTip').html(optionSelected.data('description'));
+
+        mainDiv.find('#type').on('change', function () {
+            var optionSelected = $('option:selected', this);
+            $.couponManager.displayEfffect(optionSelected);
+
+        });
+    };
+    $.couponManager.onEffectChange();
 
     $.couponManager.displayConditionsSummary = function() {
         var mainDiv = $('#condition-list');
@@ -277,7 +276,9 @@ $(function($){
     // Set max usage to unlimited or not
     $.couponManager.onUsageUnlimitedChange = function() {
         var $isUnlimited = $('#is-unlimited');
-        $maxUsage = $('#max-usage');
+
+        var $maxUsage = $('#max-usage');
+
         if ($maxUsage.val() == -1) {
             $isUnlimited.prop('checked', true);
             $maxUsage.hide();
@@ -299,5 +300,6 @@ $(function($){
             }
         });
     };
+
     $.couponManager.onUsageUnlimitedChange();
 });

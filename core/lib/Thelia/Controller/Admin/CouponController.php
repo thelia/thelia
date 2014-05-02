@@ -77,15 +77,10 @@ class CouponController extends BaseAdminController
         // Parameters given to the template
         $args = [];
 
-        $i18n = new I18n();
-        /** @var Lang $lang */
-        $lang = $this->getSession()->getLang();
         $eventToDispatch = TheliaEvents::COUPON_CREATE;
 
         if ($this->getRequest()->isMethod('POST')) {
             $this->validateCreateOrUpdateForm(
-                $i18n,
-                $lang,
                 $eventToDispatch,
                 'created',
                 'creation'
@@ -140,16 +135,11 @@ class CouponController extends BaseAdminController
         // Parameters given to the template
         $args = [];
 
-        $i18n = new I18n();
-        /** @var Lang $lang */
-        $lang = $this->getSession()->getLang();
         $eventToDispatch = TheliaEvents::COUPON_UPDATE;
 
         // Update
         if ($this->getRequest()->isMethod('POST')) {
             $this->validateCreateOrUpdateForm(
-                $i18n,
-                $lang,
                 $eventToDispatch,
                 'updated',
                 'update',
@@ -189,6 +179,7 @@ class CouponController extends BaseAdminController
             // Pass it to the parser
             $this->getParserContext()->addForm($changeForm);
         }
+
         $args['couponCode'] = $coupon->getCode();
         $args['availableCoupons'] = $this->getAvailableCoupons();
         $args['couponInputsHtml'] = $couponManager->drawBackOfficeInputs();
@@ -456,8 +447,6 @@ class CouponController extends BaseAdminController
     /**
      * Validate the CreateOrUpdate form
      *
-     * @param I18n   $i18n            Local code (fr_FR)
-     * @param Lang   $lang            Local variables container
      * @param string $eventToDispatch Event which will activate actions
      * @param string $log             created|edited
      * @param string $action          creation|edition
@@ -465,15 +454,15 @@ class CouponController extends BaseAdminController
      *
      * @return $this
      */
-    protected function validateCreateOrUpdateForm(I18n $i18n, Lang $lang, $eventToDispatch, $log, $action, Coupon $model = null)
+    protected function validateCreateOrUpdateForm($eventToDispatch, $log, $action, Coupon $model = null)
     {
         // Create the form from the request
-        $creationForm = new CouponCreationForm($this->getRequest());
+        $couponForm = new CouponCreationForm($this->getRequest());
 
         $message = false;
         try {
             // Check the form against conditions violations
-            $form = $this->validateForm($creationForm, 'POST');
+            $form = $this->validateForm($couponForm, 'POST');
 
             $couponEvent = $this->feedCouponCreateOrUpdateEvent($form, $model);
 
@@ -492,32 +481,39 @@ class CouponController extends BaseAdminController
                 )
             );
 
-            $this->redirect(
-                str_replace(
-                    '{id}',
-                    $couponEvent->getCouponModel()->getId(),
-                    $creationForm->getSuccessUrl()
-                )
-            );
+            if ($this->getRequest()->get('save_mode') == 'stay') {
+                $this->redirect(
+                    str_replace(
+                        '{id}',
+                        $couponEvent->getCouponModel()->getId(),
+                        $couponForm->getSuccessUrl()
+                    )
+                );
 
-        } catch (FormValidationException $e) {
+                exit();
+            }
+
+            // Redirect to the success URL
+            $this->redirectToRoute('admin.coupon.list');
+
+        } catch (FormValidationException $ex) {
             // Invalid data entered
-            $message = 'Please check your input:';
+            $message = $this->createStandardFormValidationErrorMessage($ex);
 
-        } catch (\Exception $e) {
+        } catch (\Exception $ex) {
             // Any other error
-            $message = $this->getTranslator()->trans('Sorry, an error occurred: %err', ['%err' => $e->getMessage()]);
+            $message = $this->getTranslator()->trans('Sorry, an error occurred: %err', ['%err' => $ex->getMessage()]);
 
-            $this->logError($action, $message, $e);
+            $this->logError($action, $message, $ex);
         }
 
         if ($message !== false) {
             // Mark the form as with error
-            $creationForm->setErrorMessage($message);
+            $couponForm->setErrorMessage($message);
 
             // Send the form and the error to the parser
             $this->getParserContext()
-                ->addForm($creationForm)
+                ->addForm($couponForm)
                 ->setGeneralError($message);
         }
 
