@@ -107,11 +107,12 @@
                             <div class="form-group {if $error}has-error{/if}">
 
                                 <label for="is-unlimited" class="checkbox control-label">
-                                    <input id="is-unlimited" type="checkbox" name="is-unlimited" >
-                                    {intl l='Unlimited usage'}
+                                    <input id="is-unlimited" type="checkbox" name="is-unlimited" {if $value == '' || $value == -1}checked="checked"{/if}>
+                                    {intl l='Unlimited number of uses'}
                                 </label>
+
                                 <label id="max-usage-label" for="max-usage" class="control-label">{intl l='Maximum usage count :'}</label>
-                                <input id="max-usage" type="text" class="form-control" name="{$name}" value="{if !$value}-1{else}{$value}{/if}" placeholder="{intl l='Usage count'}">
+                                <input id="max-usage" type="text" class="form-control" name="{$name}" value="{if $value == ''}-1{else}{$value}{/if}" placeholder="{intl l='Usage count'}">
                                 {if $error}{$message}{/if}
                             </div>
                         {/form_field}
