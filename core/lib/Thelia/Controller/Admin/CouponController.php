@@ -34,6 +34,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Tools\I18n;
 use Thelia\Tools\Rest\ResponseRest;
 
@@ -53,7 +54,7 @@ class CouponController extends BaseAdminController
      */
     public function browseAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) {
             return $response;
         }
 
@@ -69,12 +70,12 @@ class CouponController extends BaseAdminController
      */
     public function createAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::CREATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::CREATE)) {
             return $response;
         }
 
         // Parameters given to the template
-        $args = array();
+        $args = [];
 
         $i18n = new I18n();
         /** @var Lang $lang */
@@ -92,15 +93,14 @@ class CouponController extends BaseAdminController
         } else {
             // If no input for expirationDate, now + 2 months
             $defaultDate = new \DateTime();
-            $args['defaultDate'] = $defaultDate->modify('+2 month')
-                ->format('Y-m-d');
+            $args['defaultDate'] = $defaultDate->modify('+2 month')->format($this->getDefaultDateFormat());
         }
 
-        $args['dateFormat'] = $this->getSession()->getLang()->getDateFormat();
+        $args['dateFormat'] = $this->getDefaultDateFormat();
         $args['availableCoupons'] = $this->getAvailableCoupons();
         $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
             'admin.coupon.draw.inputs.ajax',
-            array('couponServiceId' => 'couponServiceId'),
+            ['couponServiceId' => 'couponServiceId'],
             Router::ABSOLUTE_URL
         );
         $args['formAction'] = 'admin/coupon/create';
@@ -120,7 +120,7 @@ class CouponController extends BaseAdminController
      */
     public function updateAction($couponId)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -138,7 +138,7 @@ class CouponController extends BaseAdminController
         $couponManager = $couponFactory->buildCouponFromModel($coupon);
 
         // Parameters given to the template
-        $args = array();
+        $args = [];
 
         $i18n = new I18n();
         /** @var Lang $lang */
@@ -164,7 +164,7 @@ class CouponController extends BaseAdminController
                 $coupon->getSerializedConditions()
             );
 
-            $data = array(
+            $data = [
                 'code' => $coupon->getCode(),
                 'title' => $coupon->getTitle(),
                 'amount' => $coupon->getAmount(),
@@ -172,14 +172,14 @@ class CouponController extends BaseAdminController
                 'shortDescription' => $coupon->getShortDescription(),
                 'description' => $coupon->getDescription(),
                 'isEnabled' => $coupon->getIsEnabled(),
-                'expirationDate' => $coupon->getExpirationDate('Y-m-d'),
+                'expirationDate' => $coupon->getExpirationDate(),
                 'isAvailableOnSpecialOffers' => $coupon->getIsAvailableOnSpecialOffers(),
                 'isCumulative' => $coupon->getIsCumulative(),
                 'isRemovingPostage' => $coupon->getIsRemovingPostage(),
                 'maxUsage' => $coupon->getMaxUsage(),
                 'conditions' => $conditions,
                 'locale' => $this->getCurrentEditionLocale(),
-            );
+            ];
 
             $args['conditions'] = $this->cleanConditionForTemplate($conditions);
 
@@ -194,44 +194,46 @@ class CouponController extends BaseAdminController
         $args['couponInputsHtml'] = $couponManager->drawBackOfficeInputs();
         $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
             'admin.coupon.draw.inputs.ajax',
-            array('couponServiceId' => 'couponServiceId'),
+            ['couponServiceId' => 'couponServiceId'],
             Router::ABSOLUTE_URL
         );
         $args['availableConditions'] = $this->getAvailableConditions();
         $args['urlAjaxGetConditionInputFromServiceId'] = $this->getRoute(
             'admin.coupon.draw.condition.read.inputs.ajax',
-            array('conditionId' => 'conditionId'),
+            ['conditionId' => 'conditionId'],
             Router::ABSOLUTE_URL
         );
         $args['urlAjaxGetConditionInputFromConditionInterface'] = $this->getRoute(
             'admin.coupon.draw.condition.update.inputs.ajax',
-            array(
+            [
                 'couponId' => $couponId,
                 'conditionIndex' => 8888888
-            ),
+            ],
             Router::ABSOLUTE_URL
         );
 
         $args['urlAjaxSaveConditions'] = $this->getRoute(
             'admin.coupon.condition.save',
-            array('couponId' => $couponId),
+            ['couponId' => $couponId],
             Router::ABSOLUTE_URL
         );
         $args['urlAjaxDeleteConditions'] = $this->getRoute(
             'admin.coupon.condition.delete',
-            array(
+            [
                 'couponId' => $couponId,
                 'conditionIndex' => 8888888
-            ),
+            ],
             Router::ABSOLUTE_URL
         );
         $args['urlAjaxGetConditionSummaries'] = $this->getRoute(
             'admin.coupon.draw.condition.summaries.ajax',
-            array('couponId' => $couponId),
+            ['couponId' => $couponId],
             Router::ABSOLUTE_URL
         );
 
         $args['formAction'] = 'admin/coupon/update/' . $couponId;
+
+        $args['dateFormat'] = $this->getDefaultDateFormat();
 
         return $this->render('coupon-update', $args);
     }
@@ -245,7 +247,7 @@ class CouponController extends BaseAdminController
      */
     public function getConditionEmptyInputAjaxAction($conditionId)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW))
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW))
             return $response;
 
         $this->checkXmlHttpRequest();
@@ -277,11 +279,11 @@ class CouponController extends BaseAdminController
 
         return $this->render(
             'coupon/condition-input-ajax',
-            array(
+            [
                 'inputsDrawn' => $html,
                 'conditionServiceId' => $serviceId,
                 'conditionIndex' => '',
-            )
+            ]
         );
     }
 
@@ -295,7 +297,7 @@ class CouponController extends BaseAdminController
      */
     public function getConditionToUpdateInputAjaxAction($couponId, $conditionIndex)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) {
             return $response;
         }
 
@@ -332,13 +334,11 @@ class CouponController extends BaseAdminController
         }
 
         return $this->render(
-            'coupon/condition-input-ajax',
-            array(
+            'coupon/condition-input-ajax', [
                 'inputsDrawn' => $condition->drawBackOfficeInputs(),
                 'conditionServiceId' => $condition->getServiceId(),
                 'conditionIndex' => $conditionIndex,
-
-            )
+            ]
         );
     }
 
@@ -351,7 +351,7 @@ class CouponController extends BaseAdminController
      */
     public function saveConditionsAction($couponId)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -400,7 +400,7 @@ class CouponController extends BaseAdminController
      */
     public function deleteConditionsAction($couponId, $conditionIndex)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -428,41 +428,6 @@ class CouponController extends BaseAdminController
         $this->manageConditionUpdate($coupon, $conditions);
 
         return new Response();
-    }
-
-    /**
-     * Build a Coupon from its form
-     *
-     * @param array $data Form data
-     *
-     * @return Coupon
-     */
-    protected function buildCouponFromForm(array $data)
-    {
-        $couponBeingCreated = new Coupon();
-        $couponBeingCreated->setCode($data['code']);
-        $couponBeingCreated->setType($data['type']);
-        $couponBeingCreated->setTitle($data['title']);
-        $couponBeingCreated->setShortDescription($data['shortDescription']);
-        $couponBeingCreated->setDescription($data['description']);
-        $couponBeingCreated->setAmount($data['amount']);
-        $couponBeingCreated->setIsEnabled($data['isEnabled']);
-        $couponBeingCreated->setExpirationDate($data['expirationDate']);
-        $couponBeingCreated->setSerializedConditions(
-            new ConditionCollection(
-                array()
-            )
-        );
-        $couponBeingCreated->setIsCumulative($data['isCumulative']);
-        $couponBeingCreated->setIsRemovingPostage(
-            $data['isRemovingPostage']
-        );
-        $couponBeingCreated->setMaxUsage($data['maxUsage']);
-        $couponBeingCreated->setIsAvailableOnSpecialOffers(
-            $data['isAvailableOnSpecialOffers']
-        );
-
-        return $couponBeingCreated;
     }
 
     /**
@@ -567,10 +532,10 @@ class CouponController extends BaseAdminController
         /** @var CouponManager $couponManager */
         $couponManager = $this->container->get('thelia.coupon.manager');
         $availableConditions = $couponManager->getAvailableConditions();
-        $cleanedConditions = array();
+        $cleanedConditions = [];
         /** @var ConditionInterface $availableCondition */
         foreach ($availableConditions as $availableCondition) {
-            $condition = array();
+            $condition = [];
             $condition['serviceId'] = $availableCondition->getServiceId();
             $condition['name'] = $availableCondition->getName();
             $condition['toolTip'] = $availableCondition->getToolTip();
@@ -590,10 +555,10 @@ class CouponController extends BaseAdminController
         /** @var CouponManager $couponManager */
         $couponManager = $this->container->get('thelia.coupon.manager');
         $availableCoupons = $couponManager->getAvailableCoupons();
-        $cleanedCoupons = array();
+        $cleanedCoupons = [];
         /** @var CouponInterface $availableCoupon */
         foreach ($availableCoupons as $availableCoupon) {
-            $condition = array();
+            $condition = [];
             $condition['serviceId'] = $availableCoupon->getServiceId();
             $condition['name'] = $availableCoupon->getName();
             $condition['toolTip'] = $availableCoupon->getToolTip();
@@ -613,17 +578,17 @@ class CouponController extends BaseAdminController
      */
     protected function cleanConditionForTemplate(ConditionCollection $conditions)
     {
-        $cleanedConditions = array();
+        $cleanedConditions = [];
         /** @var $condition ConditionInterface */
         foreach ($conditions as $index => $condition) {
-            $temp = array(
+            $temp = [
                 'serviceId' => $condition->getServiceId(),
                 'index' => $index,
                 'name' => $condition->getName(),
                 'toolTip' => $condition->getToolTip(),
                 'summary' => $condition->getSummary(),
                 'validators' => $condition->getValidators()
-            );
+            ];
             $cleanedConditions[] = $temp;
         }
 
@@ -640,7 +605,7 @@ class CouponController extends BaseAdminController
      */
     public function getBackOfficeInputsAjaxAction($couponServiceId)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) {
             return $response;
         }
 
@@ -668,7 +633,7 @@ class CouponController extends BaseAdminController
      */
     public function getBackOfficeConditionSummariesAjaxAction($couponId)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) {
             return $response;
         }
 
@@ -689,7 +654,7 @@ class CouponController extends BaseAdminController
             return $this->pageNotFound();
         }
 
-        $args = array();
+        $args = [];
         $args['conditions'] = $this->cleanConditionForTemplate($couponManager->getConditions());
 
         return $this->render('coupon/conditions', $args);
@@ -740,7 +705,7 @@ class CouponController extends BaseAdminController
         $serviceId = $data['type'];
         /** @var CouponInterface $couponManager */
         $couponManager = $this->container->get($serviceId);
-        $effects = array(CouponAbstract::INPUT_AMOUNT_NAME => $data[CouponAbstract::INPUT_AMOUNT_NAME]);
+        $effects = [CouponAbstract::INPUT_AMOUNT_NAME => $data[CouponAbstract::INPUT_AMOUNT_NAME]];
         $effects = $this->addExtendedLogic($effects, $couponManager->getExtendedInputs());
 
         $couponEvent = new CouponCreateOrUpdateEvent(
@@ -751,7 +716,7 @@ class CouponController extends BaseAdminController
             $data['shortDescription'],
             $data['description'],
             $data['isEnabled'],
-            \DateTime::createFromFormat('Y-m-d', $data['expirationDate']),
+            $data['expirationDate'],
             $data['isAvailableOnSpecialOffers'],
             $data['isCumulative'],
             $data['isRemovingPostage'],
@@ -777,8 +742,8 @@ class CouponController extends BaseAdminController
         $request = $this->getRequest();
         $post = $request->request->getIterator();
         $serviceId = $request->request->get('categoryCondition');
-        $operators = array();
-        $values = array();
+        $operators = [];
+        $values = [];
         foreach ($post as $key => $input) {
             if (isset($input['operator']) && isset($input['value'])) {
                 $operators[$key] = $input['operator'];
@@ -834,5 +799,10 @@ class CouponController extends BaseAdminController
                 $couponEvent->getCouponModel()->getType()
             )
         );
+    }
+
+    protected function getDefaultDateFormat()
+    {
+        return LangQuery::create()->findOneByByDefault(true)->getDateFormat();
     }
 }
