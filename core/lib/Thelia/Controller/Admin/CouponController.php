@@ -247,8 +247,9 @@ class CouponController extends BaseAdminController
      */
     public function getConditionEmptyInputAjaxAction($conditionId)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW))
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) {
             return $response;
+        }
 
         $this->checkXmlHttpRequest();
 
@@ -282,7 +283,7 @@ class CouponController extends BaseAdminController
             [
                 'inputsDrawn' => $html,
                 'conditionServiceId' => $serviceId,
-                'conditionIndex' => '',
+                'conditionIndex' => ''
             ]
         );
     }
@@ -800,7 +801,6 @@ class CouponController extends BaseAdminController
             )
         );
     }
-
     protected function getDefaultDateFormat()
     {
         return LangQuery::create()->findOneByByDefault(true)->getDateFormat();
