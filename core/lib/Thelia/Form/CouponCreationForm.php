@@ -12,11 +12,13 @@
 
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\Date;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
-use Thelia\Coupon\ExpirationDateTransformer;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Core\Translation\Translator;
+use Thelia\Model\Base\LangQuery;
 
 /**
  * Allow to build a form Coupon
@@ -91,16 +93,18 @@ class CouponCreationForm extends BaseForm
                 array()
             )
             ->add(
-                $this->formBuilder->create(
-                    'expirationDate',
-                    'text',
-                    array(
-                        'constraints' => array(
-                            new NotBlank(),
-                            //new Date()
-                        )
+                'expirationDate',
+                'text',
+                array(
+                    'constraints' => array(
+                        new NotBlank(),
+                        new Callback(array(
+                            "methods" => array(
+                                array($this, "checkLocalizedDate"),
+                            ),
+                        ))
                     )
-                )->addViewTransformer(new ExpirationDateTransformer())
+                )
             )
             ->add(
                 'isCumulative',
@@ -140,6 +144,24 @@ class CouponCreationForm extends BaseForm
                     )
                 )
             );
+    }
+
+    /**
+     * Validate a date entered with the default Language date format.
+     *
+     * @param string $value
+     * @param ExecutionContextInterface $context
+     */
+    public function checkLocalizedDate($value, ExecutionContextInterface $context)
+    {
+        $format = LangQuery::create()->findOneByByDefault(true)->getDateFormat();
+
+        if (false === \DateTime::createFromFormat($format, $value)) {
+            $context->addViolation(Translator::getInstance()->trans("Date '%date' is invalid, please enter a valid date using %fmt format", [
+                '%fmt' => $format,
+                '%date' => $value
+            ]));
+        }
     }
 
     /**
