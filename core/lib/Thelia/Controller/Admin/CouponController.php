@@ -172,7 +172,7 @@ class CouponController extends BaseAdminController
                 'shortDescription' => $coupon->getShortDescription(),
                 'description' => $coupon->getDescription(),
                 'isEnabled' => $coupon->getIsEnabled(),
-                'expirationDate' => $coupon->getExpirationDate(),
+                'expirationDate' => $coupon->getExpirationDate($this->getDefaultDateFormat()),
                 'isAvailableOnSpecialOffers' => $coupon->getIsAvailableOnSpecialOffers(),
                 'isCumulative' => $coupon->getIsCumulative(),
                 'isRemovingPostage' => $coupon->getIsRemovingPostage(),
@@ -506,7 +506,8 @@ class CouponController extends BaseAdminController
 
         } catch (\Exception $e) {
             // Any other error
-            $message = 'Sorry, an error occurred:';
+            $message = $this->getTranslator()->trans('Sorry, an error occurred: %err', ['%err' => $e->getMessage()]);
+
             $this->logError($action, $message, $e);
         }
 
@@ -717,7 +718,7 @@ class CouponController extends BaseAdminController
             $data['shortDescription'],
             $data['description'],
             $data['isEnabled'],
-            $data['expirationDate'],
+            \DateTime::createFromFormat($this->getDefaultDateFormat(), $data['expirationDate']),
             $data['isAvailableOnSpecialOffers'],
             $data['isCumulative'],
             $data['isRemovingPostage'],
@@ -801,6 +802,7 @@ class CouponController extends BaseAdminController
             )
         );
     }
+
     protected function getDefaultDateFormat()
     {
         return LangQuery::create()->findOneByByDefault(true)->getDateFormat();
