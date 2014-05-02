@@ -25,7 +25,7 @@ class MatchForEveryone extends ConditionAbstract
     protected $serviceId = 'thelia.condition.match_for_everyone';
 
     /** @var array Available Operators (Operators::CONST) */
-    protected $availableOperators = array();
+    protected $availableOperators = [];
 
     /**
      * Check validators relevancy and store them
@@ -51,8 +51,8 @@ class MatchForEveryone extends ConditionAbstract
      */
     protected function setValidators()
     {
-        $this->operators = array();
-        $this->values = array();
+        $this->operators = [];
+        $this->values = [];
 
         return $this;
     }
@@ -75,8 +75,8 @@ class MatchForEveryone extends ConditionAbstract
     public function getName()
     {
         return $this->translator->trans(
-            'Everybody can use it (no condition)',
-            array(),
+            'Unconditional usage',
+            [],
             'condition'
         );
     }
@@ -90,8 +90,8 @@ class MatchForEveryone extends ConditionAbstract
     public function getToolTip()
     {
         $toolTip = $this->translator->trans(
-            'Will return always true',
-            array(),
+            'This condition is always true',
+            [],
             'condition'
         );
 
@@ -107,8 +107,8 @@ class MatchForEveryone extends ConditionAbstract
     public function getSummary()
     {
         $toolTip = $this->translator->trans(
-            'Will return always true',
-            array(),
+            'Unconditionnal usage',
+            [],
             'condition'
         );
 
@@ -122,7 +122,7 @@ class MatchForEveryone extends ConditionAbstract
      */
     protected function generateInputs()
     {
-        return array();
+        return [];
     }
 
     /**

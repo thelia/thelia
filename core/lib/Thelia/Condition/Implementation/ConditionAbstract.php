@@ -18,6 +18,7 @@ use Thelia\Condition\SerializableCondition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
+use Thelia\Model\Base\CurrencyQuery;
 use Thelia\Model\Currency;
 use Thelia\Type\FloatType;
 
@@ -35,10 +36,10 @@ abstract class ConditionAbstract implements ConditionInterface
     protected $serviceId = null;
 
     /** @var array Available Operators (Operators::CONST) */
-    protected $availableOperators = array();
+    protected $availableOperators = [];
 
     /** @var array Parameters validating parameters against */
-    protected $validators = array();
+    protected $validators = [];
 
     /** @var  FacadeInterface Provide necessary value from Thelia */
     protected $facade = null;
@@ -47,10 +48,10 @@ abstract class ConditionAbstract implements ConditionInterface
     protected $translator = null;
 
     /** @var array Operators set by Admin in BackOffice */
-    protected $operators = array();
+    protected $operators = [];
 
     /** @var array Values set by Admin in BackOffice */
-    protected $values = array();
+    protected $values = [];
 
     /** @var ConditionEvaluator Conditions validator */
     protected $conditionValidator = null;
@@ -64,6 +65,7 @@ abstract class ConditionAbstract implements ConditionInterface
     {
         $this->facade = $facade;
         $this->translator = $facade->getTranslator();
+        $this->parser = $facade->getParser();
         $this->conditionValidator = $facade->getConditionEvaluator();
     }
 
@@ -86,9 +88,9 @@ abstract class ConditionAbstract implements ConditionInterface
     {
         $this->validators = $this->generateInputs();
 
-        $translatedInputs = array();
+        $translatedInputs = [];
         foreach ($this->validators as $key => $validator) {
-            $translatedOperators = array();
+            $translatedOperators = [];
             foreach ($validator['availableOperators'] as $availableOperators) {
                 $translatedOperators[$availableOperators] = Operators::getI18n(
                     $this->translator,
@@ -99,7 +101,7 @@ abstract class ConditionAbstract implements ConditionInterface
             $validator['availableOperators'] = $translatedOperators;
             $translatedInputs[$key] = $validator;
         }
-        $validators = array();
+        $validators = [];
         $validators['inputs'] = $translatedInputs;
         $validators['setOperators'] = $this->operators;
         $validators['setValues'] = $this->values;
@@ -216,27 +218,21 @@ abstract class ConditionAbstract implements ConditionInterface
      */
     protected function drawBackOfficeInputOperators($inputKey)
     {
-        $selectHtml = '';
-        $optionHtml = '';
-        $inputs = $this->getValidators();
-        if (isset($inputs['inputs'][$inputKey])) {
-            $operators = $inputs['inputs'][$inputKey]['availableOperators'];
-            foreach ($operators as $key => $operator) {
-                $selected = '';
-                if (isset($this->operators) && isset($this->operators[$inputKey]) && $this->operators[$inputKey] == $key) {
-                    $selected = ' selected="selected"';
-                }
-                $optionHtml .= '<option value="' . $key . '" '. $selected . '>' . $operator . '</option>';
-            }
+        $html = '';
 
-            $selectHtml .= '
-            <select class="form-control" id="' . $inputKey . '-operator" name="' . $inputKey . '[operator]">
-                ' . $optionHtml . '
-            </select>
-        ';
+        $inputs = $this->getValidators();
+
+        if (isset($inputs['inputs'][$inputKey])) {
+
+            $html = $this->facade->getParser()->render('coupon/condition-fragments/condition-selector.html', [
+                    'operators' => $inputs['inputs'][$inputKey]['availableOperators'],
+                    'value'     => isset($this->operators[$inputKey]) ? $this->operators[$inputKey] : '',
+                    'inputKey'  => $inputKey
+                ]
+            );
         }
 
-        return $selectHtml;
+        return $html;
     }
 
     /**
@@ -251,26 +247,19 @@ abstract class ConditionAbstract implements ConditionInterface
     protected function drawBackOfficeBaseInputsText($label, $inputKey)
     {
         $operatorSelectHtml = $this->drawBackOfficeInputOperators($inputKey);
+
         $currentValue = '';
         if (isset($this->values) && isset($this->values[$inputKey])) {
             $currentValue = $this->values[$inputKey];
         }
 
-        $html = '
-                <div id="condition-add-operators-values" class="form-group col-md-6">
-                    <label for="operator">' . $label . '</label>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            ' . $operatorSelectHtml . '
-                        </div>
-                        <div class="input-group col-lg-6">
-                                <input type="text" class="form-control" id="' . $inputKey . '-value" name="' . $inputKey . '[value]" value="' . $currentValue . '">
-                        </div>
-                    </div>
-                </div>
-            ';
-
-        return $html;
+        return $this->facade->getParser()->render('coupon/conditions-fragments/base-input-text.html', [
+                'label' => $label,
+                'inputKey' => $inputKey,
+                'currentValue' => $currentValue,
+                'operatorSelectHtml' => $operatorSelectHtml
+            ]
+        );
     }
 
     /**
@@ -285,23 +274,39 @@ abstract class ConditionAbstract implements ConditionInterface
      */
     protected function drawBackOfficeInputQuantityValues($inputKey, $max = 10, $min = 0)
     {
-        $selectHtml = '';
-        $optionHtml = '';
-        for ($i = $min; $i <= $max; $i++) {
-            $selected = '';
-            if (isset($this->values) && isset($this->values[$inputKey]) && $this->values[$inputKey] == $i) {
-                $selected = ' selected="selected"';
-            }
-            $optionHtml .= '<option value="' . $i . '" ' . $selected . '>' . $i . '</option>';
-        }
-
-        $selectHtml .= '
-            <select class="form-control" id="' . $inputKey . '-value" name="' . $inputKey . '[value]">
-                ' . $optionHtml . '
-            </select>
-        ';
-
-        return $selectHtml;
+        return $this->facade->getParser()->render('coupon/condition-fragments/quantity-selector.html', [
+                'min'      => $min,
+                'max'      => $max,
+                'value'    => isset($this->values[$inputKey]) ? $this->values[$inputKey] : '',
+                'inputKey' => $inputKey
+            ]
+        );
     }
 
+    /**
+     * Draw the currency input displayed in the BackOffice
+     * allowing Admin to set its Coupon Conditions
+     *
+     * @param string $inputKey Input key (ex: self::INPUT1)
+     *
+     * @return string HTML string
+     */
+    protected function drawBackOfficeCurrencyInput($inputKey)
+    {
+        $currencies = CurrencyQuery::create()->find();
+
+        $cleanedCurrencies = [];
+
+        /** @var Currency $currency */
+        foreach ($currencies as $currency) {
+            $cleanedCurrencies[$currency->getCode()] = $currency->getSymbol();
+        }
+
+        return $this->facade->getParser()->render('coupon/condition-fragments/currency-selector.html', [
+                'currencies' => $cleanedCurrencies,
+                'value'      => isset($this->values[$inputKey]) ? $this->values[$inputKey] : '',
+                'inputKey'   => $inputKey
+            ]
+        );
+    }
 }

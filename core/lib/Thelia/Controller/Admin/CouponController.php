@@ -292,30 +292,42 @@ class CouponController extends BaseAdminController
      */
     public function getConditionEmptyInputAjaxAction($conditionId)
     {
-        $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW);
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, array(), AccessManager::VIEW))
+            return $response;
 
         $this->checkXmlHttpRequest();
 
-        /** @var ConditionFactory $conditionFactory */
-        $conditionFactory = $this->container->get('thelia.condition.factory');
-        $inputs = $conditionFactory->getInputsFromServiceId($conditionId);
-        if (!$this->container->has($conditionId)) {
-            return false;
+        if (! empty($conditionId)) {
+
+            /** @var ConditionFactory $conditionFactory */
+            $conditionFactory = $this->container->get('thelia.condition.factory');
+            $inputs = $conditionFactory->getInputsFromServiceId($conditionId);
+
+            if (!$this->container->has($conditionId)) {
+                return false;
+            }
+
+            if ($inputs === null) {
+                return $this->pageNotFound();
+            }
+
+            /** @var ConditionInterface $condition */
+            $condition = $this->container->get($conditionId);
+
+            $html      = $condition->drawBackOfficeInputs();
+            $serviceId = $condition->getServiceId();
         }
-
-        /** @var ConditionInterface $condition */
-        $condition = $this->container->get($conditionId);
-
-        if ($inputs === null) {
-            return $this->pageNotFound();
+        else {
+            $html = '';
+            $serviceId = '';
         }
 
         return $this->render(
             'coupon/condition-input-ajax',
             array(
-                'inputsDrawn' => $condition->drawBackOfficeInputs(),
-                'conditionServiceId' => $condition->getServiceId(),
-                'conditionIndex' => -1,
+                'inputsDrawn' => $html,
+                'conditionServiceId' => $serviceId,
+                'conditionIndex' => '',
             )
         );
     }
