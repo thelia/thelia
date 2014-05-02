@@ -95,6 +95,7 @@ $(function($){
         ).done(function() {
             $.couponManager.displayConditionsSummary();
             $('#condition-add-operators-values').html('');
+            $('#condition-add-type').find('.typeToolTip').html('');
             // Set the condition selector to default
             $("#category-condition option").filter(function() {
                 return $(this).val() == '';
