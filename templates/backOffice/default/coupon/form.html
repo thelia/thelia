@@ -119,7 +119,6 @@
                     </div>
 
                     <div class="col-md-3">
-
                         <div id="coupon-type">
                             {form_field form=$form field='type'}
                                 <div class="form-group {if $error}has-error{/if}">
@@ -180,21 +179,17 @@
             </form>
         </div>
 
-
-        <div class="row">
-            <div class="col-md-12 title title-without-tabs">
-                {intl l='Coupon conditions'}
-            </div>
-        </div>
-
-        <div class="row">
+      <div class="row">
             {if $noConditions}
                 <div class="col-md-12">
+                    <p class="title title-without-tabs">{intl l="Coupon conditions"}</p>
                     <br />
                     {include file='includes/notifications.html' type='info' dismissable=false message={intl l='Please save this coupon first to define coupon conditions'}}
                 </div>
             {else}
                 <div class="col-md-6">
+                    <p class="title title-without-tabs">{intl l="Coupon conditions"}</p>
+
                     <div class="table-responsive">
                         <table class="table table-striped table-condensed" id="folder_list">
                            <thead>
@@ -211,10 +206,13 @@
                 </div>
 
                 <div class="col-md-6">
+
+                    <p class="title title-without-tabs">{intl l="Add a condition"}</p>
+
                     <form id="condition-form" action="{$urlAjaxSaveConditions}" {form_enctype form=$form} method="POST" >
 
                         <div id="condition-add-type" class="form-group">
-                            <label for="categoryCondition">{intl l='Condition\'s category :'}</label>
+                            <label for="categoryCondition">{intl l='Condition category :'}</label>
                             <select name="categoryCondition" id="category-condition" class="form-control">
                                 <option value="" data-description="">{intl l='Please select a condition'}</option>
                                 {foreach from=$availableConditions item=availableCondition}
