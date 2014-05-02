@@ -65,7 +65,6 @@ abstract class ConditionAbstract implements ConditionInterface
     {
         $this->facade = $facade;
         $this->translator = $facade->getTranslator();
-        $this->parser = $facade->getParser();
         $this->conditionValidator = $facade->getConditionEvaluator();
     }
 
