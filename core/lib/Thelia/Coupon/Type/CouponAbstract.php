@@ -353,20 +353,7 @@ abstract class CouponAbstract implements CouponInterface
      *
      * @return string HTML string
      */
-    public function drawBackOfficeInputs()
-    {
-        $label = $this->getInputName();
-        $value = $this->amount;
-
-        $html = '
-                <div class="form-group input-' . self::INPUT_AMOUNT_NAME . ' ">
-                    <label for="' . self::INPUT_AMOUNT_NAME . '" class="control-label">' . $label . '</label>
-                    <input id="' . self::INPUT_AMOUNT_NAME . '" type="text" class="form-control" name="thelia_coupon_creation[' . self::INPUT_AMOUNT_NAME . ']" value="' . $value . '" placeholder="14.50">
-                </div>
-            ';
-
-        return $html;
-    }
+    public abstract function drawBackOfficeInputs();
 
     /**
      * Get all extended inputs name to manage
