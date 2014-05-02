@@ -68,7 +68,7 @@ abstract class Operators
             break;
         case self::EQUAL:
             $ret = $translator->trans(
-                'Equals to',
+                'Equals',
                 [],
                 'condition'
             );
