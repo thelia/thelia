@@ -25,7 +25,14 @@ use Thelia\Model\LangQuery;
  * Controller uses to generate sitemap.xml
  *
  * A default cache of 2 hours is used to avoid attack. You can flush cache if you have `ADMIN` role and pass flush=1 in
- * query parameter.
+ * query string parameter.
+ *
+ * You can generate sitemap according to specific language and/or specific context (catalog/content). You have to
+ * use ```lang``` and ```context``` query string parameters to do so. If a language is not used in website or if the
+ * context is not supported the page not found is displayed.
+ *
+ * {url}/sitemap?lang=fr&context=catalog will generate a sitemap for catalog (categories and products)
+ * for french language.
  *
  * @package Front\Controller
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
@@ -140,7 +147,6 @@ class SitemapController extends BaseFrontController {
             ->findOneByCode($lang);
 
         return (null !== $lang);
-
     }
 
 } 

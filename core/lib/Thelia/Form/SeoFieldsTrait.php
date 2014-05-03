@@ -12,7 +12,6 @@
 
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
 /**
