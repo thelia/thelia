@@ -350,10 +350,13 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Draw the input displayed in the BackOffice
      * allowing Admin to set its Coupon effect
+     * Override this method to do something useful
      *
      * @return string HTML string
      */
-    public abstract function drawBackOfficeInputs();
+    public function drawBackOfficeInputs() {
+        return "";
+    }
 
     /**
      * Get all extended inputs name to manage
