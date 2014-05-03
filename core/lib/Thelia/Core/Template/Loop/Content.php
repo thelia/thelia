@@ -223,9 +223,6 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("VISIBLE"                 , $content->getVisible())
             ;
 
-
-
-
             $loopResult->addRow($this->findNextPrev($loopResultRow, $content, $defaultFolderId));
         }
 
@@ -234,8 +231,8 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @param LoopResultRow $loopResultRow
-     * @param \Thelia\Model\Content $content
+     * @param  LoopResultRow         $loopResultRow
+     * @param  \Thelia\Model\Content $content
      * @param $defaultFolderId
      * @return LoopResultRow
      */
