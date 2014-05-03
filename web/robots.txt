@@ -6,4 +6,4 @@ Disallow: /admin
 Disallow: /cart
 Disallow: /404
 
-#Sitemap: http://www.yourdomain.com/sitemap.xml
+#Sitemap: http://www.yourdomain.com/sitemap
