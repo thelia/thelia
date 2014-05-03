@@ -200,6 +200,15 @@
     </route>
     <!-- end sitemap generator -->
 
+    <!-- feed generator -->
+    <route id="feed.process" path="/feed/{context}/{lang}/{id}">
+        <default key="_controller">Front\Controller\FeedController::generateAction</default>
+        <default key="context">catalog</default>
+        <default key="lang"></default>
+        <default key="id"></default>
+    </route>
+    <!-- end feed generator -->
+
     <!-- Default Route -->
     <route id="default" path="/{_view}">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
