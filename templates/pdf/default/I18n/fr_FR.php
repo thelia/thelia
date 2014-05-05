@@ -14,7 +14,7 @@ return array(
     'Ref' => 'Ref',
     'THANK YOU' => 'MERCI',
     'Tax' => 'Taxes',
-    'Taxed total' => 'Montant total des taxes',
+    'Taxed total' => 'Total TTC',
     'Total' => 'Total',
     'Total with tax' => 'Total TTC',
     'Total without tax' => 'Total HT',
