@@ -93,7 +93,7 @@ abstract class CouponAbstract implements CouponInterface
      *
      * @param FacadeInterface $facade Service facade
      */
-    protected function __construct(FacadeInterface $facade)
+    public function __construct(FacadeInterface $facade)
     {
         $this->facade = $facade;
         $this->translator = $facade->getTranslator();
