@@ -62,8 +62,8 @@
 
         <table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size:13px;line-height:2em">
             <tr style="color:#999;font-size:11px">
-                <td style="color:#999;border-bottom:1px solid #000">What You Purchased</td>
-                <td align="right" style="color:#999;border-bottom:1px solid #000">Price in {$orderCurrencyIsoCode}</td>
+                <td style="color:#999;border-bottom:1px solid #000">{intl l="What You Purchased"}</td>
+                <td align="right" style="color:#999;border-bottom:1px solid #000">{intl l="Price in"} {$orderCurrencyIsoCode}</td>
             </tr>
             {loop type="order_product" name="order-products" order=$ID}
             {if $WAS_IN_PROMO == 1}
@@ -112,10 +112,11 @@
     {config key="store_name"}<br>
     {config key="store_address1"}<br />
     {config key="store_zipcode"}, {config key="store_city"}<br />
-    {loop type="country" name="store_country" id={config key="store_country"}}
-        {$TITLE}
-    {/loop}
-
+    {if {config key="store_country"}}
+        {loop type="country" name="store_country" id={config key="store_country"}}
+            {$TITLE}
+        {/loop}
+    {/if}
     <br />
     <br />
     {intl l="Thanks"}<br />

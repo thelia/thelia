@@ -135,7 +135,7 @@
                 {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
                 {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}<br />
                 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
-                {$ZIPCODE} {$COUNTRY}<br/>
+                {$ZIPCODE} {$CITY}<br/>
                 {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
                 {/loop}
             </p>
@@ -146,7 +146,7 @@
                 {loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
                 {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}<br />
                 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
-                {$ZIPCODE} {$COUNTRY}<br/>
+                {$ZIPCODE} {$CITY}<br/>
                 {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
                 {/loop}
             </p>
