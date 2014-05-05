@@ -3,6 +3,10 @@
 - display estimated shipping on cart page
 - export newsletter subscribers list
 - Fix redirect issues
+- enhancement of coupon UI
+- enhancement of admin menu. Coupon is now in Tools menu
+- front office, email and pdf templates are translated in Russian and Czech
+- fix bugs : https://github.com/thelia/thelia/issues?milestone=4&page=1&state=closed
 
 #2.0.0
 - Coupons values are re-evaluated when a product quantity is changed in the shopping cart
