@@ -14,6 +14,7 @@ namespace Thelia\Core\Template\Loop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
 use Thelia\Module\BaseModule;
@@ -54,6 +55,12 @@ class Delivery extends BaseSpecificModule
 
         /** @var Module $deliveryModule */
         foreach ($loopResult->getResultDataCollection() as $deliveryModule) {
+
+            $areaDeliveryModule = AreaDeliveryModuleQuery::create()
+                ->findByCountryAndModule($country, $deliveryModule);
+
+            if (null === $areaDeliveryModule) continue;
+
             $loopResultRow = new LoopResultRow($deliveryModule);
 
             /** @var DeliveryModuleInterface $moduleInstance */
