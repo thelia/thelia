@@ -40,6 +40,8 @@ export PATH=/Applications/MAMP/bin/php/php5.4.x/bin/:$PATH
 * configure a complete development environment : http://php-osx.liip.ch/
 * use a virtual machine with vagrant and puppet : https://puphpet.com/
 
+### MySQL 5.6
+
 As of MySQL 5.6, default configuration sets the sql_mode value to
 
 ```
@@ -60,6 +62,8 @@ Assuming your sql_mode is the default one, you can change the value directly on 
 ```sql
 SET @@GLOBAL.sql_mode='NO_ENGINE_SUBSTITUTION', @@SESSION.sql_mode='NO_ENGINE_SUBSTITUTION'
 ```
+
+For more information on sql_mode you can consult the [MySQL doc](http://dev.mysql.com/doc/refman/5.0/fr/server-sql-mode.html "sql Mode")
 
 Installation
 ------------
