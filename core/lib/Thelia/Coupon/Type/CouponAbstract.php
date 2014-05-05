@@ -93,7 +93,7 @@ abstract class CouponAbstract implements CouponInterface
      *
      * @param FacadeInterface $facade Service facade
      */
-    public function __construct(FacadeInterface $facade)
+    protected function __construct(FacadeInterface $facade)
     {
         $this->facade = $facade;
         $this->translator = $facade->getTranslator();
@@ -355,7 +355,7 @@ abstract class CouponAbstract implements CouponInterface
      * @return string HTML string
      */
     public function drawBackOfficeInputs() {
-        return $this->facade->getParser()->render('coupon/type-fragments/remove-x-amount.html', [
+        return $this->facade->getParser()->render('coupon/type-fragments/remove-x.html', [
                 'label'     => $this->getInputName(),
                 'fieldName' => self::INPUT_AMOUNT_NAME,
                 'value'     => $this->amount
