@@ -502,6 +502,7 @@ try {
 
 } catch (Exception $e) {
     echo "error : ".$e->getMessage()."\n";
+    echo $e->getTraceAsString();
     $con->rollBack();
 }
 

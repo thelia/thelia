@@ -54,57 +54,57 @@ abstract class Operators
         switch ($operator) {
         case self::INFERIOR:
             $ret = $translator->trans(
-                'inferior to',
-                array(),
+                'Less than',
+                [],
                 'condition'
             );
             break;
         case self::INFERIOR_OR_EQUAL:
             $ret = $translator->trans(
-                'inferior or equal to',
-                array(),
+                'Less than or equals',
+                [],
                 'condition'
             );
             break;
         case self::EQUAL:
             $ret = $translator->trans(
-                'equal to',
-                array(),
+                'Equals',
+                [],
                 'condition'
             );
             break;
         case self::SUPERIOR_OR_EQUAL:
             $ret = $translator->trans(
-                'superior or equal to',
-                array(),
+                'Greater than or equals',
+                [],
                 'condition'
             );
             break;
         case self::SUPERIOR:
             $ret = $translator->trans(
-                'superior to',
-                array(),
+                'Greater than',
+                [],
                 'condition'
             );
             break;
         case self::DIFFERENT:
             $ret = $translator->trans(
-                'different from',
-                array(),
+                'Not equals',
+                [],
                 'condition'
             );
             break;
         case self::IN:
             $ret = $translator->trans(
-                'in',
-                array(),
+                'In',
+                [],
                 'condition'
             );
             break;
         case self::OUT:
             $ret = $translator->trans(
-                'not in',
-                array(),
+                'Not in',
+                [],
                 'condition'
             );
             break;

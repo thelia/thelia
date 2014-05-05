@@ -4,7 +4,7 @@ $(function($){
     $.couponManager = {};
 
     // Condition being updated category id
-    $.couponManager.conditionToUpdateServiceId = -1;
+    $.couponManager.conditionToUpdateServiceId = '';
     // Condition being updated index
     $.couponManager.conditionToUpdateIndex = false;
 
@@ -20,6 +20,7 @@ $(function($){
     $.couponManager.intlPleaseRetry = '';
     $.couponManager.intlPleaseSelectAnotherCondition = '';
     $.couponManager.intlDoYouReallyWantToSetCouponAvailableForEveryOne = '';
+    $.couponManager.intlDoYouReallyWantToDeleteThisCondition = '';
 
     // *****************************************
     // ****************** Delete ***************
@@ -28,11 +29,13 @@ $(function($){
     $.couponManager.onClickDeleteCondition = function() {
         $('.condition-delete-btn').on('click', function (e) {
             e.preventDefault();
-            var $this = $(this);
-            var index = $this.attr('data-conditionIndex');
-            $.couponManager.conditionToUpdateServiceId = -1;
-            $.couponManager.conditionToUpdateIndex = false;
-            $.couponManager.removeConditionAjax(index);
+            if (confirm($.couponManager.intlDoYouReallyWantToDeleteThisCondition)) {
+                var $this = $(this);
+                var index = $this.data('condition-index');
+                $.couponManager.conditionToUpdateServiceId = '';
+                $.couponManager.conditionToUpdateIndex = false;
+                $.couponManager.removeConditionAjax(index);
+            }
         });
     };
     $.couponManager.onClickDeleteCondition();
@@ -53,7 +56,7 @@ $(function($){
                     $('#condition-list').html($.couponManager.intlPleaseSelectAnotherCondition);
                 }
             }
-        }).done(function(data) {
+        }).done(function() {
             // Reload condition summaries ajax
             $.couponManager.displayConditionsSummary();
         });
@@ -92,9 +95,10 @@ $(function($){
         ).done(function() {
             $.couponManager.displayConditionsSummary();
             $('#condition-add-operators-values').html('');
+            $('#condition-add-type').find('.typeToolTip').html('');
             // Set the condition selector to default
             $("#category-condition option").filter(function() {
-                return $(this).val() == '-1';
+                return $(this).val() == '';
             }).prop('selected', true);
         }).fail(function() {
             $('#condition-add-operators-values').html(
@@ -115,8 +119,8 @@ $(function($){
         $('.condition-update-btn').on('click', function (e) {
             e.preventDefault();
             var $this = $(this);
-            $.couponManager.conditionToUpdateServiceId = $this.attr('data-serviceId');
-            $.couponManager.conditionToUpdateIndex = $this.attr('data-conditionIndex');
+            $.couponManager.conditionToUpdateServiceId = $this.data('service-id');
+            $.couponManager.conditionToUpdateIndex = $this.data('condition-index');
 
             $.couponManager.updateConditionSelectFromConditionInterfaceAjax(
                 $.couponManager.conditionToUpdateIndex,
@@ -135,7 +139,7 @@ $(function($){
             var $this = $(this);
             var mainDiv = $('#condition-add-type');
             var optionSelected = $('option:selected', this);
-            mainDiv.find('.typeToolTip').html(optionSelected.attr('data-description'));
+            mainDiv.find('.typeToolTip').html(optionSelected.data('description'));
 
             // Only if add mode
             if (false != $.couponManager.conditionToUpdateIndex) {
@@ -179,7 +183,7 @@ $(function($){
             }
         }).done(function(data) {
             $('#condition-add-operators-values').html(data);
-            if ($.couponManager.conditionToUpdateServiceId == -1) {
+            if ($.couponManager.conditionToUpdateServiceId == '') {
                 // Placeholder can't be saved
                 $('#condition-save-btn').hide();
             } else {
@@ -204,28 +208,13 @@ $(function($){
     };
 
 
-
-
     // ***********************************************
     // *************** Manager Coupon ****************
     // ***********************************************
-    // Reload effect inputs when changing effect
-    $.couponManager.onEffectChange = function() {
-        var mainDiv = $('#coupon-type');
-        var optionSelected = mainDiv.find('#type option:selected');
-        mainDiv.find('.typeToolTip').html(optionSelected.attr('data-description'));
-
-        mainDiv.find('#type').on('change', function () {
-            var optionSelected = $('option:selected', this);
-            $.couponManager.displayEfffect(optionSelected);
-
-        });
-    };
-    $.couponManager.onEffectChange();
 
     $.couponManager.displayEfffect = function(optionSelected) {
         var mainDiv = $('#coupon-type');
-        mainDiv.find('.typeToolTip').html(optionSelected.attr('data-description'));
+        mainDiv.find('.typeToolTip').html(optionSelected.data('description'));
 
         var inputsDiv = mainDiv.find('.inputs');
         inputsDiv.html('<div class="loading" ></div>');
@@ -247,6 +236,20 @@ $(function($){
             inputsDiv.html(data);
         });
     };
+
+    // Reload effect inputs when changing effect
+    $.couponManager.onEffectChange = function() {
+        var mainDiv = $('#coupon-type');
+        var optionSelected = mainDiv.find('#type option:selected');
+        mainDiv.find('.typeToolTip').html(optionSelected.data('description'));
+
+        mainDiv.find('#type').on('change', function () {
+            var optionSelected = $('option:selected', this);
+            $.couponManager.displayEfffect(optionSelected);
+
+        });
+    };
+    $.couponManager.onEffectChange();
 
     $.couponManager.displayConditionsSummary = function() {
         var mainDiv = $('#condition-list');
@@ -274,7 +277,9 @@ $(function($){
     // Set max usage to unlimited or not
     $.couponManager.onUsageUnlimitedChange = function() {
         var $isUnlimited = $('#is-unlimited');
-        $maxUsage = $('#max-usage');
+
+        var $maxUsage = $('#max-usage');
+
         if ($maxUsage.val() == -1) {
             $isUnlimited.prop('checked', true);
             $maxUsage.hide();
@@ -296,5 +301,6 @@ $(function($){
             }
         });
     };
+
     $.couponManager.onUsageUnlimitedChange();
 });

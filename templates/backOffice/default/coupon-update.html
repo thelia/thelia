@@ -14,12 +14,12 @@
                 <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
                 <li><a href="{url path='admin/tools'}">{intl l='Tools'}</a></li>
                 <li><a href="{url path='admin/coupon'}">{intl l='Coupon'}</a></li>
-                <li>{intl l="Editing %title" title="$couponCode"}</li>
+                <li>{intl l='Editing coupon "%title"' title="$couponCode"}</li>
             </ul>
         </nav>
 
         {form name="thelia.admin.coupon.creation"}
-            {include file='coupon/form.html' formAction={url path={$formAction}} form=$form noConditions=false}
+            {include file='coupon/form.html' formAction={url path={$formAction}} form=$form noConditions=false title={intl l='Editing coupon "%title"' title=$couponCode}}
         {/form}
     </div> <!-- #wrapper -->
 </div>
@@ -52,6 +52,7 @@
             $.couponManager.intlPleaseRetry = '{intl l='Please retry'}';
             $.couponManager.intlPleaseSelectAnotherCondition = '{intl l='Please select another condition'}';
             $.couponManager.intlDoYouReallyWantToSetCouponAvailableForEveryOne = '{intl l='Do you really want to set this coupon available to everyone ?'}';
+            $.couponManager.intlDoYouReallyWantToDeleteThisCondition = '{intl l='Do you really want to delete this condition ?'}';
 
             $('#condition-save-btn').hide();
         });

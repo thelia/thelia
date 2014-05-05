@@ -44,35 +44,35 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback((array($this, 'callbackI18n'))));
 
         $actual = Operators::getI18n($stubTranslator, Operators::INFERIOR);
-        $expected = 'inferior to';
+        $expected = 'Less than';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::INFERIOR_OR_EQUAL);
-        $expected = 'inferior or equal to';
+        $expected = 'Less than or equals';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::EQUAL);
-        $expected = 'equal to';
+        $expected = 'Equals';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::SUPERIOR_OR_EQUAL);
-        $expected = 'superior or equal to';
+        $expected = 'Greater than or equals';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::SUPERIOR);
-        $expected = 'superior to';
+        $expected = 'Greater than';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::DIFFERENT);
-        $expected = 'different from';
+        $expected = 'Not equals';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::IN);
-        $expected = 'in';
+        $expected = 'In';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::OUT);
-        $expected = 'not in';
+        $expected = 'Not in';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, 'unexpected operator');

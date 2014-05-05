@@ -18,6 +18,8 @@ use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateHelper;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
 use Thelia\Cart\CartTrait;
@@ -42,6 +44,9 @@ class BaseFacade implements FacadeInterface
 
     /** @var Translator Service Translator  */
     protected $translator = null;
+
+    /** @var ParserInterface The thelia parser  */
+    private $parser = null;
 
     /**
      * Constructor
@@ -195,6 +200,23 @@ class BaseFacade implements FacadeInterface
     public function getTranslator()
     {
         return $this->container->get('thelia.translator');
+    }
+
+    /**
+     * Return platform Parser
+     *
+     * @return ParserInterface
+     */
+    public function getParser()
+    {
+        if ($this->parser == null) {
+            $this->parser = $this->container->get('thelia.parser');
+
+            // Define the current back-office template that should be used
+            $this->parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveAdminTemplate());
+        }
+
+        return $this->parser;
     }
 
     /**

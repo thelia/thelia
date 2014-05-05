@@ -1,0 +1,9 @@
+<div class="form-group input-{$fieldName}">
+    <label for="{$fieldName}" class="control-label">{$label}</label>
+    <div class="input-group">
+        <input id="{$fieldName}" type="money" class="form-control" name="thelia_coupon_creation[{$fieldName}]" value="{$value}" placeholder="14.50">
+        {loop type="currency" name="get-symbol" default_only="true"}
+        <div class="input-group-addon">{$SYMBOL}</div>
+        {/loop}
+    </div>
+</div>

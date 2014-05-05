@@ -116,7 +116,7 @@ class RemoveXPercent extends CouponAbstract
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Percentage removed from the cart', array(), 'coupon');
+            ->trans('Percent Discount', array(), 'coupon');
     }
 
     /**
@@ -129,7 +129,7 @@ class RemoveXPercent extends CouponAbstract
         $toolTip = $this->facade
             ->getTranslator()
             ->trans(
-                'This coupon will remove the entered percentage to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.',
+                'This coupon will offert a flat percentage off a shopper\'s entire order (not applied to shipping costs or tax rates). If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
                 array(),
                 'coupon'
             );
@@ -145,17 +145,12 @@ class RemoveXPercent extends CouponAbstract
      */
     public function drawBackOfficeInputs()
     {
-        $labelPercentage = $this->getInputName();
-
-        $html = '
-                <input type="hidden" name="thelia_coupon_creation[' . self::INPUT_AMOUNT_NAME . ']" value="0"/>
-                <div class="form-group input-' . self::INPUT_PERCENTAGE_NAME . '">
-                    <label for="' . self::INPUT_PERCENTAGE_NAME . '" class="control-label">' . $labelPercentage . '</label>
-                    <input id="' . self::INPUT_PERCENTAGE_NAME . '" class="form-control" name="' . self::INPUT_EXTENDED__NAME . '[' . self::INPUT_PERCENTAGE_NAME . ']' . '" type="text" value="' . $this->percentage . '"/>
-                </div>
-            ';
-
-        return $html;
+        return $this->facade->getParser()->render('coupon/type-fragments/remove-x-percent.html', [
+            'label'     => $this->getInputName(),
+            'typeKey'   => self::INPUT_AMOUNT_NAME,
+            'fieldId'   => self::INPUT_PERCENTAGE_NAME,
+            'fieldName' => self::INPUT_EXTENDED__NAME,
+            'value'     => $this->percentage
+        ]);
     }
-
 }

@@ -350,22 +350,16 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Draw the input displayed in the BackOffice
      * allowing Admin to set its Coupon effect
+     * Override this method to do something useful
      *
      * @return string HTML string
      */
-    public function drawBackOfficeInputs()
-    {
-        $label = $this->getInputName();
-        $value = $this->amount;
-
-        $html = '
-                <div class="form-group input-' . self::INPUT_AMOUNT_NAME . ' ">
-                    <label for="' . self::INPUT_AMOUNT_NAME . '" class="control-label">' . $label . '</label>
-                    <input id="' . self::INPUT_AMOUNT_NAME . '" type="text" class="form-control" name="thelia_coupon_creation[' . self::INPUT_AMOUNT_NAME . ']" value="' . $value . '" placeholder="14.50">
-                </div>
-            ';
-
-        return $html;
+    public function drawBackOfficeInputs() {
+        return $this->facade->getParser()->render('coupon/type-fragments/remove-x.html', [
+                'label'     => $this->getInputName(),
+                'fieldName' => self::INPUT_AMOUNT_NAME,
+                'value'     => $this->amount
+            ]);
     }
 
     /**
