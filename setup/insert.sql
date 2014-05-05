@@ -46,7 +46,8 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('thelia_extra_version','', 1, 1, NOW(), NOW()),
 ('front_cart_country_cookie_name','fcccn', 1, 1, NOW(), NOW()),
 ('front_cart_country_cookie_expires','2592000', 1, 1, NOW(), NOW()),
-('sitemap_ttl','7200', 1, 1, NOW(), NOW());
+('sitemap_ttl','7200', 1, 1, NOW(), NOW()),
+('feed_ttl','7200', 1, 1, NOW(), NOW());
 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
