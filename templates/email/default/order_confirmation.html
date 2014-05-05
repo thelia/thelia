@@ -112,10 +112,11 @@
     {config key="store_name"}<br>
     {config key="store_address1"}<br />
     {config key="store_zipcode"}, {config key="store_city"}<br />
-    {loop type="country" name="store_country" id={config key="store_country"}}
-        {$TITLE}
-    {/loop}
-
+    {if {config key="store_country"}}
+        {loop type="country" name="store_country" id={config key="store_country"}}
+            {$TITLE}
+        {/loop}
+    {/if}
     <br />
     <br />
     {intl l="Thanks"}<br />
