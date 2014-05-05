@@ -70,7 +70,7 @@ class FeedController extends BaseFrontController {
             $this->pageNotFound();
         }
 
-        // the locale : fr, en,
+        // the locale : fr_FR, en_US,
         if ("" !== $lang) {
             if (! $this->checkLang($lang)){
                 $this->pageNotFound();
@@ -162,8 +162,8 @@ class FeedController extends BaseFrontController {
     /**
      * Check if a lang is used
      *
-     * @param $lang The lang code. e.g.: fr
-     * @return bool true if the language is used, otherwise false
+     * @param $lang string  The lang code. e.g.: fr
+     * @return bool         true if the language is used, otherwise false
      */
     private function checkLang($lang)
     {
@@ -176,7 +176,7 @@ class FeedController extends BaseFrontController {
 
 
     /**
-     * Ckeck if the element exists and is visible
+     * Check if the element exists and is visible
      *
      * @param $context string   catalog or content
      * @param $id string        id of the element
