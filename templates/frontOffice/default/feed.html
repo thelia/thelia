@@ -8,7 +8,7 @@
 {if $_context_ == "catalog"}
     <channel>
     {if $_id_ == "" }
-        <title>{intl l="Catalog"} | {$store_name}</title>
+        <title>{intl l="All products in"} {$store_name}</title>
         <link>{url path="/"}</link>
         <description>{$store_name}</description>
         <language>{$locale|replace:'_':'-'|lower}</language>
@@ -16,7 +16,7 @@
         <generator>Thelia 2.0</generator>
     {else}
         {loop type="category" name="category" id=$_id_ lang=$_lang_ }
-        <title>{$TITLE} | {$store_name}</title>
+        <title>{intl l="All products in"} {$TITLE} - {$store_name}</title>
         <link>{$URL}</link>
         <description>{$CHAPO}</description>
         <language>{$LOCALE|replace:'_':'-'|lower}</language>
@@ -37,16 +37,16 @@
     </channel>
 {else}
     <channel>
-        {if $_id_ == "" }
-        <title>{intl l="Contents"} | {$store_name}</title>
+    {if $_id_ == "" }
+        <title>{intl l="All contents in"} {$store_name}</title>
         <link>{url path="/"}</link>
         <description>{$store_name}</description>
         <language>{$locale|replace:'_':'-'|lower}</language>
         <lastBuildDate>{$smarty.now|date_format:'r'}</lastBuildDate>
         <generator>Thelia 2.0</generator>
-        {else}
+    {else}
         {loop type="folder" name="folder" id=$_id_ lang=$_lang_ }
-        <title>{$TITLE} | {$store_name}</title>
+        <title>{intl l="All contents in"} {$TITLE} - {$store_name}</title>
         <link>{$URL}</link>
         <description>{$CHAPO}</description>
         <language>{$LOCALE|replace:'_':'-'|lower}</language>
@@ -54,8 +54,8 @@
         <lastBuildDate>{$smarty.now|date_format:'r'}</lastBuildDate>
         <generator>Thelia 2.0</generator>
         {/loop}
-        {/if}
-        {loop type="content" name="content" folder_default=$_id_ lang=$_lang_ }
+    {/if}
+    {loop type="content" name="content" folder_default=$_id_ lang=$_lang_ }
         <item>
             <title>{$TITLE}</title>
             <link>{$URL}</link>
@@ -63,7 +63,7 @@
             <pubDate>{format_date date=$CREATE_DATE format="r"}</pubDate>
             <guid>{$URL}</guid>
         </item>
-        {/loop}
+    {/loop}
     </channel>
 {/if}
 </rss>
