@@ -22,6 +22,7 @@
 /*************************************************************************************/
 namespace Front\Controller;
 
+use Front\Front;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Cart\CartTrait;
