@@ -701,6 +701,16 @@ final class TheliaEvents
     const MODULE_PAY = 'thelia.module.pay';
 
     /**
+     * Hook
+     */
+    const HOOK_BEFORE_RENDER = 'thelia.hook.beforeProcess';
+    const HOOK_PROCESS_RENDER = 'thelia.hook.processRender';
+    const HOOK_AFTER_RENDER = 'thelia.hook.afterProcess';
+    //
+    const MODULE_HOOK_UPDATE = 'thelia.hook.action.update';
+
+
+    /**
      * sent for clearing cache
      */
     const CACHE_CLEAR = 'thelia.cache.clear';
