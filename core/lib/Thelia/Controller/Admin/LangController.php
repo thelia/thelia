@@ -74,7 +74,10 @@ class LangController extends BaseAdminController
             'code' => $lang->getCode(),
             'locale' => $lang->getLocale(),
             'date_format' => $lang->getDateFormat(),
-            'time_format' => $lang->getTimeFormat()
+            'time_format' => $lang->getTimeFormat(),
+            'decimal_separator' => $lang->getDecimalSeparator(),
+            'thousands_separator' => $lang->getThousandsSeparator(),
+            'decimals' => $lang->getDecimals(),
         ));
 
         $this->getParserContext()->addForm($langForm);
@@ -124,6 +127,9 @@ class LangController extends BaseAdminController
             ->setLocale($form->get('locale')->getData())
             ->setDateFormat($form->get('date_format')->getData())
             ->setTimeFormat($form->get('time_format')->getData())
+            ->setDecimalSeparator($form->get('decimal_separator')->getData())
+            ->setThousandsSeparator($form->get('thousands_separator')->getData())
+            ->setDecimals($form->get('decimals')->getData())
         ;
     }
 

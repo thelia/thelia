@@ -122,4 +122,10 @@ class Lang extends BaseLang
         $this->dispatchEvent(TheliaEvents::AFTER_DELETELANG, new LangEvent($this));
     }
 
+    public function preSave(ConnectionInterface $con = null)
+    {
+        $this->setDatetimeFormat(sprintf("%s %s", $this->getDateFormat(), $this->getTimeFormat()));
+
+        return true;
+    }
 }
