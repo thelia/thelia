@@ -165,7 +165,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
         /* define config directory */
         $configDirectory = THELIA_TEMPLATE_DIR . $this->getTemplate() . '/configs';
-        $this->setConfigDir($configDirectory);
+        $this->addConfigDir($configDirectory, 0);
 
         /* add modules template directories */
         $this->addTemplateDirectory(
@@ -180,6 +180,7 @@ class SmartyParser extends Smarty implements ParserInterface
         if (isset($this->templateDirectories[$templateDefinition->getType()][$templateDefinition->getName()])) {
             foreach ($this->templateDirectories[$templateDefinition->getType()][$templateDefinition->getName()] as $key => $directory) {
                 $this->addTemplateDir($directory, $key);
+                $this->addConfigDir($directory . "/configs", $key);
             }
         }
     }
