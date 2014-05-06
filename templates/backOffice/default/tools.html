@@ -10,9 +10,14 @@
 
         <div id="wrapper" class="container">
 
-            {module_include location='tools_top'}
+            <nav>
+                <ul class="breadcrumb">
+                    <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
+                    <li>{intl l='Tools'}</li>
+                </ul>
+            </nav>
 
-            <h2>{intl l="Thelia tools"}</h2>
+            {module_include location='tools_top'}
 
             <div class="row">
 
