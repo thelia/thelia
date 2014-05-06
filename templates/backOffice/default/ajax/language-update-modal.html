@@ -47,6 +47,27 @@
             <span class="help-block">{intl l='The syntax used is identical to the PHP <a href="http://www.php.net/date" target="_other">date()</a> function'}</span>
         </div>
     {/form_field}
+    {form_field form=$form field='decimal_separator'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='eg: . or ,'}">
+            <span class="help-block">{intl l='Sets the separator for the decimal point'}</span>
+        </div>
+    {/form_field}
+    {form_field form=$form field='thousands_separator'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}">
+            <span class="help-block">{intl l='Sets the thousands separator.'}</span>
+        </div>
+    {/form_field}
+    {form_field form=$form field='decimals'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="2">
+            <span class="help-block">{intl l='Sets the number of decimal points'}</span>
+        </div>
+    {/form_field}
 
 
 

@@ -24,6 +24,9 @@ class LangCreateEvent extends LangEvent
     protected $locale;
     protected $date_format;
     protected $time_format;
+    protected $decimal_separator;
+    protected $thousands_separator;
+    protected $decimals;
 
     /**
      * @param mixed $code
@@ -124,5 +127,61 @@ class LangCreateEvent extends LangEvent
     {
         return $this->title;
     }
+
+    /**
+     * @param mixed $decimal_separator
+     */
+    public function setDecimalSeparator($decimal_separator)
+    {
+        $this->decimal_separator = $decimal_separator;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDecimalSeparator()
+    {
+        return $this->decimal_separator;
+    }
+
+    /**
+     * @param mixed $decimals
+     */
+    public function setDecimals($decimals)
+    {
+        $this->decimals = $decimals;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDecimals()
+    {
+        return $this->decimals;
+    }
+
+    /**
+     * @param mixed $thousands_separator
+     */
+    public function setThousandsSeparator($thousands_separator)
+    {
+        $this->thousands_separator = $thousands_separator;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getThousandsSeparator()
+    {
+        return $this->thousands_separator;
+    }
+
+
 
 }

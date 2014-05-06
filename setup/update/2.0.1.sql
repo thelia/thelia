@@ -101,6 +101,16 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max, 'en_US', 'export of newsletter subscribers'),
 (@max, 'fr_FR', 'export des inscrits à la newsletter');
 
+SELECT @max := MAX(`id`) FROM `lang`;
+SET @max := @max+1;
+
+INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`date_format`,`time_format`,`datetime_format`,`decimal_separator`,`thousands_separator`,`decimals`,`by_default`,`created_at`,`updated_at`)VALUES
+(@max, 'Russian', 'ru', 'ru_RU', '', 'j.n.Y', 'H:i:s', 'j.n.Y H:i:s', ',', ' ', '2', 0,  NOW(), NOW());
+
+SET @max := @max+1;
+
+INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`date_format`,`time_format`,`datetime_format`,`decimal_separator`,`thousands_separator`,`decimals`,`by_default`,`created_at`,`updated_at`)VALUES
+(@max, 'Czech', 'cs', 'cs_CZ', '', 'j.n.Y', 'H:i:s', 'j.n.Y H:i:s', ',', ' ', '2', 0,  NOW(), NOW());
 
 
 SET FOREIGN_KEY_CHECKS = 1;

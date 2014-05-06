@@ -55,6 +55,9 @@ class LangTest extends \PHPUnit_Framework_TestCase
             ->setCode('TES')
             ->setDateFormat('Y-m-d')
             ->setTimeFormat('H:i:s')
+            ->setDecimalSeparator(".")
+            ->setThousandsSeparator(" ")
+            ->setDecimals("2")
             ->setDispatcher($this->dispatcher)
         ;
 
@@ -72,6 +75,10 @@ class LangTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('TES', $createdLang->getCode());
         $this->assertEquals('Y-m-d', $createdLang->getDateFormat());
         $this->assertEquals('H:i:s', $createdLang->getTimeFormat());
+        $this->assertEquals('.', $createdLang->getDecimalSeparator());
+        $this->assertEquals(' ', $createdLang->getThousandsSeparator());
+        $this->assertEquals('2', $createdLang->getDecimals());
+        $this->assertEquals('Y-m-d H:i:s', $createdLang->getDatetimeFormat());
 
         return $createdLang;
     }
@@ -90,6 +97,9 @@ class LangTest extends \PHPUnit_Framework_TestCase
             ->setCode('TEST')
             ->setDateFormat('d-m-Y')
             ->setTimeFormat('H-i-s')
+            ->setDecimalSeparator(",")
+            ->setThousandsSeparator(".")
+            ->setDecimals("1")
             ->setDispatcher($this->dispatcher)
         ;
 
@@ -105,6 +115,10 @@ class LangTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test update', $updatedLang->getTitle());
         $this->assertEquals('d-m-Y', $updatedLang->getDateFormat());
         $this->assertEquals('H-i-s', $updatedLang->getTimeFormat());
+        $this->assertEquals(',', $updatedLang->getDecimalSeparator());
+        $this->assertEquals('.', $updatedLang->getThousandsSeparator());
+        $this->assertEquals('1', $updatedLang->getDecimals());
+        $this->assertEquals('d-m-Y H-i-s', $updatedLang->getDatetimeFormat());
 
         return $updatedLang;
     }

@@ -91,6 +91,30 @@ class LangCreateForm extends BaseForm
                     'for' => 'time_lang'
                 )
             ))
+            ->add('decimal_separator', 'text', array(
+                'constraints' => array(
+                    new NotBlank()
+                ),
+                'label' => Translator::getInstance()->trans('decimal separator'),
+                'label_attr' => array(
+                    'for' => 'decimal_separator'
+                )
+            ))
+            ->add('thousands_separator', 'text', array(
+                'label' => Translator::getInstance()->trans('thousands separator'),
+                'label_attr' => array(
+                    'for' => 'thousands_separator'
+                )
+            ))
+            ->add('decimals', 'text', array(
+                'constraints' => array(
+                    new NotBlank()
+                ),
+                'label' => Translator::getInstance()->trans('Sets the number of decimal points'),
+                'label_attr' => array(
+                    'for' => 'decimals'
+                )
+            ))
         ;
     }
 

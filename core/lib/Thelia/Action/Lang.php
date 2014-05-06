@@ -41,6 +41,9 @@ class Lang extends BaseAction implements EventSubscriberInterface
                 ->setCode($event->getCode())
                 ->setDateFormat($event->getDateFormat())
                 ->setTimeFormat($event->getTimeFormat())
+                ->setDecimalSeparator($event->getDecimalSeparator())
+                ->setThousandsSeparator($event->getThousandsSeparator())
+                ->setDecimals($event->getDecimals())
                 ->save();
 
             $event->setLang($lang);
@@ -69,6 +72,9 @@ class Lang extends BaseAction implements EventSubscriberInterface
             ->setLocale($event->getLocale())
             ->setDateFormat($event->getDateFormat())
             ->setTimeFormat($event->getTimeFormat())
+            ->setDecimalSeparator($event->getDecimalSeparator())
+            ->setThousandsSeparator($event->getThousandsSeparator())
+            ->setDecimals($event->getDecimals())
             ->save();
 
         $event->setLang($lang);
