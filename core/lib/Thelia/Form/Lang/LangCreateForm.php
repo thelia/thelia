@@ -101,9 +101,6 @@ class LangCreateForm extends BaseForm
                 )
             ))
             ->add('thousands_separator', 'text', array(
-                'constraints' => array(
-                    new NotBlank()
-                ),
                 'label' => Translator::getInstance()->trans('thousands separator'),
                 'label_attr' => array(
                     'for' => 'thousands_separator'
