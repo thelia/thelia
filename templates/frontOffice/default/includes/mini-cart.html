@@ -16,16 +16,14 @@
                 {loop type="cart" name="cartloop"}
                     <tr>
                         <td class="image">
-                            {ifloop rel="product-image"}
-                                {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="60"}
-                                    <img src="{$IMAGE_URL}" alt="{$TITLE}">
-                                {/loop}
-                            {/ifloop}
+                            {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="60"}
+                                <img src="{$IMAGE_URL}" alt="{$TITLE}">
+                            {/loop}
                         </td>
                         <td class="product">
-                            <h3 class="name" style="margin:0"><a href="{$URL}">
-                                    {$TITLE}
-                                </a></h3>
+                            <h3 class="name" style="margin:0">
+                                {$TITLE}
+                            </h3>
                             <a href="{url path="/cart/delete/{$ITEM_ID}"}" class="btn btn-remove" data-tip="tooltip" data-title="Delete" data-original-title=""><i class="icon-trash"></i> <span>{intl l="Remove"}</span></a>
                         </td>
                         <td class="unitprice text-center">

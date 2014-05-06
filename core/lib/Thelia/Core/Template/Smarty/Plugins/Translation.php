@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Smarty\Plugins;
@@ -30,6 +19,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class Translation extends AbstractSmartyPlugin
 {
     protected $translator;
+    protected $defaultTranslationDomain = '';
 
     public function __construct(TranslatorInterface $translator)
     {
@@ -37,34 +27,51 @@ class Translation extends AbstractSmartyPlugin
     }
 
     /**
+     * Set the default translation domain
+     *
+     * @param  array                     $params
+     * @param  \Smarty_Internal_Template $smarty
+     * @return string
+     */
+    public function setDefaultTranslationDomain($params, &$smarty)
+    {
+        $this->defaultTranslationDomain = $this->getParam($params, 'domain');
+    }
+
+    /**
      * Process translate function
      *
-     * @param  unknown $params
-     * @param  unknown $smarty
+     * @param  array                     $params
+     * @param  \Smarty_Internal_Template $smarty
      * @return string
      */
     public function translate($params, &$smarty)
     {
-        // All parameters other than 'l' are supposed to be variables. Build an array of var => value pairs
+        // All parameters other than 'l' and 'd' are supposed to be variables. Build an array of var => value pairs
         // and pass it to the translator
         $vars = array();
 
         foreach ($params as $name => $value) {
-            if ($name != 'l') $vars["%$name"] = $value;
+            if ($name != 'l' && $name != 'd') $vars["%$name"] = $value;
         }
 
-        return $this->translator->trans($this->getParam($params, 'l'), $vars);
-    }
+        return $this->translator->trans(
+            $this->getParam($params, 'l'),
+            $vars,
+            $this->getParam($params, 'd', $this->defaultTranslationDomain)
+        );
+}
 
     /**
-     * Define the various smarty plugins hendled by this class
+     * Define the various smarty plugins handled by this class
      *
-     * @return an array of smarty plugin descriptors
+     * @return SmartyPluginDescriptor[] an array of smarty plugin descriptors
      */
     public function getPluginDescriptors()
     {
         return array(
             new SmartyPluginDescriptor('function', 'intl', $this, 'translate'),
+            new SmartyPluginDescriptor('function', 'default_translation_domain', $this, 'setDefaultTranslationDomain'),
         );
     }
 }

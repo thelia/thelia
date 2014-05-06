@@ -23,8 +23,6 @@ class Order extends BaseOrder
      */
     public function preInsert(ConnectionInterface $con = null)
     {
-        $this->setRef($this->generateRef());
-
         $this->dispatchEvent(TheliaEvents::ORDER_BEFORE_CREATE, new OrderEvent($this));
 
         return true;
@@ -35,22 +33,34 @@ class Order extends BaseOrder
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        $this->setRef($this->generateRef())
+            ->save($con);
         $this->dispatchEvent(TheliaEvents::ORDER_AFTER_CREATE, new OrderEvent($this));
+    }
+
+    public function postSave(ConnectionInterface $con = null)
+    {
+        if ($this->isPaid() && null === $this->getInvoiceDate()) {
+            $this
+                ->setInvoiceDate(time())
+                ->save($con);
+        }
     }
 
     public function generateRef()
     {
-        /* order addresses are unique */
-
-        return uniqid('ORD', true);
+       return sprintf('ORD%s', str_pad($this->getId(), 12, 0, STR_PAD_LEFT));
     }
 
     /**
      * Compute this order amount.
      *
-     * @param  float $tax             (output only) returns the tax amount for this order
-     * @param  bool  $includePostage  if true, the postage cost is included to the total
-     * @param  bool  $includeDiscount if true, the discount will be included to the total
+     * The order amount amount is only avaible once the order is persisted in database.
+     * Duting invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
+     *
+     * @param  float|int $tax             (output only) returns the tax amount for this order
+     * @param  bool      $includePostage  if true, the postage cost is included to the total
+     * @param  bool      $includeDiscount if true, the discount will be included to the total
      * @return float
      */
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)

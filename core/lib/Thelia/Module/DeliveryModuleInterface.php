@@ -1,38 +1,42 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Module;
 
 use Thelia\Model\Country;
+use Thelia\Module\Exception\DeliveryException;
 
 interface DeliveryModuleInterface extends BaseModuleInterface
 {
     /**
-     * calculate and return delivery price
+     * This method is called by the Delivery  loop, to check if the current module has to be displayed to the customer.
+     * Override it to implements your delivery rules/
      *
-     * @param Country $country
+     * If you return true, the delivery method will de displayed to the customer
+     * If you return false, the delivery method will not be displayed
      *
-     * @return mixed
+     * @param Country $country the country to deliver to.
+     *
+     * @return boolean
+     */
+    public function isValidDelivery(Country $country);
+
+    /**
+     * Calculate and return delivery price in the shop's default currency
+     *
+     * @param Country $country the country to deliver to.
+     *
+     * @return float             the delivery price
+     * @throws DeliveryException if the postage price cannot be calculated.
      */
     public function getPostage(Country $country);
 }

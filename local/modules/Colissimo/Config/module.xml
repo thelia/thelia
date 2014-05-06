@@ -2,10 +2,10 @@
 <module>
     <fullnamespace>Colissimo\Colissimo</fullnamespace>
     <descriptive locale="en_US">
-        <title>colisimo</title>
+        <title>Colissimo delivery</title>
     </descriptive>
     <descriptive locale="fr_FR">
-        <title>colisimo</title>
+        <title>Livraison par Colissimo</title>
     </descriptive>
     <version>1.0</version>
     <author>

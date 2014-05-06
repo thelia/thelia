@@ -1,25 +1,15 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
+
 namespace Thelia\Controller\Front;
 
 use Symfony\Component\Routing\Router;
@@ -48,13 +38,13 @@ class BaseFrontController extends BaseController
     /**
      * Redirect to à route ID related URL
      *
-     * @param unknown                                $routeId       the route ID, as found in Config/Resources/routing/admin.xml
-     * @param array|\Thelia\Controller\Front\unknown $urlParameters the URL parametrs, as a var/value pair array
-     * @param bool                                   $referenceType
+     * @param string $routeId       the route ID, as found in Config/Resources/routing/admin.xml
+     * @param array  $urlParameters the URL parametrs, as a var/value pair array
+     * @param bool   $referenceType
      */
-    public function redirectToRoute($routeId, $urlParameters = array(), $referenceType = Router::ABSOLUTE_PATH)
+    public function redirectToRoute($routeId, array $urlParameters = [], array $routeParameters = [], $referenceType = Router::ABSOLUTE_PATH)
     {
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, array(), $referenceType), $urlParameters));
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, $routeParameters, $referenceType), $urlParameters));
     }
 
     public function checkAuth()
@@ -104,9 +94,9 @@ class BaseFrontController extends BaseController
     /**
      * Render the given template, and returns the result as an Http Response.
      *
-     * @param $templateName the complete template name, with extension
-     * @param  array                                $args   the template arguments
-     * @param  int                                  $status http code status
+     * @param  string                               $templateName the complete template name, with extension
+     * @param  array                                $args         the template arguments
+     * @param  int                                  $status       http code status
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function render($templateName, $args = array(), $status = 200)

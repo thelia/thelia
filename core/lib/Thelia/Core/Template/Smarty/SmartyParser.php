@@ -1,4 +1,14 @@
 <?php
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace Thelia\Core\Template\Smarty;
 
@@ -92,11 +102,11 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Add a template directory to the current template list
      *
-     * @param unknown $templateType      the template type (a TemplateDefinition type constant)
+     * @param int     $templateType      the template type (a TemplateDefinition type constant)
      * @param string  $templateName      the template name
      * @param string  $templateDirectory path to the template dirtectory
      * @param unknown $key               ???
-     * @param string  $unshift           ??? Etienne ?
+     * @param boolean $unshift           ??? Etienne ?
      */
     public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false)
     {
@@ -116,9 +126,9 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Return the registeted template directories for a givent template type
      *
-     * @param  unknown                  $templateType
+     * @param  int                      $templateType
      * @throws InvalidArgumentException
-     * @return multitype:
+     * @return mixed:
      */
     public function getTemplateDirectories($templateType)
     {
@@ -155,7 +165,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
         /* define config directory */
         $configDirectory = THELIA_TEMPLATE_DIR . $this->getTemplate() . '/configs';
-        $this->setConfigDir($configDirectory);
+        $this->addConfigDir($configDirectory, 0);
 
         /* add modules template directories */
         $this->addTemplateDirectory(
@@ -170,6 +180,7 @@ class SmartyParser extends Smarty implements ParserInterface
         if (isset($this->templateDirectories[$templateDefinition->getType()][$templateDefinition->getName()])) {
             foreach ($this->templateDirectories[$templateDefinition->getType()][$templateDefinition->getName()] as $key => $directory) {
                 $this->addTemplateDir($directory, $key);
+                $this->addConfigDir($directory . "/configs", $key);
             }
         }
     }
@@ -229,11 +240,28 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function render($realTemplateName, array $parameters = array())
     {
-        if (false === $this->templateExists($realTemplateName)) {
+        if (false === $this->templateExists($realTemplateName) || false === $this->checkTemplate($realTemplateName)) {
             throw new ResourceNotFoundException(Translator::getInstance()->trans("Template file %file cannot be found.", array('%file' => $realTemplateName)));
         }
 
         return $this->internalRenderer('file', $realTemplateName, $parameters);
+
+    }
+
+    private function checkTemplate($fileName)
+    {
+        $templates = $this->getTemplateDir();
+
+        $found = true;
+        foreach ($templates as $key => $value) {
+            $absolutePath = rtrim(realpath(dirname($value.$fileName)), "/");
+            $templateDir =  rtrim(realpath($value), "/");
+            if (!empty($absolutePath) && strpos($absolutePath, $templateDir) !== 0) {
+                $found = false;
+            }
+        }
+
+       return $found;
     }
 
     /**

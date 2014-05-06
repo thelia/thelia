@@ -217,7 +217,7 @@ class OrderTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', true, 45, null);
+        $this->addColumn('REF', 'Ref', 'VARCHAR', false, 45, null);
         $this->addForeignKey('CUSTOMER_ID', 'CustomerId', 'INTEGER', 'customer', 'ID', true, null, null);
         $this->addForeignKey('INVOICE_ORDER_ADDRESS_ID', 'InvoiceOrderAddressId', 'INTEGER', 'order_address', 'ID', true, null, null);
         $this->addForeignKey('DELIVERY_ORDER_ADDRESS_ID', 'DeliveryOrderAddressId', 'INTEGER', 'order_address', 'ID', true, null, null);

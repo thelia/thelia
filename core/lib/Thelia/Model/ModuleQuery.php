@@ -25,6 +25,7 @@ class ModuleQuery extends BaseModuleQuery
         if (null === self::$activated) {
             self::$activated = self::create()
                 ->filterByActivate(1)
+                ->orderByPosition()
                 ->find();
         }
 

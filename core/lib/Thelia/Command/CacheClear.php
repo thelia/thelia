@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Command;
@@ -53,6 +42,12 @@ class CacheClear extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 "do not clear the assets cache in the web space"
             )
+            ->addOption(
+                'with-images',
+                null,
+                InputOption::VALUE_NONE,
+                'clear images generated in web/cache directory'
+            )
         ;
     }
 
@@ -62,8 +57,13 @@ class CacheClear extends ContainerAwareCommand
         $cacheDir = $this->getContainer()->getParameter("kernel.cache_dir");
 
         $this->clearCache($cacheDir, $output);
+
         if (!$input->getOption("without-assets")) {
             $this->clearCache(THELIA_WEB_DIR . "assets", $output);
+        }
+
+        if ($input->getOption('with-images')) {
+            $this->clearCache(THELIA_CACHE_DIR, $output);
         }
 
     }

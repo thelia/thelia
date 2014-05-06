@@ -5,11 +5,13 @@ Thelia
 ------
 [![Build Status](https://travis-ci.org/thelia/thelia.png?branch=master)](https://travis-ci.org/thelia/thelia) [![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia) [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
 
-[Thelia](http://thelia.net/v2) is an open source tool for creating e-business websites and managing online content. This software is published under GPL.
+[Thelia](http://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under LGPL.
 
-Here is the most recent developed code for the next major version (v2). You can download this version for testing or having a look on the code (or anything you wish, respecting GPL). See http://thelia.net/v2 web site for more information.
+This is the new major version of Thelia.
 
-Most part of the code can possibly change, a large part will be refactor soon, graphical setup does not exist yet.
+You can download this version and have a try or take a look at the  source code (or anything you wish, respecting LGPL).  See http://thelia.net/ web site for more information.
+
+A repository containing all thelia modules is available at this address : https://github.com/thelia-modules
 
 Requirements
 ------------
@@ -34,7 +36,7 @@ If you use Mac OSX, it still doesn't use php 5.4 as default php version... There
 * use last MAMP version and put the php bin directory in your path:
 
 ```bash
-export PATH=/Applications/MAMP/bin/php/php5.4.x/bin/:$PATH
+export PATH=/Applications/MAMP/bin/php/php5.5.x/bin/:$PATH
 ```
 
 * configure a complete development environment : http://php-osx.liip.ch/
@@ -65,15 +67,36 @@ SET @@GLOBAL.sql_mode='NO_ENGINE_SUBSTITUTION', @@SESSION.sql_mode='NO_ENGINE_SU
 
 For more information on sql_mode you can consult the [MySQL doc](http://dev.mysql.com/doc/refman/5.0/fr/server-sql-mode.html "sql Mode")
 
-Installation
-------------
+## Download Thelia 2
 
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.0.0-RC1
+$ php composer.phar create-project thelia/thelia path/ 2.0.0
 ```
 
-Finish the installation using cli tools :
+## Install it
+
+You can install Thelia by two different way
+
+### Using install wizard
+
+Installing thelia with the web install wizard allow to create an administrator, add some informations about your shop, etc
+
+First of all, you have to configure a vhost as describe in [configuration](http://doc.thelia.net/en/documentation/configuration.html) section.
+
+The install wizard in accessible with your favorite browser :
+
+``` bash
+http://yourdomain.tld/[/subdomain_if_needed]/install
+```
+
+For example, I have thelia downloaded at http://thelia.net and my vhost is correctly configured, I have to reach this address :
+
+``` bash
+http://thelia.net/install
+```
+
+### Using cli tools
 
 ``` bash
 $ php Thelia thelia:install
@@ -87,6 +110,12 @@ Documentation
 Thelia documentation is available at http://doc.thelia.net
 
 The documentation is also in beta version and some part can be obsolete cause to some refactor.
+
+
+Roadmap
+-------
+
+The Roadmap is available at http://thelia.net/community/roadmap
 
 
 Contribute

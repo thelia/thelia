@@ -10,40 +10,51 @@
 
     <div id="wrapper" class="container">
 
+        {loop type="module" id="$delivery_module_id" active="*" name="module.name" backend_context="1"}
+
         <ul class="breadcrumb">
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
-            <li><a href="{url path='/admin/configuration/shipping_zones'}">{intl l="Shipping zones"}</a></li>
-            <li>{intl l='Editing shipping zone "%name"' name="{$TITLE}"}</li>
+            <li><a href="{url path='/admin/configuration/shipping_zones'}">{intl l="Shipping configuration"}</a></li>
+            <li>{intl l='Editing shipping configuration for module "%name"' name="{$TITLE}"}</li>
         </ul>
 
         <div class="row">
             <div class="col-md-12">
                 <div class="general-block-decorator">
-                    
-                    <div class="col-md-12 title title-without-tabs">
-                        {intl l='Edit shipping zone %title' title=$TITLE}
+
+                    <div class="title title-without-tabs">
+                        <div class="row">
+                            <div class="col-md-10">
+                                {intl l='Shipping configuration of delivery module "%title"' title={$TITLE}}
+                            </div>
+                            <div class="col-md-2 text-right">
+                                <a href="{url path='/admin/configuration/shipping_zones'}" class="btn btn-sm btn-default">{intl l='Close'} <span class="glyphicon glyphicon-remove"></span></a>
+                            </div>
+                        </div>
                     </div>
+
 
                     <div class="form-container clearfix">
                         <div class="col-md-4">
+                            {ifloop rel="area.module.not_associated"}
                             {form name="thelia.shopping_zone_area"}
                             <form method="POST" action="{url path="/admin/configuration/shipping_zones/area/add"}">
                                 {form_hidden_fields form=$form}
 
                                 {form_field form=$form field='success_url'}
-                                    <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/{$shipping_zones_id}"}" /> {* the url the user is redirected to on login success *}
+                                    <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/{$delivery_module_id}"}" /> {* the url the user is redirected to on login success *}
                                 {/form_field}
 
                                 {form_field form=$form field='shipping_zone_id'}
-                                <input type="hidden" name="{$name}" value="{$shipping_zones_id}" />
+                                <input type="hidden" name="{$name}" value="{$delivery_module_id}" />
                                 {/form_field}
 
                                 {form_field form=$form field='area_id'}
                                 <label class="control-label" for="{$label_attr.for}">{$label}</label>
                                 <div class="input-group">                                    
                                     <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
-                                        {loop name="area.module.not_associated" type="area" without_zone=$shipping_zones_id}
+                                        {loop name="area.module.not_associated" type="area" without_zone=$delivery_module_id}
                                         <option value="{$ID}">{$NAME}</option>
                                         {/loop}
                                     </select>
@@ -54,6 +65,12 @@
                                 {/form_field}
                             </form>
                             {/form}
+                            {/ifloop}
+                            {elseloop rel="area.module.not_associated"}
+                                <div class="alert alert-info">
+                                    {intl l="This delivery module handles all shipping zones."}
+                                </div>
+                            {/elseloop}
                         </div>
 
                         <div class="col-md-8">
@@ -61,21 +78,30 @@
                                 <table class="table table-striped table-condensed">
                                     <thead>
                                         <tr>
-                                            <th>{intl l="Zones"}</th>
-                                            <th>{intl l="Actions"}</th>
+                                            <th>{intl l="Shipping zone"}</th>
+                                            <th class="text-center">{intl l="Actions"}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {loop type="area" name="area.module.associated" with_zone=$shipping_zones_id}
+                                        {loop type="area" name="area.module.associated" with_zone=$delivery_module_id}
                                         <tr>
                                             <td>{$NAME}</td>
-                                            <td>
+                                            <td class="text-center">
                                                 <a class="btn btn-default btn-xs delete-zone-area" title="{intl l='Delete this zone'}"  href="#delete_zone_dialog" data-id="{$ID}" data-toggle="modal">
                                                     <span class="glyphicon glyphicon-trash"></span>
                                                 </a>
                                             </td>
                                         </tr>
                                         {/loop}
+                                        {elseloop rel="area.module.associated"}
+                                            <tr>
+                                                <td colspan="2">
+                                                    <div class="text-center">
+                                                        {intl l="There are no shipping zones attached to this module."}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {/elseloop}
                                     </tbody>
                                 </table>
                             </div>
@@ -86,6 +112,7 @@
             </div>
         </div>
 
+        {/loop}
     </div>
 </div>  
 
@@ -96,17 +123,17 @@
             {form_hidden_fields form=$form}
 
             {form_field form=$form field='success_url'}
-                <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/{$shipping_zones_id}"}" /> {* the url the user is redirected to on login success *}
+                <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/{$delivery_module_id}"}" /> {* the url the user is redirected to on login success *}
             {/form_field}
 
             {form_field form=$form field='shipping_zone_id'}
-                <input type="hidden" name="{$name}" value="{$shipping_zones_id}" />
+                <input type="hidden" name="{$name}" value="{$delivery_module_id}" />
             {/form_field}
 
             {form_field form=$form field='area_id'}
                 <input type="hidden" name="{$name}" value="" id="shipping-zone-id-delete" />
             {/form_field}
-
+            {module_include location='zone_delete_form'}
         {/form}
     {/capture}
 

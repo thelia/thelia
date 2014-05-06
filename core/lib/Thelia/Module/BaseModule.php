@@ -1,25 +1,13 @@
 <?php
-
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Module;
@@ -29,15 +17,20 @@ use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Thelia\Model\Map\ModuleTableMap;
-use Thelia\Model\ModuleI18nQuery;
-use Thelia\Model\Map\ModuleImageTableMap;
-use Thelia\Model\ModuleI18n;
-use Thelia\Tools\Image;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Exception\ModuleException;
+use Thelia\Model\Cart;
+use Thelia\Model\Country;
+use Thelia\Model\Map\ModuleImageTableMap;
+use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
+use Thelia\Model\ModuleI18n;
+use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\ModuleImage;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\Order;
+use Thelia\TaxEngine\TaxEngine;
+use Thelia\Tools\Image;
 
 class BaseModule extends ContainerAware implements BaseModuleInterface
 {
@@ -124,8 +117,18 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         $this->request = $request;
     }
 
+    /**
+     * @return \Thelia\Core\HttpFoundation\Request the request.
+     *
+     * @throws \RuntimeException
+     */
     public function getRequest()
     {
+        if ($this->hasRequest() === false) {
+            // Try to get request from container.
+            $this->setRequest($this->getContainer()->get('request'));
+        }
+
         if ($this->hasRequest() === false) {
             throw new \RuntimeException("Sorry, the request is not available in this context");
         }
@@ -152,6 +155,12 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         return $this->dispatcher;
     }
 
+    /**
+     * Sets a module titles for various languages
+     *
+     * @param Module $module the module.
+     * @param array  $titles an associative array of locale => title_string
+     */
     public function setTitle(Module $module, $titles)
     {
         if (is_array($titles)) {
@@ -173,6 +182,19 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         }
     }
 
+    /**
+     * Ensure the proper deployment of the module's images.
+     *
+     * TODO : this method does not take care of internationalization. This is a bug.
+     *
+     * @param Module              $module     the module
+     * @param string              $folderPath the image folder path
+     * @param ConnectionInterface $con
+     *
+     * @throws \Thelia\Exception\ModuleException
+     * @throws \Exception
+     * @throws \UnexpectedValueException
+     */
     public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null)
     {
         try {
@@ -181,13 +203,14 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
             throw $e;
         }
         if (null === $con) {
-            $con = \Propel\Runtime\Propel::getConnection(
+            $con = Propel::getConnection(
                 ModuleImageTableMap::DATABASE_NAME
             );
         }
 
         /* browse the directory */
         $imagePosition = 1;
+        /** @var \DirectoryIterator $directoryContent */
         foreach ($directoryBrowser as $directoryContent) {
             /* is it a file ? */
             if ($directoryContent->isFile()) {
@@ -263,8 +286,72 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     }
 
     /**
+     * Check if this module is the payment module for a given order
      *
-     * This method allow adding new compilers to Thelia container
+     * @param  Order $order an order
+     * @return bool  true if this module is the payment module for the given order.
+     */
+    public function isPaymentModuleFor(Order $order)
+    {
+        $model = $this->getModuleModel();
+
+        return $order->getPaymentModuleId() == $model->getId();
+    }
+
+    /**
+     * Check if this module is the delivery module for a given order
+     *
+     * @param  Order $order an order
+     * @return bool  true if this module is the delivery module for the given order.
+     */
+    public function isDeliveryModuleFor(Order $order)
+    {
+        $model = $this->getModuleModel();
+
+        return $order->getDeliveryModuleId() == $model->getId();
+    }
+
+    /**
+     * A convenient method to get the current order total, with or without tax, discount or postage.
+     * This method operates on the order currently in the user's session, and should not be used to
+     * get the total amount of an order already stored in the database. For such orders, use
+     * Order::getTotalAmount() method.
+     *
+     * @param bool $with_tax      if true, to total price will include tax amount
+     * @param bool $with_discount if true, the total price will include discount, if any
+     * @param bool $with_postage  if true, the total price will include the delivery costs, if any.
+     *
+     * @return float|int the current order amount.
+     */
+    public function getCurrentOrderTotalAmount($with_tax = true, $with_discount = true, $with_postage = true)
+    {
+        /** @var Session $session */
+        $session = $this->getRequest()->getSession();
+
+        /** @var Cart $cart */
+        $cart = $session->getCart();
+
+        /** @var Order $order */
+        $order = $session->getOrder();
+
+        /** @var TaxEngine $taxEngine */
+        $taxEngine = $this->getContainer()->get("thelia.taxengine");
+
+        /** @var Country $country */
+        $country = $taxEngine->getDeliveryCountry();
+
+        $amount = $with_tax ? $cart->getTaxedAmount($country, $with_discount) : $cart->getTotalAmount($with_discount);
+
+        if ($with_postage) {
+            $amount += $order->getPostage();
+        }
+
+        return $amount;
+    }
+
+    /**
+     *
+     * This method adds new compilers to Thelia container
      *
      * You must return an array. This array can contain :
      *  - arrays
@@ -302,33 +389,66 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         return array();
     }
 
+    /**
+     * This method is called when the plugin is installed for the first time, using
+     * zip upload method.
+     *
+     * @param ConnectionInterface $con
+     */
     public function install(ConnectionInterface $con = null)
     {
-        // Implement this method to do something useful.
+        // Override this method to do something useful.
     }
 
+    /**
+     * This method is called before the module activation, and may prevent it by returning false.
+     *
+     * @param ConnectionInterface $con
+     *
+     * @return bool true to continue module activation, false to prevent it.
+     */
     public function preActivation(ConnectionInterface $con = null)
     {
+        // Override this method to do something useful.
         return true;
     }
 
+    /**
+     * This method is called just after the module was successfully activated.
+     *
+     * @param ConnectionInterface $con
+     */
     public function postActivation(ConnectionInterface $con = null)
     {
-        // Implement this method to do something useful.
+        // Override this method to do something useful.
     }
 
+    /**
+     * This method is called before the module de-activation, and may prevent it by returning false.
+     *
+     * @param  ConnectionInterface $con
+     * @return bool                true to continue module de-activation, false to prevent it.
+     */
     public function preDeactivation(ConnectionInterface $con = null)
     {
+        // Override this method to do something useful.
         return true;
     }
 
     public function postDeactivation(ConnectionInterface $con = null)
     {
-        // Implement this method to do something useful.
+        // Override this method to do something useful.
     }
 
+    /**
+     * This method is called just before the deletion of the module, giving the module an opportunity
+     * to delete its data.
+     *
+     * @param ConnectionInterface $con
+     * @param bool                $deleteModuleData if true, the module should remove all its data from the system.
+     */
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
     {
-        // Implement this method to do something useful.
+        // Override this method to do something useful.
     }
 }

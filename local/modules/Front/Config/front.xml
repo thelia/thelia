@@ -55,12 +55,17 @@
     </route>
 
     <route id="customer.password.change.view" path="/account/password" methods="get">
-        <default key="_controller">Front\Controller\DefaultController::noAction</default>
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">account-password</default>
     </route>
 
     <route id="customer.order.pdf.delivery" path="/account/order/pdf/delivery/{order_id}">
         <default key="_controller">Front\Controller\OrderController::generateDeliveryPdf</default>
+        <requirement key="order_id">\d+</requirement>
+    </route>
+
+    <route id="customer.order.pdf.invoice" path="/account/order/pdf/invoice/{order_id}">
+        <default key="_controller">Front\Controller\OrderController::generateInvoicePdf</default>
         <requirement key="order_id">\d+</requirement>
     </route>
     <!-- end customer routes -->
@@ -118,6 +123,11 @@
         <default key="_controller">Front\Controller\CartController::changeItem</default>
         <default key="_view">cart</default>
     </route>
+
+    <route id="cart.update.country" path="/cart/country">
+        <default key="_controller">Front\Controller\CartController::changeCountry</default>
+        <default key="_view">cart</default>
+    </route>
     <!-- end cart routes -->
 
     <!-- order management process -->
@@ -158,6 +168,11 @@
         <default key="_controller">Front\Controller\OrderController::orderPlaced</default>
         <default key="_view">order-placed</default>
     </route>
+
+    <route id="order.failed" path="/order/failed/{order_id}/{message}">
+        <default key="_controller">Front\Controller\OrderController::orderFailed</default>
+        <default key="_view">order-failed</default>
+    </route>
     <!-- end order management process -->
 
     <!-- contact management -->
@@ -178,6 +193,21 @@
         <default key="_view">newsletter</default>
     </route>
     <!-- end newsletter management -->
+
+    <!-- sitemap generator -->
+    <route id="sitemap.process" path="/sitemap">
+        <default key="_controller">Front\Controller\SitemapController::generateAction</default>
+    </route>
+    <!-- end sitemap generator -->
+
+    <!-- feed generator -->
+    <route id="feed.process" path="/feed/{context}/{lang}/{id}">
+        <default key="_controller">Front\Controller\FeedController::generateAction</default>
+        <default key="context">catalog</default>
+        <default key="lang"></default>
+        <default key="id"></default>
+    </route>
+    <!-- end feed generator -->
 
     <!-- Default Route -->
     <route id="default" path="/{_view}">

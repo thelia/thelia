@@ -1,25 +1,14 @@
 <?php
-/**********************************************************************************/
-/*                                                                                */
-/*      Thelia	                                                                  */
-/*                                                                                */
-/*      Copyright (c) OpenStudio                                                  */
-/*      email : info@thelia.net                                                   */
-/*      web : http://www.thelia.net                                               */
-/*                                                                                */
-/*      This program is free software; you can redistribute it and/or modify      */
-/*      it under the terms of the GNU General Public License as published by      */
-/*      the Free Software Foundation; either version 3 of the License             */
-/*                                                                                */
-/*      This program is distributed in the hope that it will be useful,           */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of            */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             */
-/*      GNU General Public License for more details.                              */
-/*                                                                                */
-/*      You should have received a copy of the GNU General Public License         */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.      */
-/*                                                                                */
-/**********************************************************************************/
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace Thelia\Condition;
 
@@ -55,35 +44,35 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback((array($this, 'callbackI18n'))));
 
         $actual = Operators::getI18n($stubTranslator, Operators::INFERIOR);
-        $expected = 'inferior to';
+        $expected = 'Less than';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::INFERIOR_OR_EQUAL);
-        $expected = 'inferior or equal to';
+        $expected = 'Less than or equals';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::EQUAL);
-        $expected = 'equal to';
+        $expected = 'Equals';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::SUPERIOR_OR_EQUAL);
-        $expected = 'superior or equal to';
+        $expected = 'Greater than or equals';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::SUPERIOR);
-        $expected = 'superior to';
+        $expected = 'Greater than';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::DIFFERENT);
-        $expected = 'different from';
+        $expected = 'Not equals';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::IN);
-        $expected = 'in';
+        $expected = 'In';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::OUT);
-        $expected = 'not in';
+        $expected = 'Not in';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, 'unexpected operator');

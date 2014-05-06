@@ -16,7 +16,7 @@
         			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                     <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
                     <li><a href="{url path='/admin/configuration/templates'}">{intl l="Templates"}</a></li>
-                    <li>{intl l='Editing template "%name"' name=$NAME}</li>
+                    <li>{intl l='Editing template "%name"' name={$NAME}}</li>
                 </ul>
 
         		<div class="row">
@@ -67,7 +67,7 @@
                                 <div class="col-md-6">
                                        <div class="well well-sm">
 	                                    <p class="title title-without-tabs">{intl l='Attributes'}</p>
-	                                    <p>Manage attributes included in this product templates</p>
+	                                    <p>{intl l="Manage attributes included in this product template"}</p>
 
 	                                    <div id="attribute_list_management">
 	                                       <div class="loading"></div>
@@ -78,7 +78,7 @@
                                 <div class="col-md-6">
                                     <div class="well well-sm">
 	                                    <p class="title title-without-tabs">{intl l='Features'}</p>
-	                                    <p>Manage features included in this product templates</p>
+	                                    <p>{intl l="Manage features included in this product template"}</p>
 
                                         <div id="feature_list_management">
                                            <div class="loading"></div>
@@ -97,7 +97,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="alert alert-error">
-                            {intl l="Sorry, template ID=%id was not found." id=$template_id}
+                            {intl l="Sorry, template ID=%id was not found." id={$template_id}}
                         </div>
                     </div>
                 </div>

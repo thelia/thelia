@@ -1,28 +1,18 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Smarty\Assets;
 
+use Thelia\Log\Tlog;
 use Thelia\Tools\URL;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
 
@@ -119,6 +109,27 @@ class SmartyAssetsManager
 
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
 
+        // if it's not a custom template and looking for a different origin (e.g. module)
+        // we first check if the asset is present in the default "source" (template)
+        // if not we take the default asset from the assetOrigin (module)
+        if (! $webAssetTemplate && $assetOrigin !== "0") {
+            if (isset($templateDirectories[$templateDefinition->getName()]["0"])) {
+                if (file_exists($templateDirectories[$templateDefinition->getName()]["0"] . DS . $file)) {
+                    // the file exists, we take the default origin
+                    $assetOrigin = "0";
+                }
+            }
+        }
+
+        if (! isset($templateDirectories[$templateDefinition->getName()][$assetOrigin])) {
+            // we try with the default origin
+            if (! $webAssetTemplate && $assetOrigin !== "0") {
+                $assetOrigin = "0";
+            } else {
+                throw new \Exception("Failed to get real path of '/".dirname($file)."'");
+            }
+        }
+
         if (! isset($templateDirectories[$templateDefinition->getName()][$assetOrigin])) {
             throw new \Exception("Failed to get real path of '/".dirname($file)."'");
         }
@@ -130,17 +141,21 @@ class SmartyAssetsManager
             $file = str_replace('/', DS, $file);
         }
 
-        $url = $this->assetsManager->processAsset(
-            $assetSource . DS . $file,
-            $assetSource . DS . self::$assetsDirectory,
-            $this->web_root . $this->path_relative_to_web_root,
-            $templateDefinition->getPath(),
-            $assetOrigin,
-            URL::getInstance()->absoluteUrl($this->path_relative_to_web_root, null, URL::PATH_TO_FILE /* path only */),
-            $assetType,
-            $filters,
-            $debug
-        );
+        $url = "";
+        // test if file exists before running the process
+        if (file_exists($assetSource . DS . $file)) {
+            $url = $this->assetsManager->processAsset(
+                $assetSource . DS . $file,
+                $assetSource . DS . self::$assetsDirectory,
+                $this->web_root . $this->path_relative_to_web_root,
+                $templateDefinition->getPath(),
+                $assetOrigin,
+                URL::getInstance()->absoluteUrl($this->path_relative_to_web_root, null, URL::PATH_TO_FILE /* path only */),
+                $assetType,
+                $filters,
+                $debug
+            );
+        }
 
         return $url;
     }
@@ -149,10 +164,13 @@ class SmartyAssetsManager
     {
         // Opening tag (first call only)
         if ($repeat) {
-            $url = $this->computeAssetUrl($assetType, $params, $template);
-
+            $url = "";
+            try {
+                $url = $this->computeAssetUrl($assetType, $params, $template);
+            } catch (\Exception $ex) {
+                Tlog::getInstance()->addWarning("Failed to get real path of " . $params['file']);
+            }
             $template->assign('asset_url', $url);
-
         } elseif (isset($content)) {
             return $content;
         }

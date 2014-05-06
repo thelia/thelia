@@ -1,25 +1,15 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
+
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -70,8 +60,12 @@ class ProductCreationForm extends BaseForm
                 ->add("price", "number", array(
                     "constraints" => array(new NotBlank()),
                     "label"      => Translator::getInstance()->trans("Product base price excluding taxes *"),
-                    "label_attr" => array("for" => "price_field")
+                    "label_attr" => array("for" => "price_without_tax")
                 ))
+               ->add("tax_price", "number", array(
+                       "label"      => Translator::getInstance()->trans("Product base price with taxes"),
+                       "label_attr" => array("for" => "price_with_tax")
+                   ))
                 ->add("currency", "integer", array(
                     "constraints" => array(new NotBlank()),
                     "label"      => Translator::getInstance()->trans("Price currency *"),
@@ -83,8 +77,7 @@ class ProductCreationForm extends BaseForm
                     "label_attr" => array("for" => "tax_rule_field")
                 ))
                 ->add("weight", "number", array(
-                    "constraints" => array(new NotBlank()),
-                    "label"      => Translator::getInstance()->trans("Weight *"),
+                    "label"      => Translator::getInstance()->trans("Weight"),
                     "label_attr" => array("for" => "weight_field")
                 ))
             ;

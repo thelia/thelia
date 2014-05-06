@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Order;
@@ -40,6 +29,8 @@ class OrderEvent extends ActionEvent
     protected $status = null;
     protected $deliveryRef = null;
 
+    protected $cartItemId = null;
+
     /**
      * @var Response
      */
@@ -59,6 +50,24 @@ class OrderEvent extends ActionEvent
     public function setOrder(Order $order)
     {
         $this->order = $order;
+    }
+
+    /**
+     * @param null $cartItemId
+     */
+    public function setCartItemId($cartItemId)
+    {
+        $this->cartItemId = $cartItemId;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getCartItemId()
+    {
+        return $this->cartItemId;
     }
 
     /**
@@ -118,7 +127,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param $status
+     * @param int $status
      */
     public function setStatus($status)
     {

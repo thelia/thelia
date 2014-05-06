@@ -1,31 +1,20 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Currency as CurrencyModel;
 
@@ -98,18 +87,14 @@ class Currency extends BaseAction implements EventSubscriberInterface
     {
 
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
+            // Reset default status
+            CurrencyQuery::create()->filterByByDefault(true)->update(array('ByDefault' => false));
 
-            if ($currency->getByDefault() != $event->getIsDefault()) {
-
-                // Reset default status
-                CurrencyQuery::create()->filterByByDefault(true)->update(array('ByDefault' => false));
-
-                $currency
-                    ->setDispatcher($event->getDispatcher())
-                    ->setByDefault($event->getIsDefault())
-                    ->save()
-                ;
-            }
+            $currency
+                ->setDispatcher($event->getDispatcher())
+                ->setByDefault($event->getIsDefault())
+                ->save()
+            ;
 
             $event->setCurrency($currency);
         }
@@ -134,7 +119,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updateRates(EventDispatcherInterface $dispatcher)
+    public function updateRates(ActionEvent $event)
     {
         $rates_url = ConfigQuery::read('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml');
 
@@ -148,7 +133,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
                 if (null !== $currency = CurrencyQuery::create()->findOneByCode($code)) {
                     $currency
-                        ->setDispatcher($dispatcher)
+                        ->setDispatcher($event->getDispatcher())
                         ->setRate($rate)
                         ->save()
                     ;

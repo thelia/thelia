@@ -19,6 +19,12 @@ GNU General Public License : http://www.gnu.org/licenses/
 
 {* Declare assets directory, relative to template base directory *}
 {declare_assets directory='assets'}
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='fo.default'}
+
+{* -- Define some stuff for Smarty ------------------------------------------ *}
+{config_load file='variables.conf'}
+
 {block name="no-return-functions"}{/block}
 {assign var="store_name" value="{config key="store_name"}"}
 {if not $store_name}{assign var="store_name" value="{intl l='Thelia V2'}"}{/if}
@@ -58,6 +64,11 @@ GNU General Public License : http://www.gnu.org/licenses/
     {images file='assets/img/favicon.ico'}<link rel="shortcut icon" type="image/x-icon" href="{$asset_url}">{/images}
     {images file='assets/img/favicon.png'}<link rel="icon" type="image/png" href="{$asset_url}" />{/images}
 
+    {* Feeds *}
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}" href="{url path="/feed/catalog/{lang attr="locale"}"}" />
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All contents'}" href="{url path="/feed/content/{lang attr="locale"}"}" />
+    {block name="feeds"}{/block}
+
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}
     <!--[if lt IE 9]>
     <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -92,7 +103,7 @@ GNU General Public License : http://www.gnu.org/licenses/
             <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="{intl l="Main Navigation"}">
                 {nocache}
                 <ul class="nav navbar-nav navbar-cart navbar-right">
-                    {loop type="auth" name="customer_info_block" role="CUSTOMER" context="front"}
+                    {loop type="auth" name="customer_info_block" role="CUSTOMER"}
                         <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
                         <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
                     {/loop}
@@ -256,7 +267,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                 {loop name="footer_links" type="content" folder="2"}
                                     <li><a href="{$URL}">{$TITLE}</a></li>
                                 {/loop}
-                                {loop type="auth" name="customer_is_logged" role="CUSTOMER" context="front"}
+                                {loop type="auth" name="customer_is_logged" role="CUSTOMER"}
                                     <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
                                     <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
                                 {/loop}

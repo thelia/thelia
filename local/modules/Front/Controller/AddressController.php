@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Front\Controller;
+use Front\Front;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\Address\AddressEvent;
@@ -78,9 +79,9 @@ class AddressController extends BaseFrontController
             $this->redirectSuccess($addressCreate);
 
         } catch (FormValidationException $e) {
-            $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
+            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (\Exception $e) {
-            $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
+            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
 
         if ($message !== false) {
@@ -138,9 +139,9 @@ class AddressController extends BaseFrontController
 
             $this->redirectSuccess($addressUpdate);
         } catch (FormValidationException $e) {
-            $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
+            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (\Exception $e) {
-            $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
+            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
         $this->getParserContext()->set("address_id", $address_id);
         if ($message !== false) {
@@ -182,7 +183,6 @@ class AddressController extends BaseFrontController
         }
 
         \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during address deletion : %s', $error_message));
-
 
         // If Ajax Request
         if ($this->getRequest()->isXmlHttpRequest()) {

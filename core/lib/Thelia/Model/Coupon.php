@@ -64,7 +64,8 @@ class Coupon extends BaseCoupon
      */
     public function createOrUpdate($code, $title, array $effects, $type, $isRemovingPostage, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $defaultSerializedRule, $locale = null)
     {
-        $this->setCode($code)
+        $this
+            ->setCode($code)
             ->setType($type)
             ->setEffects($effects)
             ->setIsRemovingPostage($isRemovingPostage)
@@ -72,8 +73,9 @@ class Coupon extends BaseCoupon
             ->setExpirationDate($expirationDate)
             ->setIsAvailableOnSpecialOffers($isAvailableOnSpecialOffers)
             ->setIsCumulative($isCumulative)
-            ->setMaxUsage($maxUsage);
-        $this->setTitle($title)
+            ->setMaxUsage($maxUsage)
+            ->setLocale($locale)
+            ->setTitle($title)
             ->setShortDescription($shortDescription)
             ->setDescription($description);
 
@@ -82,21 +84,7 @@ class Coupon extends BaseCoupon
             $this->setSerializedConditions($defaultSerializedRule);
         }
 
-        // Set object language (i18n)
-        if (!is_null($locale)) {
-            $this->setLocale($locale);
-        }
-
-        $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
-        $con->beginTransaction();
-        try {
-            $this->save($con);
-            $con->commit();
-
-        } catch (\Exception $e) {
-            $con->rollback();
-            throw $e;
-        }
+        $this->save();
     }
 
     /**
@@ -116,15 +104,7 @@ class Coupon extends BaseCoupon
             $this->setLocale($locale);
         }
 
-        $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
-        $con->beginTransaction();
-        try {
-            $this->save($con);
-            $con->commit();
-        } catch (\Exception $e) {
-            $con->rollback();
-            throw $e;
-        }
+        $this->save();
     }
 
     /**

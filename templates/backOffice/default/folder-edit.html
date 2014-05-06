@@ -20,7 +20,7 @@
             <div class="col-md-12 general-block-decorator">
                 <div class="row">
                     <div class="col-md-7 title">
-						{intl l='Edit folder %title' title=$TITLE}
+						{intl l='Edit folder %title' title={$TITLE}}
 		            </div>
 
                     <div class="col-md-5 actions">
@@ -152,13 +152,7 @@
                                     }
                                 </div>
 
-                                {module_include location='folder-edit' countvar='module_count'}
-
-                                {if $countvar == 0}
-                                    <div class="alert alert-info">
-                                        {intl l="There is currently no active module here."}
-                                    </div>
-                                {/if}
+                                {include file="includes/module-tab-content.html" location="folder-edit"}
 		                    </div>
 		                 </div>
                     </div>
@@ -232,7 +226,7 @@
                 });
             });
 
-            // Initialize folder (id={$folder_id}) select value
+            // Initialize folder select value
              {if $folder_id != 0}
                  $('#folder_id').val("{$folder_id}").change();
              {/if}

@@ -1,25 +1,15 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
@@ -88,6 +78,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         try {
             $skeletonDir = str_replace("/", DIRECTORY_SEPARATOR, THELIA_ROOT . "/core/lib/Thelia/Command/Skeleton/Module/");
 
+            // config.xml file
             $fs->copy($skeletonDir . "config.xml", $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "config.xml");
 
             $moduleContent = file_get_contents($skeletonDir . "module.xml");
@@ -97,6 +88,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
             file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "module.xml", $moduleContent);
 
+            // PHP Class template
             $classContent = file_get_contents($skeletonDir . "Class.php.template");
 
             $classContent = str_replace("%%CLASSNAME%%", $this->module, $classContent);
@@ -104,11 +96,31 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
             file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . $this->module.".php", $classContent);
 
+            // schema.xml file
             $schemaContent = file_get_contents($skeletonDir . "schema.xml");
 
             $schemaContent = str_replace("%%NAMESPACE%%", $this->module, $schemaContent);
 
             file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "schema.xml", $schemaContent);
+
+            // routing.xml file
+            $routingContent = file_get_contents($skeletonDir . "routing.xml");
+
+            $routingContent = str_replace("%%NAMESPACE%%", $this->module, $routingContent);
+            $routingContent = str_replace("%%CLASSNAME_LOWER%%", strtolower($this->module), $routingContent);
+
+            file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "routing.xml", $routingContent);
+
+            // I18n sample files
+            $fs->copy(
+                $skeletonDir . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "fr_FR.php",
+                $this->moduleDirectory . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "fr_FR.php"
+            );
+
+            $fs->copy(
+                $skeletonDir . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "en_US.php",
+                $this->moduleDirectory . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "en_US.php"
+            );
         } catch (\Exception $ex) {
             $fs->remove($this->moduleDirectory);
 

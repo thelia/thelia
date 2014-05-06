@@ -22,12 +22,11 @@
 /*************************************************************************************/
 namespace Front\Controller;
 
+use Front\Front;
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Cart\CartTrait;
 use Thelia\Controller\Front\BaseFrontController;
-use Thelia\Core\Event\PdfEvent;
-use Thelia\Core\HttpFoundation\Response;
-use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
@@ -39,7 +38,7 @@ use Thelia\Form\OrderPayment;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
-use Thelia\Model\Base\OrderQuery;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
@@ -104,11 +103,11 @@ class OrderController extends BaseFrontController
             $this->redirectToRoute("order.invoice");
 
         } catch (FormValidationException $e) {
-            $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
+            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
-            $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
+            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
 
         if ($message !== false) {
@@ -160,11 +159,11 @@ class OrderController extends BaseFrontController
             $this->redirectToRoute("order.payment.process");
 
         } catch (FormValidationException $e) {
-            $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
+            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
-            $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
+            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
 
         if ($message !== false) {
@@ -202,7 +201,7 @@ class OrderController extends BaseFrontController
 
         if (null !== $placedOrder && null !== $placedOrder->getId()) {
             /* order has been placed */
-            if($orderEvent->hasResponse()) {
+            if ($orderEvent->hasResponse()) {
                 return $orderEvent->getResponse();
             } else {
                 $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute('order.placed', array('order_id' => $orderEvent->getPlacedOrder()->getId()))));
@@ -237,6 +236,29 @@ class OrderController extends BaseFrontController
         $this->getParserContext()->set("placed_order_id", $placedOrder->getId());
     }
 
+    public function orderFailed($order_id, $message)
+    {
+        /* check if the placed order matched the customer */
+        $failedOrder = OrderQuery::create()->findPk(
+            $this->getRequest()->attributes->get('order_id')
+        );
+
+        if (null === $failedOrder) {
+            throw new TheliaProcessException("No failed order", TheliaProcessException::NO_PLACED_ORDER, $failedOrder);
+        }
+
+        $customer = $this->getSecurityContext()->getCustomerUser();
+
+        if (null === $customer || $failedOrder->getCustomerId() !== $customer->getId()) {
+            throw new TheliaProcessException("Received failed order id does not belong to the current customer", TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER, $placedOrder);
+        }
+
+        $this->getParserContext()
+            ->set("failed_order_id", $failedOrder->getId())
+            ->set("failed_order_message", $message)
+        ;
+    }
+
     protected function getOrderEvent()
     {
         $order = $this->getOrder($this->getRequest());
@@ -261,16 +283,39 @@ class OrderController extends BaseFrontController
 
     public function generateInvoicePdf($order_id)
     {
-        /* check customer */
-        $this->checkAuth();
+        $this->checkOrderCustomer($order_id);
+
+
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
     }
 
     public function generateDeliveryPdf($order_id)
     {
-        /* check customer */
-        $this->checkAuth();
+        $this->checkOrderCustomer($order_id);
+
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
+    }
+
+    private function checkOrderCustomer($order_id)
+    {
+        $this->checkAuth();
+
+        $order = OrderQuery::create()->findPk($order_id);
+        $valid = true;
+        if ($order) {
+            $customerOrder = $order->getCustomer();
+            $customer = $this->getSecurityContext()->getCustomerUser();
+
+            if ($customerOrder->getId() != $customer->getId()) {
+                $valid = false;
+            }
+        } else {
+            $valid = false;
+        }
+
+        if (false === $valid) {
+            throw new AccessDeniedHttpException();
+        }
     }
 
     public function getDeliveryModuleListAjaxAction()
@@ -285,6 +330,5 @@ class OrderController extends BaseFrontController
 
         return $this->render('ajax/order-delivery-module-list', $args);
     }
-
 
 }

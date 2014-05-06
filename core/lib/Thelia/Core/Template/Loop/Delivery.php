@@ -1,34 +1,25 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Exception\OrderException;
+use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\Module;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
+use Thelia\Module\Exception\DeliveryException;
 
 /**
  * Class Delivery
@@ -62,9 +53,17 @@ class Delivery extends BaseSpecificModule
             $country = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
         }
 
+        /** @var Module $deliveryModule */
         foreach ($loopResult->getResultDataCollection() as $deliveryModule) {
+
+            $areaDeliveryModule = AreaDeliveryModuleQuery::create()
+                ->findByCountryAndModule($country, $deliveryModule);
+
+            if (null === $areaDeliveryModule) continue;
+
             $loopResultRow = new LoopResultRow($deliveryModule);
 
+            /** @var DeliveryModuleInterface $moduleInstance */
             $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
 
             if (false === $moduleInstance instanceof DeliveryModuleInterface) {
@@ -72,28 +71,27 @@ class Delivery extends BaseSpecificModule
             }
 
             try {
-                $postage = $moduleInstance->getPostage($country);
-            } catch (OrderException $e) {
-                switch ($e->getCode()) {
-                    case OrderException::DELIVERY_MODULE_UNAVAILABLE:
-                        /* do not show this delivery module */
-                        continue(2);
-                        break;
-                    default:
-                        throw $e;
+                // Check if module is valid, by calling isValidDelivery(),
+                // or catching a DeliveryException.
+
+                if ($moduleInstance->isValidDelivery($country)) {
+
+                    $postage = $moduleInstance->getPostage($country);
+
+                    $loopResultRow
+                        ->set('ID', $deliveryModule->getId())
+                        ->set('TITLE', $deliveryModule->getVirtualColumn('i18n_TITLE'))
+                        ->set('CHAPO', $deliveryModule->getVirtualColumn('i18n_CHAPO'))
+                        ->set('DESCRIPTION', $deliveryModule->getVirtualColumn('i18n_DESCRIPTION'))
+                        ->set('POSTSCRIPTUM', $deliveryModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                        ->set('POSTAGE', $postage)
+                    ;
+
+                    $loopResult->addRow($loopResultRow);
                 }
+            } catch (DeliveryException $ex) {
+                // Module is not available
             }
-
-            $loopResultRow
-                ->set('ID', $deliveryModule->getId())
-                ->set('TITLE', $deliveryModule->getVirtualColumn('i18n_TITLE'))
-                ->set('CHAPO', $deliveryModule->getVirtualColumn('i18n_CHAPO'))
-                ->set('DESCRIPTION', $deliveryModule->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set('POSTSCRIPTUM', $deliveryModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set('POSTAGE', $postage)
-            ;
-
-            $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;

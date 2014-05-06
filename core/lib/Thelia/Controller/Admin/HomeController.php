@@ -1,28 +1,18 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\OrderQuery;
@@ -39,13 +29,33 @@ class HomeController extends BaseAdminController
         return $this->render('home');
     }
 
+    /**
+     * Get the latest available Thelia version from the Thelia web site.
+     *
+     * @return Thelia\Core\HttpFoundation\Response the response
+     */
+    public function getLatestTheliaVersion()
+    {
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
+
+        // get the latest version
+        $version = @file_get_contents("http://thelia.net/version.php");
+
+        if ($version === false)
+            $version = $this->getTranslator()->trans("Not found");
+        else if (! preg_match("/^[0-9.]*$/", $version))
+            $version = $this->getTranslator()->trans("Unavailable");
+
+        return Response::create($version);
+    }
+
     public function loadStatsAjaxAction()
     {
         if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
 
         $data = new \stdClass();
 
-        $data->title = "Stats on " . $this->getRequest()->query->get('month', date('m')) . "/" . $this->getRequest()->query->get('year', date('Y'));
+        $data->title = $this->getTranslator()->trans("Stats on %month/%year", array('%month' => $this->getRequest()->query->get('month', date('m')), '%year' => $this->getRequest()->query->get('year', date('Y'))));
 
         /* sales */
         $saleSeries = new \stdClass();

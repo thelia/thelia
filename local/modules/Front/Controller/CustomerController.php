@@ -22,6 +22,8 @@
 /*************************************************************************************/
 namespace Front\Controller;
 
+use Front\Front;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
@@ -69,9 +71,9 @@ class CustomerController extends BaseFrontController
                 $this->dispatch(TheliaEvents::LOST_PASSWORD, $event);
 
             } catch (FormValidationException $e) {
-                $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
+                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             } catch (\Exception $e) {
-                $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
+                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             }
 
             if ($message !== false) {
@@ -133,9 +135,9 @@ class CustomerController extends BaseFrontController
                     $this->redirectSuccess($customerCreation);
                 }
             } catch (FormValidationException $e) {
-                $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
+                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             } catch (\Exception $e) {
-                $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
+                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             }
 
             if ($message !== false) {
@@ -194,9 +196,9 @@ class CustomerController extends BaseFrontController
                 $this->redirectSuccess($customerPasswordUpdateForm);
 
             } catch (FormValidationException $e) {
-                $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
+                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             } catch (\Exception $e) {
-                $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
+                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             }
 
             if ($message !== false) {
@@ -257,9 +259,9 @@ class CustomerController extends BaseFrontController
                 $this->redirectSuccess($customerProfileUpdateForm);
 
             } catch (FormValidationException $e) {
-                $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
+                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             } catch (\Exception $e) {
-                $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
+                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             }
 
             if ($message !== false) {
@@ -307,7 +309,9 @@ class CustomerController extends BaseFrontController
 
                         $this->processLogin($customer);
 
-                        $this->redirectSuccess($customerLoginForm);
+                        $successUrl = $customerLoginForm->getSuccessUrl();
+
+                        return RedirectResponse::create($successUrl);
 
                     } catch (UsernameNotFoundException $e) {
                         $message = "Wrong email or password. Please try again";
@@ -320,9 +324,9 @@ class CustomerController extends BaseFrontController
                 }
 
             } catch (FormValidationException $e) {
-                $message = sprintf(Translator::getInstance()->trans("Please check your input: %s"), $e->getMessage());
+                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             } catch (\Exception $e) {
-                $message = sprintf(Translator::getInstance()->trans("Sorry, an error occured: %s"), $e->getMessage());
+                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             }
 
             if ($message !== false) {
@@ -345,7 +349,7 @@ class CustomerController extends BaseFrontController
         }
 
         // Redirect to home page
-        $this->redirect(URL::getInstance()->getIndexPage());
+        return RedirectResponse::create(URL::getInstance()->getIndexPage());
     }
 
     /**

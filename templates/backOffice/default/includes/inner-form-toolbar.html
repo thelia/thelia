@@ -4,7 +4,9 @@ A toolbar displayed in forms, to display language change flags, submit and close
 Parameters:
 
    - hide_flags: true / false. If true, the flags will not be visible
-   - hide_submit_buttons: true / false. If true, only the close button will be deplayed.
+   - hide_submit_buttons: true / false. If true, only the close button will be displayed.
+   - hide_save_buttons: true / false. If true, the "Save" button will be hidden
+   - hide_save_and_close_button: true / false. If true, the "Save and close" button will be hidden
    - show_currencies: true/false. If true, show the currency selection bar
    - page_url: the current page URL. Default is $current_url. Used to switchedition anguage.
    - close_url: no default. URL displayed when close button is clicked. If empty, the close button is not displayed.
@@ -21,7 +23,7 @@ Parameters:
                 {else}
                     {$lang_url = {url path={$page_url|default:$current_url nofilter} edit_language_id=$ID}}
                 {/if}
-		        <a class="language-change-button" data-language-id="{$ID}" href="{$lang_url nofilter}" title="{intl l='Edit information in %lng' lng=$TITLE}">
+		        <a class="language-change-button" data-language-id="{$ID}" href="{$lang_url nofilter}" title="{intl l='Edit information in %lng' lng={$TITLE}}">
 		            <img src="{image file="../assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" />
 		        </a>
 		    </li>
@@ -36,7 +38,7 @@ Parameters:
             <div class="col-md-12">
                 <div class="button-group">
                     {loop name="currency_list" type="currency"}
-                        <a class="btn btn-sm {if $ID == $edit_currency_id}btn-primary{else}btn-default{/if}" href="{url noamp=1 path='/admin/products/update' edit_currency_id=$ID product_id=$product_id current_tab='details'}" title="{intl l='Edit prices in %curr' curr=$NAME}">
+                        <a class="btn btn-sm {if $ID == $edit_currency_id}btn-primary{else}btn-default{/if}" href="{url noamp=1 path='/admin/products/update' edit_currency_id=$ID product_id=$product_id current_tab='details'}" title="{intl l='Edit prices in %curr' curr={$NAME}}">
                             {$SYMBOL}
                         </a>
                     {/loop}
@@ -48,8 +50,12 @@ Parameters:
 
     <div class="col-md-6 inner-actions">
          {if $hide_submit_buttons != true}
-            <button type="submit" name="save_mode" value="stay" class="form-submit-button btn btn-sm btn-default btn-success" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>
-            <button type="submit" name="save_mode" value="close" class="form-submit-button btn btn-sm btn-default btn-info" title="{intl l='Save and close'}">{intl l='Save and close'} <span class="glyphicon glyphicon-remove"></span></button>
+            {if $hide_save_buttons != true}
+                <button type="submit" name="save_mode" value="stay" class="form-submit-button btn btn-sm btn-default btn-success" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>
+            {/if}
+            {if $hide_save_and_close_button != true}
+                <button type="submit" name="save_mode" value="close" class="form-submit-button btn btn-sm btn-default btn-info" title="{intl l='Save and close'}">{intl l='Save and close'} <span class="glyphicon glyphicon-remove"></span></button>
+            {/if}
          {/if}
          {if ! empty($close_url)}
             <a href="{$close_url}" class="page-close-button btn btn-sm btn-default">{intl l='Close'} <span class="glyphicon glyphicon-remove"></span></a>

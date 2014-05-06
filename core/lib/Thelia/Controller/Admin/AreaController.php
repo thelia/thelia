@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia                                                                       */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
@@ -275,7 +264,7 @@ class AreaController extends AbstractCrudController
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
         $request = $this->getRequest();
-        $removeCountryEvent = new AreaRemoveCountryEvent($request->request->get('areai_id', 0), $request->request->get('country_id', 0));
+        $removeCountryEvent = new AreaRemoveCountryEvent($request->request->get('area_id', 0), $request->request->get('country_id', 0));
 
         $this->dispatch(TheliaEvents::AREA_REMOVE_COUNTRY, $removeCountryEvent);
 

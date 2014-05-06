@@ -1,25 +1,15 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
+
 namespace Thelia\TaxEngine\TaxType;
 
 use Thelia\Exception\TaxEngineException;
@@ -47,6 +37,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
 
     public function fixAmountRetriever(Product $product)
     {
+        $taxAmount = 0;
         $featureId = $this->getRequirement("feature");
 
         $query = FeatureProductQuery::create()
@@ -54,14 +45,17 @@ class FeatureFixAmountTaxType extends BaseTaxType
             ->filterByFeatureId($featureId)
             ->findOne();
 
-        $taxAmount = $query->getFreeTextValue();
+        if (null !== $query) {
+            $taxAmount = $query->getFreeTextValue();
 
-        $testInt = new FloatType();
-        if (!$testInt->isValid($taxAmount)) {
-            throw new TaxEngineException(
+            $testInt = new FloatType();
+            if (!$testInt->isValid($taxAmount)) {
+                throw new TaxEngineException(
                     Translator::getInstance()->trans('Feature value does not match FLOAT format'),
                     TaxEngineException::FEATURE_BAD_EXPECTED_VALUE
-            );
+                );
+            }
+
         }
 
         return $taxAmount;

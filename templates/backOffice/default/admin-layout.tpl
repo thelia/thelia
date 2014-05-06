@@ -10,6 +10,9 @@
 {* -- Declare assets directory, relative to template base directory --------- *}
 {declare_assets directory='assets'}
 
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
+
 <!DOCTYPE html>
 <html lang="{$lang_code}">
 <head>
@@ -87,7 +90,7 @@
                                 <div class="btn-group">
                                     {loop type="lang" name="ui-lang" id="{lang attr='id'}"}
                                     <button class="btn btn-default">
-                                        <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a>
+                                        <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
                                     </button>
                                     {/loop}
 
@@ -162,9 +165,9 @@
                                         {loop name="order-status-list" type="order-status"}
                                             {assign "orderStatusLabel" "order_$CODE"}
                                             <li role="menuitem">
-                                                <a class="clearfix" data-target="{url path="admin/orders/$LABEL"}" href="{url path="admin/orders" status=$ID}">
+                                                <a class="clearfix" data-target="{url path="admin/orders/$LABEL"}" href="{url path="admin/orders" status={$ID}}">
                                                     <span class="pull-left">{$TITLE}</span>
-                                                    <span class="label label-{#$orderStatusLabel#} pull-right">{count type="order" customer="*" backend_context="1" status=$ID}</span>
+                                                    <span class="label label-{#$orderStatusLabel#} pull-right">{count type="order" customer="*" backend_context="1" status={$ID}}</span>
                                                 </a>
                                             </li>
                                         {/loop}
@@ -184,26 +187,28 @@
                             </li>
                             {/loop}
 
-                            {loop name="menu-auth-coupon" type="auth" role="ADMIN" resource="admin.coupon"  access="VIEW"}
-                            <li class="{if $admin_current_location == 'coupon'}active{/if}" id="coupon_menu">
-                                <a href="{url path='/admin/coupon'}">{intl l="Coupons"}</a>
+                            {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools"  access="VIEW"}
+                            <li class="{if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
+                                <a href="{url path='/admin/tools'}">{intl l="Tools"}</a>
                             </li>
                             {/loop}
 
-                            {loop name="menu-auth-config" type="auth" role="ADMIN" resource="admin.config"  access="VIEW"}
+                            {loop name="menu-auth-modules" type="auth" role="ADMIN" resource="admin.module"  access="VIEW"}
+                                <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
+                                    <a href="{url path='/admin/modules'}">{intl l="Modules"}</a>
+                                </li>
+                            {/loop}
+
+                            {loop name="menu-auth-config" type="auth" role="ADMIN" resource="admin.configuration"  access="VIEW"}
                             <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
                                 <a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a>
                             </li>
                             {/loop}
 
-                            {loop name="menu-auth-modules" type="auth" role="ADMIN" resource="admin.module"  access="VIEW"}
-                            <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
-                                <a href="{url path='/admin/modules'}">{intl l="Modules"}</a>
-                            </li>
 
                             {module_include location='in_top_menu_items'}
 
-                            {/loop}
+
                         </ul>
 
                         {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}

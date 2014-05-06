@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Action;
@@ -26,12 +15,14 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cart\CartEvent;
+use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\ProductPrice;
-use Thelia\Model\ProductPriceQuery;
+use Thelia\Model\Base\ProductSaleElementsQuery;
+use Thelia\Model\Currency;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Tools\ProductPriceTools;
 
 /**
  *
@@ -43,6 +34,7 @@ use Thelia\Model\ConfigQuery;
  */
 class Cart extends BaseAction implements EventSubscriberInterface
 {
+
     /**
      *
      * add an article in the current cart
@@ -55,6 +47,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $newness = $event->getNewness();
         $append = $event->getAppend();
         $quantity = $event->getQuantity();
+        $currency = $cart->getCurrency();
+        $customer = $cart->getCustomer();
+        $discount = 0;
+
+        if (null !== $customer && $customer->getDiscount() > 0) {
+            $discount = $customer->getDiscount();
+        }
 
         $productSaleElementsId = $event->getProductSaleElementsId();
         $productId = $event->getProduct();
@@ -62,13 +61,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
 
         if ($cartItem === null || $newness) {
-            $productPrice = ProductPriceQuery::create()
-                ->filterByProductSaleElementsId($productSaleElementsId)
-                ->findOne();
 
-            $event->setCartItem(
-                $this->doAddItem($event->getDispatcher(), $cart, $productId, $productPrice->getProductSaleElements(), $quantity, $productPrice)
-            );
+            $productSaleElements = ProductSaleElementsQuery::create()
+                ->findPk($productSaleElementsId);
+
+            if (null !== $productSaleElements) {
+                $productPrices = $productSaleElements->getPricesByCurrency($currency, $discount);
+                $event->setCartItem(
+                    $this->doAddItem($event->getDispatcher(), $cart, $productId, $productSaleElements, $quantity, $productPrices)
+                );
+            }
         }
 
         if ($append && $cartItem !== null) {
@@ -136,6 +138,52 @@ class Cart extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function updateCart(CurrencyChangeEvent $event)
+    {
+        $session = $event->getRequest()->getSession();
+        $cart = $session->getCart();
+        if (null !== $cart) {
+            $this->updateCartPrices($cart, $event->getCurrency());
+        }
+    }
+
+    /**
+     *
+     * Refresh article's price
+     *
+     * @param \Thelia\Model\Cart     $cart
+     * @param \Thelia\Model\Currency $currency
+     */
+    public function updateCartPrices(\Thelia\Model\Cart $cart, Currency $currency)
+    {
+
+        $customer = $cart->getCustomer();
+        $discount = 0;
+
+        if (null !== $customer && $customer->getDiscount() > 0) {
+            $discount = $customer->getDiscount();
+        }
+
+        // cart item
+        foreach ($cart->getCartItems() as $cartItem) {
+            $productSaleElements = $cartItem->getProductSaleElements();
+
+            $productPrice = $productSaleElements->getPricesByCurrency($currency, $discount);
+
+            $cartItem
+                ->setPrice($productPrice->getPrice())
+                ->setPromoPrice($productPrice->getPromoPrice());
+
+            $cartItem->save();
+        }
+
+        // update the currency cart
+        $cart->setCurrencyId($currency->getId());
+        $cart->save();
+
+    }
+
+
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
@@ -163,6 +211,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_DELETEITEM => array("deleteItem", 128),
             TheliaEvents::CART_UPDATEITEM => array("changeItem", 128),
             TheliaEvents::CART_CLEAR => array("clear", 128),
+            TheliaEvents::CHANGE_DEFAULT_CURRENCY => array("updateCart", 128),
         );
     }
 
@@ -186,15 +235,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * try to attach a new item to an existing cart
      *
-     * @param \Thelia\Model\Cart                $cart
-     * @param int                               $productId
-     * @param \Thelia\Model\ProductSaleElements $productSaleElements
-     * @param float                             $quantity
-     * @param ProductPrice                      $productPrice
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     * @param \Thelia\Model\Cart                                          $cart
+     * @param int                                                         $productId
+     * @param \Thelia\Model\ProductSaleElements                           $productSaleElements
+     * @param float                                                       $quantity
+     * @param ProductPriceTools                                           $productPrices
      *
      * @return CartItem
      */
-    protected function doAddItem(EventDispatcherInterface $dispatcher, \Thelia\Model\Cart $cart, $productId, \Thelia\Model\ProductSaleElements $productSaleElements, $quantity, ProductPrice $productPrice)
+    protected function doAddItem(EventDispatcherInterface $dispatcher, \Thelia\Model\Cart $cart, $productId, \Thelia\Model\ProductSaleElements $productSaleElements, $quantity, ProductPriceTools $productPrices)
     {
         $cartItem = new CartItem();
         $cartItem->setDisptacher($dispatcher);
@@ -203,8 +253,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->setProductId($productId)
             ->setProductSaleElementsId($productSaleElements->getId())
             ->setQuantity($quantity)
-            ->setPrice($productPrice->getPrice())
-            ->setPromoPrice($productPrice->getPromoPrice())
+            ->setPrice($productPrices->getPrice())
+            ->setPromoPrice($productPrices->getPromoPrice())
             ->setPromo($productSaleElements->getPromo())
             ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30))
             ->save();

@@ -1,25 +1,15 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
+
 namespace Thelia\Core\Template;
 
 /**
@@ -39,6 +29,13 @@ interface ParserInterface
     public function setStatus($status);
 
     /**
+     * Setup the parser with a template definition, which provides a template description.
+     *
+     * @param TemplateDefinition $templateDefinition
+     */
+    public function setTemplateDefinition(TemplateDefinition $templateDefinition);
+
+    /**
      * Add a template directory to the current template list
      *
      * @param unknown $templateType the template type (
@@ -53,17 +50,17 @@ interface ParserInterface
     /**
      * Return the registeted template directories for a givent template type
      *
-     * @param  unknown                  $templateType
-     * @throws InvalidArgumentException if the tempmateType is not defined
-     * @return array:                   an array of defined templates directories for the given template type
+     * @param  unknown                   $templateType
+     * @throws \InvalidArgumentException if the templateType is not defined
+     * @return array:                    an array of defined templates directories for the given template type
      */
     public function getTemplateDirectories($templateType);
 
     /**
      * Create a variable that will be available in the templates
      *
-     * @param $variable the vatiable name
-     * @param $value the value of the variable
+     * @param string $variable the variable name
+     * @param mixed  $value    the value of the variable
      */
     public function assign($variable, $value);
 }

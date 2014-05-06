@@ -3,6 +3,11 @@
 {* Body Class *}
 {block name="body-class"}page-home{/block}
 
+{* Page Title *}
+{block name='no-return-functions' append}
+    {$page_title = {config key="store_name"}}
+{/block}
+
 {* Hide breadcrumb *}
 {block name='breadcrumb'}{/block}
 

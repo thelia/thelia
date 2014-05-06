@@ -1,25 +1,14 @@
 <?php
-/**********************************************************************************/
-/*                                                                                */
-/*      Thelia	                                                                  */
-/*                                                                                */
-/*      Copyright (c) OpenStudio                                                  */
-/*      email : info@thelia.net                                                   */
-/*      web : http://www.thelia.net                                               */
-/*                                                                                */
-/*      This program is free software; you can redistribute it and/or modify      */
-/*      it under the terms of the GNU General Public License as published by      */
-/*      the Free Software Foundation; either version 3 of the License             */
-/*                                                                                */
-/*      This program is distributed in the hope that it will be useful,           */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of            */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             */
-/*      GNU General Public License for more details.                              */
-/*                                                                                */
-/*      You should have received a copy of the GNU General Public License         */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.      */
-/*                                                                                */
-/**********************************************************************************/
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace Thelia\Condition\Implementation;
 
@@ -164,7 +153,7 @@ class MatchForTotalAmount extends ConditionAbstract
     {
         return $this->translator->trans(
             'By cart total amount',
-            array(),
+            [],
             'condition'
         );
     }
@@ -179,7 +168,7 @@ class MatchForTotalAmount extends ConditionAbstract
     {
         $toolTip = $this->translator->trans(
             'Check the total Cart amount in the given currency',
-            array(),
+            [],
             'condition'
         );
 
@@ -219,7 +208,7 @@ class MatchForTotalAmount extends ConditionAbstract
     protected function generateInputs()
     {
         $currencies = CurrencyQuery::create()->find();
-        $cleanedCurrencies = array();
+        $cleanedCurrencies = [];
         /** @var Currency $currency */
         foreach ($currencies as $currency) {
             $cleanedCurrencies[$currency->getCode()] = $currency->getSymbol();
@@ -251,7 +240,7 @@ class MatchForTotalAmount extends ConditionAbstract
     {
         $labelPrice = $this->facade
             ->getTranslator()
-            ->trans('Price', array(), 'condition');
+            ->trans('Cart total amount is', [], 'condition');
 
         $html = $this->drawBackOfficeBaseInputsText($labelPrice, self::INPUT1);
 
@@ -269,66 +258,17 @@ class MatchForTotalAmount extends ConditionAbstract
      */
     protected function drawBackOfficeBaseInputsText($label, $inputKey)
     {
-        $operatorSelectHtml = $this->drawBackOfficeInputOperators(self::INPUT1);
-        $currencySelectHtml = $this->drawBackOfficeCurrencyInput(self::INPUT2);
-        $selectedAmount = '';
-        if (isset($this->values) && isset($this->values[$inputKey])) {
-            $selectedAmount = $this->values[$inputKey];
-        }
+        return $this->facade->getParser()->render('coupon/condition-fragments/cart-total-amount-condition.html', [
+                'label'              => $label,
+                'inputKey'           => $inputKey,
+                'value'              => isset($this->values[$inputKey]) ? $this->values[$inputKey] : '',
 
-        $html = '
-            <label for="operator">' . $label . '</label>
-            <div class="row">
-                <div class="col-lg-6">
-                    ' . $operatorSelectHtml . '
-                </div>
-                <div class="input-group col-lg-3">
-                    <input type="text" class="form-control" id="' . self::INPUT1 . '-value" name="' . self::INPUT1 . '[value]" value="' . $selectedAmount . '">
-                </div>
-                <div class="input-group col-lg-3">
-                    <input type="hidden" id="' . self::INPUT2 . '-operator" name="' . self::INPUT2 . '[operator]" value="==" />
-                    ' . $currencySelectHtml . '
-                </div>
-            </div>
-        ';
+                'field_1_name'        => self::INPUT1,
+                'field_2_name'        => self::INPUT2,
 
-        return $html;
+                'operatorSelectHtml' => $this->drawBackOfficeInputOperators(self::INPUT1),
+                'currencySelectHtml' => $this->drawBackOfficeCurrencyInput(self::INPUT2),
+            ]
+        );
     }
-
-    /**
-     * Draw the currency input displayed in the BackOffice
-     * allowing Admin to set its Coupon Conditions
-     *
-     * @param string $inputKey Input key (ex: self::INPUT1)
-     *
-     * @return string HTML string
-     */
-    protected function drawBackOfficeCurrencyInput($inputKey)
-    {
-        $optionHtml = '';
-
-        $currencies = CurrencyQuery::create()->find();
-        $cleanedCurrencies = array();
-        /** @var Currency $currency */
-        foreach ($currencies as $currency) {
-            $cleanedCurrencies[$currency->getCode()] = $currency->getSymbol();
-        }
-
-        foreach ($cleanedCurrencies as $key => $cleanedCurrency) {
-            $selected = '';
-            if (isset($this->values) && isset($this->values[$inputKey]) && $this->values[$inputKey] == $key) {
-                $selected = ' selected="selected"';
-            }
-            $optionHtml .= '<option value="' . $key . '" ' . $selected . '>' . $cleanedCurrency . '</option>';
-        }
-
-        $selectHtml = '
-            <select class="form-control" id="' . $inputKey . '-value" name="' . $inputKey . '[value]">
-                ' . $optionHtml . '
-            </select>
-        ';
-
-        return $selectHtml;
-    }
-
 }

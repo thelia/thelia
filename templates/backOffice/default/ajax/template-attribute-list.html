@@ -1,3 +1,6 @@
+{* Set the default translation domain, that will be used by intl when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
+
 <div class="form-group">
     {ifloop rel="free_attributes"}
     <form method="POST" action="{url path='/admin/configuration/templates/attributes/add'}">
@@ -21,7 +24,7 @@
 
     {/ifloop}
     {elseloop rel="free_attributes"}
-    <div class="alert alert-info">There is currently no available attributes.</div>
+    <div class="alert alert-info">{intl l="There is currently no available attributes."}</div>
     {/elseloop}
 </div>
 

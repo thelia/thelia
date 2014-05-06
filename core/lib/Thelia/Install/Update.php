@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Install;
@@ -42,6 +31,8 @@ class Update
         '2' => '2.0.0-beta3',
         '3' => '2.0.0-beta4',
         '4' => '2.0.0-RC1',
+        '5' => '2.0.0',
+        '6' => '2.0.1',
     );
 
     protected function isLatestVersion($version)
@@ -93,9 +84,9 @@ class Update
 
     protected function updateToVersion($version, Database $database,Tlog $logger)
     {
-        if (file_exists(THELIA_ROOT . '/install/update/'.$version.'.sql')) {
+        if (file_exists(THELIA_ROOT . '/setup/update/'.$version.'.sql')) {
             $logger->debug(sprintf('inserting file %s', $version.'$sql'));
-            $database->insertSql(null, array(THELIA_ROOT . '/install/update/'.$version.'.sql'));
+            $database->insertSql(null, array(THELIA_ROOT . '/setup/update/'.$version.'.sql'));
             $logger->debug(sprintf('end inserting file %s', $version.'$sql'));
         }
 

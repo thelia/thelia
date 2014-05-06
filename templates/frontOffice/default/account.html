@@ -2,7 +2,7 @@
 
 {* Security *}
 {block name="no-return-functions" prepend}
-    {check_auth context="front" role="CUSTOMER" login_tpl="login"}
+    {check_auth role="CUSTOMER" login_tpl="login"}
 {/block}
 
 {* Breadcrumb *}
@@ -38,15 +38,18 @@
                             <ul class="list-info">
                                 <li>
                                     <address class="adr">
-                                        <span class="street-address">{$ADDRESS1 nofilter}</span><br>
+                                        {if $COMPANY}
+                                          <span class="org">{$COMPANY}</span><br>
+                                        {/if}
+                                        <span class="street-address">{$ADDRESS1}</span><br>
                                         {if $ADDRESS2 != ""}
-                                            <span class="extended-address">{$ADDRESS2 nofilter}</span><br>
+                                            <span class="extended-address">{$ADDRESS2}</span><br>
                                         {/if}
                                         {if $ADDRESS3 != ""}
-                                            <span class="extended-address">{$ADDRESS3 nofilter}</span><br>
+                                            <span class="extended-address">{$ADDRESS3}</span><br>
                                         {/if}
                                         <span class="postal-code">{$ZIPCODE}</span>
-                                        <span class="locality">{$CITY nofilter}<br><span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                        <span class="locality">{$CITY}<br><span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
                                     </address>
                                 </li>
                                 <li>
@@ -94,15 +97,15 @@
                                             </li>
                                             <li>
                                                 <address class="adr">
-                                                    <span class="street-address">{$ADDRESS1 nofilter}</span><br>
+                                                    <span class="street-address">{$ADDRESS1}</span><br>
                                                     {if $ADDRESS2 != ""}
-                                                        <span class="street-address">{$ADDRESS2 nofilter}</span><br>
+                                                        <span class="street-address">{$ADDRESS2}</span><br>
                                                     {/if}
                                                     {if $ADDRESS3 != ""}
-                                                        <span class="street-address">{$ADDRESS3 nofilter}</span><br>
+                                                        <span class="street-address">{$ADDRESS3}</span><br>
                                                     {/if}
                                                     <span class="postal-code">{$ZIPCODE}</span>
-                                                    <span class="locality">{$CITY nofilter}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                                    <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
                                                 </address>
                                             </li>
                                             <li>
@@ -157,8 +160,12 @@
                                     <td>{$REF}</td>
                                     <td>{format_date date=$CREATE_DATE}</td>
                                     <td>{format_number number=$TOTAL_TAXED_AMOUNT} {loop type="currency" name="order.currency" id={$CURRENCY}}{$SYMBOL}{/loop}</td>
-                                    <td><span class="label-delivered">{loop type="order-status" name="order.status" id={$STATUS}}{$TITLE}{/loop}</span></td>
-                                    <td><a href="{url path="/account/order/pdf/delivery/$ID"}" class="btn btn-order-details" data-toggle="tooltip" title="{intl l="View order %ref as pdf document" ref={$REF}}"><span class="icon-cloud-download"></span> {intl l="Order details"}</a></td>
+                                    <td>{loop type="order-status" name="order.status" id={$STATUS}}{assign "orderStatusLabel" "order_$CODE"}<span class="label label-{#$orderStatusLabel#}">{$TITLE}</span>{/loop}</td>
+                                    <td>
+                                    {if $STATUS >=2}
+                                        <a href="{url path="/account/order/pdf/invoice/$ID"}" class="btn btn-order-details" data-toggle="tooltip" title="{intl l="View order %ref as pdf document" ref={$REF}}"><span class="icon-cloud-download"></span> {intl l="Order details"}</a>
+                                    {/if}
+                                    </td>
                                 </tr>
                                 {/loop}
 

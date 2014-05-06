@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Tests\Core\Template\Element;
@@ -29,6 +18,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Translation\Translator;
 use Thelia\Tools\URL;
 use Thelia\TaxEngine\TaxEngine;
 
@@ -106,6 +96,7 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
 
         $this->container->set('request', $request);
         $this->container->set('event_dispatcher', new EventDispatcher());
+        $this->container->set('thelia.translator',new Translator($this->container));
         $this->container->set('thelia.securityContext', new SecurityContext($request));
         $this->container->set('router.admin', $stubRouterAdmin);
         $this->container->set('thelia.url.manager', new URL($this->container));

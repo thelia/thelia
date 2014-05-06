@@ -1,28 +1,18 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Core\Template;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Model\ConfigQuery;
 use Thelia\Log\Tlog;
 use Thelia\Core\Translation\Translator;
@@ -57,6 +47,31 @@ class TemplateHelper
         );
     }
 
+    /**
+     * Check if a template definition is the current active template
+     *
+     * @param  TemplateDefinition $tplDefinition
+     * @return bool               true is the given template is the active template
+     */
+    public function isActive(TemplateDefinition $tplDefinition)
+    {
+        switch ($tplDefinition->getType()) {
+            case TemplateDefinition::FRONT_OFFICE:
+                $tplVar = 'active-front-template';
+                break;
+             case TemplateDefinition::BACK_OFFICE:
+                 $tplVar = 'active-front-template';
+                 break;
+            case TemplateDefinition::PDF:
+                 $tplVar = 'active-front-template';
+                 break;
+            case TemplateDefinition::EMAIL:
+                $tplVar = 'active-front-template';
+                break;
+        }
+
+        return $tplDefinition->getName() == ConfigQuery::read($tplVar, 'default');
+    }
     /**
      * @return TemplateDefinition
      */
@@ -106,10 +121,11 @@ class TemplateHelper
     /**
      * Return a list of existing templates for a given template type
      *
-     * @param  int $templateType the template type
-     * @return An  array of \Thelia\Core\Template\TemplateDefinition
+     * @param  int                  $templateType the template type
+     * @param string the template base (module or core, default to core).
+     * @return TemplateDefinition[] of \Thelia\Core\Template\TemplateDefinition
      */
-    public function getList($templateType)
+    public function getList($templateType, $base = THELIA_TEMPLATE_DIR)
     {
         $list = $exclude = array();
 
@@ -119,24 +135,29 @@ class TemplateHelper
 
             if ($templateType == $type) {
 
-                $baseDir = THELIA_TEMPLATE_DIR.$subdir;
+                $baseDir = rtrim($base, DS).DS.$subdir;
 
-                // Every subdir of the basedir is supposed to be a template.
-                $di = new \DirectoryIterator($baseDir);
+                try {
+                    // Every subdir of the basedir is supposed to be a template.
+                    $di = new \DirectoryIterator($baseDir);
 
-                foreach ($di as $file) {
-                // Ignore 'dot' elements
-                if ($file->isDot() || ! $file->isDir()) continue;
+                    /** @var \DirectoryIterator $file */
+                    foreach ($di as $file) {
+                        // Ignore 'dot' elements
+                        if ($file->isDot() || ! $file->isDir()) continue;
 
-                    // Ignore reserved directory names
-                    if (in_array($file->getFilename(), $exclude)) continue;
+                        // Ignore reserved directory names
+                        if (in_array($file->getFilename(), $exclude)) continue;
 
-                    $list[] = new TemplateDefinition($file->getFilename(), $templateType);
+                        $list[] = new TemplateDefinition($file->getFilename(), $templateType);
+                    }
+                } catch (\UnexpectedValueException $ex) {
+                    // Ignore the exception and continue
                 }
-
-                return $list;
             }
         }
+
+        return $list;
     }
 
     protected function normalizePath($path)
@@ -163,20 +184,21 @@ class TemplateHelper
      * @param  string                              $walkMode      type of file scanning: WALK_MODE_PHP or WALK_MODE_TEMPLATE
      * @param  \Thelia\Core\Translation\Translator $translator    the current translator
      * @param  string                              $currentLocale the current locale
+     * @param  string                              $domain        the translation domain (fontoffice, backoffice, module, etc...)
      * @param  array                               $strings       the list of strings
      * @throws \InvalidArgumentException           if $walkMode contains an invalid value
      * @return number                              the total number of translatable texts
      */
-    public function walkDir($directory, $walkMode, Translator $translator, $currentLocale, &$strings)
+    public function walkDir($directory, $walkMode, Translator $translator, $currentLocale, $domain, &$strings)
     {
         $num_texts = 0;
 
         if ($walkMode == self::WALK_MODE_PHP) {
-            $prefix = '\-\>[\s]*trans[\s]*\(';
+            $prefix = '\-\>[\s]*trans[\s]*\([\s]*';
 
             $allowed_exts = array('php');
         } elseif ($walkMode == self::WALK_MODE_TEMPLATE) {
-            $prefix = '\{intl[\s]l=';
+            $prefix = '\{intl(?:.*?)l=[\s]*';
 
             $allowed_exts = array('html', 'tpl', 'xml');
         } else {
@@ -189,11 +211,12 @@ class TemplateHelper
 
             Tlog::getInstance()->debug("Walking in $directory, in mode $walkMode");
 
+            /** @var \DirectoryIterator $fileInfo */
             foreach (new \DirectoryIterator($directory) as $fileInfo) {
 
                 if ($fileInfo->isDot()) continue;
 
-                if ($fileInfo->isDir()) $num_texts += $this->walkDir($fileInfo->getPathName(), $walkMode, $translator, $currentLocale, $strings);
+                if ($fileInfo->isDir()) $num_texts += $this->walkDir($fileInfo->getPathName(), $walkMode, $translator, $currentLocale, $domain, $strings);
 
                 if ($fileInfo->isFile()) {
 
@@ -213,6 +236,8 @@ class TemplateHelper
 
                                 Tlog::getInstance()->debug("Strings found: ", $matches[2]);
 
+                                $idx = 0;
+
                                 foreach ($matches[2] as $match) {
 
                                     $hash = md5($match);
@@ -224,16 +249,22 @@ class TemplateHelper
                                     } else {
                                         $num_texts++;
 
-                                        // remove \'
-                                        $match = str_replace("\\'", "'", $match);
+                                        // remove \' (or \"), that will prevent the translator to work properly, as
+                                        // "abc \def\" ghi" will be passed as abc "def" ghi to the translator.
+
+                                        $quote = $matches[1][$idx];
+
+                                        $match = str_replace("\\$quote", $quote, $match);
 
                                         $strings[$hash] = array(
                                                 'files'   => array($short_path),
                                                 'text'  => $match,
-                                                'translation' => $translator->trans($match, array(), 'messages', $currentLocale, false),
+                                                'translation' => $translator->trans($match, array(), $domain, $currentLocale, false),
                                                 'dollar'  => strstr($match, '$') !== false
                                         );
                                     }
+
+                                    $idx++;
                                 }
                             }
                         }
@@ -244,13 +275,24 @@ class TemplateHelper
             return $num_texts;
 
         } catch (\UnexpectedValueException $ex) {
-            echo $ex;
+            // Directory does not exists => ignore/
         }
     }
 
 
-    public function writeTranslation($file, $texts, $translations)
+    public function writeTranslation($file, $texts, $translations, $createIfNotExists = false)
     {
+        $fs = new Filesystem();
+
+        if (! $fs->exists($file) && true === $createIfNotExists) {
+
+            $dir = dirname($file);
+
+            if (! $fs->exists($file)) {
+                $fs->mkdir($dir);
+            }
+        }
+
         if ($fp = @fopen($file, 'w')) {
 
             fwrite($fp, '<' . "?php\n\n");

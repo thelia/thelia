@@ -27,6 +27,11 @@ class Admin extends BaseAdmin implements UserInterface
 {
     use ModelEventDispatcherTrait;
 
+    /**
+     * Retrieve all permissions for the current admin
+     *
+     * @return array|string
+     */
     public function getPermissions()
     {
         $profileId = $this->getProfileId();
@@ -105,7 +110,7 @@ class Admin extends BaseAdmin implements UserInterface
      */
     public function eraseCredentials()
     {
-        $this->setPassword(null);
+        parent::setPassword(null);
     }
 
     /**

@@ -1,30 +1,22 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia                                                                       */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Finder\Finder;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Translation\Translator;
+use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Template\TemplateDefinition;
@@ -36,13 +28,47 @@ use Thelia\Tools\URL;
  */
 class TranslationsController extends BaseAdminController
 {
+    /**
+     * @param  string                    $item_name the modume code
+     * @return Module                    the module object
+     * @throws \InvalidArgumentException if module was not found
+     */
+    protected function getModule($item_name)
+    {
+        if (null !== $module = ModuleQuery::create()->findPk($item_name))
+            return $module;
+
+        throw new \InvalidArgumentException(
+            $this->getTranslator()->trans("No module found for code '%item'", ['%item' => $item_name])
+        );
+    }
+
+    protected function getModuleTemplateNames(Module $module, $template_type)
+    {
+        $templates =
+            TemplateHelper::getInstance()->getList(
+                $template_type,
+                $module->getAbsoluteTemplateBasePath()
+            );
+
+        $names = [];
+
+        foreach($templates as $template) $names[] = $template->getName();
+
+        return $names;
+    }
+
     protected function renderTemplate()
     {
-
         // Get related strings, if all input data are here
         $item_to_translate = $this->getRequest()->get('item_to_translate');
 
-        $item_id = $this->getRequest()->get('item_id', '');
+        $item_name = $this->getRequest()->get('item_name', '');
+
+        if ($item_to_translate == 'mo' && ! empty($item_name))
+            $module_part = $this->getRequest()->get('module_part', '');
+        else
+            $module_part = false;
 
         $all_strings = array();
 
@@ -52,55 +78,134 @@ class TranslationsController extends BaseAdminController
 
         $templateArguments = array(
                 'item_to_translate'             => $item_to_translate,
-                'item_id'                       => $item_id,
+                'item_name'                     => $item_name,
+                'module_part'                   => $module_part,
                 'view_missing_traductions_only' => $this->getRequest()->get('view_missing_traductions_only', 0),
                 'max_input_vars_warning'        => false,
         );
 
         // Find the i18n directory, and the directory to examine.
 
-        if (! empty($item_id) || $item_to_translate == 'co') {
+        if (! empty($item_name) || $item_to_translate == 'co') {
 
             switch ($item_to_translate) {
 
+                // Module core
                 case 'mo' :
-                    if (null !== $module = ModuleQuery::create()->findPk($item_id)) {
+                    $module = $this->getModule($item_name);
+
+                    if ($module_part == 'core') {
                         $directory = $module->getAbsoluteBaseDir();
+                        $domain = $module->getTranslationDomain();
                         $i18n_directory = $module->getAbsoluteI18nPath();
                         $walkMode = TemplateHelper::WALK_MODE_PHP;
+                    } elseif ($module_part == 'admin-includes') {
+                        $directory = $module->getAbsoluteAdminIncludesPath();
+                        $domain = $module->getAdminIncludesTranslationDomain();
+                        $i18n_directory = $module->getAbsoluteAdminIncludesI18nPath();
+                        $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
+                    } elseif (! empty($module_part)) {
+                        // Front or back office template, form of $module_part is [bo|fo].subdir-name
+                        list($type, $subdir) = explode('.', $module_part);
+
+                        if ($type == 'bo') {
+                            $directory = $module->getAbsoluteBackOfficeTemplatePath($subdir);
+                            $domain = $module->getBackOfficeTemplateTranslationDomain($subdir);
+                            $i18n_directory = $module->getAbsoluteBackOfficeI18nTemplatePath($subdir);
+                        } elseif ($type == 'fo') {
+                            $directory = $module->getAbsoluteFrontOfficeTemplatePath($subdir);
+                            $domain = $module->getFrontOfficeTemplateTranslationDomain($subdir);
+                            $i18n_directory = $module->getAbsoluteFrontOfficeI18nTemplatePath($subdir);
+                        } else {
+                            throw new \InvalidArgumentException("Undefined module template type: '$type'.");
+                        }
+
+                        $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
                     }
+
+                    // If the module is not active, load the translation file,
+                    // as it is not already loaded in Thelia.php
+                    if (! empty ($domain) && ! $module->getActivate()) {
+                        $this->loadTranslation($i18n_directory, $domain);
+                    }
+
+                    // List front and back office templates defined by this module
+                    $templateArguments['back_office_templates'] =
+                        implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::BACK_OFFICE));
+
+                    $templateArguments['front_office_templates'] =
+                        implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::FRONT_OFFICE));
+
+                    // Check if we have admin-include files
+                    try {
+                        $finder = Finder::create()
+                                    ->files()
+                                    ->depth(0)
+                                    ->in($module->getAbsoluteAdminIncludesPath())
+                                    ->name('/\.html$/i')
+                        ;
+
+                        $hasAdminIncludes = $finder->count() > 0;
+                    } catch (\InvalidArgumentException $ex) {
+                        $hasAdminIncludes = false;
+                    }
+
+                    $templateArguments['has_admin_includes'] = $hasAdminIncludes;
+
                     break;
 
+                // Thelia Core
                 case 'co' :
                     $directory = THELIA_ROOT . 'core/lib/Thelia';
+                    $domain = 'core';
                     $i18n_directory = THELIA_ROOT . 'core/lib/Thelia/Config/I18n';
                     $walkMode = TemplateHelper::WALK_MODE_PHP;
                 break;
 
+                // Front-office template
                 case 'fo' :
-                    $template = new TemplateDefinition($item_id, TemplateDefinition::FRONT_OFFICE);
+                    $template = new TemplateDefinition($item_name, TemplateDefinition::FRONT_OFFICE);
                 break;
 
+                // Back-office template
                 case 'bo' :
-                    $template = new TemplateDefinition($item_id, TemplateDefinition::BACK_OFFICE);
+                    $template = new TemplateDefinition($item_name, TemplateDefinition::BACK_OFFICE);
                 break;
 
+                // PDF templates
                 case 'pf' :
-                    $template = new TemplateDefinition($item_id, TemplateDefinition::PDF);
+                    $template = new TemplateDefinition($item_name, TemplateDefinition::PDF);
                 break;
 
+                // Email templates
                 case 'ma' :
-                    $template = new TemplateDefinition($item_id, TemplateDefinition::EMAIL);
+                    $template = new TemplateDefinition($item_name, TemplateDefinition::EMAIL);
                 break;
+
+                default:
+                    /*
+                    throw new \InvalidArgumentException(
+                        $this->getTranslator()->trans("Undefined translation type: %item", ['%item' => $item_to_translate])
+                    );
+                    */
             }
 
             if ($template) {
                 $directory = $template->getAbsolutePath();
+
                 $i18n_directory = $template->getAbsoluteI18nPath();
+
+                $domain = $template->getTranslationDomain();
+
+                // Load translations files is this template is not the current template
+                // as it is not loaded in Thelia.php
+                if (! TemplateHelper::getInstance()->isActive($template)) {
+                    $this->loadTranslation($i18n_directory, $domain);
+                }
             }
 
             // Load strings to translate
-            if ($directory) {
+            if ($directory && ! empty($domain)) {
 
                 // Save the string set, if the form was submitted
                 if ($i18n_directory) {
@@ -113,11 +218,11 @@ class TranslationsController extends BaseAdminController
 
                         if (! empty($texts)) {
 
-                            $file = sprintf("%s/%s.php", $i18n_directory, $this->getCurrentEditionLocale());
+                            $file = sprintf("%s".DS."%s.php", $i18n_directory, $this->getCurrentEditionLocale());
 
                             $translations = $this->getRequest()->get('translation', array());
 
-                            TemplateHelper::getInstance()->writeTranslation($file, $texts, $translations);
+                            TemplateHelper::getInstance()->writeTranslation($file, $texts, $translations, true);
 
                             if ($save_mode == 'stay')
                                 $this->redirectToRoute("admin.configuration.translations", $templateArguments);
@@ -133,6 +238,7 @@ class TranslationsController extends BaseAdminController
                         $walkMode,
                         $this->getTranslator(),
                         $this->getCurrentEditionLocale(),
+                        $domain,
                         $all_strings
                 );
 
@@ -163,4 +269,24 @@ class TranslationsController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
         return $this->renderTemplate();
     }
+
+    private function loadTranslation($directory, $domain)
+    {
+        try {
+            $finder = Finder::create()
+                ->files()
+                ->depth(0)
+                ->in($directory);
+
+            /** @var \DirectoryIterator $file */
+            foreach ($finder as $file) {
+                list($locale, $format) = explode('.', $file->getBaseName(), 2);
+
+                Translator::getInstance()->addResource($format, $file->getPathname(), $locale, $domain);
+            }
+        } catch (\InvalidArgumentException $ex) {
+            // Ignore missing I18n directories
+        }
+    }
+
 }

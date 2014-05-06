@@ -1,0 +1,28 @@
+<?php
+
+return array(
+    'Custmer Number' => 'Číslo zákazníka',
+    'DELIVERY' => 'DODÁNÍ',
+    'Delivery module' => 'Doručovací modul',
+    'INVOICE' => 'FAKTURA',
+    'Invoice REF' => 'Faktura číslo',
+    'Invoice date' => 'Datum vystavení',
+    'Payment module' => 'Platební modul',
+    'Postage' => 'Poštovné',
+    'Product' => 'Zboží',
+    'Quantity' => 'Množství',
+    'Ref' => 'Číslo',
+    'THANK YOU' => 'Děkuji',
+    'Tax' => 'Daň',
+    'Taxed total' => 'Celkem před zdaněním',
+    'Total' => 'Celkem',
+    'Total with tax' => 'Celkem včetně daně',
+    'Total without tax' => 'Celkem bez daně',
+    'Unit taxed price' => 'Jednotková cena včetně daně',
+    'Unit. price' => 'Jednotková cena',
+    'delivery adress' => 'Doručovací adresa',
+    'delivery module' => 'doručovací modul',
+    'invoice address' => 'fakturační adresa',
+    'page' => 'stránka',
+    'product' => 'zboží',
+);

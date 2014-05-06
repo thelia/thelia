@@ -18,6 +18,16 @@ class ConfigQuery extends BaseConfigQuery
 {
     protected static $cache = array();
 
+    /**
+     *
+     * Find a config variable and return the value or default value if not founded.
+     *
+     * Use this method for better performance, a cache is created for each variable already searched
+     *
+     * @param $search
+     * @param  null  $default
+     * @return mixed
+     */
     public static function read($search, $default = null)
     {
         if (array_key_exists($search, self::$cache)) {
@@ -125,12 +135,12 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function getSmtpPassword()
     {
-        return self::read('smtp.authmode');
+        return self::read('smtp.password');
     }
 
     public static function getSmtpAuthMode()
     {
-        return self::read('smtp.host');
+        return self::read('smtp.authmode');
     }
 
     public static function getSmtpTimeout()

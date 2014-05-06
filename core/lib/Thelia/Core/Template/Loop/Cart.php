@@ -1,11 +1,14 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: manu
- * Date: 08/08/13
- * Time: 12:44
- * To change this template use File | Settings | File Templates.
- */
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
 
@@ -90,7 +93,6 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow->set("TITLE", $product->getTitle());
             $loopResultRow->set("REF", $product->getRef());
             $loopResultRow->set("QUANTITY", $cartItem->getQuantity());
-            $loopResultRow->set("PRICE", $cartItem->getPrice());
             $loopResultRow->set("PRODUCT_ID", $product->getId());
             $loopResultRow->set("PRODUCT_URL", $product->getUrl($this->request->getSession()->getLang()->getLocale()))
                 ->set("STOCK", $productSaleElement->getQuantity())

@@ -11,17 +11,14 @@
     <nav>
         <ul class="breadcrumb">
             <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
+            <li><a href="{url path='admin/tools'}">{intl l='Tools'}</a></li>
             <li><a href="{url path='admin/coupon'}">{intl l='Coupon'}</a></li>
             <li>{intl l='Create'}</li>
         </ul>
     </nav>
 
-    <div class="page-header">
-        <h1>{intl l='Coupons : '}<small>{intl l='Create a new coupon'}</small></h1>
-    </div>
-
     {form name="thelia.admin.coupon.creation"}
-    {include file='coupon/form.html' formAction={url path={$formAction}} noConditions=true}
+    {include file='coupon/form.html' formAction={url path={$formAction}} noConditions=true title={intl l='Create a new coupon'}}
     {/form}
 </section> <!-- #wrapper -->
 
@@ -47,6 +44,7 @@
             $.couponManager.urlAjaxAdminCouponDrawInputs = "{$urlAjaxAdminCouponDrawInputs}";
             $.couponManager.intlPleaseRetry = '{intl l='Please retry'}';
             $.couponManager.intlDoYouReallyWantToSetCouponAvailableForEveryOne = '{intl l='Do you really want to set this coupon available to everyone ?'}';
+            $.couponManager.intlDoYouReallyWantToDeleteThisCondition = '{intl l='Do you really want to delete this condition ?'}';
         });
     </script>
 

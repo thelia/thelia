@@ -2,7 +2,7 @@
 
 {* Security *}
 {block name="no-return-functions" prepend}
-    {check_auth context="front" role="CUSTOMER" login_tpl="login"}
+    {check_auth role="CUSTOMER" login_tpl="login"}
 {/block}
 
 {* Body Class *}
@@ -60,7 +60,7 @@
                 {form_field form=$form field="title"}
                     {assign var="customer_title_id" value="{$value|default:$TITLE}"}
                     <div class="form-group group-title{if $error} has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
                         <div class="control-input">
                             <select name="{$name}" id="{$label_attr.for}" class="form-control"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                                 <option value="">-- {intl l="Select Title"} --</option>
@@ -105,6 +105,19 @@
                         </div>
                     </div>
                     <!--/.form-group-->
+                {/form_field}
+
+                {form_field form=$form field="company"}
+                  <div class="form-group group-company{if $error} has-error{/if}">
+                    <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                      <div class="control-input">
+                        <input type="text" name="{$name}" value="{$value|default:{$COMPANY} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder company"}" value="{$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                        {if $error }
+                          <span class="help-block">{$message}</span>
+                          {assign var="error_focus" value="true"}
+                        {/if}
+                      </div>
+                  </div><!--/.form-group-->
                 {/form_field}
 
                 {form_field form=$form field="address1"}
@@ -170,7 +183,7 @@
                 {form_field form=$form field="country"}
                     {assign var="customer_country_id" value="{$value|default:$COUNTRY}"}
                     <div class="form-group group-country {if $error}has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
                         <div class="control-input">
                             <select name="{$name}" id="{$label_attr.for}" class="form-control"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                                 <option value="">-- {intl l="Select Country"} --</option>

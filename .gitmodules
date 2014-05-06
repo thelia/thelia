@@ -1,0 +1,3 @@
+[submodule "local/modules/Klikandpay"]
+	path = local/modules/Klikandpay
+	url = https://github.com/thelia-modules/Klikandpay

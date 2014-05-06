@@ -26,11 +26,12 @@ use Propel\Runtime\Exception\PropelException;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\CouponCode;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
+use Thelia\Module\Exception\DeliveryException;
 
 /**
  * Class CouponController
@@ -68,18 +69,29 @@ class CouponController extends BaseFrontController
 
             /* recalculate postage amount */
             $order = $this->getSession()->getOrder();
-            if(null !== $order) {
+            if (null !== $order) {
                 $deliveryModule = $order->getModuleRelatedByDeliveryModuleId();
                 $deliveryAddress = AddressQuery::create()->findPk($order->chosenDeliveryAddress);
 
-                if(null !== $deliveryModule && null !== $deliveryAddress) {
+                if (null !== $deliveryModule && null !== $deliveryAddress) {
                     $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
-                    $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
 
                     $orderEvent = new OrderEvent($order);
-                    $orderEvent->setPostage($postage);
 
-                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
+                    try {
+                        $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
+
+                        $orderEvent->setPostage($postage);
+
+                        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
+                    }
+                    catch (DeliveryException $ex) {
+                        // The postage has been chosen, but changes dues to coupon causes an exception.
+                        // Reset the postage data in the order
+                        $orderEvent->setDeliveryModule(0);
+
+                        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
+                    }
                 }
             }
 

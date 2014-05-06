@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Lang;
@@ -35,6 +24,9 @@ class LangCreateEvent extends LangEvent
     protected $locale;
     protected $date_format;
     protected $time_format;
+    protected $decimal_separator;
+    protected $thousands_separator;
+    protected $decimals;
 
     /**
      * @param mixed $code
@@ -135,5 +127,61 @@ class LangCreateEvent extends LangEvent
     {
         return $this->title;
     }
+
+    /**
+     * @param mixed $decimal_separator
+     */
+    public function setDecimalSeparator($decimal_separator)
+    {
+        $this->decimal_separator = $decimal_separator;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDecimalSeparator()
+    {
+        return $this->decimal_separator;
+    }
+
+    /**
+     * @param mixed $decimals
+     */
+    public function setDecimals($decimals)
+    {
+        $this->decimals = $decimals;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDecimals()
+    {
+        return $this->decimals;
+    }
+
+    /**
+     * @param mixed $thousands_separator
+     */
+    public function setThousandsSeparator($thousands_separator)
+    {
+        $this->thousands_separator = $thousands_separator;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getThousandsSeparator()
+    {
+        return $this->thousands_separator;
+    }
+
+
 
 }

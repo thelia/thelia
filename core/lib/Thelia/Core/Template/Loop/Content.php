@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
@@ -64,6 +53,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('folder_default'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('current_folder'),
+            Argument::createBooleanTypeArgument('with_prev_next_info', false),
             Argument::createIntTypeArgument('depth', 1),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createAnyTypeArgument('title'),
@@ -212,9 +202,10 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\Content $content */
         foreach ($loopResult->getResultDataCollection() as $content) {
             $loopResultRow = new LoopResultRow($content);
-
+            $defaultFolderId = $content->getDefaultFolderId();
             $loopResultRow->set("ID"            , $content->getId())
                 ->set("IS_TRANSLATED"           , $content->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE"                  , $this->locale)
@@ -227,16 +218,54 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("META_DESCRIPTION"        , $content->getVirtualColumn('i18n_META_DESCRIPTION'))
                 ->set("META_KEYWORDS"            , $content->getVirtualColumn('i18n_META_KEYWORDS'))
                 ->set("POSITION"                , $content->getPosition())
-                ->set("DEFAULT_FOLDER"          , $content->getDefaultFolderId())
+                ->set("DEFAULT_FOLDER"          , $defaultFolderId)
 
                 ->set("VISIBLE"                 , $content->getVisible())
             ;
 
-            $loopResult->addRow($loopResultRow);
+            $loopResult->addRow($this->findNextPrev($loopResultRow, $content, $defaultFolderId));
         }
 
         return $loopResult;
 
+    }
+
+    /**
+     * @param  LoopResultRow         $loopResultRow
+     * @param  \Thelia\Model\Content $content
+     * @param $defaultFolderId
+     * @return LoopResultRow
+     */
+    private function findNextPrev(LoopResultRow $loopResultRow, \Thelia\Model\Content $content, $defaultFolderId)
+    {
+        if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
+
+            // Find previous and next category
+            $previous = ContentQuery::create()
+                ->joinContentFolder()
+                ->where('ContentFolder.folder_id = ?', $defaultFolderId)
+                ->filterByPosition($content->getPosition(), Criteria::LESS_THAN)
+                ->orderByPosition(Criteria::DESC)
+                ->findOne()
+            ;
+
+            $next = ContentQuery::create()
+                ->joinContentFolder()
+                ->where('ContentFolder.folder_id = ?', $defaultFolderId)
+                ->filterByPosition($content->getPosition(), Criteria::GREATER_THAN)
+                ->orderByPosition(Criteria::ASC)
+                ->findOne()
+            ;
+
+            $loopResultRow
+                ->set("HAS_PREVIOUS"     , $previous != null ? 1 : 0)
+                ->set("HAS_NEXT"         , $next != null ? 1 : 0)
+                ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)
+                ->set("NEXT"             , $next != null ? $next->getId() : -1)
+            ;
+        }
+
+        return $loopResultRow;
     }
 
 }

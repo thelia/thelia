@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
@@ -46,11 +35,11 @@ class ShippingZoneController extends BaseAdminController
         return $this->render("shipping-zones", array("display_shipping_zone" => 20));
     }
 
-    public function updateAction($shipping_zones_id)
+    public function updateAction($delivery_module_id)
     {
         if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::VIEW)) return $response;
         return $this->render("shipping-zones-edit", array(
-            "shipping_zones_id" => $shipping_zones_id
+            "delivery_module_id" => $delivery_module_id
         ));
     }
 
@@ -133,13 +122,13 @@ class ShippingZoneController extends BaseAdminController
     protected function renderEditionTemplate()
     {
         return $this->render("shipping-zones-edit", array(
-            "shipping_zones_id" => $this->getShippingZoneId()
+            "delivery_module_id" => $this->getDeliveryModuleId()
         ));
     }
 
-    protected function getShippingZoneId()
+    protected function getDeliveryModuleId()
     {
-        return $this->getRequest()->get('shipping_zone_id', 0);
+        return $this->getRequest()->get('delivery_module_id', 0);
     }
 
 }

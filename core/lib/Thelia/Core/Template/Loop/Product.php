@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
@@ -83,6 +72,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             Argument::createIntTypeArgument('min_stock'),
             Argument::createFloatTypeArgument('min_weight'),
             Argument::createFloatTypeArgument('max_weight'),
+            Argument::createBooleanTypeArgument('with_prev_next_info', false),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('current_category'),
             Argument::createIntTypeArgument('depth', 1),
@@ -467,12 +457,19 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
+        /** @var \Thelia\Core\Security\SecurityContext $securityContext */
+        $securityContext = $this->container->get('thelia.securityContext');
 
         foreach ($loopResult->getResultDataCollection() as $product) {
 
             $loopResultRow = new LoopResultRow($product);
 
             $price = $product->getVirtualColumn('price');
+
+            if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+                $price = $price * (1-($securityContext->getCustomerUser()->getDiscount()/100));
+            }
+
             try {
                 $taxedPrice = $product->getTaxedPrice(
                     $taxCountry,
@@ -482,6 +479,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 $taxedPrice = null;
             }
             $promoPrice = $product->getVirtualColumn('promo_price');
+
+            if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+                $promoPrice = $promoPrice * (1-($securityContext->getCustomerUser()->getDiscount()/100));
+            }
             try {
                 $taxedPromoPrice = $product->getTaxedPromoPrice(
                     $taxCountry,
@@ -494,35 +495,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             // Find previous and next product, in the default category.
             $default_category_id = $product->getDefaultCategoryId();
 
-            $previous = ProductQuery::create()
-                ->joinProductCategory()
-                ->where('ProductCategory.category_id = ?', $default_category_id)
-                ->filterByPosition($product->getPosition(), Criteria::LESS_THAN)
-                ->orderByPosition(Criteria::DESC)
-                ->findOne()
-            ;
-
-            $next = ProductQuery::create()
-                ->joinProductCategory()
-                ->where('ProductCategory.category_id = ?', $default_category_id)
-                ->filterByPosition($product->getPosition(), Criteria::GREATER_THAN)
-                ->orderByPosition(Criteria::ASC)
-                ->findOne()
-            ;
-
             $loopResultRow
-                ->set("ID"                      , $product->getId())
-                ->set("REF"                     , $product->getRef())
-                ->set("IS_TRANSLATED"           , $product->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"                  , $this->locale)
-                ->set("TITLE"                   , $product->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO"                   , $product->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION"             , $product->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM"            , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL"                     , $product->getUrl($this->locale))
-                ->set("META_TITLE"              , $product->getVirtualColumn('i18n_META_TITLE'))
-                ->set("META_DESCRIPTION"        , $product->getVirtualColumn('i18n_META_DESCRIPTION'))
-                ->set("META_KEYWORDS"            , $product->getVirtualColumn('i18n_META_KEYWORDS'))
+                ->set("WEIGHT"                  , $product->getVirtualColumn('weight'))
+                ->set("QUANTITY"                , $product->getVirtualColumn('quantity'))
+                ->set("EAN_CODE"                , $product->getVirtualColumn('ean_code'))
                 ->set("BEST_PRICE"              , $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
                 ->set("BEST_PRICE_TAX"          , $taxedPrice - $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
                 ->set("BEST_TAXED_PRICE"        , $product->getVirtualColumn('is_promo') ? $taxedPromoPrice : $taxedPrice)
@@ -532,25 +508,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("PROMO_PRICE"             , $promoPrice)
                 ->set("PROMO_PRICE_TAX"         , $taxedPromoPrice - $promoPrice)
                 ->set("TAXED_PROMO_PRICE"       , $taxedPromoPrice)
-                ->set("PRODUCT_SALE_ELEMENT"    , $product->getVirtualColumn('pse_id'))
-                ->set("WEIGHT"                  , $product->getVirtualColumn('weight'))
-                ->set("QUANTITY"                , $product->getVirtualColumn('quantity'))
-                ->set("EAN_CODE"                , $product->getVirtualColumn('ean_code'))
                 ->set("IS_PROMO"                , $product->getVirtualColumn('is_promo'))
                 ->set("IS_NEW"                  , $product->getVirtualColumn('is_new'))
-                ->set("POSITION"                , $product->getPosition())
-                ->set("VISIBLE"                 , $product->getVisible() ? "1" : "0")
-                ->set("TEMPLATE"                , $product->getTemplateId())
-                ->set("HAS_PREVIOUS"            , $previous != null ? 1 : 0)
-                ->set("HAS_NEXT"                , $next != null ? 1 : 0)
-                ->set("PREVIOUS"                , $previous != null ? $previous->getId() : -1)
-                ->set("NEXT"                    , $next != null ? $next->getId() : -1)
-                ->set("DEFAULT_CATEGORY"        , $default_category_id)
-                ->set("TAX_RULE_ID"             , $product->getTaxRuleId())
 
             ;
 
-            $loopResult->addRow($loopResultRow);
+
+            $loopResult->addRow($this->associateValues($loopResultRow, $product, $default_category_id));
         }
 
         return $loopResult;
@@ -985,6 +949,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $loopResult = new LoopResult($results);
 
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
+        /** @var \Thelia\Core\Security\SecurityContext $securityContext */
+        $securityContext = $this->container->get('thelia.securityContext');
 
         foreach ($loopResult->getResultDataCollection() as $product) {
 
@@ -992,10 +958,14 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             $price = $product->getRealLowestPrice();
 
+           if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+                $price = $price * (1-($securityContext->getCustomerUser()->getDiscount()/100));
+            }
+
             try {
                 $taxedPrice = $product->getTaxedPrice(
                     $taxCountry,
-                    $product->getRealLowestPrice()
+                    $price
                 );
             } catch (TaxEngineException $e) {
                 $taxedPrice = null;
@@ -1004,6 +974,48 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             // Find previous and next product, in the default category.
             $default_category_id = $product->getDefaultCategoryId();
 
+            $loopResultRow
+                ->set("BEST_PRICE"       , $price)
+                ->set("BEST_PRICE_TAX"   , $taxedPrice - $price)
+                ->set("BEST_TAXED_PRICE" , $taxedPrice)
+                ->set("IS_PROMO"                , $product->getVirtualColumn('is_promo'))
+                ->set("IS_NEW"                  , $product->getVirtualColumn('is_new'))
+            ;
+
+
+            $loopResult->addRow($this->associateValues($loopResultRow, $product, $default_category_id));
+        }
+
+        return $loopResult;
+    }
+
+    private function associateValues($loopResultRow, $product, $default_category_id)
+    {
+        $loopResultRow
+            ->set("ID"                      , $product->getId())
+            ->set("REF"                     , $product->getRef())
+            ->set("IS_TRANSLATED"           , $product->getVirtualColumn('IS_TRANSLATED'))
+            ->set("LOCALE"                  , $this->locale)
+            ->set("TITLE"                   , $product->getVirtualColumn('i18n_TITLE'))
+            ->set("CHAPO"                   , $product->getVirtualColumn('i18n_CHAPO'))
+            ->set("DESCRIPTION"             , $product->getVirtualColumn('i18n_DESCRIPTION'))
+            ->set("POSTSCRIPTUM"            , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
+            ->set("URL"                     , $product->getUrl($this->locale))
+            ->set("META_TITLE"              , $product->getVirtualColumn('i18n_META_TITLE'))
+            ->set("META_DESCRIPTION"        , $product->getVirtualColumn('i18n_META_DESCRIPTION'))
+            ->set("META_KEYWORDS"            , $product->getVirtualColumn('i18n_META_KEYWORDS'))
+            ->set("PRODUCT_SALE_ELEMENT"    , $product->getVirtualColumn('pse_id'))
+            ->set("POSITION"                , $product->getPosition())
+            ->set("VISIBLE"                 , $product->getVisible() ? "1" : "0")
+            ->set("TEMPLATE"                , $product->getTemplateId())
+            ->set("DEFAULT_CATEGORY"        , $default_category_id)
+            ->set("TAX_RULE_ID"             , $product->getTaxRuleId())
+
+        ;
+
+
+        if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
+            // Find previous and next category
             $previous = ProductQuery::create()
                 ->joinProductCategory()
                 ->where('ProductCategory.category_id = ?', $default_category_id)
@@ -1021,39 +1033,14 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ;
 
             $loopResultRow
-                ->set("ID"               , $product->getId())
-                ->set("REF"              , $product->getRef())
-                ->set("IS_TRANSLATED"    , $product->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"           , $this->locale)
-                ->set("TITLE"            , $product->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO"            , $product->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION"      , $product->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM"     , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL"              , $product->getUrl($this->locale))
-                ->set("META_TITLE"       , $product->getVirtualColumn('i18n_META_TITLE'))
-                ->set("META_DESCRIPTION" , $product->getVirtualColumn('i18n_META_DESCRIPTION'))
-                ->set("META_KEYWORDS"     , $product->getVirtualColumn('i18n_META_KEYWORDS'))
-                ->set("BEST_PRICE"       , $price)
-                ->set("BEST_PRICE_TAX"   , $taxedPrice - $price)
-                ->set("BEST_TAXED_PRICE" , $taxedPrice)
-                ->set("IS_PROMO"         , $product->getVirtualColumn('main_product_is_promo'))
-                ->set("IS_NEW"           , $product->getVirtualColumn('main_product_is_new'))
-                ->set("POSITION"         , $product->getPosition())
-                ->set("VISIBLE"          , $product->getVisible() ? "1" : "0")
-                ->set("TEMPLATE"         , $product->getTemplateId())
                 ->set("HAS_PREVIOUS"     , $previous != null ? 1 : 0)
                 ->set("HAS_NEXT"         , $next != null ? 1 : 0)
                 ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)
                 ->set("NEXT"             , $next != null ? $next->getId() : -1)
-                ->set("DEFAULT_CATEGORY" , $default_category_id)
-                ->set("TAX_RULE_ID"      , $product->getTaxRuleId())
-
             ;
-
-            $loopResult->addRow($loopResultRow);
         }
 
-        return $loopResult;
+        return $loopResultRow;
     }
 
     protected function manageFeatureAv(&$search, $feature_availability)

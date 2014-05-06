@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
@@ -157,13 +146,14 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     /**
      * Update SEO modification, and either go back to the object list, or stay on the edition page.
      *
-     * @return Thelia\Core\HttpFoundation\Response the response
+     * @return \Thelia\Core\HttpFoundation\Response the response
      */
     public function processUpdateSeoAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
             return $response;
+        }
 
         // Error (Default: false)
         $error_msg = false;
@@ -221,14 +211,16 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             $this->getParserContext()->addForm($changeForm);
         }
 
-        $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj SEO modification", array('%obj' => $this->objectName)),
-            $error_msg,
-            $updateSeoForm,
-            $ex
-        );
+        if (false !== $error_msg) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("%obj SEO modification", array('%obj' => $this->objectName)),
+                $error_msg,
+                $updateSeoForm,
+                $ex
+            );
 
-        // At this point, the form has errors, and should be redisplayed.
-        return $this->renderEditionTemplate();
+            // At this point, the form has errors, and should be redisplayed.
+            return $this->renderEditionTemplate();
+        }
     }
 }

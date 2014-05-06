@@ -4,11 +4,21 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Cart\CartItemDuplicationItem;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Cart as BaseCart;
 
 class Cart extends BaseCart
 {
-    public function duplicate($token, Customer $customer = null)
+    /**
+     * Duplicate the current existing cart. Only the token is changed
+     *
+     * @param $token
+     * @param  Customer $customer
+     * @return Cart
+     */
+    public function duplicate($token, Customer $customer = null, Currency $currency = null, EventDispatcherInterface $dispatcher)
     {
         $cartItems = $this->getCartItems();
 
@@ -16,11 +26,21 @@ class Cart extends BaseCart
         $cart->setAddressDeliveryId($this->getAddressDeliveryId());
         $cart->setAddressInvoiceId($this->getAddressInvoiceId());
         $cart->setToken($token);
-        // TODO : set current Currency
-        $cart->setCurrencyId($this->getCurrencyId());
+        $discount = 0;
+
+        if (null === $currency) {
+            $currencyQuery = CurrencyQuery::create();
+            $currency = $currencyQuery->findPk($this->getCurrencyId()) ?: $currencyQuery->findOneByByDefault(1);
+        }
+
+        $cart->setCurrency($currency);
 
         if ($customer) {
             $cart->setCustomer($customer);
+
+            if ($customer->getDiscount() > 0) {
+                $discount = $customer->getDiscount();
+            }
         }
 
         $cart->save();
@@ -40,28 +60,27 @@ class Cart extends BaseCart
                 $item->setProductId($cartItem->getProductId());
                 $item->setQuantity($cartItem->getQuantity());
                 $item->setProductSaleElements($productSaleElements);
-                if ($currentDateTime <= $cartItem->getPriceEndOfLife()) {
-                    $item->setPrice($cartItem->getPrice())
-                        ->setPromoPrice($cartItem->getPromoPrice())
-                        ->setPromo($productSaleElements->getPromo())
-                    // TODO : new price EOF or duplicate current priceEOF from $cartItem ?
-                        ->setPriceEndOfLife($cartItem->getPriceEndOfLife());
-                } else {
-                    $productPrices = ProductPriceQuery::create()->filterByProductSaleElements($productSaleElements)->findOne();
+                $prices = $productSaleElements->getPricesByCurrency($currency, $discount);
+                $item
+                    ->setPrice($prices->getPrice())
+                    ->setPromoPrice($prices->getPromoPrice())
+                    ->setPromo($productSaleElements->getPromo());
 
-                    $item->setPrice($productPrices->getPrice())
-                        ->setPromoPrice($productPrices->getPromoPrice())
-                        ->setPromo($productSaleElements->getPromo())
-                        ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30));
-                }
                 $item->save();
+                $dispatcher->dispatch(TheliaEvents::CART_ITEM_DUPLICATE, new CartItemDuplicationItem($item, $cartItem));
             }
 
         }
+        $this->delete();
 
         return $cart;
     }
 
+    /**
+     * Retrieve the last item added in the cart
+     *
+     * @return CartItem
+     */
     public function getLastCartItemAdded()
     {
         return CartItemQuery::create()
@@ -71,6 +90,18 @@ class Cart extends BaseCart
         ;
     }
 
+    /**
+     *
+     * Retrieve the total taxed amount.
+     *
+     * By default, the total include the discount
+     *
+     * /!\ The postage amount is not available so it's the total with or without discount an without postage
+     *
+     * @param  Country   $country
+     * @param  bool      $discount
+     * @return float|int
+     */
     public function getTaxedAmount(Country $country, $discount = true)
     {
         $total = 0;
@@ -86,7 +117,13 @@ class Cart extends BaseCart
         return $total;
     }
 
-    public function getTotalAmount()
+    /**
+     *
+     * @see getTaxedAmount same as this method but the amount is without taxes
+     * @param  bool      $discount
+     * @return float|int
+     */
+    public function getTotalAmount($discount = true)
     {
         $total = 0;
 
@@ -97,11 +134,18 @@ class Cart extends BaseCart
             $total += $subtotal;
         }
 
-        $total -= $this->getDiscount();
+        if ($discount) {
+            $total -= $this->getDiscount();
+        }
 
         return $total;
     }
 
+    /**
+     * Retrieve the total weight for all products in cart
+     *
+     * @return float|int
+     */
     public function getWeight()
     {
         $weight = 0;

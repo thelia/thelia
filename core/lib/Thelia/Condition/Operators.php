@@ -1,25 +1,14 @@
 <?php
-/**********************************************************************************/
-/*                                                                                */
-/*      Thelia	                                                                  */
-/*                                                                                */
-/*      Copyright (c) OpenStudio                                                  */
-/*      email : info@thelia.net                                                   */
-/*      web : http://www.thelia.net                                               */
-/*                                                                                */
-/*      This program is free software; you can redistribute it and/or modify      */
-/*      it under the terms of the GNU General Public License as published by      */
-/*      the Free Software Foundation; either version 3 of the License             */
-/*                                                                                */
-/*      This program is distributed in the hope that it will be useful,           */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of            */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             */
-/*      GNU General Public License for more details.                              */
-/*                                                                                */
-/*      You should have received a copy of the GNU General Public License         */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.      */
-/*                                                                                */
-/**********************************************************************************/
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace Thelia\Condition;
 
@@ -65,57 +54,57 @@ abstract class Operators
         switch ($operator) {
         case self::INFERIOR:
             $ret = $translator->trans(
-                'inferior to',
-                array(),
+                'Less than',
+                [],
                 'condition'
             );
             break;
         case self::INFERIOR_OR_EQUAL:
             $ret = $translator->trans(
-                'inferior or equal to',
-                array(),
+                'Less than or equals',
+                [],
                 'condition'
             );
             break;
         case self::EQUAL:
             $ret = $translator->trans(
-                'equal to',
-                array(),
+                'Equals',
+                [],
                 'condition'
             );
             break;
         case self::SUPERIOR_OR_EQUAL:
             $ret = $translator->trans(
-                'superior or equal to',
-                array(),
+                'Greater than or equals',
+                [],
                 'condition'
             );
             break;
         case self::SUPERIOR:
             $ret = $translator->trans(
-                'superior to',
-                array(),
+                'Greater than',
+                [],
                 'condition'
             );
             break;
         case self::DIFFERENT:
             $ret = $translator->trans(
-                'different from',
-                array(),
+                'Not equals',
+                [],
                 'condition'
             );
             break;
         case self::IN:
             $ret = $translator->trans(
-                'in',
-                array(),
+                'In',
+                [],
                 'condition'
             );
             break;
         case self::OUT:
             $ret = $translator->trans(
-                'not in',
-                array(),
+                'Not in',
+                [],
                 'condition'
             );
             break;

@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
@@ -67,19 +56,26 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             Argument::createBooleanTypeArgument('reseller'),
             Argument::createIntTypeArgument('sponsor'),
             new Argument(
-                    'order',
-                    new TypeCollection(
-                            new Type\EnumListType(array(
-                                    'id', 'id_reverse',
-                                    'reference', 'reference_reverse',
-                                    'firstname', 'firstname_reverse',
-                                    'lastname', 'lastname_reverse',
-                                    'last_order', 'last_order_reverse',
-                                    'order_amount', 'order_amount_reverse',
-                                    'registration_date', 'registration_date_reverse'
-                            ))
-                    ),
-                    'lastname'
+                'order',
+                new TypeCollection(
+                    new Type\EnumListType(array(
+                        'id',
+                        'id_reverse',
+                        'reference',
+                        'reference_reverse',
+                        'firstname',
+                        'firstname_reverse',
+                        'lastname',
+                        'lastname_reverse',
+                        'last_order',
+                        'last_order_reverse',
+                        'order_amount',
+                        'order_amount_reverse',
+                        'registration_date',
+                        'registration_date_reverse'
+                    ))
+                ),
+                'lastname'
             )
         );
     }
@@ -166,7 +162,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             $search->filterBySponsor($sponsor, Criteria::EQUAL);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
@@ -219,19 +215,15 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             $loopResultRow = new LoopResultRow($customer);
 
             $loopResultRow
-                ->set("ID"        , $customer->getId())
-                ->set("REF"       , $customer->getRef())
-                ->set("TITLE"     , $customer->getTitleId())
-                ->set("FIRSTNAME" , $customer->getFirstname())
-                ->set("LASTNAME"  , $customer->getLastname())
-                ->set("EMAIL"     , $customer->getEmail())
-                ->set("RESELLER"  , $customer->getReseller())
-                ->set("SPONSOR"   , $customer->getSponsor())
-                ->set("DISCOUNT"  , $customer->getDiscount())
-
-                ->set("LAST_ORDER_DATE"     , $lastOrder != null ? $lastOrder->getCreatedAt() : '')
-                ->set("LAST_ORDER_AMOUNT"   , $lastOrder != null ? $lastOrder->getCreatedAt() : '')
-                ->set("LAST_ORDER_CURRENCY" , $lastOrder != null ? $lastOrder->getCreatedAt() : '')
+                ->set("ID", $customer->getId())
+                ->set("REF", $customer->getRef())
+                ->set("TITLE", $customer->getTitleId())
+                ->set("FIRSTNAME", $customer->getFirstname())
+                ->set("LASTNAME", $customer->getLastname())
+                ->set("EMAIL", $customer->getEmail())
+                ->set("RESELLER", $customer->getReseller())
+                ->set("SPONSOR", $customer->getSponsor())
+                ->set("DISCOUNT", $customer->getDiscount())
             ;
 
             $loopResult->addRow($loopResultRow);

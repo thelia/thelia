@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
@@ -335,15 +324,17 @@ abstract class AbstractCrudController extends BaseAdminController
             $error_msg = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj creation", array('%obj' => $this->objectName)),
-            $error_msg,
-            $creationForm,
-            $ex
-        );
+        if (false !== $error_msg) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("%obj creation", array('%obj' => $this->objectName)),
+                $error_msg,
+                $creationForm,
+                $ex
+            );
 
-        // At this point, the form has error, and should be redisplayed.
-        return $this->renderList();
+            // At this point, the form has error, and should be redisplayed.
+            return $this->renderList();
+        }
     }
 
     /**
@@ -435,15 +426,17 @@ abstract class AbstractCrudController extends BaseAdminController
             $error_msg = $ex->getMessage();*/
         }
 
-        // At this point, the form has errors, and should be redisplayed.
-        $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)),
-            $error_msg,
-            $changeForm,
-            $ex
-        );
+        if (false !== $error_msg) {
+            // At this point, the form has errors, and should be redisplayed.
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)),
+                $error_msg,
+                $changeForm,
+                $ex
+            );
 
-        return $this->renderEditionTemplate();
+            return $this->renderEditionTemplate();
+        }
     }
 
     /**

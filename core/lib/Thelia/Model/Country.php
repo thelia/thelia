@@ -16,6 +16,14 @@ class Country extends BaseCountry
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
+    /**
+     *
+     * Put the current country as the default one.
+     *
+     * @throws \RuntimeException
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function toggleDefault()
     {
         if ($this->getId() === null) {
