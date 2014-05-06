@@ -42,6 +42,31 @@ export PATH=/Applications/MAMP/bin/php/php5.5.x/bin/:$PATH
 * configure a complete development environment : http://php-osx.liip.ch/
 * use a virtual machine with vagrant and puppet : https://puphpet.com/
 
+### MySQL 5.6
+
+As of MySQL 5.6, default configuration sets the sql_mode value to
+
+```
+STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION
+```
+
+This 'STRICT_TRANS_TABLES' configuration results in SQL errors when no default value is defined on NOT NULL columns and the value is empty or invalid.
+
+You can edit this default config in ` /etc/my.cnf ` and change the sql_mode to remove the STRICT_TRANS_TABLES part
+
+```
+[mysqld]
+sql_mode=NO_ENGINE_SUBSTITUTION
+```
+
+Assuming your sql_mode is the default one, you can change the value directly on the run by running the following SQL Command
+
+```sql
+SET @@GLOBAL.sql_mode='NO_ENGINE_SUBSTITUTION', @@SESSION.sql_mode='NO_ENGINE_SUBSTITUTION'
+```
+
+For more information on sql_mode you can consult the [MySQL doc](http://dev.mysql.com/doc/refman/5.0/fr/server-sql-mode.html "sql Mode")
+
 ## Download Thelia 2
 
 ``` bash
