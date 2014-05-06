@@ -63,5 +63,25 @@ class RegisterListenersPass implements CompilerPassInterface
 
             $definition->addMethodCall('addSubscriberService', array($id, $class));
         }
+
+        foreach ($container->findTaggedServiceIds('hook.event_listener') as $id => $events) {
+            foreach ($events as $event) {
+                $priority = isset($event['priority']) ? $event['priority'] : 0;
+
+                if (!isset($event['event'])) {
+                    throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "hook.event_listener" tags.', $id));
+                }
+
+                if (!isset($event['method'])) {
+                    $event['method'] = 'on'.preg_replace(array(
+                            '/(?<=\b)[a-z]/ie',
+                            '/[^a-z0-9]/i'
+                        ), array('strtoupper("\\0")', ''), $event['event']);
+                }
+
+                $definition->addMethodCall('addListenerService', array('hook.' . $event['event'], array($id, $event['method']), $priority));
+            }
+        }
+
     }
 }

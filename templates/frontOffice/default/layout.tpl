@@ -206,6 +206,11 @@ GNU General Public License : http://www.gnu.org/licenses/
 
 <main class="main-container" role="main">
     <div class="container">
+
+        <div class="alert alert-success">
+            {hook name="body"}
+        </div>
+
         {block name="breadcrumb"}{include file="misc/breadcrumb.tpl"}{/block}
         <div id="content">{block name="main-content"}{/block}</div>
     </div><!-- /.container -->
