@@ -198,7 +198,7 @@ class Thelia extends Kernel
                     }
 
                     $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
-                    $loader->load("config.xml");
+                    $loader->load("config.xml", "module.".$module->getCode());
 
                     // Core module translation
                     if (is_dir($dir = $module->getAbsoluteI18nPath())) {
