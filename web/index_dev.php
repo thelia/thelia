@@ -15,6 +15,9 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpKernel\HttpCache\HttpCache;
 
+// allow cache to be cleared by php client or web
+// umask(0002);
+
 //use Symfony\Component\DependencyInjection;
 
 $env = 'dev';

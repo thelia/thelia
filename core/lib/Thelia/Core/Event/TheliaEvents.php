@@ -707,7 +707,7 @@ final class TheliaEvents
     const HOOK_PROCESS_RENDER = 'thelia.hook.processRender';
     const HOOK_AFTER_RENDER = 'thelia.hook.afterProcess';
     //
-    const MODULE_HOOK_UPDATE = 'thelia.hook.action.update';
+    const MODULE_HOOK_UPDATE_POSITION = 'thelia.hook.action.update';
 
 
     /**
