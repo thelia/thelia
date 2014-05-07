@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleHook;
-
+use Thelia\Model\ModuleQuery;
 
 
 /**
@@ -72,7 +72,30 @@ class RegisterListenersPass implements CompilerPassInterface
         //return;
         // Hook listener
         foreach ($container->findTaggedServiceIds('hook.event_listener') as $id => $events) {
+
+            $class = $container->getDefinition($id)->getClass();
+
+            // the class must implements BaseHookInterface
+            $refClass = new \ReflectionClass($class);
+            $interface = 'Thelia\Core\Hook\BaseHookInterface';
+            if (!$refClass->implementsInterface($interface)) {
+                throw new \InvalidArgumentException(sprintf('Hook "%s" must implement interface "%s".', $id, $interface));
+            }
+
+            // retrieve the module id
+            $properties = $container->getDefinition($id)->getProperties();
+            $module = null;
+            if (array_key_exists('module', $properties)){
+                $moduleCode = explode(".", $properties['module'])[1];
+                //Tlog::getInstance()->addDebug("_HOOK_ addListenerService :: module = " . $moduleCode );
+                if (null !== $module = ModuleQuery::create()->findOneByCode($moduleCode)){
+                    $module = $module->getId();
+                }
+            }
+            //Tlog::getInstance()->addDebug("_HOOK_ addListenerService :: module = " . print_r($module, true));
+
             foreach ($events as $event) {
+
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
 
                 if (!isset($event['event'])) {
@@ -86,10 +109,9 @@ class RegisterListenersPass implements CompilerPassInterface
                         ), array('strtoupper("\\0")', ''), $event['event']);
                 }
 
-                // todo: retrieve the module id
                 // test if hook is already registered in ModuleHook
                 $moduleHook = ModuleHookQuery::create()
-                    ->filterByModuleId(8)
+                    ->filterByModuleId($module)
                     ->filterByEvent($event['event'])
                     ->findOne();
                 if (null === $moduleHook) {
@@ -97,7 +119,7 @@ class RegisterListenersPass implements CompilerPassInterface
                     $moduleHook = new ModuleHook();
                     //$moduleHook->setModuleId();
                     $moduleHook->setEvent($event['event'])
-                        ->setModuleId(8)
+                        ->setModuleId($module)
                         ->setClassname($id)
                         ->setMethod($event['method'])
                         ->setActive(true)
