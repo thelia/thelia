@@ -50,17 +50,23 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         $this->container = $container;
     }
 
-    public function toggleActivation(ModuleToggleActivationEvent $event)
+    public function toggleModuleActivation(ModuleToggleActivationEvent $event)
     {
-        // Todo update module hook for the mdule
-
+        // Todo update module hook for the module
+        return $event;
     }
 
-    public function delete(ModuleDeleteEvent $event)
+    public function deleteModuleActivation(ModuleDeleteEvent $event)
     {
-        // Todo update module hook for the mdule
+        // Todo update module hook for the module
+        return $event;
     }
 
+    public function updateModuleHookPosition(ModuleDeleteEvent $event)
+    {
+        // Todo update module hook for the module hook
+        return $event;
+    }
 
     protected function cacheClear(EventDispatcherInterface $dispatcher)
     {
@@ -94,10 +100,11 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('updateModuleHook', 128),
-            TheliaEvents::MODULE_DELETE => array('updateModuleHook', 128),
-            TheliaEvents::MODULE_HOOK_UPDATE_POSITION => array('updateModulePosition', 128),
-            //TheliaEvents::MODULE_HOOK_UPDATE_CONTEXT => array('updateModulePosition', 128),
+            TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleModuleActivation', 128),
+            TheliaEvents::MODULE_DELETE => array('deleteModuleActivation', 128),
+            TheliaEvents::MODULE_HOOK_UPDATE_POSITION => array('updateModuleHookPosition', 128),
+            // TheliaEvents::MODULE_HOOK_UPDATE_CONTEXT => array('updateModuleHookContext', 128),
+            // TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION => array('toggleModuleHookActivation', 128),
         );
     }
 }

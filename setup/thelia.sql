@@ -881,7 +881,7 @@ CREATE TABLE `module_hook`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `module_id` INTEGER NOT NULL,
     `event` VARCHAR(255),
-    `class` VARCHAR(255),
+    `classname` VARCHAR(255),
     `method` VARCHAR(255),
     `active` TINYINT(1) NOT NULL,
     `module_active` TINYINT(1) NOT NULL,

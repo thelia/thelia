@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Core\Event\Hook\HookEvent;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
@@ -42,15 +43,18 @@ class Hook extends AbstractSmartyPlugin
      * @param  unknown $smarty
      * @return string  no text is returned.
      */
-    public function processHook($params, &$smarty)
+    public function processHookFunction($params, &$smarty)
     {
         // The current order of the table
-        $hookName = "hook." . $this->getParam($params, 'name');
+        $hookName = $this->getParam($params, 'name');
+
         Tlog::getInstance()->addDebug("_HOOK_ process hook : " . $hookName);
 
         $event = new HookEvent($hookName);
 
-        $event = $this->getDispatcher()->dispatch($hookName, $event);
+        $event = $this->getDispatcher()->dispatch('hook.before.' . $hookName, $event);
+        $event = $this->getDispatcher()->dispatch('hook.' . $hookName, $event);
+        $event = $this->getDispatcher()->dispatch('hook.after.' . $hookName, $event);
 
         $content = "";
         foreach ($event->getFragments() as $fragment){
@@ -61,6 +65,19 @@ class Hook extends AbstractSmartyPlugin
     }
 
     /**
+     * Generates the content of the hook
+     *
+     * @param  array   $params
+     * @param  unknown $smarty
+     * @return string  no text is returned.
+     */
+    public function processHookBlock($params, $content, $template, &$repeat)
+    {
+        //throw new NotImplementedException();
+        return "";
+    }
+
+    /**
      * Define the various smarty plugins handled by this class
      *
      * @return an array of smarty plugin descriptors
@@ -68,7 +85,8 @@ class Hook extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor('function', 'hook', $this, 'processHook')
+            new SmartyPluginDescriptor('function', 'hook', $this, 'processHookFunction'),
+            new SmartyPluginDescriptor('block', 'hook', $this, 'processHookBlock')
         );
     }
 

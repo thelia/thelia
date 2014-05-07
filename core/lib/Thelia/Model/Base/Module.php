@@ -2,12 +2,9 @@
 
 namespace Thelia\Model\Base;
 
-use \ModuleHook as ChildModuleHook;
 use \DateTime;
 use \Exception;
-use \ModuleHookQuery;
 use \PDO;
-use Base\ModuleHook;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -23,6 +20,8 @@ use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\AreaDeliveryModule as ChildAreaDeliveryModule;
 use Thelia\Model\AreaDeliveryModuleQuery as ChildAreaDeliveryModuleQuery;
 use Thelia\Model\Module as ChildModule;
+use Thelia\Model\ModuleHook as ChildModuleHook;
+use Thelia\Model\ModuleHookQuery as ChildModuleHookQuery;
 use Thelia\Model\ModuleI18n as ChildModuleI18n;
 use Thelia\Model\ModuleI18nQuery as ChildModuleI18nQuery;
 use Thelia\Model\ModuleImage as ChildModuleImage;
@@ -1072,7 +1071,7 @@ abstract class Module implements ActiveRecordInterface
 
             if ($this->moduleHooksScheduledForDeletion !== null) {
                 if (!$this->moduleHooksScheduledForDeletion->isEmpty()) {
-                    \ModuleHookQuery::create()
+                    \Thelia\Model\ModuleHookQuery::create()
                         ->filterByPrimaryKeys($this->moduleHooksScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
                     $this->moduleHooksScheduledForDeletion = null;
@@ -2458,7 +2457,7 @@ abstract class Module implements ActiveRecordInterface
             return;
         }
         $this->collModuleHooks = new ObjectCollection();
-        $this->collModuleHooks->setModel('\ModuleHook');
+        $this->collModuleHooks->setModel('\Thelia\Model\ModuleHook');
     }
 
     /**
@@ -2483,7 +2482,7 @@ abstract class Module implements ActiveRecordInterface
                 // return empty collection
                 $this->initModuleHooks();
             } else {
-                $collModuleHooks = ModuleHookQuery::create(null, $criteria)
+                $collModuleHooks = ChildModuleHookQuery::create(null, $criteria)
                     ->filterByModule($this)
                     ->find($con);
 
@@ -2574,7 +2573,7 @@ abstract class Module implements ActiveRecordInterface
                 return count($this->getModuleHooks());
             }
 
-            $query = ModuleHookQuery::create(null, $criteria);
+            $query = ChildModuleHookQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
