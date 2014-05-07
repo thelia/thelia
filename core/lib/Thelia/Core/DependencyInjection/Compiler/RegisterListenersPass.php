@@ -14,6 +14,8 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Test\Model\ModuleHookQuery;
+use Test\Model\ModuleHook;
 
 /**
  * Class RegisterListenersPass
@@ -64,6 +66,8 @@ class RegisterListenersPass implements CompilerPassInterface
             $definition->addMethodCall('addSubscriberService', array($id, $class));
         }
 
+        return;
+        // Hook listener
         foreach ($container->findTaggedServiceIds('hook.event_listener') as $id => $events) {
             foreach ($events as $event) {
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
@@ -79,8 +83,41 @@ class RegisterListenersPass implements CompilerPassInterface
                         ), array('strtoupper("\\0")', ''), $event['event']);
                 }
 
-                $definition->addMethodCall('addListenerService', array('hook.' . $event['event'], array($id, $event['method']), $priority));
+                // todo: retrieve the module id
+                // test if hook is already registered in ModuleHook
+                $moduleHook = ModuleHookQuery::create()
+                    //->filterByModuleId()
+                    ->filterByEvent($event['event'])
+                    ->findOne();
+                if (null === $moduleHook) {
+                    // hook for module doesn't exist, we add it with default registered values
+                    $moduleHook = new ModuleHook();
+                    //$moduleHook->setModuleId();
+                    $moduleHook->setEvent($event['event'])
+                        ->setClass($id)
+                        ->setMethod($event['method'])
+                        ->setActive(true)
+                        ->setModuleActive(true)
+                        ->setPriority($priority)
+                        ->save();
+                }
             }
+        }
+
+        // now we can add listeners for active hooks and active module
+        $moduleHooks = ModuleHookQuery::create()
+            //->filterByModuleId()
+            ->filterByActive(true)
+            ->filterByModuleActive(true)
+            ->find();
+        foreach ($moduleHooks as $moduleHook) {
+            $definition->addMethodCall('addListenerService',
+                array(
+                    'hook.' . $moduleHook->getEvent(),
+                    array($moduleHook->getClass(), $moduleHook->getMethod()),
+                    $moduleHook->getPriority()
+                )
+            );
         }
 
     }

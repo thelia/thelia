@@ -871,6 +871,34 @@ CREATE TABLE `module`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- module_hook
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_hook`;
+
+CREATE TABLE `module_hook`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER NOT NULL,
+    `event` VARCHAR(255),
+    `class` VARCHAR(255),
+    `method` VARCHAR(255),
+    `active` TINYINT(1) NOT NULL,
+    `module_active` TINYINT(1) NOT NULL,
+    `priority` INTEGER NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_module_event` (`event`),
+    INDEX `idx_module_hook_event` (`event`),
+    INDEX `idx_module_hook_active` (`active`),
+    INDEX `FI_module_hook_module_id` (`module_id`),
+    CONSTRAINT `fk_module_hook_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- accessory
 -- ---------------------------------------------------------------------
 
