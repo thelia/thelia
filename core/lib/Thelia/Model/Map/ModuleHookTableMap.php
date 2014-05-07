@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Module;
-use Thelia\Model\ModuleQuery;
+use Thelia\Model\ModuleHook;
+use Thelia\Model\ModuleHookQuery;
 
 
 /**
- * This class defines the structure of the 'module' table.
+ * This class defines the structure of the 'module_hook' table.
  *
  *
  *
@@ -26,14 +26,14 @@ use Thelia\Model\ModuleQuery;
  * (i.e. if it's a text column type).
  *
  */
-class ModuleTableMap extends TableMap
+class ModuleHookTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.ModuleTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.ModuleHookTableMap';
 
     /**
      * The default database name for this class
@@ -43,17 +43,17 @@ class ModuleTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'module';
+    const TABLE_NAME = 'module_hook';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Module';
+    const OM_CLASS = '\\Thelia\\Model\\ModuleHook';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Module';
+    const CLASS_DEFAULT = 'Thelia.Model.ModuleHook';
 
     /**
      * The total number of columns
@@ -73,56 +73,47 @@ class ModuleTableMap extends TableMap
     /**
      * the column name for the ID field
      */
-    const ID = 'module.ID';
+    const ID = 'module_hook.ID';
 
     /**
-     * the column name for the CODE field
+     * the column name for the MODULE_ID field
      */
-    const CODE = 'module.CODE';
+    const MODULE_ID = 'module_hook.MODULE_ID';
 
     /**
-     * the column name for the TYPE field
+     * the column name for the EVENT field
      */
-    const TYPE = 'module.TYPE';
+    const EVENT = 'module_hook.EVENT';
 
     /**
-     * the column name for the ACTIVATE field
+     * the column name for the CLASSNAME field
      */
-    const ACTIVATE = 'module.ACTIVATE';
+    const CLASSNAME = 'module_hook.CLASSNAME';
 
     /**
-     * the column name for the POSITION field
+     * the column name for the METHOD field
      */
-    const POSITION = 'module.POSITION';
+    const METHOD = 'module_hook.METHOD';
 
     /**
-     * the column name for the FULL_NAMESPACE field
+     * the column name for the ACTIVE field
      */
-    const FULL_NAMESPACE = 'module.FULL_NAMESPACE';
+    const ACTIVE = 'module_hook.ACTIVE';
 
     /**
-     * the column name for the CREATED_AT field
+     * the column name for the MODULE_ACTIVE field
      */
-    const CREATED_AT = 'module.CREATED_AT';
+    const MODULE_ACTIVE = 'module_hook.MODULE_ACTIVE';
 
     /**
-     * the column name for the UPDATED_AT field
+     * the column name for the PRIORITY field
      */
-    const UPDATED_AT = 'module.UPDATED_AT';
+    const PRIORITY = 'module_hook.PRIORITY';
 
     /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
-
-    // i18n behavior
-
-    /**
-     * The default locale to use for translations.
-     *
-     * @var string
-     */
-    const DEFAULT_LOCALE = 'en_US';
 
     /**
      * holds an array of fieldnames
@@ -131,11 +122,11 @@ class ModuleTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Code', 'Type', 'Activate', 'Position', 'FullNamespace', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'type', 'activate', 'position', 'fullNamespace', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ModuleTableMap::ID, ModuleTableMap::CODE, ModuleTableMap::TYPE, ModuleTableMap::ACTIVATE, ModuleTableMap::POSITION, ModuleTableMap::FULL_NAMESPACE, ModuleTableMap::CREATED_AT, ModuleTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'TYPE', 'ACTIVATE', 'POSITION', 'FULL_NAMESPACE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'code', 'type', 'activate', 'position', 'full_namespace', 'created_at', 'updated_at', ),
+        self::TYPE_PHPNAME       => array('Id', 'ModuleId', 'Event', 'Classname', 'Method', 'Active', 'ModuleActive', 'Priority', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'moduleId', 'event', 'classname', 'method', 'active', 'moduleActive', 'priority', ),
+        self::TYPE_COLNAME       => array(ModuleHookTableMap::ID, ModuleHookTableMap::MODULE_ID, ModuleHookTableMap::EVENT, ModuleHookTableMap::CLASSNAME, ModuleHookTableMap::METHOD, ModuleHookTableMap::ACTIVE, ModuleHookTableMap::MODULE_ACTIVE, ModuleHookTableMap::PRIORITY, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'MODULE_ID', 'EVENT', 'CLASSNAME', 'METHOD', 'ACTIVE', 'MODULE_ACTIVE', 'PRIORITY', ),
+        self::TYPE_FIELDNAME     => array('id', 'module_id', 'event', 'classname', 'method', 'active', 'module_active', 'priority', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
@@ -146,11 +137,11 @@ class ModuleTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Type' => 2, 'Activate' => 3, 'Position' => 4, 'FullNamespace' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'type' => 2, 'activate' => 3, 'position' => 4, 'fullNamespace' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
-        self::TYPE_COLNAME       => array(ModuleTableMap::ID => 0, ModuleTableMap::CODE => 1, ModuleTableMap::TYPE => 2, ModuleTableMap::ACTIVATE => 3, ModuleTableMap::POSITION => 4, ModuleTableMap::FULL_NAMESPACE => 5, ModuleTableMap::CREATED_AT => 6, ModuleTableMap::UPDATED_AT => 7, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'TYPE' => 2, 'ACTIVATE' => 3, 'POSITION' => 4, 'FULL_NAMESPACE' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'type' => 2, 'activate' => 3, 'position' => 4, 'full_namespace' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ModuleId' => 1, 'Event' => 2, 'Classname' => 3, 'Method' => 4, 'Active' => 5, 'ModuleActive' => 6, 'Priority' => 7, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'moduleId' => 1, 'event' => 2, 'classname' => 3, 'method' => 4, 'active' => 5, 'moduleActive' => 6, 'priority' => 7, ),
+        self::TYPE_COLNAME       => array(ModuleHookTableMap::ID => 0, ModuleHookTableMap::MODULE_ID => 1, ModuleHookTableMap::EVENT => 2, ModuleHookTableMap::CLASSNAME => 3, ModuleHookTableMap::METHOD => 4, ModuleHookTableMap::ACTIVE => 5, ModuleHookTableMap::MODULE_ACTIVE => 6, ModuleHookTableMap::PRIORITY => 7, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'MODULE_ID' => 1, 'EVENT' => 2, 'CLASSNAME' => 3, 'METHOD' => 4, 'ACTIVE' => 5, 'MODULE_ACTIVE' => 6, 'PRIORITY' => 7, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'module_id' => 1, 'event' => 2, 'classname' => 3, 'method' => 4, 'active' => 5, 'module_active' => 6, 'priority' => 7, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
@@ -164,20 +155,20 @@ class ModuleTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('module');
-        $this->setPhpName('Module');
-        $this->setClassName('\\Thelia\\Model\\Module');
+        $this->setName('module_hook');
+        $this->setPhpName('ModuleHook');
+        $this->setClassName('\\Thelia\\Model\\ModuleHook');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('CODE', 'Code', 'VARCHAR', true, 55, null);
-        $this->addColumn('TYPE', 'Type', 'TINYINT', true, null, null);
-        $this->addColumn('ACTIVATE', 'Activate', 'TINYINT', false, null, null);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
-        $this->addColumn('FULL_NAMESPACE', 'FullNamespace', 'VARCHAR', false, 255, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addForeignKey('MODULE_ID', 'ModuleId', 'INTEGER', 'module', 'ID', true, null, null);
+        $this->addColumn('EVENT', 'Event', 'VARCHAR', false, 255, null);
+        $this->addColumn('CLASSNAME', 'Classname', 'VARCHAR', false, 255, null);
+        $this->addColumn('METHOD', 'Method', 'VARCHAR', false, 255, null);
+        $this->addColumn('ACTIVE', 'Active', 'BOOLEAN', true, 1, null);
+        $this->addColumn('MODULE_ACTIVE', 'ModuleActive', 'BOOLEAN', true, 1, null);
+        $this->addColumn('PRIORITY', 'Priority', 'INTEGER', true, null, null);
     } // initialize()
 
     /**
@@ -185,40 +176,8 @@ class ModuleTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('OrderRelatedByPaymentModuleId', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'payment_module_id', ), 'RESTRICT', 'RESTRICT', 'OrdersRelatedByPaymentModuleId');
-        $this->addRelation('OrderRelatedByDeliveryModuleId', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'delivery_module_id', ), 'RESTRICT', 'RESTRICT', 'OrdersRelatedByDeliveryModuleId');
-        $this->addRelation('ModuleHook', '\\Thelia\\Model\\ModuleHook', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'RESTRICT', 'RESTRICT', 'ModuleHooks');
-        $this->addRelation('AreaDeliveryModule', '\\Thelia\\Model\\AreaDeliveryModule', RelationMap::ONE_TO_MANY, array('id' => 'delivery_module_id', ), 'CASCADE', 'RESTRICT', 'AreaDeliveryModules');
-        $this->addRelation('ProfileModule', '\\Thelia\\Model\\ProfileModule', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', 'RESTRICT', 'ProfileModules');
-        $this->addRelation('ModuleImage', '\\Thelia\\Model\\ModuleImage', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', 'RESTRICT', 'ModuleImages');
-        $this->addRelation('ModuleI18n', '\\Thelia\\Model\\ModuleI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ModuleI18ns');
+        $this->addRelation('Module', '\\Thelia\\Model\\Module', RelationMap::MANY_TO_ONE, array('module_id' => 'id', ), 'RESTRICT', 'RESTRICT');
     } // buildRelations()
-
-    /**
-     *
-     * Gets the list of behaviors registered for this table
-     *
-     * @return array Associative array (name => parameters) of behaviors
-     */
-    public function getBehaviors()
-    {
-        return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
-        );
-    } // getBehaviors()
-    /**
-     * Method to invalidate the instance pool of all tables related to module     * by a foreign key with ON DELETE CASCADE
-     */
-    public static function clearRelatedInstancePool()
-    {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                AreaDeliveryModuleTableMap::clearInstancePool();
-                ProfileModuleTableMap::clearInstancePool();
-                ModuleImageTableMap::clearInstancePool();
-                ModuleI18nTableMap::clearInstancePool();
-            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -276,7 +235,7 @@ class ModuleTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? ModuleTableMap::CLASS_DEFAULT : ModuleTableMap::OM_CLASS;
+        return $withPrefix ? ModuleHookTableMap::CLASS_DEFAULT : ModuleHookTableMap::OM_CLASS;
     }
 
     /**
@@ -290,21 +249,21 @@ class ModuleTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Module object, last column rank)
+     * @return array (ModuleHook object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = ModuleTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = ModuleTableMap::getInstanceFromPool($key))) {
+        $key = ModuleHookTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ModuleHookTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + ModuleTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ModuleHookTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = ModuleTableMap::OM_CLASS;
+            $cls = ModuleHookTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            ModuleTableMap::addInstanceToPool($obj, $key);
+            ModuleHookTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -327,8 +286,8 @@ class ModuleTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = ModuleTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = ModuleTableMap::getInstanceFromPool($key))) {
+            $key = ModuleHookTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ModuleHookTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -337,7 +296,7 @@ class ModuleTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                ModuleTableMap::addInstanceToPool($obj, $key);
+                ModuleHookTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -358,23 +317,23 @@ class ModuleTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ModuleTableMap::ID);
-            $criteria->addSelectColumn(ModuleTableMap::CODE);
-            $criteria->addSelectColumn(ModuleTableMap::TYPE);
-            $criteria->addSelectColumn(ModuleTableMap::ACTIVATE);
-            $criteria->addSelectColumn(ModuleTableMap::POSITION);
-            $criteria->addSelectColumn(ModuleTableMap::FULL_NAMESPACE);
-            $criteria->addSelectColumn(ModuleTableMap::CREATED_AT);
-            $criteria->addSelectColumn(ModuleTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(ModuleHookTableMap::ID);
+            $criteria->addSelectColumn(ModuleHookTableMap::MODULE_ID);
+            $criteria->addSelectColumn(ModuleHookTableMap::EVENT);
+            $criteria->addSelectColumn(ModuleHookTableMap::CLASSNAME);
+            $criteria->addSelectColumn(ModuleHookTableMap::METHOD);
+            $criteria->addSelectColumn(ModuleHookTableMap::ACTIVE);
+            $criteria->addSelectColumn(ModuleHookTableMap::MODULE_ACTIVE);
+            $criteria->addSelectColumn(ModuleHookTableMap::PRIORITY);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.CODE');
-            $criteria->addSelectColumn($alias . '.TYPE');
-            $criteria->addSelectColumn($alias . '.ACTIVATE');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.FULL_NAMESPACE');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.MODULE_ID');
+            $criteria->addSelectColumn($alias . '.EVENT');
+            $criteria->addSelectColumn($alias . '.CLASSNAME');
+            $criteria->addSelectColumn($alias . '.METHOD');
+            $criteria->addSelectColumn($alias . '.ACTIVE');
+            $criteria->addSelectColumn($alias . '.MODULE_ACTIVE');
+            $criteria->addSelectColumn($alias . '.PRIORITY');
         }
     }
 
@@ -387,7 +346,7 @@ class ModuleTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(ModuleTableMap::DATABASE_NAME)->getTable(ModuleTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ModuleHookTableMap::DATABASE_NAME)->getTable(ModuleHookTableMap::TABLE_NAME);
     }
 
     /**
@@ -395,16 +354,16 @@ class ModuleTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ModuleTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(ModuleTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new ModuleTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ModuleHookTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(ModuleHookTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new ModuleHookTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Module or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ModuleHook or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Module object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ModuleHook object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -415,25 +374,25 @@ class ModuleTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ModuleTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ModuleHookTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Module) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\ModuleHook) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(ModuleTableMap::DATABASE_NAME);
-            $criteria->add(ModuleTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ModuleHookTableMap::DATABASE_NAME);
+            $criteria->add(ModuleHookTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = ModuleQuery::create()->mergeWith($criteria);
+        $query = ModuleHookQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { ModuleTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { ModuleHookTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { ModuleTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { ModuleHookTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -441,20 +400,20 @@ class ModuleTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the module table.
+     * Deletes all rows from the module_hook table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return ModuleQuery::create()->doDeleteAll($con);
+        return ModuleHookQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Module or Criteria object.
+     * Performs an INSERT on the database, given a ModuleHook or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Module object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or ModuleHook object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -463,22 +422,22 @@ class ModuleTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ModuleTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ModuleHookTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Module object
+            $criteria = $criteria->buildCriteria(); // build Criteria from ModuleHook object
         }
 
-        if ($criteria->containsKey(ModuleTableMap::ID) && $criteria->keyContainsValue(ModuleTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ModuleTableMap::ID.')');
+        if ($criteria->containsKey(ModuleHookTableMap::ID) && $criteria->keyContainsValue(ModuleHookTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ModuleHookTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = ModuleQuery::create()->mergeWith($criteria);
+        $query = ModuleHookQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -494,7 +453,7 @@ class ModuleTableMap extends TableMap
         return $pk;
     }
 
-} // ModuleTableMap
+} // ModuleHookTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-ModuleTableMap::buildTableMap();
+ModuleHookTableMap::buildTableMap();

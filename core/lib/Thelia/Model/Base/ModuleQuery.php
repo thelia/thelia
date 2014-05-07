@@ -3,7 +3,6 @@
 namespace Thelia\Model\Base;
 
 use \Exception;
-use \ModuleHook;
 use \PDO;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -725,16 +724,16 @@ abstract class ModuleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \ModuleHook object
+     * Filter the query by a related \Thelia\Model\ModuleHook object
      *
-     * @param \ModuleHook|ObjectCollection $moduleHook  the related object to use as filter
+     * @param \Thelia\Model\ModuleHook|ObjectCollection $moduleHook  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
     public function filterByModuleHook($moduleHook, $comparison = null)
     {
-        if ($moduleHook instanceof \ModuleHook) {
+        if ($moduleHook instanceof \Thelia\Model\ModuleHook) {
             return $this
                 ->addUsingAlias(ModuleTableMap::ID, $moduleHook->getModuleId(), $comparison);
         } elseif ($moduleHook instanceof ObjectCollection) {
@@ -743,7 +742,7 @@ abstract class ModuleQuery extends ModelCriteria
                 ->filterByPrimaryKeys($moduleHook->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByModuleHook() only accepts arguments of type \ModuleHook or Collection');
+            throw new PropelException('filterByModuleHook() only accepts arguments of type \Thelia\Model\ModuleHook or Collection');
         }
     }
 
@@ -788,13 +787,13 @@ abstract class ModuleQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \ModuleHookQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ModuleHookQuery A secondary query class using the current class as primary query
      */
     public function useModuleHookQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinModuleHook($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ModuleHook', '\ModuleHookQuery');
+            ->useQuery($relationAlias ? $relationAlias : 'ModuleHook', '\Thelia\Model\ModuleHookQuery');
     }
 
     /**
