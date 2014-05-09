@@ -703,11 +703,11 @@ final class TheliaEvents
     /**
      * Hook
      */
-    const HOOK_BEFORE_RENDER = 'thelia.hook.beforeProcess';
+    const BEFORE_HOOK_RENDER = 'thelia.hook.beforeRender';
     const HOOK_PROCESS_RENDER = 'thelia.hook.processRender';
-    const HOOK_AFTER_RENDER = 'thelia.hook.afterProcess';
-    //
-    const MODULE_HOOK_UPDATE_POSITION = 'thelia.hook.action.update';
+    const AFTER_HOOK_RENDER = 'thelia.hook.afterRender';
+    const HOOK_UPDATE_POSITION = 'thelia.hook.action.update';
+    const HOOK_TOGGLE_ACTIVATION = 'thelia.hook.action.toggleActivation';
 
 
     /**

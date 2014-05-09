@@ -28,6 +28,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
+use Thelia\Model\Base\ModuleHookQuery;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
@@ -52,17 +53,40 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
 
     public function toggleModuleActivation(ModuleToggleActivationEvent $event)
     {
-        // Todo update module hook for the module
+        if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
+            Tlog::getInstance()->debug(sprintf(" GU %s %s", "toggle Module activation", $event->getModuleId()));
+            ModuleHookQuery::create()
+                ->filterByModuleId($module->getId())
+                ->update(array('ModuleActive' => ! ($module->getActivate() == BaseModule::IS_ACTIVATED)));
+
+            // already done
+            // $this->cacheClear($event->getDispatcher());
+        }
         return $event;
     }
 
-    public function deleteModuleActivation(ModuleDeleteEvent $event)
+    public function deleteModule(ModuleDeleteEvent $event)
     {
-        // Todo update module hook for the module
+        if ($event->getModuleId()) {
+            Tlog::getInstance()->debug(sprintf(" GU %s %s", "delete Module", $event->getModuleId()));
+
+            ModuleHookQuery::create()
+                ->filterByModuleId($event->getModuleId())
+                ->delete();
+
+            // already done
+            // $this->cacheClear($event->getDispatcher());
+        }
         return $event;
     }
 
-    public function updateModuleHookPosition(ModuleDeleteEvent $event)
+    public function toggleHookActivation(ModuleDeleteEvent $event)
+    {
+        // Todo update module hook for the module hook
+        return $event;
+    }
+
+    public function updateHookPosition(ModuleDeleteEvent $event)
     {
         // Todo update module hook for the module hook
         return $event;
@@ -100,11 +124,11 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleModuleActivation', 128),
-            TheliaEvents::MODULE_DELETE => array('deleteModuleActivation', 128),
-            TheliaEvents::MODULE_HOOK_UPDATE_POSITION => array('updateModuleHookPosition', 128),
+            TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleModuleActivation', 256),
+            TheliaEvents::MODULE_DELETE => array('deleteModule', 256),
+            TheliaEvents::HOOK_UPDATE_POSITION => array('updateHookPosition', 128),
+            TheliaEvents::HOOK_TOGGLE_ACTIVATION => array('toggleHookActivation', 128),
             // TheliaEvents::MODULE_HOOK_UPDATE_CONTEXT => array('updateModuleHookContext', 128),
-            // TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION => array('toggleModuleHookActivation', 128),
         );
     }
 }
