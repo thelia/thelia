@@ -101,12 +101,12 @@ class ConditionCollectionTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $collection = new ConditionCollection();
@@ -138,22 +138,22 @@ class ConditionCollectionTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators1 = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values1 = array(
-            MatchForTotalAmount::INPUT1 => 400,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators1, $values1);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
         $operators2 = array(
-            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values2 = array(
-            MatchForTotalAmount::INPUT1 => 600,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 600,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition2->setValidatorsFromForm($operators2, $values2);
 
         $collection = new ConditionCollection();
