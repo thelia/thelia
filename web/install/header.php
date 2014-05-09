@@ -30,7 +30,7 @@ $lang = isset($_REQUEST['lang']) ? $_REQUEST['lang'] : null;
 if($lang){
     $_SESSION['install']['lang'] = $_REQUEST['lang'];
 }
-elseif(!$lang && !$_SESSION['install']['lang']){
+elseif(!$lang && !isset($_SESSION['install']['lang'])){
     $_SESSION['install']['lang'] = "en_US";
 }
 
