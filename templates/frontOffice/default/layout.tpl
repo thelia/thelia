@@ -208,13 +208,8 @@ GNU General Public License : http://www.gnu.org/licenses/
     <div class="container">
 
         <div class="alert alert-success">
-            {hook name="header" }
+            {*hook name="header" *}
             {hook name="body" }
-            {*
-            {hook name="product-tab"}
-                Loremp
-            {/hook}
-            *}
         </div>
 
         {block name="breadcrumb"}{include file="misc/breadcrumb.tpl"}{/block}

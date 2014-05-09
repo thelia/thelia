@@ -48,21 +48,41 @@ abstract class BaseHook {
         /** @var \Thelia\Core\Template\Smarty\SmartyParser $templateDefinition */
         $templateDefinition = $smartyParser->getTemplateDefinition(false);
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
+
+        Tlog::getInstance()->debug(sprintf(" GU %s", print_r($templateDirectories, true) ));
+
+
         if (isset($templateDirectories[$templateDefinition->getName()]["0"])) {
             $templatePath = $templateDirectories[$templateDefinition->getName()]["0"]
                 . DS . TemplateDefinition::HOOK_OVERRIDE_SUBDIR
                 . DS . $this->module->getCode()
                 . DS . $templateName;
+            Tlog::getInstance()->debug(sprintf(" GU PATH1 %s", print_r($templatePath, true) ));
             if (! file_exists($templatePath)) {
                 $templatePath = null;
             }
         }
 
-        // If the smarty template doesn't exist, we take the template in the module directory
+        // If the smarty template doesn't exist, we try to see if there is an
+        // implementation for the template used in the module directory
         if (null === $templatePath){
             if (isset($templateDirectories[$templateDefinition->getName()][$this->module->getCode()])) {
                 $templatePath = $templateDirectories[$templateDefinition->getName()][$this->module->getCode()]
                     . DS . $templateName;
+                Tlog::getInstance()->debug(sprintf(" GU PATH2 %s", print_r($templatePath, true) ));
+                if (! file_exists($templatePath)) {
+                    $templatePath = null;
+                }
+            }
+        }
+
+        // Not here, we finally try to fallback on the default theme in the module
+        if (null === $templatePath && $templateDefinition->getName() !== TemplateDefinition::HOOK_DEFAULT_THEME) {
+            if ($templateDirectories[TemplateDefinition::HOOK_DEFAULT_THEME]
+                && isset($templateDirectories[TemplateDefinition::HOOK_DEFAULT_THEME][$this->module->getCode()])) {
+                $templatePath = $templateDirectories[TemplateDefinition::HOOK_DEFAULT_THEME][$this->module->getCode()]
+                    . DS . $templateName;
+                Tlog::getInstance()->debug(sprintf(" GU PATH3 %s", print_r($templatePath, true) ));
                 if (! file_exists($templatePath)) {
                     $templatePath = null;
                 }

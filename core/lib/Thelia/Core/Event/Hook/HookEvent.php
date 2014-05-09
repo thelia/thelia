@@ -22,8 +22,6 @@ use Thelia\Core\Hook\HookFragmentInterface;
  */
 class HookEvent extends Event {
 
-    protected $smarty = null;
-
     protected $id = null;
 
     protected $fragments = array();
@@ -67,23 +65,5 @@ class HookEvent extends Event {
     {
         return $this->id;
     }
-
-    /**
-     * @param null $smarty
-     */
-    public function setSmarty($smarty)
-    {
-        $this->smarty = $smarty;
-        return $this;
-    }
-
-    /**
-     * @return null
-     */
-    public function getSmarty()
-    {
-        return $this->smarty;
-    }
-
 
 } 
