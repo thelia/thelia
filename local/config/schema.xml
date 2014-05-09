@@ -2,9 +2,22 @@
 
 <database defaultIdMethod="native" name="thelia">
   <vendor type="mysql">
-    <parameter name="Engine" value="InnoDB"/>
-    <parameter name="Charset" value="utf8"/>
+      <parameter name="Engine" value="InnoDB"/>
+      <parameter name="Charset" value="utf8"/>
   </vendor>
+  <table name="api" namespace="Thelia\Model">
+      <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+      <column name="label" type="VARCHAR" size="255" />
+      <column name="api_key" type="VARCHAR" size="100" />
+      <column name="profile_id" type="INTEGER" />
+      <behavior name="timestampable" />
+      <index name="idx_api_profile_id">
+          <index-column name="profile_id" />
+      </index>
+      <foreign-key foreignTable="profile" name="fk_api_profile_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+          <reference foreign="id" local="profile_id"/>
+      </foreign-key>
+  </table>
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="parent" type="INTEGER" />

@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Profile;
-use Thelia\Model\ProfileQuery;
+use Thelia\Model\Api;
+use Thelia\Model\ApiQuery;
 
 
 /**
- * This class defines the structure of the 'profile' table.
+ * This class defines the structure of the 'api' table.
  *
  *
  *
@@ -26,14 +26,14 @@ use Thelia\Model\ProfileQuery;
  * (i.e. if it's a text column type).
  *
  */
-class ProfileTableMap extends TableMap
+class ApiTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.ProfileTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.ApiTableMap';
 
     /**
      * The default database name for this class
@@ -43,22 +43,22 @@ class ProfileTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'profile';
+    const TABLE_NAME = 'api';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Profile';
+    const OM_CLASS = '\\Thelia\\Model\\Api';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Profile';
+    const CLASS_DEFAULT = 'Thelia.Model.Api';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -68,41 +68,42 @@ class ProfileTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'profile.ID';
+    const ID = 'api.ID';
 
     /**
-     * the column name for the CODE field
+     * the column name for the LABEL field
      */
-    const CODE = 'profile.CODE';
+    const LABEL = 'api.LABEL';
+
+    /**
+     * the column name for the API_KEY field
+     */
+    const API_KEY = 'api.API_KEY';
+
+    /**
+     * the column name for the PROFILE_ID field
+     */
+    const PROFILE_ID = 'api.PROFILE_ID';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'profile.CREATED_AT';
+    const CREATED_AT = 'api.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'profile.UPDATED_AT';
+    const UPDATED_AT = 'api.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
-
-    // i18n behavior
-
-    /**
-     * The default locale to use for translations.
-     *
-     * @var string
-     */
-    const DEFAULT_LOCALE = 'en_US';
 
     /**
      * holds an array of fieldnames
@@ -111,12 +112,12 @@ class ProfileTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Code', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ProfileTableMap::ID, ProfileTableMap::CODE, ProfileTableMap::CREATED_AT, ProfileTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'code', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'Label', 'ApiKey', 'ProfileId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'label', 'apiKey', 'profileId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ApiTableMap::ID, ApiTableMap::LABEL, ApiTableMap::API_KEY, ApiTableMap::PROFILE_ID, ApiTableMap::CREATED_AT, ApiTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'LABEL', 'API_KEY', 'PROFILE_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'label', 'api_key', 'profile_id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -126,12 +127,12 @@ class ProfileTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(ProfileTableMap::ID => 0, ProfileTableMap::CODE => 1, ProfileTableMap::CREATED_AT => 2, ProfileTableMap::UPDATED_AT => 3, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Label' => 1, 'ApiKey' => 2, 'ProfileId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'label' => 1, 'apiKey' => 2, 'profileId' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(ApiTableMap::ID => 0, ApiTableMap::LABEL => 1, ApiTableMap::API_KEY => 2, ApiTableMap::PROFILE_ID => 3, ApiTableMap::CREATED_AT => 4, ApiTableMap::UPDATED_AT => 5, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LABEL' => 1, 'API_KEY' => 2, 'PROFILE_ID' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'label' => 1, 'api_key' => 2, 'profile_id' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -144,14 +145,16 @@ class ProfileTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('profile');
-        $this->setPhpName('Profile');
-        $this->setClassName('\\Thelia\\Model\\Profile');
+        $this->setName('api');
+        $this->setPhpName('Api');
+        $this->setClassName('\\Thelia\\Model\\Api');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('CODE', 'Code', 'VARCHAR', true, 30, null);
+        $this->addColumn('LABEL', 'Label', 'VARCHAR', false, 255, null);
+        $this->addColumn('API_KEY', 'ApiKey', 'VARCHAR', false, 100, null);
+        $this->addForeignKey('PROFILE_ID', 'ProfileId', 'INTEGER', 'profile', 'ID', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -161,12 +164,7 @@ class ProfileTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Api', '\\Thelia\\Model\\Api', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'RESTRICT', 'RESTRICT', 'Apis');
-        $this->addRelation('Admin', '\\Thelia\\Model\\Admin', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'RESTRICT', 'RESTRICT', 'Admins');
-        $this->addRelation('ProfileResource', '\\Thelia\\Model\\ProfileResource', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'CASCADE', 'RESTRICT', 'ProfileResources');
-        $this->addRelation('ProfileModule', '\\Thelia\\Model\\ProfileModule', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'CASCADE', 'CASCADE', 'ProfileModules');
-        $this->addRelation('ProfileI18n', '\\Thelia\\Model\\ProfileI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ProfileI18ns');
-        $this->addRelation('Resource', '\\Thelia\\Model\\Resource', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Resources');
+        $this->addRelation('Profile', '\\Thelia\\Model\\Profile', RelationMap::MANY_TO_ONE, array('profile_id' => 'id', ), 'RESTRICT', 'RESTRICT');
     } // buildRelations()
 
     /**
@@ -179,20 +177,8 @@ class ProfileTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
-    /**
-     * Method to invalidate the instance pool of all tables related to profile     * by a foreign key with ON DELETE CASCADE
-     */
-    public static function clearRelatedInstancePool()
-    {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                ProfileResourceTableMap::clearInstancePool();
-                ProfileModuleTableMap::clearInstancePool();
-                ProfileI18nTableMap::clearInstancePool();
-            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -250,7 +236,7 @@ class ProfileTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? ProfileTableMap::CLASS_DEFAULT : ProfileTableMap::OM_CLASS;
+        return $withPrefix ? ApiTableMap::CLASS_DEFAULT : ApiTableMap::OM_CLASS;
     }
 
     /**
@@ -264,21 +250,21 @@ class ProfileTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Profile object, last column rank)
+     * @return array (Api object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = ProfileTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = ProfileTableMap::getInstanceFromPool($key))) {
+        $key = ApiTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ApiTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + ProfileTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ApiTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = ProfileTableMap::OM_CLASS;
+            $cls = ApiTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            ProfileTableMap::addInstanceToPool($obj, $key);
+            ApiTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -301,8 +287,8 @@ class ProfileTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = ProfileTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = ProfileTableMap::getInstanceFromPool($key))) {
+            $key = ApiTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ApiTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -311,7 +297,7 @@ class ProfileTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                ProfileTableMap::addInstanceToPool($obj, $key);
+                ApiTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -332,13 +318,17 @@ class ProfileTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ProfileTableMap::ID);
-            $criteria->addSelectColumn(ProfileTableMap::CODE);
-            $criteria->addSelectColumn(ProfileTableMap::CREATED_AT);
-            $criteria->addSelectColumn(ProfileTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(ApiTableMap::ID);
+            $criteria->addSelectColumn(ApiTableMap::LABEL);
+            $criteria->addSelectColumn(ApiTableMap::API_KEY);
+            $criteria->addSelectColumn(ApiTableMap::PROFILE_ID);
+            $criteria->addSelectColumn(ApiTableMap::CREATED_AT);
+            $criteria->addSelectColumn(ApiTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.CODE');
+            $criteria->addSelectColumn($alias . '.LABEL');
+            $criteria->addSelectColumn($alias . '.API_KEY');
+            $criteria->addSelectColumn($alias . '.PROFILE_ID');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -353,7 +343,7 @@ class ProfileTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(ProfileTableMap::DATABASE_NAME)->getTable(ProfileTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ApiTableMap::DATABASE_NAME)->getTable(ApiTableMap::TABLE_NAME);
     }
 
     /**
@@ -361,16 +351,16 @@ class ProfileTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProfileTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(ProfileTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new ProfileTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ApiTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(ApiTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new ApiTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Profile or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a Api or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Profile object or primary key or array of primary keys
+     * @param mixed               $values Criteria or Api object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -381,25 +371,25 @@ class ProfileTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProfileTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ApiTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Profile) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\Api) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(ProfileTableMap::DATABASE_NAME);
-            $criteria->add(ProfileTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ApiTableMap::DATABASE_NAME);
+            $criteria->add(ApiTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = ProfileQuery::create()->mergeWith($criteria);
+        $query = ApiQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { ProfileTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { ApiTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { ProfileTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { ApiTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -407,20 +397,20 @@ class ProfileTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the profile table.
+     * Deletes all rows from the api table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return ProfileQuery::create()->doDeleteAll($con);
+        return ApiQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Profile or Criteria object.
+     * Performs an INSERT on the database, given a Api or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Profile object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or Api object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -429,22 +419,22 @@ class ProfileTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProfileTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ApiTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Profile object
+            $criteria = $criteria->buildCriteria(); // build Criteria from Api object
         }
 
-        if ($criteria->containsKey(ProfileTableMap::ID) && $criteria->keyContainsValue(ProfileTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProfileTableMap::ID.')');
+        if ($criteria->containsKey(ApiTableMap::ID) && $criteria->keyContainsValue(ApiTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ApiTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = ProfileQuery::create()->mergeWith($criteria);
+        $query = ApiQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -460,7 +450,7 @@ class ProfileTableMap extends TableMap
         return $pk;
     }
 
-} // ProfileTableMap
+} // ApiTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-ProfileTableMap::buildTableMap();
+ApiTableMap::buildTableMap();
