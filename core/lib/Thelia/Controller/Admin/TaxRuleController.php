@@ -16,6 +16,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\TaxRuleCreationForm;
 use Thelia\Form\TaxRuleModificationForm;
 use Thelia\Form\TaxRuleTaxListUpdateForm;

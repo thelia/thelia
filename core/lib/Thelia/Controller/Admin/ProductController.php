@@ -38,6 +38,7 @@ use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
 
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\FeatureQuery;

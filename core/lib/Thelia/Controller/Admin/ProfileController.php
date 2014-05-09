@@ -16,6 +16,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ProfileCreationForm;
 use Thelia\Form\ProfileModificationForm;
 use Thelia\Form\ProfileUpdateModuleAccessForm;

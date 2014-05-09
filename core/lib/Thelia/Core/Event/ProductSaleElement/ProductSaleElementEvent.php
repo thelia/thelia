@@ -19,7 +19,7 @@ class ProductSaleElementEvent extends ActionEvent
 {
     public $product_sale_element = null;
 
-    public function __construct(ProductSaleElement $product_sale_element = null)
+    public function __construct(ProductSaleElements $product_sale_element = null)
     {
         $this->product_sale_element = $product_sale_element;
     }

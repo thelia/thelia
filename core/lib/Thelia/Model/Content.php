@@ -56,9 +56,21 @@ class Content extends BaseContent
 
     public function setDefaultFolder($folderId)
     {
-/*        ContentFolderQuery::create()
-            ->filterByContentId($this->getId)
-            ->update(array("DefaultFolder" => 0));*/
+        // Unset previous category
+        ContentFolderQuery::create()
+            ->filterByContentId($this->getId())
+            ->filterByDefaultFolder(true)
+            ->find()
+            ->setByDefault(false)
+            ->save();
+
+        // Set new default category
+        ContentFolderQuery::create()
+            ->filterByContentId($this->getId())
+            ->filterByFolderId($folderId)
+            ->find()
+            ->setByDefault(true)
+            ->save();
 
         return $this;
     }

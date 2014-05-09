@@ -302,7 +302,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function createManual(OrderManualEvent $event)
     {
-        $placedOrder = $this->createOrder(
+        $this->createOrder(
             $event->getDispatcher(),
             $event->getOrder(),
             $event->getCurrency(),
