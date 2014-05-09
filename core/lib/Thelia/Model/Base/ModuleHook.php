@@ -96,10 +96,10 @@ abstract class ModuleHook implements ActiveRecordInterface
     protected $module_active;
 
     /**
-     * The value for the priority field.
+     * The value for the position field.
      * @var        int
      */
-    protected $priority;
+    protected $position;
 
     /**
      * @var        Module
@@ -450,14 +450,14 @@ abstract class ModuleHook implements ActiveRecordInterface
     }
 
     /**
-     * Get the [priority] column value.
+     * Get the [position] column value.
      *
      * @return   int
      */
-    public function getPriority()
+    public function getPosition()
     {
 
-        return $this->priority;
+        return $this->position;
     }
 
     /**
@@ -628,25 +628,25 @@ abstract class ModuleHook implements ActiveRecordInterface
     } // setModuleActive()
 
     /**
-     * Set the value of [priority] column.
+     * Set the value of [position] column.
      *
      * @param      int $v new value
      * @return   \Thelia\Model\ModuleHook The current object (for fluent API support)
      */
-    public function setPriority($v)
+    public function setPosition($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->priority !== $v) {
-            $this->priority = $v;
-            $this->modifiedColumns[ModuleHookTableMap::PRIORITY] = true;
+        if ($this->position !== $v) {
+            $this->position = $v;
+            $this->modifiedColumns[ModuleHookTableMap::POSITION] = true;
         }
 
 
         return $this;
-    } // setPriority()
+    } // setPosition()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -706,8 +706,8 @@ abstract class ModuleHook implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ModuleHookTableMap::translateFieldName('ModuleActive', TableMap::TYPE_PHPNAME, $indexType)];
             $this->module_active = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ModuleHookTableMap::translateFieldName('Priority', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->priority = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ModuleHookTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->position = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -962,8 +962,8 @@ abstract class ModuleHook implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleHookTableMap::MODULE_ACTIVE)) {
             $modifiedColumns[':p' . $index++]  = '`MODULE_ACTIVE`';
         }
-        if ($this->isColumnModified(ModuleHookTableMap::PRIORITY)) {
-            $modifiedColumns[':p' . $index++]  = '`PRIORITY`';
+        if ($this->isColumnModified(ModuleHookTableMap::POSITION)) {
+            $modifiedColumns[':p' . $index++]  = '`POSITION`';
         }
 
         $sql = sprintf(
@@ -997,8 +997,8 @@ abstract class ModuleHook implements ActiveRecordInterface
                     case '`MODULE_ACTIVE`':
                         $stmt->bindValue($identifier, (int) $this->module_active, PDO::PARAM_INT);
                         break;
-                    case '`PRIORITY`':
-                        $stmt->bindValue($identifier, $this->priority, PDO::PARAM_INT);
+                    case '`POSITION`':
+                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -1084,7 +1084,7 @@ abstract class ModuleHook implements ActiveRecordInterface
                 return $this->getModuleActive();
                 break;
             case 7:
-                return $this->getPriority();
+                return $this->getPosition();
                 break;
             default:
                 return null;
@@ -1122,7 +1122,7 @@ abstract class ModuleHook implements ActiveRecordInterface
             $keys[4] => $this->getMethod(),
             $keys[5] => $this->getActive(),
             $keys[6] => $this->getModuleActive(),
-            $keys[7] => $this->getPriority(),
+            $keys[7] => $this->getPosition(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1189,7 +1189,7 @@ abstract class ModuleHook implements ActiveRecordInterface
                 $this->setModuleActive($value);
                 break;
             case 7:
-                $this->setPriority($value);
+                $this->setPosition($value);
                 break;
         } // switch()
     }
@@ -1222,7 +1222,7 @@ abstract class ModuleHook implements ActiveRecordInterface
         if (array_key_exists($keys[4], $arr)) $this->setMethod($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setActive($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setModuleActive($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setPriority($arr[$keys[7]]);
+        if (array_key_exists($keys[7], $arr)) $this->setPosition($arr[$keys[7]]);
     }
 
     /**
@@ -1241,7 +1241,7 @@ abstract class ModuleHook implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleHookTableMap::METHOD)) $criteria->add(ModuleHookTableMap::METHOD, $this->method);
         if ($this->isColumnModified(ModuleHookTableMap::ACTIVE)) $criteria->add(ModuleHookTableMap::ACTIVE, $this->active);
         if ($this->isColumnModified(ModuleHookTableMap::MODULE_ACTIVE)) $criteria->add(ModuleHookTableMap::MODULE_ACTIVE, $this->module_active);
-        if ($this->isColumnModified(ModuleHookTableMap::PRIORITY)) $criteria->add(ModuleHookTableMap::PRIORITY, $this->priority);
+        if ($this->isColumnModified(ModuleHookTableMap::POSITION)) $criteria->add(ModuleHookTableMap::POSITION, $this->position);
 
         return $criteria;
     }
@@ -1311,7 +1311,7 @@ abstract class ModuleHook implements ActiveRecordInterface
         $copyObj->setMethod($this->getMethod());
         $copyObj->setActive($this->getActive());
         $copyObj->setModuleActive($this->getModuleActive());
-        $copyObj->setPriority($this->getPriority());
+        $copyObj->setPosition($this->getPosition());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1403,7 +1403,7 @@ abstract class ModuleHook implements ActiveRecordInterface
         $this->method = null;
         $this->active = null;
         $this->module_active = null;
-        $this->priority = null;
+        $this->position = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();

@@ -106,9 +106,9 @@ class ModuleHookTableMap extends TableMap
     const MODULE_ACTIVE = 'module_hook.MODULE_ACTIVE';
 
     /**
-     * the column name for the PRIORITY field
+     * the column name for the POSITION field
      */
-    const PRIORITY = 'module_hook.PRIORITY';
+    const POSITION = 'module_hook.POSITION';
 
     /**
      * The default string format for model objects of the related table
@@ -122,11 +122,11 @@ class ModuleHookTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ModuleId', 'Event', 'Classname', 'Method', 'Active', 'ModuleActive', 'Priority', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'moduleId', 'event', 'classname', 'method', 'active', 'moduleActive', 'priority', ),
-        self::TYPE_COLNAME       => array(ModuleHookTableMap::ID, ModuleHookTableMap::MODULE_ID, ModuleHookTableMap::EVENT, ModuleHookTableMap::CLASSNAME, ModuleHookTableMap::METHOD, ModuleHookTableMap::ACTIVE, ModuleHookTableMap::MODULE_ACTIVE, ModuleHookTableMap::PRIORITY, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'MODULE_ID', 'EVENT', 'CLASSNAME', 'METHOD', 'ACTIVE', 'MODULE_ACTIVE', 'PRIORITY', ),
-        self::TYPE_FIELDNAME     => array('id', 'module_id', 'event', 'classname', 'method', 'active', 'module_active', 'priority', ),
+        self::TYPE_PHPNAME       => array('Id', 'ModuleId', 'Event', 'Classname', 'Method', 'Active', 'ModuleActive', 'Position', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'moduleId', 'event', 'classname', 'method', 'active', 'moduleActive', 'position', ),
+        self::TYPE_COLNAME       => array(ModuleHookTableMap::ID, ModuleHookTableMap::MODULE_ID, ModuleHookTableMap::EVENT, ModuleHookTableMap::CLASSNAME, ModuleHookTableMap::METHOD, ModuleHookTableMap::ACTIVE, ModuleHookTableMap::MODULE_ACTIVE, ModuleHookTableMap::POSITION, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'MODULE_ID', 'EVENT', 'CLASSNAME', 'METHOD', 'ACTIVE', 'MODULE_ACTIVE', 'POSITION', ),
+        self::TYPE_FIELDNAME     => array('id', 'module_id', 'event', 'classname', 'method', 'active', 'module_active', 'position', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
@@ -137,11 +137,11 @@ class ModuleHookTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ModuleId' => 1, 'Event' => 2, 'Classname' => 3, 'Method' => 4, 'Active' => 5, 'ModuleActive' => 6, 'Priority' => 7, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'moduleId' => 1, 'event' => 2, 'classname' => 3, 'method' => 4, 'active' => 5, 'moduleActive' => 6, 'priority' => 7, ),
-        self::TYPE_COLNAME       => array(ModuleHookTableMap::ID => 0, ModuleHookTableMap::MODULE_ID => 1, ModuleHookTableMap::EVENT => 2, ModuleHookTableMap::CLASSNAME => 3, ModuleHookTableMap::METHOD => 4, ModuleHookTableMap::ACTIVE => 5, ModuleHookTableMap::MODULE_ACTIVE => 6, ModuleHookTableMap::PRIORITY => 7, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'MODULE_ID' => 1, 'EVENT' => 2, 'CLASSNAME' => 3, 'METHOD' => 4, 'ACTIVE' => 5, 'MODULE_ACTIVE' => 6, 'PRIORITY' => 7, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'module_id' => 1, 'event' => 2, 'classname' => 3, 'method' => 4, 'active' => 5, 'module_active' => 6, 'priority' => 7, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ModuleId' => 1, 'Event' => 2, 'Classname' => 3, 'Method' => 4, 'Active' => 5, 'ModuleActive' => 6, 'Position' => 7, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'moduleId' => 1, 'event' => 2, 'classname' => 3, 'method' => 4, 'active' => 5, 'moduleActive' => 6, 'position' => 7, ),
+        self::TYPE_COLNAME       => array(ModuleHookTableMap::ID => 0, ModuleHookTableMap::MODULE_ID => 1, ModuleHookTableMap::EVENT => 2, ModuleHookTableMap::CLASSNAME => 3, ModuleHookTableMap::METHOD => 4, ModuleHookTableMap::ACTIVE => 5, ModuleHookTableMap::MODULE_ACTIVE => 6, ModuleHookTableMap::POSITION => 7, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'MODULE_ID' => 1, 'EVENT' => 2, 'CLASSNAME' => 3, 'METHOD' => 4, 'ACTIVE' => 5, 'MODULE_ACTIVE' => 6, 'POSITION' => 7, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'module_id' => 1, 'event' => 2, 'classname' => 3, 'method' => 4, 'active' => 5, 'module_active' => 6, 'position' => 7, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
@@ -168,7 +168,7 @@ class ModuleHookTableMap extends TableMap
         $this->addColumn('METHOD', 'Method', 'VARCHAR', false, 255, null);
         $this->addColumn('ACTIVE', 'Active', 'BOOLEAN', true, 1, null);
         $this->addColumn('MODULE_ACTIVE', 'ModuleActive', 'BOOLEAN', true, 1, null);
-        $this->addColumn('PRIORITY', 'Priority', 'INTEGER', true, null, null);
+        $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
     } // initialize()
 
     /**
@@ -324,7 +324,7 @@ class ModuleHookTableMap extends TableMap
             $criteria->addSelectColumn(ModuleHookTableMap::METHOD);
             $criteria->addSelectColumn(ModuleHookTableMap::ACTIVE);
             $criteria->addSelectColumn(ModuleHookTableMap::MODULE_ACTIVE);
-            $criteria->addSelectColumn(ModuleHookTableMap::PRIORITY);
+            $criteria->addSelectColumn(ModuleHookTableMap::POSITION);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.MODULE_ID');
@@ -333,7 +333,7 @@ class ModuleHookTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.METHOD');
             $criteria->addSelectColumn($alias . '.ACTIVE');
             $criteria->addSelectColumn($alias . '.MODULE_ACTIVE');
-            $criteria->addSelectColumn($alias . '.PRIORITY');
+            $criteria->addSelectColumn($alias . '.POSITION');
         }
     }
 

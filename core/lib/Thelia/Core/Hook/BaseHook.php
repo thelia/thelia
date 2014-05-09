@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Hook;
 use Thelia\Core\Template\Smarty\SmartyParser;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
 use Thelia\Module\BaseModule;
 
@@ -21,7 +22,7 @@ use Thelia\Module\BaseModule;
  * @package Thelia\Core\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-abstract class BaseHook implements BaseHookInterface {
+abstract class BaseHook {
 
 
     /**
@@ -35,23 +36,84 @@ abstract class BaseHook implements BaseHookInterface {
     public $parser = null;
 
 
-    public function render($templateName)
+    public function render($templateName, array $parameters = array())
     {
+        $templatePath = null;
+
         // retrieve the template
         $smartyParser = $this->parser;
 
+        // First look into the current template in the right scope : frontOffice, backOffice, ...
+        // template should be overrided in : {template_path}/modules/{module_code}/{template_name}
         /** @var \Thelia\Core\Template\Smarty\SmartyParser $templateDefinition */
         $templateDefinition = $smartyParser->getTemplateDefinition(false);
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
+        if (isset($templateDirectories[$templateDefinition->getName()]["0"])) {
+            $templatePath = $templateDirectories[$templateDefinition->getName()]["0"]
+                . DS . TemplateDefinition::HOOK_OVERRIDE_SUBDIR
+                . DS . $this->module->getCode()
+                . DS . $templateName;
+            if (! file_exists($templatePath)) {
+                $templatePath = null;
+            }
+        }
 
-        Tlog::getInstance()->addDebug(" GU _HOOK_ render :: " . print_r($templateDirectories, true) );
+        // If the smarty template doesn't exist, we take the template in the module directory
+        if (null === $templatePath){
+            if (isset($templateDirectories[$templateDefinition->getName()][$this->module->getCode()])) {
+                $templatePath = $templateDirectories[$templateDefinition->getName()][$this->module->getCode()]
+                    . DS . $templateName;
+                if (! file_exists($templatePath)) {
+                    $templatePath = null;
+                }
+            }
+        }
 
-        return "BOOM";
+        $content = "";
+        if (null !== $templatePath){
+            $content = $smartyParser->render($templatePath, $parameters);
+        } else {
+            $content = sprintf("ERR: Unknow template %s for module %s", $templateName, $this->module->getCode());
+        }
+
+        return $content;
     }
 
-    public function assign($name, $value)
+
+
+    /**
+     * @param \Thelia\Module\BaseModule $module
+     */
+    public function setModule($module)
     {
-        // TODO: Implement assign() method.
+        $this->module = $module;
     }
+
+    /**
+     * @return \Thelia\Module\BaseModule
+     */
+    public function getModule()
+    {
+        return $this->module;
+    }
+
+    /**
+     * @param \Thelia\Core\Template\Smarty\SmartyParser $parser
+     */
+    public function setParser($parser)
+    {
+        $this->parser = $parser;
+    }
+
+    /**
+     * @return \Thelia\Core\Template\Smarty\SmartyParser
+     */
+    public function getParser()
+    {
+        return $this->parser;
+    }
+
+
+
 
 } 

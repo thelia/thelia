@@ -747,7 +747,7 @@
     <column name="method" size="255" type="VARCHAR" />
     <column name="active" required="true" type="BOOLEAN" />
     <column name="module_active" required="true" type="BOOLEAN" />
-    <column name="priority" required="true" type="INTEGER" />
+    <column name="position" required="true" type="INTEGER" />
     <index name="idx_module_event">
       <index-column name="event" />
     </index>

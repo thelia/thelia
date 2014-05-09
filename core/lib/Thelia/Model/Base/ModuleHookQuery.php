@@ -28,7 +28,7 @@ use Thelia\Model\Map\ModuleHookTableMap;
  * @method     ChildModuleHookQuery orderByMethod($order = Criteria::ASC) Order by the method column
  * @method     ChildModuleHookQuery orderByActive($order = Criteria::ASC) Order by the active column
  * @method     ChildModuleHookQuery orderByModuleActive($order = Criteria::ASC) Order by the module_active column
- * @method     ChildModuleHookQuery orderByPriority($order = Criteria::ASC) Order by the priority column
+ * @method     ChildModuleHookQuery orderByPosition($order = Criteria::ASC) Order by the position column
  *
  * @method     ChildModuleHookQuery groupById() Group by the id column
  * @method     ChildModuleHookQuery groupByModuleId() Group by the module_id column
@@ -37,7 +37,7 @@ use Thelia\Model\Map\ModuleHookTableMap;
  * @method     ChildModuleHookQuery groupByMethod() Group by the method column
  * @method     ChildModuleHookQuery groupByActive() Group by the active column
  * @method     ChildModuleHookQuery groupByModuleActive() Group by the module_active column
- * @method     ChildModuleHookQuery groupByPriority() Group by the priority column
+ * @method     ChildModuleHookQuery groupByPosition() Group by the position column
  *
  * @method     ChildModuleHookQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildModuleHookQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -57,7 +57,7 @@ use Thelia\Model\Map\ModuleHookTableMap;
  * @method     ChildModuleHook findOneByMethod(string $method) Return the first ChildModuleHook filtered by the method column
  * @method     ChildModuleHook findOneByActive(boolean $active) Return the first ChildModuleHook filtered by the active column
  * @method     ChildModuleHook findOneByModuleActive(boolean $module_active) Return the first ChildModuleHook filtered by the module_active column
- * @method     ChildModuleHook findOneByPriority(int $priority) Return the first ChildModuleHook filtered by the priority column
+ * @method     ChildModuleHook findOneByPosition(int $position) Return the first ChildModuleHook filtered by the position column
  *
  * @method     array findById(int $id) Return ChildModuleHook objects filtered by the id column
  * @method     array findByModuleId(int $module_id) Return ChildModuleHook objects filtered by the module_id column
@@ -66,7 +66,7 @@ use Thelia\Model\Map\ModuleHookTableMap;
  * @method     array findByMethod(string $method) Return ChildModuleHook objects filtered by the method column
  * @method     array findByActive(boolean $active) Return ChildModuleHook objects filtered by the active column
  * @method     array findByModuleActive(boolean $module_active) Return ChildModuleHook objects filtered by the module_active column
- * @method     array findByPriority(int $priority) Return ChildModuleHook objects filtered by the priority column
+ * @method     array findByPosition(int $position) Return ChildModuleHook objects filtered by the position column
  *
  */
 abstract class ModuleHookQuery extends ModelCriteria
@@ -155,7 +155,7 @@ abstract class ModuleHookQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `MODULE_ID`, `EVENT`, `CLASSNAME`, `METHOD`, `ACTIVE`, `MODULE_ACTIVE`, `PRIORITY` FROM `module_hook` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `MODULE_ID`, `EVENT`, `CLASSNAME`, `METHOD`, `ACTIVE`, `MODULE_ACTIVE`, `POSITION` FROM `module_hook` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -470,16 +470,16 @@ abstract class ModuleHookQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the priority column
+     * Filter the query on the position column
      *
      * Example usage:
      * <code>
-     * $query->filterByPriority(1234); // WHERE priority = 1234
-     * $query->filterByPriority(array(12, 34)); // WHERE priority IN (12, 34)
-     * $query->filterByPriority(array('min' => 12)); // WHERE priority > 12
+     * $query->filterByPosition(1234); // WHERE position = 1234
+     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
+     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
      * </code>
      *
-     * @param     mixed $priority The value to use as filter.
+     * @param     mixed $position The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -487,16 +487,16 @@ abstract class ModuleHookQuery extends ModelCriteria
      *
      * @return ChildModuleHookQuery The current query, for fluid interface
      */
-    public function filterByPriority($priority = null, $comparison = null)
+    public function filterByPosition($position = null, $comparison = null)
     {
-        if (is_array($priority)) {
+        if (is_array($position)) {
             $useMinMax = false;
-            if (isset($priority['min'])) {
-                $this->addUsingAlias(ModuleHookTableMap::PRIORITY, $priority['min'], Criteria::GREATER_EQUAL);
+            if (isset($position['min'])) {
+                $this->addUsingAlias(ModuleHookTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($priority['max'])) {
-                $this->addUsingAlias(ModuleHookTableMap::PRIORITY, $priority['max'], Criteria::LESS_EQUAL);
+            if (isset($position['max'])) {
+                $this->addUsingAlias(ModuleHookTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -507,7 +507,7 @@ abstract class ModuleHookQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ModuleHookTableMap::PRIORITY, $priority, $comparison);
+        return $this->addUsingAlias(ModuleHookTableMap::POSITION, $position, $comparison);
     }
 
     /**

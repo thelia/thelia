@@ -885,7 +885,7 @@ CREATE TABLE `module_hook`
     `method` VARCHAR(255),
     `active` TINYINT(1) NOT NULL,
     `module_active` TINYINT(1) NOT NULL,
-    `priority` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_module_event` (`event`),
     INDEX `idx_module_hook_event` (`event`),

@@ -75,11 +75,10 @@ class RegisterListenersPass implements CompilerPassInterface
 
             $class = $container->getDefinition($id)->getClass();
 
-            // the class must implements BaseHookInterface
-            $refClass = new \ReflectionClass($class);
-            $interface = 'Thelia\Core\Hook\BaseHookInterface';
-            if (!$refClass->implementsInterface($interface)) {
-                throw new \InvalidArgumentException(sprintf('Hook "%s" must implement interface "%s".', $id, $interface));
+            // the class must extends BaseHook
+            $implementClass = 'Thelia\Core\Hook\BaseHook';
+            if (! is_subclass_of($class, $implementClass)) {
+                throw new \InvalidArgumentException(sprintf('Hook class "%s" must extends class "%s".', $class, $implementClass));
             }
 
             // retrieve the module id
@@ -109,11 +108,14 @@ class RegisterListenersPass implements CompilerPassInterface
                         ), array('strtoupper("\\0")', ''), $event['event']);
                 }
 
+                // TODO test if method exists in the class
+
                 // test if hook is already registered in ModuleHook
                 $moduleHook = ModuleHookQuery::create()
                     ->filterByModuleId($module)
                     ->filterByEvent($event['event'])
                     ->findOne();
+
                 if (null === $moduleHook) {
                     // hook for module doesn't exist, we add it with default registered values
                     $moduleHook = new ModuleHook();
@@ -124,7 +126,7 @@ class RegisterListenersPass implements CompilerPassInterface
                         ->setMethod($event['method'])
                         ->setActive(true)
                         ->setModuleActive(true)
-                        ->setPriority($priority)
+                        ->setPosition(ModuleHook::MAX_POSITION)
                         ->save();
                 }
             }
@@ -132,18 +134,41 @@ class RegisterListenersPass implements CompilerPassInterface
 
         // now we can add listeners for active hooks and active module
         $moduleHooks = ModuleHookQuery::create()
-            ->filterByActive(true)
-            ->filterByModuleActive(true)
+            //->filterByActive(true)
+            //->filterByModuleActive(true)
+            ->orderByEvent()
+            ->orderByPosition()
+            ->orderById()
             ->find();
+
+        $modulePosition = 0;
+        $moduleEvent = "";
+        /** @var ModuleHook $moduleHook */
         foreach ($moduleHooks as $moduleHook) {
-            Tlog::getInstance()->addDebug(" GU _HOOK_ addListenerService");
-            $definition->addMethodCall('addListenerService',
-                array(
-                    'hook.' . $moduleHook->getEvent(),
-                    array($moduleHook->getClassname(), $moduleHook->getMethod()),
-                    $moduleHook->getPriority()
-                )
-            );
+            // manage module hook position for new hook
+            if ($moduleEvent !== $moduleHook->getEvent()){
+                $moduleEvent = $moduleHook->getEvent();
+                $modulePosition = 1;
+            } else {
+                $modulePosition++;
+            }
+            if ($moduleHook->getPosition() === ModuleHook::MAX_POSITION){
+                // new module hook, we set it at the end of the queue for this event
+                $moduleHook->setPosition($modulePosition)->save();
+            } else {
+                $modulePosition = $moduleHook->getPosition($modulePosition);
+            }
+            // Add the the new listener for active hooks, we have to reverse the priority and the position
+            if ($moduleHook->getActive() && $moduleHook->getModuleActive()){
+                Tlog::getInstance()->addDebug(" GU _HOOK_ addListenerService");
+                $definition->addMethodCall('addListenerService',
+                    array(
+                        'hook.' . $moduleHook->getEvent(),
+                        array($moduleHook->getClassname(), $moduleHook->getMethod()),
+                        ModuleHook::MAX_POSITION - $moduleHook->getPosition()
+                    )
+                );
+            }
         }
 
     }
