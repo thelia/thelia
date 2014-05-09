@@ -44,10 +44,9 @@ abstract class BaseHook implements BaseHookInterface {
         $templateDefinition = $smartyParser->getTemplateDefinition(false);
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
 
-        Tlog::getInstance()->addDebug("_HOOK_ render :: " . print_r($templateDirectories, true) );
+        Tlog::getInstance()->addDebug(" GU _HOOK_ render :: " . print_r($templateDirectories, true) );
 
-
-        // TODO: Implement render() method.
+        return "BOOM";
     }
 
     public function assign($name, $value)

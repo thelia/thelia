@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
-
+use Thelia\Log\Tlog;
 
 
 /**
@@ -234,6 +234,7 @@ class XmlFileLoader extends FileLoader
     protected function parseHook($id, $hook, $file, $type) {
         $definition = $this->parseService($id, $hook, $file);
         if (null !== $definition){
+            Tlog::getInstance()->debug(" GU _HOOK_ parse hook :: " . $id . " " . $type );
             if (null !== $type){
                 // inject the BaseModule
                 $definition->setProperty('module', new Reference($type));

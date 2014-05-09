@@ -73,23 +73,27 @@ class Thelia extends Kernel
         $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
         $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
         if ($this->isDebug()) {
-            $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
+            $serviceContainer->setLogger('defaultLogger', $this->getPropelLog());
             $con->useDebug(true);
         }
-
     }
 
     /**
-     * dispatch an event when application is boot
+     * Initialize a specific logger for propel.
+     *
+     * @return Tlog a Tlog instance
      */
-    public function boot()
+    protected function getPropelLog()
     {
-        parent::boot();
+        $log = Tlog::getNewInstance();
 
-        if (file_exists(THELIA_CONF_DIR . 'database.yml') === true) {
-            $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
-        }
+        $logFilePath = THELIA_ROOT."log".DS."propel.log";
 
+        $log->setPrefix("#LEVEL: #DATE #HOUR: ");
+        $log->setDestinations("\\Thelia\\Log\\Destination\\TlogDestinationFile");
+        $log->setConfig("\\Thelia\\Log\\Destination\\TlogDestinationFile", 0, $logFilePath);
+
+        return $log;
     }
 
     /**
@@ -119,7 +123,7 @@ class Thelia extends Kernel
     {
         // Get template path
         $templateDirectory = $module->getAbsoluteTemplateDirectoryPath($templateSubdirName);
-
+        Tlog::getInstance()->debug(" GU _HOOK_ template " . $module->getCode() . " " . $templateDirectory);
         try {
             $templateDirBrowser = new \DirectoryIterator($templateDirectory);
 
@@ -130,6 +134,10 @@ class Thelia extends Kernel
 
                 /* is it a directory which is not . or .. ? */
                 if ($templateDirContent->isDir() && ! $templateDirContent->isDot()) {
+
+                    Tlog::getInstance()->debug(" GU _HOOK_ template 2 " . $templateType . " " . $templateDirContent->getFilename() . ' ' .
+                        $templateDirContent->getPathName() . ' ' .
+                        $code);
 
                     $parser->addMethodCall(
                         'addTemplateDirectory',

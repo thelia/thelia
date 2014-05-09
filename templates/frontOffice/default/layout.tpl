@@ -192,9 +192,9 @@ GNU General Public License : http://www.gnu.org/licenses/
                     <span id="currency-label" class="dropdown-label">{intl l="Currency:"}</span>
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/currency"}">{currency attr="code"}</a>
                     <ul class="select dropdown-menu">
-                        {loop type="currency" name="currency_available" exclude="{currency attr="id"}" }
+                        {*loop type="currency" name="currency_available" exclude="{currency attr="id"}" }
                             <li><a href="{url path="{navigate to="current"}" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
-                        {/loop}
+                        {/loop*}
                     </ul>
                 </div>
             </div>
@@ -209,13 +209,12 @@ GNU General Public License : http://www.gnu.org/licenses/
 
         <div class="alert alert-success">
             {hook name="header" }
-
             {hook name="body" }
             {*
             {hook name="product-tab"}
                 Loremp
             {/hook}
-*}
+            *}
         </div>
 
         {block name="breadcrumb"}{include file="misc/breadcrumb.tpl"}{/block}

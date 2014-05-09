@@ -92,7 +92,7 @@ class RegisterListenersPass implements CompilerPassInterface
                     $module = $module->getId();
                 }
             }
-            //Tlog::getInstance()->addDebug("_HOOK_ addListenerService :: module = " . print_r($module, true));
+            Tlog::getInstance()->addDebug(" GU _HOOK_ addListenerService :: module = " . print_r($module, true));
 
             foreach ($events as $event) {
 
@@ -132,12 +132,11 @@ class RegisterListenersPass implements CompilerPassInterface
 
         // now we can add listeners for active hooks and active module
         $moduleHooks = ModuleHookQuery::create()
-            ->filterByModuleId(8)
             ->filterByActive(true)
             ->filterByModuleActive(true)
             ->find();
         foreach ($moduleHooks as $moduleHook) {
-            Tlog::getInstance()->addDebug("_HOOK_ addListenerService");
+            Tlog::getInstance()->addDebug(" GU _HOOK_ addListenerService");
             $definition->addMethodCall('addListenerService',
                 array(
                     'hook.' . $moduleHook->getEvent(),

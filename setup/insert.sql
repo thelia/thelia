@@ -115,7 +115,7 @@ INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
 
 INSERT INTO `currency` (`id`, `code`, `symbol`, `rate`, `position`, `by_default`, `created_at`, `updated_at`)
 VALUES
-(1, 'EUR', '€', '1', 1, '1', NOW(),  NOW()),
+(1, 'EUR', '€', '1.00', 1, '1', NOW(),  NOW()),
 (2, 'USD', '$', '1.26', 2, '0', NOW(), NOW()),
 (3, 'GBP', '£', '0.89', 3, '0', NOW(), NOW());
 
