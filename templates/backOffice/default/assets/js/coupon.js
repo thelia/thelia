@@ -105,6 +105,7 @@ $(function($){
                 $.couponManager.intlPleaseRetry
             );
         }).always(function() {
+            $('#condition-save-btn').hide();
             // Reload condition summaries ajax
             $.couponManager.displayConditionsSummary();
         });
