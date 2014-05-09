@@ -13,7 +13,7 @@
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\Operators;
-use Thelia\Exception\InvalidConditionOperatorException;
+use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
@@ -22,99 +22,64 @@ use Thelia\Model\CurrencyQuery;
  * Check if a Checkout total amount match criteria
  *
  * @package Condition
- * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>, Franck Allimant <franck@cqfdev.fr>
  *
  */
 class MatchForTotalAmount extends ConditionAbstract
 {
     /** Condition 1st parameter : price */
-    CONST INPUT1 = 'price';
+    CONST CART_TOTAL = 'price';
 
     /** Condition 1st parameter : currency */
-    CONST INPUT2 = 'currency';
+    CONST CART_CURRENCY = 'currency';
 
-    /** @var string Service Id from Resources/config.xml  */
-    protected $serviceId = 'thelia.condition.match_for_total_amount';
-
-    /** @var array Available Operators (Operators::CONST) */
-    protected $availableOperators = array(
-        self::INPUT1 => array(
-            Operators::INFERIOR,
-            Operators::INFERIOR_OR_EQUAL,
-            Operators::EQUAL,
-            Operators::SUPERIOR_OR_EQUAL,
-            Operators::SUPERIOR
-        ),
-        self::INPUT2 => array(
-            Operators::EQUAL,
-       )
-    );
-
-    /**
-     * Check validators relevancy and store them
-     *
-     * @param array $operators Operators the Admin set in BackOffice
-     * @param array $values    Values the Admin set in BackOffice
-     *
-     * @throws \InvalidArgumentException
-     * @return $this
-     */
-    public function setValidatorsFromForm(array $operators, array $values)
+    public function __construct(FacadeInterface $facade)
     {
-        $this->setValidators(
-            $operators[self::INPUT1],
-            $values[self::INPUT1],
-            $operators[self::INPUT2],
-            $values[self::INPUT2]
-        );
+        // Define the allowed comparison operators
+        $this->availableOperators = [
+            self::CART_TOTAL => [
+                Operators::INFERIOR,
+                Operators::INFERIOR_OR_EQUAL,
+                Operators::EQUAL,
+                Operators::SUPERIOR_OR_EQUAL,
+                Operators::SUPERIOR
+            ],
+            self::CART_CURRENCY => [
+                Operators::EQUAL,
+            ]
+        ];
 
-        return $this;
+        parent::__construct($facade);
     }
 
     /**
-     * Check validators relevancy and store them
-     *
-     * @param string $priceOperator    Price Operator ex <
-     * @param float  $priceValue       Price set to meet condition
-     * @param string $currencyOperator Currency Operator ex =
-     * @param string $currencyValue    Currency set to meet condition
-     *
-     * @throws \Thelia\Exception\InvalidConditionOperatorException
-     * @return $this
+     * @inheritdoc
      */
-    protected function setValidators($priceOperator, $priceValue, $currencyOperator, $currencyValue)
+    public function getServiceId()
     {
-        $isOperator1Legit = $this->isOperatorLegit(
-            $priceOperator,
-            $this->availableOperators[self::INPUT1]
-        );
-        if (!$isOperator1Legit) {
-            throw new InvalidConditionOperatorException(
-                get_class(), 'price'
-            );
-        }
+        return 'thelia.condition.match_for_total_amount';
+    }
 
-        $isOperator1Legit = $this->isOperatorLegit(
-            $currencyOperator,
-            $this->availableOperators[self::INPUT2]
-        );
-        if (!$isOperator1Legit) {
-            throw new InvalidConditionOperatorException(
-                get_class(), 'price'
-            );
-        }
+    /**
+     * @inheritdoc
+     */
+    public function setValidatorsFromForm(array $operators, array $values)
+    {
+        $this
+            ->checkComparisonOperatorValue($operators, self::CART_TOTAL)
+            ->checkComparisonOperatorValue($operators, self::CART_CURRENCY);
 
-        $this->isPriceValid($priceValue);
+        $this->isPriceValid($values[self::CART_TOTAL]);
 
-        $this->isCurrencyValid($currencyValue);
+        $this->isCurrencyValid($values[self::CART_CURRENCY]);
 
         $this->operators = array(
-            self::INPUT1 => $priceOperator,
-            self::INPUT2 => $currencyOperator,
+            self::CART_TOTAL => $operators[self::CART_TOTAL],
+            self::CART_CURRENCY => $operators[self::CART_CURRENCY],
         );
         $this->values = array(
-            self::INPUT1 => $priceValue,
-            self::INPUT2 => $currencyValue,
+            self::CART_TOTAL => $values[self::CART_TOTAL],
+            self::CART_CURRENCY => $values[self::CART_CURRENCY],
         );
 
         return $this;
@@ -129,25 +94,27 @@ class MatchForTotalAmount extends ConditionAbstract
     {
         $condition1 = $this->conditionValidator->variableOpComparison(
             $this->facade->getCartTotalPrice(),
-            $this->operators[self::INPUT1],
-            $this->values[self::INPUT1]
+            $this->operators[self::CART_TOTAL],
+            $this->values[self::CART_TOTAL]
         );
-        $condition2 = $this->conditionValidator->variableOpComparison(
-            $this->facade->getCheckoutCurrency(),
-            $this->operators[self::INPUT2],
-            $this->values[self::INPUT2]
-        );
-        if ($condition1 && $condition2) {
-            return true;
+
+        if ($condition1) {
+            $condition2 = $this->conditionValidator->variableOpComparison(
+                $this->facade->getCheckoutCurrency(),
+                $this->operators[self::CART_CURRENCY],
+                $this->values[self::CART_CURRENCY]
+            );
+
+            if ($condition2) {
+                return true;
+            }
         }
 
         return false;
     }
 
     /**
-     * Get I18n name
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getName()
     {
@@ -159,10 +126,7 @@ class MatchForTotalAmount extends ConditionAbstract
     }
 
     /**
-     * Get I18n tooltip
-     * Explain in detail what the Condition checks
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getToolTip()
     {
@@ -176,23 +140,21 @@ class MatchForTotalAmount extends ConditionAbstract
     }
 
     /**
-     * Get I18n summary
-     * Explain briefly the condition with given values
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getSummary()
     {
         $i18nOperator = Operators::getI18n(
-            $this->translator, $this->operators[self::INPUT1]
+            $this->translator,
+            $this->operators[self::CART_TOTAL]
         );
 
         $toolTip = $this->translator->trans(
             'If cart total amount is <strong>%operator%</strong> %amount% %currency%',
             array(
                 '%operator%' => $i18nOperator,
-                '%amount%' => $this->values[self::INPUT1],
-                '%currency%' => $this->values[self::INPUT2]
+                '%amount%' => $this->values[self::CART_TOTAL],
+                '%currency%' => $this->values[self::CART_CURRENCY]
             ),
             'condition'
         );
@@ -201,28 +163,28 @@ class MatchForTotalAmount extends ConditionAbstract
     }
 
     /**
-     * Generate inputs ready to be drawn
-     *
-     * @return array
+     * @inheritdoc
      */
     protected function generateInputs()
     {
         $currencies = CurrencyQuery::create()->find();
+
         $cleanedCurrencies = [];
+
         /** @var Currency $currency */
         foreach ($currencies as $currency) {
             $cleanedCurrencies[$currency->getCode()] = $currency->getSymbol();
         }
 
         return array(
-            self::INPUT1 => array(
-                'availableOperators' => $this->availableOperators[self::INPUT1],
+            self::CART_TOTAL => array(
+                'availableOperators' => $this->availableOperators[self::CART_TOTAL],
                 'availableValues' => '',
                 'value' => '',
                 'selectedOperator' => ''
             ),
-            self::INPUT2 => array(
-                'availableOperators' => $this->availableOperators[self::INPUT2],
+            self::CART_CURRENCY => array(
+                'availableOperators' => $this->availableOperators[self::CART_CURRENCY],
                 'availableValues' => $cleanedCurrencies,
                 'value' => '',
                 'selectedOperator' => Operators::EQUAL
@@ -231,10 +193,7 @@ class MatchForTotalAmount extends ConditionAbstract
     }
 
     /**
-     * Draw the input displayed in the BackOffice
-     * allowing Admin to set its Coupon Conditions
-     *
-     * @return string HTML string
+     * @inheritdoc
      */
     public function drawBackOfficeInputs()
     {
@@ -242,32 +201,26 @@ class MatchForTotalAmount extends ConditionAbstract
             ->getTranslator()
             ->trans('Cart total amount is', [], 'condition');
 
-        $html = $this->drawBackOfficeBaseInputsText($labelPrice, self::INPUT1);
+        $html = $this->drawBackOfficeBaseInputsText($labelPrice, self::CART_TOTAL);
 
         return $html;
     }
 
     /**
-     * Draw the base input displayed in the BackOffice
-     * allowing Admin to set its Coupon Conditions
-     *
-     * @param string $label    I18n input label
-     * @param string $inputKey Input key (ex: self::INPUT1)
-     *
-     * @return string HTML string
+     * @inheritdoc
      */
     protected function drawBackOfficeBaseInputsText($label, $inputKey)
     {
-        return $this->facade->getParser()->render('coupon/condition-fragments/cart-total-amount-condition.html', [
-                'label'              => $label,
-                'inputKey'           => $inputKey,
-                'value'              => isset($this->values[$inputKey]) ? $this->values[$inputKey] : '',
-
-                'field_1_name'        => self::INPUT1,
-                'field_2_name'        => self::INPUT2,
-
-                'operatorSelectHtml' => $this->drawBackOfficeInputOperators(self::INPUT1),
-                'currencySelectHtml' => $this->drawBackOfficeCurrencyInput(self::INPUT2),
+        return $this->facade->getParser()->render(
+            'coupon/condition-fragments/cart-total-amount-condition.html',
+            [
+                'label' => $label,
+                'inputKey' => $inputKey,
+                'value' => isset($this->values[$inputKey]) ? $this->values[$inputKey] : '',
+                'field_1_name' => self::CART_TOTAL,
+                'field_2_name' => self::CART_CURRENCY,
+                'operatorSelectHtml' => $this->drawBackOfficeInputOperators(self::CART_TOTAL),
+                'currencySelectHtml' => $this->drawBackOfficeCurrencyInput(self::CART_CURRENCY),
             ]
         );
     }
