@@ -62,7 +62,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
-        $conditionFactory = $this->container->get('thelia.condition.factory');
+        $this->container->get('thelia.condition.factory');
 
         /** @var OrderCoupon $orderCoupon */
         foreach ($loopResult->getResultDataCollection() as $orderCoupon) {

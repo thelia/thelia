@@ -59,8 +59,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
      */
     public function update(CurrencyUpdateEvent $event)
     {
-        $search = CurrencyQuery::create();
-
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
 
             $currency

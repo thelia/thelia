@@ -17,7 +17,6 @@ use Thelia\Model\Base\AreaDeliveryModuleQuery as BaseAreaDeliveryModuleQuery;
 class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
 {
 
-
     public function findByCountryAndModule(Country $country, Module $module)
     {
         $response = null;
