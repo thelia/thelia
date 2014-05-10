@@ -119,7 +119,7 @@ class MatchForTotalAmount extends ConditionAbstract
     public function getName()
     {
         return $this->translator->trans(
-            'By cart total amount',
+            'Cart total amount',
             [],
             'condition'
         );

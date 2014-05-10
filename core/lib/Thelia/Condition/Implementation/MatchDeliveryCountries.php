@@ -49,7 +49,7 @@ class MatchDeliveryCountries extends AbstractMatchCountries
     public function getName()
     {
         return $this->translator->trans(
-            'Delivery country condition',
+            'Delivery country',
             [],
             'condition'
         );

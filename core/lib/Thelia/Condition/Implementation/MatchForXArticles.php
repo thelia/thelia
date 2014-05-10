@@ -103,7 +103,7 @@ class MatchForXArticles extends ConditionAbstract
     public function getName()
     {
         return $this->translator->trans(
-            'Cart item count condition',
+            'Cart item count',
             [],
             'condition'
         );

@@ -49,7 +49,7 @@ class MatchBillingCountries extends AbstractMatchCountries
     public function getName()
     {
         return $this->translator->trans(
-            'Billing country condition',
+            'Billing country',
             [],
             'condition'
         );
