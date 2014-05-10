@@ -17,8 +17,7 @@ use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
 use Thelia\Model\Base\ProductQuery;
 use Thelia\Model\CartItem;
-use Thelia\Model\Category;
-use Thelia\Model\CategoryQuery;
+use Thelia\Model\Product;
 
 /**
  * Check a Checkout against its Product number
@@ -149,7 +148,7 @@ class CartContainsProducts extends ConditionAbstract
 
         if (null !== $prodList = ProductQuery::create()->findPks($prodIds)) {
 
-            /** @var Category $prod */
+            /** @var Product $prod */
             foreach($prodList as $prod) {
                 $prodStrList .= $prod->getTitle() . ', ';
             }
