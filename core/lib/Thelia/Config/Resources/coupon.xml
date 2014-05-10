@@ -33,23 +33,39 @@
         <service id="thelia.condition.factory" class="Thelia\Condition\ConditionFactory">
             <argument type="service" id="service_container" />
         </service>
+
         <service id="thelia.condition.validator" class="Thelia\Condition\ConditionEvaluator">
         </service>
+
         <service id="thelia.condition.match_for_everyone" class="Thelia\Condition\Implementation\MatchForEveryone">
             <argument type="service" id="thelia.facade" />
             <tag name="thelia.coupon.addCondition"/>
         </service>
+
         <service id="thelia.condition.match_for_total_amount" class="Thelia\Condition\Implementation\MatchForTotalAmount">
             <argument type="service" id="thelia.facade" />
             <tag name="thelia.coupon.addCondition"/>
         </service>
+
         <service id="thelia.condition.match_for_x_articles" class="Thelia\Condition\Implementation\MatchForXArticles">
             <argument type="service" id="thelia.facade" />
             <tag name="thelia.coupon.addCondition"/>
         </service>
 
+        <service id="thelia.condition.match_delivery_countries" class="Thelia\Condition\Implementation\MatchDeliveryCountries">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCondition"/>
+        </service>
 
+        <service id="thelia.condition.match_billing_countries" class="Thelia\Condition\Implementation\MatchBillingCountries">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCondition"/>
+        </service>
 
+        <service id="thelia.condition.start_date" class="Thelia\Condition\Implementation\StartDate">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCondition"/>
+        </service>
 
     </services>
 
