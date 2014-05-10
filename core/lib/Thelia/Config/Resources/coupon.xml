@@ -67,6 +67,16 @@
             <tag name="thelia.coupon.addCondition"/>
         </service>
 
+        <service id="thelia.condition.cart_contains_categories" class="Thelia\Condition\Implementation\CartContainsCategories">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCondition"/>
+        </service>
+
+        <service id="thelia.condition.cart_contains_products" class="Thelia\Condition\Implementation\CartContainsProducts">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCondition"/>
+        </service>
+
     </services>
 
 </config>
