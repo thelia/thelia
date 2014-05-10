@@ -52,7 +52,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::EQUAL);
-        $expected = 'Equals to';
+        $expected = 'Equal to';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::SUPERIOR_OR_EQUAL);
@@ -64,7 +64,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::DIFFERENT);
-        $expected = 'Not equals to';
+        $expected = 'Not equal to';
         $this->assertEquals($expected, $actual);
 
         $actual = Operators::getI18n($stubTranslator, Operators::IN);
