@@ -1,0 +1,15 @@
+{capture name="module_include"}
+    {module_include location=$location countvar='module_count'}
+{/capture}
+
+{if trim($smarty.capture.module_include) == ''}
+    <br />
+
+        <div class="alert alert-info">
+            <p class="text-center" style="font-size: 2.2em"><span class="glyphicon glyphicon-info-sign"></span></p>
+            <p class="text-center">{intl l="There is currently no active module here."}</p>
+        </div>
+
+{else}
+    x="{$smarty.capture.module_include nofilter}"
+{/if}

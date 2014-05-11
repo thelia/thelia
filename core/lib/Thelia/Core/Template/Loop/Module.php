@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
@@ -177,65 +166,81 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\Module $module */
         foreach ($loopResult->getResultDataCollection() as $module) {
-            $loopResultRow = new LoopResultRow($module);
-            $loopResultRow->set("ID", $module->getId())
-                ->set("IS_TRANSLATED",$module->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("TITLE",$module->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $module->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $module->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $module->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("CODE", $module->getCode())
-                ->set("TYPE", $module->getType())
-                ->set("ACTIVE", $module->getActivate())
-                ->set("CLASS", $module->getFullNamespace())
-                ->set("POSITION", $module->getPosition());
 
-            $hasConfigurationInterface = false;
+            try {
+                new \ReflectionClass($module->getFullNamespace());
 
-            /* first test if module defines it's own config route  */
-            if ($module->getActivate()) {
-                // Works only fo activated modules - see Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass
-                $routerId = "router." . $module->getBaseDir();
-                if ($this->container->has($routerId)) {
-                    try {
-                        if ($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
+                $exists = true;
+            } catch (\ReflectionException $ex) {
+                $exists = false;
+            }
+
+            if ($exists || $this->getBackendContext()) {
+                $loopResultRow = new LoopResultRow($module);
+
+                $loopResultRow
+                    ->set("ID"           , $module->getId())
+                    ->set("IS_TRANSLATED", $module->getVirtualColumn('IS_TRANSLATED'))
+                    ->set("LOCALE"       , $this->locale)
+                    ->set("TITLE"        , $module->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO"        , $module->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION"  , $module->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("POSTSCRIPTUM" , $module->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set("CODE"         , $module->getCode())
+                    ->set("TYPE"         , $module->getType())
+                    ->set("ACTIVE"       , $module->getActivate())
+                    ->set("CLASS"        , $module->getFullNamespace())
+                    ->set("POSITION"     , $module->getPosition())
+                    ->set("EXISTS"       , $exists)
+                ;
+
+                $hasConfigurationInterface = false;
+
+                /* first test if module defines it's own config route  */
+                if ($module->getActivate()) {
+                    // Works only fo activated modules - see Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass
+                    $routerId = "router." . $module->getBaseDir();
+                    if ($this->container->has($routerId)) {
+                        try {
+                            if ($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
+                                $hasConfigurationInterface = true;
+                            }
+                        } catch (ResourceNotFoundException $e) {
+                            /* $hasConfigurationInterface stays false */
+                        }
+                    }
+
+                    /* if not ; test if it uses admin inclusion : module_configuration.html */
+                    if (false === $hasConfigurationInterface) {
+                        if (file_exists($module->getAbsoluteAdminIncludesPath() . DS . "module_configuration.html")) {
                             $hasConfigurationInterface = true;
                         }
-                    } catch (ResourceNotFoundException $e) {
-                        /* $hasConfigurationInterface stays false */
                     }
-                }
+                } else {
+                    // Make a quick and dirty test on the module's routing.xml file
+                    $routing = @file_get_contents($module->getAbsoluteConfigPath() . DS . "routing.xml");
 
-                /* if not ; test if it uses admin inclusion : module_configuration.html */
-                if (false === $hasConfigurationInterface) {
-                    if (file_exists( sprintf("%s/AdminIncludes/%s.html", $module->getAbsoluteBaseDir(), "module_configuration"))) {
+                    if ($routing && strpos($routing, '/admin/module/') !== false) {
                         $hasConfigurationInterface = true;
                     }
                 }
-            } else {
-                // Make a quick and dirty test on the module's routing.xml file
-                $routing = @file_get_contents($module->getAbsoluteBaseDir() . DS . "Config" . DS . "routing.xml");
 
-                if ($routing && strpos($routing, '/admin/module/') !== false) {
-                    $hasConfigurationInterface = true;
+                $loopResultRow->set("CONFIGURABLE", $hasConfigurationInterface ? 1 : 0);
+
+                if (null !== $this->getProfile()) {
+                    $accessValue = $module->getVirtualColumn('access');
+                    $manager = new AccessManager($accessValue);
+
+                    $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW)? 1 : 0)
+                        ->set("CREATABLE", $manager->can(AccessManager::CREATE) ? 1 : 0)
+                        ->set("UPDATABLE", $manager->can(AccessManager::UPDATE)? 1 : 0)
+                        ->set("DELETABLE", $manager->can(AccessManager::DELETE)? 1 : 0);
                 }
+
+                $loopResult->addRow($loopResultRow);
             }
-
-            $loopResultRow->set("CONFIGURABLE", $hasConfigurationInterface ? 1 : 0);
-
-            if (null !== $this->getProfile()) {
-                $accessValue = $module->getVirtualColumn('access');
-                $manager = new AccessManager($accessValue);
-
-                $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW)? 1 : 0)
-                    ->set("CREATABLE", $manager->can(AccessManager::CREATE) ? 1 : 0)
-                    ->set("UPDATABLE", $manager->can(AccessManager::UPDATE)? 1 : 0)
-                    ->set("DELETABLE", $manager->can(AccessManager::DELETE)? 1 : 0);
-            }
-
-            $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;

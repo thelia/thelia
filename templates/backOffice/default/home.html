@@ -8,6 +8,7 @@
 
 		    {module_include location='home_top'}
 
+            {loop type="auth" name="can_view" role="ADMIN" resource="admin.order" access="VIEW"}
 			<div class="col-md-12 general-block-decorator dashboard">
 
 				<div class="title title-without-tabs clearfix">
@@ -36,57 +37,78 @@
 				</div>
 
  			</div>
-
+            {/loop}
 
 	 		<div class="row">
-	 			<div class="col-md-4">
-					<div class="general-block-decorator">
-						<div class="title title-without-tabs">{intl l="Shop Informations"}</div>
-						<div class="table-responsive">
-							<table class="table table-striped">
-								<tbody>
-									<tr>
-										<th>{intl l="Customers"}</th>
-		                                <td>
-                                            {count type="customer" current="false" backend_context="1"}
-		                                </td>
-									</tr>
-									<tr>
-										<th>{intl l="Categories"}</th>
-		                                <td>
-                                            {count type="category" visible="*" backend_context="1"}
-		                                </td>
-									</tr>
-									<tr>
-										<th>{intl l="Products"}</th>
-		                                <td>
-                                            {count type="product" visible="*" backend_context="1"}
-		                                </td>
-									</tr>
-									<tr>
-										<th>{intl l="Online products"}</th>
-		                                <td>
-                                            {count type="product" visible="true" backend_context="1"}
-		                                </td>
-									</tr>
-									<tr>
-										<th>{intl l="Offline products"}</th>
-		                                <td>
-                                            {count type="product" visible="false" backend_context="1"}
-		                                </td>
-									</tr>
-									<tr>
-										<th>{intl l="Orders"}</th>
-		                                <td>
-                                            {count type="order" status="*" backend_context="1"}
-		                                </td>
-									</tr>
-					            </tbody>
-					        </table>
-					    </div>
-					</div>
-				</div>
 
+                {* Do not display shop information block if user none of the required authorizations *}
+
+                {capture name="shop_information_block_content"}
+                    {loop type="auth" name="can_view" role="ADMIN" resource="admin.customer" access="VIEW"}
+                        <tr>
+                            <th>{intl l="Customers"}</th>
+                            <td>
+                                {count type="customer" current="false" backend_context="1"}
+                            </td>
+                        </tr>
+                    {/loop}
+
+                    {loop type="auth" name="can_view" role="ADMIN" resource="admin.category" access="VIEW"}
+                        <tr>
+                            <th>{intl l="Categories"}</th>
+                            <td>
+                                {count type="category" visible="*" backend_context="1"}
+                            </td>
+                        </tr>
+                    {/loop}
+
+                    {loop type="auth" name="can_view" role="ADMIN" resource="admin.product" access="VIEW"}
+                        <tr>
+                            <th>{intl l="Products"}</th>
+                            <td>
+                                {count type="product" visible="*" backend_context="1"}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>{intl l="Online products"}</th>
+                            <td>
+                                {count type="product" visible="true" backend_context="1"}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>{intl l="Offline products"}</th>
+                            <td>
+                                {count type="product" visible="false" backend_context="1"}
+                            </td>
+                        </tr>
+                    {/loop}
+
+                    {loop type="auth" name="can_view" role="ADMIN" resource="admin.order" access="VIEW"}
+                        <tr>
+                            <th>{intl l="Orders"}</th>
+                            <td>
+                                {count type="order" status="*" backend_context="1"}
+                            </td>
+                        </tr>
+                    {/loop}
+                {/capture}
+
+                {if trim($smarty.capture.shop_information_block_content) ne ""}
+                    <div class="col-md-4">
+                        <div class="general-block-decorator">
+                            <div class="title title-without-tabs">{intl l="Shop Informations"}</div>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <tbody>
+                                    {$smarty.capture.shop_information_block_content nofilter}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {/if}
+
+                {loop type="auth" name="can_view" role="ADMIN" resource="admin.order" access="VIEW"}
 				<div class="col-md-4">
 					<div class="general-block-decorator">
 						<div class="title title-without-tabs">{intl l="Sales statistics"}</div>
@@ -221,6 +243,7 @@
 						</div>
 					</div>
 				</div>
+                {/loop}
 
 				<div class="col-md-4">
 					<div class="general-block-decorator">
@@ -234,11 +257,11 @@
 									</tr>
 									<tr>
 										<th>{intl l="Latest version available"}</th>
-										<td><a href="">V1.5.4.2</a></td>
+										<td><a href="http://thelia.net/#download" id="latest-thelia-version">{intl l="Loading..."}</a></td>
 									</tr>
 									<tr>
 										<th>{intl l="News"}</th>
-										<td><a href="" target="_blank">{intl l="Click here"}</a></td>
+										<td><a href="http://thelia.net/blog" target="_blank">{intl l="Click here"}</a></td>
 									</tr>
 								</tbody>
 							</table>
@@ -396,8 +419,13 @@ jQuery(function($){
         });
 
     }
-
     {/literal}
+
+    // Get the latest Thelia version
+    $('#latest-thelia-version').load("{url path='/admin/latest-thelia-version'}", function(response, status, xhr) {
+        if (status == "error")
+            $('#latest-thelia-version').text("Unavailable");
+    });
 
 });
 

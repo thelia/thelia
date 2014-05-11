@@ -13,22 +13,26 @@
         <nav>
             <ul class="breadcrumb">
                 <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
-                <li><a href="{url path='admin/coupon'}">{intl l='Coupon'}</a></li>
+                <li><a href="{url path='admin/tools'}">{intl l='Tools'}</a></li>
+                <li><a href="{url path='admin/coupon'}">{intl l='Coupons'}</a></li>
             </ul>
         </nav>
+
+        {module_include location='coupon_top'}
 
         <div class="row">
             <div class="col-md-12">
                 <div class="general-block-decorator">
                     <div class="table-responsive">
                         <table class="table table-striped table-condensed" id="folder_list">
+
                             <caption>
-                                {intl l='Enabled coupons'}
+                                {intl l='Coupons'}
 
                                 {module_include location='coupon_list_caption'}
 
                                 {loop type="auth" name="can_create" role="ADMIN" resource="admin.coupon" access="CREATE"}
-                                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Create a new coupon'}" href="{$urlCreateCoupon}">
+                                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Create a new coupon'}" href="{url path='/admin/coupon/create'}">
                                         <span class="glyphicon glyphicon-plus-sign"></span>
                                     </a>
                                 {/loop}
@@ -36,98 +40,119 @@
 
                             <thead>
                                 <tr>
-                                    <th>{block name="coupon-label-code"}{intl l='Code'}{/block}</th>
-                                    <th>{block name="coupon-label-title"}{intl l='Title'}{/block}</th>
-                                    <th>{block name="coupon-label-expiration-date"}{intl l='Days before expiration'}{/block}</th>
-                                    <th>{block name="coupon-label-usage-left"}{intl l='Usage left'}{/block}</th>
-                                    <th class="sorter-false filter-false">{block name="coupon-label-action"}{/block}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loop type="coupon" name="list_coupon" is_enabled="1" backend_context="true"}
-                                    <tr>
-                                        <td>{block name="coupon-code"}<a href="{$urlReadCoupon|replace:'0':$ID}">{$CODE}</a>{/block}</td>
-                                        <td>{block name="coupon-title"}{$TITLE}{/block}</td>
-                                        <td>{block name="coupon-expiration-date"}{$DAY_LEFT_BEFORE_EXPIRATION}{/block}</td>
-                                        <td>
-                                            {block name="coupon-usage-left"}
-                                                {if $USAGE_LEFT == -1}
-                                                    <span class="label label-success">
-                                                        {intl l="Unlimited"}
-                                                    </span>
-                                                {elseif $USAGE_LEFT}
-                                                    <span class="label label-success">
-                                                        {$USAGE_LEFT}
-                                                    </span>
-                                                {else}
-                                                    <span class="label label-warning">
-                                                        0
-                                                    </span>
-                                                {/if}
-                                            {/block}
-                                        </td>
-                                        <td>
-                                            {block name="coupon-action"}
-                                                <a href="{$urlEditCoupon|replace:'0':$ID}" class="btn btn-default btn-primary btn-medium">
-                                                    <span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}
-                                                </a>
-                                            {/block}
-                                        </td>
-                                    </tr>
-                                {/loop}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                    <th>{admin_sortable_header
+                                        current_order=$coupon_order
+                                        order='code'
+                                        reverse_order='code-reverse'
+                                        path={url path='/admin/coupon'}
+                                        request_parameter_name='coupon_order'
+                                        label="{intl l='Code'}"
+                                    }
+                                    </th>
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="general-block-decorator">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-condensed" id="folder_list">
-                            <caption>
-                                {intl l='Disabled coupons'}
-                            </caption>
-                            <thead>
-                                <tr>
-                                    <th>{block name="coupon-label-code"}{intl l='Code'}{/block}</th>
-                                    <th>{block name="coupon-label-title"}{intl l='Title'}{/block}</th>
-                                    <th>{block name="coupon-label-expiration-date"}{intl l='Expiration date'}{/block}</th>
-                                    <th>{block name="coupon-label-usage-left"}{intl l='Usage left'}{/block}</th>
-                                    <th class="sorter-false filter-false">{block name="coupon-label-action"}{/block}</th>
+                                    <th>{admin_sortable_header
+                                        current_order=$coupon_order
+                                        order='title'
+                                        reverse_order='title-reverse'
+                                        path={url path='/admin/coupon'}
+                                        request_parameter_name='coupon_order'
+                                        label="{intl l='Title'}"
+                                    }
+                                    </th>
+
+                                    <th class="text-center">{admin_sortable_header
+                                        current_order=$coupon_order
+                                        order='enabled'
+                                        reverse_order='enabled-reverse'
+                                        path={url path='/admin/coupon'}
+                                        request_parameter_name='coupon_order'
+                                        label="{intl l='Status'}"
+                                    }
+                                    </th>
+
+                                    <th class="text-center">{admin_sortable_header
+                                        current_order=$coupon_order
+                                        order='expiration-date'
+                                        reverse_order='expiration-date-reverse'
+                                        path={url path='/admin/coupon'}
+                                        request_parameter_name='coupon_order'
+                                        label="{intl l='Expiration date'}"
+                                    }
+                                    </th>
+
+                                    <th class="text-center">{admin_sortable_header
+                                        current_order=$coupon_order
+                                        order='days-left'
+                                        reverse_order='days-left-reverse'
+                                        path={url path='/admin/coupon'}
+                                        request_parameter_name='coupon_order'
+                                        label="{intl l='Days before expiration'}"
+                                    }
+                                    </th>
+
+                                    <th class="text-center">{admin_sortable_header
+                                        current_order=$coupon_order
+                                        order='usages-left'
+                                        reverse_order='usages-left-reverse'
+                                        path={url path='/admin/coupon'}
+                                        request_parameter_name='coupon_order'
+                                        label="{intl l='Usages left'}"
+                                    }
+                                    </th>
+
+                                    {module_include location='coupon_table_header'}
+
+                                    <th>&nbsp;</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {loop type="coupon" name="list_coupon" is_enabled="0" backend_context="true"}
+                                {loop type="coupon" name="list_coupon" order={$coupon_order|default:'code'} backend_context="true"}
                                     <tr>
-                                        <td>{block name="coupon-code"}<a href="{$urlReadCoupon|replace:'0':$ID}">{$CODE}</a>{/block}</td>
-                                        <td>{block name="coupon-title"}{$TITLE}{/block}</td>
-                                        <td>{block name="coupon-expiration-date"}{$EXPIRATION_DATE}{/block}</td>
                                         <td>
-                                            {block name="coupon-usage-left"}
-                                                {if $USAGE_LEFT == -1}
-                                                    <span class="label label-success">
-                                                        {intl l="Unlimited"}
-                                                    </span>
-                                                {elseif $USAGE_LEFT}
-                                                    <span class="label label-success">
-                                                            {$USAGE_LEFT}
-                                                    </span>
-                                                {else}
-                                                    <span class="label label-warning">
-                                                            0
-                                                    </span>
-                                                {/if}
-                                            {/block}
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
+                                                <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/$ID"}">{$CODE}</a>
+                                            {/loop}
+                                            {elseloop rel="can_change"}
+                                                {$CODE}
+                                            {/elseloop}
                                         </td>
-                                        <td>
-                                            {block name="coupon-action"}
-                                            <a href="{$urlEditCoupon|replace:'couponId':$ID}" class="btn btn-default btn-primary btn-medium">
-                                                <span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}
-                                            </a>
-                                            {/block}
+
+                                        <td>{$TITLE}</td>
+
+                                        <td class="text-center">
+                                            {if $IS_ENABLED}
+                                                <span class="label label-success">{intl l="Enabled"}</span>
+                                            {else}
+                                                <span class="label label-default">{intl l="Disabled"}</span>
+                                            {/if}
+                                        </td>
+
+                                        <td class="text-center">{format_date date=$EXPIRATION_DATE output="date"}</td>
+
+                                        <td class="text-center">
+                                            {if $DAY_LEFT_BEFORE_EXPIRATION <= 0}
+                                                <span class="label label-default">{intl l='Expired'}</span>
+                                            {else}
+                                                {$DAY_LEFT_BEFORE_EXPIRATION}
+                                            {/if}
+                                        </td>
+
+                                        <td class="text-center">
+                                            {if $USAGE_LEFT == -1}
+                                                {intl l="Unlimited"}
+                                            {elseif $USAGE_LEFT}
+                                                {$USAGE_LEFT}
+                                            {else}
+                                                <span class="label label-default">0</span>
+                                            {/if}
+                                        </td>
+
+                                        {module_include location='coupon_table_row'}
+
+                                        <td class="text-center">
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
+                                                <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                            {/loop}
                                         </td>
                                     </tr>
                                 {/loop}
@@ -135,6 +160,9 @@
                         </table>
                     </div>
                 </div>
+
+                {module_include location='coupon_bottom'}
+
             </div>
         </div>
 

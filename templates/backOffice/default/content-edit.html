@@ -7,190 +7,184 @@
 
 {block name="main-content"}
     <div class="folder edit-folder">
-    <div id="wrapper" class="container">
+        <div id="wrapper" class="container">
 
-    {include file="includes/folder-breadcrumb.html" editing_content="true"}
+            {include file="includes/folder-breadcrumb.html" editing_content="true"}
 
-    <div class="row">
-    {loop name="content_edit" type="content" visible="*" id="{$content_id}" backend_context="1" lang="$edit_language_id"}
-        <div class="col-md-12 general-block-decorator">
-        <div class="row">
-            <div class="col-md-7 title">
-                {intl l='Edit content %title' title=$TITLE}
-            </div>
-
-            <div class="col-md-5 actions">
-
-                {if $HAS_PREVIOUS != 0}
-                    <a href="{url path="/admin/content/update/$PREVIOUS"}" class="btn btn-default" title="{intl l='Edit previous content'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
-                {else}
-                    <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
-                {/if}
-
-                <a  href="{$URL}" target="_blank" class="btn btn-default" title="{intl l='Preview folder page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
-
-                {if $HAS_NEXT != 0}
-                    <a href="{url path="/admin/content/update/$NEXT"}" class="btn btn-default" title="{intl l='Edit next content'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
-                {else}
-                    <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
-                {/if}
-            </div>
-        </div>
-
-        <div class="row">
-        <div class="col-md-12">
-
-        <ul class="nav nav-tabs" id="tabbed-menu">
-            <li class="active"><a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
-            <li><a href="#seo" data-toggle="tab">{intl l="SEO"}</a></li>
-            <li><a href="#association" data-toggle="tab">{intl l="Associations"}</a></li>
-            <li><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
-            <li><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
-            <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
-        </ul>
-
-        <div class="tab-content">
-
-        <div class="tab-pane fade active in" id="general">
-
-            <div class="form-container">
-
-                {form name="thelia.admin.content.modification"}
-                    <form method="POST" action="{url path='/admin/content/save'}" {form_enctype form=$form} class="clearfix">
-
-                        {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/folders' parent=$DEFAULT_FOLDER}"}
-
-                        {* Be sure to get the folder ID, even if the form could not be validated *}
-                        <input type="hidden" name="content_id" value="{$content_id}" />
-
-                        <input type="hidden" name="current_tab" value="general" />
-
-                        {form_hidden_fields form=$form}
-
-                        {form_field form=$form field='success_url'}
-                            <input type="hidden" name="{$name}" value="{url path="/admin/content/update{$ID}"}" />
-                        {/form_field}
-
-                        {form_field form=$form field='locale'}
-                            <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
-                        {/form_field}
-
-                        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-
+            <div class="row">
+                {loop name="content_edit" type="content" visible="*" id="{$content_id}" backend_context="1" lang="$edit_language_id"}
+                    <div class="col-md-12 general-block-decorator">
                         <div class="row">
-                            <div class="col-md-8">
-                                {include file="includes/standard-description-form-fields.html"}
+                            <div class="col-md-7 title">
+                                {intl l='Edit content %title' title={$TITLE}}
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-5 actions">
 
-                                {form_field form=$form field='default_folder'}
-                                    <div class="form-group {if $error}has-error{/if}">
+                                {if $HAS_PREVIOUS != 0}
+                                    <a href="{url path="/admin/content/update/$PREVIOUS"}" class="btn btn-default" title="{intl l='Edit previous content'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                {else}
+                                    <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                {/if}
 
-                                        <label for="{$label_attr.for}" class="control-label">
-                                            {$label} :
-                                        </label>
+                                <a href="{$URL}" target="_blank" class="btn btn-default" title="{intl l='Preview folder page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
 
-                                        <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-                                            <option value="0">{intl l="Top level"}</option>
-
-                                            {$myparent=$DEFAULT_FOLDER}
-                                            {loop name="fold-parent" type="folder-tree" visible="*" folder="0"}
-                                                 <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if}>{$TITLE}</option>
-                                            {/loop}
-
-                                        </select>
-                                    </div>
-                                {/form_field}
-
-                                {form_field form=$form field='visible'}
-                                    <div class="form-group {if $error}has-error{/if}">
-                                        <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
-                                        <div class="checkbox">
-                                            <label>
-                                                <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
-                                                {$label}
-                                            </label>
-                                        </div>
-                                    </div>
-                                {/form_field}
+                                {if $HAS_NEXT != 0}
+                                    <a href="{url path="/admin/content/update/$NEXT"}" class="btn btn-default" title="{intl l='Edit next content'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                {else}
+                                    <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                {/if}
                             </div>
                         </div>
 
-                        {include
-                            file="includes/inner-form-toolbar.html"
-                            hide_submit_buttons = false
-                            hide_flags = true
+                        <div class="row">
+                            <div class="col-md-12">
 
-                            close_url="{url path='/admin/folders' parent=$DEFAULT_FOLDER}"
-                        }
+                                <ul class="nav nav-tabs" id="tabbed-menu">
+                                    <li class="active">
+                                        <a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
+                                    <li><a href="#seo" data-toggle="tab">{intl l="SEO"}</a></li>
+                                    <li><a href="#association" data-toggle="tab">{intl l="Associations"}</a></li>
+                                    <li><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
+                                    <li><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
+                                    <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
+                                </ul>
 
-                        <small>{intl l='Folder created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</small>
+                                <div class="tab-content">
 
-                    </form>
-                {/form}
+                                    <div class="tab-pane fade active in" id="general">
+
+                                        <div class="form-container">
+
+                                            {form name="thelia.admin.content.modification"}
+                                                <form method="POST" action="{url path='/admin/content/save'}" {form_enctype form=$form} class="clearfix">
+
+                                                    {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/folders' parent=$DEFAULT_FOLDER}"}
+
+                                                    {* Be sure to get the folder ID, even if the form could not be validated *}
+                                                    <input type="hidden" name="content_id" value="{$content_id}"/>
+
+                                                    <input type="hidden" name="current_tab" value="general"/>
+
+                                                    {form_hidden_fields form=$form}
+
+                                                    {form_field form=$form field='success_url'}
+                                                        <input type="hidden" name="{$name}" value="{url path="/admin/content/update{$ID}"}"/>
+                                                    {/form_field}
+
+                                                    {form_field form=$form field='locale'}
+                                                        <input type="hidden" name="{$name}" value="{$edit_language_locale}"/>
+                                                    {/form_field}
+
+                                                    {if $form_error}
+                                                        <div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                                    <div class="row">
+                                                        <div class="col-md-8">
+                                                            {include file="includes/standard-description-form-fields.html"}
+                                                        </div>
+
+                                                        <div class="col-md-4">
+
+                                                            {form_field form=$form field='default_folder'}
+                                                                <div class="form-group {if $error}has-error{/if}">
+
+                                                                    <label for="{$label_attr.for}" class="control-label">
+                                                                        {$label} :
+                                                                    </label>
+
+                                                                    <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
+                                                                        <option value="0">{intl l="Top level"}</option>
+
+                                                                        {$myparent=$DEFAULT_FOLDER}
+                                                                        {loop name="fold-parent" type="folder-tree" visible="*" folder="0"}
+                                                                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if}>{$TITLE}</option>
+                                                                        {/loop}
+
+                                                                    </select>
+                                                                </div>
+                                                            {/form_field}
+
+                                                            {form_field form=$form field='visible'}
+                                                                <div class="form-group {if $error}has-error{/if}">
+                                                                    <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
+
+                                                                    <div class="checkbox">
+                                                                        <label>
+                                                                            <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+                                                                            {$label}
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            {/form_field}
+                                                        </div>
+                                                    </div>
+
+                                                    {include
+                                                    file="includes/inner-form-toolbar.html"
+                                                    hide_submit_buttons = false
+                                                    hide_flags = true
+
+                                                    close_url="{url path='/admin/folders' parent=$DEFAULT_FOLDER}"
+                                                    }
+
+                                                    <small>{intl l='Folder created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</small>
+
+                                                </form>
+                                            {/form}
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="seo">
+                                        {form name="thelia.admin.seo"}
+                                            {include file="includes/seo-tab.html"
+                                            form = $form
+                                            formAction = "{url path='/admin/content/seo/save'}"
+                                            closeUrl = "{url path='/admin/folders' parent=$DEFAULT_FOLDER}"
+                                            current_id = $content_id
+                                            }
+                                        {/form}
+                                    </div>
+
+                                    <div class="tab-pane fade" id="association">
+                                        {include file="includes/content-folder-management.html"}
+                                    </div>
+
+                                    <div class="tab-pane fade" id="images">
+                                        {include file='includes/image-upload-form.html' imageType='content' parentId=$content_id}
+                                    </div>
+
+                                    <div class="tab-pane fade" id="documents">
+                                        {include file='includes/document-upload-form.html' documentType='content' parentId=$content_id}
+                                    </div>
+
+                                    <div class="tab-pane fade" id="modules">
+                                        <div class="form-container">
+                                            {include
+                                            file = "includes/inner-form-toolbar.html"
+                                            hide_submit_buttons = true
+                                            page_url  = {$pageUrl}
+                                            close_url = {$closeUrl}
+                                            current_tab = "modules"
+                                            }
+                                        </div>
+
+                                        {include file="includes/module-tab-content.html" location="content-edit"}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {/loop}
             </div>
         </div>
-
-        <div class="tab-pane fade" id="seo">
-            {form name="thelia.admin.seo"}
-                {include file="includes/seo-tab.html"
-                form = $form
-                formAction = "{url path='/admin/content/seo/save'}"
-                closeUrl = "{url path='/admin/folders' parent=$DEFAULT_FOLDER}"
-                current_id = $content_id
-                }
-            {/form}
-        </div>
-
-        <div class="tab-pane fade" id="association">
-            {include file="includes/content-folder-management.html"}
-        </div>
-
-        <div class="tab-pane fade" id="images">
-            {include file='includes/image-upload-form.html' imageType='content' parentId=$content_id}
-        </div>
-
-        <div class="tab-pane fade" id="documents">
-            {include file='includes/document-upload-form.html' documentType='content' parentId=$content_id}
-        </div>
-
-        <div class="tab-pane fade" id="modules">
-            <div class="form-container">
-                {include
-                    file = "includes/inner-form-toolbar.html"
-                    hide_submit_buttons = true
-                    page_url  = {$pageUrl}
-                    close_url = {$closeUrl}
-                    current_tab = "modules"
-                }
-            </div>
-
-            {module_include location='content-edit' countvar='module_count'}
-
-            {if $module_count == 0}
-                <div class="alert alert-info">
-                    {intl l="There is currently no active module here."}
-                </div>
-            {/if}
-        </div>
-        </div>
-        </div>
-        </div>
-        </div>
-    {/loop}
     </div>
-    </div>
-    </div>
-
-
-{* Delete category confirmation dialog *}
+    {* Delete category confirmation dialog *}
 
     {capture "delete_folder_dialog"}
-        <input type="hidden" name="content_id" value="{$content_id}" />
-        <input type="hidden" name="additional_folder_id" id="additional_folder_delete_id" value="" />
-
-        <input type="hidden" name="current_tab" value="association" />
+        <input type="hidden" name="content_id" value="{$content_id}"/>
+        <input type="hidden" name="additional_folder_id" id="additional_folder_delete_id" value=""/>
+        <input type="hidden" name="current_tab" value="association"/>
     {/capture}
 
     {include
@@ -220,9 +214,10 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
     {javascripts file='assets/js/jquery-ui-1.10.3.custom.min.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
-
     <script>
         $(function() {
+            // Load active tab
+
             $.imageUploadManager.initImageDropZone();
             $.documentUploadManager.initDocumentDropZone();
 
@@ -234,7 +229,7 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
 
             // Show proper tab, if defined
             {if ! empty($current_tab)}
-            $('#tabbed-menu a[href="#{$current_tab}"]').tab('show')
+                $('.nav-tabs a[href="#{$current_tab}"]').trigger("click");
             {/if}
 
             $('a.delete-folder').click(function(e) {
@@ -250,10 +245,10 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
             // Load content on folder selection
             $('#folder_id').change(function(event) {
                 $.ajax({
-                    url      : '{url path="/admin/folder/$folder_id/available-related-content/"}' + $(this).val() + '.xml',
-                    type     : 'get',
-                    dataType : 'json',
-                    success  : function(json) {
+                    url: '{url path="/admin/folder/$folder_id/available-related-content/"}' + $(this).val() + '.xml',
+                    type: 'get',
+                    dataType: 'json',
+                    success: function(json) {
                         $('#content_id :not(:first-child)').remove();
 
                         var have_content = false;
@@ -273,7 +268,7 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
                 });
             });
 
-            // Initialize folder (id={$folder_id}) select value
+            // Initialize folder select value
             {if $folder_id != 0}
             $('#folder_id').val("{$folder_id}").change();
             {/if}

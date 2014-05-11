@@ -1,31 +1,20 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Tests\Model;
 
 use Thelia\Model\ConfigQuery;
 use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Model\Message;
+use Thelia\Model\Message as ModelMessage;
 use Thelia\Core\Template\Smarty\SmartyParser;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateHelper;
@@ -86,7 +75,7 @@ class Message extends \PHPUnit_Framework_TestCase
      */
     public function testMessageWithTextAndHtmlBody()
     {
-        $message = new Message();
+        $message = new ModelMessage();
 
         $message->setLocale('fr_FR');
 
@@ -108,7 +97,7 @@ class Message extends \PHPUnit_Framework_TestCase
      */
     public function testMessageWithTextOnlyBody()
     {
-        $message = new Message();
+        $message = new ModelMessage();
 
         $message->setLocale('fr_FR');
 
@@ -130,7 +119,7 @@ class Message extends \PHPUnit_Framework_TestCase
      */
     public function testMessageWithTextAndHtmlBodyAndTextAndHtmlLayout()
     {
-        $message = new Message();
+        $message = new ModelMessage();
 
         $message->setLocale('fr_FR');
 
@@ -161,7 +150,7 @@ class Message extends \PHPUnit_Framework_TestCase
      */
     public function testMessageWithTextOnlyBodyAndTextOnlyLayout()
     {
-        $message = new Message();
+        $message = new ModelMessage();
 
         $message->setLocale('fr_FR');
 
@@ -189,7 +178,7 @@ class Message extends \PHPUnit_Framework_TestCase
      */
     public function testMessageWithTextAndHtmlBodyAndTextOnlyLayout()
     {
-        $message = new Message();
+        $message = new ModelMessage();
 
         $message->setLocale('fr_FR');
 
@@ -218,7 +207,7 @@ class Message extends \PHPUnit_Framework_TestCase
      */
     public function testMessageWithTextAndHtmlBodyAndTextAndHtmlLayoutAndTextAndHtmlTemplate()
     {
-        $message = new Message();
+        $message = new ModelMessage();
 
         $message->setLocale('fr_FR');
 
@@ -257,7 +246,7 @@ class Message extends \PHPUnit_Framework_TestCase
      */
     public function testMessageWithTextAndHtmlBodyAndTextAndHtmlLayoutAndTextAndHtmlTemplateWichExtendsLayout()
     {
-        $message = new Message();
+        $message = new ModelMessage();
 
         $message->setLocale('fr_FR');
 
@@ -296,7 +285,7 @@ class Message extends \PHPUnit_Framework_TestCase
      */
     public function testMessageWithTextAndHtmlBodyAndTextAndHtmlExtendableLayout()
     {
-        $message = new Message();
+        $message = new ModelMessage();
 
         $message->setLocale('fr_FR');
 

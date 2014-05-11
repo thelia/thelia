@@ -22,7 +22,7 @@
                 <div class="col-md-12 general-block-decorator">
                     <div class="row">
                         <div class="col-md-7 title">
-                            {intl l='Edit product %title' title=$TITLE}
+                            {intl l='Edit product %title' title={$TITLE}}
                         </div>
 
                         <div class="col-md-5 actions">
@@ -119,13 +119,7 @@
                                         }
                                     </div>
 
-                                    {module_include location='product-edit' countvar='module_count'}
-
-                                    {if $module_count == 0}
-                                        <div class="alert alert-info">
-                                            {intl l="There is currently no active module here."}
-                                        </div>
-                                    {/if}
+                                    {include file="includes/module-tab-content.html" location="product-edit"}
                                 </div>
 
                              </div>

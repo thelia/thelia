@@ -135,12 +135,12 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function getSmtpPassword()
     {
-        return self::read('smtp.authmode');
+        return self::read('smtp.password');
     }
 
     public static function getSmtpAuthMode()
     {
-        return self::read('smtp.host');
+        return self::read('smtp.authmode');
     }
 
     public static function getSmtpTimeout()

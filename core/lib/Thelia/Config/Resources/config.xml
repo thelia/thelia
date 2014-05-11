@@ -96,6 +96,10 @@
         <service id="mailer" class="Thelia\Mailer\MailerFactory">
             <argument type="service" id="event_dispatcher"/>
         </service>
+
+        <service id="response.listener" class="Thelia\Core\EventListener\ResponseListener">
+            <tag name="kernel.event_subscriber"/>
+        </service>
     </services>
 
 </config>

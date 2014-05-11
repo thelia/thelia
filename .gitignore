@@ -34,6 +34,7 @@ local/modules/*
 !local/modules/Front/
 !local/modules/TheliaDebugBar/
 !local/modules/Tinymce/
+!local/modules/Colissimo/
 
 # Ignore everything in the "templates" directory, except the "default template"
 templates/*

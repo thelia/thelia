@@ -2,7 +2,6 @@
 
 {block name="page-title"}{intl l='Edit an image'}{/block}
 
-{block name="check-resource"}admin.image{/block}
 {block name="check-access"}update{/block}
 
 {block name="main-content"}
@@ -14,7 +13,7 @@
                 <ul class="breadcrumb">
         			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                     <li><a href="{url path="{$redirectUrl}"}">{intl l="Image"}</a></li>
-                    <li>{intl l='Editing image "%name"' name=$TITLE}</li>
+                    <li>{intl l='Editing image "%name"' name={$TITLE}}</li>
                 </ul>
 
         		<div class="row">
@@ -22,7 +21,7 @@
         				<div class="row">
 
         					<div class="col-md-12 title title-without-tabs">
-        					   {intl l='Edit image "%name"' name=$TITLE}
+        					   {intl l='Edit image "%name"' name={$TITLE}}
         					</div>
 
                             <div class="form-container">
@@ -68,7 +67,7 @@
                                                     {form_field form=$form field='file'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                                                            <input type="file" id="{$label_attr.for}" name="{$name}" class="form-control" value="" title="{$label}" placeholder="{intl l='File'}">
+                                                            <input type="file" id="{$label_attr.for}" name="{$name}" value="" title="{$label}" placeholder="{intl l='File'}">
                                                         </div>
                                                     {/form_field}
 
@@ -137,7 +136,7 @@
                             </div>
                         </div>
                         <div class="alert alert-error">
-                            {intl l="Sorry, image ID=%id was not found." id=$imageId}
+                            {intl l="Sorry, image ID=%id was not found." id={$imageId}}
                         </div>
                     </div>
                 </div>

@@ -13,7 +13,7 @@
         <div class="clearfix">
             <ul class="breadcrumb pull-left">
                 <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
-                <li><a href="{url path='/admin/modules'}">{intl l="Modules"}</a></li>
+                <li>{intl l="Modules"}</li>
             </ul>
 {*            {loop type="auth" name="can_create" role="ADMIN" resource="admin.module" access="UPDATE"}
                 <a class="btn btn-default btn-primary pull-right" title="{intl l='Install a new module'}" href="#install_dialog" data-toggle="modal">
@@ -103,7 +103,8 @@
            var url_management = "{url path="/admin/module/toggle-activation/"}";
            $(".module-activation").on("switch-change", function(e, data){
 
-        	   var module_id = $(this).data('id');
+               var checkbox = $(this);
+        	   var module_id = checkbox.data('id');
         	   var is_checked = data.value;
 
                $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
@@ -120,6 +121,7 @@
 
                })
                .fail(function(jqXHR, textStatus, errorThrown){
+                    checkbox.bootstrapSwitch('toggleState', true);
                     $("#loading-event").remove();
                     $('#module-failed-body').html(jqXHR.responseJSON.error);
                     $("#module-failed").modal("show");
@@ -154,6 +156,7 @@
 
         });
     </script>
+
 {/block}
 
 {block name="javascript-last-call"}

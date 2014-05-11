@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Smarty\Plugins;
@@ -67,25 +56,31 @@ class Module extends AbstractSmartyPlugin
         if (false !== $location = $this->getParam($params, 'location', false)) {
 
             if ($this->debug === true && $this->request->get('SHOW_INCLUDE')) {
-                echo sprintf('<div style="background-color: #C82D26; border-color: #000000; border: solid;">%s</div>', $location);
+                echo sprintf('<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">%s</div>', $location);
             }
 
             $moduleLimit = $this->getParam($params, 'module', null);
 
             $modules = ModuleQuery::getActivated();
 
+            /** @var \Thelia\Model\Module $module */
             foreach ($modules as $module) {
 
                 if (null !== $moduleLimit && $moduleLimit != $module->getCode()) {
                     continue;
                 }
 
-                $file = sprintf("%s/AdminIncludes/%s.html", $module->getAbsoluteBaseDir(), $location);
+                $file = $module->getAbsoluteAdminIncludesPath() . DS . $location . '.html';
 
                 if (file_exists($file)) {
-                    $content .= file_get_contents($file);
 
-                    $count++;
+                    $output = trim(file_get_contents($file));
+
+                    if (! empty($output)) {
+                        $content .= $output;
+
+                        $count++;
+                    }
                 }
             }
         }

@@ -1,25 +1,14 @@
 <?php
-/**********************************************************************************/
-/*                                                                                */
-/*      Thelia	                                                                  */
-/*                                                                                */
-/*      Copyright (c) OpenStudio                                                  */
-/*      email : info@thelia.net                                                   */
-/*      web : http://www.thelia.net                                               */
-/*                                                                                */
-/*      This program is free software; you can redistribute it and/or modify      */
-/*      it under the terms of the GNU General Public License as published by      */
-/*      the Free Software Foundation; either version 3 of the License             */
-/*                                                                                */
-/*      This program is distributed in the hope that it will be useful,           */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of            */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             */
-/*      GNU General Public License for more details.                              */
-/*                                                                                */
-/*      You should have received a copy of the GNU General Public License         */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.      */
-/*                                                                                */
-/**********************************************************************************/
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace Thelia\Coupon\Type;
 
@@ -361,22 +350,17 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Draw the input displayed in the BackOffice
      * allowing Admin to set its Coupon effect
+     * Override this method to do something useful
      *
      * @return string HTML string
      */
     public function drawBackOfficeInputs()
     {
-        $label = $this->getInputName();
-        $value = $this->amount;
-
-        $html = '
-                <div class="form-group input-' . self::INPUT_AMOUNT_NAME . ' ">
-                    <label for="' . self::INPUT_AMOUNT_NAME . '" class="control-label">' . $label . '</label>
-                    <input id="' . self::INPUT_AMOUNT_NAME . '" type="text" class="form-control" name="thelia_coupon_creation[' . self::INPUT_AMOUNT_NAME . ']" value="' . $value . '" placeholder="14.50">
-                </div>
-            ';
-
-        return $html;
+        return $this->facade->getParser()->render('coupon/type-fragments/remove-x.html', [
+                'label'     => $this->getInputName(),
+                'fieldName' => self::INPUT_AMOUNT_NAME,
+                'value'     => $this->amount
+            ]);
     }
 
     /**

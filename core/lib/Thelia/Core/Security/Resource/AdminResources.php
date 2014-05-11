@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Core\Security\Resource;
@@ -56,6 +45,8 @@ final class AdminResources
 
     const ADMINISTRATOR = "admin.configuration.administrator";
 
+    const ADVANCED_CONFIGURATION = "admin.configuration.advanced";
+
     const AREA = "admin.configuration.area";
 
     const ATTRIBUTE = "admin.configuration.attribute";
@@ -78,6 +69,8 @@ final class AdminResources
 
     const FOLDER = "admin.folder";
 
+    const HOME = "admin.home";
+
     const LANGUAGE = "admin.configuration.language";
 
     const MAILING_SYSTEM = "admin.configuration.mailing-system";
@@ -98,11 +91,19 @@ final class AdminResources
 
     const TEMPLATE = "admin.configuration.template";
 
-    const SYSTEM_LOG = "admin.configuration.system-log";
+    const SYSTEM_LOG = "admin.configuration.system-logs";
+
+    const ADMIN_LOG = "admin.configuration.admin-logs";
 
     const STORE = "admin.configuration.store";
 
     const TRANSLATIONS = "admin.configuration.translations";
 
     const UPDATE = "admin.configuration.update";
+
+    const EXPORT = "admin.export";
+
+    const EXPORT_CUSTOMER_NEWSLETTER = "admin.export.customer.newsletter";
+
+    const TOOLS = "admin.tools";
 }

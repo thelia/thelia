@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Action;
@@ -48,7 +37,6 @@ use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductAttributeCombination;
-use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Tools\I18n;
 
@@ -106,7 +94,14 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $order = $event->getOrder();
 
-        $order->setDeliveryModuleId($event->getDeliveryModule());
+        $deliveryModuleId = $event->getDeliveryModule();
+
+        $order->setDeliveryModuleId($deliveryModuleId);
+
+        // Reset postage cost if the delivery module had been removed
+        if ($deliveryModuleId <= 0) {
+            $order->setPostage(0);
+        }
 
         $event->setOrder($order);
     }
@@ -206,7 +201,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $placedOrder->setInvoiceOrderAddressId($invoiceOrderAddress->getId());
 
         $placedOrder->setStatusId(
-                OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_NOT_PAID)->getId()
+                OrderStatusQuery::getNotPaidStatus()->getId()
         );
 
         /* memorize discount */
@@ -307,7 +302,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function createManual(OrderManualEvent $event)
     {
-        $placedOrder = $this->createOrder(
+        $this->createOrder(
             $event->getDispatcher(),
             $event->getOrder(),
             $event->getCurrency(),

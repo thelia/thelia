@@ -1,25 +1,14 @@
 <?php
-/**********************************************************************************/
-/*                                                                                */
-/*      Thelia	                                                                  */
-/*                                                                                */
-/*      Copyright (c) OpenStudio                                                  */
-/*      email : info@thelia.net                                                   */
-/*      web : http://www.thelia.net                                               */
-/*                                                                                */
-/*      This program is free software; you can redistribute it and/or modify      */
-/*      it under the terms of the GNU General Public License as published by      */
-/*      the Free Software Foundation; either version 3 of the License             */
-/*                                                                                */
-/*      This program is distributed in the hope that it will be useful,           */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of            */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             */
-/*      GNU General Public License for more details.                              */
-/*                                                                                */
-/*      You should have received a copy of the GNU General Public License         */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.      */
-/*                                                                                */
-/**********************************************************************************/
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
 
@@ -36,6 +25,9 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon as MCoupon;
 use Thelia\Model\CouponQuery;
+use Thelia\Model\Map\CouponTableMap;
+use Thelia\Type\EnumListType;
+use Thelia\Type\TypeCollection;
 
 /**
  * Coupon Loop
@@ -55,7 +47,23 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createBooleanOrBothTypeArgument('is_enabled')
+            Argument::createBooleanOrBothTypeArgument('is_enabled'),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new EnumListType(array(
+                        'id', 'id-reverse',
+                        'code', 'code-reverse',
+                        'title', 'title-reverse',
+                        'enabled', 'enabled-reverse',
+                        'expiration-date', 'expiration-date-reverse',
+                        'days-left', 'days-left-reverse',
+                        'usages-left', 'usages-left-reverse'
+                        )
+                    )
+                ),
+                'code'
+            )
         );
     }
 
@@ -77,6 +85,63 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByIsEnabled($isEnabled ? true : false);
         }
 
+        $search->addAsColumn('days_left', 'DATEDIFF('.CouponTableMap::EXPIRATION_DATE.', CURDATE()) - 1');
+
+        $orders = $this->getOrder();
+
+        foreach ($orders as $order) {
+            switch ($order) {
+                case 'id':
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case 'id-reverse':
+                    $search->orderById(Criteria::DESC);
+                    break;
+
+                case 'code':
+                    $search->orderByCode(Criteria::ASC);
+                    break;
+                case 'code-reverse':
+                    $search->orderByCode(Criteria::DESC);
+                    break;
+
+                case 'title':
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
+                    break;
+                case 'title-reverse':
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
+                    break;
+
+                case 'enabled':
+                    $search->orderByIsEnabled(Criteria::ASC);
+                    break;
+                case 'enabled-reverse':
+                    $search->orderByIsEnabled(Criteria::DESC);
+                    break;
+
+                case 'expiration-date':
+                    $search->orderByExpirationDate(Criteria::ASC);
+                    break;
+                case 'expiration-date-reverse':
+                    $search->orderByExpirationDate(Criteria::DESC);
+                    break;
+
+                case 'usages-left':
+                    $search->orderByMaxUsage(Criteria::ASC);
+                    break;
+                case 'usages-left-reverse':
+                    $search->orderByMaxUsage(Criteria::DESC);
+                    break;
+
+                case 'days-left':
+                    $search->addAscendingOrderByColumn('days_left');
+                    break;
+                case 'days-left-reverse':
+                    $search->addDescendingOrderByColumn('days_left');
+                    break;
+            }
+        }
+
         return $search;
     }
 
@@ -92,7 +157,9 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 
         /** @var MCoupon $coupon */
         foreach ($loopResult->getResultDataCollection() as $coupon) {
+
             $loopResultRow = new LoopResultRow($coupon);
+
             $conditions = $conditionFactory->unserializeConditionCollection(
                 $coupon->getSerializedConditions()
             );
@@ -114,10 +181,6 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 $coupon->getExpirationDate()
             );
 
-            $now = time();
-            $datediff = $coupon->getExpirationDate()->getTimestamp() - $now;
-            $daysLeftBeforeExpiration = floor($datediff/(60*60*24));
-
             $cleanedConditions = array();
             /** @var ConditionInterface $condition */
             foreach ($conditions as $condition) {
@@ -127,14 +190,16 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 );
                 $cleanedConditions[] = $temp;
             }
-            $loopResultRow->set("ID", $coupon->getId())
+
+            $loopResultRow
+                ->set("ID", $coupon->getId())
                 ->set("IS_TRANSLATED", $coupon->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE", $this->locale)
                 ->set("CODE", $coupon->getCode())
                 ->set("TITLE", $coupon->getVirtualColumn('i18n_TITLE'))
                 ->set("SHORT_DESCRIPTION", $coupon->getVirtualColumn('i18n_SHORT_DESCRIPTION'))
                 ->set("DESCRIPTION", $coupon->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("EXPIRATION_DATE", $coupon->getExpirationDate($lang->getDateFormat()))
+                ->set("EXPIRATION_DATE", $coupon->getExpirationDate())
                 ->set("USAGE_LEFT", $coupon->getMaxUsage())
                 ->set("IS_CUMULATIVE", $coupon->getIsCumulative())
                 ->set("IS_REMOVING_POSTAGE", $coupon->getIsRemovingPostage())
@@ -143,7 +208,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("AMOUNT", $coupon->getAmount())
                 ->set("APPLICATION_CONDITIONS", $cleanedConditions)
                 ->set("TOOLTIP", $couponManager->getToolTip())
-                ->set("DAY_LEFT_BEFORE_EXPIRATION", $daysLeftBeforeExpiration)
+                ->set("DAY_LEFT_BEFORE_EXPIRATION", max(0, $coupon->getVirtualColumn('days_left')))
                 ->set("SERVICE_ID", $couponManager->getServiceId());
             $loopResult->addRow($loopResultRow);
         }

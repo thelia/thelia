@@ -172,7 +172,7 @@ class Product extends BaseProduct
             $this->setTaxRuleId($taxRuleId);
 
             // Create the default product sale element of this product
-            $sale_elements = $this->createProductSaleElement($con, $baseWeight, $basePrice, $basePrice, $priceCurrencyId, true);
+            $this->createProductSaleElement($con, $baseWeight, $basePrice, $basePrice, $priceCurrencyId, true);
 
             // Store all the stuff !
             $con->commit();
@@ -214,6 +214,7 @@ class Product extends BaseProduct
             ->setPromoPrice($salePrice)
             ->setPrice($basePrice)
             ->setCurrencyId($currencyId)
+            ->setFromDefaultCurrency(false)
             ->save($con)
         ;
 

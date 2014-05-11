@@ -1,25 +1,14 @@
 <?php
-/**********************************************************************************/
-/*                                                                                */
-/*      Thelia	                                                                  */
-/*                                                                                */
-/*      Copyright (c) OpenStudio                                                  */
-/*      email : info@thelia.net                                                   */
-/*      web : http://www.thelia.net                                               */
-/*                                                                                */
-/*      This program is free software; you can redistribute it and/or modify      */
-/*      it under the terms of the GNU General Public License as published by      */
-/*      the Free Software Foundation; either version 3 of the License             */
-/*                                                                                */
-/*      This program is distributed in the hope that it will be useful,           */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of            */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             */
-/*      GNU General Public License for more details.                              */
-/*                                                                                */
-/*      You should have received a copy of the GNU General Public License         */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.      */
-/*                                                                                */
-/**********************************************************************************/
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace Thelia\Coupon\Type;
 
@@ -127,7 +116,7 @@ class RemoveXPercent extends CouponAbstract
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Percentage removed from the cart', array(), 'coupon');
+            ->trans('Percent Discount', array(), 'coupon');
     }
 
     /**
@@ -140,7 +129,7 @@ class RemoveXPercent extends CouponAbstract
         $toolTip = $this->facade
             ->getTranslator()
             ->trans(
-                'This coupon will remove the entered percentage to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.',
+                'This coupon will offert a flat percentage off a shopper\'s entire order (not applied to shipping costs or tax rates). If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
                 array(),
                 'coupon'
             );
@@ -156,17 +145,12 @@ class RemoveXPercent extends CouponAbstract
      */
     public function drawBackOfficeInputs()
     {
-        $labelPercentage = $this->getInputName();
-
-        $html = '
-                <input type="hidden" name="thelia_coupon_creation[' . self::INPUT_AMOUNT_NAME . ']" value="0"/>
-                <div class="form-group input-' . self::INPUT_PERCENTAGE_NAME . '">
-                    <label for="' . self::INPUT_PERCENTAGE_NAME . '" class="control-label">' . $labelPercentage . '</label>
-                    <input id="' . self::INPUT_PERCENTAGE_NAME . '" class="form-control" name="' . self::INPUT_EXTENDED__NAME . '[' . self::INPUT_PERCENTAGE_NAME . ']' . '" type="text" value="' . $this->percentage . '"/>
-                </div>
-            ';
-
-        return $html;
+        return $this->facade->getParser()->render('coupon/type-fragments/remove-x-percent.html', [
+            'label'     => $this->getInputName(),
+            'typeKey'   => self::INPUT_AMOUNT_NAME,
+            'fieldId'   => self::INPUT_PERCENTAGE_NAME,
+            'fieldName' => self::INPUT_EXTENDED__NAME,
+            'value'     => $this->percentage
+        ]);
     }
-
 }

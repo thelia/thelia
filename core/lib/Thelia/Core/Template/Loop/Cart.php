@@ -1,11 +1,14 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: manu
- * Date: 08/08/13
- * Time: 12:44
- * To change this template use File | Settings | File Templates.
- */
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
 

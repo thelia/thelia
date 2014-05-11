@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Model\Base\Message as BaseMessage;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
@@ -74,13 +75,13 @@ class Message extends BaseMessage
     {
         $body = false;
 
-        $mail_template_path = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath() . DS;
+        //$mail_template_path = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath() . DS;
 
         // Try to get the body from template file, if a file is defined
         if (! empty($template)) {
             try {
 
-                $body = $parser->render($mail_template_path . $template);
+                $body = $parser->render($template);
             } catch (ResourceNotFoundException $ex) {
                 // Ignore this.
             }
@@ -98,7 +99,7 @@ class Message extends BaseMessage
             $parser->assign('message_body', $body);
 
             // Render the layout file
-            $body = $parser->render($mail_template_path . $layout);
+            $body = $parser->render($layout);
         }
 
         return $body;
@@ -136,6 +137,7 @@ class Message extends BaseMessage
      */
     public function buildMessage($parser, \Swift_Message $messageInstance)
     {
+        $parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveMailTemplate());
         $subject     = $parser->fetch(sprintf("string:%s", $this->getSubject()));
         $htmlMessage = $this->getHtmlMessageBody($parser);
         $textMessage = $this->getTextMessageBody($parser);

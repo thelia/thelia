@@ -16,8 +16,18 @@
         <default key="_controller">Thelia\Controller\Admin\HomeController::defaultAction</default>
     </route>
 
+    <route id="admin.home.view" path="/admin/latest-thelia-version">
+        <default key="_controller">Thelia\Controller\Admin\HomeController::getLatestTheliaVersion</default>
+    </route>
+
     <route id="admin.home.stats" path="/admin/home/stats">
         <default key="_controller">Thelia\Controller\Admin\HomeController::loadStatsAjaxAction</default>
+    </route>
+
+    <route id="admin.news-feed" path="/admin/ajax/thelia_news_feed">
+        <default key="_controller">Thelia\Controller\Admin\AdminController::processTemplateAction</default>
+        <default key="template">ajax/thelia_news_feed</default>
+        <default key="not-logged">1</default>
     </route>
 
     <!-- end home -->
@@ -502,10 +512,6 @@
         <default key="_controller">Thelia\Controller\Admin\CouponController::updateAction</default>
         <requirement key="couponId">\d+</requirement>
     </route>
-    <route id="admin.coupon.read" path="/admin/coupon/read/{couponId}">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
-        <requirement key="couponId">\d+</requirement>
-    </route>
     <route id="admin.coupon.draw.inputs.ajax" path="/admin/coupon/draw/inputs/{couponServiceId}">
         <default key="_controller">Thelia\Controller\Admin\CouponController::getBackOfficeInputsAjaxAction</default>
         <requirement key="couponServiceId">.*</requirement>
@@ -538,6 +544,10 @@
     </route>
 
     <!-- Routes to the Config (system variables) controller -->
+
+    <route id="admin.configuration.index" path="/admin/configuration">
+        <default key="_controller">Thelia\Controller\Admin\ConfigurationController::indexAction</default>
+    </route>
 
     <route id="admin.configuration.variables.default" path="/admin/configuration/variables">
         <default key="_controller">Thelia\Controller\Admin\ConfigController::defaultAction</default>
@@ -767,9 +777,9 @@
         <default key="_controller">Thelia\Controller\Admin\ShippingZoneController::indexAction</default>
     </route>
 
-    <route id="admin.configuration.shipping-zones.update.view" path="/admin/configuration/shipping_zones/update/{shipping_zones_id}" methods="get">
+    <route id="admin.configuration.shipping-zones.update.view" path="/admin/configuration/shipping_zones/update/{delivery_module_id}" methods="get">
         <default key="_controller">Thelia\Controller\Admin\ShippingZoneController::updateAction</default>
-        <requirement key="shipping_zones_id">\d+</requirement>
+        <requirement key="delivery_module_id">\d+</requirement>
     </route>
 
     <route id="admin.configuration.shipping-zones.area.add" path="/admin/configuration/shipping_zones/area/add" methods="post">
@@ -981,6 +991,25 @@
 
     <!-- end feature and feature routes  management -->
 
+    <!-- cache route management -->
+    <route id="admin.configuration.advanced" path="/admin/configuration/advanced">
+        <default key="_controller">Thelia\Controller\Admin\AdvancedConfigurationController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.advanced.flush-cache" path="/admin/configuration/advanced/flush-cache">
+        <default key="_controller">Thelia\Controller\Admin\AdvancedConfigurationController::flushCacheAction</default>
+    </route>
+
+    <route id="admin.configuration.advanced.flush-assets" path="/admin/configuration/advanced/flush-assets">
+        <default key="_controller">Thelia\Controller\Admin\AdvancedConfigurationController::flushAssetsAction</default>
+    </route>
+
+    <route id="admin.configuration.advanced.flush-images-and-documents" path="/admin/configuration/advanced/flush-images-and-documents">
+        <default key="_controller">Thelia\Controller\Admin\AdvancedConfigurationController::flushImagesAndDocumentsAction</default>
+    </route>
+
+    <!-- and cache route management -->
+
     <!-- Modules rule management -->
 
     <route id="admin.module" path="/admin/modules">
@@ -1127,6 +1156,16 @@
 
     <route id="admin.configuration.translations.update" path="/admin/configuration/translations/update">
         <default key="_controller">Thelia\Controller\Admin\TranslationsController::updateAction</default>
+    </route>
+
+    <!-- export management -->
+
+    <route id="export.main" path="/admin/export">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::indexAction</default>
+    </route>
+
+    <route id="export.customer.newsletter" path="/admin/export/customer/newsletter">
+        <default key="_controller">Thelia\Controller\Admin\CustomerExportController::NewsletterExportAction</default>
     </route>
 
     <!-- The default route, to display a template -->

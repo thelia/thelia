@@ -32,7 +32,13 @@
 
         						    {form name="thelia.admin.country.modification"}
         						    	<form method="POST" action="{url path="/admin/configuration/country/save/{$ID}"}" {form_enctype form=$form} class="clearfix">
-                                            {include file = "includes/inner-form-toolbar.html"}
+                                            {include
+                                                file = "includes/inner-form-toolbar.html"
+                                                hide_submit_buttons = false
+
+                                                page_url  = {url path="/admin/configuration/country/update/$ID"}
+                                                close_url = {url path="/admin/configuration/countries"}
+                                            }
                                             <div class="row">
             	                                <div class="col-md-12">
                                                     {* Be sure to get the country ID, even if the form could not be validated *}
@@ -41,7 +47,7 @@
                 						        	{form_hidden_fields form=$form}
 
                 						        	{form_field form=$form field='success_url'}
-                						        		<input type="hidden" name="{$name}" value="{url path="/admin/configuration/country/update/{$ID}"}" />
+                						        		<input type="hidden" name="{$name}" value="{url path="/admin/configuration/countries"}" />
                 						        	{/form_field}
 
                                                     {form_field form=$form field='locale'}
@@ -116,7 +122,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="alert alert-error">
-                            {intl l="Sorry, country ID=%id was not found." id=$country_id}
+                            {intl l="Sorry, country ID=%id was not found." id={$country_id}}
                         </div>
                     </div>
                 </div>

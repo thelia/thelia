@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -32,8 +33,14 @@ class Content extends BaseContent
      */
     protected function addCriteriaToPositionQuery($query)
     {
-        // TODO: Find the default folder for this content,
-        // and generate the position relative to this folder
+        $contents = ContentFolderQuery::create()
+            ->filterByFolderId($this->getDefaultFolderId())
+            ->filterByDefaultFolder(true)
+            ->select('content_id')
+            ->find();
+
+        // Filtrer la requete sur ces produits
+        if ($contents != null) $query->filterById($contents, Criteria::IN);
     }
 
     public function getDefaultFolderId()
@@ -49,9 +56,21 @@ class Content extends BaseContent
 
     public function setDefaultFolder($folderId)
     {
-/*        ContentFolderQuery::create()
-            ->filterByContentId($this->getId)
-            ->update(array("DefaultFolder" => 0));*/
+        // Unset previous category
+        ContentFolderQuery::create()
+            ->filterByContentId($this->getId())
+            ->filterByDefaultFolder(true)
+            ->find()
+            ->setByDefault(false)
+            ->save();
+
+        // Set new default category
+        ContentFolderQuery::create()
+            ->filterByContentId($this->getId())
+            ->filterByFolderId($folderId)
+            ->find()
+            ->setByDefault(true)
+            ->save();
 
         return $this;
     }

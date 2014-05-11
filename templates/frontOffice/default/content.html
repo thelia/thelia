@@ -18,6 +18,11 @@
     {/loop}
 {/block}
 
+{* Feeds *}
+{block name="feeds"}
+<link rel="alternate" type="application/rss+xml" title="{intl l='All contents in'} {content attr='title'}" href="{url path="/feed/content/{lang attr="locale"}/{content attr="id"}"}" />
+{/block}
+
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = []}

@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Tests\Action;
@@ -66,6 +55,9 @@ class LangTest extends \PHPUnit_Framework_TestCase
             ->setCode('TES')
             ->setDateFormat('Y-m-d')
             ->setTimeFormat('H:i:s')
+            ->setDecimalSeparator(".")
+            ->setThousandsSeparator(" ")
+            ->setDecimals("2")
             ->setDispatcher($this->dispatcher)
         ;
 
@@ -83,6 +75,10 @@ class LangTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('TES', $createdLang->getCode());
         $this->assertEquals('Y-m-d', $createdLang->getDateFormat());
         $this->assertEquals('H:i:s', $createdLang->getTimeFormat());
+        $this->assertEquals('.', $createdLang->getDecimalSeparator());
+        $this->assertEquals(' ', $createdLang->getThousandsSeparator());
+        $this->assertEquals('2', $createdLang->getDecimals());
+        $this->assertEquals('Y-m-d H:i:s', $createdLang->getDatetimeFormat());
 
         return $createdLang;
     }
@@ -101,6 +97,9 @@ class LangTest extends \PHPUnit_Framework_TestCase
             ->setCode('TEST')
             ->setDateFormat('d-m-Y')
             ->setTimeFormat('H-i-s')
+            ->setDecimalSeparator(",")
+            ->setThousandsSeparator(".")
+            ->setDecimals("1")
             ->setDispatcher($this->dispatcher)
         ;
 
@@ -116,6 +115,10 @@ class LangTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test update', $updatedLang->getTitle());
         $this->assertEquals('d-m-Y', $updatedLang->getDateFormat());
         $this->assertEquals('H-i-s', $updatedLang->getTimeFormat());
+        $this->assertEquals(',', $updatedLang->getDecimalSeparator());
+        $this->assertEquals('.', $updatedLang->getThousandsSeparator());
+        $this->assertEquals('1', $updatedLang->getDecimals());
+        $this->assertEquals('d-m-Y H-i-s', $updatedLang->getDatetimeFormat());
 
         return $updatedLang;
     }

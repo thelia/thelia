@@ -10,9 +10,14 @@
 
         <div id="wrapper" class="container">
 
-            {module_include location='configuration_top'}
+            <nav>
+                <ul class="breadcrumb">
+                    <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
+                    <li>{intl l='Configuration'}</li>
+                </ul>
+            </nav>
 
-            <h2>{intl l="Thelia configuration"}</h2>
+            {module_include location='configuration_top'}
 
             <div class="row">
 
@@ -89,14 +94,14 @@
 
                                 {loop type="auth" name="pcc2" role="ADMIN" resource="admin.configuration.shipping-zone" access="VIEW"}
                                     <tr>
-                                        <td><a href="{url path='/admin/configuration/shipping_zones'}">{intl l='Shipping zones'}</a></td>
+                                        <td><a href="{url path='/admin/configuration/shipping_zones'}">{intl l='Shipping configuration'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_zones'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc3" role="ADMIN" resource="admin.configuration.shipping-configuration" access="VIEW"}
                                     <tr>
-                                        <td><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l='Shipping configuration'}</a></td>
+                                        <td><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l='Shipping zones management'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_configuration'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
@@ -176,6 +181,12 @@
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/system-logs'}">{intl l='System logs'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/system-logs'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
+                                {loop type="auth" name="pcc9" role="ADMIN" resource="admin.configuration.advanced" access="VIEW"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/advanced'}">{intl l='Advanced configuration'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/advanced'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
                                 {module_include location='system_configuration_bottom'}

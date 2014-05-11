@@ -1,25 +1,14 @@
 <?php
-/**********************************************************************************/
-/*                                                                                */
-/*      Thelia	                                                                  */
-/*                                                                                */
-/*      Copyright (c) OpenStudio                                                  */
-/*      email : info@thelia.net                                                   */
-/*      web : http://www.thelia.net                                               */
-/*                                                                                */
-/*      This program is free software; you can redistribute it and/or modify      */
-/*      it under the terms of the GNU General Public License as published by      */
-/*      the Free Software Foundation; either version 3 of the License             */
-/*                                                                                */
-/*      This program is distributed in the hope that it will be useful,           */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of            */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             */
-/*      GNU General Public License for more details.                              */
-/*                                                                                */
-/*      You should have received a copy of the GNU General Public License         */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.      */
-/*                                                                                */
-/**********************************************************************************/
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace Thelia\Coupon\Type;
 
@@ -44,7 +33,7 @@ class RemoveXAmount extends CouponAbstract
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Remove X amount to total cart', array(), 'coupon');
+            ->trans('Fixed Amount Discount', array(), 'coupon');
     }
 
     /**
@@ -56,7 +45,7 @@ class RemoveXAmount extends CouponAbstract
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Amount removed from the cart', array(), 'coupon');
+            ->trans('Discount amount', array(), 'coupon');
     }
 
     /**
@@ -69,11 +58,20 @@ class RemoveXAmount extends CouponAbstract
         $toolTip = $this->facade
             ->getTranslator()
             ->trans(
-                'This coupon will remove the entered amount to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.',
+                'This coupon will subtracts a set amount from the total cost of an order. If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
                 array(),
                 'coupon'
             );
 
         return $toolTip;
+    }
+
+    public function drawBackOfficeInputs()
+    {
+        return $this->facade->getParser()->render('coupon/type-fragments/remove-x-amount.html', [
+                'label'     => $this->getInputName(),
+                'fieldName' => self::INPUT_AMOUNT_NAME,
+                'value'     => $this->amount
+            ]);
     }
 }

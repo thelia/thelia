@@ -1,3 +1,6 @@
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
+
 {loop name="product_edit" type="product" visible="*" id=$product_id backend_context="1" lang=$edit_language_id}
 <div class="form-container">
 
@@ -266,7 +269,7 @@
 	                    <p class="title title-without-tabs">{intl l='Additional categories'}</p>
 	                    <p>{intl l='A product could be attached to more than one category. Select here the additional categories for this product.'}
 	                    {loop name="default_category" type="category" id=$DEFAULT_CATEGORY}
-	                        {intl l='You can change the default category (%title) in the "General" tab.' title=$TITLE}
+	                        {intl l='You can change the default category (%title) in the "General" tab.' title={$TITLE}}
 	                    {/loop}
 
 	                    {$exclude_from_tree = "-1"}
@@ -557,12 +560,12 @@ $(function() {
         }
     });
 
-    // Initialize folder (id={$folder_id}) select value
+    // Initialize folder select value
     {if $folder_id != 0}
         $('#folder_id').val("{$folder_id}").change();
     {/if}
 
-    // Initialize accessory category id (id={$accessory_category_id}) select value
+    // Initialize accessory category id select value
     {if $accessory_category_id != 0}
         $('#accessory_category_id').val("{$accessory_category_id}").change();
     {/if}

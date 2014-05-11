@@ -1,27 +1,18 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
+
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -266,9 +257,9 @@ class BaseAdminController extends BaseController
     /**
      * Redirect to à route ID related URL
      *
-     * @param unknown                                $routeId         the route ID, as found in Config/Resources/routing/admin.xml
-     * @param array|\Thelia\Controller\Admin\unknown $urlParameters   the URL parametrs, as a var/value pair array
-     * @param array                                  $routeParameters
+     * @param string $routeId         the route ID, as found in Config/Resources/routing/admin.xml
+     * @param array  $urlParameters   the URL parameters, as a var/value pair array
+     * @param array  $routeParameters
      */
     public function redirectToRoute($routeId, array $urlParameters = array(), array $routeParameters = array())
     {
@@ -405,14 +396,20 @@ class BaseAdminController extends BaseController
     /**
      * Render the given template, and returns the result as an Http Response.
      *
-     * @param $templateName the complete template name, with extension
-     * @param  array                                $args   the template arguments
-     * @param  int                                  $status http code status
+     * @param  string                               $templateName the complete template name, with extension
+     * @param  array                                $args         the template arguments
+     * @param  int                                  $status       http code status
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function render($templateName, $args = array(), $status = 200)
     {
-        return Response::create($this->renderRaw($templateName, $args), $status);
+        $response = $this->renderRaw($templateName, $args);
+
+        if (!$response instanceof \Symfony\Component\HttpFoundation\Response) {
+            $response = Response::create($response, $status);
+        }
+
+        return $response;
     }
 
     /**
@@ -422,7 +419,7 @@ class BaseAdminController extends BaseController
      * @param array $args        the template arguments
      * @param null  $templateDir
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return string|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function renderRaw($templateName, $args = array(), $templateDir = null)
     {
@@ -460,16 +457,17 @@ class BaseAdminController extends BaseController
 
         // Render the template.
         try {
-            $data = $this->getParser($templateDir)->render($templateName, $args);
+            $content = $this->getParser($templateDir)->render($templateName, $args);
 
-            return $data;
         } catch (AuthenticationException $ex) {
             // User is not authenticated, and templates requires authentication -> redirect to login page
             // We user login_tpl as a path, not a template.
-            Redirect::exec(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
+            $content = RedirectResponse::create(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
         } catch (AuthorizationException $ex) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.
-            return $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."), 403);
+            $content = $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."), 403);
         }
+
+        return $content;
     }
 }

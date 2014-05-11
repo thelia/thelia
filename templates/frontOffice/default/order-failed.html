@@ -1,0 +1,50 @@
+{extends file="layout.tpl"}
+
+{* Security *}
+{block name="no-return-functions" prepend}
+    {check_auth role="CUSTOMER" login_tpl="login"}
+{/block}
+
+{* Body Class *}
+{block name="body-class"}page-order-payment{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['title' => {intl l="Cart"}, 'url'=>{url path="/cart"}],
+        ['title' => {intl l="Secure Payment"}, 'url'=>{url path="/order/pay"}]
+    ]}
+{/block}
+
+
+{block name="main-content"}
+    <div class="main">
+        <article class="col-main clearfix" role="main" aria-labelledby="main-label">
+
+            <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
+
+            {include file="misc/checkout-progress.tpl" step="last"}
+
+            {loop type="order" name="failed-order" id=$failed_order_id}
+
+            <div id="payment-failure" class="panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
+                </div>
+                <div class="panel-body">
+                    <h3>{intl l="We're sorry, a problem occured and your payment was not successful."}</h3>
+                    {if null !== $failed_order_message}
+                        <p>{$failed_order_message}</p>
+                    {/if}
+
+                    <a href="{url path="/order/invoice"}" role="button" class="btn btn-checkout"><span>{intl l="Try again"}</span></a>
+                </div>
+            </div>
+
+            {/loop}
+
+            <a href="{navigate to="index"}" role="button" class="btn btn-checkout-home"><span>{intl l="Go home"}</span></a>
+
+        </article>
+    </div>
+{/block}

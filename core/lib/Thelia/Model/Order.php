@@ -23,8 +23,6 @@ class Order extends BaseOrder
      */
     public function preInsert(ConnectionInterface $con = null)
     {
-        $this->setRef($this->generateRef());
-
         $this->dispatchEvent(TheliaEvents::ORDER_BEFORE_CREATE, new OrderEvent($this));
 
         return true;
@@ -35,14 +33,23 @@ class Order extends BaseOrder
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        $this->setRef($this->generateRef())
+            ->save($con);
         $this->dispatchEvent(TheliaEvents::ORDER_AFTER_CREATE, new OrderEvent($this));
+    }
+
+    public function postSave(ConnectionInterface $con = null)
+    {
+        if ($this->isPaid() && null === $this->getInvoiceDate()) {
+            $this
+                ->setInvoiceDate(time())
+                ->save($con);
+        }
     }
 
     public function generateRef()
     {
-        /* order addresses are unique */
-
-        return uniqid('ORD', true);
+       return sprintf('ORD%s', str_pad($this->getId(), 12, 0, STR_PAD_LEFT));
     }
 
     /**

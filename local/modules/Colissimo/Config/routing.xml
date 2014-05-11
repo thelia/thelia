@@ -10,4 +10,8 @@
     <route id="colissimo.edit.freeshipping" path="/admin/module/colissimo/freeshipping" methods="post">
         <default key="_controller">Colissimo\Controller\FreeShipping::set</default>
     </route>
+
+    <route id="colissimo.export" path="/admin/module/colissimo/export" methods="post">
+        <default key="_controller">Colissimo\Controller\Export::exportAction</default>
+    </route>
 </routes>

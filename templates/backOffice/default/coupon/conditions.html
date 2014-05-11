@@ -1,5 +1,5 @@
 {* List all condition with their summary *}
-{foreach from=$conditions item=condition key=i name=conditionsForeach}
+{foreach from=$conditions item=condition name=conditionsForeach}
     <tr>
         <td>
             {if !$smarty.foreach.conditionsForeach.first}
@@ -7,13 +7,15 @@
             {/if}
             {$condition.summary nofilter}
         </td>
-        <td>
-            <a data-serviceId="{$condition.serviceId}" data-conditionIndex="{$condition.index}" class="btn btn-default btn-primary btn-medium condition-update-btn" href="{$urlEdit}">
-                <span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}
+
+        <td class="text-center">
+            <a title="{intl l='Change this condition'}" data-service-id="{$condition.serviceId}" data-condition-index="{$condition.index}" class="condition-update-btn" href="{$urlEdit}">
+                <span class="glyphicon glyphicon-edit"></span>
             </a>
+
             {if $conditions|count != 1}
-                <a data-conditionIndex="{$condition.index}" data-target="#delete" data-toggle="confirm" class="btn btn-default btn-danger btn-medium condition-delete-btn" href="{$urlDelete}">
-                    <span class="glyphicon glyphicon-remove"></span> {intl l='Delete'}
+                <a title="{intl l='Delete this condition'}" data-condition-index="{$condition.index}" data-target="#delete" data-toggle="confirm" class="condition-delete-btn" href="{$urlDelete}">
+                    <span class="glyphicon glyphicon-remove"></span>
                 </a>
             {/if}
         </td>

@@ -1,25 +1,15 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
+
 namespace Thelia\Cart;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -86,6 +76,7 @@ trait CartTrait
             //le cookie de panier n'existe pas, il va falloir le créer et faire un enregistrement en base.
             $cart = $this->createCart($session);
         }
+        $session->setCart($cart->getId());
 
         return $cart;
     }
@@ -97,7 +88,8 @@ trait CartTrait
     protected function createCart(Session $session)
     {
         $cart = new CartModel();
-        $cart->setToken($this->generateCookie());
+        $cart->setToken($this->generateCookie($session));
+        $cart->setCurrency($session->getCurrency(true));
 
         if (null !== $customer = $session->getCustomerUser()) {
             $cart->setCustomer($customer);
@@ -120,7 +112,8 @@ trait CartTrait
      */
     protected function duplicateCart(EventDispatcherInterface $dispatcher, CartModel $cart, Session $session, Customer $customer = null)
     {
-        $newCart = $cart->duplicate($this->generateCookie(), $customer);
+        $currency = $session->getCurrency();
+        $newCart = $cart->duplicate($this->generateCookie($session), $customer, $currency, $dispatcher);
         $session->setCart($newCart->getId());
 
         $cartEvent = new CartEvent($newCart);
@@ -130,18 +123,12 @@ trait CartTrait
         return $cartEvent->getCart();
     }
 
-    protected function generateCookie()
+    protected function generateCookie(Session $session)
     {
         $id = null;
         if (ConfigQuery::read("cart.session_only", 0) == 0) {
             $id = uniqid('', true);
-            setcookie(
-                "thelia_cart",
-                $id,
-                time()+ConfigQuery::read("cart.cookie_lifetime", 60*60*24*365),
-                '/'
-            );
-
+            $session->set('cart_use_cookie', $id);
         }
 
         return $id;

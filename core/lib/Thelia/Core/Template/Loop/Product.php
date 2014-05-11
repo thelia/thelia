@@ -1,24 +1,13 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
@@ -468,12 +457,19 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
+        /** @var \Thelia\Core\Security\SecurityContext $securityContext */
+        $securityContext = $this->container->get('thelia.securityContext');
 
         foreach ($loopResult->getResultDataCollection() as $product) {
 
             $loopResultRow = new LoopResultRow($product);
 
             $price = $product->getVirtualColumn('price');
+
+            if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+                $price = $price * (1-($securityContext->getCustomerUser()->getDiscount()/100));
+            }
+
             try {
                 $taxedPrice = $product->getTaxedPrice(
                     $taxCountry,
@@ -483,6 +479,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 $taxedPrice = null;
             }
             $promoPrice = $product->getVirtualColumn('promo_price');
+
+            if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+                $promoPrice = $promoPrice * (1-($securityContext->getCustomerUser()->getDiscount()/100));
+            }
             try {
                 $taxedPromoPrice = $product->getTaxedPromoPrice(
                     $taxCountry,
@@ -857,7 +857,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $visible = $this->getVisible();
 
-        if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
+        if ($visible !== Type\BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
 
         $exclude = $this->getExclude();
 
@@ -949,6 +949,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $loopResult = new LoopResult($results);
 
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
+        /** @var \Thelia\Core\Security\SecurityContext $securityContext */
+        $securityContext = $this->container->get('thelia.securityContext');
 
         foreach ($loopResult->getResultDataCollection() as $product) {
 
@@ -956,10 +958,14 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             $price = $product->getRealLowestPrice();
 
+           if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+                $price = $price * (1-($securityContext->getCustomerUser()->getDiscount()/100));
+            }
+
             try {
                 $taxedPrice = $product->getTaxedPrice(
                     $taxCountry,
-                    $product->getRealLowestPrice()
+                    $price
                 );
             } catch (TaxEngineException $e) {
                 $taxedPrice = null;

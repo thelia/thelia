@@ -1,28 +1,19 @@
 <?php
 /*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
+/*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
 /*************************************************************************************/
+
 namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -78,7 +69,7 @@ class ViewListener implements EventSubscriberInterface
         $parser = $this->container->get('thelia.parser');
         $parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveFrontTemplate());
         $request = $this->container->get('request');
-
+        $response = null;
         try {
             $content = $parser->render($request->attributes->get('_view').".html");
 
@@ -88,27 +79,29 @@ class ViewListener implements EventSubscriberInterface
                 $response = new Response($content, $parser->getStatus() ?: 200);
             }
 
-            $event->setResponse($response);
         } catch (ResourceNotFoundException $e) {
             throw new NotFoundHttpException();
         } catch (AuthenticationException $ex) {
 
             // Redirect to the login template
-            Redirect::exec($this->container->get('thelia.url.manager')->viewUrl($ex->getLoginTemplate()));
+            $response = RedirectResponse::create($this->container->get('thelia.url.manager')->viewUrl($ex->getLoginTemplate()));
         } catch (OrderException $e) {
             switch ($e->getCode()) {
                 case OrderException::CART_EMPTY:
                     // Redirect to the cart template
-                    Redirect::exec($this->container->get('router.chainRequest')->generate($e->cartRoute, $e->arguments, Router::ABSOLUTE_URL));
+                    $response = RedirectResponse::create($this->container->get('router.chainRequest')->generate($e->cartRoute, $e->arguments, Router::ABSOLUTE_URL));
                     break;
                 case OrderException::UNDEFINED_DELIVERY:
                     // Redirect to the delivery choice template
-                    Redirect::exec($this->container->get('router.chainRequest')->generate($e->orderDeliveryRoute, $e->arguments, Router::ABSOLUTE_URL));
+                    $response = RedirectResponse::create($this->container->get('router.chainRequest')->generate($e->orderDeliveryRoute, $e->arguments, Router::ABSOLUTE_URL));
                     break;
             }
-
-            throw $e;
+            if (null === $response) {
+                throw $e;
+            }
         }
+
+        $event->setResponse($response);
     }
 
     public function beforeKernelView(GetResponseForControllerResultEvent $event)

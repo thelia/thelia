@@ -1,0 +1,5 @@
+<select class="form-control" id="{$inputKey}-operator" name="{$inputKey}[operator]">
+{foreach $operators as $key => $operator}
+    <option value="{$key}"{if $key == $value}selected="selected"{/if}>{$operator}</option>
+{/foreach}
+</select>

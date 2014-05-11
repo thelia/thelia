@@ -1,0 +1,28 @@
+<?php
+
+return array(
+    'Custmer Number' => 'Номер заказчика',
+    'DELIVERY' => 'ДОСТАВКА',
+    'Delivery module' => 'Модуль доставки',
+    'INVOICE' => 'СЧЕТ-ФАКТУРА',
+    'Invoice REF' => 'Счет-фактура номер',
+    'Invoice date' => 'Дата фактуры',
+    'Payment module' => 'Модуль оплаты',
+    'Postage' => 'Почтовые расходы',
+    'Product' => 'Товар',
+    'Quantity' => 'Количество',
+    'Ref' => 'Номер',
+    'THANK YOU' => 'Спасибо',
+    'Tax' => 'Налог',
+    'Taxed total' => 'Итого без налогов',
+    'Total' => 'Итого',
+    'Total with tax' => 'Итого с налогом',
+    'Total without tax' => 'Итого без налога',
+    'Unit taxed price' => 'Цена единицы с налогом',
+    'Unit. price' => 'Цена единицы',
+    'delivery adress' => 'Адрес доставки',
+    'delivery module' => 'модуль доставки',
+    'invoice address' => 'Адрес плательщика',
+    'page' => 'страница',
+    'product' => 'товар',
+);
