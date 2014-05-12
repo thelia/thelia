@@ -739,6 +739,27 @@
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
     </behavior>
   </table>
+  <table name="hook" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="code" required="true" size="255" type="VARCHAR" />
+    <column name="type" required="true" type="TINYINT" />
+    <column name="native" type="BOOLEAN" />
+    <column name="activate" type="BOOLEAN" />
+    <column name="position" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <column name="chapo" type="LONGVARCHAR" />
+    <index name="idx_module_activate">
+      <index-column name="activate" />
+    </index>
+    <unique name="code_UNIQUE">
+      <unique-column name="code" />
+    </unique>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description, chapo" />
+    </behavior>
+  </table>
   <table name="module_hook" namespace="Thelia\Model">
     <column name="id" autoIncrement="true" primaryKey="true" required="true" type="INTEGER" />
     <column name="module_id" required="true" type="INTEGER" />

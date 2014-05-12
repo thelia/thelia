@@ -99,6 +99,20 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 ('5',  'en_US',  'tinymce wysiwyg editor', NULL,  NULL,  NULL),
 ('5',  'fr_FR',  'éditeur wysiwyg tinymce', NULL,  NULL,  NULL);
 
+INSERT INTO `hook` (`id`, `code`, `type`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
+(1, 'header', 1, 1, 1, 1, NOW(), NOW())
+,(2, 'body', 1, 1, 1, 1, NOW(), NOW())
+,(3, 'footer', 1, 1, 1, 1, NOW(), NOW())
+;
+
+INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+(1, 'en_US', 'Header', NULL,  NULL)
+,(1, 'fr_FR', 'Haut de page', NULL,  NULL)
+,(2, 'en_US', 'Body', NULL,  NULL)
+,(2, 'fr_FR', 'Corps de la page', NULL,  NULL)
+,(3, 'en_US', 'Footer', NULL,  NULL)
+,(3, 'fr_FR', 'Pied de page', NULL,  NULL)
+;
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
 (1, 1, 1, NOW(), NOW()),
