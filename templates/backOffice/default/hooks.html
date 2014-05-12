@@ -1,0 +1,159 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Hooks'}{/block}
+
+{block name="check-resource"}admin.hook{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+<div class="hooks">
+
+    <div id="wrapper" class="container">
+
+        <div class="clearfix">
+            <ul class="breadcrumb pull-left">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li>{intl l="Hooks"}</li>
+            </ul>
+{*            {loop type="auth" name="can_create" role="ADMIN" resource="admin.module" access="UPDATE"}
+                <a class="btn btn-default btn-primary pull-right" title="{intl l='add a new hook'}" href="#add_dialog" data-toggle="modal">
+                    <span class="glyphicon glyphicon-import"></span> {intl l="Add a new module"}
+                </a>
+            {/loop}
+*}
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+            {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
+
+            {loop type="hook" name="hook" order=$hook_order backend_context=1}
+                <div class="general-block-decorator">
+                    <h3>{$ID}. {$TITLE}</h3>
+                    {include file="includes/hook-block.html" hook_code="{$CODE}"}
+                </div>
+            {/loop}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{* Delete module confirmation dialog *}
+
+{capture "delete_module_dialog"}
+    <input type="hidden" name="module_id" id="delete_module_id" value="" />
+
+    <div class="row">
+        <div class="col-md-12">
+		    <div class="form-group">
+		        <div class="checkbox">
+		            <label>
+		                <input type="checkbox" name="delete-module-data" value="1">
+		                {intl l="Delete also module data"}
+		            </label>
+		        </div>
+		    </div>
+		</div>
+	</div>
+
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "delete_module_dialog"
+    dialog_title    = {intl l="Delete a module"}
+    dialog_message  = {intl l="Do you really want to delete this module ?"}
+
+    form_action         = {url path='/admin/module/delete'}
+    form_content        = {$smarty.capture.delete_module_dialog nofilter}
+}
+
+<div class="modal fade" id="module-failed" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>{intl l="An error occured"}</h3>
+            </div>
+            <div class="modal-body" id="module-failed-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{/block}
+
+{block name="javascript-initialization"}
+
+    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    <script>
+        $(document).ready(function() {
+           var url_management = "{url path="/admin/hook/toggle-activation/"}";
+           $(".module-hook-activation").on("switch-change", function(e, data){
+
+               var checkbox = $(this);
+        	   var module_id = checkbox.data('id');
+        	   var is_checked = data.value;
+
+               $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+               $.ajax({
+                    url: url_management+$(this).data('id')
+               }).done(function(){
+                   $("#loading-event").remove();
+               })
+               .success(function() {
+
+               })
+               .fail(function(jqXHR, textStatus, errorThrown){
+                    checkbox.bootstrapSwitch('toggleState', true);
+                    $("#loading-event").remove();
+                    $('#hook-failed-body').html(jqXHR.responseJSON.error);
+                    $("#hook-failed").modal("show");
+               });
+
+           });
+
+           $(".module-hook-delete-action").click(function(){
+                $("#delete_module_hook_id").val($(this).data("id"));
+           });
+
+           {* Inline editing of object position using bootstrap-editable *}
+
+           $('.modulePositionChange').editable({
+               type        : 'text',
+               title       : "{intl l="Enter new module position"}",
+               mode        : 'popup',
+               inputclass  : 'input-mini',
+               placement   : 'left',
+               success     : function(response, newValue) {
+                   // The URL template
+                   var url = "{url noamp='1' path='/admin/hook/update-position' module_hook_id='__ID__' position='__POS__'}";
+
+                   // Perform subtitutions
+                   url = url.replace('__ID__', $(this).data('id'))
+                   .replace('__POS__', newValue);
+
+                   // Reload the page
+                   location.href = url;
+               }
+           });
+
+        });
+    </script>
+
+{/block}
+
+{block name="javascript-last-call"}
+    {module_include location='hooks-js'}
+{/block}

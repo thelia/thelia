@@ -1027,7 +1027,7 @@
 
     <route id="admin.module.toggle-activation" path="/admin/module/toggle-activation/{module_id}">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::toggleActivationAction</default>
-        <requirement key="module_id">\d+</requirement>
+        <requirement key="module_hook_id">\d+</requirement>
     </route>
 
     <route id="admin.module.delete" path="/admin/module/delete">
@@ -1036,6 +1036,24 @@
 
     <route id="admin.module.update-position" path="/admin/module/update-position">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::updatePositionAction</default>
+    </route>
+
+    <!-- Hooks rule management -->
+
+    <route id="admin.hook" path="/admin/hooks">
+        <default key="_controller">Thelia\Controller\Admin\HookController::indexAction</default>
+    </route>
+    <route id="admin.hook.toggle-activation" path="/admin/hook/toggle-activation/{module_hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\HookController::toggleActivationAction</default>
+        <requirement key="module_hook_id">\d+</requirement>
+    </route>
+    <!--
+    <route id="admin.hook.delete" path="/admin/hook/delete">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::deleteAction</default>
+    </route>
+    -->
+    <route id="admin.hook.update-position" path="/admin/hook/update-position">
+        <default key="_controller">Thelia\Controller\Admin\HookController::updatePositionAction</default>
     </route>
 
     <!--

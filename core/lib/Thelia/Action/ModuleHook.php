@@ -19,6 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Cache\CacheEvent;
+use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
@@ -80,16 +81,36 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         return $event;
     }
 
-    public function toggleHookActivation(ModuleDeleteEvent $event)
+    public function toggleHookActivation(ModuleHookToggleActivationEvent $event)
     {
-        // Todo update module hook for the module hook
+        if (null !== $moduleHook = $event->getModuleHook()){
+            if ($moduleHook->getModuleActive()){
+                $moduleHook->setActive(! $moduleHook->getActive());
+                $moduleHook->save();
+            } else {
+                throw new \LogicException($this->getTranslator()->trans("The module has to be activated."));
+            }
+        }
         return $event;
     }
 
-    public function updateHookPosition(ModuleDeleteEvent $event)
+    /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param UpdatePositionEvent $event
+     */
+    public function updateHookPosition(UpdatePositionEvent $event)
     {
-        // Todo update module hook for the module hook
-        return $event;
+        // we have to filter query with the current hook
+        // because position is scoped by hook and is not global
+        if (null !== $event->getObjectId()){
+            $moduleHook = ModuleHookQuery::create()->findPk($event->getObjectId());
+            if (null !== $moduleHook){
+                $query = ModuleHookQuery::create()->filterByEvent($moduleHook->getEvent());
+                $this->genericUpdatePosition($query, $event);
+                //$this->cacheClear($event->getDispatcher());
+            }
+        }
     }
 
     protected function cacheClear(EventDispatcherInterface $dispatcher)

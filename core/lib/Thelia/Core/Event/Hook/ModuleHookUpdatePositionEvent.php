@@ -11,54 +11,36 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Hook;
+use Thelia\Core\Event\UpdatePositionEvent;
 
-use Symfony\Component\EventDispatcher\Event;
-use Thelia\Core\Hook\HookFragmentInterface;
 
 /**
- * Class HookEvent
+ * Class ModuleHookUpdatePositionEvent
  * @package Thelia\Core\Event\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class HookEvent extends Event {
+class ModuleHookUpdatePositionEvent extends UpdatePositionEvent {
 
-    protected $id = null;
-
-    protected $fragments = array();
+    /** @var String $hook  */
+    protected $hook = null;
 
     /**
-     *
-     * @param HookFragmentInterface $fragment
+     * @param null $hook
+     * @return String|null
      */
-    public function addFragment(HookFragmentInterface $fragment)
+    public function setHook($hook)
     {
-        $this->fragments[] = $fragment;
+        $this->hook = $hook;
         return $this;
     }
 
     /**
-     * @return array
+     * @return String|null
      */
-    public function getFragments()
+    public function getHook()
     {
-        return $this->fragments;
+        return $this->hook;
     }
 
-    /**
-     * @param null $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return null
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
 } 

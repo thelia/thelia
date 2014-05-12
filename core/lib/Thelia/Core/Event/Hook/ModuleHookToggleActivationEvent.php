@@ -12,53 +12,13 @@
 
 namespace Thelia\Core\Event\Hook;
 
-use Symfony\Component\EventDispatcher\Event;
-use Thelia\Core\Hook\HookFragmentInterface;
+
 
 /**
- * Class HookEvent
+ * Class ModuleHookToggleActivationEvent
  * @package Thelia\Core\Event\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class HookEvent extends Event {
-
-    protected $id = null;
-
-    protected $fragments = array();
-
-    /**
-     *
-     * @param HookFragmentInterface $fragment
-     */
-    public function addFragment(HookFragmentInterface $fragment)
-    {
-        $this->fragments[] = $fragment;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFragments()
-    {
-        return $this->fragments;
-    }
-
-    /**
-     * @param null $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return null
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
+class ModuleHookToggleActivationEvent extends ModuleHookEvent {
 
 } 
