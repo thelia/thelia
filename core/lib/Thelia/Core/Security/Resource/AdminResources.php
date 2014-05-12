@@ -79,6 +79,8 @@ final class AdminResources
 
     const MODULE = "admin.module";
 
+    const HOOK = "admin.hook";
+
     const ORDER = "admin.order";
 
     const PRODUCT = "admin.product";
