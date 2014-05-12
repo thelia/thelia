@@ -77,6 +77,11 @@
             <tag name="thelia.coupon.addCondition"/>
         </service>
 
+        <service id="thelia.condition.for_some_customers" class="Thelia\Condition\Implementation\ForSomeCustomers">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCondition"/>
+        </service>
+
     </services>
 
 </config>
