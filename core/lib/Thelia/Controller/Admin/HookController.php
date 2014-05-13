@@ -217,9 +217,14 @@ class HookController extends AbstractCrudController {
     /**
      * Redirect to the edition template
      */
-    protected function redirectToEditionTemplate()
+    protected function redirectToEditionTemplate($request = null, $country = null)
     {
-        // TODO: Implement redirectToEditionTemplate() method.
+        // We always return to the module edition form
+        $this->redirectToRoute(
+            "admin.hook.update",
+            $this->getViewArguments(),
+            $this->getRouteArguments()
+        );
     }
 
     /**
@@ -227,6 +232,20 @@ class HookController extends AbstractCrudController {
      */
     protected function redirectToListTemplate()
     {
-        // TODO: Implement redirectToListTemplate() method.
+        $this->redirectToRoute(
+            "admin.hook"
+        );
+    }
+
+    protected function getViewArguments()
+    {
+        return array();
+    }
+
+    protected function getRouteArguments($module_hook_id = null)
+    {
+        return array(
+            'module_hook_id' => $module_hook_id === null ? $this->getRequest()->get('module_hook_id') : $module_hook_id,
+        );
     }
 }

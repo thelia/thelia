@@ -131,6 +131,11 @@ class TheliaLoop extends AbstractSmartyPlugin
             );
         }
 
+        $prefix = $this->getParam($params, 'prefix');
+        if (null == $prefix) {
+            $prefix = '';
+        }
+
         if ($content === null) {
             // Check if a loop with the same name exists in the current scope, and abort if it's the case.
             if (array_key_exists($name, $this->varstack)) {

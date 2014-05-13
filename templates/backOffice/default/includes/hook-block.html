@@ -1,4 +1,4 @@
-<div class="table-responsive">
+<div class="hook-modules table-responsive">
     <table class="table table-striped table-condensed table-left-aligned">
         <thead>
             <tr>
@@ -6,14 +6,14 @@
                 <th> {intl l='Module'}</th>
                 <th class="text-center">{intl l='Enable/Disable'}</th>
                 <th class="text-center">{intl l='Position'}</th>
-                <th class="actions">{intl l="Actions"}</th>
             </tr>
         </thead>
         <tbody>
             {loop type="module_hook" name="hook.{$hook_code}" hook="{$hook_code}" backend_context=1}
-            <tr
-                data-active="{if $ACTIVE}0{else}1{/if}"
-                data-module-active="{if $MODULE_ACTIVE}0{else}1{/if}"
+            <tr class="hook-module {if ! $MODULE_ACTIVE}inactive{/if}"
+                data-visible="{if $MODULE_ACTIVE}{if $ACTIVE}1{else}0{/if}{else}0{/if}"
+                data-active="{if $ACTIVE}1{else}0{/if}"
+                data-module-active="{if $MODULE_ACTIVE}1{else}0{/if}"
                 data-module-id="{$MODULE_ID}"
                 >
                 <td>{$ID}</td>
@@ -45,14 +45,13 @@
                         id=$ID
                     }
                 </td>
-                <td class="text-right">
-                    ...
-                </td>
             </tr>
             {/loop}
+            {elseloop rel="hook.{$hook_code}"}
             <tr>
                 <td colspan="5">No modules hooked here ({$hook_code})</td>
             </tr>
+            {/elseloop}
         </tbody>
     </table>
 </div>

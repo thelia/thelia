@@ -23,16 +23,49 @@
 *}
         </div>
 
+        <div class="general-block-decorator ">
+            <div class="hooks-filter row">
+                <div class="col-md-4 col-sm-12">
+                    <label for="hooks-filter-status">{intl l="By status"}</label>
+                    <select id="hooks-filter-status">
+                        <option value="">{intl l="All"}</option>
+                        <option value="1">{intl l="Active"}</option>
+                        <option value="0">{intl l="Inactive"}</option>
+                    </select>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <label for="hooks-filter-module">{intl l="By module"}</label>
+                    <select id="hooks-filter-module">
+                        <option value="">{intl l="All"}</option>
+                        {loop type="module" name="module" order=$module_order backend_context=1}
+                        <option value="{$ID}">{$TITLE}</option>
+                        {/loop}
+                    </select>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <label for="hooks-filter-type">{intl l="By type"}</label>
+                    <select id="hooks-filter-type">
+                        <option value="">{intl l="All"}</option>
+                        <option value="1">{intl l="Front Office"}</option>
+                        <option value="2">{intl l="Back Office"}</option>
+                        <option value="3">{intl l="pdf"}</option>
+                        <option value="4">{intl l="email"}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-12">
-            {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
+                {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
 
-            {loop type="hook" name="hook" order=$hook_order backend_context=1}
-                <div class="general-block-decorator">
-                    <h3>{$ID}. {$TITLE}</h3>
+                {loop type="hook" name="hook" order=$hook_order backend_context=1}
+                <div class="hook general-block-decorator" data-id="{$ID}" data-type="{$TYPE}">
+                    <p class="title title-without-tabs">{$ID}. {$TITLE}</p>
+                    <p class="hook-description">{$DESCRIPTION}</p>
                     {include file="includes/hook-block.html" hook_code="{$CODE}"}
                 </div>
-            {/loop}
+                {/loop}
             </div>
         </div>
 
@@ -103,7 +136,7 @@
            $(".module-hook-activation").on("switch-change", function(e, data){
 
                var checkbox = $(this);
-        	   var module_id = checkbox.data('id');
+        	   var module_hook_id = checkbox.data('id');
         	   var is_checked = data.value;
 
                $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
@@ -148,6 +181,53 @@
                    location.href = url;
                }
            });
+
+            var isFilterProcessing = false,
+                $fStatus = $('#hooks-filter-status'),
+                $fModule = $('#hooks-filter-module'),
+                $fType   = $('#hooks-filter-type');
+
+            /* filters */
+            $('.hooks-filter select').on('change', function(){
+                console.log(this, isFilterProcessing);
+                if (! isFilterProcessing) {
+                    isFilterProcessing = true;
+
+                    var formData = {
+                        status: $fStatus.val(),
+                        module: $fModule.val(),
+                        type: $fType.val()
+                    };
+                    console.log("filtering", formData);
+
+                    // filters hook type first
+                    $(".hooks .hook").each(function(){
+                        var $hook = $(this),
+                            $lines;
+
+                        if (formData.type == "" || formData.type == $hook.data("type")){
+                            $hook.removeClass("hidden");
+                           // test each line
+                           $lines = $hook.find("tr.hook-module");
+                           $lines.each(function(){
+                               var $line = $(this),
+                                   visible;
+                               visible = (formData.status == "" || formData.status == $line.data("visible"))
+                                         && (formData.module == "" || formData.module == $line.data("module-id"));
+                               if (visible) {
+                                   $line.removeClass("hidden");
+                               } else {
+                                   $line.addClass("hidden");
+                               }
+                           });
+                       } else {
+                           $hook.addClass("hidden");
+                       }
+                    });
+                    isFilterProcessing = false;
+                }
+            });
+
 
         });
     </script>

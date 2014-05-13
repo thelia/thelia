@@ -29,7 +29,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
-use Thelia\Model\Base\ModuleHookQuery;
+use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
@@ -40,7 +40,7 @@ use Thelia\Module\BaseModule;
  * @package Thelia\Action
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleHook extends BaseAction implements EventSubscriberInterface
+class ModuleHook extends BaseAction  implements EventSubscriberInterface
 {
     /**
      * @var ContainerInterface
@@ -91,6 +91,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
                 throw new \LogicException($this->getTranslator()->trans("The module has to be activated."));
             }
         }
+        $this->cacheClear($event->getDispatcher());
         return $event;
     }
 
@@ -101,16 +102,10 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
      */
     public function updateHookPosition(UpdatePositionEvent $event)
     {
-        // we have to filter query with the current hook
-        // because position is scoped by hook and is not global
-        if (null !== $event->getObjectId()){
-            $moduleHook = ModuleHookQuery::create()->findPk($event->getObjectId());
-            if (null !== $moduleHook){
-                $query = ModuleHookQuery::create()->filterByEvent($moduleHook->getEvent());
-                $this->genericUpdatePosition($query, $event);
-                //$this->cacheClear($event->getDispatcher());
-            }
-        }
+        $this->genericUpdatePosition(ModuleHookQuery::create(), $event);
+        $this->cacheClear($event->getDispatcher());
+
+        return $event;
     }
 
     protected function cacheClear(EventDispatcherInterface $dispatcher)
