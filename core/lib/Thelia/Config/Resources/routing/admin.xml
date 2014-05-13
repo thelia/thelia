@@ -1041,6 +1041,14 @@
         <default key="_controller">Thelia\Controller\Admin\AdvancedConfigurationController::flushImagesAndDocumentsAction</default>
     </route>
 
+    <route id="admin.configuration.api" path="/admin/configuration/api" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ApiController::indexAction</default>
+    </route>
+
+    <route id="admin.configuration.api.create" path="/admin/configuration/api" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ApiController::createAction</default>
+    </route>
+
     <!-- and cache route management -->
 
     <!-- Modules rule management -->

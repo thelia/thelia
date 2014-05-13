@@ -187,7 +187,13 @@
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/system-logs'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
-                                {loop type="auth" name="pcc9" role="ADMIN" resource="admin.configuration.advanced" access="VIEW"}
+                                {loop type="auth" name="pcc9" role="ADMIN" resource="admin.configuration.api" access="VIEW"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/api'}">{intl l='API configuration'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/api'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
+                                {loop type="auth" name="pcc10" role="ADMIN" resource="admin.configuration.advanced" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/advanced'}">{intl l='Advanced configuration'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/advanced'}"><i class="glyphicon glyphicon-edit"></i></a></td>

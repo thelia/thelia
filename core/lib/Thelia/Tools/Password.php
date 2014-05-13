@@ -21,7 +21,12 @@ class Password
 {
     private static function randgen($letter, $length)
     {
-        return substr(str_shuffle($letter), 0, $length);
+        $string = "";
+        do {
+            $string .= substr(str_shuffle($letter), 0, 1);
+        } while(strlen($string) < $length);
+
+        return $string;
     }
 
     /**
@@ -34,6 +39,14 @@ class Password
     {
         $letter = "abcdefghijklmnopqrstuvwxyz";
         $letter .= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        $letter .= "0123456789";
+
+        return self::randgen($letter, $length);
+    }
+
+    public static function generateHexaRandom($length = 8)
+    {
+        $letter = "ABCDEF";
         $letter .= "0123456789";
 
         return self::randgen($letter, $length);
