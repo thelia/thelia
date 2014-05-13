@@ -28,7 +28,7 @@
                             <caption class="clearfix">
                                 {intl l="Api"}
                                 {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.api" access="CREATE"}
-                                    <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new API credential'}" href="#api_create_dialog" data-toggle="modal">
+                                    <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new API access'}" href="#api_create_dialog" data-toggle="modal">
                                         <span class="glyphicon glyphicon-plus"></span>
                                     </a>
                                 {/loop}
@@ -66,7 +66,7 @@
                                     <td>
                                         <div class="btn-group">
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs js-update-api" title="{intl l='Change this api access'}" href="#api_update_dialog" data-id="{$api.Id}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Change this api access'}" href="{url path="/admin/configuration/api/update/{$api.Id}"}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
 
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="DELETE"}
@@ -132,7 +132,7 @@
     file = "includes/generic-create-dialog.html"
 
     dialog_id    = "api_create_dialog"
-    dialog_title = {intl l="Create a new API credential"}
+    dialog_title = {intl l="Create a new API access"}
     dialog_body  = {$smarty.capture.api_create_dialog nofilter}
 
     dialog_ok_label     = {intl l="Create"}
@@ -155,25 +155,87 @@
         file = "includes/generic-confirm-dialog.html"
 
         dialog_id       = "api_delete_dialog"
-        dialog_title    = {intl l="Delete api credential"}
-        dialog_message  = {intl l="Do you really want to delete this api credential ?"}
+        dialog_title    = {intl l="Delete api access"}
+        dialog_message  = {intl l="Do you really want to delete this api access ?"}
 
         form_action         = {url path='/admin/configuration/api/delete'}
         form_content        = {$smarty.capture.api_delete_dialog nofilter}
     }
 
+{if $api_id > 0}
+    {form name="thelia_api_update"}
+
+        {* Capture the dialog body, to pass it to the generic dialog *}
+
+    {capture "api_update_dialog"}
+        {form_field form=$form field='profile'}
+            {form_hidden_fields form=$form}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{$label} :</label>
+
+                <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker">
+                    {foreach $choices as $choice}
+                        {if $choice->value == 0}
+                            <option value="0" {if $value == null}selected{/if}>{intl l='Superadministrator'}</option>
+                        {else}
+                            {loop name='profile' type="profile" id=$choice->value}
+                                <option value="{$ID}" {if $value == $ID}selected{/if}>{$TITLE}</option>
+                            {/loop}
+                        {/if}
+                    {/foreach}
+                </select>
+
+            </div>
+        {/form_field}
+
+    {/capture}
+
+    {include
+        file = "includes/generic-create-dialog.html"
+
+        dialog_id    = "api_update_dialog"
+        dialog_title = {intl l="Edit api access"}
+        dialog_body  = {$smarty.capture.api_update_dialog nofilter}
+
+        dialog_ok_label     = {intl l="Save"}
+        dialog_cancel_label = {intl l="Cancel"}
+
+        form_action        = {url path="/admin/configuration/api/update/{$api_id}"}
+        form_enctype       = {form_enctype form=$form}
+        form_error_message = $form_error_message
+    }
+
+    {/form}
+{/if}
 
 
 {/block}
 
 {block name="javascript-initialization"}
-
+    {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
+        <script src='{$asset_url}'></script>
+    {/javascripts}
+    {javascripts file='assets/js/main.js'}
+        <script src='{$asset_url}'></script>
+    {/javascripts}
 <script type="text/javascript">
 
     $(document).ready(function(){
         $(".js-delete-api").click(function(e){
             $('#api_delete_id').val($(this).data('id'))
         });
+
+        {if $api_id > 0}
+
+        // JS stuff for update form
+            {include
+                file      = "includes/generic-js-dialog.html"
+                dialog_id = "api_update_dialog"
+                form_name = "thelia_api_update"
+            }
+
+            $('#api_update_dialog').modal();
+        {/if}
     });
 
 </script>

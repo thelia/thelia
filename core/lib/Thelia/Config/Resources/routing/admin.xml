@@ -1057,6 +1057,14 @@
         <default key="_controller">Thelia\Controller\Admin\ApiController::deleteAction</default>
     </route>
 
+    <route id="admin.configuration.api.update" path="/admin/configuration/api/update/{api_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ApiController::updateAction</default>
+    </route>
+
+    <route id="admin.configuration.api.update.process" path="/admin/configuration/api/update/{api_id}" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ApiController::processUpdateAction</default>
+    </route>
+
     <!-- and cache route management -->
 
     <!-- Modules rule management -->

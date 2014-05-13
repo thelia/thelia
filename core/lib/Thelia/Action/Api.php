@@ -15,6 +15,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Api\ApiCreateEvent;
 use Thelia\Core\Event\Api\ApiDeleteEvent;
+use Thelia\Core\Event\Api\ApiUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Api as ApiModel;
 
@@ -45,6 +46,14 @@ class Api extends BaseAction implements EventSubscriberInterface
         $api->delete();
     }
 
+    public function updateApi(ApiUpdateEvent $event)
+    {
+        $api = $event->getApi();
+
+        $api->setProfileId($event->getProfile())
+            ->save();
+    }
+
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
@@ -69,7 +78,8 @@ class Api extends BaseAction implements EventSubscriberInterface
     {
         return [
             TheliaEvents::API_CREATE => ['createApi', 128],
-            TheliaEvents::API_DELETE => ['deleteApi', 128]
+            TheliaEvents::API_DELETE => ['deleteApi', 128],
+            TheliaEvents::API_UPDATE => ['updateApi', 128],
         ];
     }
 }

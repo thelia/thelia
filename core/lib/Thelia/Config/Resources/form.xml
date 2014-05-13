@@ -138,7 +138,7 @@
         <form name="thelia.cache.flush" class="Thelia\Form\Cache\CacheFlushForm"/>
         <form name="thelia.assets.flush" class="Thelia\Form\Cache\AssetsFlushForm"/>
         <form name="thelia.images-and-documents-cache.flush" class="Thelia\Form\Cache\ImagesAndDocumentsCacheFlushForm"/>
-
+        
         <form name="thelia.export" class="Thelia\Form\ExportForm" />
         <form name="thelia.import" class="Thelia\Form\ImportForm" />
 
@@ -148,6 +148,7 @@
         <form name="thelia.empty" class="Thelia\Form\EmptyForm"/>
 
         <form name="thelia_api_create" class="Thelia\Form\Api\ApiCreateForm"/>
+        <form name="thelia_api_update" class="Thelia\Form\Api\ApiUpdateForm"/>
 
     </forms>
 

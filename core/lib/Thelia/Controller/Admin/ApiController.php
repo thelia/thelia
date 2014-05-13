@@ -15,12 +15,14 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\Event\Api\ApiCreateEvent;
 use Thelia\Core\Event\Api\ApiDeleteEvent;
+use Thelia\Core\Event\Api\ApiUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Api\ApiCreateForm;
+use Thelia\Form\Api\ApiUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Api;
 use Thelia\Model\ApiQuery;
@@ -34,18 +36,12 @@ use Thelia\Tools\URL;
  */
 class ApiController extends BaseAdminController
 {
+    protected $api;
+
     public function downloadAction($api_id)
     {
-        if (null !== $response = $this->checkAuth([AdminResources::API], [], AccessManager::VIEW)) {
-            return $response;
-        }
-
-        $api = ApiQuery::create()->findPk($api_id);
-
-        if (null === $api) {
-            $response = $this->errorPage(Translator::getInstance()->trans("api id %id does not exists", ['%id' => $api_id]));
-        } else {
-            $response = $this->retrieveSecureKey($api);
+        if (null === $response = $this->checkApiAccess($api_id, AccessManager::VIEW)) {
+            $response = $this->retrieveSecureKey($this->api);
         }
 
         return $response;
@@ -53,18 +49,10 @@ class ApiController extends BaseAdminController
 
     public function deleteAction()
     {
-        if (null !== $response = $this->checkAuth([AdminResources::API], [], AccessManager::DELETE)) {
-            return $response;
-        }
-
         $api_id = $this->getRequest()->request->get('api_id');
 
-        $api = ApiQuery::create()->findPk($api_id);
-
-        if (null === $api) {
-            $response = $this->errorPage(Translator::getInstance()->trans("api id %id does not exists", ['%id' => $api_id]));
-        } else {
-            $response = $this->deleteApi($api);
+        if (null === $response = $this->checkApiAccess($api_id, AccessManager::DELETE)) {
+            $response = $this->deleteApi($this->api);
         }
 
         return $response;
@@ -143,13 +131,84 @@ class ApiController extends BaseAdminController
         }
     }
 
-    protected function renderList()
+    public function updateAction($api_id)
+    {
+        if (null === $response = $this->checkApiAccess($api_id, AccessManager::UPDATE)) {
+            $form = new ApiUpdateForm($this->getRequest(), 'form', ['profile' => $this->api->getProfileId()]);
+
+            $this->getParserContext()->addForm($form);
+
+            $response = $this->renderList($api_id);
+        }
+
+        return $response;
+    }
+
+    public function processUpdateAction($api_id)
+    {
+        if (null === $response = $this->checkApiAccess($api_id, AccessManager::UPDATE)) {
+            $response = $this->doUpdate($this->api);
+        }
+
+        return $response;
+    }
+
+    private function doUpdate(Api $api)
+    {
+        $error_msg = null;
+        $form = new ApiUpdateForm($this->getRequest());
+        try {
+
+            $updateForm = $this->validateForm($form);
+
+            $event = new ApiUpdateEvent($api, $updateForm->get('profile')->getData() ?: null);
+
+            $this->dispatch(TheliaEvents::API_UPDATE, $event);
+
+            $response = RedirectResponse::create(URL::getInstance()->absoluteUrl($this->getRoute('admin.configuration.api')));
+
+        } catch(FormValidationException $e) {
+            $error_msg = $this->createStandardFormValidationErrorMessage($e);
+        } catch(\Exception $e) {
+            $error_msg = $e->getMessage();
+        }
+
+        if (null !== $error_msg) {
+            $this->setupFormErrorContext(
+                "foo",
+                $error_msg,
+                $form,
+                $e
+            );
+
+            $response = $this->renderList($api->getId());
+        }
+
+        return $response;
+    }
+
+    private function checkApiAccess($api_id, $access)
+    {
+        $response = null;
+        if (null === $response = $this->checkAuth([AdminResources::API], [], AccessManager::UPDATE)) {
+            $this->api = ApiQuery::create()->findPk($api_id);
+
+            if (null === $this->api) {
+                $response = $this->errorPage(Translator::getInstance()->trans("api id %id does not exists", ['%id' => $api_id]));
+            }
+        }
+
+        return $response;
+    }
+
+    protected function renderList($api_id = null)
     {
         $apiAccessList = ApiQuery::create()->find()->toArray();
         return $this->render(
             'api',
             [
-                'api_list' => $apiAccessList
+                'api_list' => $apiAccessList,
+                'api_id'   => $api_id
             ]
         );
     }
