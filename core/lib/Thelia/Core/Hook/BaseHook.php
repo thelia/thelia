@@ -16,15 +16,13 @@ use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
 use Thelia\Module\BaseModule;
 
-
 /**
  * Class BaseHook
  * @package Thelia\Core\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-abstract class BaseHook {
-
-
+abstract class BaseHook
+{
     /**
      * @var BaseModule
      */
@@ -34,7 +32,6 @@ abstract class BaseHook {
      * @var SmartyParser
      */
     public $parser = null;
-
 
     public function render($templateName, array $parameters = array())
     {
@@ -51,7 +48,6 @@ abstract class BaseHook {
 
         Tlog::getInstance()->debug(sprintf(" GU %s", print_r($templateDirectories, true) ));
 
-
         if (isset($templateDirectories[$templateDefinition->getName()]["0"])) {
             $templatePath = $templateDirectories[$templateDefinition->getName()]["0"]
                 . DS . TemplateDefinition::HOOK_OVERRIDE_SUBDIR
@@ -65,7 +61,7 @@ abstract class BaseHook {
 
         // If the smarty template doesn't exist, we try to see if there is an
         // implementation for the template used in the module directory
-        if (null === $templatePath){
+        if (null === $templatePath) {
             if (isset($templateDirectories[$templateDefinition->getName()][$this->module->getCode()])) {
                 $templatePath = $templateDirectories[$templateDefinition->getName()][$this->module->getCode()]
                     . DS . $templateName;
@@ -90,7 +86,7 @@ abstract class BaseHook {
         }
 
         $content = "";
-        if (null !== $templatePath){
+        if (null !== $templatePath) {
             $content = $smartyParser->render($templatePath, $parameters);
         } else {
             $content = sprintf("ERR: Unknow template %s for module %s", $templateName, $this->module->getCode());
@@ -98,8 +94,6 @@ abstract class BaseHook {
 
         return $content;
     }
-
-
 
     /**
      * @param \Thelia\Module\BaseModule $module
@@ -133,7 +127,4 @@ abstract class BaseHook {
         return $this->parser;
     }
 
-
-
-
-} 
+}

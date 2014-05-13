@@ -16,10 +16,8 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Core\Event\Hook\HookEvent;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
-use Thelia\Core\Security\SecurityContext;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Thelia\Log\Tlog;
-
 
 /**
  * Class Hook
@@ -57,7 +55,7 @@ class Hook extends AbstractSmartyPlugin
         $event = $this->getDispatcher()->dispatch('hook.after.' . $hookName, $event);
 
         $content = "";
-        foreach ($event->getFragments() as $fragment){
+        foreach ($event->getFragments() as $fragment) {
             $content .= $fragment->getContent();
         }
 
@@ -89,7 +87,6 @@ class Hook extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('block', 'hook', $this, 'processHookBlock')
         );
     }
-
 
     /**
      * Return the event dispatcher,

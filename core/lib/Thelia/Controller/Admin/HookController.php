@@ -12,21 +12,19 @@
 
 namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
-use Thelia\Core\Event\Hook\ModuleHookUpdatePositionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Model\ModuleHookQuery;
 
-
 /**
  * Class HookController
  * @package Thelia\Controller\Admin
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class HookController extends AbstractCrudController {
-
+class HookController extends AbstractCrudController
+{
     public function __construct()
     {
         parent::__construct(
@@ -47,7 +45,6 @@ class HookController extends AbstractCrudController {
     public function indexAction()
     {
         if (null !== $response = $this->checkAuth(AdminResources::HOOK, array(), AccessManager::VIEW)) return $response;
-
         return $this->renderList();
     }
 

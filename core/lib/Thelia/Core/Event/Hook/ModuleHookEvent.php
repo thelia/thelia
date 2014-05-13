@@ -15,14 +15,13 @@ namespace Thelia\Core\Event\Hook;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\ModuleHook;
 
-
 /**
  * Class ModuleHookEvent
  * @package Thelia\Core\Event\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleHookEvent extends ActionEvent{
-
+class ModuleHookEvent extends ActionEvent
+{
     public $moduleHook = null;
 
     public function __construct(ModuleHook $moduleHook = null)
@@ -47,4 +46,4 @@ class ModuleHookEvent extends ActionEvent{
         return $this;
     }
 
-} 
+}

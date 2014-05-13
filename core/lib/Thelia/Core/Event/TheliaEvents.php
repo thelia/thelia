@@ -710,7 +710,6 @@ final class TheliaEvents
     const HOOK_UPDATE_POSITION  = 'thelia.hook.action.updatePosition';
     const HOOK_TOGGLE_ACTIVATION = 'thelia.hook.action.toggleActivation';
 
-
     /**
      * sent for clearing cache
      */

@@ -12,7 +12,6 @@ class ModuleHook extends BaseModuleHook
 
     const MAX_POSITION = 1000;
 
-
     /**
      * Calculate next position relative to our default category
      */

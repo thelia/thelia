@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ModuleHookQuery as BaseModuleHookQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'module_hook' table.
  *

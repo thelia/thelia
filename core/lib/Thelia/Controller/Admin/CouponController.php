@@ -33,9 +33,7 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
-use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
-use Thelia\Tools\I18n;
 use Thelia\Tools\Rest\ResponseRest;
 
 /**
@@ -263,8 +261,7 @@ class CouponController extends BaseAdminController
 
             $html      = $condition->drawBackOfficeInputs();
             $serviceId = $condition->getServiceId();
-        }
-        else {
+        } else {
             $html = '';
             $serviceId = '';
         }

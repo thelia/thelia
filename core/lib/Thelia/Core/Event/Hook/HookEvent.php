@@ -20,8 +20,8 @@ use Thelia\Core\Hook\HookFragmentInterface;
  * @package Thelia\Core\Event\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class HookEvent extends Event {
-
+class HookEvent extends Event
+{
     protected $id = null;
 
     protected $fragments = array();
@@ -33,6 +33,7 @@ class HookEvent extends Event {
     public function addFragment(HookFragmentInterface $fragment)
     {
         $this->fragments[] = $fragment;
+
         return $this;
     }
 
@@ -50,6 +51,7 @@ class HookEvent extends Event {
     public function setId($id)
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -61,4 +63,4 @@ class HookEvent extends Event {
         return $this->id;
     }
 
-} 
+}

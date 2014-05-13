@@ -12,9 +12,8 @@
 
 namespace Thelia\Core\Hook;
 
-
-interface HookFragmentInterface {
-
+interface HookFragmentInterface
+{
     public function getKey();
 
     public function setKey($key);
@@ -23,4 +22,4 @@ interface HookFragmentInterface {
 
     public function setContent($content);
 
-} 
+}

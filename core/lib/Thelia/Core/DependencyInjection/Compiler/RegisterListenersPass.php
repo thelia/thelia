@@ -19,7 +19,6 @@ use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleHook;
 use Thelia\Model\ModuleQuery;
 
-
 /**
  * Class RegisterListenersPass
  * @package Thelia\Core\DependencyInjection\Compiler
@@ -84,10 +83,10 @@ class RegisterListenersPass implements CompilerPassInterface
             // retrieve the module id
             $properties = $container->getDefinition($id)->getProperties();
             $module = null;
-            if (array_key_exists('module', $properties)){
+            if (array_key_exists('module', $properties)) {
                 $moduleCode = explode(".", $properties['module'])[1];
                 //Tlog::getInstance()->addDebug("_HOOK_ addListenerService :: module = " . $moduleCode );
-                if (null !== $module = ModuleQuery::create()->findOneByCode($moduleCode)){
+                if (null !== $module = ModuleQuery::create()->findOneByCode($moduleCode)) {
                     $module = $module->getId();
                 }
             }
@@ -146,20 +145,20 @@ class RegisterListenersPass implements CompilerPassInterface
         /** @var ModuleHook $moduleHook */
         foreach ($moduleHooks as $moduleHook) {
             // manage module hook position for new hook
-            if ($moduleEvent !== $moduleHook->getEvent()){
+            if ($moduleEvent !== $moduleHook->getEvent()) {
                 $moduleEvent = $moduleHook->getEvent();
                 $modulePosition = 1;
             } else {
                 $modulePosition++;
             }
-            if ($moduleHook->getPosition() === ModuleHook::MAX_POSITION){
+            if ($moduleHook->getPosition() === ModuleHook::MAX_POSITION) {
                 // new module hook, we set it at the end of the queue for this event
                 $moduleHook->setPosition($modulePosition)->save();
             } else {
                 $modulePosition = $moduleHook->getPosition($modulePosition);
             }
             // Add the the new listener for active hooks, we have to reverse the priority and the position
-            if ($moduleHook->getActive() && $moduleHook->getModuleActive()){
+            if ($moduleHook->getActive() && $moduleHook->getModuleActive()) {
                 Tlog::getInstance()->addDebug(" GU _HOOK_ addListenerService");
                 $definition->addMethodCall('addListenerService',
                     array(

@@ -145,7 +145,7 @@ class CouponCreationForm extends BaseForm
     /**
      * Validate a date entered with the default Language date format.
      *
-     * @param string $value
+     * @param string                    $value
      * @param ExecutionContextInterface $context
      */
     public function checkLocalizedDate($value, ExecutionContextInterface $context)

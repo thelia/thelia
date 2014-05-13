@@ -23,10 +23,8 @@
 
 namespace Thelia\Model;
 
-use Propel\Runtime\Propel;
 use Thelia\Model\Base\Coupon as BaseCoupon;
 use Thelia\Model\Exception\InvalidArgumentException;
-use Thelia\Model\Map\CouponTableMap;
 
 /**
  * Used to provide an effect (mostly a discount)

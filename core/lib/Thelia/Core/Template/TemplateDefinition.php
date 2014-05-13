@@ -26,7 +26,6 @@ class TemplateDefinition
     const HOOK_OVERRIDE_SUBDIR = 'modules';
     const HOOK_DEFAULT_THEME = 'default';
 
-
     protected static $standardTemplatesSubdirs = array(
         self::FRONT_OFFICE => self::FRONT_OFFICE_SUBDIR,
         self::BACK_OFFICE  => self::BACK_OFFICE_SUBDIR,

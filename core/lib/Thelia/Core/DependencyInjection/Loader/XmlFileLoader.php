@@ -26,7 +26,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Thelia\Log\Tlog;
 
-
 /**
  *
  * Load, read and validate config xml files
@@ -207,9 +206,10 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    protected function parseDefinition($id, $service, $file) {
+    protected function parseDefinition($id, $service, $file)
+    {
         $definition = $this->parseService($id, $service, $file);
-        if (null !== $definition){
+        if (null !== $definition) {
             $this->container->setDefinition($id, $definition);
         }
     }
@@ -231,11 +231,12 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    protected function parseHook($id, $hook, $file, $type) {
+    protected function parseHook($id, $hook, $file, $type)
+    {
         $definition = $this->parseService($id, $hook, $file);
-        if (null !== $definition){
+        if (null !== $definition) {
             Tlog::getInstance()->debug(" GU _HOOK_ parse hook :: " . $id . " " . $type );
-            if (null !== $type){
+            if (null !== $type) {
                 // inject the BaseModule
                 $definition->setProperty('module', new Reference($type));
             }
@@ -244,13 +245,12 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-
     /**
      * Parses an individual Definition
      *
-     * @param string           $id
-     * @param SimpleXMLElement $service
-     * @param string           $file
+     * @param  string           $id
+     * @param  SimpleXMLElement $service
+     * @param  string           $file
      * @return Definition
      */
     protected function parseService($id, $service, $file)

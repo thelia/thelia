@@ -12,7 +12,6 @@
 
 namespace Thelia\Core\Hook;
 
-
 use Thelia\Core\Template\Smarty\SmartyParser;
 use Thelia\Module\BaseModuleInterface;
 

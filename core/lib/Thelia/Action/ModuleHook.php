@@ -10,30 +10,22 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Action;
 
-use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
-use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
-use Thelia\Core\Event\Order\OrderPaymentEvent;
 
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\ModuleHookQuery;
-use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
-
 
 /**
  * Class ModuleHook
@@ -63,6 +55,7 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
             // already done
             // $this->cacheClear($event->getDispatcher());
         }
+
         return $event;
     }
 
@@ -78,13 +71,14 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
             // already done
             // $this->cacheClear($event->getDispatcher());
         }
+
         return $event;
     }
 
     public function toggleHookActivation(ModuleHookToggleActivationEvent $event)
     {
-        if (null !== $moduleHook = $event->getModuleHook()){
-            if ($moduleHook->getModuleActive()){
+        if (null !== $moduleHook = $event->getModuleHook()) {
+            if ($moduleHook->getModuleActive()) {
                 $moduleHook->setActive(! $moduleHook->getActive());
                 $moduleHook->save();
             } else {
@@ -92,6 +86,7 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
             }
         }
         $this->cacheClear($event->getDispatcher());
+
         return $event;
     }
 

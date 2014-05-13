@@ -354,7 +354,8 @@ abstract class CouponAbstract implements CouponInterface
      *
      * @return string HTML string
      */
-    public function drawBackOfficeInputs() {
+    public function drawBackOfficeInputs()
+    {
         return $this->facade->getParser()->render('coupon/type-fragments/remove-x.html', [
                 'label'     => $this->getInputName(),
                 'fieldName' => self::INPUT_AMOUNT_NAME,

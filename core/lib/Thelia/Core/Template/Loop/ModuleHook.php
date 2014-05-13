@@ -13,8 +13,6 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -22,9 +20,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
-use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Model\HookQuery;
 
 //use Thelia\Module\BaseModule;
 use Thelia\Model\ModuleHookQuery;
