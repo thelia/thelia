@@ -37,6 +37,7 @@ class ConditionEvaluator
         foreach ($conditions as $condition) {
             if (!$condition->isMatching()) {
                 $isMatching = false;
+                break;
             }
         }
 

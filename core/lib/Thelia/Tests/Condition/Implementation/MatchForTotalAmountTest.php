@@ -94,12 +94,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::IN,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::IN,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => '400',
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => '400',
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -123,12 +123,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::INFERIOR
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::INFERIOR
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => '400',
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => '400',
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -152,12 +152,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 'X',
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 'X',
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -181,12 +181,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400,
-            MatchForTotalAmount::INPUT2 => 'FLA');
+            MatchForTotalAmount::CART_TOTAL => 400,
+            MatchForTotalAmount::CART_CURRENCY => 'FLA');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -209,12 +209,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -237,12 +237,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -265,12 +265,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::INFERIOR_OR_EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR_OR_EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -293,12 +293,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::INFERIOR_OR_EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR_OR_EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -321,12 +321,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::INFERIOR_OR_EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR_OR_EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -349,12 +349,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -377,12 +377,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -405,12 +405,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR_OR_EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR_OR_EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -433,12 +433,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR_OR_EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR_OR_EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -461,12 +461,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR_OR_EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR_OR_EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -489,12 +489,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -517,12 +517,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -545,12 +545,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -573,12 +573,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'USD');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'USD');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -621,12 +621,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'UNK');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'UNK');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
@@ -686,12 +686,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 'notfloat',
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 'notfloat',
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
@@ -751,12 +751,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 0.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 0.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
@@ -863,12 +863,12 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $actual = $condition1->getToolTip();
@@ -889,19 +889,19 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::EQUAL,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR');
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR');
         $condition1->setValidatorsFromForm($operators, $values);
 
         $actual = $condition1->getValidators();
 
         $validators = array(
             'inputs' => array(
-                MatchForTotalAmount::INPUT1 => array(
+                MatchForTotalAmount::CART_TOTAL => array(
                     'availableOperators' => array(
                         '<' => 'Price',
                         '<=' => 'Price',
@@ -913,7 +913,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
                     'value' => '',
                     'selectedOperator' => ''
                 ),
-                MatchForTotalAmount::INPUT2 => array(
+                MatchForTotalAmount::CART_CURRENCY => array(
                     'availableOperators' => array('==' => 'Price'),
                     'availableValues' => array(
                         'EUR' => '€',

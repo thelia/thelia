@@ -114,23 +114,23 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $condition1 = new MatchForTotalAmount($facade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 40.00,
-            MatchForTotalAmount::INPUT2 => 'EUR'
+            MatchForTotalAmount::CART_TOTAL => 40.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($facade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR'
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
         );
         $condition2->setValidatorsFromForm($operators, $values);
 
@@ -176,23 +176,23 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 40.00,
-            MatchForTotalAmount::INPUT2 => 'EUR'
+            MatchForTotalAmount::CART_TOTAL => 40.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR'
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
         );
         $condition2->setValidatorsFromForm($operators, $values);
 
@@ -274,23 +274,23 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 40.00,
-            MatchForTotalAmount::INPUT2 => 'EUR'
+            MatchForTotalAmount::CART_TOTAL => 40.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR'
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
         );
         $condition2->setValidatorsFromForm($operators, $values);
 
@@ -337,23 +337,23 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 40.00,
-            MatchForTotalAmount::INPUT2 => 'EUR'
+            MatchForTotalAmount::CART_TOTAL => 40.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR'
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
         );
         $condition2->setValidatorsFromForm($operators, $values);
 
@@ -397,23 +397,23 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::SUPERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 40.00,
-            MatchForTotalAmount::INPUT2 => 'EUR'
+            MatchForTotalAmount::CART_TOTAL => 40.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
         $operators = array(
-            MatchForTotalAmount::INPUT1 => Operators::INFERIOR,
-            MatchForTotalAmount::INPUT2 => Operators::EQUAL
+            MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
         );
         $values = array(
-            MatchForTotalAmount::INPUT1 => 400.00,
-            MatchForTotalAmount::INPUT2 => 'EUR'
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
         );
         $condition2->setValidatorsFromForm($operators, $values);
 

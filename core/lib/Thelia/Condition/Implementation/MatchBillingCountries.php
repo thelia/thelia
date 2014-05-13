@@ -12,45 +12,21 @@
 
 namespace Thelia\Condition\Implementation;
 
-use Thelia\Coupon\FacadeInterface;
-
 /**
- * Allow every one, perform no check
+ * Check a Checkout against its Product number
  *
  * @package Condition
- * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ * @author  Franck Allimant <franck@cqfdev.fr>
  *
  */
-class MatchForEveryone extends ConditionAbstract
+class MatchBillingCountries extends AbstractMatchCountries
 {
-    /**
-     * @inheritdoc
-     */
-    public function __construct(FacadeInterface $facade) {
-
-        // Define the allowed comparison operators
-        $this->availableOperators = [];
-
-        parent::__construct($facade);
-    }
-
     /**
      * @inheritdoc
      */
     public function getServiceId()
     {
-        return 'thelia.condition.match_for_everyone';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setValidatorsFromForm(array $operators, array $values)
-    {
-        $this->operators = [];
-        $this->values = [];
-
-        return $this;
+        return 'thelia.condition.match_billing_countries';
     }
 
     /**
@@ -58,7 +34,13 @@ class MatchForEveryone extends ConditionAbstract
      */
     public function isMatching()
     {
-        return true;
+        $billingAddress = $this->facade->getCustomer()->getDefaultAddress();
+
+        return $this->conditionValidator->variableOpComparison(
+            $billingAddress->getCountryId(),
+            $this->operators[self::COUNTRIES_LIST],
+            $this->values[self::COUNTRIES_LIST]
+        );
     }
 
     /**
@@ -67,7 +49,7 @@ class MatchForEveryone extends ConditionAbstract
     public function getName()
     {
         return $this->translator->trans(
-            'Unconditional usage',
+            'Billing country',
             [],
             'condition'
         );
@@ -79,7 +61,7 @@ class MatchForEveryone extends ConditionAbstract
     public function getToolTip()
     {
         $toolTip = $this->translator->trans(
-            'This condition is always true',
+            'The coupon applies to the selected delivery countries',
             [],
             'condition'
         );
@@ -87,35 +69,19 @@ class MatchForEveryone extends ConditionAbstract
         return $toolTip;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getSummary()
-    {
-        $toolTip = $this->translator->trans(
-            'Unconditionnal usage',
-            [],
-            'condition'
+    protected function getSummaryLabel($cntryStrList, $i18nOperator) {
+
+        return $this->translator->trans(
+            'Only if order billing country is %op% <strong>%countries_list%</strong>', [
+                '%countries_list%' => $cntryStrList,
+                '%op%' => $i18nOperator
+            ], 'condition'
         );
-
-        return $toolTip;
     }
 
-    /**
-     * @inheritdoc
-    */
-    protected function generateInputs()
-    {
-        return [];
+    protected function getFormLabel() {
+        return $this->translator->trans(
+            'Billing coutry is', [], 'condition'
+        );
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function drawBackOfficeInputs()
-    {
-        // No input
-        return '';
-    }
-
 }

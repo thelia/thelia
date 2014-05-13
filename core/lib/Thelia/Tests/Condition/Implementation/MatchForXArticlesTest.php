@@ -59,10 +59,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::IN
+            MatchForXArticles::CART_QUANTITY => Operators::IN
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 5
+            MatchForXArticles::CART_QUANTITY => 5
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -95,10 +95,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::SUPERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 'X'
+            MatchForXArticles::CART_QUANTITY => 'X'
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -131,10 +131,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::INFERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::INFERIOR
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 5
+            MatchForXArticles::CART_QUANTITY => 5
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -167,10 +167,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::INFERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::INFERIOR
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 4,
+            MatchForXArticles::CART_QUANTITY => 4,
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -203,10 +203,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::INFERIOR_OR_EQUAL,
+            MatchForXArticles::CART_QUANTITY => Operators::INFERIOR_OR_EQUAL,
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 5,
+            MatchForXArticles::CART_QUANTITY => 5,
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -239,10 +239,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::INFERIOR_OR_EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::INFERIOR_OR_EQUAL
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 4
+            MatchForXArticles::CART_QUANTITY => 4
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -275,10 +275,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::INFERIOR_OR_EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::INFERIOR_OR_EQUAL
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 3
+            MatchForXArticles::CART_QUANTITY => 3
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -311,10 +311,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::EQUAL
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 4
+            MatchForXArticles::CART_QUANTITY => 4
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -347,10 +347,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::EQUAL
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 5
+            MatchForXArticles::CART_QUANTITY => 5
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -383,10 +383,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::SUPERIOR_OR_EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR_OR_EQUAL
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 4
+            MatchForXArticles::CART_QUANTITY => 4
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -419,10 +419,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::SUPERIOR_OR_EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR_OR_EQUAL
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 3
+            MatchForXArticles::CART_QUANTITY => 3
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -455,10 +455,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::SUPERIOR_OR_EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR_OR_EQUAL
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 5
+            MatchForXArticles::CART_QUANTITY => 5
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -491,10 +491,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::SUPERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 3
+            MatchForXArticles::CART_QUANTITY => 3
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -527,10 +527,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::SUPERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 4
+            MatchForXArticles::CART_QUANTITY => 4
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -557,10 +557,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::SUPERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 4
+            MatchForXArticles::CART_QUANTITY => 4
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -572,44 +572,6 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
         $expected->values = $values;
 
         $actual = $serializableRule;
-
-        $this->assertEquals($expected, $actual);
-
-    }
-
-    public function testGetAvailableOperators()
-    {
-        /** @var FacadeInterface $stubFacade */
-        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubFacade->expects($this->any())
-            ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
-        $stubFacade->expects($this->any())
-            ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
-
-        $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
-            MatchForXArticles::INPUT1 => Operators::SUPERIOR
-        );
-        $values = array(
-            MatchForXArticles::INPUT1 => 4
-        );
-        $condition1->setValidatorsFromForm($operators, $values);
-
-        $expected = array(
-            MatchForXArticles::INPUT1 => array(
-                Operators::INFERIOR,
-                Operators::INFERIOR_OR_EQUAL,
-                Operators::EQUAL,
-                Operators::SUPERIOR_OR_EQUAL,
-                Operators::SUPERIOR
-            )
-        );
-        $actual = $condition1->getAvailableOperators();
 
         $this->assertEquals($expected, $actual);
 
@@ -687,10 +649,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::SUPERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 4
+            MatchForXArticles::CART_QUANTITY => 4
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -712,10 +674,10 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = array(
-            MatchForXArticles::INPUT1 => Operators::SUPERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
         );
         $values = array(
-            MatchForXArticles::INPUT1 => 4
+            MatchForXArticles::CART_QUANTITY => 4
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -723,7 +685,7 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
 
         $validators = array(
             'inputs' => array(
-                MatchForXArticles::INPUT1 => array(
+                MatchForXArticles::CART_QUANTITY => array(
                     'availableOperators' => array(
                         '<' => 'Price',
                         '<=' => 'Price',

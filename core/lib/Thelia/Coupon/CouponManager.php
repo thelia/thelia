@@ -111,7 +111,7 @@ class CouponManager
 
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
-            if (!$coupon->isExpired()) {
+            if ($coupon && !$coupon->isExpired()) {
                 if ($coupon->isCumulative()) {
                     if (isset($couponsKept[0])) {
                         /** @var CouponInterface $previousCoupon */
