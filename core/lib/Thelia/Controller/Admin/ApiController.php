@@ -18,6 +18,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\Api\ApiCreateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Api;
@@ -40,10 +41,12 @@ class ApiController extends BaseAdminController
         $api = ApiQuery::create()->findPk($api_id);
 
         if (null === $api) {
-            throw new \RuntimeException(sprintf('api id %d does not exists', $api_id));
+            $response = $this->errorPage(Translator::getInstance()->trans("api id %id does not exists", ['%id' => $api_id]));
+        } else {
+            $response = $this->retrieveSecureKey($api);
         }
 
-        return $this->retrieveSecureKey($api);
+        return $response;
     }
 
     /**
