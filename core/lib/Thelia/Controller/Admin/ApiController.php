@@ -15,10 +15,12 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\Event\Api\ApiCreateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Api\ApiCreateForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Model\Api;
 use Thelia\Model\ApiQuery;
 
 
@@ -29,6 +31,35 @@ use Thelia\Model\ApiQuery;
  */
 class ApiController extends BaseAdminController
 {
+    public function downloadAction($api_id)
+    {
+        if (null !== $response = $this->checkAuth([AdminResources::API], [], AccessManager::VIEW)) {
+            return $response;
+        }
+
+        $api = ApiQuery::create()->findPk($api_id);
+
+        if (null === $api) {
+            throw new \RuntimeException(sprintf('api id %d does not exists', $api_id));
+        }
+
+        return $this->retrieveSecureKey($api);
+    }
+
+    /**
+     * @param Api $api
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    private function retrieveSecureKey(Api $api)
+    {
+        $response = Response::create($api->getSecureKey());
+        $response->headers->add([
+            'Content-Type' => 'application/octet-stream',
+            'Content-disposition' => sprintf('filename=%s.key', $api->getApiKey())
+        ]);
+
+        return $response;
+    }
 
     public function indexAction()
     {

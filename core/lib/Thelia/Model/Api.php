@@ -14,15 +14,20 @@ class Api extends BaseApi
     {
         $this->setApiKey(Password::generateHexaRandom(25));
 
-        $this->generatePrivateKey();
+        $this->generateSecureKey();
 
         return true;
     }
 
-    private function generatePrivateKey()
+    private function getKeyDir()
+    {
+        return THELIA_CONF_DIR . DS . 'key';
+    }
+
+    private function generateSecureKey()
     {
         $fs = new Filesystem();
-        $dir = THELIA_CONF_DIR . DS . 'key';
+        $dir = $this->getKeyDir();
         if (!$fs->exists($dir)) {
             $fs->mkdir($dir, 0700);
         }
@@ -32,6 +37,11 @@ class Api extends BaseApi
         file_put_contents($file, Password::generateHexaRandom(45));
         $fs->chmod($file, 0600);
 
+    }
+
+    public function getSecureKey()
+    {
+        return file_get_contents($this->getKeyDir() . DS . $this->getApiKey() . '.key');
     }
 
 }

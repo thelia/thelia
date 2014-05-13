@@ -37,7 +37,7 @@
                             <tr>
                                 <th>{intl l="Label"}</th>
                                 <th>{intl l="Api key"}</th>
-                                <th>{intl l="private key"}</th>
+                                <th>{intl l="Secure key"}</th>
                                 <th>{intl l="profile"}</th>
                                 <th class="col-md-1">{intl l="Actions"}</th>
                             </tr>
@@ -51,7 +51,9 @@
                                 <tr>
                                     <td >{$api.Label}</td>
                                     <td >{$api.ApiKey}</td>
-                                    <td >{$api.ApiKey}</td>
+                                    <td >
+                                        <a href="{url path="/admin/configuration/api/secure_key/{$api.Id}"}">{intl l="download"}</a>
+                                    </td>
                                     <td >
                                         {if $api.ProfileId}
                                             {loop type="profile" name="admin-profile" id={$api.ProfileId}}
