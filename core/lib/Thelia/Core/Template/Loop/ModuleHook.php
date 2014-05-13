@@ -22,6 +22,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 //use Thelia\Module\BaseModule;
+use Thelia\Log\Tlog;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
@@ -43,17 +44,12 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            new Argument(
-                'hook',
-                new Type\TypeCollection(
-                    new Type\AlphaNumStringListType()
-                )
-            ),
+            Argument::createIntTypeArgument('hook'),
             Argument::createIntTypeArgument('module'),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'code', 'code_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'enabled', 'enabled_reverse'))
+                    new Type\EnumListType(array('id', 'id_reverse', 'hook', 'hook_reverse', 'manual', 'manual_reverse', 'enabled', 'enabled_reverse'))
                 ),
                 'manual'
             ),
@@ -74,7 +70,12 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
 
         $hook = $this->getHook();
         if (null !== $hook) {
-            $search->filterByEvent($hook, Criteria::IN);
+            $search->filterByHookId($hook, Criteria::EQUAL);
+        }
+
+        $module = $this->getModule();
+        if (null !== $module) {
+            $search->filterByModuleId($module, Criteria::EQUAL);
         }
 
         $exclude = $this->getExclude();
@@ -102,11 +103,11 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
                 case "id_reverse":
                     $search->orderById(Criteria::DESC);
                     break;
-                case "code":
-                    $search->orderByCode(Criteria::ASC);
+                case "hook":
+                    $search->orderByHookId(Criteria::ASC);
                     break;
-                case "code_reverse":
-                    $search->orderByCode(Criteria::DESC);
+                case "hook_reverse":
+                    $search->orderByHookId(Criteria::DESC);
                     break;
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);
@@ -123,6 +124,7 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
              }
         }
 
+        Tlog::getInstance()->debug(sprintf(" GU loop mh %s",$search ));
         return $search;
 
     }
@@ -138,10 +140,9 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
                 $loopResultRow
                     ->set("ID"           , $moduleHook->getId())
                     //->set("IS_TRANSLATED", $moduleHook->getVirtualColumn('IS_TRANSLATED'))
-                    ->set("LOCALE"       , $this->locale)
+                    ->set("HOOK_ID"      , $moduleHook->getHookId())
                     ->set("MODULE_ID"    , $moduleHook->getModuleId())
                     ->set("MODULE_TITLE" , $moduleHook->getModule()->getTitle())
-                    ->set("HOOK"         , $moduleHook->getEvent())
                     ->set("CLASSNAME"    , $moduleHook->getClassname())
                     ->set("ACTIVE"       , $moduleHook->getActive())
                     ->set("MODULE_ACTIVE", $moduleHook->getModuleActive())

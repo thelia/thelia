@@ -134,9 +134,9 @@ class Thelia extends Kernel
                 /* is it a directory which is not . or .. ? */
                 if ($templateDirContent->isDir() && ! $templateDirContent->isDot()) {
 
-                    Tlog::getInstance()->debug(" GU _HOOK_ template 2 " . $templateType . " " . $templateDirContent->getFilename() . ' ' .
+                    /*Tlog::getInstance()->debug(" GU _HOOK_ template 2 " . $templateType . " " . $templateDirContent->getFilename() . ' ' .
                         $templateDirContent->getPathName() . ' ' .
-                        $code);
+                        $code);*/
 
                     $parser->addMethodCall(
                         'addTemplateDirectory',

@@ -235,7 +235,6 @@ class XmlFileLoader extends FileLoader
     {
         $definition = $this->parseService($id, $hook, $file);
         if (null !== $definition) {
-            Tlog::getInstance()->debug(" GU _HOOK_ parse hook :: " . $id . " " . $type );
             if (null !== $type) {
                 // inject the BaseModule
                 $definition->setProperty('module', new Reference($type));

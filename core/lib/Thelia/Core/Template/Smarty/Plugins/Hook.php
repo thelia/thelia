@@ -13,7 +13,7 @@
 namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
-use Thelia\Core\Event\Hook\HookEvent;
+use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
@@ -48,7 +48,7 @@ class Hook extends AbstractSmartyPlugin
 
         Tlog::getInstance()->addDebug("_HOOK_ process hook : " . $hookName);
 
-        $event = new HookEvent($hookName);
+        $event = new HookRenderEvent($hookName);
 
         $event = $this->getDispatcher()->dispatch('hook.before.' . $hookName, $event);
         $event = $this->getDispatcher()->dispatch('hook.' . $hookName, $event);

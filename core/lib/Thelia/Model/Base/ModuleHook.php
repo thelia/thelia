@@ -14,6 +14,8 @@ use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
+use Thelia\Model\Hook as ChildHook;
+use Thelia\Model\HookQuery as ChildHookQuery;
 use Thelia\Model\Module as ChildModule;
 use Thelia\Model\ModuleHookQuery as ChildModuleHookQuery;
 use Thelia\Model\ModuleQuery as ChildModuleQuery;
@@ -66,10 +68,10 @@ abstract class ModuleHook implements ActiveRecordInterface
     protected $module_id;
 
     /**
-     * The value for the event field.
-     * @var        string
+     * The value for the hook_id field.
+     * @var        int
      */
-    protected $event;
+    protected $hook_id;
 
     /**
      * The value for the classname field.
@@ -105,6 +107,11 @@ abstract class ModuleHook implements ActiveRecordInterface
      * @var        Module
      */
     protected $aModule;
+
+    /**
+     * @var        Hook
+     */
+    protected $aHook;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -395,14 +402,14 @@ abstract class ModuleHook implements ActiveRecordInterface
     }
 
     /**
-     * Get the [event] column value.
+     * Get the [hook_id] column value.
      *
-     * @return   string
+     * @return   int
      */
-    public function getEvent()
+    public function getHookId()
     {
 
-        return $this->event;
+        return $this->hook_id;
     }
 
     /**
@@ -507,25 +514,29 @@ abstract class ModuleHook implements ActiveRecordInterface
     } // setModuleId()
 
     /**
-     * Set the value of [event] column.
+     * Set the value of [hook_id] column.
      *
-     * @param      string $v new value
+     * @param      int $v new value
      * @return   \Thelia\Model\ModuleHook The current object (for fluent API support)
      */
-    public function setEvent($v)
+    public function setHookId($v)
     {
         if ($v !== null) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
-        if ($this->event !== $v) {
-            $this->event = $v;
-            $this->modifiedColumns[ModuleHookTableMap::EVENT] = true;
+        if ($this->hook_id !== $v) {
+            $this->hook_id = $v;
+            $this->modifiedColumns[ModuleHookTableMap::HOOK_ID] = true;
+        }
+
+        if ($this->aHook !== null && $this->aHook->getId() !== $v) {
+            $this->aHook = null;
         }
 
 
         return $this;
-    } // setEvent()
+    } // setHookId()
 
     /**
      * Set the value of [classname] column.
@@ -691,8 +702,8 @@ abstract class ModuleHook implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ModuleHookTableMap::translateFieldName('ModuleId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->module_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ModuleHookTableMap::translateFieldName('Event', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->event = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ModuleHookTableMap::translateFieldName('HookId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->hook_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ModuleHookTableMap::translateFieldName('Classname', TableMap::TYPE_PHPNAME, $indexType)];
             $this->classname = (null !== $col) ? (string) $col : null;
@@ -741,6 +752,9 @@ abstract class ModuleHook implements ActiveRecordInterface
         if ($this->aModule !== null && $this->module_id !== $this->aModule->getId()) {
             $this->aModule = null;
         }
+        if ($this->aHook !== null && $this->hook_id !== $this->aHook->getId()) {
+            $this->aHook = null;
+        }
     } // ensureConsistency
 
     /**
@@ -781,6 +795,7 @@ abstract class ModuleHook implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aModule = null;
+            $this->aHook = null;
         } // if (deep)
     }
 
@@ -904,6 +919,13 @@ abstract class ModuleHook implements ActiveRecordInterface
                 $this->setModule($this->aModule);
             }
 
+            if ($this->aHook !== null) {
+                if ($this->aHook->isModified() || $this->aHook->isNew()) {
+                    $affectedRows += $this->aHook->save($con);
+                }
+                $this->setHook($this->aHook);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -947,8 +969,8 @@ abstract class ModuleHook implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleHookTableMap::MODULE_ID)) {
             $modifiedColumns[':p' . $index++]  = '`MODULE_ID`';
         }
-        if ($this->isColumnModified(ModuleHookTableMap::EVENT)) {
-            $modifiedColumns[':p' . $index++]  = '`EVENT`';
+        if ($this->isColumnModified(ModuleHookTableMap::HOOK_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`HOOK_ID`';
         }
         if ($this->isColumnModified(ModuleHookTableMap::CLASSNAME)) {
             $modifiedColumns[':p' . $index++]  = '`CLASSNAME`';
@@ -982,8 +1004,8 @@ abstract class ModuleHook implements ActiveRecordInterface
                     case '`MODULE_ID`':
                         $stmt->bindValue($identifier, $this->module_id, PDO::PARAM_INT);
                         break;
-                    case '`EVENT`':
-                        $stmt->bindValue($identifier, $this->event, PDO::PARAM_STR);
+                    case '`HOOK_ID`':
+                        $stmt->bindValue($identifier, $this->hook_id, PDO::PARAM_INT);
                         break;
                     case '`CLASSNAME`':
                         $stmt->bindValue($identifier, $this->classname, PDO::PARAM_STR);
@@ -1069,7 +1091,7 @@ abstract class ModuleHook implements ActiveRecordInterface
                 return $this->getModuleId();
                 break;
             case 2:
-                return $this->getEvent();
+                return $this->getHookId();
                 break;
             case 3:
                 return $this->getClassname();
@@ -1117,7 +1139,7 @@ abstract class ModuleHook implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getModuleId(),
-            $keys[2] => $this->getEvent(),
+            $keys[2] => $this->getHookId(),
             $keys[3] => $this->getClassname(),
             $keys[4] => $this->getMethod(),
             $keys[5] => $this->getActive(),
@@ -1132,6 +1154,9 @@ abstract class ModuleHook implements ActiveRecordInterface
         if ($includeForeignObjects) {
             if (null !== $this->aModule) {
                 $result['Module'] = $this->aModule->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aHook) {
+                $result['Hook'] = $this->aHook->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1174,7 +1199,7 @@ abstract class ModuleHook implements ActiveRecordInterface
                 $this->setModuleId($value);
                 break;
             case 2:
-                $this->setEvent($value);
+                $this->setHookId($value);
                 break;
             case 3:
                 $this->setClassname($value);
@@ -1217,7 +1242,7 @@ abstract class ModuleHook implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setModuleId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setEvent($arr[$keys[2]]);
+        if (array_key_exists($keys[2], $arr)) $this->setHookId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setClassname($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setMethod($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setActive($arr[$keys[5]]);
@@ -1236,7 +1261,7 @@ abstract class ModuleHook implements ActiveRecordInterface
 
         if ($this->isColumnModified(ModuleHookTableMap::ID)) $criteria->add(ModuleHookTableMap::ID, $this->id);
         if ($this->isColumnModified(ModuleHookTableMap::MODULE_ID)) $criteria->add(ModuleHookTableMap::MODULE_ID, $this->module_id);
-        if ($this->isColumnModified(ModuleHookTableMap::EVENT)) $criteria->add(ModuleHookTableMap::EVENT, $this->event);
+        if ($this->isColumnModified(ModuleHookTableMap::HOOK_ID)) $criteria->add(ModuleHookTableMap::HOOK_ID, $this->hook_id);
         if ($this->isColumnModified(ModuleHookTableMap::CLASSNAME)) $criteria->add(ModuleHookTableMap::CLASSNAME, $this->classname);
         if ($this->isColumnModified(ModuleHookTableMap::METHOD)) $criteria->add(ModuleHookTableMap::METHOD, $this->method);
         if ($this->isColumnModified(ModuleHookTableMap::ACTIVE)) $criteria->add(ModuleHookTableMap::ACTIVE, $this->active);
@@ -1306,7 +1331,7 @@ abstract class ModuleHook implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setModuleId($this->getModuleId());
-        $copyObj->setEvent($this->getEvent());
+        $copyObj->setHookId($this->getHookId());
         $copyObj->setClassname($this->getClassname());
         $copyObj->setMethod($this->getMethod());
         $copyObj->setActive($this->getActive());
@@ -1392,13 +1417,64 @@ abstract class ModuleHook implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildHook object.
+     *
+     * @param                  ChildHook $v
+     * @return                 \Thelia\Model\ModuleHook The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setHook(ChildHook $v = null)
+    {
+        if ($v === null) {
+            $this->setHookId(NULL);
+        } else {
+            $this->setHookId($v->getId());
+        }
+
+        $this->aHook = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildHook object, it will not be re-added.
+        if ($v !== null) {
+            $v->addModuleHook($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildHook object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildHook The associated ChildHook object.
+     * @throws PropelException
+     */
+    public function getHook(ConnectionInterface $con = null)
+    {
+        if ($this->aHook === null && ($this->hook_id !== null)) {
+            $this->aHook = ChildHookQuery::create()->findPk($this->hook_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aHook->addModuleHooks($this);
+             */
+        }
+
+        return $this->aHook;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
     {
         $this->id = null;
         $this->module_id = null;
-        $this->event = null;
+        $this->hook_id = null;
         $this->classname = null;
         $this->method = null;
         $this->active = null;
@@ -1426,6 +1502,7 @@ abstract class ModuleHook implements ActiveRecordInterface
         } // if ($deep)
 
         $this->aModule = null;
+        $this->aHook = null;
     }
 
     /**

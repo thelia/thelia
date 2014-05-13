@@ -10,41 +10,34 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Hook;
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Model\Hook;
+namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\GreaterThan;
 
 /**
- * Class HookEvent
- * @package Thelia\Core\Event\Hook
+ * Class HookModificationForm
+ * @package Thelia\Form
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class HookEvent extends ActionEvent {
+class HookModificationForm extends HookCreationForm {
 
-    public $hook = null;
+    use StandardDescriptionFieldsTrait;
 
-    public function __construct(Hook $hook = null)
+    protected function buildForm()
     {
-        $this->hook = $hook;
+        parent::buildForm(true);
+
+        $this->formBuilder
+            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
+        ;
+
+        // Add standard description fields, excluding title and locale, which a re defined in parent class
+        $this->addStandardDescFields(array('title', 'description', 'locale'));
     }
 
-    public function hasModuleHook()
+    public function getName()
     {
-        return ! is_null($this->hook);
+        return "thelia_hook_modification";
     }
-
-    public function getModuleHook()
-    {
-        return $this->hook;
-    }
-
-    public function setModuleHook(Hook $hook)
-    {
-        $this->hook = $hook;
-
-        return $this;
-    }
-
 
 } 

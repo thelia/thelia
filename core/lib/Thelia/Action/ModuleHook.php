@@ -130,8 +130,8 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
         return array(
             TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleModuleActivation', 256),
             TheliaEvents::MODULE_DELETE => array('deleteModule', 256),
-            TheliaEvents::HOOK_UPDATE_POSITION => array('updateHookPosition', 128),
-            TheliaEvents::HOOK_TOGGLE_ACTIVATION => array('toggleHookActivation', 128),
+            TheliaEvents::MODULE_HOOK_UPDATE_POSITION => array('updateHookPosition', 128),
+            TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION => array('toggleHookActivation', 128),
         );
     }
 }

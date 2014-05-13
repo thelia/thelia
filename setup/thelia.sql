@@ -901,22 +901,26 @@ CREATE TABLE `module_hook`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `module_id` INTEGER NOT NULL,
-    `event` VARCHAR(255),
+    `hook_id` INTEGER NOT NULL,
     `classname` VARCHAR(255),
     `method` VARCHAR(255),
     `active` TINYINT(1) NOT NULL,
     `module_active` TINYINT(1) NOT NULL,
     `position` INTEGER NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `idx_module_event` (`event`),
-    INDEX `idx_module_hook_event` (`event`),
     INDEX `idx_module_hook_active` (`active`),
     INDEX `FI_module_hook_module_id` (`module_id`),
+    INDEX `FI_module_hook_hook_id` (`hook_id`),
     CONSTRAINT `fk_module_hook_module_id`
         FOREIGN KEY (`module_id`)
         REFERENCES `module` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_module_hook_hook_id`
+        FOREIGN KEY (`hook_id`)
+        REFERENCES `hook` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------

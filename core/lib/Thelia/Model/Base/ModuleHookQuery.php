@@ -23,7 +23,7 @@ use Thelia\Model\Map\ModuleHookTableMap;
  *
  * @method     ChildModuleHookQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildModuleHookQuery orderByModuleId($order = Criteria::ASC) Order by the module_id column
- * @method     ChildModuleHookQuery orderByEvent($order = Criteria::ASC) Order by the event column
+ * @method     ChildModuleHookQuery orderByHookId($order = Criteria::ASC) Order by the hook_id column
  * @method     ChildModuleHookQuery orderByClassname($order = Criteria::ASC) Order by the classname column
  * @method     ChildModuleHookQuery orderByMethod($order = Criteria::ASC) Order by the method column
  * @method     ChildModuleHookQuery orderByActive($order = Criteria::ASC) Order by the active column
@@ -32,7 +32,7 @@ use Thelia\Model\Map\ModuleHookTableMap;
  *
  * @method     ChildModuleHookQuery groupById() Group by the id column
  * @method     ChildModuleHookQuery groupByModuleId() Group by the module_id column
- * @method     ChildModuleHookQuery groupByEvent() Group by the event column
+ * @method     ChildModuleHookQuery groupByHookId() Group by the hook_id column
  * @method     ChildModuleHookQuery groupByClassname() Group by the classname column
  * @method     ChildModuleHookQuery groupByMethod() Group by the method column
  * @method     ChildModuleHookQuery groupByActive() Group by the active column
@@ -47,12 +47,16 @@ use Thelia\Model\Map\ModuleHookTableMap;
  * @method     ChildModuleHookQuery rightJoinModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Module relation
  * @method     ChildModuleHookQuery innerJoinModule($relationAlias = null) Adds a INNER JOIN clause to the query using the Module relation
  *
+ * @method     ChildModuleHookQuery leftJoinHook($relationAlias = null) Adds a LEFT JOIN clause to the query using the Hook relation
+ * @method     ChildModuleHookQuery rightJoinHook($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Hook relation
+ * @method     ChildModuleHookQuery innerJoinHook($relationAlias = null) Adds a INNER JOIN clause to the query using the Hook relation
+ *
  * @method     ChildModuleHook findOne(ConnectionInterface $con = null) Return the first ChildModuleHook matching the query
  * @method     ChildModuleHook findOneOrCreate(ConnectionInterface $con = null) Return the first ChildModuleHook matching the query, or a new ChildModuleHook object populated from the query conditions when no match is found
  *
  * @method     ChildModuleHook findOneById(int $id) Return the first ChildModuleHook filtered by the id column
  * @method     ChildModuleHook findOneByModuleId(int $module_id) Return the first ChildModuleHook filtered by the module_id column
- * @method     ChildModuleHook findOneByEvent(string $event) Return the first ChildModuleHook filtered by the event column
+ * @method     ChildModuleHook findOneByHookId(int $hook_id) Return the first ChildModuleHook filtered by the hook_id column
  * @method     ChildModuleHook findOneByClassname(string $classname) Return the first ChildModuleHook filtered by the classname column
  * @method     ChildModuleHook findOneByMethod(string $method) Return the first ChildModuleHook filtered by the method column
  * @method     ChildModuleHook findOneByActive(boolean $active) Return the first ChildModuleHook filtered by the active column
@@ -61,7 +65,7 @@ use Thelia\Model\Map\ModuleHookTableMap;
  *
  * @method     array findById(int $id) Return ChildModuleHook objects filtered by the id column
  * @method     array findByModuleId(int $module_id) Return ChildModuleHook objects filtered by the module_id column
- * @method     array findByEvent(string $event) Return ChildModuleHook objects filtered by the event column
+ * @method     array findByHookId(int $hook_id) Return ChildModuleHook objects filtered by the hook_id column
  * @method     array findByClassname(string $classname) Return ChildModuleHook objects filtered by the classname column
  * @method     array findByMethod(string $method) Return ChildModuleHook objects filtered by the method column
  * @method     array findByActive(boolean $active) Return ChildModuleHook objects filtered by the active column
@@ -155,7 +159,7 @@ abstract class ModuleHookQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `MODULE_ID`, `EVENT`, `CLASSNAME`, `METHOD`, `ACTIVE`, `MODULE_ACTIVE`, `POSITION` FROM `module_hook` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `MODULE_ID`, `HOOK_ID`, `CLASSNAME`, `METHOD`, `ACTIVE`, `MODULE_ACTIVE`, `POSITION` FROM `module_hook` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -329,32 +333,46 @@ abstract class ModuleHookQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the event column
+     * Filter the query on the hook_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByEvent('fooValue');   // WHERE event = 'fooValue'
-     * $query->filterByEvent('%fooValue%'); // WHERE event LIKE '%fooValue%'
+     * $query->filterByHookId(1234); // WHERE hook_id = 1234
+     * $query->filterByHookId(array(12, 34)); // WHERE hook_id IN (12, 34)
+     * $query->filterByHookId(array('min' => 12)); // WHERE hook_id > 12
      * </code>
      *
-     * @param     string $event The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
+     * @see       filterByHook()
+     *
+     * @param     mixed $hookId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildModuleHookQuery The current query, for fluid interface
      */
-    public function filterByEvent($event = null, $comparison = null)
+    public function filterByHookId($hookId = null, $comparison = null)
     {
-        if (null === $comparison) {
-            if (is_array($event)) {
+        if (is_array($hookId)) {
+            $useMinMax = false;
+            if (isset($hookId['min'])) {
+                $this->addUsingAlias(ModuleHookTableMap::HOOK_ID, $hookId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($hookId['max'])) {
+                $this->addUsingAlias(ModuleHookTableMap::HOOK_ID, $hookId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $event)) {
-                $event = str_replace('*', '%', $event);
-                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(ModuleHookTableMap::EVENT, $event, $comparison);
+        return $this->addUsingAlias(ModuleHookTableMap::HOOK_ID, $hookId, $comparison);
     }
 
     /**
@@ -583,6 +601,81 @@ abstract class ModuleHookQuery extends ModelCriteria
         return $this
             ->joinModule($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Module', '\Thelia\Model\ModuleQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\Hook object
+     *
+     * @param \Thelia\Model\Hook|ObjectCollection $hook The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildModuleHookQuery The current query, for fluid interface
+     */
+    public function filterByHook($hook, $comparison = null)
+    {
+        if ($hook instanceof \Thelia\Model\Hook) {
+            return $this
+                ->addUsingAlias(ModuleHookTableMap::HOOK_ID, $hook->getId(), $comparison);
+        } elseif ($hook instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(ModuleHookTableMap::HOOK_ID, $hook->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByHook() only accepts arguments of type \Thelia\Model\Hook or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Hook relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildModuleHookQuery The current query, for fluid interface
+     */
+    public function joinHook($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Hook');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Hook');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Hook relation Hook object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\HookQuery A secondary query class using the current class as primary query
+     */
+    public function useHookQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinHook($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Hook', '\Thelia\Model\HookQuery');
     }
 
     /**

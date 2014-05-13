@@ -185,6 +185,7 @@ class HookTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('ModuleHook', '\\Thelia\\Model\\ModuleHook', RelationMap::ONE_TO_MANY, array('id' => 'hook_id', ), 'CASCADE', 'RESTRICT', 'ModuleHooks');
         $this->addRelation('HookI18n', '\\Thelia\\Model\\HookI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'HookI18ns');
     } // buildRelations()
 
@@ -208,6 +209,7 @@ class HookTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+                ModuleHookTableMap::clearInstancePool();
                 HookI18nTableMap::clearInstancePool();
             }
 

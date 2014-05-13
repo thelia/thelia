@@ -9,7 +9,7 @@
             </tr>
         </thead>
         <tbody>
-            {loop type="module_hook" name="hook.{$hook_code}" hook="{$hook_code}" backend_context=1}
+            {loop type="module_hook" name="hook.{$hook_id}" hook="{$hook_id}" backend_context=1}
             <tr class="hook-module {if ! $MODULE_ACTIVE}inactive{/if}"
                 data-visible="{if $MODULE_ACTIVE}{if $ACTIVE}1{else}0{/if}{else}0{/if}"
                 data-active="{if $ACTIVE}1{else}0{/if}"
@@ -47,9 +47,9 @@
                 </td>
             </tr>
             {/loop}
-            {elseloop rel="hook.{$hook_code}"}
+            {elseloop rel="hook.{$hook_id}"}
             <tr>
-                <td colspan="5">No modules hooked here ({$hook_code})</td>
+                <td colspan="5">No modules hooked here</td>
             </tr>
             {/elseloop}
         </tbody>

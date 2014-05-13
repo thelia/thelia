@@ -15,6 +15,7 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Thelia\Log\Tlog;
+use Thelia\Model\HookQuery;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleHook;
 use Thelia\Model\ModuleQuery;
@@ -100,6 +101,12 @@ class RegisterListenersPass implements CompilerPassInterface
                     throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "hook.event_listener" tags.', $id));
                 }
 
+                $hook = HookQuery::create()->findOneByCode($event['event']);
+                if (null === $hook){
+                    Tlog::getInstance()->addAlert(sprintf("Hook %s is unknow.", $event['event']));
+                    continue;
+                }
+
                 if (!isset($event['method'])) {
                     $event['method'] = 'on'.preg_replace(array(
                             '/(?<=\b)[a-z]/ie',
@@ -107,19 +114,17 @@ class RegisterListenersPass implements CompilerPassInterface
                         ), array('strtoupper("\\0")', ''), $event['event']);
                 }
 
-                // TODO test if method exists in the class
-
                 // test if hook is already registered in ModuleHook
                 $moduleHook = ModuleHookQuery::create()
                     ->filterByModuleId($module)
-                    ->filterByEvent($event['event'])
+                    ->filterByHook($hook)
                     ->findOne();
 
                 if (null === $moduleHook) {
                     // hook for module doesn't exist, we add it with default registered values
                     $moduleHook = new ModuleHook();
                     //$moduleHook->setModuleId();
-                    $moduleHook->setEvent($event['event'])
+                    $moduleHook->setHook($hook)
                         ->setModuleId($module)
                         ->setClassname($id)
                         ->setMethod($event['method'])
@@ -135,18 +140,18 @@ class RegisterListenersPass implements CompilerPassInterface
         $moduleHooks = ModuleHookQuery::create()
             //->filterByActive(true)
             //->filterByModuleActive(true)
-            ->orderByEvent()
+            ->orderByHookId()
             ->orderByPosition()
             ->orderById()
             ->find();
 
         $modulePosition = 0;
-        $moduleEvent = "";
+        $hookId = 0;
         /** @var ModuleHook $moduleHook */
         foreach ($moduleHooks as $moduleHook) {
             // manage module hook position for new hook
-            if ($moduleEvent !== $moduleHook->getEvent()) {
-                $moduleEvent = $moduleHook->getEvent();
+            if ($hookId !== $moduleHook->getHookId()) {
+                $hookId = $moduleHook->getHookId();
                 $modulePosition = 1;
             } else {
                 $modulePosition++;
@@ -162,7 +167,7 @@ class RegisterListenersPass implements CompilerPassInterface
                 Tlog::getInstance()->addDebug(" GU _HOOK_ addListenerService");
                 $definition->addMethodCall('addListenerService',
                     array(
-                        'hook.' . $moduleHook->getEvent(),
+                        'hook.' . $moduleHook->getHook()->getCode(),
                         array($moduleHook->getClassname(), $moduleHook->getMethod()),
                         ModuleHook::MAX_POSITION - $moduleHook->getPosition()
                     )

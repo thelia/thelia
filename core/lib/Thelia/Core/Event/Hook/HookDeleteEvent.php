@@ -11,40 +11,33 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Hook;
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Model\Hook;
+
 
 
 /**
- * Class HookEvent
+ * Class HookDeleteEvent
  * @package Thelia\Core\Event\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class HookEvent extends ActionEvent {
+class HookDeleteEvent extends HookEvent {
 
-    public $hook = null;
+    protected $hook_id;
 
-    public function __construct(Hook $hook = null)
+    /**
+     * @param mixed $hook_id
+     */
+    public function setHookId($hook_id)
     {
-        $this->hook = $hook;
-    }
-
-    public function hasModuleHook()
-    {
-        return ! is_null($this->hook);
-    }
-
-    public function getModuleHook()
-    {
-        return $this->hook;
-    }
-
-    public function setModuleHook(Hook $hook)
-    {
-        $this->hook = $hook;
-
+        $this->hook_id = $hook_id;
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getHookId()
+    {
+        return $this->hook_id;
+    }
 
 } 

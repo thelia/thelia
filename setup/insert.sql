@@ -106,12 +106,12 @@ INSERT INTO `hook` (`id`, `code`, `type`, `native`, `activate`, `position`, `cre
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-(1, 'en_US', 'Header', NULL,  NULL)
-,(1, 'fr_FR', 'Haut de page', NULL,  NULL)
-,(2, 'en_US', 'Body', NULL,  NULL)
-,(2, 'fr_FR', 'Corps de la page', NULL,  NULL)
-,(3, 'en_US', 'Footer', NULL,  NULL)
-,(3, 'fr_FR', 'Pied de page', NULL,  NULL)
+(1, 'en_US', 'Header', 'This hook is injected in the head Tag of the page.',  NULL)
+,(1, 'fr_FR', 'Haut de page', 'Ce hook est injecté dans la balise head de la page.',  NULL)
+,(2, 'en_US', 'Body', 'This hook is injected in the body of the page.',  NULL)
+,(2, 'fr_FR', 'Corps de la page', 'Ce hook est injecté dans la balise head de la page.',  NULL)
+,(3, 'en_US', 'Footer', 'This hook is injected in the footer of the page.',  NULL)
+,(3, 'fr_FR', 'Pied de page', 'Ce hook est injecté dans le pied de page.',  NULL)
 ;
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES

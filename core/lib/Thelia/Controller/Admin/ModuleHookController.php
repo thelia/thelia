@@ -32,31 +32,31 @@ class ModuleHookController extends AbstractCrudController
             'manual',
             'hook_order',
 
-            AdminResources::HOOK,
+            AdminResources::MODULE_HOOK,
 
             null,
-            TheliaEvents::HOOK_UPDATE,
+            TheliaEvents::MODULE_HOOK_UPDATE,
             null,
             null,
-            TheliaEvents::HOOK_UPDATE_POSITION
+            TheliaEvents::MODULE_HOOK_UPDATE_POSITION
         );
     }
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::HOOK, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, array(), AccessManager::VIEW)) return $response;
         return $this->renderList();
     }
 
     public function toggleActivationAction($module_hook_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::HOOK, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, array(), AccessManager::UPDATE)) return $response;
         $message = null;
 
         $event = new ModuleHookToggleActivationEvent($this->getExistingObject());
 
         try {
-            $this->dispatch(TheliaEvents::HOOK_TOGGLE_ACTIVATION, $event);
+            $this->dispatch(TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION, $event);
         } catch (\Exception $ex) {
             $message = $ex->getMessage();
         }

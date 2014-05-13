@@ -25,7 +25,7 @@ class ModuleHook extends BaseModuleHook
 
         // Filtrer la requete sur ces produits
         //if ($produits != null) $query->filterById($produits, Criteria::IN);
-        $query->filterByEvent($this->getEvent());
+        $query->filterByHookId($this->getHookId());
     }
 
 }
