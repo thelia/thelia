@@ -1049,15 +1049,15 @@
 
     <!-- Hooks rule management -->
 
-    <route id="admin.hook" path="/admin/hooks">
-        <default key="_controller">Thelia\Controller\Admin\HookController::indexAction</default>
+    <route id="admin.module-hook" path="/admin/module-hooks">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::indexAction</default>
     </route>
-    <route id="admin.hook.toggle-activation" path="/admin/hook/toggle-activation/{module_hook_id}">
-        <default key="_controller">Thelia\Controller\Admin\HookController::toggleActivationAction</default>
+    <route id="admin.module-hook.toggle-activation" path="/admin/module-hooks/toggle-activation/{module_hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::toggleActivationAction</default>
         <requirement key="module_hook_id">\d+</requirement>
     </route>
-    <route id="admin.hook.update-position" path="/admin/hook/update-position">
-        <default key="_controller">Thelia\Controller\Admin\HookController::updatePositionAction</default>
+    <route id="admin.module-hook.update-position" path="/admin/module-hooks/update-position">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::updatePositionAction</default>
     </route>
 
     <!-- end Hooks rule management -->

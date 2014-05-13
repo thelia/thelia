@@ -51,9 +51,6 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
             ModuleHookQuery::create()
                 ->filterByModuleId($module->getId())
                 ->update(array('ModuleActive' => ! ($module->getActivate() == BaseModule::IS_ACTIVATED)));
-
-            // already done
-            // $this->cacheClear($event->getDispatcher());
         }
 
         return $event;
@@ -62,14 +59,9 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
     public function deleteModule(ModuleDeleteEvent $event)
     {
         if ($event->getModuleId()) {
-            Tlog::getInstance()->debug(sprintf(" GU %s %s", "delete Module", $event->getModuleId()));
-
             ModuleHookQuery::create()
                 ->filterByModuleId($event->getModuleId())
                 ->delete();
-
-            // already done
-            // $this->cacheClear($event->getDispatcher());
         }
 
         return $event;
@@ -93,7 +85,8 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param UpdatePositionEvent $event
+     * @param   UpdatePositionEvent $event
+     * @return  UpdatePositionEvent $event
      */
     public function updateHookPosition(UpdatePositionEvent $event)
     {
@@ -139,7 +132,6 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
             TheliaEvents::MODULE_DELETE => array('deleteModule', 256),
             TheliaEvents::HOOK_UPDATE_POSITION => array('updateHookPosition', 128),
             TheliaEvents::HOOK_TOGGLE_ACTIVATION => array('toggleHookActivation', 128),
-            // TheliaEvents::MODULE_HOOK_UPDATE_CONTEXT => array('updateModuleHookContext', 128),
         );
     }
 }

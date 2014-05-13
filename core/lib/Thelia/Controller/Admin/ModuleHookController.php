@@ -23,7 +23,7 @@ use Thelia\Model\ModuleHookQuery;
  * @package Thelia\Controller\Admin
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class HookController extends AbstractCrudController
+class ModuleHookController extends AbstractCrudController
 {
     public function __construct()
     {
