@@ -595,6 +595,7 @@ final class TheliaEvents
     // -- Api management ---------------------------------------------
 
     const API_CREATE                            = 'action.createApi';
+    const API_DELETE                            = 'action.deleteApi';
 
     // -- Mailing System management ---------------------------------------------
 

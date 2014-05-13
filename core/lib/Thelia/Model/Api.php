@@ -19,6 +19,12 @@ class Api extends BaseApi
         return true;
     }
 
+    public function postDelete(ConnectionInterface $con = null)
+    {
+        $fs = new Filesystem();
+        $fs->remove($this->getKeyDir(). DS . $this->getApiKey() . '.key');
+    }
+
     private function getKeyDir()
     {
         return THELIA_CONF_DIR . DS . 'key';

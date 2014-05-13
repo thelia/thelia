@@ -143,4 +143,39 @@
     form_error_message = $form_error_message
 }
 {/form}
+
+    {capture "api_delete_dialog"}
+        <input type="hidden" name="api_id" id="api_delete_id" value="" />
+
+        {module_include location='administrator_delete_form'}
+
+    {/capture}
+
+    {include
+        file = "includes/generic-confirm-dialog.html"
+
+        dialog_id       = "api_delete_dialog"
+        dialog_title    = {intl l="Delete api credential"}
+        dialog_message  = {intl l="Do you really want to delete this api credential ?"}
+
+        form_action         = {url path='/admin/configuration/api/delete'}
+        form_content        = {$smarty.capture.api_delete_dialog nofilter}
+    }
+
+
+
+{/block}
+
+{block name="javascript-initialization"}
+
+<script type="text/javascript">
+
+    $(document).ready(function(){
+        $(".js-delete-api").click(function(e){
+            $('#api_delete_id').val($(this).data('id'))
+        });
+    });
+
+</script>
+
 {/block}

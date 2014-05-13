@@ -14,6 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\Event\Api\ApiCreateEvent;
+use Thelia\Core\Event\Api\ApiDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
@@ -23,6 +24,7 @@ use Thelia\Form\Api\ApiCreateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Api;
 use Thelia\Model\ApiQuery;
+use Thelia\Tools\URL;
 
 
 /**
@@ -47,6 +49,34 @@ class ApiController extends BaseAdminController
         }
 
         return $response;
+    }
+
+    public function deleteAction()
+    {
+        if (null !== $response = $this->checkAuth([AdminResources::API], [], AccessManager::DELETE)) {
+            return $response;
+        }
+
+        $api_id = $this->getRequest()->request->get('api_id');
+
+        $api = ApiQuery::create()->findPk($api_id);
+
+        if (null === $api) {
+            $response = $this->errorPage(Translator::getInstance()->trans("api id %id does not exists", ['%id' => $api_id]));
+        } else {
+            $response = $this->deleteApi($api);
+        }
+
+        return $response;
+    }
+
+    private function deleteApi(Api $api)
+    {
+        $event = new ApiDeleteEvent($api);
+
+        $this->dispatch(TheliaEvents::API_DELETE, $event);
+
+        return RedirectResponse::create(URL::getInstance()->absoluteUrl($this->getRoute('admin.configuration.api')));
     }
 
     /**

@@ -14,6 +14,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Api\ApiCreateEvent;
+use Thelia\Core\Event\Api\ApiDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Api as ApiModel;
 
@@ -35,6 +36,13 @@ class Api extends BaseAction implements EventSubscriberInterface
             ->save()
         ;
 
+    }
+
+    public function deleteApi(ApiDeleteEvent $event)
+    {
+        $api = $event->getApi();
+
+        $api->delete();
     }
 
     /**
@@ -60,7 +68,8 @@ class Api extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::API_CREATE => ['createApi', 128]
+            TheliaEvents::API_CREATE => ['createApi', 128],
+            TheliaEvents::API_DELETE => ['deleteApi', 128]
         ];
     }
 }
