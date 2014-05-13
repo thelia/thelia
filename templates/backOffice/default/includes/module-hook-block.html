@@ -25,9 +25,9 @@
                     </div>
                     <noscript>
                         {if $ACTIVE}
-                        <a title="{intl l="Deactivate hook" title={$TITLE}}" href="{url path="/admin/hook/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
+                        <a title="{intl l="Deactivate hook" title={$TITLE}}" href="{url path="/admin/module-hooks/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
                         {else}
-                        <a title="{intl l="activate hook" title={$TITLE}}" href="{url path="/admin/hook/toggle-activation/{$ID}"}">{intl l="activation"}</a>
+                        <a title="{intl l="activate hook" title={$TITLE}}" href="{url path="/admin/module-hooks/toggle-activation/{$ID}"}">{intl l="activation"}</a>
                         {/if}
                     </noscript>
                     {else}
@@ -38,7 +38,7 @@
                     {admin_position_block
                         resource="admin.hooks"
                         access="UPDATE"
-                        path={url path="admin/hook/update-position"}
+                        path={url path="admin/module-hooks/update-position"}
                         url_parameter="module_hook_id"
                         in_place_edit_class="moduleHookPositionChange"
                         position=$POSITION

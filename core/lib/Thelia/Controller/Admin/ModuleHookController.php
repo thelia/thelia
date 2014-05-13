@@ -70,7 +70,7 @@ class ModuleHookController extends AbstractCrudController
                 $response = $this->nullResponse();
             }
         } else {
-            $this->redirectToRoute('admin.hook');
+            $this->redirectToRoute('admin.module-hook');
         }
 
         return $response;
@@ -198,7 +198,7 @@ class ModuleHookController extends AbstractCrudController
     protected function renderListTemplate($currentOrder)
     {
         return $this->render(
-            'hooks',
+            'module-hooks',
             array('module_order' => $currentOrder)
         );
     }
@@ -230,7 +230,7 @@ class ModuleHookController extends AbstractCrudController
     protected function redirectToListTemplate()
     {
         $this->redirectToRoute(
-            "admin.hook"
+            "admin.module-hook"
         );
     }
 
