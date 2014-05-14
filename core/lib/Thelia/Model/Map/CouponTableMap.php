@@ -227,8 +227,12 @@ class CouponTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('CouponCountry', '\\Thelia\\Model\\CouponCountry', RelationMap::ONE_TO_MANY, array('id' => 'coupon_id', ), 'CASCADE', null, 'CouponCountries');
+        $this->addRelation('CouponModule', '\\Thelia\\Model\\CouponModule', RelationMap::ONE_TO_MANY, array('id' => 'coupon_id', ), 'CASCADE', null, 'CouponModules');
         $this->addRelation('CouponI18n', '\\Thelia\\Model\\CouponI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CouponI18ns');
         $this->addRelation('CouponVersion', '\\Thelia\\Model\\CouponVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CouponVersions');
+        $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_MANY, array(), 'CASCADE', null, 'Countries');
+        $this->addRelation('Module', '\\Thelia\\Model\\Module', RelationMap::MANY_TO_MANY, array(), 'CASCADE', null, 'Modules');
     } // buildRelations()
 
     /**
@@ -252,6 +256,8 @@ class CouponTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+                CouponCountryTableMap::clearInstancePool();
+                CouponModuleTableMap::clearInstancePool();
                 CouponI18nTableMap::clearInstancePool();
                 CouponVersionTableMap::clearInstancePool();
             }

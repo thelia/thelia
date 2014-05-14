@@ -60,7 +60,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
             ->filterByViewLocale($viewLocale)
             ->filterByViewId($viewId)
             ->filterByRedirected(null)
-            ->orderByUpdatedAt(Criteria::DESC)
+            ->orderById(Criteria::DESC)
             ->findOne();
     }
 
@@ -81,7 +81,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
             ->filterByViewLocale($viewLocale)
             ->filterByViewId($viewId)
             ->filterByRedirected(null)
-            ->orderByUpdatedAt(Criteria::DESC);
+            ->orderById(Criteria::DESC);
 
         $otherParametersCount = count($viewOtherParameters);
         if ($otherParametersCount > 0) {

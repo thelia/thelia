@@ -25,6 +25,10 @@ use Thelia\Model\Country as ChildCountry;
 use Thelia\Model\CountryI18n as ChildCountryI18n;
 use Thelia\Model\CountryI18nQuery as ChildCountryI18nQuery;
 use Thelia\Model\CountryQuery as ChildCountryQuery;
+use Thelia\Model\Coupon as ChildCoupon;
+use Thelia\Model\CouponCountry as ChildCouponCountry;
+use Thelia\Model\CouponCountryQuery as ChildCouponCountryQuery;
+use Thelia\Model\CouponQuery as ChildCouponQuery;
 use Thelia\Model\TaxRuleCountry as ChildTaxRuleCountry;
 use Thelia\Model\TaxRuleCountryQuery as ChildTaxRuleCountryQuery;
 use Thelia\Model\Map\CountryTableMap;
@@ -137,10 +141,21 @@ abstract class Country implements ActiveRecordInterface
     protected $collAddressesPartial;
 
     /**
+     * @var        ObjectCollection|ChildCouponCountry[] Collection to store aggregation of ChildCouponCountry objects.
+     */
+    protected $collCouponCountries;
+    protected $collCouponCountriesPartial;
+
+    /**
      * @var        ObjectCollection|ChildCountryI18n[] Collection to store aggregation of ChildCountryI18n objects.
      */
     protected $collCountryI18ns;
     protected $collCountryI18nsPartial;
+
+    /**
+     * @var        ChildCoupon[] Collection to store aggregation of ChildCoupon objects.
+     */
+    protected $collCoupons;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -168,6 +183,12 @@ abstract class Country implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
+    protected $couponsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
     protected $taxRuleCountriesScheduledForDeletion = null;
 
     /**
@@ -175,6 +196,12 @@ abstract class Country implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $addressesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $couponCountriesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -926,8 +953,11 @@ abstract class Country implements ActiveRecordInterface
 
             $this->collAddresses = null;
 
+            $this->collCouponCountries = null;
+
             $this->collCountryI18ns = null;
 
+            $this->collCoupons = null;
         } // if (deep)
     }
 
@@ -1073,6 +1103,33 @@ abstract class Country implements ActiveRecordInterface
                 $this->resetModified();
             }
 
+            if ($this->couponsScheduledForDeletion !== null) {
+                if (!$this->couponsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk  = $this->getPrimaryKey();
+                    foreach ($this->couponsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+
+                    CouponCountryQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->couponsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getCoupons() as $coupon) {
+                    if ($coupon->isModified()) {
+                        $coupon->save($con);
+                    }
+                }
+            } elseif ($this->collCoupons) {
+                foreach ($this->collCoupons as $coupon) {
+                    if ($coupon->isModified()) {
+                        $coupon->save($con);
+                    }
+                }
+            }
+
             if ($this->taxRuleCountriesScheduledForDeletion !== null) {
                 if (!$this->taxRuleCountriesScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\TaxRuleCountryQuery::create()
@@ -1101,6 +1158,23 @@ abstract class Country implements ActiveRecordInterface
 
                 if ($this->collAddresses !== null) {
             foreach ($this->collAddresses as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->couponCountriesScheduledForDeletion !== null) {
+                if (!$this->couponCountriesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\CouponCountryQuery::create()
+                        ->filterByPrimaryKeys($this->couponCountriesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->couponCountriesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCouponCountries !== null) {
+            foreach ($this->collCouponCountries as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1358,6 +1432,9 @@ abstract class Country implements ActiveRecordInterface
             if (null !== $this->collAddresses) {
                 $result['Addresses'] = $this->collAddresses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collCouponCountries) {
+                $result['CouponCountries'] = $this->collCouponCountries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collCountryI18ns) {
                 $result['CountryI18ns'] = $this->collCountryI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1564,6 +1641,12 @@ abstract class Country implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getCouponCountries() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCouponCountry($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getCountryI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCountryI18n($relObj->copy($deepCopy));
@@ -1667,6 +1750,9 @@ abstract class Country implements ActiveRecordInterface
         }
         if ('Address' == $relationName) {
             return $this->initAddresses();
+        }
+        if ('CouponCountry' == $relationName) {
+            return $this->initCouponCountries();
         }
         if ('CountryI18n' == $relationName) {
             return $this->initCountryI18ns();
@@ -2213,6 +2299,252 @@ abstract class Country implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collCouponCountries collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCouponCountries()
+     */
+    public function clearCouponCountries()
+    {
+        $this->collCouponCountries = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCouponCountries collection loaded partially.
+     */
+    public function resetPartialCouponCountries($v = true)
+    {
+        $this->collCouponCountriesPartial = $v;
+    }
+
+    /**
+     * Initializes the collCouponCountries collection.
+     *
+     * By default this just sets the collCouponCountries collection to an empty array (like clearcollCouponCountries());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCouponCountries($overrideExisting = true)
+    {
+        if (null !== $this->collCouponCountries && !$overrideExisting) {
+            return;
+        }
+        $this->collCouponCountries = new ObjectCollection();
+        $this->collCouponCountries->setModel('\Thelia\Model\CouponCountry');
+    }
+
+    /**
+     * Gets an array of ChildCouponCountry objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCountry is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCouponCountry[] List of ChildCouponCountry objects
+     * @throws PropelException
+     */
+    public function getCouponCountries($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCouponCountriesPartial && !$this->isNew();
+        if (null === $this->collCouponCountries || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCouponCountries) {
+                // return empty collection
+                $this->initCouponCountries();
+            } else {
+                $collCouponCountries = ChildCouponCountryQuery::create(null, $criteria)
+                    ->filterByCountry($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCouponCountriesPartial && count($collCouponCountries)) {
+                        $this->initCouponCountries(false);
+
+                        foreach ($collCouponCountries as $obj) {
+                            if (false == $this->collCouponCountries->contains($obj)) {
+                                $this->collCouponCountries->append($obj);
+                            }
+                        }
+
+                        $this->collCouponCountriesPartial = true;
+                    }
+
+                    reset($collCouponCountries);
+
+                    return $collCouponCountries;
+                }
+
+                if ($partial && $this->collCouponCountries) {
+                    foreach ($this->collCouponCountries as $obj) {
+                        if ($obj->isNew()) {
+                            $collCouponCountries[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCouponCountries = $collCouponCountries;
+                $this->collCouponCountriesPartial = false;
+            }
+        }
+
+        return $this->collCouponCountries;
+    }
+
+    /**
+     * Sets a collection of CouponCountry objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $couponCountries A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCountry The current object (for fluent API support)
+     */
+    public function setCouponCountries(Collection $couponCountries, ConnectionInterface $con = null)
+    {
+        $couponCountriesToDelete = $this->getCouponCountries(new Criteria(), $con)->diff($couponCountries);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->couponCountriesScheduledForDeletion = clone $couponCountriesToDelete;
+
+        foreach ($couponCountriesToDelete as $couponCountryRemoved) {
+            $couponCountryRemoved->setCountry(null);
+        }
+
+        $this->collCouponCountries = null;
+        foreach ($couponCountries as $couponCountry) {
+            $this->addCouponCountry($couponCountry);
+        }
+
+        $this->collCouponCountries = $couponCountries;
+        $this->collCouponCountriesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CouponCountry objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CouponCountry objects.
+     * @throws PropelException
+     */
+    public function countCouponCountries(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCouponCountriesPartial && !$this->isNew();
+        if (null === $this->collCouponCountries || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCouponCountries) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCouponCountries());
+            }
+
+            $query = ChildCouponCountryQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCountry($this)
+                ->count($con);
+        }
+
+        return count($this->collCouponCountries);
+    }
+
+    /**
+     * Method called to associate a ChildCouponCountry object to this object
+     * through the ChildCouponCountry foreign key attribute.
+     *
+     * @param    ChildCouponCountry $l ChildCouponCountry
+     * @return   \Thelia\Model\Country The current object (for fluent API support)
+     */
+    public function addCouponCountry(ChildCouponCountry $l)
+    {
+        if ($this->collCouponCountries === null) {
+            $this->initCouponCountries();
+            $this->collCouponCountriesPartial = true;
+        }
+
+        if (!in_array($l, $this->collCouponCountries->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCouponCountry($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param CouponCountry $couponCountry The couponCountry object to add.
+     */
+    protected function doAddCouponCountry($couponCountry)
+    {
+        $this->collCouponCountries[]= $couponCountry;
+        $couponCountry->setCountry($this);
+    }
+
+    /**
+     * @param  CouponCountry $couponCountry The couponCountry object to remove.
+     * @return ChildCountry The current object (for fluent API support)
+     */
+    public function removeCouponCountry($couponCountry)
+    {
+        if ($this->getCouponCountries()->contains($couponCountry)) {
+            $this->collCouponCountries->remove($this->collCouponCountries->search($couponCountry));
+            if (null === $this->couponCountriesScheduledForDeletion) {
+                $this->couponCountriesScheduledForDeletion = clone $this->collCouponCountries;
+                $this->couponCountriesScheduledForDeletion->clear();
+            }
+            $this->couponCountriesScheduledForDeletion[]= clone $couponCountry;
+            $couponCountry->setCountry(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Country is new, it will return
+     * an empty collection; or if this Country has previously
+     * been saved, it will retrieve related CouponCountries from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Country.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCouponCountry[] List of ChildCouponCountry objects
+     */
+    public function getCouponCountriesJoinCoupon($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCouponCountryQuery::create(null, $criteria);
+        $query->joinWith('Coupon', $joinBehavior);
+
+        return $this->getCouponCountries($query, $con);
+    }
+
+    /**
      * Clears out the collCountryI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2438,6 +2770,189 @@ abstract class Country implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collCoupons collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCoupons()
+     */
+    public function clearCoupons()
+    {
+        $this->collCoupons = null; // important to set this to NULL since that means it is uninitialized
+        $this->collCouponsPartial = null;
+    }
+
+    /**
+     * Initializes the collCoupons collection.
+     *
+     * By default this just sets the collCoupons collection to an empty collection (like clearCoupons());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initCoupons()
+    {
+        $this->collCoupons = new ObjectCollection();
+        $this->collCoupons->setModel('\Thelia\Model\Coupon');
+    }
+
+    /**
+     * Gets a collection of ChildCoupon objects related by a many-to-many relationship
+     * to the current object by way of the coupon_country cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCountry is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return ObjectCollection|ChildCoupon[] List of ChildCoupon objects
+     */
+    public function getCoupons($criteria = null, ConnectionInterface $con = null)
+    {
+        if (null === $this->collCoupons || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCoupons) {
+                // return empty collection
+                $this->initCoupons();
+            } else {
+                $collCoupons = ChildCouponQuery::create(null, $criteria)
+                    ->filterByCountry($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collCoupons;
+                }
+                $this->collCoupons = $collCoupons;
+            }
+        }
+
+        return $this->collCoupons;
+    }
+
+    /**
+     * Sets a collection of Coupon objects related by a many-to-many relationship
+     * to the current object by way of the coupon_country cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param  Collection $coupons A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return ChildCountry The current object (for fluent API support)
+     */
+    public function setCoupons(Collection $coupons, ConnectionInterface $con = null)
+    {
+        $this->clearCoupons();
+        $currentCoupons = $this->getCoupons();
+
+        $this->couponsScheduledForDeletion = $currentCoupons->diff($coupons);
+
+        foreach ($coupons as $coupon) {
+            if (!$currentCoupons->contains($coupon)) {
+                $this->doAddCoupon($coupon);
+            }
+        }
+
+        $this->collCoupons = $coupons;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of ChildCoupon objects related by a many-to-many relationship
+     * to the current object by way of the coupon_country cross-reference table.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return int the number of related ChildCoupon objects
+     */
+    public function countCoupons($criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        if (null === $this->collCoupons || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCoupons) {
+                return 0;
+            } else {
+                $query = ChildCouponQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCountry($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collCoupons);
+        }
+    }
+
+    /**
+     * Associate a ChildCoupon object to this object
+     * through the coupon_country cross reference table.
+     *
+     * @param  ChildCoupon $coupon The ChildCouponCountry object to relate
+     * @return ChildCountry The current object (for fluent API support)
+     */
+    public function addCoupon(ChildCoupon $coupon)
+    {
+        if ($this->collCoupons === null) {
+            $this->initCoupons();
+        }
+
+        if (!$this->collCoupons->contains($coupon)) { // only add it if the **same** object is not already associated
+            $this->doAddCoupon($coupon);
+            $this->collCoupons[] = $coupon;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param    Coupon $coupon The coupon object to add.
+     */
+    protected function doAddCoupon($coupon)
+    {
+        $couponCountry = new ChildCouponCountry();
+        $couponCountry->setCoupon($coupon);
+        $this->addCouponCountry($couponCountry);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$coupon->getCountries()->contains($this)) {
+            $foreignCollection   = $coupon->getCountries();
+            $foreignCollection[] = $this;
+        }
+    }
+
+    /**
+     * Remove a ChildCoupon object to this object
+     * through the coupon_country cross reference table.
+     *
+     * @param ChildCoupon $coupon The ChildCouponCountry object to relate
+     * @return ChildCountry The current object (for fluent API support)
+     */
+    public function removeCoupon(ChildCoupon $coupon)
+    {
+        if ($this->getCoupons()->contains($coupon)) {
+            $this->collCoupons->remove($this->collCoupons->search($coupon));
+
+            if (null === $this->couponsScheduledForDeletion) {
+                $this->couponsScheduledForDeletion = clone $this->collCoupons;
+                $this->couponsScheduledForDeletion->clear();
+            }
+
+            $this->couponsScheduledForDeletion[] = $coupon;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2481,8 +2996,18 @@ abstract class Country implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collCouponCountries) {
+                foreach ($this->collCouponCountries as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collCountryI18ns) {
                 foreach ($this->collCountryI18ns as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCoupons) {
+                foreach ($this->collCoupons as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2494,7 +3019,9 @@ abstract class Country implements ActiveRecordInterface
 
         $this->collTaxRuleCountries = null;
         $this->collAddresses = null;
+        $this->collCouponCountries = null;
         $this->collCountryI18ns = null;
+        $this->collCoupons = null;
         $this->aArea = null;
     }
 
