@@ -138,9 +138,13 @@ return array(
     'Price ascending' => 'Prix croissant',
     'Price descending' => 'Prix décroissant',
     'Proceed checkout' => 'Continuer la commande',
-    'Product Empty Button' => 'Bouton produit vide',
-    'Product Empty Message' => 'Message produit vide',
-    'Product Empty Title' => 'Titre produit vide',
+    'Product Empty Button' => 'Ajouter mon premier produit',
+    'Product Empty Message' => 'Ajouter rapidement un produit.
+        <ol>
+            <li>Cochez <strong>Nouveau</strong> dans l\'onglet Prix si vous voulez voir votre produit dans la section Nouveautés.</li>
+            <li>Cochez <strong>En promo</strong> dans l\'onglet Prix si vous voulez voir votre produit dans la section Offres.</li>
+        </ol>',
+    'Product Empty Title' => 'Bienvenue',
     'Product Name' => 'Nom du produit',
     'Product Offers' => 'Offre spéciale',
     'Qty' => 'Qté',
