@@ -1,6 +1,6 @@
 {extends file="admin-layout.tpl"}
 
-{block name="page-title"}{intl l='Countries'}{/block}
+{block name="page-title"}{intl l='Hooks'}{/block}
 
 {block name="check-resource"}admin.configuration.country{/block}
 {block name="check-access"}view{/block}
@@ -13,7 +13,7 @@
         <ul class="breadcrumb">
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
-            <li><a href="{url path='/admin/configuration/hooks'}">{intl l="Hooks"}</a></li>
+            <li><a href="{url path='/admin/hooks'}">{intl l="Hooks"}</a></li>
         </ul>
 
         {module_include location='hooks_top'}
@@ -27,7 +27,7 @@
                         <div class="table-responsive">
                             <table class="table table-striped table-condensed">
                                 <caption class="clearfix">
-                                    {intl l='Countries'}
+                                    {intl l='Hooks'}
                                     {loop type="auth" name="can_create" role="ADMIN" resource="admin.hook" access="CREATE"}
                                     <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new hook'}" href="#add_hook_dialog" data-toggle="modal">
                                         <span class="glyphicon glyphicon-plus-sign"></span>
@@ -35,17 +35,17 @@
                                     {/loop}
                                 </caption>
                                 <thead>
-                                <tr>
-                                    <th>{intl l="ID"}</th>
-                                    <th>{intl l="Code"}</th>
-                                    <th>{intl l="Title"}</th>
-                                    <th>{intl l="Native"}</th>
-                                    <th>{intl l="Active"}</th>
+                                    <tr>
+                                        <th>{intl l="ID"}</th>
+                                        <th>{intl l="Code"}</th>
+                                        <th>{intl l="Title"}</th>
+                                        <th>{intl l="Native"}</th>
+                                        <th>{intl l="Active"}</th>
 
-                                    {module_include location='countries_table_header'}
+                                        {module_include location='hooks_table_header'}
 
-                                    <th class="actions">{intl l='Actions'}</th>
-                                </tr>
+                                        <th class="actions">{intl l='Actions'}</th>
+                                    </tr>
                                 </thead>
 
                                 <tbody>
@@ -56,18 +56,16 @@
                                     <td><a href="{url path="/admin/hook/update/{$ID}"}">{$TITLE}</a></td>
                                     <td>
                                         <div class="make-switch switch-small hook-native" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
-                                            <input type="checkbox" {if $ACTIVE}checked{/if}>
+                                            <input type="checkbox" {if $NATIVE}checked="checked"{/if} />
                                         </div>
                                     </td>
                                     <td>
                                         <div class="make-switch switch-small hook-activation" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
-                                            <input type="checkbox" {if $ACTIVE}checked{/if}>
+                                            <input type="checkbox" {if $ACTIVE}checked="checked"{/if} />
                                         </div>
                                     </td>
-                                    <td>{$ISOCODE}</td>
-                                    <td>{$ISOALPHA3}</td>
 
-                                    {module_include location='countries_table_row'}
+                                    {module_include location='hooks_table_row'}
 
                                     <td class="actions">
                                         <div class="btn-group">
@@ -110,6 +108,106 @@
 
     </div>
 </div>
+
+
+{* Adding a new Hook *}
+
+{form name="thelia.admin.hook.creation"}
+
+    {* Capture the dialog body, to pass it to the generic dialog *}
+    {capture "hook_creation_dialog"}
+
+        {form_hidden_fields form=$form}
+
+        {form_field form=$form field='success_url'}
+        {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
+        <input type="hidden" name="{$name}" value="{url path='/admin/hook/update/_ID_'}" />
+        {/form_field}
+
+        {loop type="lang" name="current-edit-lang" default_only="1"}
+
+        {form_field form=$form field='title'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+            <div class="input-group">
+                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Hook title'}">
+                <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+            </div>
+            <div class="help-block">{intl l="Enter here the value in the default language (%title)" title={$TITLE}}</div>
+        </div>
+        {/form_field}
+
+        {form_field form=$form field='locale'}
+        <input type="hidden" name="{$name}" value="{$LOCALE}" />
+        {/form_field}
+
+        {/loop}
+
+        {form_field form=$form field='locale'}
+        <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+        {/form_field}
+
+        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+        {form_field form=$form field='code'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Code'}">
+        </div>
+        {/form_field}
+
+        {form_field form=$form field='type'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+            <select name="{$name}" id="{$label_attr.for}" class="form-control">
+                {foreach $choices as $choice}
+                <option value="{$choice->value}" {if !$form_error && $choice->value == $ESCAPED_TYPE || $form_error && $choice->value == $value}selected="selected" {/if}>{$choice->label}</option>
+                {/foreach}
+            </select>
+        </div>
+        {/form_field}
+
+        {form_field form=$form field='native'}
+        <div class="form-group {if $error}has-error{/if}">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+                    {$label}
+                </label>
+            </div>
+        </div>
+        {/form_field}
+
+        {form_field form=$form field='active'}
+        <div class="form-group {if $error}has-error{/if}">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+                    {$label}
+                </label>
+            </div>
+        </div>
+        {/form_field}
+
+        {module_include location='hook_create_form'}
+
+    {/capture}
+
+    {include
+    file = "includes/generic-create-dialog.html"
+
+    dialog_id    = "add_hook_dialog"
+    dialog_title = {intl l="Create a new Hook"}
+    dialog_body  = {$smarty.capture.hook_creation_dialog nofilter}
+
+    dialog_ok_label     = {intl l="Create this hook"}
+    dialog_cancel_label = {intl l="Cancel"}
+
+    form_action        = {url path='/admin/hooks/create'}
+    form_enctype       = {form_enctype form=$form}
+    form_error_message = $form_error_message
+    }
+{/form}
 
 
 {* Delete confirmation dialog *}
@@ -177,29 +275,25 @@ form_content        = {$smarty.capture.delete_dialog nofilter}
         });
 
         $('.hook-native').on('switch-change', function(e, data){
-            if(data.value) {
-                $.ajax({
-                    url : "{url path='/admin/hook/toggleNative'}",
-                    data : {
-                        hook_id: $(this).data('id')
-                    }
-                }).fail(function(){
-                    $('#toggle-native-failed').modal('show');
-                });
-            }
+            $.ajax({
+                url : "{url path='/admin/hook/toggle-native'}",
+                data : {
+                    hook_id: $(this).data('id')
+                }
+            }).fail(function(){
+                $('#toggle-native-failed').modal('show');
+            });
         });
 
-        $('.hook-active').on('switch-change', function(e, data){
-            if(data.value) {
-                $.ajax({
-                    url : "{url path='/admin/hook/toggleActive'}",
-                    data : {
-                        hook_id: $(this).data('id')
-                    }
-                }).fail(function(){
-                    $('#toggle-active-failed').modal('show');
-                });
-            }
+        $('.hook-activation').on('switch-change', function(e, data){
+            $.ajax({
+                url : "{url path='/admin/hook/toggle-activation'}",
+                data : {
+                    hook_id: $(this).data('id')
+                }
+            }).fail(function(){
+                $('#toggle-active-failed').modal('show');
+            });
         });
     });
 
@@ -209,5 +303,5 @@ form_content        = {$smarty.capture.delete_dialog nofilter}
 {/block}
 
 {block name="javascript-last-call"}
-{module_include location='countries-js'}
+{module_include location='hooks-js'}
 {/block}

@@ -19,8 +19,8 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
  * @package Thelia\Form
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class HookModificationForm extends HookCreationForm {
-
+class HookModificationForm extends HookCreationForm
+{
     use StandardDescriptionFieldsTrait;
 
     protected function buildForm()
@@ -32,7 +32,7 @@ class HookModificationForm extends HookCreationForm {
         ;
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class
-        $this->addStandardDescFields(array('title', 'description', 'locale'));
+        $this->addStandardDescFields(array('title', 'postscriptum', 'locale'));
     }
 
     public function getName()
@@ -40,4 +40,4 @@ class HookModificationForm extends HookCreationForm {
         return "thelia_hook_modification";
     }
 
-} 
+}

@@ -767,6 +767,7 @@
     <column name="classname" size="255" type="VARCHAR" />
     <column name="method" size="255" type="VARCHAR" />
     <column name="active" required="true" type="BOOLEAN" />
+    <column name="hook_active" required="true" type="BOOLEAN" />
     <column name="module_active" required="true" type="BOOLEAN" />
     <column name="position" required="true" type="INTEGER" />
     <index name="idx_module_hook_active">

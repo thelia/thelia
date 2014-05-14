@@ -122,7 +122,6 @@ class Thelia extends Kernel
     {
         // Get template path
         $templateDirectory = $module->getAbsoluteTemplateDirectoryPath($templateSubdirName);
-        Tlog::getInstance()->debug(" GU _HOOK_ template " . $module->getCode() . " " . $templateDirectory);
         try {
             $templateDirBrowser = new \DirectoryIterator($templateDirectory);
 
@@ -133,10 +132,6 @@ class Thelia extends Kernel
 
                 /* is it a directory which is not . or .. ? */
                 if ($templateDirContent->isDir() && ! $templateDirContent->isDot()) {
-
-                    /*Tlog::getInstance()->debug(" GU _HOOK_ template 2 " . $templateType . " " . $templateDirContent->getFilename() . ' ' .
-                        $templateDirContent->getPathName() . ' ' .
-                        $code);*/
 
                     $parser->addMethodCall(
                         'addTemplateDirectory',

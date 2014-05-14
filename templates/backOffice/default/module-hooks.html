@@ -1,8 +1,8 @@
 {extends file="admin-layout.tpl"}
 
-{block name="page-title"}{intl l='Hooks'}{/block}
+{block name="page-title"}{intl l='Hooks position'}{/block}
 
-{block name="check-resource"}admin.hook{/block}
+{block name="check-resource"}admin.module-hook{/block}
 {block name="check-access"}view{/block}
 
 {block name="main-content"}
@@ -13,14 +13,9 @@
         <div class="clearfix">
             <ul class="breadcrumb pull-left">
                 <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
-                <li>{intl l="Hooks"}</li>
+                <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                <li>{intl l="Hooks position"}</li>
             </ul>
-{*            {loop type="auth" name="can_create" role="ADMIN" resource="admin.module" access="UPDATE"}
-                <a class="btn btn-default btn-primary pull-right" title="{intl l='add a new hook'}" href="#add_dialog" data-toggle="modal">
-                    <span class="glyphicon glyphicon-import"></span> {intl l="Add a new module"}
-                </a>
-            {/loop}
-*}
         </div>
 
         <div class="general-block-decorator ">

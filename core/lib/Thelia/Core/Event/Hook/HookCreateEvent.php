@@ -12,37 +12,19 @@
 
 namespace Thelia\Core\Event\Hook;
 
-
-
 /**
  * Class HookCreateEvent
  * @package Thelia\Core\Event\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class HookCreateEvent extends HookEvent {
-
+class HookCreateEvent extends HookEvent
+{
     protected $locale;
-    protected $title;
-    protected $description;
+    protected $code;
     protected $type;
+    protected $title;
     protected $native;
-
-    /**
-     * @param mixed $description
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
+    protected $active;
 
     /**
      * @param mixed $locale
@@ -50,6 +32,7 @@ class HookCreateEvent extends HookEvent {
     public function setLocale($locale)
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -67,6 +50,7 @@ class HookCreateEvent extends HookEvent {
     public function setNative($native)
     {
         $this->native = $native;
+
         return $this;
     }
 
@@ -84,6 +68,7 @@ class HookCreateEvent extends HookEvent {
     public function setTitle($title)
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -101,6 +86,7 @@ class HookCreateEvent extends HookEvent {
     public function setType($type)
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -112,5 +98,40 @@ class HookCreateEvent extends HookEvent {
         return $this->type;
     }
 
+    /**
+     * @param mixed $active
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
 
-} 
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param mixed $code
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+}

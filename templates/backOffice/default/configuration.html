@@ -189,6 +189,18 @@
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/advanced'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
+                                {loop type="auth" name="pcc10" role="ADMIN" resource="admin.hook" access="VIEW"}
+                                <tr>
+                                    <td><a href="{url path='/admin/hooks'}">{intl l='Hooks'}</a></td>
+                                    <td><a class="btn btn-default btn-xs" href="{url path='/admin/hooks'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                </tr>
+                                {/loop}
+                                {loop type="auth" name="pcc11" role="ADMIN" resource="admin.module-hook" access="VIEW"}
+                                <tr>
+                                    <td><a href="{url path='/admin/module-hooks'}">{intl l='Hooks position'}</a></td>
+                                    <td><a class="btn btn-default btn-xs" href="{url path='/admin/module-hooks'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                </tr>
+                                {/loop}
                                 {module_include location='system_configuration_bottom'}
                             </table>
                         </div>

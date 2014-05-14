@@ -14,6 +14,7 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Thelia\Log\Tlog;
 use Thelia\Model\HookQuery;
 use Thelia\Model\ModuleHookQuery;
@@ -86,12 +87,10 @@ class RegisterListenersPass implements CompilerPassInterface
             $module = null;
             if (array_key_exists('module', $properties)) {
                 $moduleCode = explode(".", $properties['module'])[1];
-                //Tlog::getInstance()->addDebug("_HOOK_ addListenerService :: module = " . $moduleCode );
                 if (null !== $module = ModuleQuery::create()->findOneByCode($moduleCode)) {
                     $module = $module->getId();
                 }
             }
-            Tlog::getInstance()->addDebug(" GU _HOOK_ addListenerService :: module = " . print_r($module, true));
 
             foreach ($events as $event) {
 
@@ -102,8 +101,12 @@ class RegisterListenersPass implements CompilerPassInterface
                 }
 
                 $hook = HookQuery::create()->findOneByCode($event['event']);
-                if (null === $hook){
+                if (null === $hook) {
                     Tlog::getInstance()->addAlert(sprintf("Hook %s is unknow.", $event['event']));
+                    continue;
+                }
+                if (! $hook->getActivate()) {
+                    Tlog::getInstance()->addAlert(sprintf("Hook %s is not activated.", $event['event']));
                     continue;
                 }
 
@@ -129,6 +132,7 @@ class RegisterListenersPass implements CompilerPassInterface
                         ->setClassname($id)
                         ->setMethod($event['method'])
                         ->setActive(true)
+                        ->setHookActive(true)
                         ->setModuleActive(true)
                         ->setPosition(ModuleHook::MAX_POSITION)
                         ->save();
@@ -137,6 +141,13 @@ class RegisterListenersPass implements CompilerPassInterface
         }
 
         // now we can add listeners for active hooks and active module
+        $this->addHooksMethodCall($definition);
+
+    }
+
+
+    protected function addHooksMethodCall(Definition $definition){
+
         $moduleHooks = ModuleHookQuery::create()
             //->filterByActive(true)
             //->filterByModuleActive(true)
@@ -164,7 +175,6 @@ class RegisterListenersPass implements CompilerPassInterface
             }
             // Add the the new listener for active hooks, we have to reverse the priority and the position
             if ($moduleHook->getActive() && $moduleHook->getModuleActive()) {
-                Tlog::getInstance()->addDebug(" GU _HOOK_ addListenerService");
                 $definition->addMethodCall('addListenerService',
                     array(
                         'hook.' . $moduleHook->getHook()->getCode(),

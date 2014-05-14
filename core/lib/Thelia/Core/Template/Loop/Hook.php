@@ -66,7 +66,7 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
                 new TypeCollection(
                     new Type\EnumListType(array('id', 'id_reverse', 'code', 'code_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'enabled', 'enabled_reverse'))
                 ),
-                'manual'
+                'id'
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanOrBothTypeArgument('active', Type\BooleanOrBothType::ANY)

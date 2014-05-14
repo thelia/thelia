@@ -13,7 +13,6 @@
 namespace Thelia\Core\Hook;
 use Thelia\Core\Template\Smarty\SmartyParser;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Log\Tlog;
 use Thelia\Module\BaseModule;
 
 /**
@@ -46,14 +45,11 @@ abstract class BaseHook
         $templateDefinition = $smartyParser->getTemplateDefinition(false);
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
 
-        Tlog::getInstance()->debug(sprintf(" GU %s", print_r($templateDirectories, true) ));
-
         if (isset($templateDirectories[$templateDefinition->getName()]["0"])) {
             $templatePath = $templateDirectories[$templateDefinition->getName()]["0"]
                 . DS . TemplateDefinition::HOOK_OVERRIDE_SUBDIR
                 . DS . $this->module->getCode()
                 . DS . $templateName;
-            Tlog::getInstance()->debug(sprintf(" GU PATH1 %s", print_r($templatePath, true) ));
             if (! file_exists($templatePath)) {
                 $templatePath = null;
             }
@@ -65,7 +61,6 @@ abstract class BaseHook
             if (isset($templateDirectories[$templateDefinition->getName()][$this->module->getCode()])) {
                 $templatePath = $templateDirectories[$templateDefinition->getName()][$this->module->getCode()]
                     . DS . $templateName;
-                Tlog::getInstance()->debug(sprintf(" GU PATH2 %s", print_r($templatePath, true) ));
                 if (! file_exists($templatePath)) {
                     $templatePath = null;
                 }
@@ -78,7 +73,6 @@ abstract class BaseHook
                 && isset($templateDirectories[TemplateDefinition::HOOK_DEFAULT_THEME][$this->module->getCode()])) {
                 $templatePath = $templateDirectories[TemplateDefinition::HOOK_DEFAULT_THEME][$this->module->getCode()]
                     . DS . $templateName;
-                Tlog::getInstance()->debug(sprintf(" GU PATH3 %s", print_r($templatePath, true) ));
                 if (! file_exists($templatePath)) {
                     $templatePath = null;
                 }

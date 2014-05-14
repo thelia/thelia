@@ -1057,12 +1057,12 @@
         <default key="_controller">Thelia\Controller\Admin\HookController::createAction</default>
     </route>
 
-    <route id="admin.hook.update" path="/admin/hook/update/{country_id}">
+    <route id="admin.hook.update" path="/admin/hook/update/{hook_id}">
         <default key="_controller">Thelia\Controller\Admin\HookController::updateAction</default>
         <requirement key="hook_id">\d+</requirement>
     </route>
 
-    <route id="admin.hook.save" path="/admin/hook/save/{country_id}">
+    <route id="admin.hook.save" path="/admin/hook/save/{hook_id}">
         <default key="_controller">Thelia\Controller\Admin\HookController::processUpdateAction</default>
         <requirement key="hook_id">\d+</requirement>
     </route>
@@ -1071,13 +1071,12 @@
         <default key="_controller">Thelia\Controller\Admin\HookController::deleteAction</default>
     </route>
 
-    <route id="admin.hook.toggle-activation" path="/admin/hook/toggle-activation/{module_hook_id}">
-        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::toggleActivationAction</default>
-        <requirement key="hook_id">\d+</requirement>
+    <route id="admin.hook.toggle-activation" path="/admin/hook/toggle-activation">
+        <default key="_controller">Thelia\Controller\Admin\HookController::toggleActivationAction</default>
     </route>
 
-    <route id="admin.hook.update-position" path="/admin/hook/update-position">
-        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::updatePositionAction</default>
+    <route id="admin.hook.toggle-native" path="/admin/hook/toggle-native">
+        <default key="_controller">Thelia\Controller\Admin\HookController::toggleNativeAction</default>
     </route>
 
     <route id="admin.module-hook" path="/admin/module-hooks">

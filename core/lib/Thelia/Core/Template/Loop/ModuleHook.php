@@ -22,7 +22,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 //use Thelia\Module\BaseModule;
-use Thelia\Log\Tlog;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
@@ -55,6 +54,7 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanOrBothTypeArgument('active', Type\BooleanOrBothType::ANY),
+            Argument::createBooleanOrBothTypeArgument('hook_active', Type\BooleanOrBothType::ANY),
             Argument::createBooleanOrBothTypeArgument('module_active', Type\BooleanOrBothType::ANY)
         );
     }
@@ -86,6 +86,11 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
         $active = $this->getActive();
         if ($active !== Type\BooleanOrBothType::ANY) {
             $search->filterByActive($active, Criteria::EQUAL);
+        }
+
+        $hookActive = $this->getHook_active();
+        if ($hookActive !== Type\BooleanOrBothType::ANY) {
+            $search->filterByHookActive($hookActive, Criteria::EQUAL);
         }
 
         $moduleActive = $this->getModule_active();
@@ -124,7 +129,6 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
              }
         }
 
-        Tlog::getInstance()->debug(sprintf(" GU loop mh %s",$search ));
         return $search;
 
     }
@@ -145,6 +149,7 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
                     ->set("MODULE_TITLE" , $moduleHook->getModule()->getTitle())
                     ->set("CLASSNAME"    , $moduleHook->getClassname())
                     ->set("ACTIVE"       , $moduleHook->getActive())
+                    ->set("HOOK_ACTIVE"  , $moduleHook->getHookActive())
                     ->set("MODULE_ACTIVE", $moduleHook->getModuleActive())
                     ->set("POSITION"     , $moduleHook->getPosition())
                 ;

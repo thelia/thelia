@@ -13,6 +13,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -34,26 +35,35 @@ class HookCreationForm extends BaseForm
                     "for" => "code"
                 )
             ))
-            ->add("type", "integer", array(
+            ->add("locale", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label_attr" => array("for" => "locale_create")
+            ))
+            ->add("type", "choice", array(
+                "choices" => array(
+                    TemplateDefinition::FRONT_OFFICE => Translator::getInstance()->trans("Front Office"),
+                    TemplateDefinition::BACK_OFFICE => Translator::getInstance()->trans("Back Office"),
+                    TemplateDefinition::EMAIL => Translator::getInstance()->trans("email"),
+                    TemplateDefinition::PDF => Translator::getInstance()->trans("pdf"),
+                ),
+                "constraints" => array(
+                    new NotBlank()
+                ),
                 "label" => Translator::getInstance()->trans("Type"),
                 "label_attr" => array(
                     "for" => "type"
                 )
             ))
-            ->add("native", "integer", array(
+            ->add("native", "checkbox", array(
                 "label" => Translator::getInstance()->trans("Native"),
                 "label_attr" => array(
                     "for" => "native"
                 )
             ))
-            ->add("native", "integer", array(
-                "label" => Translator::getInstance()->trans("Native"),
-                "label_attr" => array(
-                    "for" => "native"
-                )
-            ))
-            ->add("active", "integer", array(
-                "label" => Translator::getInstance()->trans("Native"),
+            ->add("active", "checkbox", array(
+                "label" => Translator::getInstance()->trans("Active"),
                 "label_attr" => array(
                     "for" => "active"
                 )
@@ -67,14 +77,6 @@ class HookCreationForm extends BaseForm
                     "for" => "title"
                 )
             ))
-            ->add("description", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Description"),
-                "label_attr" => array("for" => "desciption")
-            ))
-
         ;
     }
 

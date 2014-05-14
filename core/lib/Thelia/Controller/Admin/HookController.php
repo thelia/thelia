@@ -14,12 +14,15 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\Hook\HookCreateEvent;
 use Thelia\Core\Event\Hook\HookDeleteEvent;
+use Thelia\Core\Event\Hook\HookToggleActivationEvent;
+use Thelia\Core\Event\Hook\HookToggleNativeEvent;
 use Thelia\Core\Event\Hook\HookUpdateEvent;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Form\HookCreationForm;
 use Thelia\Form\HookModificationForm;
+use Thelia\Log\Tlog;
 use Thelia\Model\HookQuery;
 
 /**
@@ -43,6 +46,12 @@ class HookController extends AbstractCrudController
             TheliaEvents::HOOK_UPDATE,
             TheliaEvents::HOOK_DELETE
         );
+    }
+
+    public function indexAction()
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::HOOK, array(), AccessManager::VIEW)) return $response;
+        return $this->renderList();
     }
 
     /**
@@ -73,9 +82,11 @@ class HookController extends AbstractCrudController
             'code' => $object->getCode(),
             'type' => $object->getType(),
             'native' => $object->getNative(),
+            'active' => $object->getActivate(),
             'locale' => $object->getLocale(),
             'title' => $object->getTitle(),
-            'description' => $object->getTitle(),
+            'chapo' => $object->getChapo(),
+            'description' => $object->getDescription(),
         );
 
         return new HookModificationForm($this->getRequest(), 'form', $data);
@@ -102,19 +113,23 @@ class HookController extends AbstractCrudController
     {
         $event = new HookUpdateEvent($formData['id']);
 
-        return $this->hydrateEvent($event, $formData);
+        return $this->hydrateEvent($event, $formData, true);
     }
 
-    protected function hydrateEvent($event, $formData)
+    protected function hydrateEvent($event, $formData, $update=false)
     {
         $event
             ->setLocale($formData['locale'])
-            ->setTitle($formData['title'])
             ->setType($formData['type'])
             ->setCode($formData['code'])
             ->setNative($formData['native'])
-            ->setDescription($formData['description'])
-        ;
+            ->setActive($formData['active'])
+            ->setTitle($formData['title']);
+        if ($update) {
+            $event
+                ->setChapo($formData['chapo'])
+                ->setDescription($formData['description']);
+        }
 
         return $event;
     }
@@ -223,7 +238,7 @@ class HookController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.hook.default');
+        $this->redirectToRoute('admin.hook');
     }
 
     public function toggleNativeAction()
@@ -240,6 +255,7 @@ class HookController extends AbstractCrudController
                 }
             } catch (\Exception $ex) {
                 $content = $ex->getMessage();
+                Tlog::getInstance()->debug(sprintf("%s", $content));
             }
         }
 
@@ -260,6 +276,7 @@ class HookController extends AbstractCrudController
                 }
             } catch (\Exception $ex) {
                 $content = $ex->getMessage();
+                Tlog::getInstance()->debug(sprintf("%s", $content));
             }
         }
 

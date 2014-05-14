@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\Hook\HookFragmentInterface;
 
 /**
- * Class HookEvent
+ * Class HookRenderEvent
  * @package Thelia\Core\Event\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */

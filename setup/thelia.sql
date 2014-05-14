@@ -905,6 +905,7 @@ CREATE TABLE `module_hook`
     `classname` VARCHAR(255),
     `method` VARCHAR(255),
     `active` TINYINT(1) NOT NULL,
+    `hook_active` TINYINT(1) NOT NULL,
     `module_active` TINYINT(1) NOT NULL,
     `position` INTEGER NOT NULL,
     PRIMARY KEY (`id`),

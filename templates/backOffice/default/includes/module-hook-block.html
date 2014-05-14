@@ -10,16 +10,18 @@
         </thead>
         <tbody>
             {loop type="module_hook" name="hook.{$hook_id}" hook="{$hook_id}" backend_context=1}
+            {assign var="visible" value="{if $MODULE_ACTIVE && $HOOK_ACTIVE}{if $ACTIVE}1{else}0{/if}{else}0{/if}" }
             <tr class="hook-module {if ! $MODULE_ACTIVE}inactive{/if}"
-                data-visible="{if $MODULE_ACTIVE}{if $ACTIVE}1{else}0{/if}{else}0{/if}"
+                data-visible="{$visible}"
                 data-active="{if $ACTIVE}1{else}0{/if}"
+                data-hook-active="{if $HOOK_ACTIVE}1{else}0{/if}"
                 data-module-active="{if $MODULE_ACTIVE}1{else}0{/if}"
                 data-module-id="{$MODULE_ID}"
                 >
                 <td>{$ID}</td>
                 <td>{$MODULE_TITLE}</td>
                 <td class="text-center">
-                    {if $MODULE_ACTIVE}
+                    {if $MODULE_ACTIVE && $HOOK_ACTIVE}
                     <div class="make-switch switch-small module-hook-activation" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
                         <input type="checkbox" {if $ACTIVE}checked{/if}>
                     </div>

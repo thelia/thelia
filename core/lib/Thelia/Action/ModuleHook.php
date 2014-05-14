@@ -16,6 +16,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
+use Thelia\Core\Event\Hook\HookCreateEvent;
+use Thelia\Core\Event\Hook\HookToggleActivationEvent;
+use Thelia\Core\Event\Hook\HookUpdateEvent;
 use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
@@ -47,10 +50,9 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
     public function toggleModuleActivation(ModuleToggleActivationEvent $event)
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
-            Tlog::getInstance()->debug(sprintf(" GU %s %s", "toggle Module activation", $event->getModuleId()));
             ModuleHookQuery::create()
                 ->filterByModuleId($module->getId())
-                ->update(array('ModuleActive' => ! ($module->getActivate() == BaseModule::IS_ACTIVATED)));
+                ->update(array('ModuleActive' => ($module->getActivate() == BaseModule::IS_ACTIVATED)));
         }
 
         return $event;
@@ -67,7 +69,7 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
         return $event;
     }
 
-    public function toggleHookActivation(ModuleHookToggleActivationEvent $event)
+    public function toggleModuleHookActivation(ModuleHookToggleActivationEvent $event)
     {
         if (null !== $moduleHook = $event->getModuleHook()) {
             if ($moduleHook->getModuleActive()) {
@@ -85,16 +87,40 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param   UpdatePositionEvent $event
-     * @return  UpdatePositionEvent $event
+     * @param  UpdatePositionEvent $event
+     * @return UpdatePositionEvent $event
      */
-    public function updateHookPosition(UpdatePositionEvent $event)
+    public function updateModuleHookPosition(UpdatePositionEvent $event)
     {
         $this->genericUpdatePosition(ModuleHookQuery::create(), $event);
         $this->cacheClear($event->getDispatcher());
 
         return $event;
     }
+
+
+    public function updateHook(HookUpdateEvent $event)
+    {
+        if ($event->hasHook()) {
+            $hook = $event->getHook();
+            ModuleHookQuery::create()
+                ->filterByHookId($hook->getId())
+                ->update(array('HookActive' => $hook->getActivate()));
+            $this->cacheClear($event->getDispatcher());
+        }
+    }
+
+    public function toggleHookActivation(HookToggleActivationEvent $event)
+    {
+        if ($event->hasHook()) {
+            $hook = $event->getHook();
+            ModuleHookQuery::create()
+                ->filterByHookId($hook->getId())
+                ->update(array('HookActive' => $hook->getActivate()));
+            $this->cacheClear($event->getDispatcher());
+        }
+    }
+
 
     protected function cacheClear(EventDispatcherInterface $dispatcher)
     {
@@ -104,6 +130,8 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
 
         $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
     }
+
+
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -128,10 +156,15 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleModuleActivation', 256),
-            TheliaEvents::MODULE_DELETE => array('deleteModule', 256),
-            TheliaEvents::MODULE_HOOK_UPDATE_POSITION => array('updateHookPosition', 128),
-            TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION => array('toggleHookActivation', 128),
+            TheliaEvents::MODULE_HOOK_UPDATE_POSITION => array('updateModuleHookPosition', 128),
+            TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION => array('toggleModuleHookActivation', 128),
+
+            TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleModuleActivation', 64),
+            TheliaEvents::MODULE_DELETE => array('deleteModule', 64),
+
+            TheliaEvents::HOOK_TOGGLE_ACTIVATION => array('toggleHookActivation', 64),
+            TheliaEvents::HOOK_UPDATE => array('updateHook', 64),
+
         );
     }
 }
