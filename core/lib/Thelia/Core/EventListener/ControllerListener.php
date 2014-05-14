@@ -15,6 +15,8 @@ namespace Thelia\Core\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Controller\Api\BaseApiController;
@@ -64,13 +66,27 @@ class ControllerListener implements EventSubscriberInterface
 
     private function checkApiAccess(Request $request)
     {
-        $key = $request->query->get('key');
+
+        $key = $request->headers->get('authorization');
+        if (null !== $key) {
+            $key = substr($key, 6);
+        }
 
         $apiAccount = ApiQuery::create()->findOneByApiKey($key);
 
         if (null === $apiAccount) {
-            throw new AccessDeniedHttpException();
+            throw new UnauthorizedHttpException('Token');
         }
+
+        $secureKey = pack('H*', $apiAccount->getSecureKey());
+
+        $sign = hash_hmac('sha1', $request->getContent(), $secureKey);
+
+        if ($sign != $request->query->get('sign')) {
+            throw new PreconditionFailedHttpException('wrong body request signature');
+        }
+
+
     }
 
     /**

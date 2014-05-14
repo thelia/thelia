@@ -25,7 +25,7 @@ class TestController extends BaseApiController
 
     public function indexAction()
     {
-        return Response::create($this->getRequest()->getContent());
+        return Response::create("toto");
     }
 
 }
