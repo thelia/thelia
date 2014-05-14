@@ -85,20 +85,11 @@
                             </div>
                         {/form_field}
 
-                        {form_field form=$form field='isRemovingPostage'}
-                            <div class="form-group {if $error}has-error{/if}">
-                                <label for="is-removing-postage" class="checkbox control-label">
-                                    <input id="is-removing-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
-                                    {if $error}{$message}{/if}
-                                    {intl l='Provides free shipping'}
-                                </label>
-                            </div>
-                        {/form_field}
-
                         {form_field form=$form field='expirationDate'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="expiration-date" class="control-label">{intl l='Expiration date * :'}</label>
-                                <input required type="date" id="expiration-date" name="{$name}" class="form-control" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}" placeholder="{intl l='Format: %fmt, e.g. %date' fmt=$dateFormat date={$smarty.now|date_format:$dateFormat}}">
+                                {* Do not use 'date' input type, as some browsers enforce RFC339 date formats, which is not what we want *}
+                                <input required type="text" id="expiration-date" name="{$name}" class="form-control" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}" placeholder="{intl l='Format: %fmt, e.g. %date' fmt=$dateFormat date={$smarty.now|date_format:$dateFormat}}">
                                 {if $error}{$message}{/if}
                             </div>
                         {/form_field}
@@ -116,6 +107,45 @@
                                 {if $error}{$message}{/if}
                             </div>
                         {/form_field}
+
+                        {form_field form=$form field='isRemovingPostage'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="is-removing-postage" class="checkbox control-label">
+                                    <input id="is-removing-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
+                                    {if $error}{$message}{/if}
+                                    {intl l='Provides free shipping'}
+                                </label>
+                            </div>
+                        {/form_field}
+
+                        <div class="free-postage-conditions" style="display: none">
+                            {form_field form=$form field='freeShippingForCountries'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="for-countries-only">{intl l="Free shipping to countries  :"}</label>
+                                <select multiple size="5" class="form-control" id="for-countries-only" name="{$name}">
+                                    <option value="">{intl l="All countries"}</option>
+                                    {loop type="country" name="list-of-countries" order="alpha" backend_context="1"}
+                                        <option style="padding-left: {$LEVEL * 20}px" value="{$ID}">{$TITLE}</option>
+                                    {/loop}
+                                </select>
+                                <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one country'}</span>
+                            </div>
+                            {/form_field}
+
+                            {form_field form=$form field='freeShippingForModules'}
+                                <div class="form-group {if $error}has-error{/if}">
+                                    <label for="for-modules-only">{intl l="Free shipping for methods :"}</label>
+                                    <select multiple size="5" class="form-control" id="for-modules-only" name="{$name}">
+                                        <option value="">{intl l="All shipping methods"}</option>
+                                        {loop type="module" name="list-of-shipping-moddule" module_type=2 order=alpha backend_context=1}
+                                            <option value="{$ID}">{$TITLE}</option>
+                                        {/loop}
+                                    </select>
+                                    <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one shipping method'}</span>
+                                </div>
+                            {/form_field}
+                        </div>
+
                     </div>
 
                     <div class="col-md-3">
