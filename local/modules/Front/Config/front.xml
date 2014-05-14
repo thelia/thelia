@@ -247,6 +247,6 @@
     <route id="default" path="/{_view}">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">index</default>
-        <requirement key="_view">^(?!admin)[^/]+</requirement>
+        <requirement key="_view">^(?!admin|api)[^/]+</requirement>
     </route>
 </routes>

@@ -83,15 +83,6 @@ class ControllerResolver extends BaseControllerResolver
             $controller->setContainer($this->container);
         }
 
-        //check if an admin is logged in
-        if ($controller instanceof BaseAdminController) {
-            $securityContext = $this->container->get('thelia.securityContext');
-            $request = $this->container->get('request');
-            if (false === $securityContext->hasAdminUser() && $request->attributes->get('not-logged') != 1) {
-                throw new AdminAccessDenied();
-            }
-        }
-
         return array($controller, $method);
     }
 }
