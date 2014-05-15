@@ -8,4 +8,8 @@
         <default key="_controller">Thelia\Controller\Api\IndexController::indexAction</default>
         <default key="not-logged">1</default>
     </route>
+
+    <route id="api.customer.list" path="/api/customers" methods="get">
+        <default key="_controller">Thelia\Controller\Api\CustomerController::listAction</default>
+    </route>
 </routes>

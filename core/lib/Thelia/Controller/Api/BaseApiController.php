@@ -12,9 +12,11 @@
 
 namespace Thelia\Controller\Api;
 
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Controller\a;
 use Thelia\Controller\BaseController;
-use Thelia\Controller\the;
+use Thelia\Core\HttpFoundation\Response;
+use Thelia\Model\Api;
 
 
 /**
@@ -25,38 +27,66 @@ use Thelia\Controller\the;
 class BaseApiController extends BaseController
 {
 
+    protected $apiUser;
+
+    protected function checkAuth($resources, $modules, $accesses)
+    {
+        $resources = is_array($resources) ? $resources : array($resources);
+        $modules = is_array($modules) ? $modules : array($modules);
+        $accesses = is_array($accesses) ? $accesses : array($accesses);
+
+        if (true !== $this->getSecurityContext()->isUserGranted(array("API"), $resources, $modules, $accesses, $this->getApiUser()))
+        {
+            throw new AccessDeniedHttpException();
+        }
+    }
+
+    public function setApiUser(Api $apiUser)
+    {
+        $this->apiUser = $apiUser;
+    }
+
+    public function getApiUser()
+    {
+        return $this->apiUser;
+    }
+
     /**
      * @return a ParserInterface instance parser
      */
     protected function getParser($template = null)
     {
-        // TODO: Implement getParser() method.
+        throw new \RuntimeException("The parser is not available here");
     }
 
     /**
      * Render the given template, and returns the result as an Http Response.
      *
-     * @param $templateName the complete template name, with extension
+     * @param $content
      * @param  array $args the template arguments
      * @param  int $status http code status
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    protected function render($templateName, $args = array(), $status = 200)
+    protected function render($content, $args = array(), $status = 200, $headers = array())
     {
-        // TODO: Implement render() method.
+        return Response::create($this->renderRaw($content), $status, $headers);
     }
 
     /**
      * Render the given template, and returns the result as a string.
      *
-     * @param $templateName the complete template name, with extension
+     * @param $content
      * @param array $args the template arguments
      * @param null $templateDir
      *
      * @return string
      */
-    protected function renderRaw($templateName, $args = array(), $templateDir = null)
+    protected function renderRaw($content, $args = array(), $templateDir = null)
     {
-        // TODO: Implement renderRaw() method.
+        if (is_array($content)) {
+            $content = json_encode($content);
+        }
+
+        return $content;
     }
 }

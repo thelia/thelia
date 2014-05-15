@@ -58,9 +58,11 @@ class ControllerListener implements EventSubscriberInterface
         $controller = $event->getController();
 
         if($controller[0] instanceof BaseApiController && $event->getRequest()->attributes->get('not-logged') != 1) {
-            $this->checkApiAccess(
+            $apiAccount = $this->checkApiAccess(
                 $event->getRequest()
             );
+
+            $controller[0]->setApiUser($apiAccount);
         }
     }
 
@@ -86,7 +88,7 @@ class ControllerListener implements EventSubscriberInterface
             throw new PreconditionFailedHttpException('wrong body request signature');
         }
 
-
+        return $apiAccount;
     }
 
     /**
