@@ -93,7 +93,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
     protected function displayException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
-        $event->setResponse(new Response($exception->getMessage(), $exception->getStatusCode()));
+        $event->setResponse(new Response($exception->getMessage(), $exception->getStatusCode(), $exception->getHeaders()));
     }
 
     /**
