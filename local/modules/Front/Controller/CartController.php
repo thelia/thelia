@@ -177,7 +177,7 @@ class CartController extends BaseFrontController
             $deliveryAddress = AddressQuery::create()->findPk($order->chosenDeliveryAddress);
 
             if (null !== $deliveryModule && null !== $deliveryAddress) {
-                $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
+                $moduleInstance = $deliveryModule->getModuleInstance($this->container);
 
                 $orderEvent = new OrderEvent($order);
 

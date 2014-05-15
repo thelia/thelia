@@ -3,10 +3,12 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\Base\Module as BaseModule;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 use Thelia\Model\Tools\PositionManagementTrait;
+use Thelia\Module\BaseModuleInterface;
 
 class Module extends BaseModule
 {
@@ -182,6 +184,21 @@ class Module extends BaseModule
         return $moduleReflection->implementsInterface("Thelia\Module\PaymentModuleInterface");
     }
 
+    /**
+     * @param ContainerInterface $container the Thelia container
+     * @return BaseModuleInterface a module instance
+     * @throws \InvalidArgumentException if the module could not be found in the container/
+     */
+    public function getModuleInstance(ContainerInterface $container) {
+
+        $instance = $this->container->get(sprintf('module.%s', $this->getCode()));
+
+        if ($instance == null) {
+            throw new \InvalidArgumentException(sprintf('Undefined module in container: "%s"', $this->getCode()));
+        }
+
+        return $instance;
+    }
     /**
      * @return BaseModule a new module instance.
      */
