@@ -23,15 +23,15 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Log\Tlog;
 use Thelia\Model\Base\CustomerQuery;
+use Thelia\Model\Base\ProductSaleElementsQuery;
+use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\CartItem;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\ProductSaleElements;
-use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Tools\ProductPriceTools;
 use Thelia\Tools\TokenProvider;
 
