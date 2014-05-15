@@ -178,7 +178,9 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 $coupon->getIsAvailableOnSpecialOffers(),
                 $coupon->getIsEnabled(),
                 $coupon->getMaxUsage(),
-                $coupon->getExpirationDate()
+                $coupon->getExpirationDate(),
+                $coupon->getFreeShippingForCountries(),
+                $coupon->getFreeShippingForModules()
             );
 
             $cleanedConditions = array();

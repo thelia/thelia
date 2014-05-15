@@ -32,6 +32,8 @@ use Thelia\Form\CouponCreationForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Coupon;
+use Thelia\Model\CouponCountry;
+use Thelia\Model\CouponModule;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Tools\Rest\ResponseRest;
@@ -152,6 +154,21 @@ class CouponController extends BaseAdminController
                 $coupon->getSerializedConditions()
             );
 
+            $freeShippingForCountries = $freeShippingForModules = [];
+
+            /** @var CouponCountry $item */
+            foreach($coupon->getFreeShippingForCountries() as $item) {
+                $freeShippingForCountries[] = $item->getCountryId();
+            }
+
+            /** @var CouponModule $item */
+            foreach($coupon->getFreeShippingForModules() as $item) {
+                $freeShippingForModules[] = $item->getModuleId();
+            }
+
+            if (empty($freeShippingForCountries)) $freeShippingForCountries[] = 0;
+            if (empty($freeShippingForModules)) $freeShippingForModules[] = 0;
+
             $data = [
                 'code' => $coupon->getCode(),
                 'title' => $coupon->getTitle(),
@@ -167,6 +184,8 @@ class CouponController extends BaseAdminController
                 'maxUsage' => $coupon->getMaxUsage(),
                 'conditions' => $conditions,
                 'locale' => $this->getCurrentEditionLocale(),
+                'freeShippingForCountries' => $freeShippingForCountries,
+                'freeShippingForModules' => $freeShippingForModules
             ];
 
             $args['conditions'] = $this->cleanConditionForTemplate($conditions);
@@ -557,7 +576,7 @@ class CouponController extends BaseAdminController
             $condition['serviceId'] = $availableCoupon->getServiceId();
             $condition['name'] = $availableCoupon->getName();
             $condition['toolTip'] = $availableCoupon->getToolTip();
-            $condition['inputName'] = $availableCoupon->getInputName();
+            // $condition['inputName'] = $availableCoupon->getInputName();
             $cleanedCoupons[] = $condition;
         }
 
@@ -702,7 +721,7 @@ class CouponController extends BaseAdminController
         $couponManager = $this->container->get($serviceId);
         $effects = [CouponAbstract::INPUT_AMOUNT_NAME => $data[CouponAbstract::INPUT_AMOUNT_NAME]];
         $effects = $this->addExtendedLogic($effects, $couponManager->getExtendedInputs());
-
+var_dump($data);
         $couponEvent = new CouponCreateOrUpdateEvent(
             $data['code'],
             $serviceId,
@@ -716,7 +735,9 @@ class CouponController extends BaseAdminController
             $data['isCumulative'],
             $data['isRemovingPostage'],
             $data['maxUsage'],
-            $data['locale']
+            $data['locale'],
+            $data['freeShippingForCountries'],
+            $data['freeShippingForModules']
         );
 
         // If Update mode
@@ -774,7 +795,9 @@ class CouponController extends BaseAdminController
             $coupon->getIsCumulative(),
             $coupon->getIsRemovingPostage(),
             $coupon->getMaxUsage(),
-            $coupon->getLocale()
+            $coupon->getLocale(),
+            $coupon->getFreeShippingForCountries(),
+            $coupon->getFreeShippingForModules()
         );
         $couponEvent->setCouponModel($coupon);
         $couponEvent->setConditions($conditions);

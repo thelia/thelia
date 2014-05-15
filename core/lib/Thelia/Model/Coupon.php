@@ -25,6 +25,8 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\Coupon as BaseCoupon;
+use Thelia\Model\Base\CouponCountryQuery;
+use Thelia\Model\Base\CouponModuleQuery;
 use Thelia\Model\Exception\InvalidArgumentException;
 use Thelia\Model\Map\CouponTableMap;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
@@ -127,11 +129,13 @@ class Coupon extends BaseCoupon
                 ;
             }
 
+            $con->commit();
+
         } catch (\Exception $ex) {
 
-        $con->rollback();
+            $con->rollback();
 
-        throw $ex;
+            throw $ex;
         }
     }
 
@@ -247,5 +251,22 @@ class Coupon extends BaseCoupon
         $effects = json_encode($unserializedEffects);
 
         return $effects;
+    }
+
+    /**
+     * Return the countries for which free shipping is valid
+     * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
+     */
+    public function getFreeShippingForCountries() {
+        return CouponCountryQuery::create()->filterByCouponId($this->getId())->find();
+    }
+
+    /**
+     * Return the modules for which free shipping is valid
+     *
+     * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
+     */
+    public function getFreeShippingForModules() {
+        return CouponModuleQuery::create()->filterByCouponId($this->getId())->find();
     }
 }

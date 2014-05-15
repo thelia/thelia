@@ -15,7 +15,14 @@ namespace Thelia\Coupon;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Log\Tlog;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\Base\CouponModule;
 use Thelia\Model\Coupon;
+use Thelia\Model\CouponCountry;
+use Thelia\Model\Order;
+use Thelia\Model\OrderAddress;
+use Thelia\Model\OrderAddressQuery;
 
 /**
  * Manage how Coupons could interact with a Checkout
@@ -78,9 +85,10 @@ class CouponManager
      * Check if there is a Coupon removing Postage
      * @return bool
      */
-    public function isCouponRemovingPostage()
+    public function isCouponRemovingPostage(Order $order)
     {
         $coupons = $this->facade->getCurrentCoupons();
+
         if (count($coupons) == 0) {
             return false;
         }
@@ -89,7 +97,60 @@ class CouponManager
 
         /** @var CouponInterface $coupon */
         foreach ($couponsKept as $coupon) {
+
             if ($coupon->isRemovingPostage()) {
+
+                 // Check if delivery country is on the list of countries for which delivery is free
+                // If the list is empty, the shipping is free for all countries.
+                $couponCountries = $coupon->getFreeShippingForCountries();
+
+                if (! $couponCountries->isEmpty()) {
+
+                    if (null === $deliveryAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress())) {
+                        continue;
+                    }
+
+                    $countryValid = false;
+
+                    $deliveryCountryId = $deliveryAddress->getCountryId();
+
+                    /** @var CouponCountry $couponCountry */
+                    foreach($couponCountries as $couponCountry) {
+                        if ($deliveryCountryId == $couponCountry->getCountryId()) {
+                            $countryValid = true;
+                            break;
+                        }
+                    }
+
+                    if (! $countryValid) {
+                        continue;
+                    }
+                }
+
+                // Check if shipping method is on the list of methods for which delivery is free
+                // If the list is empty, the shipping is free for all methods.
+                $couponModules = $coupon->getFreeShippingForModules();
+
+                if (! $couponModules->isEmpty()) {
+
+                    $moduleValid = false;
+
+                    $shippingModuleId = $order->getDeliveryModuleId();
+
+                    /** @var CouponModule $couponModule */
+                    foreach($couponModules as $couponModule) {
+                        if ($shippingModuleId == $couponModule->getModuleId()) {
+                            $moduleValid = true;
+                            break;
+                        }
+                    }
+
+                    if (! $moduleValid) {
+                        continue;
+                    }
+                }
+
+                // All conditions are met, the shipping is free !
                 return true;
             }
         }

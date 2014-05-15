@@ -73,6 +73,12 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /** @var string Language code ISO (ex: fr_FR) */
     protected $locale = null;
 
+    /** @var array ID of Countries to which shipping is free */
+    protected $freeShippingForCountries;
+
+    /** @var  array ID of Shipping modules for which shipping is free */
+    protected $freeShippingForMethods;
+
     /**
      * Constructor
      *
@@ -91,8 +97,13 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param boolean   $isRemovingPostage          Is removing Postage
      * @param int       $maxUsage                   Coupon quantity
      * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
+     * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
+     * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
      */
-    public function __construct($code, $serviceId, $title, array $effects, $shortDescription, $description, $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $isRemovingPostage, $maxUsage, $locale)
+    public function __construct(
+        $code, $serviceId, $title, array $effects, $shortDescription, $description,
+        $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative,
+        $isRemovingPostage, $maxUsage, $locale, $freeShippingForCountries, $freeShippingForMethods)
     {
         $this->code = $code;
         $this->description = $description;
@@ -107,6 +118,44 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         $this->serviceId = $serviceId;
         $this->locale = $locale;
         $this->setEffects($effects);
+        $this->freeShippingForCountries = $freeShippingForCountries;
+        $this->freeShippingForMethods = $freeShippingForMethods;
+    }
+
+    /**
+     * @param array $freeShippingForCountries
+     * @return $this
+     */
+    public function setFreeShippingForCountries($freeShippingForCountries)
+    {
+        $this->freeShippingForCountries = $freeShippingForCountries;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFreeShippingForCountries()
+    {
+        return $this->freeShippingForCountries;
+    }
+
+    /**
+     * @param array $freeShippingForMethods
+     * @return $this
+     */
+    public function setFreeShippingForMethods($freeShippingForMethods)
+    {
+        $this->freeShippingForMethods = $freeShippingForMethods;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFreeShippingForMethods()
+    {
+        return $this->freeShippingForMethods;
     }
 
     /**

@@ -12,8 +12,11 @@
 
 namespace Thelia\Coupon\Type;
 
+use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
+use Thelia\Model\CouponCountry;
+use Thelia\Model\CouponModule;
 
 /**
  * Represents a Coupon ready to be processed in a Checkout process
@@ -30,13 +33,6 @@ interface CouponInterface
      * @return string
      */
     public function getName();
-
-    /**
-     * Get I18n amount input name
-     *
-     * @return string
-     */
-    public function getInputName();
 
     /**
      * Get I18n tooltip
@@ -68,6 +64,9 @@ interface CouponInterface
      * @param bool            $isEnabled                  False if Coupon is disabled by admin
      * @param int             $maxUsage                   How many usage left
      * @param \Datetime       $expirationDate             When the Code is expiring
+     * @param ObjectCollection $freeShippingForCountries   list of countries which shipping is free. All if empty
+     * @param ObjectCollection $freeShippingForModules     list of modules for which shipping is free. All if empty
+
      */
     public function set(
         FacadeInterface $facade,
@@ -81,7 +80,10 @@ interface CouponInterface
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        \DateTime $expirationDate);
+        \DateTime $expirationDate,
+        $freeShippingForCountries,
+        $freeShippingForModules
+    );
 
     /**
      * Return Coupon code (ex: XMAS)
@@ -218,4 +220,13 @@ interface CouponInterface
      */
     public function getExtendedInputs();
 
+    /**
+     * @return ObjectCollection list of country IDs for which shipping is free. All if empty
+     */
+    public function getFreeShippingForCountries();
+
+    /**
+     * @return ObjectCollection list of module IDs for which shipping is free. All if empty
+     */
+    public function getFreeShippingForModules();
 }

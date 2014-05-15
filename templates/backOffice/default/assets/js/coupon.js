@@ -303,5 +303,17 @@ $(function($){
         });
     };
 
+    // Shipping conditions
+    $('#is-removing-postage').change(function(ev) {
+        if ($(this).is(':checked')) {
+            $('.free-postage-conditions').stop().slideDown();
+        }
+        else {
+            $('.free-postage-conditions').stop().slideUp();
+        }
+    })
+
     $.couponManager.onUsageUnlimitedChange();
+
+    $('#is-removing-postage').change();
 });

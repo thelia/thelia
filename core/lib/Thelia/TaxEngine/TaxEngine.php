@@ -121,8 +121,8 @@ class TaxEngine
             /* is there a logged in customer ? */
             if (null !== $customer = $this->session->getCustomerUser()) {
                 if (null !== $this->session->getOrder()
-                        && null !== $this->session->getOrder()->chosenDeliveryAddress
-                        && null !== $currentDeliveryAddress = AddressQuery::create()->findPk($this->session->getOrder()->chosenDeliveryAddress)) {
+                        && null !== $this->session->getOrder()->getChoosenDeliveryAddress()
+                        && null !== $currentDeliveryAddress = AddressQuery::create()->findPk($this->session->getOrder()->getChoosenDeliveryAddress())) {
                     $this->taxCountry = $currentDeliveryAddress->getCountry();
                 } else {
                     $customerDefaultAddress = $customer->getDefaultAddress();

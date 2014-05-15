@@ -12,11 +12,13 @@
 
 namespace Thelia\Coupon\Type;
 
+use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
+use Thelia\Condition\ConditionOrganizerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Condition\ConditionCollection;
-use Thelia\Condition\ConditionOrganizerInterface;
+use Thelia\Model\CouponCountry;
+use Thelia\Model\CouponModule;
 
 /**
  * Assist in writing a CouponInterface
@@ -88,6 +90,12 @@ abstract class CouponAbstract implements CouponInterface
     /** @var bool if Coupon is available for Products already on special offers */
     protected $isAvailableOnSpecialOffers = false;
 
+    /** @var CouponCountry[] list of country IDs for which shipping is free. All if empty*/
+    protected $freeShippingForCountries = [];
+
+    /** @var CouponModule[] list of shipping module IDs for which shippiog is free. All if empty*/
+    protected $freeShippingForModules = [];
+
     /**
      * Constructor
      *
@@ -115,23 +123,7 @@ abstract class CouponAbstract implements CouponInterface
     }
 
     /**
-     * Set Coupon
-     *
-     * @param FacadeInterface $facade                     Provides necessary value from Thelia
-     * @param string          $code                       Coupon code (ex: XMAS)
-     * @param string          $title                      Coupon title (ex: Coupon for XMAS)
-     * @param string          $shortDescription           Coupon short description
-     * @param string          $description                Coupon description
-     * @param array           $effects                    Coupon effects params
-     * @param bool            $isCumulative               If Coupon is cumulative
-     * @param bool            $isRemovingPostage          If Coupon is removing postage
-     * @param bool            $isAvailableOnSpecialOffers If available on Product already
-     *                                                    on special offer price
-     * @param bool            $isEnabled                  False if Coupon is disabled by admin
-     * @param int             $maxUsage                   How many usage left
-     * @param \Datetime       $expirationDate             When the Code is expiring
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function set(
         FacadeInterface $facade,
@@ -145,7 +137,9 @@ abstract class CouponAbstract implements CouponInterface
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        \DateTime $expirationDate
+        \DateTime $expirationDate,
+        $freeShippingForCountries,
+        $freeShippingForModules
     )
     {
         $this->code = $code;
@@ -164,6 +158,9 @@ abstract class CouponAbstract implements CouponInterface
 
         $this->effects = $effects;
         $this->amount = $effects[self::INPUT_AMOUNT_NAME];
+
+        $this->freeShippingForCountries = $freeShippingForCountries;
+        $this->freeShippingForModules = $freeShippingForModules;
 
         return $this;
     }
@@ -228,6 +225,20 @@ abstract class CouponAbstract implements CouponInterface
     public function isRemovingPostage()
     {
         return $this->isRemovingPostage;
+    }
+
+    /**
+     * @return array list of country IDs for which shipping is free. All if empty
+     */
+    public function getFreeShippingForCountries() {
+        return $this->freeShippingForCountries;
+    }
+
+    /**
+     * @return array list of module IDs for which shipping is free. All if empty
+     */
+    public function getFreeShippingForModules() {
+        return $this->freeShippingForModules;
     }
 
     /**

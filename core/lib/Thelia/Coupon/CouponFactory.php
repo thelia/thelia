@@ -107,7 +107,9 @@ class CouponFactory
             $model->getIsAvailableOnSpecialOffers(),
             $model->getIsEnabled(),
             $model->getMaxUsage(),
-            $model->getExpirationDate()
+            $model->getExpirationDate(),
+            $model->getFreeShippingForCountries(),
+            $model->getFreeShippingForModules()
         );
 
         /** @var ConditionFactory $conditionFactory */

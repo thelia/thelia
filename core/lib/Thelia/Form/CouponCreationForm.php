@@ -18,7 +18,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Base\CountryI18n;
+use Thelia\Model\Base\CountryQuery;
 use Thelia\Model\Base\LangQuery;
+use Thelia\Model\Base\ModuleQuery;
+use Thelia\Model\CountryI18nQuery;
+use Thelia\Model\Module;
+use Thelia\Model\ModuleI18nQuery;
+use Thelia\Module\BaseModule;
 
 /**
  * Allow to build a form Coupon
@@ -36,6 +43,33 @@ class CouponCreationForm extends BaseForm
      */
     protected function buildForm()
     {
+        // Create countries and shipping modules list
+        $countries = [0 => '   '];
+
+        $list = CountryQuery::create()->find();
+
+        /** @var Country $item */
+        foreach($list as $item) {
+            $countries[$item->getId()] = $item->getTitle();
+        }
+
+        asort($countries);
+
+        $countries[0] = Translator::getInstance()->trans("All countries");
+
+        $modules = [0 => '   '];
+
+        $list = ModuleQuery::create()->filterByActivate(BaseModule::IS_ACTIVATED)->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->find();
+
+        /** @var Module $item */
+        foreach($list as $item) {
+            $modules[$item->getId()] = $item->getTitle();
+        }
+
+        asort($modules);
+
+        $modules[0] = Translator::getInstance()->trans("All shipping methods");
+
         $this->formBuilder
             ->add(
                 'code',
@@ -115,6 +149,22 @@ class CouponCreationForm extends BaseForm
                 'isRemovingPostage',
                 'text',
                 array()
+            )
+            ->add(
+                'freeShippingForCountries',
+                'choice',
+                array(
+                    'multiple' => true,
+                    'choices' => $countries
+                )
+            )
+            ->add(
+                'freeShippingForModules',
+                'choice',
+                array(
+                    'multiple' => true,
+                    'choices' => $modules
+                )
             )
             ->add(
                 'isAvailableOnSpecialOffers',

@@ -123,10 +123,9 @@
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="for-countries-only">{intl l="Free shipping to countries  :"}</label>
                                 <select multiple size="5" class="form-control" id="for-countries-only" name="{$name}">
-                                    <option value="">{intl l="All countries"}</option>
-                                    {loop type="country" name="list-of-countries" order="alpha" backend_context="1"}
-                                        <option style="padding-left: {$LEVEL * 20}px" value="{$ID}">{$TITLE}</option>
-                                    {/loop}
+                                    {foreach $choices as $choice}
+                                        <option value="{$choice->value}" {if in_array($choice->value, $value)}selected="selected"{/if}>{$choice->label}</option>
+                                    {/foreach}
                                 </select>
                                 <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one country'}</span>
                             </div>
@@ -136,16 +135,14 @@
                                 <div class="form-group {if $error}has-error{/if}">
                                     <label for="for-modules-only">{intl l="Free shipping for methods :"}</label>
                                     <select multiple size="5" class="form-control" id="for-modules-only" name="{$name}">
-                                        <option value="">{intl l="All shipping methods"}</option>
-                                        {loop type="module" name="list-of-shipping-moddule" module_type=2 order=alpha backend_context=1}
-                                            <option value="{$ID}">{$TITLE}</option>
-                                        {/loop}
+                                        {foreach $choices as $choice}
+                                            <option value="{$choice->value}" {if in_array($choice->value, $value)}selected="selected"{/if}>{$choice->label}</option>
+                                        {/foreach}
                                     </select>
                                     <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one shipping method'}</span>
                                 </div>
                             {/form_field}
                         </div>
-
                     </div>
 
                     <div class="col-md-3">

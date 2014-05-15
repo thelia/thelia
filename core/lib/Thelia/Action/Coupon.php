@@ -202,7 +202,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->isCumulative(),
             $event->getMaxUsage(),
             $defaultSerializedRule,
-            $event->getLocale()
+            $event->getLocale(),
+            $event->getFreeShippingForCountries(),
+            $event->getFreeShippingForMethods()
         );
 
         $event->setCouponModel($coupon);
@@ -235,8 +237,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     public function testFreePostage(OrderEvent $event)
     {
-        if ($this->couponManager->isCouponRemovingPostage()) {
-            $order = $event->getOrder();
+        $order = $event->getOrder();
+
+        if ($this->couponManager->isCouponRemovingPostage($order)) {
 
             $order->setPostage(0);
 
