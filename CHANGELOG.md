@@ -6,6 +6,7 @@
     - Cart contains product
     - Cart contains product from category
     - For specific customers
+- Free shipping can now be restricted to some countries and/or shipping methods
     
 
 #2.0.1
