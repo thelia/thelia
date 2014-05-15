@@ -191,7 +191,7 @@ class Module extends BaseModule
      */
     public function getModuleInstance(ContainerInterface $container) {
 
-        $instance = $this->container->get(sprintf('module.%s', $this->getCode()));
+        $instance = $container->get(sprintf('module.%s', $this->getCode()));
 
         if ($instance == null) {
             throw new \InvalidArgumentException(sprintf('Undefined module in container: "%s"', $this->getCode()));
