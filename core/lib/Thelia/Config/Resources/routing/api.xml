@@ -5,6 +5,7 @@
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
     <route id="api.test" path="/api">
-        <default key="_controller">Thelia\Controller\Api\TestController::indexAction</default>
+        <default key="_controller">Thelia\Controller\Api\IndexController::indexAction</default>
+        <default key="not-logged">1</default>
     </route>
 </routes>

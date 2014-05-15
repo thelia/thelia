@@ -16,16 +16,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 
 /**
- * Class TestController
+ *
+ * This controller allow to test if api server is up or down
+ *
+ * Class IndexController
  * @package Thelia\Controller\Api
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class TestController extends BaseApiController
+class IndexController extends BaseApiController
 {
 
     public function indexAction()
     {
-        return Response::create("toto");
+        return Response::create("OK");
     }
 
 }

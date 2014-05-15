@@ -57,7 +57,7 @@ class ControllerListener implements EventSubscriberInterface
     {
         $controller = $event->getController();
 
-        if($controller[0] instanceof BaseApiController) {
+        if($controller[0] instanceof BaseApiController && $event->getRequest()->attributes->get('not-logged') != 1) {
             $this->checkApiAccess(
                 $event->getRequest()
             );
