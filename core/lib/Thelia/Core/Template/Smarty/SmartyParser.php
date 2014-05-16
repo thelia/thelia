@@ -100,6 +100,16 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
+     * Return the current request or null if no request exists
+     *
+     * @return Request|null
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
      * Add a template directory to the current template list
      *
      * @param int     $templateType      the template type (a TemplateDefinition type constant)
