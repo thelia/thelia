@@ -68,6 +68,10 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModuleQuery rightJoinCouponModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CouponModule relation
  * @method     ChildModuleQuery innerJoinCouponModule($relationAlias = null) Adds a INNER JOIN clause to the query using the CouponModule relation
  *
+ * @method     ChildModuleQuery leftJoinOrderCouponModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderCouponModule relation
+ * @method     ChildModuleQuery rightJoinOrderCouponModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderCouponModule relation
+ * @method     ChildModuleQuery innerJoinOrderCouponModule($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderCouponModule relation
+ *
  * @method     ChildModuleQuery leftJoinModuleI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ModuleI18n relation
  * @method     ChildModuleQuery rightJoinModuleI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ModuleI18n relation
  * @method     ChildModuleQuery innerJoinModuleI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ModuleI18n relation
@@ -1016,6 +1020,79 @@ abstract class ModuleQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related \Thelia\Model\OrderCouponModule object
+     *
+     * @param \Thelia\Model\OrderCouponModule|ObjectCollection $orderCouponModule  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildModuleQuery The current query, for fluid interface
+     */
+    public function filterByOrderCouponModule($orderCouponModule, $comparison = null)
+    {
+        if ($orderCouponModule instanceof \Thelia\Model\OrderCouponModule) {
+            return $this
+                ->addUsingAlias(ModuleTableMap::ID, $orderCouponModule->getModuleId(), $comparison);
+        } elseif ($orderCouponModule instanceof ObjectCollection) {
+            return $this
+                ->useOrderCouponModuleQuery()
+                ->filterByPrimaryKeys($orderCouponModule->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByOrderCouponModule() only accepts arguments of type \Thelia\Model\OrderCouponModule or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the OrderCouponModule relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildModuleQuery The current query, for fluid interface
+     */
+    public function joinOrderCouponModule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('OrderCouponModule');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'OrderCouponModule');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the OrderCouponModule relation OrderCouponModule object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\OrderCouponModuleQuery A secondary query class using the current class as primary query
+     */
+    public function useOrderCouponModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinOrderCouponModule($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderCouponModule', '\Thelia\Model\OrderCouponModuleQuery');
+    }
+
+    /**
      * Filter the query by a related \Thelia\Model\ModuleI18n object
      *
      * @param \Thelia\Model\ModuleI18n|ObjectCollection $moduleI18n  the related object to use as filter
@@ -1102,6 +1179,23 @@ abstract class ModuleQuery extends ModelCriteria
         return $this
             ->useCouponModuleQuery()
             ->filterByCoupon($coupon, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related OrderCoupon object
+     * using the order_coupon_module table as cross reference
+     *
+     * @param OrderCoupon $orderCoupon the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildModuleQuery The current query, for fluid interface
+     */
+    public function filterByOrderCoupon($orderCoupon, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useOrderCouponModuleQuery()
+            ->filterByOrderCoupon($orderCoupon, $comparison)
             ->endUse();
     }
 

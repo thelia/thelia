@@ -1369,4 +1369,30 @@
       <index-column name="module_id" />
     </index>
   </table>
+  <table isCrossRef="true" name="order_coupon_country" namespace="Thelia\Model">
+    <column name="coupon_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="country_id" primaryKey="true" required="true" type="INTEGER" />
+    <foreign-key foreignTable="country" name="fk_order_coupon_country_country_id" onDelete="CASCADE">
+      <reference foreign="id" local="country_id" />
+    </foreign-key>
+    <foreign-key foreignTable="order_coupon" name="fk_order_coupon_country_coupon_id">
+      <reference foreign="id" local="coupon_id" />
+    </foreign-key>
+    <index name="fk_country_id_idx">
+      <index-column name="country_id" />
+    </index>
+  </table>
+  <table isCrossRef="true" name="order_coupon_module" namespace="Thelia\Model">
+    <column name="coupon_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="module_id" primaryKey="true" required="true" type="INTEGER" />
+    <foreign-key foreignTable="order_coupon" name="fk_coupon_module_coupon_id0" onDelete="CASCADE">
+      <reference foreign="id" local="coupon_id" />
+    </foreign-key>
+    <foreign-key foreignTable="module" name="fk_coupon_module_module_id0" onDelete="CASCADE">
+      <reference foreign="id" local="module_id" />
+    </foreign-key>
+    <index name="fk_module_id_idx">
+      <index-column name="module_id" />
+    </index>
+  </table>
 </database>

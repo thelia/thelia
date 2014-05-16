@@ -1691,6 +1691,49 @@ CREATE TABLE `coupon_module`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- order_coupon_country
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_coupon_country`;
+
+CREATE TABLE `order_coupon_country`
+(
+    `coupon_id` INTEGER NOT NULL,
+    `country_id` INTEGER NOT NULL,
+    PRIMARY KEY (`coupon_id`,`country_id`),
+    INDEX `fk_country_id_idx` (`country_id`),
+    CONSTRAINT `fk_order_coupon_country_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_coupon_country_coupon_id`
+        FOREIGN KEY (`coupon_id`)
+        REFERENCES `order_coupon` (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- order_coupon_module
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_coupon_module`;
+
+CREATE TABLE `order_coupon_module`
+(
+    `coupon_id` INTEGER NOT NULL,
+    `module_id` INTEGER NOT NULL,
+    PRIMARY KEY (`coupon_id`,`module_id`),
+    INDEX `fk_module_id_idx` (`module_id`),
+    CONSTRAINT `fk_coupon_module_coupon_id0`
+        FOREIGN KEY (`coupon_id`)
+        REFERENCES `order_coupon` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_coupon_module_module_id0`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 

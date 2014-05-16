@@ -12,7 +12,9 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
@@ -22,11 +24,17 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
-use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Model\Base\CouponCountry;
+use Thelia\Model\Base\CouponModule;
+use Thelia\Model\Base\CouponModuleQuery;
 use Thelia\Model\Coupon as CouponModel;
+use Thelia\Model\CouponCountryQuery;
 use Thelia\Model\CouponQuery;
+use Thelia\Model\Map\OrderCouponTableMap;
 use Thelia\Model\OrderCoupon;
+use Thelia\Model\OrderCouponCountry;
+use Thelia\Model\OrderCouponModule;
 
 /**
  * Process Coupon Events
@@ -251,38 +259,80 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param \Thelia\Core\Event\Order\OrderEvent $event
+     *
+     * @throws \Exception if something goes wrong.
      */
     public function afterOrder(OrderEvent $event)
     {
         $consumedCoupons = $this->request->getSession()->getConsumedCoupons();
 
         if (is_array($consumedCoupons)) {
-            foreach ($consumedCoupons as $couponCode) {
-                $couponQuery = CouponQuery::create();
-                $couponModel = $couponQuery->findOneByCode($couponCode);
-                $couponModel->setLocale($this->request->getSession()->getLang()->getLocale());
 
-                /* decrease coupon quantity */
-                $this->couponManager->decrementQuantity($couponModel);
+            $con = Propel::getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
+            $con->beginTransaction();
 
-                /* memorize coupon */
-                $orderCoupon = new OrderCoupon();
-                $orderCoupon->setOrder($event->getOrder())
-                    ->setCode($couponModel->getCode())
-                    ->setType($couponModel->getType())
-                    ->setAmount($couponModel->getAmount())
+            try {
+                foreach ($consumedCoupons as $couponCode) {
+                    $couponQuery = CouponQuery::create();
+                    $couponModel = $couponQuery->findOneByCode($couponCode);
+                    $couponModel->setLocale($this->request->getSession()->getLang()->getLocale());
 
-                    ->setTitle($couponModel->getTitle())
-                    ->setShortDescription($couponModel->getShortDescription())
-                    ->setDescription($couponModel->getDescription())
+                    /* decrease coupon quantity */
+                    $this->couponManager->decrementQuantity($couponModel);
 
-                    ->setExpirationDate($couponModel->getExpirationDate())
-                    ->setIsCumulative($couponModel->getIsCumulative())
-                    ->setIsRemovingPostage($couponModel->getIsRemovingPostage())
-                    ->setIsAvailableOnSpecialOffers($couponModel->getIsAvailableOnSpecialOffers())
-                    ->setSerializedConditions($couponModel->getSerializedConditions())
-                ;
-                $orderCoupon->save();
+                    /* memorize coupon */
+                    $orderCoupon = new OrderCoupon();
+                    $orderCoupon->setOrder($event->getOrder())
+                        ->setCode($couponModel->getCode())
+                        ->setType($couponModel->getType())
+                        ->setAmount($couponModel->getAmount())
+
+                        ->setTitle($couponModel->getTitle())
+                        ->setShortDescription($couponModel->getShortDescription())
+                        ->setDescription($couponModel->getDescription())
+
+                        ->setExpirationDate($couponModel->getExpirationDate())
+                        ->setIsCumulative($couponModel->getIsCumulative())
+                        ->setIsRemovingPostage($couponModel->getIsRemovingPostage())
+                        ->setIsAvailableOnSpecialOffers($couponModel->getIsAvailableOnSpecialOffers())
+                        ->setSerializedConditions($couponModel->getSerializedConditions())
+                    ;
+                    $orderCoupon->save();
+
+                    // Copy order coupon free shipping data for countries and modules
+                    $couponCountries = CouponCountryQuery::create()->filterByCouponId($couponModel->getId())->find();
+
+                    /** @var CouponCountry $couponCountry */
+                    foreach($couponCountries as $couponCountry) {
+                        $occ = new OrderCouponCountry();
+
+                        $occ
+                            ->setCouponId($orderCoupon->getId())
+                            ->setCountryId($couponCountry->getCountryId())
+                            ->save();
+                        ;
+                    }
+
+                    $couponModules = CouponModuleQuery::create()->filterByCouponId($couponModel->getId())->find();
+
+                    /** @var CouponModule $couponModule */
+                    foreach($couponModules as $couponModule) {
+                        $ocm = new OrderCouponModule();
+
+                        $ocm
+                            ->setCouponId($orderCoupon->getId())
+                            ->setModuleId($couponModule->getModuleId())
+                            ->save();
+                        ;
+                    }
+                }
+
+                $con->commit();
+            }
+            catch (\Exception  $ex) {
+                $con->rollBack();
+
+                throw($ex);
             }
         }
 
@@ -316,7 +366,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::COUPON_UPDATE => array("update", 128),
             TheliaEvents::COUPON_CONSUME => array("consume", 128),
             TheliaEvents::COUPON_CONDITION_UPDATE => array("updateCondition", 128),
-            TheliaEvents::ORDER_SET_POSTAGE => array("testFreePostage", 256),
+            TheliaEvents::ORDER_SET_POSTAGE => array("testFreePostage", 132),
             TheliaEvents::ORDER_BEFORE_PAYMENT => array("afterOrder", 128),
             TheliaEvents::CART_ADDITEM => array("updateOrderDiscount", 10),
             TheliaEvents::CART_UPDATEITEM => array("updateOrderDiscount", 10),

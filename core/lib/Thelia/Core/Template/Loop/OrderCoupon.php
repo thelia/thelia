@@ -69,6 +69,8 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
 
         if (null !== $order = OrderQuery::create()->findPk($this->getOrder())) {
 
+            $oneDayInSeconds = 60*60*24;
+
             /** @var \Thelia\Model\OrderCoupon $orderCoupon */
             foreach ($loopResult->getResultDataCollection() as $orderCoupon) {
 
@@ -76,7 +78,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
 
                 $now = time();
                 $datediff = $orderCoupon->getExpirationDate()->getTimestamp() - $now;
-                $daysLeftBeforeExpiration = floor($datediff/(60*60*24));
+                $daysLeftBeforeExpiration = floor($datediff/($oneDayInSeconds));
 
                 $freeShippingForCountriesIds = [];
                 /** @var OrderCouponCountry $couponCountry */

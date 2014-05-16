@@ -30,6 +30,10 @@ use Thelia\Model\ModuleImage as ChildModuleImage;
 use Thelia\Model\ModuleImageQuery as ChildModuleImageQuery;
 use Thelia\Model\ModuleQuery as ChildModuleQuery;
 use Thelia\Model\Order as ChildOrder;
+use Thelia\Model\OrderCoupon as ChildOrderCoupon;
+use Thelia\Model\OrderCouponModule as ChildOrderCouponModule;
+use Thelia\Model\OrderCouponModuleQuery as ChildOrderCouponModuleQuery;
+use Thelia\Model\OrderCouponQuery as ChildOrderCouponQuery;
 use Thelia\Model\OrderQuery as ChildOrderQuery;
 use Thelia\Model\ProfileModule as ChildProfileModule;
 use Thelia\Model\ProfileModuleQuery as ChildProfileModuleQuery;
@@ -154,6 +158,12 @@ abstract class Module implements ActiveRecordInterface
     protected $collCouponModulesPartial;
 
     /**
+     * @var        ObjectCollection|ChildOrderCouponModule[] Collection to store aggregation of ChildOrderCouponModule objects.
+     */
+    protected $collOrderCouponModules;
+    protected $collOrderCouponModulesPartial;
+
+    /**
      * @var        ObjectCollection|ChildModuleI18n[] Collection to store aggregation of ChildModuleI18n objects.
      */
     protected $collModuleI18ns;
@@ -163,6 +173,11 @@ abstract class Module implements ActiveRecordInterface
      * @var        ChildCoupon[] Collection to store aggregation of ChildCoupon objects.
      */
     protected $collCoupons;
+
+    /**
+     * @var        ChildOrderCoupon[] Collection to store aggregation of ChildOrderCoupon objects.
+     */
+    protected $collOrderCoupons;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -191,6 +206,12 @@ abstract class Module implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $couponsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $orderCouponsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -227,6 +248,12 @@ abstract class Module implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $couponModulesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $orderCouponModulesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -913,9 +940,12 @@ abstract class Module implements ActiveRecordInterface
 
             $this->collCouponModules = null;
 
+            $this->collOrderCouponModules = null;
+
             $this->collModuleI18ns = null;
 
             $this->collCoupons = null;
+            $this->collOrderCoupons = null;
         } // if (deep)
     }
 
@@ -1076,6 +1106,33 @@ abstract class Module implements ActiveRecordInterface
                 }
             }
 
+            if ($this->orderCouponsScheduledForDeletion !== null) {
+                if (!$this->orderCouponsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk  = $this->getPrimaryKey();
+                    foreach ($this->orderCouponsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+
+                    OrderCouponModuleQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->orderCouponsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getOrderCoupons() as $orderCoupon) {
+                    if ($orderCoupon->isModified()) {
+                        $orderCoupon->save($con);
+                    }
+                }
+            } elseif ($this->collOrderCoupons) {
+                foreach ($this->collOrderCoupons as $orderCoupon) {
+                    if ($orderCoupon->isModified()) {
+                        $orderCoupon->save($con);
+                    }
+                }
+            }
+
             if ($this->ordersRelatedByPaymentModuleIdScheduledForDeletion !== null) {
                 if (!$this->ordersRelatedByPaymentModuleIdScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\OrderQuery::create()
@@ -1172,6 +1229,23 @@ abstract class Module implements ActiveRecordInterface
 
                 if ($this->collCouponModules !== null) {
             foreach ($this->collCouponModules as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->orderCouponModulesScheduledForDeletion !== null) {
+                if (!$this->orderCouponModulesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\OrderCouponModuleQuery::create()
+                        ->filterByPrimaryKeys($this->orderCouponModulesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->orderCouponModulesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collOrderCouponModules !== null) {
+            foreach ($this->collOrderCouponModules as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1428,6 +1502,9 @@ abstract class Module implements ActiveRecordInterface
             if (null !== $this->collCouponModules) {
                 $result['CouponModules'] = $this->collCouponModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collOrderCouponModules) {
+                $result['OrderCouponModules'] = $this->collOrderCouponModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collModuleI18ns) {
                 $result['ModuleI18ns'] = $this->collModuleI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1652,6 +1729,12 @@ abstract class Module implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getOrderCouponModules() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addOrderCouponModule($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getModuleI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addModuleI18n($relObj->copy($deepCopy));
@@ -1716,6 +1799,9 @@ abstract class Module implements ActiveRecordInterface
         }
         if ('CouponModule' == $relationName) {
             return $this->initCouponModules();
+        }
+        if ('OrderCouponModule' == $relationName) {
+            return $this->initOrderCouponModules();
         }
         if ('ModuleI18n' == $relationName) {
             return $this->initModuleI18ns();
@@ -3412,6 +3498,252 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collOrderCouponModules collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addOrderCouponModules()
+     */
+    public function clearOrderCouponModules()
+    {
+        $this->collOrderCouponModules = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collOrderCouponModules collection loaded partially.
+     */
+    public function resetPartialOrderCouponModules($v = true)
+    {
+        $this->collOrderCouponModulesPartial = $v;
+    }
+
+    /**
+     * Initializes the collOrderCouponModules collection.
+     *
+     * By default this just sets the collOrderCouponModules collection to an empty array (like clearcollOrderCouponModules());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initOrderCouponModules($overrideExisting = true)
+    {
+        if (null !== $this->collOrderCouponModules && !$overrideExisting) {
+            return;
+        }
+        $this->collOrderCouponModules = new ObjectCollection();
+        $this->collOrderCouponModules->setModel('\Thelia\Model\OrderCouponModule');
+    }
+
+    /**
+     * Gets an array of ChildOrderCouponModule objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModule is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildOrderCouponModule[] List of ChildOrderCouponModule objects
+     * @throws PropelException
+     */
+    public function getOrderCouponModules($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOrderCouponModulesPartial && !$this->isNew();
+        if (null === $this->collOrderCouponModules || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOrderCouponModules) {
+                // return empty collection
+                $this->initOrderCouponModules();
+            } else {
+                $collOrderCouponModules = ChildOrderCouponModuleQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collOrderCouponModulesPartial && count($collOrderCouponModules)) {
+                        $this->initOrderCouponModules(false);
+
+                        foreach ($collOrderCouponModules as $obj) {
+                            if (false == $this->collOrderCouponModules->contains($obj)) {
+                                $this->collOrderCouponModules->append($obj);
+                            }
+                        }
+
+                        $this->collOrderCouponModulesPartial = true;
+                    }
+
+                    reset($collOrderCouponModules);
+
+                    return $collOrderCouponModules;
+                }
+
+                if ($partial && $this->collOrderCouponModules) {
+                    foreach ($this->collOrderCouponModules as $obj) {
+                        if ($obj->isNew()) {
+                            $collOrderCouponModules[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collOrderCouponModules = $collOrderCouponModules;
+                $this->collOrderCouponModulesPartial = false;
+            }
+        }
+
+        return $this->collOrderCouponModules;
+    }
+
+    /**
+     * Sets a collection of OrderCouponModule objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $orderCouponModules A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildModule The current object (for fluent API support)
+     */
+    public function setOrderCouponModules(Collection $orderCouponModules, ConnectionInterface $con = null)
+    {
+        $orderCouponModulesToDelete = $this->getOrderCouponModules(new Criteria(), $con)->diff($orderCouponModules);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->orderCouponModulesScheduledForDeletion = clone $orderCouponModulesToDelete;
+
+        foreach ($orderCouponModulesToDelete as $orderCouponModuleRemoved) {
+            $orderCouponModuleRemoved->setModule(null);
+        }
+
+        $this->collOrderCouponModules = null;
+        foreach ($orderCouponModules as $orderCouponModule) {
+            $this->addOrderCouponModule($orderCouponModule);
+        }
+
+        $this->collOrderCouponModules = $orderCouponModules;
+        $this->collOrderCouponModulesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related OrderCouponModule objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related OrderCouponModule objects.
+     * @throws PropelException
+     */
+    public function countOrderCouponModules(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOrderCouponModulesPartial && !$this->isNew();
+        if (null === $this->collOrderCouponModules || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOrderCouponModules) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getOrderCouponModules());
+            }
+
+            $query = ChildOrderCouponModuleQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModule($this)
+                ->count($con);
+        }
+
+        return count($this->collOrderCouponModules);
+    }
+
+    /**
+     * Method called to associate a ChildOrderCouponModule object to this object
+     * through the ChildOrderCouponModule foreign key attribute.
+     *
+     * @param    ChildOrderCouponModule $l ChildOrderCouponModule
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function addOrderCouponModule(ChildOrderCouponModule $l)
+    {
+        if ($this->collOrderCouponModules === null) {
+            $this->initOrderCouponModules();
+            $this->collOrderCouponModulesPartial = true;
+        }
+
+        if (!in_array($l, $this->collOrderCouponModules->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddOrderCouponModule($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param OrderCouponModule $orderCouponModule The orderCouponModule object to add.
+     */
+    protected function doAddOrderCouponModule($orderCouponModule)
+    {
+        $this->collOrderCouponModules[]= $orderCouponModule;
+        $orderCouponModule->setModule($this);
+    }
+
+    /**
+     * @param  OrderCouponModule $orderCouponModule The orderCouponModule object to remove.
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function removeOrderCouponModule($orderCouponModule)
+    {
+        if ($this->getOrderCouponModules()->contains($orderCouponModule)) {
+            $this->collOrderCouponModules->remove($this->collOrderCouponModules->search($orderCouponModule));
+            if (null === $this->orderCouponModulesScheduledForDeletion) {
+                $this->orderCouponModulesScheduledForDeletion = clone $this->collOrderCouponModules;
+                $this->orderCouponModulesScheduledForDeletion->clear();
+            }
+            $this->orderCouponModulesScheduledForDeletion[]= clone $orderCouponModule;
+            $orderCouponModule->setModule(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrderCouponModules from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrderCouponModule[] List of ChildOrderCouponModule objects
+     */
+    public function getOrderCouponModulesJoinOrderCoupon($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderCouponModuleQuery::create(null, $criteria);
+        $query->joinWith('OrderCoupon', $joinBehavior);
+
+        return $this->getOrderCouponModules($query, $con);
+    }
+
+    /**
      * Clears out the collModuleI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -3820,6 +4152,189 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collOrderCoupons collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addOrderCoupons()
+     */
+    public function clearOrderCoupons()
+    {
+        $this->collOrderCoupons = null; // important to set this to NULL since that means it is uninitialized
+        $this->collOrderCouponsPartial = null;
+    }
+
+    /**
+     * Initializes the collOrderCoupons collection.
+     *
+     * By default this just sets the collOrderCoupons collection to an empty collection (like clearOrderCoupons());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initOrderCoupons()
+    {
+        $this->collOrderCoupons = new ObjectCollection();
+        $this->collOrderCoupons->setModel('\Thelia\Model\OrderCoupon');
+    }
+
+    /**
+     * Gets a collection of ChildOrderCoupon objects related by a many-to-many relationship
+     * to the current object by way of the order_coupon_module cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModule is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return ObjectCollection|ChildOrderCoupon[] List of ChildOrderCoupon objects
+     */
+    public function getOrderCoupons($criteria = null, ConnectionInterface $con = null)
+    {
+        if (null === $this->collOrderCoupons || null !== $criteria) {
+            if ($this->isNew() && null === $this->collOrderCoupons) {
+                // return empty collection
+                $this->initOrderCoupons();
+            } else {
+                $collOrderCoupons = ChildOrderCouponQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collOrderCoupons;
+                }
+                $this->collOrderCoupons = $collOrderCoupons;
+            }
+        }
+
+        return $this->collOrderCoupons;
+    }
+
+    /**
+     * Sets a collection of OrderCoupon objects related by a many-to-many relationship
+     * to the current object by way of the order_coupon_module cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param  Collection $orderCoupons A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function setOrderCoupons(Collection $orderCoupons, ConnectionInterface $con = null)
+    {
+        $this->clearOrderCoupons();
+        $currentOrderCoupons = $this->getOrderCoupons();
+
+        $this->orderCouponsScheduledForDeletion = $currentOrderCoupons->diff($orderCoupons);
+
+        foreach ($orderCoupons as $orderCoupon) {
+            if (!$currentOrderCoupons->contains($orderCoupon)) {
+                $this->doAddOrderCoupon($orderCoupon);
+            }
+        }
+
+        $this->collOrderCoupons = $orderCoupons;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of ChildOrderCoupon objects related by a many-to-many relationship
+     * to the current object by way of the order_coupon_module cross-reference table.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return int the number of related ChildOrderCoupon objects
+     */
+    public function countOrderCoupons($criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        if (null === $this->collOrderCoupons || null !== $criteria) {
+            if ($this->isNew() && null === $this->collOrderCoupons) {
+                return 0;
+            } else {
+                $query = ChildOrderCouponQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByModule($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collOrderCoupons);
+        }
+    }
+
+    /**
+     * Associate a ChildOrderCoupon object to this object
+     * through the order_coupon_module cross reference table.
+     *
+     * @param  ChildOrderCoupon $orderCoupon The ChildOrderCouponModule object to relate
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function addOrderCoupon(ChildOrderCoupon $orderCoupon)
+    {
+        if ($this->collOrderCoupons === null) {
+            $this->initOrderCoupons();
+        }
+
+        if (!$this->collOrderCoupons->contains($orderCoupon)) { // only add it if the **same** object is not already associated
+            $this->doAddOrderCoupon($orderCoupon);
+            $this->collOrderCoupons[] = $orderCoupon;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param    OrderCoupon $orderCoupon The orderCoupon object to add.
+     */
+    protected function doAddOrderCoupon($orderCoupon)
+    {
+        $orderCouponModule = new ChildOrderCouponModule();
+        $orderCouponModule->setOrderCoupon($orderCoupon);
+        $this->addOrderCouponModule($orderCouponModule);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$orderCoupon->getModules()->contains($this)) {
+            $foreignCollection   = $orderCoupon->getModules();
+            $foreignCollection[] = $this;
+        }
+    }
+
+    /**
+     * Remove a ChildOrderCoupon object to this object
+     * through the order_coupon_module cross reference table.
+     *
+     * @param ChildOrderCoupon $orderCoupon The ChildOrderCouponModule object to relate
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function removeOrderCoupon(ChildOrderCoupon $orderCoupon)
+    {
+        if ($this->getOrderCoupons()->contains($orderCoupon)) {
+            $this->collOrderCoupons->remove($this->collOrderCoupons->search($orderCoupon));
+
+            if (null === $this->orderCouponsScheduledForDeletion) {
+                $this->orderCouponsScheduledForDeletion = clone $this->collOrderCoupons;
+                $this->orderCouponsScheduledForDeletion->clear();
+            }
+
+            $this->orderCouponsScheduledForDeletion[] = $orderCoupon;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -3881,6 +4396,11 @@ abstract class Module implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collOrderCouponModules) {
+                foreach ($this->collOrderCouponModules as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collModuleI18ns) {
                 foreach ($this->collModuleI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -3888,6 +4408,11 @@ abstract class Module implements ActiveRecordInterface
             }
             if ($this->collCoupons) {
                 foreach ($this->collCoupons as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collOrderCoupons) {
+                foreach ($this->collOrderCoupons as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -3903,8 +4428,10 @@ abstract class Module implements ActiveRecordInterface
         $this->collProfileModules = null;
         $this->collModuleImages = null;
         $this->collCouponModules = null;
+        $this->collOrderCouponModules = null;
         $this->collModuleI18ns = null;
         $this->collCoupons = null;
+        $this->collOrderCoupons = null;
     }
 
     /**

@@ -219,6 +219,10 @@ class OrderCouponTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('order_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('OrderCouponCountry', '\\Thelia\\Model\\OrderCouponCountry', RelationMap::ONE_TO_MANY, array('id' => 'coupon_id', ), null, null, 'OrderCouponCountries');
+        $this->addRelation('OrderCouponModule', '\\Thelia\\Model\\OrderCouponModule', RelationMap::ONE_TO_MANY, array('id' => 'coupon_id', ), 'CASCADE', null, 'OrderCouponModules');
+        $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_MANY, array(), 'CASCADE', null, 'Countries');
+        $this->addRelation('Module', '\\Thelia\\Model\\Module', RelationMap::MANY_TO_MANY, array(), 'CASCADE', null, 'Modules');
     } // buildRelations()
 
     /**
@@ -233,6 +237,15 @@ class OrderCouponTableMap extends TableMap
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
+    /**
+     * Method to invalidate the instance pool of all tables related to order_coupon     * by a foreign key with ON DELETE CASCADE
+     */
+    public static function clearRelatedInstancePool()
+    {
+        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+                OrderCouponModuleTableMap::clearInstancePool();
+            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
