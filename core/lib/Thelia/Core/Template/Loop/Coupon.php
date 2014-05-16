@@ -23,7 +23,9 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Model\Base\CouponModule;
 use Thelia\Model\Coupon as MCoupon;
+use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Map\CouponTableMap;
 use Thelia\Type\EnumListType;
@@ -193,6 +195,18 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 $cleanedConditions[] = $temp;
             }
 
+            $freeShippingForCountriesIds = [];
+            /** @var CouponCountry $couponCountry */
+            foreach($coupon->getFreeShippingForCountries() as $couponCountry) {
+                $freeShippingForCountriesIds[] = $couponCountry->getCountryId();
+            }
+
+            $freeShippingForModulesIds = [];
+            /** @var CouponModule $couponModule */
+            foreach($coupon->getFreeShippingForModules() as $couponModule) {
+                $freeShippingForModulesIds[] = $couponModule->getModuleId();
+            }
+
             $loopResultRow
                 ->set("ID", $coupon->getId())
                 ->set("IS_TRANSLATED", $coupon->getVirtualColumn('IS_TRANSLATED'))
@@ -211,7 +225,11 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("APPLICATION_CONDITIONS", $cleanedConditions)
                 ->set("TOOLTIP", $couponManager->getToolTip())
                 ->set("DAY_LEFT_BEFORE_EXPIRATION", max(0, $coupon->getVirtualColumn('days_left')))
-                ->set("SERVICE_ID", $couponManager->getServiceId());
+                ->set("SERVICE_ID", $couponManager->getServiceId())
+                ->set("FREE_SHIPPING_FOR_COUNTRIES_LIST", implode(',', $freeShippingForCountriesIds))
+                ->set("FREE_SHIPPING_FOR_MODULES_LIST", implode(',', $freeShippingForModulesIds))
+            ;
+
             $loopResult->addRow($loopResultRow);
         }
 

@@ -20,6 +20,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\OrderCouponCountry;
+use Thelia\Model\OrderCouponModule;
 use Thelia\Model\OrderCouponQuery;
 use Thelia\Model\OrderQuery;
 
@@ -52,9 +54,10 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
 
         $order = $this->getOrder();
 
-        $search->filterByOrderId($order, Criteria::EQUAL);
-
-        $search->orderById(Criteria::ASC);
+        $search
+            ->filterByOrderId($order, Criteria::EQUAL)
+            ->orderById(Criteria::ASC)
+        ;
 
         return $search;
 
@@ -64,26 +67,45 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
     {
         $this->container->get('thelia.condition.factory');
 
-        /** @var OrderCoupon $orderCoupon */
-        foreach ($loopResult->getResultDataCollection() as $orderCoupon) {
-            $loopResultRow = new LoopResultRow($orderCoupon);
+        if (null !== $order = OrderQuery::create()->findPk($this->getOrder())) {
 
-            $now = time();
-            $datediff = $orderCoupon->getExpirationDate()->getTimestamp() - $now;
-            $daysLeftBeforeExpiration = floor($datediff/(60*60*24));
+            /** @var \Thelia\Model\OrderCoupon $orderCoupon */
+            foreach ($loopResult->getResultDataCollection() as $orderCoupon) {
 
-            $loopResultRow->set("ID", $orderCoupon->getId())
-                ->set("CODE", $orderCoupon->getCode())
-                ->set("TITLE", $orderCoupon->getTitle())
-                ->set("SHORT_DESCRIPTION", $orderCoupon->getShortDescription())
-                ->set("DESCRIPTION", $orderCoupon->getDescription())
-                ->set("EXPIRATION_DATE", $orderCoupon->getExpirationDate( OrderQuery::create()->findPk($this->getOrder())->getLangId() ))
-                ->set("IS_CUMULATIVE", $orderCoupon->getIsCumulative())
-                ->set("IS_REMOVING_POSTAGE", $orderCoupon->getIsRemovingPostage())
-                ->set("IS_AVAILABLE_ON_SPECIAL_OFFERS", $orderCoupon->getIsAvailableOnSpecialOffers())
-                ->set("DAY_LEFT_BEFORE_EXPIRATION", $daysLeftBeforeExpiration)
-            ;
-            $loopResult->addRow($loopResultRow);
+                $loopResultRow = new LoopResultRow($orderCoupon);
+
+                $now = time();
+                $datediff = $orderCoupon->getExpirationDate()->getTimestamp() - $now;
+                $daysLeftBeforeExpiration = floor($datediff/(60*60*24));
+
+                $freeShippingForCountriesIds = [];
+                /** @var OrderCouponCountry $couponCountry */
+                foreach($orderCoupon->getFreeShippingForCountries() as $couponCountry) {
+                    $freeShippingForCountriesIds[] = $couponCountry->getCountryId();
+                }
+
+                $freeShippingForModulesIds = [];
+                /** @var OrderCouponModule $couponModule */
+                foreach($orderCoupon->getFreeShippingForModules() as $couponModule) {
+                    $freeShippingForModulesIds[] = $couponModule->getModuleId();
+                }
+
+                $loopResultRow->set("ID", $orderCoupon->getId())
+                    ->set("CODE", $orderCoupon->getCode())
+                    ->set("TITLE", $orderCoupon->getTitle())
+                    ->set("SHORT_DESCRIPTION", $orderCoupon->getShortDescription())
+                    ->set("DESCRIPTION", $orderCoupon->getDescription())
+                    ->set("EXPIRATION_DATE", $orderCoupon->getExpirationDate( $order->getLangId() ))
+                    ->set("IS_CUMULATIVE", $orderCoupon->getIsCumulative())
+                    ->set("IS_REMOVING_POSTAGE", $orderCoupon->getIsRemovingPostage())
+                    ->set("IS_AVAILABLE_ON_SPECIAL_OFFERS", $orderCoupon->getIsAvailableOnSpecialOffers())
+                    ->set("DAY_LEFT_BEFORE_EXPIRATION", $daysLeftBeforeExpiration)
+                    ->set("FREE_SHIPPING_FOR_COUNTRIES_LIST", implode(',', $freeShippingForCountriesIds))
+                    ->set("FREE_SHIPPING_FOR_MODULES_LIST", implode(',', $freeShippingForModulesIds))
+                ;
+
+                $loopResult->addRow($loopResultRow);
+            }
         }
 
         return $loopResult;
