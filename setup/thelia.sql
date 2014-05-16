@@ -887,7 +887,7 @@ CREATE TABLE `hook`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `code_UNIQUE` (`code`),
+    UNIQUE INDEX `code_UNIQUE` (`code`, `type`),
     INDEX `idx_module_activate` (`activate`)
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 

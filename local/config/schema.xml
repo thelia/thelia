@@ -754,6 +754,7 @@
     </index>
     <unique name="code_UNIQUE">
       <unique-column name="code" />
+      <unique-column name="type" />
     </unique>
     <behavior name="timestampable" />
     <behavior name="i18n">

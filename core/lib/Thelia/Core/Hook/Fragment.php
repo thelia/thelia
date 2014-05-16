@@ -12,14 +12,40 @@
 
 namespace Thelia\Core\Hook;
 
-interface HookFragmentInterface
+/**
+ * Class HookFragment
+ * @package Thelia\Core\Hook
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ */
+class Fragment implements HookFragmentInterface
 {
-    public function getKey();
+    private $key;
+    private $content;
 
-    public function setKey($key);
+    public function __construct($key, $content="")
+    {
+        $this->key = $key;
+        $this->content = $content;
+    }
 
-    public function getContent();
+    public function getKey()
+    {
+        return $this->key;
+    }
 
-    public function setContent($content);
+    public function setKey($key)
+    {
+        $this->key = $key;
+    }
+
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    public function setContent($content)
+    {
+        $this->content = $content;
+    }
 
 }
