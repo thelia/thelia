@@ -13,65 +13,73 @@
 namespace Thelia\Core\Event\Hook;
 
 use Symfony\Component\EventDispatcher\Event;
-use Thelia\Core\Hook\Fragment;
+use Thelia\Core\Hook\FragmentBag;
+use Thelia\Core\Hook\FragmentBagInterface;
 
 /**
- * HookRenderEvent is used by the hook smarty plugin function.
- *
- * Class HookRenderEvent
- * @package Thelia\Core\Event\Hook
+ * Class HookRenderBlockEvent
+ * @package Thelia\Core\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class HookRenderEvent extends BaseHookRenderEvent
+class HookRenderBlockEvent extends BaseHookRenderEvent
 {
+    const DEFAULT_KEY = "content";
 
-    /** @var  array $fragments an array of fragments collected during the event dispatch */
-    protected $fragments;
+    /** @var  FragmentBagInterface $fragments */
+    protected $fragmentBag;
 
     public function __construct($code, array $arguments = array())
     {
         parent::__construct($code, $arguments);
-        $this->fragments = array();
+        $this->fragmentBag = new FragmentBag();
     }
 
     /**
-     * Add a new fragment
      *
      * @param  string $content
+     * @parma string $key
      * @return $this
      */
-    public function add($content)
+    public function add($content, $key=self::DEFAULT_KEY)
     {
-        $this->fragments[] = $content;
+        $this->fragmentBag->add($key, $content);
 
         return $this;
     }
 
     /**
-     * Get an array of all the fragments
-     *
      * @return array
      */
-    public function get()
+    public function keys()
     {
-        return $this->fragments;
+        return $this->fragmentBag->keys();
     }
 
     /**
-     * Concatenates all fragments in a string.
-     *
-     * @param  string $glue   the glue between fragments
-     * @param  string $before the text before the concatenated string
-     * @param  string $after  the text after the concatenated string
-     * @return string the concatenate string
+     * @param  string $key
+     * @return array
      */
-    public function dump($glue='', $before='', $after='')
+    public function get($key=self::DEFAULT_KEY)
+    {
+        return $this->fragmentBag->get($key);
+    }
+
+    /**
+     * @param  string $key
+     * @param  string $glue
+     * @param  string $before
+     * @param  string $after
+     * @return string
+     */
+    public function dump($key=self::DEFAULT_KEY, $glue='', $before='', $after='')
     {
         $ret = '';
-        if (0 !== count($this->fragments)) {
-            $ret = $before . implode($glue, $this->fragments) . $after;
+        $fragments = $this->get($key);
+        if (0 !== count($fragments)) {
+            $ret = $before . implode($glue, $fragments) . $after;
         }
 
         return $ret;
     }
+
 }

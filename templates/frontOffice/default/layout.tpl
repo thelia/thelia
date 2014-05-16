@@ -74,17 +74,18 @@ GNU General Public License : http://www.gnu.org/licenses/
     <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
+    {hook name="main.header"}
 </head>
 
 <body class="{block name="body-class"}{/block}" itemscope itemtype="http://schema.org/WebPage">
-
+{hook name="main.body.top"}
 <!-- Accessibility -->
 <a class="sr-only" href="#content">{intl l="Skip to content"}</a>
 
 <div class="page" role="document">
 
 <div class="header-container" itemscope itemtype="http://schema.org/WPHeader">
-
+    {hook name="main.header.top"}
     <div class="navbar" itemscope itemtype="http://schema.org/SiteNavigationElement">
         <div class="container">
 
@@ -201,7 +202,7 @@ GNU General Public License : http://www.gnu.org/licenses/
         </div>
 
     </header><!-- /.header -->
-
+    {hook name="main.header.bottom"}
 </div><!-- /.header-container -->
 
 <main class="main-container" role="main">
@@ -209,7 +210,24 @@ GNU General Public License : http://www.gnu.org/licenses/
 
         <div class="alert alert-success">
             {*hook name="header" *}
-            {hook name="body" }
+            {hook name="body" product_id="5" }
+
+            {hookBlock name="loop"}
+                <!-- Nav tabs -->
+                <table class="table">
+                    <tr>
+                        {foreach from=$tabs item=tab}
+                        <td>{$tab}</td>
+                        {/foreach}
+                    </tr>
+                    <tr>
+                        {foreach from=$contents item=content}
+                            <td>{$content}</td>
+                        {/foreach}
+                    </tr>
+
+                </table>
+            {/hookBlock}
         </div>
 
         {block name="breadcrumb"}{include file="misc/breadcrumb.tpl"}{/block}
