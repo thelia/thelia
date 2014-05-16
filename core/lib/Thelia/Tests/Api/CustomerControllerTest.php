@@ -78,5 +78,35 @@ class CustomerControllerTest extends ApiTestCase
 
     }
 
+    /**
+     * @covers \Thelia\Controller\Api\CustomerController::getAction
+     */
+    public function testGetAction()
+    {
+        $client = static::createClient();
 
+        $client->request(
+            'GET',
+            '/api/customers/1?&sign='.$this->getSignParameter(""),[],[],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), 'Http status code must be 200');
+    }
+
+    /**
+     * @covers \Thelia\Controller\Api\CustomerController::getAction
+     */
+    public function testGetActionWithUnexistingCustomer()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'GET',
+            '/api/customers/'.PHP_INT_MAX.'?&sign='.$this->getSignParameter(""),[],[],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode(), 'Http status code must be 404');
+    }
 }

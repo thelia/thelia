@@ -15,6 +15,7 @@ namespace Thelia\Controller\Api;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -65,7 +66,6 @@ class CustomerController extends BaseApiController
         $offset = $request->query->get('offset', 0);
         $limit = $request->query->get('limit', 10);
         $order = $request->query->get('order', $orderArgument->default);
-        $locale = $request->query->get('locale', 'en_US');
 
 
 
@@ -75,16 +75,7 @@ class CustomerController extends BaseApiController
 
         $orderArgument->setValue($order);
 
-        $titleJoin = new Join();
-        $titleJoin->addExplicitCondition(CustomerTableMap::TABLE_NAME, 'TITLE_ID', null, CustomerTitleI18nTableMap::TABLE_NAME, 'ID', null);
-        $titleJoin->setJoinType(Criteria::LEFT_JOIN);
-
-
-        $query = CustomerQuery::create()
-            ->select(['Id', 'Ref', 'TitleId', 'Title', 'Firstname', 'Lastname', 'Email', 'Reseller', 'Lang', 'Sponsor', 'Discount', 'CreatedAt', 'UpdatedAt'])
-            ->addJoinObject($titleJoin, 'title_join')
-            ->addJoinCondition('title_join', '`customer_title_i18n`.`locale` = ?', $locale, null, \PDO::PARAM_STR)
-            ->withColumn('`customer_title_i18n`.`long`', 'Title')
+        $query = $this->getBaseCustomerQuery()
             ->offset($offset)
             ->limit($limit)
         ;
@@ -95,6 +86,26 @@ class CustomerController extends BaseApiController
 
         return Response::create($results);
 
+    }
+
+    /**
+     * @return \Thelia\Model\CustomerQuery
+     */
+    private function getBaseCustomerQuery()
+    {
+        $locale = $this->getRequest()->query->get('locale', 'en_US');
+        $titleJoin = new Join();
+        $titleJoin->addExplicitCondition(CustomerTableMap::TABLE_NAME, 'TITLE_ID', null, CustomerTitleI18nTableMap::TABLE_NAME, 'ID', null);
+        $titleJoin->setJoinType(Criteria::LEFT_JOIN);
+
+        $query = CustomerQuery::create()
+            ->select(['Id', 'Ref', 'TitleId', 'Title', 'Firstname', 'Lastname', 'Email', 'Reseller', 'Lang', 'Sponsor', 'Discount', 'CreatedAt', 'UpdatedAt'])
+            ->addJoinObject($titleJoin, 'title_join')
+            ->addJoinCondition('title_join', '`customer_title_i18n`.`locale` = ?', $locale, null, \PDO::PARAM_STR)
+            ->withColumn('`customer_title_i18n`.`long`', 'Title')
+        ;
+
+        return $query;
     }
 
     /**
@@ -143,5 +154,22 @@ class CustomerController extends BaseApiController
         }
 
         return $search;
+    }
+
+    public function getCustomerAction($customer_id)
+    {
+        $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::VIEW);
+        $request = $this->getRequest();
+
+        $customer = $this->getBaseCustomerQuery()
+            ->filterByPrimaryKey($customer_id)
+            ->find();
+
+        if ($customer->isEmpty()) {
+            throw new HttpException(404, sprintf('{"error": "customer with id %d not found"}', $customer_id));
+        }
+
+        return Response::create($customer->toJSON(false, true));
+
     }
 }
