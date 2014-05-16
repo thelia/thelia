@@ -172,4 +172,11 @@ class CustomerController extends BaseApiController
         return Response::create($customer->toJSON(false, true));
 
     }
+
+    public function createCustomerAction()
+    {
+        $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::CREATE);
+
+
+    }
 }

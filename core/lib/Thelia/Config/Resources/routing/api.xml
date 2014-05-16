@@ -15,5 +15,10 @@
 
     <route id="api.customer.get" path="/api/customers/{customer_id}" methods="get">
         <default key="_controller">Thelia\Controller\Api\CustomerController::getCustomerAction</default>
+        <requirement key="customer_id">\d+</requirement>
+    </route>
+
+    <route id="api.customer.create" path="/api/customers" methods="post">
+        <default key="_controller">Thelia\Controller\Api\CustomerController::createCustomerAction</default>
     </route>
 </routes>
