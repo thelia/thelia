@@ -12,6 +12,8 @@
 
 namespace Thelia\Tests;
 
+use Thelia\Model\ApiQuery;
+
 
 /**
  * Class ApiTestCase
@@ -21,13 +23,23 @@ namespace Thelia\Tests;
 class ApiTestCase extends WebTestCase
 {
 
+    const API_KEY = "79E95BD784CADA0C9A578282E";
+
     protected function getServerParameters()
     {
         return [
             'CONTENT_TYPE' => 'application/x-www-form-urlencoded',
-            'HTTP_AUTHORIZATION' => 'Token 79E95BD784CADA0C9A578282E'
+            'HTTP_AUTHORIZATION' => 'Token '.self::API_KEY
         ];
     }
 
+    protected function getSignParameter($content)
+    {
+        $api = ApiQuery::create()
+            ->findOneByApiKey(self::API_KEY);
 
+        $secureKey = pack('H*', $api->getSecureKey());
+
+        return hash_hmac('sha1', $content, $secureKey);
+    }
 }

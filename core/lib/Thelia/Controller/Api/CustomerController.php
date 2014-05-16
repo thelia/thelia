@@ -12,8 +12,18 @@
 
 namespace Thelia\Controller\Api;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Model\CustomerQuery;
+use Thelia\Model\Map\CustomerTableMap;
+use Thelia\Model\Map\CustomerTitleI18nTableMap;
+use Thelia\Type\EnumType;
+use Thelia\Type\TypeCollection;
 
 
 /**
@@ -27,5 +37,111 @@ class CustomerController extends BaseApiController
     public function listAction()
     {
         $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::VIEW);
+        $request = $this->getRequest();
+
+        $orderArgument = new Argument(
+            'order',
+            new TypeCollection(
+                new EnumType(array(
+                    'id',
+                    'id_reverse',
+                    'reference',
+                    'reference_reverse',
+                    'firstname',
+                    'firstname_reverse',
+                    'lastname',
+                    'lastname_reverse',
+                    'last_order',
+                    'last_order_reverse',
+                    'order_amount',
+                    'order_amount_reverse',
+                    'registration_date',
+                    'registration_date_reverse'
+                ))
+            ),
+            'lastname'
+        );
+
+        $offset = $request->query->get('offset', 0);
+        $limit = $request->query->get('limit', 10);
+        $order = $request->query->get('order', $orderArgument->default);
+        $locale = $request->query->get('locale', 'en_US');
+
+
+
+        if (!$orderArgument->type->isValid($order)) {
+            throw new BadRequestHttpException('{"error": "order parameter is invalid"}');
+        }
+
+        $orderArgument->setValue($order);
+
+        $titleJoin = new Join();
+        $titleJoin->addExplicitCondition(CustomerTableMap::TABLE_NAME, 'TITLE_ID', null, CustomerTitleI18nTableMap::TABLE_NAME, 'ID', null);
+        $titleJoin->setJoinType(Criteria::LEFT_JOIN);
+
+
+        $query = CustomerQuery::create()
+            ->select(['Id', 'Ref', 'TitleId', 'Title', 'Firstname', 'Lastname', 'Email', 'Reseller', 'Lang', 'Sponsor', 'Discount', 'CreatedAt', 'UpdatedAt'])
+            ->addJoinObject($titleJoin, 'title_join')
+            ->addJoinCondition('title_join', '`customer_title_i18n`.`locale` = ?', $locale, null, \PDO::PARAM_STR)
+            ->withColumn('`customer_title_i18n`.`long`', 'Title')
+            ->offset($offset)
+            ->limit($limit)
+        ;
+
+        $query = $this->getOrderClause($orderArgument->getValue(), $query);
+
+        $results = $query->find()->toJSON(false, true);
+
+        return Response::create($results);
+
+    }
+
+    /**
+     * @param $order
+     * @param $search
+     * @return \Thelia\Model\CustomerQuery
+     */
+    private function getOrderClause($order, $search)
+    {
+        switch ($order) {
+            case 'id':
+                $search->orderById(Criteria::ASC);
+                break;
+            case 'id_reverse':
+                $search->orderById(Criteria::DESC);
+                break;
+
+            case 'reference':
+                $search->orderByRef(Criteria::ASC);
+                break;
+            case 'reference_reverse':
+                $search->orderByRef(Criteria::DESC);
+                break;
+
+            case 'lastname':
+                $search->orderByLastname(Criteria::ASC);
+                break;
+            case 'lastname_reverse':
+                $search->orderByLastname(Criteria::DESC);
+                break;
+
+            case 'firstname':
+                $search->orderByFirstname(Criteria::ASC);
+                break;
+            case 'firstname_reverse':
+                $search->orderByFirstname(Criteria::DESC);
+                break;
+
+            case 'registration_date':
+                $search->orderByCreatedAt(Criteria::ASC);
+                break;
+            case 'registration_date_reverse':
+                $search->orderByCreatedAt(Criteria::DESC);
+                break;
+
+        }
+
+        return $search;
     }
 }

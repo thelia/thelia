@@ -16,7 +16,10 @@ class Api extends BaseApi implements UserInterface
 
     public function preInsert(ConnectionInterface $con = null)
     {
-        $this->setApiKey(Password::generateHexaRandom(25));
+        if (null === $this->getApiKey())
+        {
+            $this->setApiKey(Password::generateHexaRandom(25));
+        }
 
         $this->generateSecureKey();
 
