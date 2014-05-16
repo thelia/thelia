@@ -15,6 +15,7 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
 use Thelia\Model\HookQuery;
 use Thelia\Model\ModuleHookQuery;
@@ -100,7 +101,12 @@ class RegisterListenersPass implements CompilerPassInterface
                     throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "hook.event_listener" tags.', $id));
                 }
 
-                $hook = HookQuery::create()->findOneByCode($event['event']);
+                $type = (isset($event['type'])) ? $this->getHookType($event['type']) : TemplateDefinition::FRONT_OFFICE;
+
+                $hook = HookQuery::create()
+                    ->filterByCode($event['event'])
+                    ->filterByType($type)
+                    ->findOne();
                 if (null === $hook) {
                     Tlog::getInstance()->addAlert(sprintf("Hook %s is unknow.", $event['event']));
                     continue;
@@ -145,9 +151,26 @@ class RegisterListenersPass implements CompilerPassInterface
 
     }
 
+    protected function getHookType($name)
+    {
+        $type = TemplateDefinition::FRONT_OFFICE;
 
-    protected function addHooksMethodCall(Definition $definition){
+        if (null !== $name && is_string($name)) {
+            $name = preg_replace("[^a-z]", "", strtolower(trim($name)));
+            if (in_array($name, array('bo', 'back', 'backoffice'))) {
+                $type = TemplateDefinition::BACK_OFFICE;
+            } elseif (in_array($name, array('email'))) {
+                $type = TemplateDefinition::EMAIL;
+            } elseif (in_array($name, array('pdf'))) {
+                $type = TemplateDefinition::PDF;
+            }
+        }
 
+        return $type;
+    }
+
+    protected function addHooksMethodCall(Definition $definition)
+    {
         $moduleHooks = ModuleHookQuery::create()
             //->filterByActive(true)
             //->filterByModuleActive(true)
@@ -177,7 +200,7 @@ class RegisterListenersPass implements CompilerPassInterface
             if ($moduleHook->getActive() && $moduleHook->getModuleActive()) {
                 $definition->addMethodCall('addListenerService',
                     array(
-                        'hook.' . $moduleHook->getHook()->getCode(),
+                        'hook.' . $moduleHook->getHook()->getType() . "." . $moduleHook->getHook()->getCode(),
                         array($moduleHook->getClassname(), $moduleHook->getMethod()),
                         ModuleHook::MAX_POSITION - $moduleHook->getPosition()
                     )

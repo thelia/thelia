@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
-use Thelia\Core\Event\Hook\HookCreateEvent;
 use Thelia\Core\Event\Hook\HookToggleActivationEvent;
 use Thelia\Core\Event\Hook\HookUpdateEvent;
 use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
@@ -25,7 +24,6 @@ use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Log\Tlog;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
@@ -98,7 +96,6 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
         return $event;
     }
 
-
     public function updateHook(HookUpdateEvent $event)
     {
         if ($event->hasHook()) {
@@ -121,7 +118,6 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
         }
     }
 
-
     protected function cacheClear(EventDispatcherInterface $dispatcher)
     {
         $cacheEvent = new CacheEvent(
@@ -130,8 +126,6 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
 
         $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
     }
-
-
 
     /**
      * Returns an array of event names this subscriber wants to listen to.

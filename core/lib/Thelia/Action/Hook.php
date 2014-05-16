@@ -122,7 +122,6 @@ class Hook extends BaseAction  implements EventSubscriberInterface
         $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
     }
 
-
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
