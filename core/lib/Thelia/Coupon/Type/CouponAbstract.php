@@ -96,6 +96,9 @@ abstract class CouponAbstract implements CouponInterface
     /** @var CouponModule[] list of shipping module IDs for which shippiog is free. All if empty*/
     protected $freeShippingForModules = [];
 
+    /** @var true if usage count is per customer only */
+    protected $perCustomerUsageCount;
+
     /**
      * Constructor
      *
@@ -139,7 +142,8 @@ abstract class CouponAbstract implements CouponInterface
         $maxUsage,
         \DateTime $expirationDate,
         $freeShippingForCountries,
-        $freeShippingForModules
+        $freeShippingForModules,
+        $perCustomerUsageCount
     )
     {
         $this->code = $code;
@@ -161,9 +165,28 @@ abstract class CouponAbstract implements CouponInterface
 
         $this->freeShippingForCountries = $freeShippingForCountries;
         $this->freeShippingForModules = $freeShippingForModules;
+        $this->perCustomerUsageCount = $perCustomerUsageCount;
 
         return $this;
     }
+
+    /**
+     * @param true $perCustomerUsageCount
+     */
+    public function setPerCustomerUsageCount($perCustomerUsageCount)
+    {
+        $this->perCustomerUsageCount = $perCustomerUsageCount;
+        return $this;
+    }
+
+    /**
+     * @return true
+     */
+    public function getPerCustomerUsageCount()
+    {
+        return $this->perCustomerUsageCount;
+    }
+
 
     /**
      * Return Coupon code (ex: XMAS)

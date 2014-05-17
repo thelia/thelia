@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Exception\CouponExpiredException;
+use Thelia\Exception\CouponNoUsageLeftException;
 use Thelia\Exception\InvalidConditionException;
 use Thelia\Model\Coupon;
 
@@ -62,12 +63,19 @@ class CouponFactory
            return false;
         }
 
+        // Check coupon expiration date
         if ($couponModel->getExpirationDate() < new \DateTime()) {
             throw new CouponExpiredException($couponCode);
         }
 
+        // Check coupon usage count
+        if ($couponModel->getUsagesLeft($this->facade->getCustomer()->getId()) <= 0) {
+             throw new CouponNoUsageLeftException($couponCode);
+        }
+
         /** @var CouponInterface $couponInterface */
         $couponInterface = $this->buildCouponFromModel($couponModel);
+
         if ($couponInterface && $couponInterface->getConditions()->count() == 0) {
             throw new InvalidConditionException(
                 get_class($couponInterface)
@@ -109,7 +117,8 @@ class CouponFactory
             $model->getMaxUsage(),
             $model->getExpirationDate(),
             $model->getFreeShippingForCountries(),
-            $model->getFreeShippingForModules()
+            $model->getFreeShippingForModules(),
+            $model->getPerCustomerUsageCount()
         );
 
         /** @var ConditionFactory $conditionFactory */

@@ -279,26 +279,21 @@ $(function($){
     $.couponManager.onUsageUnlimitedChange = function() {
         var $isUnlimited = $('#is-unlimited');
 
-        var $maxUsage = $('#max-usage');
-
-        if ($maxUsage.val() == -1) {
+        if ($('#max-usage').val() == -1) {
             $isUnlimited.prop('checked', true);
-            $maxUsage.hide();
-            $('#max-usage-label').hide();
+            $('#max-usage-data').hide();
         } else {
             $isUnlimited.prop('checked', false);
-            $maxUsage.show();
-            $('#max-usage-label').show();
+            $('#max-usage-data').show();
         }
 
         $isUnlimited.change(function(){
-            var $this = $(this);
-            if ($this.is(':checked')) {
-                $('#max-usage').hide().val('-1');
-                $('#max-usage-label').hide();
+            if ($(this).is(':checked')) {
+                $('#max-usage-data').hide();
+                $('#max-usage').val('-1');
             } else {
-                $('#max-usage').show().val('');
-                $('#max-usage-label').show();
+                $('#max-usage').val('');
+                $('#max-usage-data').show();
             }
         });
     };

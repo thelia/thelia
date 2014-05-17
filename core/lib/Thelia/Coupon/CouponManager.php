@@ -20,6 +20,8 @@ use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\CouponModule;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponCountry;
+use Thelia\Model\CouponCustomerCount;
+use Thelia\Model\CouponCustomerCountQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderAddressQuery;
@@ -272,26 +274,64 @@ class CouponManager
      * To call when a coupon is consumed
      *
      * @param \Thelia\Model\Coupon $coupon Coupon consumed
+     * @param int|null $customerId the ID of the ordering customer
      *
      * @return int Usage left after decremental
      */
-    public function decrementQuantity(Coupon $coupon)
+    public function decrementQuantity(Coupon $coupon, $customerId = null)
     {
-        $ret = -1;
+        $ret = false;
+
         try {
 
-        $usageLeft = $coupon->getMaxUsage();
+            $usageLeft = $coupon->getUsagesLeft($customerId);
 
-        if ($usageLeft > 0) {
-            $usageLeft--;
-            $coupon->setMaxUsage($usageLeft);
+            if ($usageLeft > 0) {
 
-            $coupon->save();
-            $ret = $usageLeft;
-        }
+                // If the coupon usage is per user, add an entry to coupon customer usage count table
+                if ($coupon->getPerCustomerUsageCount()) {
 
-        } catch (\Exception $e) {
-            $ret = false;
+                    if (null == $customerId) {
+                        throw new \LogicException("Customer should not be null at this time.");
+                    }
+
+                    $ccc = CouponCustomerCountQuery::create()
+                        ->filterByCouponId($coupon->getId())
+                        ->filterByCustomerId($customerId)
+                        ->findOne()
+                    ;
+
+                    if ($ccc === null) {
+                        $ccc = new CouponCustomerCount();
+
+                        $ccc
+                            ->setCustomerId($customerId)
+                            ->setCouponId($coupon->getId())
+                            ->setCount(0);
+                    }
+
+                    $newCount = 1 + $ccc->getCount();
+
+                    $ccc
+                        ->setCount($newCount)
+                        ->save()
+                    ;
+
+                    $ret = $usageLeft - $newCount;
+                }
+                else {
+                    $usageLeft--;
+
+                    $coupon->setMaxUsage($usageLeft);
+
+                    $coupon->save();
+
+                    $ret = $usageLeft;
+                }
+            }
+        } catch (\Exception $ex) {
+            // Just log the problem.
+            Tlog::getInstance()->addError(sprintf("Failed to decrement coupon %s: %s", $coupon->getCode(), $ex->getMessage()));
         }
 
         return $ret;

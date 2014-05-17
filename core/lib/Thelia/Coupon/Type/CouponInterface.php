@@ -66,7 +66,7 @@ interface CouponInterface
      * @param \Datetime       $expirationDate             When the Code is expiring
      * @param ObjectCollection $freeShippingForCountries   list of countries which shipping is free. All if empty
      * @param ObjectCollection $freeShippingForModules     list of modules for which shipping is free. All if empty
-
+     * @param bool            $perCustomerUsageCount      true if usage count is per customer only
      */
     public function set(
         FacadeInterface $facade,
@@ -82,7 +82,8 @@ interface CouponInterface
         $maxUsage,
         \DateTime $expirationDate,
         $freeShippingForCountries,
-        $freeShippingForModules
+        $freeShippingForModules,
+        $perCustomerUsageCount
     );
 
     /**
@@ -161,6 +162,14 @@ interface CouponInterface
      * @return boolean
      */
     public function isAvailableOnSpecialOffers();
+
+    /**
+     * Check if the Coupon can be used against a
+     * product already with a special offer price
+     *
+     * @return boolean
+     */
+    public function getPerCustomerUsageCount();
 
     /**
      * Check if Coupon has been disabled by admin

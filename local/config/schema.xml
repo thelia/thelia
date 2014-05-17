@@ -911,6 +911,7 @@
     <column name="is_available_on_special_offers" required="true" type="BOOLEAN" />
     <column name="is_used" required="true" type="BOOLEAN" />
     <column name="serialized_conditions" required="true" type="LONGVARCHAR" />
+    <column name="per_customer_usage_count" required="true" type="BOOLEAN" />
     <unique name="code_UNIQUE">
       <unique-column name="code" />
     </unique>
@@ -1335,6 +1336,7 @@
     <column name="is_removing_postage" required="true" type="BOOLEAN" />
     <column name="is_available_on_special_offers" required="true" type="BOOLEAN" />
     <column name="serialized_conditions" required="true" type="LONGVARCHAR" />
+    <column name="per_customer_usage_count" required="true" type="BOOLEAN" />
     <foreign-key foreignTable="order" name="fk_order_coupon_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_id" />
     </foreign-key>
@@ -1393,6 +1395,23 @@
     </foreign-key>
     <index name="fk_module_id_idx">
       <index-column name="module_id" />
+    </index>
+  </table>
+  <table isCrossRef="true" name="coupon_customer_count" namespace="Thelia\Model">
+    <column name="coupon_id" required="true" type="INTEGER" />
+    <column name="customer_id" required="true" type="INTEGER" />
+    <column defaultValue="0" name="count" required="true" type="INTEGER" />
+    <foreign-key foreignTable="customer" name="fk_coupon_customer_customer_id" onDelete="CASCADE">
+      <reference foreign="id" local="customer_id" />
+    </foreign-key>
+    <foreign-key foreignTable="coupon" name="fk_coupon_customer_coupon_id" onDelete="CASCADE">
+      <reference foreign="id" local="coupon_id" />
+    </foreign-key>
+    <index name="fk_coupon_customer_customer_id_idx">
+      <index-column name="customer_id" />
+    </index>
+    <index name="fk_coupon_customer_coupon_id_idx">
+      <index-column name="coupon_id" />
     </index>
   </table>
 </database>

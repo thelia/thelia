@@ -182,7 +182,8 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 $coupon->getMaxUsage(),
                 $coupon->getExpirationDate(),
                 $coupon->getFreeShippingForCountries(),
-                $coupon->getFreeShippingForModules()
+                $coupon->getFreeShippingForModules(),
+                $coupon->getPerCustomerUsageCount()
             );
 
             $cleanedConditions = array();
@@ -217,6 +218,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("DESCRIPTION", $coupon->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("EXPIRATION_DATE", $coupon->getExpirationDate())
                 ->set("USAGE_LEFT", $coupon->getMaxUsage())
+                ->set("PER_CUSTOMER_USAGE_COUNT", $coupon->getPerCustomerUsageCount())
                 ->set("IS_CUMULATIVE", $coupon->getIsCumulative())
                 ->set("IS_REMOVING_POSTAGE", $coupon->getIsRemovingPostage())
                 ->set("IS_AVAILABLE_ON_SPECIAL_OFFERS", $coupon->getIsAvailableOnSpecialOffers())

@@ -104,6 +104,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
                     ->set("DAY_LEFT_BEFORE_EXPIRATION", $daysLeftBeforeExpiration)
                     ->set("FREE_SHIPPING_FOR_COUNTRIES_LIST", implode(',', $freeShippingForCountriesIds))
                     ->set("FREE_SHIPPING_FOR_MODULES_LIST", implode(',', $freeShippingForModulesIds))
+                    ->set("PER_CUSTOMER_USAGE_COUNT", $orderCoupon->getPerCustomerUsageCount())
                 ;
 
                 $loopResult->addRow($loopResultRow);

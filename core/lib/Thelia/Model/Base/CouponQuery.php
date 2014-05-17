@@ -34,6 +34,7 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCouponQuery orderByIsAvailableOnSpecialOffers($order = Criteria::ASC) Order by the is_available_on_special_offers column
  * @method     ChildCouponQuery orderByIsUsed($order = Criteria::ASC) Order by the is_used column
  * @method     ChildCouponQuery orderBySerializedConditions($order = Criteria::ASC) Order by the serialized_conditions column
+ * @method     ChildCouponQuery orderByPerCustomerUsageCount($order = Criteria::ASC) Order by the per_customer_usage_count column
  * @method     ChildCouponQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCouponQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method     ChildCouponQuery orderByVersion($order = Criteria::ASC) Order by the version column
@@ -50,6 +51,7 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCouponQuery groupByIsAvailableOnSpecialOffers() Group by the is_available_on_special_offers column
  * @method     ChildCouponQuery groupByIsUsed() Group by the is_used column
  * @method     ChildCouponQuery groupBySerializedConditions() Group by the serialized_conditions column
+ * @method     ChildCouponQuery groupByPerCustomerUsageCount() Group by the per_customer_usage_count column
  * @method     ChildCouponQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCouponQuery groupByUpdatedAt() Group by the updated_at column
  * @method     ChildCouponQuery groupByVersion() Group by the version column
@@ -65,6 +67,10 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCouponQuery leftJoinCouponModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the CouponModule relation
  * @method     ChildCouponQuery rightJoinCouponModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CouponModule relation
  * @method     ChildCouponQuery innerJoinCouponModule($relationAlias = null) Adds a INNER JOIN clause to the query using the CouponModule relation
+ *
+ * @method     ChildCouponQuery leftJoinCouponCustomerCount($relationAlias = null) Adds a LEFT JOIN clause to the query using the CouponCustomerCount relation
+ * @method     ChildCouponQuery rightJoinCouponCustomerCount($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CouponCustomerCount relation
+ * @method     ChildCouponQuery innerJoinCouponCustomerCount($relationAlias = null) Adds a INNER JOIN clause to the query using the CouponCustomerCount relation
  *
  * @method     ChildCouponQuery leftJoinCouponI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the CouponI18n relation
  * @method     ChildCouponQuery rightJoinCouponI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CouponI18n relation
@@ -89,6 +95,7 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCoupon findOneByIsAvailableOnSpecialOffers(boolean $is_available_on_special_offers) Return the first ChildCoupon filtered by the is_available_on_special_offers column
  * @method     ChildCoupon findOneByIsUsed(boolean $is_used) Return the first ChildCoupon filtered by the is_used column
  * @method     ChildCoupon findOneBySerializedConditions(string $serialized_conditions) Return the first ChildCoupon filtered by the serialized_conditions column
+ * @method     ChildCoupon findOneByPerCustomerUsageCount(boolean $per_customer_usage_count) Return the first ChildCoupon filtered by the per_customer_usage_count column
  * @method     ChildCoupon findOneByCreatedAt(string $created_at) Return the first ChildCoupon filtered by the created_at column
  * @method     ChildCoupon findOneByUpdatedAt(string $updated_at) Return the first ChildCoupon filtered by the updated_at column
  * @method     ChildCoupon findOneByVersion(int $version) Return the first ChildCoupon filtered by the version column
@@ -105,6 +112,7 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     array findByIsAvailableOnSpecialOffers(boolean $is_available_on_special_offers) Return ChildCoupon objects filtered by the is_available_on_special_offers column
  * @method     array findByIsUsed(boolean $is_used) Return ChildCoupon objects filtered by the is_used column
  * @method     array findBySerializedConditions(string $serialized_conditions) Return ChildCoupon objects filtered by the serialized_conditions column
+ * @method     array findByPerCustomerUsageCount(boolean $per_customer_usage_count) Return ChildCoupon objects filtered by the per_customer_usage_count column
  * @method     array findByCreatedAt(string $created_at) Return ChildCoupon objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCoupon objects filtered by the updated_at column
  * @method     array findByVersion(int $version) Return ChildCoupon objects filtered by the version column
@@ -203,7 +211,7 @@ abstract class CouponQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `TYPE`, `SERIALIZED_EFFECTS`, `IS_ENABLED`, `EXPIRATION_DATE`, `MAX_USAGE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `IS_USED`, `SERIALIZED_CONDITIONS`, `CREATED_AT`, `UPDATED_AT`, `VERSION` FROM `coupon` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `TYPE`, `SERIALIZED_EFFECTS`, `IS_ENABLED`, `EXPIRATION_DATE`, `MAX_USAGE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `IS_USED`, `SERIALIZED_CONDITIONS`, `PER_CUSTOMER_USAGE_COUNT`, `CREATED_AT`, `UPDATED_AT`, `VERSION` FROM `coupon` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -669,6 +677,33 @@ abstract class CouponQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the per_customer_usage_count column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPerCustomerUsageCount(true); // WHERE per_customer_usage_count = true
+     * $query->filterByPerCustomerUsageCount('yes'); // WHERE per_customer_usage_count = true
+     * </code>
+     *
+     * @param     boolean|string $perCustomerUsageCount The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCouponQuery The current query, for fluid interface
+     */
+    public function filterByPerCustomerUsageCount($perCustomerUsageCount = null, $comparison = null)
+    {
+        if (is_string($perCustomerUsageCount)) {
+            $per_customer_usage_count = in_array(strtolower($perCustomerUsageCount), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(CouponTableMap::PER_CUSTOMER_USAGE_COUNT, $perCustomerUsageCount, $comparison);
+    }
+
+    /**
      * Filter the query on the created_at column
      *
      * Example usage:
@@ -942,6 +977,79 @@ abstract class CouponQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related \Thelia\Model\CouponCustomerCount object
+     *
+     * @param \Thelia\Model\CouponCustomerCount|ObjectCollection $couponCustomerCount  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCouponQuery The current query, for fluid interface
+     */
+    public function filterByCouponCustomerCount($couponCustomerCount, $comparison = null)
+    {
+        if ($couponCustomerCount instanceof \Thelia\Model\CouponCustomerCount) {
+            return $this
+                ->addUsingAlias(CouponTableMap::ID, $couponCustomerCount->getCouponId(), $comparison);
+        } elseif ($couponCustomerCount instanceof ObjectCollection) {
+            return $this
+                ->useCouponCustomerCountQuery()
+                ->filterByPrimaryKeys($couponCustomerCount->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCouponCustomerCount() only accepts arguments of type \Thelia\Model\CouponCustomerCount or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CouponCustomerCount relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCouponQuery The current query, for fluid interface
+     */
+    public function joinCouponCustomerCount($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CouponCustomerCount');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CouponCustomerCount');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CouponCustomerCount relation CouponCustomerCount object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CouponCustomerCountQuery A secondary query class using the current class as primary query
+     */
+    public function useCouponCustomerCountQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCouponCustomerCount($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CouponCustomerCount', '\Thelia\Model\CouponCustomerCountQuery');
+    }
+
+    /**
      * Filter the query by a related \Thelia\Model\CouponI18n object
      *
      * @param \Thelia\Model\CouponI18n|ObjectCollection $couponI18n  the related object to use as filter
@@ -1118,6 +1226,23 @@ abstract class CouponQuery extends ModelCriteria
         return $this
             ->useCouponModuleQuery()
             ->filterByModule($module, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related Customer object
+     * using the coupon_customer_count table as cross reference
+     *
+     * @param Customer $customer the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCouponQuery The current query, for fluid interface
+     */
+    public function filterByCustomer($customer, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useCouponCustomerCountQuery()
+            ->filterByCustomer($customer, $comparison)
             ->endUse();
     }
 

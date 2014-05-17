@@ -79,6 +79,9 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /** @var  array ID of Shipping modules for which shipping is free */
     protected $freeShippingForMethods;
 
+    /** @var true if usage count is per customer only */
+    protected $perCustomerUsageCount;
+
     /**
      * Constructor
      *
@@ -99,11 +102,13 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
      * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
      * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
+     * @param boolean   $perCustomerUsageCount      Usage count is per customer
      */
     public function __construct(
         $code, $serviceId, $title, array $effects, $shortDescription, $description,
         $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative,
-        $isRemovingPostage, $maxUsage, $locale, $freeShippingForCountries, $freeShippingForMethods)
+        $isRemovingPostage, $maxUsage, $locale, $freeShippingForCountries, $freeShippingForMethods,
+        $perCustomerUsageCount)
     {
         $this->code = $code;
         $this->description = $description;
@@ -120,6 +125,24 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         $this->setEffects($effects);
         $this->freeShippingForCountries = $freeShippingForCountries;
         $this->freeShippingForMethods = $freeShippingForMethods;
+        $this->perCustomerUsageCount = $perCustomerUsageCount;
+    }
+
+    /**
+     * @param true $perCustomerUsageCount
+     */
+    public function setPerCustomerUsageCount($perCustomerUsageCount)
+    {
+        $this->perCustomerUsageCount = $perCustomerUsageCount;
+        return $this;
+    }
+
+    /**
+     * @return true
+     */
+    public function getPerCustomerUsageCount()
+    {
+        return $this->perCustomerUsageCount;
     }
 
     /**
