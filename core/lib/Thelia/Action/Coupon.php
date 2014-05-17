@@ -28,8 +28,6 @@ use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon as CouponModel;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponCountryQuery;
-use Thelia\Model\CouponCustomerCount;
-use Thelia\Model\CouponCustomerCountQuery;
 use Thelia\Model\CouponModule;
 use Thelia\Model\CouponModuleQuery;
 use Thelia\Model\CouponQuery;
@@ -309,7 +307,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                     $couponCountries = CouponCountryQuery::create()->filterByCouponId($couponModel->getId())->find();
 
                     /** @var CouponCountry $couponCountry */
-                    foreach($couponCountries as $couponCountry) {
+                    foreach ($couponCountries as $couponCountry) {
                         $occ = new OrderCouponCountry();
 
                         $occ
@@ -322,7 +320,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                     $couponModules = CouponModuleQuery::create()->filterByCouponId($couponModel->getId())->find();
 
                     /** @var CouponModule $couponModule */
-                    foreach($couponModules as $couponModule) {
+                    foreach ($couponModules as $couponModule) {
                         $ocm = new OrderCouponModule();
 
                         $ocm
@@ -334,8 +332,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 }
 
                 $con->commit();
-            }
-            catch (\Exception  $ex) {
+            } catch (\Exception  $ex) {
                 $con->rollBack();
 
                 throw($ex);

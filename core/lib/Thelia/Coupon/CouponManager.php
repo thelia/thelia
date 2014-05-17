@@ -23,8 +23,6 @@ use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponCustomerCount;
 use Thelia\Model\CouponCustomerCountQuery;
 use Thelia\Model\Order;
-use Thelia\Model\OrderAddress;
-use Thelia\Model\OrderAddressQuery;
 
 /**
  * Manage how Coupons could interact with a Checkout
@@ -117,7 +115,7 @@ class CouponManager
                     $deliveryCountryId = $deliveryAddress->getCountryId();
 
                     /** @var CouponCountry $couponCountry */
-                    foreach($couponCountries as $couponCountry) {
+                    foreach ($couponCountries as $couponCountry) {
                         if ($deliveryCountryId == $couponCountry->getCountryId()) {
                             $countryValid = true;
                             break;
@@ -140,7 +138,7 @@ class CouponManager
                     $shippingModuleId = $order->getDeliveryModuleId();
 
                     /** @var CouponModule $couponModule */
-                    foreach($couponModules as $couponModule) {
+                    foreach ($couponModules as $couponModule) {
                         if ($shippingModuleId == $couponModule->getModuleId()) {
                             $moduleValid = true;
                             break;
@@ -273,8 +271,8 @@ class CouponManager
      *
      * To call when a coupon is consumed
      *
-     * @param \Thelia\Model\Coupon $coupon Coupon consumed
-     * @param int|null $customerId the ID of the ordering customer
+     * @param \Thelia\Model\Coupon $coupon     Coupon consumed
+     * @param int|null             $customerId the ID of the ordering customer
      *
      * @return int Usage left after decremental
      */
@@ -318,8 +316,7 @@ class CouponManager
                     ;
 
                     $ret = $usageLeft - $newCount;
-                }
-                else {
+                } else {
                     $usageLeft--;
 
                     $coupon->setMaxUsage($usageLeft);

@@ -15,8 +15,6 @@ namespace Thelia\Coupon\Type;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Model\CouponCountry;
-use Thelia\Model\CouponModule;
 
 /**
  * Represents a Coupon ready to be processed in a Checkout process
@@ -51,22 +49,22 @@ interface CouponInterface
     /**
      * Set Coupon
      *
-     * @param FacadeInterface $facade                     Provides necessary value from Thelia
-     * @param string          $code                       Coupon code (ex: XMAS)
-     * @param string          $title                      Coupon title (ex: Coupon for XMAS)
-     * @param string          $shortDescription           Coupon short description
-     * @param string          $description                Coupon description
-     * @param array           $effects                    Coupon effects params
-     * @param bool            $isCumulative               If Coupon is cumulative
-     * @param bool            $isRemovingPostage          If Coupon is removing postage
-     * @param bool            $isAvailableOnSpecialOffers If available on Product already
-     *                                                    on special offer price
-     * @param bool            $isEnabled                  False if Coupon is disabled by admin
-     * @param int             $maxUsage                   How many usage left
-     * @param \Datetime       $expirationDate             When the Code is expiring
+     * @param FacadeInterface  $facade                     Provides necessary value from Thelia
+     * @param string           $code                       Coupon code (ex: XMAS)
+     * @param string           $title                      Coupon title (ex: Coupon for XMAS)
+     * @param string           $shortDescription           Coupon short description
+     * @param string           $description                Coupon description
+     * @param array            $effects                    Coupon effects params
+     * @param bool             $isCumulative               If Coupon is cumulative
+     * @param bool             $isRemovingPostage          If Coupon is removing postage
+     * @param bool             $isAvailableOnSpecialOffers If available on Product already
+     *                                                     on special offer price
+     * @param bool             $isEnabled                  False if Coupon is disabled by admin
+     * @param int              $maxUsage                   How many usage left
+     * @param \Datetime        $expirationDate             When the Code is expiring
      * @param ObjectCollection $freeShippingForCountries   list of countries which shipping is free. All if empty
      * @param ObjectCollection $freeShippingForModules     list of modules for which shipping is free. All if empty
-     * @param bool            $perCustomerUsageCount      true if usage count is per customer only
+     * @param bool             $perCustomerUsageCount      true if usage count is per customer only
      */
     public function set(
         FacadeInterface $facade,

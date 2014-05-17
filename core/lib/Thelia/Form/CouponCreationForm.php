@@ -18,13 +18,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Base\CountryI18n;
 use Thelia\Model\Base\CountryQuery;
 use Thelia\Model\Base\LangQuery;
 use Thelia\Model\Base\ModuleQuery;
-use Thelia\Model\CountryI18nQuery;
 use Thelia\Model\Module;
-use Thelia\Model\ModuleI18nQuery;
 use Thelia\Module\BaseModule;
 
 /**
@@ -49,7 +46,7 @@ class CouponCreationForm extends BaseForm
         $list = CountryQuery::create()->find();
 
         /** @var Country $item */
-        foreach($list as $item) {
+        foreach ($list as $item) {
             $countries[$item->getId()] = $item->getTitle();
         }
 
@@ -62,7 +59,7 @@ class CouponCreationForm extends BaseForm
         $list = ModuleQuery::create()->filterByActivate(BaseModule::IS_ACTIVATED)->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->find();
 
         /** @var Module $item */
-        foreach($list as $item) {
+        foreach ($list as $item) {
             $modules[$item->getId()] = $item->getTitle();
         }
 

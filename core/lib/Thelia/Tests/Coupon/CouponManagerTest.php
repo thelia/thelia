@@ -19,7 +19,6 @@ use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\Type\RemoveXAmount;
 use Thelia\Model\Coupon;
-use Thelia\Model\CouponCountry;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Order;
 

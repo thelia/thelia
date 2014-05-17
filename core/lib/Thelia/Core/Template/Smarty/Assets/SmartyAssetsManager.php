@@ -150,7 +150,7 @@ class SmartyAssetsManager
         $files = $finder->files()->in($assetSource)->name($file);
 
         if (! empty($files)) {
-            
+
             $url = $this->assetsManager->processAsset(
                 $assetSource . DS . $file,
                 $assetSource . DS . self::$assetsDirectory,
@@ -162,8 +162,7 @@ class SmartyAssetsManager
                 $filters,
                 $debug
             );
-        }
-        else {
+        } else {
             Tlog::getInstance()->addError("Asset $assetSource".DS."$file was not found.");
         }
 

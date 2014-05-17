@@ -198,13 +198,13 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 
             $freeShippingForCountriesIds = [];
             /** @var CouponCountry $couponCountry */
-            foreach($coupon->getFreeShippingForCountries() as $couponCountry) {
+            foreach ($coupon->getFreeShippingForCountries() as $couponCountry) {
                 $freeShippingForCountriesIds[] = $couponCountry->getCountryId();
             }
 
             $freeShippingForModulesIds = [];
             /** @var CouponModule $couponModule */
-            foreach($coupon->getFreeShippingForModules() as $couponModule) {
+            foreach ($coupon->getFreeShippingForModules() as $couponModule) {
                 $freeShippingForModulesIds[] = $couponModule->getModuleId();
             }
 

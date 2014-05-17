@@ -176,6 +176,7 @@ abstract class CouponAbstract implements CouponInterface
     public function setPerCustomerUsageCount($perCustomerUsageCount)
     {
         $this->perCustomerUsageCount = $perCustomerUsageCount;
+
         return $this;
     }
 
@@ -186,7 +187,6 @@ abstract class CouponAbstract implements CouponInterface
     {
         return $this->perCustomerUsageCount;
     }
-
 
     /**
      * Return Coupon code (ex: XMAS)
@@ -253,14 +253,16 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * @return array list of country IDs for which shipping is free. All if empty
      */
-    public function getFreeShippingForCountries() {
+    public function getFreeShippingForCountries()
+    {
         return $this->freeShippingForCountries;
     }
 
     /**
      * @return array list of module IDs for which shipping is free. All if empty
      */
-    public function getFreeShippingForModules() {
+    public function getFreeShippingForModules()
+    {
         return $this->freeShippingForModules;
     }
 

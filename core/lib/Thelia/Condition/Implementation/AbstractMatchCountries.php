@@ -44,9 +44,9 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         parent::__construct($facade);
     }
 
-    protected abstract function getSummaryLabel($cntryStrList, $i18nOperator);
+    abstract protected function getSummaryLabel($cntryStrList, $i18nOperator);
 
-    protected abstract function getFormLabel();
+    abstract protected function getFormLabel();
 
     /**
      * @inheritdoc
@@ -87,6 +87,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         // The delivery address should match one of the selected countries.
 
         /* TODO !!!! */
+
         return $this->conditionValidator->variableOpComparison(
             $this->facade->getNbArticlesInCart(),
             $this->operators[self::COUNTRIES_LIST],
@@ -110,7 +111,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         if (null !== $cntryList = CountryQuery::create()->findPks($cntryIds)) {
 
             /** @var Category $cntry */
-            foreach($cntryList as $cntry) {
+            foreach ($cntryList as $cntry) {
                 $cntryStrList .= $cntry->getTitle() . ', ';
             }
 
