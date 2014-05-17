@@ -189,8 +189,8 @@ class Module extends BaseModule
      * @return BaseModuleInterface a module instance
      * @throws \InvalidArgumentException if the module could not be found in the container/
      */
-    public function getModuleInstance(ContainerInterface $container) {
-
+    public function getModuleInstance(ContainerInterface $container)
+    {
         $instance = $container->get(sprintf('module.%s', $this->getCode()));
 
         if ($instance == null) {
