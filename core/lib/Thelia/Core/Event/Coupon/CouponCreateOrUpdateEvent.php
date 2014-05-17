@@ -134,6 +134,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     public function setPerCustomerUsageCount($perCustomerUsageCount)
     {
         $this->perCustomerUsageCount = $perCustomerUsageCount;
+
         return $this;
     }
 
@@ -146,12 +147,13 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * @param array $freeShippingForCountries
+     * @param  array $freeShippingForCountries
      * @return $this
      */
     public function setFreeShippingForCountries($freeShippingForCountries)
     {
         $this->freeShippingForCountries = $freeShippingForCountries;
+
         return $this;
     }
 
@@ -164,12 +166,13 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * @param array $freeShippingForMethods
+     * @param  array $freeShippingForMethods
      * @return $this
      */
     public function setFreeShippingForMethods($freeShippingForMethods)
     {
         $this->freeShippingForMethods = $freeShippingForMethods;
+
         return $this;
     }
 

@@ -26,8 +26,8 @@ class MatchForEveryone extends ConditionAbstract
     /**
      * @inheritdoc
      */
-    public function __construct(FacadeInterface $facade) {
-
+    public function __construct(FacadeInterface $facade)
+    {
         // Define the allowed comparison operators
         $this->availableOperators = [];
 

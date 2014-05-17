@@ -14,11 +14,7 @@ namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Exception\InvalidConditionOperatorException;
 use Thelia\Exception\InvalidConditionValueException;
-use Thelia\Model\Category;
-use Thelia\Model\CategoryImageQuery;
-use Thelia\Model\CategoryQuery;
 use Thelia\Tools\DateTimeFormat;
 
 /**
@@ -76,8 +72,7 @@ class StartDate extends ConditionAbstract
             }
 
             $timestamp = $date->getTimestamp();
-        }
-        else {
+        } else {
             $timestamp = $values[self::START_DATE];
         }
 
@@ -147,7 +142,8 @@ class StartDate extends ConditionAbstract
         return $toolTip;
     }
 
-    private function getDateFormat() {
+    private function getDateFormat()
+    {
         return DateTimeFormat::getInstance($this->facade->getRequest())->getFormat("date");
     }
 
@@ -177,8 +173,7 @@ class StartDate extends ConditionAbstract
             $date->setTimestamp($this->values[self::START_DATE]);
 
             $strDate = $date->format($this->getDateFormat());
-        }
-        else {
+        } else {
             $strDate = '';
         }
 

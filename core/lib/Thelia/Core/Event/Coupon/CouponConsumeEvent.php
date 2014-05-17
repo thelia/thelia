@@ -37,9 +37,9 @@ class CouponConsumeEvent extends ActionEvent
     /**
      * Constructor
      *
-     * @param string $code     Coupon code
-     * @param float  $discount Total discount given by this coupon
-     * @param bool   $isValid  If Coupon is valid or f Customer meets coupon conditions
+     * @param string $code         Coupon code
+     * @param float  $discount     Total discount given by this coupon
+     * @param bool   $isValid      If Coupon is valid or f Customer meets coupon conditions
      * @param bool   $freeShipping true if coupon offers free shipping
      */
     public function __construct($code, $discount = null, $isValid  = null, $freeShipping = false)
@@ -57,6 +57,7 @@ class CouponConsumeEvent extends ActionEvent
     public function setFreeShipping($freeShipping)
     {
         $this->freeShipping = $freeShipping;
+
         return $this;
     }
 

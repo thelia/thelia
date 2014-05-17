@@ -14,7 +14,6 @@ namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Exception\InvalidConditionOperatorException;
 use Thelia\Exception\InvalidConditionValueException;
 
 /**

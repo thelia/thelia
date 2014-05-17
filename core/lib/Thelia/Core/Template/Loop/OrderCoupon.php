@@ -82,13 +82,13 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
 
                 $freeShippingForCountriesIds = [];
                 /** @var OrderCouponCountry $couponCountry */
-                foreach($orderCoupon->getFreeShippingForCountries() as $couponCountry) {
+                foreach ($orderCoupon->getFreeShippingForCountries() as $couponCountry) {
                     $freeShippingForCountriesIds[] = $couponCountry->getCountryId();
                 }
 
                 $freeShippingForModulesIds = [];
                 /** @var OrderCouponModule $couponModule */
-                foreach($orderCoupon->getFreeShippingForModules() as $couponModule) {
+                foreach ($orderCoupon->getFreeShippingForModules() as $couponModule) {
                     $freeShippingForModulesIds[] = $couponModule->getModuleId();
                 }
 

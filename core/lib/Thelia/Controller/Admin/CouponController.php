@@ -157,12 +157,12 @@ class CouponController extends BaseAdminController
             $freeShippingForCountries = $freeShippingForModules = [];
 
             /** @var CouponCountry $item */
-            foreach($coupon->getFreeShippingForCountries() as $item) {
+            foreach ($coupon->getFreeShippingForCountries() as $item) {
                 $freeShippingForCountries[] = $item->getCountryId();
             }
 
             /** @var CouponModule $item */
-            foreach($coupon->getFreeShippingForModules() as $item) {
+            foreach ($coupon->getFreeShippingForModules() as $item) {
                 $freeShippingForModules[] = $item->getModuleId();
             }
 
