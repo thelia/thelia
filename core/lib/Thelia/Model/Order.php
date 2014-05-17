@@ -25,6 +25,7 @@ class Order extends BaseOrder
     public function setChoosenDeliveryAddress($choosenDeliveryAddress)
     {
         $this->choosenDeliveryAddress = $choosenDeliveryAddress;
+
         return $this;
     }
 
@@ -42,6 +43,7 @@ class Order extends BaseOrder
     public function setChoosenInvoiceAddress($choosenInvoiceAddress)
     {
         $this->choosenInvoiceAddress = $choosenInvoiceAddress;
+
         return $this;
     }
 

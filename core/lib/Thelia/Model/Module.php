@@ -185,8 +185,8 @@ class Module extends BaseModule
     }
 
     /**
-     * @param ContainerInterface $container the Thelia container
-     * @return BaseModuleInterface a module instance
+     * @param  ContainerInterface        $container the Thelia container
+     * @return BaseModuleInterface       a module instance
      * @throws \InvalidArgumentException if the module could not be found in the container/
      */
     public function getModuleInstance(ContainerInterface $container)

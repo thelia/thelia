@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderCouponCountryQuery as BaseOrderCouponCountryQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'order_coupon_country' table.
  *

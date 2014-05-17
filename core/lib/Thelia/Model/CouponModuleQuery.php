@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\CouponModuleQuery as BaseCouponModuleQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'coupon_module' table.
  *
