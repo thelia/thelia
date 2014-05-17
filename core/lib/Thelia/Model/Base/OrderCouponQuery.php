@@ -34,6 +34,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     ChildOrderCouponQuery orderByIsRemovingPostage($order = Criteria::ASC) Order by the is_removing_postage column
  * @method     ChildOrderCouponQuery orderByIsAvailableOnSpecialOffers($order = Criteria::ASC) Order by the is_available_on_special_offers column
  * @method     ChildOrderCouponQuery orderBySerializedConditions($order = Criteria::ASC) Order by the serialized_conditions column
+ * @method     ChildOrderCouponQuery orderByPerCustomerUsageCount($order = Criteria::ASC) Order by the per_customer_usage_count column
  * @method     ChildOrderCouponQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildOrderCouponQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -50,6 +51,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     ChildOrderCouponQuery groupByIsRemovingPostage() Group by the is_removing_postage column
  * @method     ChildOrderCouponQuery groupByIsAvailableOnSpecialOffers() Group by the is_available_on_special_offers column
  * @method     ChildOrderCouponQuery groupBySerializedConditions() Group by the serialized_conditions column
+ * @method     ChildOrderCouponQuery groupByPerCustomerUsageCount() Group by the per_customer_usage_count column
  * @method     ChildOrderCouponQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildOrderCouponQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -85,6 +87,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     ChildOrderCoupon findOneByIsRemovingPostage(boolean $is_removing_postage) Return the first ChildOrderCoupon filtered by the is_removing_postage column
  * @method     ChildOrderCoupon findOneByIsAvailableOnSpecialOffers(boolean $is_available_on_special_offers) Return the first ChildOrderCoupon filtered by the is_available_on_special_offers column
  * @method     ChildOrderCoupon findOneBySerializedConditions(string $serialized_conditions) Return the first ChildOrderCoupon filtered by the serialized_conditions column
+ * @method     ChildOrderCoupon findOneByPerCustomerUsageCount(boolean $per_customer_usage_count) Return the first ChildOrderCoupon filtered by the per_customer_usage_count column
  * @method     ChildOrderCoupon findOneByCreatedAt(string $created_at) Return the first ChildOrderCoupon filtered by the created_at column
  * @method     ChildOrderCoupon findOneByUpdatedAt(string $updated_at) Return the first ChildOrderCoupon filtered by the updated_at column
  *
@@ -101,6 +104,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     array findByIsRemovingPostage(boolean $is_removing_postage) Return ChildOrderCoupon objects filtered by the is_removing_postage column
  * @method     array findByIsAvailableOnSpecialOffers(boolean $is_available_on_special_offers) Return ChildOrderCoupon objects filtered by the is_available_on_special_offers column
  * @method     array findBySerializedConditions(string $serialized_conditions) Return ChildOrderCoupon objects filtered by the serialized_conditions column
+ * @method     array findByPerCustomerUsageCount(boolean $per_customer_usage_count) Return ChildOrderCoupon objects filtered by the per_customer_usage_count column
  * @method     array findByCreatedAt(string $created_at) Return ChildOrderCoupon objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildOrderCoupon objects filtered by the updated_at column
  *
@@ -191,7 +195,7 @@ abstract class OrderCouponQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ORDER_ID`, `CODE`, `TYPE`, `AMOUNT`, `TITLE`, `SHORT_DESCRIPTION`, `DESCRIPTION`, `EXPIRATION_DATE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `SERIALIZED_CONDITIONS`, `CREATED_AT`, `UPDATED_AT` FROM `order_coupon` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `ORDER_ID`, `CODE`, `TYPE`, `AMOUNT`, `TITLE`, `SHORT_DESCRIPTION`, `DESCRIPTION`, `EXPIRATION_DATE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `SERIALIZED_CONDITIONS`, `PER_CUSTOMER_USAGE_COUNT`, `CREATED_AT`, `UPDATED_AT` FROM `order_coupon` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -701,6 +705,33 @@ abstract class OrderCouponQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderCouponTableMap::SERIALIZED_CONDITIONS, $serializedConditions, $comparison);
+    }
+
+    /**
+     * Filter the query on the per_customer_usage_count column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPerCustomerUsageCount(true); // WHERE per_customer_usage_count = true
+     * $query->filterByPerCustomerUsageCount('yes'); // WHERE per_customer_usage_count = true
+     * </code>
+     *
+     * @param     boolean|string $perCustomerUsageCount The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderCouponQuery The current query, for fluid interface
+     */
+    public function filterByPerCustomerUsageCount($perCustomerUsageCount = null, $comparison = null)
+    {
+        if (is_string($perCustomerUsageCount)) {
+            $per_customer_usage_count = in_array(strtolower($perCustomerUsageCount), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(OrderCouponTableMap::PER_CUSTOMER_USAGE_COUNT, $perCustomerUsageCount, $comparison);
     }
 
     /**

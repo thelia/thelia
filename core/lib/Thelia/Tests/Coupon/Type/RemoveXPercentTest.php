@@ -109,7 +109,8 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
             $description, array('amount' => 0.00, 'percentage' => 10.00), true, true, true, true,
             254, $date->setTimestamp(strtotime("today + 3 months")),
             new ObjectCollection(),
-            new ObjectCollection()
+            new ObjectCollection(),
+            false
         );
 
         $condition1 = new MatchForTotalAmount($stubFacade);

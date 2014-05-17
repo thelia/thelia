@@ -64,13 +64,15 @@ class Coupon extends BaseCoupon
      * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
      * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
      * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
+     * @param bool      $perCustomerUsageCount      True if usage coiunt is per customer
      *
      * @throws \Exception
      */
     public function createOrUpdate(
         $code, $title, array $effects, $type, $isRemovingPostage, $shortDescription, $description,
         $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $defaultSerializedRule,
-        $locale, $freeShippingForCountries, $freeShippingForMethods)
+        $locale, $freeShippingForCountries, $freeShippingForMethods,
+        $perCustomerUsageCount)
     {
         $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
 
@@ -87,10 +89,12 @@ class Coupon extends BaseCoupon
                 ->setIsAvailableOnSpecialOffers($isAvailableOnSpecialOffers)
                 ->setIsCumulative($isCumulative)
                 ->setMaxUsage($maxUsage)
+                ->setPerCustomerUsageCount($perCustomerUsageCount)
                 ->setLocale($locale)
                 ->setTitle($title)
                 ->setShortDescription($shortDescription)
-                ->setDescription($description);
+                ->setDescription($description)
+            ;
 
             // If no rule given, set default rule
             if (null === $this->getSerializedConditions()) {
@@ -268,5 +272,33 @@ class Coupon extends BaseCoupon
      */
     public function getFreeShippingForModules() {
         return CouponModuleQuery::create()->filterByCouponId($this->getId())->find();
+    }
+
+    /**
+     * Get coupon usage left, either overall, or per customer.
+     *
+     * @param int|null $customerId the ID of the ordering customer
+     *
+     * @return int the usage left.
+     */
+    public function getUsagesLeft($customerId = null)
+    {
+        $usageLeft = $this->getMaxUsage();
+
+        if ($this->getPerCustomerUsageCount()) {
+
+             // Get usage left for current customer. If the record is not found,
+            // it means that the customer has not yes used this coupon.
+            if (null !== $couponCustomerCount = CouponCustomerCountQuery::create()
+                    ->filterByCouponId($this->getId())
+                    ->filterByCustomerId($customerId)
+                    ->findOne()) {
+
+                // The coupon has already been used -> remove this customer's usage count
+                $usageLeft -= $couponCustomerCount->getCount();
+            }
+        }
+
+        return $usageLeft;
     }
 }

@@ -51,14 +51,16 @@ class RemoveXPercent extends CouponAbstract
         $maxUsage,
         \DateTime $expirationDate,
         $freeShippingForCountries,
-        $freeShippingForModules
+        $freeShippingForModules,
+        $perCustomerUsageCount
     )
     {
         parent::set(
             $facade, $code, $title, $shortDescription, $description, $effects,
             $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate,
             $freeShippingForCountries,
-            $freeShippingForModules
+            $freeShippingForModules,
+            $perCustomerUsageCount
         );
 
         $this->percentage = $effects[self::INPUT_PERCENTAGE_NAME];

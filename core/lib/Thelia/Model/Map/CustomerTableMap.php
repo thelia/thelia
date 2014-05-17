@@ -228,6 +228,8 @@ class CustomerTableMap extends TableMap
         $this->addRelation('Address', '\\Thelia\\Model\\Address', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), 'CASCADE', 'RESTRICT', 'Addresses');
         $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), 'RESTRICT', 'RESTRICT', 'Orders');
         $this->addRelation('Cart', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), 'CASCADE', 'RESTRICT', 'Carts');
+        $this->addRelation('CouponCustomerCount', '\\Thelia\\Model\\CouponCustomerCount', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), 'CASCADE', null, 'CouponCustomerCounts');
+        $this->addRelation('Coupon', '\\Thelia\\Model\\Coupon', RelationMap::MANY_TO_MANY, array(), 'CASCADE', null, 'Coupons');
     } // buildRelations()
 
     /**
@@ -251,6 +253,7 @@ class CustomerTableMap extends TableMap
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 AddressTableMap::clearInstancePool();
                 CartTableMap::clearInstancePool();
+                CouponCustomerCountTableMap::clearInstancePool();
             }
 
     /**

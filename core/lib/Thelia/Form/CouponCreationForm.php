@@ -182,6 +182,18 @@ class CouponCreationForm extends BaseForm
                 )
             )
             ->add(
+                'perCustomerUsageCount',
+                'choice',
+                array(
+                    'multiple' => false,
+                    'required' => true,
+                    'choices'  => [
+                        1 => Translator::getInstance()->trans('Per customer'),
+                        0 => Translator::getInstance()->trans('Overall')
+                    ]
+                )
+            )
+            ->add(
                 'locale',
                 'hidden',
                 array(

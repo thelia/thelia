@@ -25,11 +25,13 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Model\Base\CouponCountry;
-use Thelia\Model\Base\CouponModule;
-use Thelia\Model\Base\CouponModuleQuery;
 use Thelia\Model\Coupon as CouponModel;
+use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponCountryQuery;
+use Thelia\Model\CouponCustomerCount;
+use Thelia\Model\CouponCustomerCountQuery;
+use Thelia\Model\CouponModule;
+use Thelia\Model\CouponModuleQuery;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Map\OrderCouponTableMap;
 use Thelia\Model\OrderCoupon;
@@ -40,7 +42,7 @@ use Thelia\Model\OrderCouponModule;
  * Process Coupon Events
  *
  * @package Coupon
- * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>, Franck Allimant <franck@cqfdev.fr>
  *
  */
 class Coupon extends BaseAction implements EventSubscriberInterface
@@ -123,7 +125,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $coupon = $this->couponFactory->buildCouponFromCode($event->getCode());
 
         if ($coupon) {
+
             $isValid = $coupon->isMatching();
+
             if ($isValid) {
                 $consumedCoupons = $this->request->getSession()->getConsumedCoupons();
 
@@ -132,6 +136,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 }
 
                 if (!isset($consumedCoupons[$event->getCode()])) {
+
                     // Prevent accumulation of the same Coupon on a Checkout
                     $consumedCoupons[$event->getCode()] = $event->getCode();
 
@@ -148,7 +153,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                         ->getSession()
                         ->getOrder()
                         ->setDiscount($totalDiscount)
-                        // ->save()
                     ;
                 }
             }
@@ -158,9 +162,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $event->setDiscount($totalDiscount);
     }
 
-    public function updateOrderDiscount($event)
+    public function updateOrderDiscount(/** @noinspection PhpUnusedParameterInspection */ $event)
     {
-
         $discount = $this->couponManager->getDiscount();
 
         $this->request
@@ -168,6 +171,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             ->getCart()
             ->setDiscount($discount)
             ->save();
+
         $this->request
             ->getSession()
             ->getOrder()
@@ -212,7 +216,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $defaultSerializedRule,
             $event->getLocale(),
             $event->getFreeShippingForCountries(),
-            $event->getFreeShippingForMethods()
+            $event->getFreeShippingForMethods(),
+            $event->getPerCustomerUsageCount()
         );
 
         $event->setCouponModel($coupon);
@@ -278,7 +283,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                     $couponModel->setLocale($this->request->getSession()->getLang()->getLocale());
 
                     /* decrease coupon quantity */
-                    $this->couponManager->decrementQuantity($couponModel);
+                    $this->couponManager->decrementQuantity($couponModel, $event->getOrder()->getCustomerId());
 
                     /* memorize coupon */
                     $orderCoupon = new OrderCoupon();
@@ -296,6 +301,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                         ->setIsRemovingPostage($couponModel->getIsRemovingPostage())
                         ->setIsAvailableOnSpecialOffers($couponModel->getIsAvailableOnSpecialOffers())
                         ->setSerializedConditions($couponModel->getSerializedConditions())
+                        ->setPerCustomerUsageCount($couponModel->getPerCustomerUsageCount())
                     ;
                     $orderCoupon->save();
 

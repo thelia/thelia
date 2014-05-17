@@ -119,7 +119,8 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
             $stubFacade, 'XMAS', 'XMAS Coupon', 'Coupon for Springbreak removing 10€ if you have a cart between 40.00€ and 400.00€ (excluded)',
             $description, array('amount' => 10.00), true, true, true, true, 254, $date->setTimestamp(strtotime("today + 3 months")),
             new ObjectCollection(),
-            new ObjectCollection()
+            new ObjectCollection(),
+            false
         );
 
         $condition1 = new MatchForTotalAmount($stubFacade);

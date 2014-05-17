@@ -101,12 +101,29 @@
                                     <input id="is-unlimited" type="checkbox" name="is-unlimited" {if $value == '' || $value == -1}checked="checked"{/if}>
                                     {intl l='Unlimited number of uses'}
                                 </label>
-
-                                <label id="max-usage-label" for="max-usage" class="control-label">{intl l='Maximum usage count :'}</label>
-                                <input id="max-usage" type="text" class="form-control" name="{$name}" value="{if $value == ''}-1{else}{$value}{/if}" placeholder="{intl l='Usage count'}">
-                                {if $error}{$message}{/if}
                             </div>
                         {/form_field}
+
+                        <div class="well well-sm" id="max-usage-data">
+                            {form_field form=$form field='maxUsage'}
+                                <div class="form-group {if $error}has-error{/if}">
+                                    <label id="max-usage-label" for="max-usage" class="control-label">{intl l='Maximum usage count :'}</label>
+                                    <input id="max-usage" type="text" class="form-control" name="{$name}" value="{if $value == ''}-1{else}{$value}{/if}" placeholder="{intl l='Usage count'}">
+                                    {if $error}{$message}{/if}
+                                </div>
+                            {/form_field}
+
+                            {form_field form=$form field='perCustomerUsageCount'}
+                                <div class="form-group {if $error}has-error{/if}" style="margin-bottom: 0;">
+                                    {foreach $choices as $choice}
+                                    <label class="radio-inline">
+                                        <input type="radio" name="{$name}" value="{$choice->value}" {if $value == $choice->data}checked="checked"{/if}>
+                                        {$choice->label}
+                                    </label>
+                                    {/foreach}
+                                </div>
+                            {/form_field}
+                        </div>
 
                         {form_field form=$form field='isRemovingPostage'}
                             <div class="form-group {if $error}has-error{/if}">
@@ -118,7 +135,7 @@
                             </div>
                         {/form_field}
 
-                        <div class="free-postage-conditions" style="display: none">
+                        <div class="free-postage-conditions well well-sm" " style="display: none">
                             {form_field form=$form field='freeShippingForCountries'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="for-countries-only">{intl l="Free shipping to countries  :"}</label>
@@ -132,7 +149,7 @@
                             {/form_field}
 
                             {form_field form=$form field='freeShippingForModules'}
-                                <div class="form-group {if $error}has-error{/if}">
+                                <div class="form-group {if $error}has-error{/if}" style="margin-bottom: 0;">
                                     <label for="for-modules-only">{intl l="Free shipping for methods :"}</label>
                                     <select multiple size="5" class="form-control" id="for-modules-only" name="{$name}">
                                         {foreach $choices as $choice}

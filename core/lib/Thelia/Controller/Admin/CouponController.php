@@ -185,7 +185,8 @@ class CouponController extends BaseAdminController
                 'conditions' => $conditions,
                 'locale' => $this->getCurrentEditionLocale(),
                 'freeShippingForCountries' => $freeShippingForCountries,
-                'freeShippingForModules' => $freeShippingForModules
+                'freeShippingForModules' => $freeShippingForModules,
+                'perCustomerUsageCount' => $coupon->getPerCustomerUsageCount(),
             ];
 
             $args['conditions'] = $this->cleanConditionForTemplate($conditions);
@@ -721,7 +722,7 @@ class CouponController extends BaseAdminController
         $couponManager = $this->container->get($serviceId);
         $effects = [CouponAbstract::INPUT_AMOUNT_NAME => $data[CouponAbstract::INPUT_AMOUNT_NAME]];
         $effects = $this->addExtendedLogic($effects, $couponManager->getExtendedInputs());
-var_dump($data);
+
         $couponEvent = new CouponCreateOrUpdateEvent(
             $data['code'],
             $serviceId,
@@ -737,7 +738,8 @@ var_dump($data);
             $data['maxUsage'],
             $data['locale'],
             $data['freeShippingForCountries'],
-            $data['freeShippingForModules']
+            $data['freeShippingForModules'],
+            $data['perCustomerUsageCount']
         );
 
         // If Update mode
@@ -797,7 +799,8 @@ var_dump($data);
             $coupon->getMaxUsage(),
             $coupon->getLocale(),
             $coupon->getFreeShippingForCountries(),
-            $coupon->getFreeShippingForModules()
+            $coupon->getFreeShippingForModules(),
+            $coupon->getPerCustomerUsageCount()
         );
         $couponEvent->setCouponModel($coupon);
         $couponEvent->setConditions($conditions);

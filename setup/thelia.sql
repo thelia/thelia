@@ -1107,6 +1107,7 @@ CREATE TABLE `coupon`
     `is_available_on_special_offers` TINYINT(1) NOT NULL,
     `is_used` TINYINT(1) NOT NULL,
     `serialized_conditions` TEXT NOT NULL,
+    `per_customer_usage_count` TINYINT(1) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -1635,6 +1636,7 @@ CREATE TABLE `order_coupon`
     `is_removing_postage` TINYINT(1) NOT NULL,
     `is_available_on_special_offers` TINYINT(1) NOT NULL,
     `serialized_conditions` TEXT NOT NULL,
+    `per_customer_usage_count` TINYINT(1) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1730,6 +1732,29 @@ CREATE TABLE `order_coupon_module`
     CONSTRAINT `fk_coupon_module_module_id0`
         FOREIGN KEY (`module_id`)
         REFERENCES `module` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- coupon_customer_count
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `coupon_customer_count`;
+
+CREATE TABLE `coupon_customer_count`
+(
+    `coupon_id` INTEGER NOT NULL,
+    `customer_id` INTEGER NOT NULL,
+    `count` INTEGER DEFAULT 0 NOT NULL,
+    INDEX `fk_coupon_customer_customer_id_idx` (`customer_id`),
+    INDEX `fk_coupon_customer_coupon_id_idx` (`coupon_id`),
+    CONSTRAINT `fk_coupon_customer_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_coupon_customer_coupon_id`
+        FOREIGN KEY (`coupon_id`)
+        REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
@@ -2506,6 +2531,7 @@ CREATE TABLE `coupon_version`
     `is_available_on_special_offers` TINYINT(1) NOT NULL,
     `is_used` TINYINT(1) NOT NULL,
     `serialized_conditions` TEXT NOT NULL,
+    `per_customer_usage_count` TINYINT(1) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
