@@ -12,7 +12,8 @@ class OrderCoupon extends BaseOrderCoupon
      * Return the countries for which free shipping is valid
      * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
      */
-    public function getFreeShippingForCountries() {
+    public function getFreeShippingForCountries()
+    {
         return OrderCouponCountryQuery::create()->filterByOrderCoupon($this)->find();
     }
 
@@ -21,7 +22,8 @@ class OrderCoupon extends BaseOrderCoupon
      *
      * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
      */
-    public function getFreeShippingForModules() {
+    public function getFreeShippingForModules()
+    {
         return OrderCouponModuleQuery::create()->filterByOrderCoupon($this)->find();
     }
 }
