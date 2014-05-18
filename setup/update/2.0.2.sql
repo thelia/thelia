@@ -29,7 +29,7 @@ CREATE TABLE `coupon_country`
         FOREIGN KEY (`coupon_id`)
         REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET='utf8';
 
 DROP TABLE IF EXISTS `coupon_module`;
 
@@ -47,7 +47,7 @@ CREATE TABLE `coupon_module`
         FOREIGN KEY (`module_id`)
         REFERENCES `module` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET='utf8';
 
 
 DROP TABLE IF EXISTS `order_coupon_country`;
@@ -65,7 +65,7 @@ CREATE TABLE `order_coupon_country`
     CONSTRAINT `fk_order_coupon_country_coupon_id`
         FOREIGN KEY (`coupon_id`)
         REFERENCES `order_coupon` (`id`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET='utf8';
 
 DROP TABLE IF EXISTS `order_coupon_module`;
 
@@ -83,7 +83,7 @@ CREATE TABLE `order_coupon_module`
         FOREIGN KEY (`module_id`)
         REFERENCES `module` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET='utf8';
 
 # Per customer usage count
 # ------------------------
@@ -111,7 +111,7 @@ CREATE TABLE `coupon_customer_count`
         FOREIGN KEY (`coupon_id`)
         REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB CHARACTER SET='utf8';
 
 
 SET FOREIGN_KEY_CHECKS = 1;
