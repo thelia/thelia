@@ -178,7 +178,6 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
                     break(2);
-                    //OMNIMOD
                 case "created":
                     $search->addAscendingOrderByColumn('created_at');
                     break;
