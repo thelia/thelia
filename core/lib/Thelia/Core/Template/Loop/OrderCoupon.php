@@ -69,7 +69,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
 
         if (null !== $order = OrderQuery::create()->findPk($this->getOrder())) {
 
-            $oneDayInSeconds = 60*60*24;
+            $oneDayInSeconds = 86400;
 
             /** @var \Thelia\Model\OrderCoupon $orderCoupon */
             foreach ($loopResult->getResultDataCollection() as $orderCoupon) {
