@@ -15,7 +15,8 @@ namespace Thelia\Condition\Implementation;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
-use Thelia\Model\Base\CountryQuery;
+use Thelia\Model\Country;
+use Thelia\Model\CountryQuery;
 
 /**
  * Check a Checkout against its Product number
@@ -110,7 +111,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
 
         if (null !== $cntryList = CountryQuery::create()->findPks($cntryIds)) {
 
-            /** @var Category $cntry */
+            /** @var Country $cntry */
             foreach ($cntryList as $cntry) {
                 $cntryStrList .= $cntry->getTitle() . ', ';
             }

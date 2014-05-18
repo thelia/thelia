@@ -18,9 +18,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Base\CountryQuery;
-use Thelia\Model\Base\LangQuery;
-use Thelia\Model\Base\ModuleQuery;
+use Thelia\Model\CountryQuery;
+use Thelia\Model\LangQuery;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Module;
 use Thelia\Module\BaseModule;
 

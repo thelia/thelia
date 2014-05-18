@@ -14,7 +14,7 @@ namespace Thelia\Tests\Action;
 
 use Thelia\Action\Address;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
-use Thelia\Model\Base\CustomerQuery;
+use Thelia\Model\CustomerQuery;
 
 /**
  *

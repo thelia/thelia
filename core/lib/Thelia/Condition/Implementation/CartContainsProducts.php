@@ -15,7 +15,7 @@ namespace Thelia\Condition\Implementation;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
-use Thelia\Model\Base\ProductQuery;
+use Thelia\Model\ProductQuery;
 use Thelia\Model\CartItem;
 use Thelia\Model\Product;
 

@@ -19,7 +19,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionOperatorException;
 use Thelia\Exception\InvalidConditionValueException;
-use Thelia\Model\Base\CurrencyQuery;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Currency;
 use Thelia\Type\FloatType;
 

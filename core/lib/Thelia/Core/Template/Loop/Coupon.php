@@ -23,7 +23,7 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Model\Base\CouponModule;
+use Thelia\Model\CouponModule;
 use Thelia\Model\Coupon as MCoupon;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponQuery;

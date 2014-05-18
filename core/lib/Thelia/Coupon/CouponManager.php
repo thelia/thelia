@@ -17,7 +17,7 @@ use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
-use Thelia\Model\Base\CouponModule;
+use Thelia\Model\CouponModule;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponCustomerCount;
