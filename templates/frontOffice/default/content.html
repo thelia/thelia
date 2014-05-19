@@ -35,8 +35,10 @@
 {/block}
 
 {block name="main-content"}
+    {assign var="$content_id" value="{content attr="id"}"}
+    {hook name="content.top" content="$content_id"}
     <div class="main layout-col-2-left">
-
+        {hook name="content.main.top" content="$content_id"}
         <article class="col-main" role="main" aria-labelledby="main-label">
             {loop name="blog.content"  type="content" current="yes"}
                 <h1 id="main-label" class="page-header">{$TITLE}</h1>
@@ -57,10 +59,12 @@
                 {/if}
             {/loop}
         </article>
+        {hook name="content.main.bottom" content="$content_id"}
 
         <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
             {include file="includes/asides/articles.html"}
         </aside>
 
     </div><!-- /.layout -->
+    {hook name="content.bottom" content="$content_id"}
 {/block}

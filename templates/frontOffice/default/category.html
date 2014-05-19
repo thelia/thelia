@@ -33,7 +33,10 @@
 
 {* Content *}
 {block name="main-content"}
+    {assign var="$category_id" value="{category attr="id"}"}
+    {hook name="category.top" category="$category_id"}
     <div class="main layout-col-2-left">
+        {hook name="category.main.top" category="$category_id"}
         {$limit={$smarty.get.limit|default:8}}
         {$product_page={$smarty.get.page|default:1}}
         {$product_order={$smarty.get.order|default:'alpha'}}
@@ -77,15 +80,15 @@
 
                 </div><!-- /.sorter -->
             </div>
-                <div id="category-products">
-                    <div class="products-content">
-                        <ul class="product-col-4">
-                            {loop type="product" name="product_list" category={category attr="id"} limit=$limit page=$product_page order=$product_order}
-                                {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="218" height="146"}
-                            {/loop}
-                        </ul>
-                    </div>
-                </div><!-- /#category-products -->
+            <div id="category-products">
+                <div class="products-content">
+                    <ul class="product-col-4">
+                        {loop type="product" name="product_list" category={category attr="id"} limit=$limit page=$product_page order=$product_order}
+                            {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="218" height="146"}
+                        {/loop}
+                    </ul>
+                </div>
+            </div><!-- /#category-products -->
             <div class="toolbar toolbar-bottom" role="toolbar">
 
                 {if $amount > $limit}
@@ -109,6 +112,7 @@
                     {intl l="No products available in this category"}
                 </div>
             {/elseloop}
+            {hook name="category.main.bottom" category="$category_id"}
         </article>
 
         <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
@@ -116,4 +120,5 @@
         </aside>
 
     </div>
+    {hook name="category.bottom" category="$category_id"}
 {/block}

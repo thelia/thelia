@@ -16,7 +16,7 @@
             <meta itemprop="productID" content="isbn:{$TITLE}">
         {/loop}
         {/loop}
-
+        {hook name="single-product.top" product="{$product_id}"}
         <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
             {loop name="product_thumbnail" type="image" product=$product_id width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
                 <img itemprop="image" src="{$IMAGE_URL}" alt="{$productTitle}">
@@ -134,5 +134,6 @@
             {/form}
             {/if}
         </div>
+        {hook name="single-product.bottom" product="{$product_id}"}
     </article><!-- /product -->
 </li>

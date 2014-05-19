@@ -20,6 +20,8 @@
             {ifloop rel="cartloop"}
             {include file="misc/checkout-progress.tpl" step="cart"}
 
+            {hook name="cart.top"}
+
             <table class="table table-cart">
                 <colgroup>
                     <col width="150">
@@ -175,11 +177,14 @@
             <a href="{url path="/order/delivery"}" class="btn btn-checkout">{intl l="Proceed checkout"}</a>
 
             {/ifloop}
-            {elseloop rel="cartloop"}
+            {elseloop rel="cart.loop"}
                 <div class="cart-warning">
                     <strong>{intl l="Warning"}!</strong> {intl l="You have no items in your shopping cart."}
                 </div>
             {/elseloop}
+
+            {hook name="cart.bottom"}
+
             {/nocache}
         </article>
 

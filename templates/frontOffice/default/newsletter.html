@@ -10,6 +10,8 @@
         <article class="col-main" role="main" aria-labelledby="main-label">
             <h1 id="main-label" class="page-header">{intl l="Newsletter Subscription"}</h1>
 
+            {hook name="newsletter.top"}
+
             {form name="thelia.front.newsletter"}
                 <form id="form-newsletter" action="{url path="/newsletter"}" method="post">
                     {form_hidden_fields form=$form}
@@ -35,6 +37,7 @@
                     </div><!--/.form-group-->
                 </form>
             {/form}
+            {hook name="newsletter.bottom"}
         </article>
     </div>
 {/block}

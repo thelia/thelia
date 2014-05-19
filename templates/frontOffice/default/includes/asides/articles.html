@@ -1,3 +1,8 @@
+{hook name="content.view.sidebar.top"}
+{ifHook rel="content.view.sidebar.body"}
+{hook name="content.view.sidebar.body"}
+{/ifHook}
+{elseHook rel="content.view.sidebar.body"}
 <section id="categories" class="block block-nav" role="navigation" aria-labelledby="categories-label">
     <div class="block-heading"><h3 class="block-title" >{intl l="Related"}</h3></div>
     <div class="block-content">
@@ -10,3 +15,5 @@
         </nav>
     </div>
 </section>
+{/elseHook}
+{hook name="content.view.sidebar.bottom"}

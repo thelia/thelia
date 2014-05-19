@@ -47,6 +47,12 @@
                 {/loop}
             {/loop}
 
+            {hook name="product.top" product="{$ID}"}
+
+            {ifHook rel="product.gallery"}
+               {hook name="product.gallery" product="{$ID}"}
+            {/ifHook}
+            {elseHook rel="product.gallery"}
             <section id="product-gallery">
                 {ifloop rel="image.main"}
                 <figure class="product-image">
@@ -96,8 +102,11 @@
                 </div>
                 {/ifloop}
             </section>
+            {/elseHook}
 
             <section id="product-details">
+                {hook name="product.details.top" product="{$ID}"}
+
                 <div class="product-info">
                     <h1 class="name"><span itemprop="name">{$TITLE}</span></h1>
                     {if $REF}<span itemprop="sku" class="sku">{intl l='Ref.'}: {$REF}</span>{/if}
@@ -211,25 +220,24 @@
                     </fieldset>
                 </form>
                 {/form}
+                {hook name="product.details.bottom" product="{$ID}"}
             </section>
 
             {strip}
             {capture "additional"}
                 {ifloop rel="feature_info"}
-
-                        <ul>
-                            {loop name="feature_info" type="feature" product="{$ID}"}
-                                {ifloop rel="feature_value_info"}
-                                <li>
-                                    <strong>{$TITLE}</strong> :
-                                    {loop name="feature_value_info" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
-                                    {$TITLE}
-                                    {/loop}
-                                </li>
-                                {/ifloop}
-                            {/loop}
-                        </ul>
-
+                    <ul>
+                        {loop name="feature_info" type="feature" product="{$ID}"}
+                            {ifloop rel="feature_value_info"}
+                            <li>
+                                <strong>{$TITLE}</strong> :
+                                {loop name="feature_value_info" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
+                                {$TITLE}
+                                {/loop}
+                            </li>
+                            {/ifloop}
+                        {/loop}
+                    </ul>
                 {/ifloop}
             {/capture}
             {/strip}
@@ -238,7 +246,6 @@
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
                     {if $smarty.capture.additional ne ""}<li role="presentation"><a id="tab2" href="#additional" data-toggle="tab" role="tab">{intl l="Additional Info"}</a></li>{/if}
-
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active in" id="description" itemprop="description" role="tabpanel" aria-labelledby="tab1">
@@ -251,6 +258,8 @@
                     {/if}
                 </div>
             </section>
+
+            {hook name="product.bottom" product="{$ID}"}
         </article><!-- /#product -->
 
         <ul class="pager">
@@ -265,7 +274,7 @@
                 {/loop}
             {/if}
         </ul>
-       {/loop}
+        {/loop}
 
     </div><!-- /.main -->
 {/block}

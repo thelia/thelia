@@ -35,7 +35,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 <!--[if IE 8 ]><html class="no-js oldie ie8" lang="{lang attr="code"}"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="{lang attr="code"}" class="no-js"> <!--<![endif]-->
 <head>
-
+    {hook name="main.head.top"}
     {* Test if javascript is enabled *}
     <script>(function(H) { H.className=H.className.replace(/\bno-js\b/,'js') } )(document.documentElement);</script>
 
@@ -74,9 +74,8 @@ GNU General Public License : http://www.gnu.org/licenses/
     <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
-    {hook name="main.header"}
+    {hook name="main.head.bottom"}
 </head>
-
 <body class="{block name="body-class"}{/block}" itemscope itemtype="http://schema.org/WebPage">
 {hook name="main.body.top"}
 <!-- Accessibility -->
@@ -103,6 +102,8 @@ GNU General Public License : http://www.gnu.org/licenses/
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
             <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="{intl l="Main Navigation"}">
                 {nocache}
+                {hook name="main.navebar.secondary"}
+                {elseHook rel="main.navebar.secondary"}
                 <ul class="nav navbar-nav navbar-cart navbar-right">
                     {loop type="auth" name="customer_info_block" role="CUSTOMER"}
                         <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
@@ -145,13 +146,17 @@ GNU General Public License : http://www.gnu.org/licenses/
                     {/elseloop}
                     {include file="includes/mini-cart.html" nocache}
                 </ul>
+                {/elseHook}
                 {/nocache}
+                {hook name="main.navebar.primary"}
+                {elseHook rel="main.navebar.primary"}
                 <ul class="nav navbar-nav navbar-categories">
                     <li><a href="{navigate to="index"}" class="home">{intl l="Home"}</a></li>
                     {loop type="category" name="category.navigation" parent="0"}
                         <li><a href="{$URL}">{$TITLE}</a></li>
                     {/loop}
                 </ul>
+                {/elseHook}
             </nav>
         </div>
     </div>
@@ -166,7 +171,6 @@ GNU General Public License : http://www.gnu.org/licenses/
             </h1>
 
             <div class="language-container">
-
                 <div class="search-container">
                     <form id="form-search" action="{url path="/search"}" method="get" role="search" aria-labelledby="search-label">
                         <label id="search-label" for="q">{intl l="Search a product"}</label>
@@ -207,42 +211,25 @@ GNU General Public License : http://www.gnu.org/licenses/
 
 <main class="main-container" role="main">
     <div class="container">
-
-        <div class="alert alert-success">
-            {ifHook rel="body"}
-                {hook name="body" product_id="5" }
-                <p>modules in hook</p>
-            {/ifHook}
-            {elseHook rel="body"}
-                <p>Sorry no modules in hook <strong>body</strong></p>
-            {/elseHook}
-        </div>
-
-        <div class="alert alert-success">
-            {hookBlock name="loop"}
-                <!-- Nav tabs -->
-                <table class="table">
-                    <tr>
-                        {foreach from=$tabs item=tab}
-                        <td>{$tab}</td>
-                        {/foreach}
-                    </tr>
-                    <tr>
-                        {foreach from=$contents item=content}
-                            <td>{$content}</td>
-                        {/foreach}
-                    </tr>
-                </table>
-            {/hookBlock}
-        </div>
-
+        {hook name="main.content.top"}
         {block name="breadcrumb"}{include file="misc/breadcrumb.tpl"}{/block}
         <div id="content">{block name="main-content"}{/block}</div>
+        {hook name="main.content.bottom"}
     </div><!-- /.container -->
 </main><!-- /.main-container -->
 
 <section class="footer-container" itemscope itemtype="http://schema.org/WPFooter">
 
+    {ifHook rel="main.footer.top"}
+    <section class="footer-block">
+        <div class="container">
+            <div class="blocks block-col-3">
+                {hook name="main.footer.top"}
+            </div>
+        </div>
+    </section>
+    {/ifHook}
+    {elseHook rel="main.footer.top"}
     <section class="footer-banner">
         <div class="container">
             <div class="banner banner-col-3">
@@ -261,7 +248,18 @@ GNU General Public License : http://www.gnu.org/licenses/
             </div>
         </div>
     </section><!-- /.footer-banner -->
+    {/elseHook}
 
+    {ifHook rel="main.footer.body"}
+    <section class="footer-block">
+        <div class="container">
+            <div class="blocks block-col-4">
+                {hook name="main.footer.body"}
+            </div>
+        </div>
+    </section>
+    {/ifHook}
+    {elseHook rel="main.footer.body"}
     <section class="footer-block">
         <div class="container">
             <div class="blocks block-col-4">
@@ -430,8 +428,18 @@ GNU General Public License : http://www.gnu.org/licenses/
             </div>
         </div>
     </section><!-- /.footer-block -->
+    {/elseHook}
 
-
+    {ifHook rel="main.footer.bottom"}
+    <footer class="footer-info" role="contentinfo">
+        <div class="container">
+            <div class="info">
+                {hook name="main.footer.bottom"}
+            </div>
+        </div>
+    </footer>
+    {/ifHook}
+    {elseHook rel="main.footer.bottom"}
     <footer class="footer-info" role="contentinfo">
         <div class="container">
             <div class="info">
@@ -450,6 +458,7 @@ GNU General Public License : http://www.gnu.org/licenses/
             </div>
         </div>
     </footer><!-- /.footer-info -->
+    {/elseHook}
 
 </section><!-- /.footer-container -->
 
@@ -486,5 +495,6 @@ GNU General Public License : http://www.gnu.org/licenses/
 {javascripts file='assets/js/script.js'}
     <script src="{$asset_url}"></script>
 {/javascripts}
+{hook name="main-body-bottom"}
 </body>
 </html>

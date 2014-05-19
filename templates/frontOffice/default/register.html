@@ -14,6 +14,7 @@
         <article class="col-main" role="main" aria-labelledby="main-label">
 
             <h1 id="main-label" class="page-header">{intl l="Create New Account"}</h1>
+            {hook name="register.top"}
             {form name="thelia.front.customer.create"}
             <form id="form-register" class="form-horizontal" action="{url path="/register"}" method="post">
                 {form_field form=$form field='success_url'}
@@ -25,6 +26,7 @@
                 {/form_field}
                 {form_hidden_fields form=$form}
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+                {hook name="register.form.top"}
                 <fieldset id="register-info" class="panel">
                     <div class="panel-heading">
                         1. {intl l="Personal Information"}
@@ -277,6 +279,8 @@
                 </div><!--/.form-group-->
                 {/form_field}
 
+                {hook name="register.form.bottom"}
+
                 <div class="form-group group-btn">
                     <div class="control-btn">
                         <button type="submit" class="btn btn-register">{intl l="Register"}</button>
@@ -284,6 +288,8 @@
                 </div><!--/.form-group-->
             </form>
             {/form}
+
+            {hook name="register.bottom"}
         </article>
 
     </div><!-- /.layout -->

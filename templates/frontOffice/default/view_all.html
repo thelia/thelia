@@ -23,6 +23,9 @@
 
         <h1 id="main-label" class="page-header">{if $product_type == "new"}{intl l="Latest products"}{elseif $product_type == "offers"}{intl l="Product Offers"}{/if}</h1>
         {assign var="amount" value="{count type="product" promo="{$product_type == "offers"}" new="{$product_type == "new"}"}"}
+
+        {hook name="view-all.top"}
+
         {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order  amount={$amount}}
         <div id="category-products">
             <div class="products-content">
@@ -41,6 +44,9 @@
         {ifloop rel="product_list"}
             {include file="includes/toolbar.html" toolbar="bottom" amount={$amount}}
         {/ifloop}
+
+        {hook name="view-all.bottom"}
+
     </article>
 
 </div><!-- /.layout -->

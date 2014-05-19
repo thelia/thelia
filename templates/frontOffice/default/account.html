@@ -21,6 +21,7 @@
 
             <h1 id="main-label" class="page-header">{intl l="My Account"}</h1>
 
+            {hook name="account.top"}
             <div id="account" class="panel-group">
                 <div class="panel account-info">
                     <div class="panel-heading">
@@ -180,6 +181,7 @@
                         </div>
                     </div>
                 </div>
+                {hook name="account.bottom"}
             </div>
         </article>
 

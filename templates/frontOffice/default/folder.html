@@ -28,10 +28,12 @@
 
 {* Content *}
 {block name="main-content"}
+{assign var="$folder_id" value="{folder attr="id"}"}
+    {hook name="folder.top" folder="$folder_id"}
     <div class="main">
 
         <div class="col-main" role="main" aria-labelledby="main-label">
-
+        {hook name="folder.main.top" folder="$folder_id"}
         {loop name="folder" type="folder" id="{folder attr="id"}"}
             <h1 id="main-label" class="page-header">{$TITLE}</h1>
             {if $CHAPO}
@@ -84,16 +86,17 @@
                 </div>
             </div><!-- /#category-products -->
 
-
             {if $POSTSCRIPTUM}
                 <small class="folder-postscriptum">
                     {$POSTSCRIPTUM}
                 </small>
             {/if}
         {/loop}
+        {hook name="folder.main.bottom" folder="$folder_id"}
 
         </div>
     </div>
+    {hook name="folder.top" folder="$folder_id"}
 {/block}
 
 
