@@ -25,8 +25,6 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\Coupon as BaseCoupon;
-use Thelia\Model\Base\CouponCountryQuery;
-use Thelia\Model\Base\CouponModuleQuery;
 use Thelia\Model\Exception\InvalidArgumentException;
 use Thelia\Model\Map\CouponTableMap;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;

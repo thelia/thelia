@@ -4,12 +4,10 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
-
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Base\Order as BaseOrder;
-use Thelia\Model\Base\OrderProductTaxQuery;
 use Thelia\Model\Map\OrderProductTaxTableMap;
+use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 
 class Order extends BaseOrder

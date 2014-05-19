@@ -3,7 +3,6 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderCoupon as BaseOrderCoupon;
-use Thelia\Model\Base\OrderCouponCountryQuery;
 
 class OrderCoupon extends BaseOrderCoupon
 {
