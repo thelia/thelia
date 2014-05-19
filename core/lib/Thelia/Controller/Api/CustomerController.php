@@ -20,6 +20,8 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Form\CustomerCreateForm;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\CustomerTitleI18nTableMap;
@@ -177,6 +179,12 @@ class CustomerController extends BaseApiController
     {
         $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::CREATE);
 
+        $form = new CustomerCreateForm($this->getRequest(), "form",[], ['csrf_protection' => false]);
 
+        try {
+            $customerForm = $this->validateForm($form);
+        } catch (FormValidationException $e) {
+            return Response::create($e->getMessage(), 400);
+        }
     }
 }
