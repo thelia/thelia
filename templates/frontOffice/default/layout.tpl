@@ -209,9 +209,16 @@ GNU General Public License : http://www.gnu.org/licenses/
     <div class="container">
 
         <div class="alert alert-success">
-            {*hook name="header" *}
-            {hook name="body" product_id="5" }
+            {ifHook rel="body"}
+                {hook name="body" product_id="5" }
+                <p>modules in hook</p>
+            {/ifHook}
+            {elseHook rel="body"}
+                <p>Sorry no modules in hook <strong>body</strong></p>
+            {/elseHook}
+        </div>
 
+        <div class="alert alert-success">
             {hookBlock name="loop"}
                 <!-- Nav tabs -->
                 <table class="table">
@@ -225,7 +232,6 @@ GNU General Public License : http://www.gnu.org/licenses/
                             <td>{$content}</td>
                         {/foreach}
                     </tr>
-
                 </table>
             {/hookBlock}
         </div>

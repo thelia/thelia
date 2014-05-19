@@ -18,6 +18,7 @@ use Thelia\Core\Template\Smarty\SmartyParser;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 
 /**
@@ -32,9 +33,17 @@ class Hook extends AbstractSmartyPlugin
 
     private $dispatcher;
 
+    /** @var Translator */
+    protected $translator;
+
+    /** @var array  */
+    protected $hookResults = array();
+
     public function __construct(ContainerAwareEventDispatcher $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+        $this->hookResults = array();
+        $this->translator = $dispatcher->getContainer()->get("thelia.translator");
     }
 
     /**
@@ -72,7 +81,8 @@ class Hook extends AbstractSmartyPlugin
         // todo implement a after hook for post treatment on event
         // $event = $this->getDispatcher()->dispatch('hook.after.' . $hookName, $event);
 
-        $content = $event->dump();
+        $content = trim($event->dump());
+        $this->hookResults[$hookName] = $content;
 
         return $content;
     }
@@ -88,6 +98,7 @@ class Hook extends AbstractSmartyPlugin
      */
     public function processHookBlock($params, $content, $smarty, &$repeat)
     {
+
         if (! $repeat) {
             return $content;
         }
@@ -105,11 +116,85 @@ class Hook extends AbstractSmartyPlugin
         // todo implement a after hook for post treatment on event
         // $event = $this->getDispatcher()->dispatch('hook.after.' . $hookName, $event);
 
+        $isEmpty = true;
         foreach ($event->keys() as $key) {
-            Tlog::getInstance()->addDebug("_HOOK_ block assign : " . $key);
-            $smarty->assign($key, $event->get($key));
+            // Tlog::getInstance()->addDebug("_HOOK_ block assign : " . $key);
+            $content = $event->get($key);
+            if (0 !== count($content)) {
+                $isEmpty = false;
+            }
+            $smarty->assign($key, $content);
         }
+        // it's a bit dirty but we just add a content to enable the ifHook/elseHook support
+        $this->hookResults[$hookName] = $isEmpty ? "" : "not empty";
+
     }
+
+    /**
+     * Process {elseHook rel="hookname"} ... {/elseHook} block
+     *
+     * @param  array                     $params   hook parameters
+     * @param  string                    $content  hook text content
+     * @param  \Smarty_Internal_Template $template the Smarty object
+     * @param  boolean                   $repeat   repeat indicator (see Smarty doc.)
+     * @return string                    the hook output
+     */
+    public function elseHook($params, $content, /** @noinspection PhpUnusedParameterInspection */ $template, &$repeat)
+    {
+        // When encountering close tag, check if hook has results.
+        if ($repeat === false) {
+            return $this->checkEmptyHook($params) ? $content : '';
+        }
+
+        return '';
+    }
+
+    /**
+     * Process {ifHook rel="hookname"} ... {/ifHook} block
+     *
+     * @param  array                     $params   hook parameters
+     * @param  string                    $content  hook text content
+     * @param  \Smarty_Internal_Template $template the Smarty object
+     * @param  boolean                   $repeat   repeat indicator (see Smarty doc.)
+     * @return string                    the hook output
+     */
+    public function ifHook($params, $content, /** @noinspection PhpUnusedParameterInspection */ $template, &$repeat)
+    {
+        // When encountering close tag, check if hook has results.
+        if ($repeat === false) {
+            return $this->checkEmptyHook($params) ? '' : $content;
+        }
+
+        return '';
+    }
+
+
+    /**
+     * Check if a hook has returned results. The hook should have been executed before, or an
+     * InvalidArgumentException is thrown
+     *
+     * @param array $params
+     *
+     * @return boolean                   true if the hook is empty
+     * @throws \InvalidArgumentException
+     */
+    protected function checkEmptyHook($params)
+    {
+        $hookName = $this->getParam($params, 'rel');
+
+        if (null == $hookName)
+            throw new \InvalidArgumentException(
+                $this->translator->trans("Missing 'rel' parameter in ifHook/elseHook arguments")
+            );
+
+        if (! isset($this->hookResults[$hookName]))
+            throw new \InvalidArgumentException(
+                $this->translator->trans("Related hook name '%name' is not defined.", ['%name' => $hookName])
+            );
+
+        return ('' === $this->hookResults[$hookName]);
+    }
+
 
     /**
      * Clean the params of the params passed to the hook function or block to feed the arguments of the event
@@ -143,7 +228,9 @@ class Hook extends AbstractSmartyPlugin
     {
         return array(
             new SmartyPluginDescriptor('function', 'hook', $this, 'processHookFunction'),
-            new SmartyPluginDescriptor('block', 'hookBlock', $this, 'processHookBlock')
+            new SmartyPluginDescriptor('block', 'hookBlock', $this, 'processHookBlock'),
+            new SmartyPluginDescriptor('block', 'elseHook', $this, 'elseHook'),
+            new SmartyPluginDescriptor('block', 'ifHook', $this, 'ifHook'),
         );
     }
 
