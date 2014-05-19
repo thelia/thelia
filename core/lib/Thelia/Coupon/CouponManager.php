@@ -15,7 +15,14 @@ namespace Thelia\Coupon;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Log\Tlog;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\CouponModule;
 use Thelia\Model\Coupon;
+use Thelia\Model\CouponCountry;
+use Thelia\Model\CouponCustomerCount;
+use Thelia\Model\CouponCustomerCountQuery;
+use Thelia\Model\Order;
 
 /**
  * Manage how Coupons could interact with a Checkout
@@ -78,9 +85,10 @@ class CouponManager
      * Check if there is a Coupon removing Postage
      * @return bool
      */
-    public function isCouponRemovingPostage()
+    public function isCouponRemovingPostage(Order $order)
     {
         $coupons = $this->facade->getCurrentCoupons();
+
         if (count($coupons) == 0) {
             return false;
         }
@@ -89,7 +97,60 @@ class CouponManager
 
         /** @var CouponInterface $coupon */
         foreach ($couponsKept as $coupon) {
+
             if ($coupon->isRemovingPostage()) {
+
+                 // Check if delivery country is on the list of countries for which delivery is free
+                // If the list is empty, the shipping is free for all countries.
+                $couponCountries = $coupon->getFreeShippingForCountries();
+
+                if (! $couponCountries->isEmpty()) {
+
+                    if (null === $deliveryAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress())) {
+                        continue;
+                    }
+
+                    $countryValid = false;
+
+                    $deliveryCountryId = $deliveryAddress->getCountryId();
+
+                    /** @var CouponCountry $couponCountry */
+                    foreach ($couponCountries as $couponCountry) {
+                        if ($deliveryCountryId == $couponCountry->getCountryId()) {
+                            $countryValid = true;
+                            break;
+                        }
+                    }
+
+                    if (! $countryValid) {
+                        continue;
+                    }
+                }
+
+                // Check if shipping method is on the list of methods for which delivery is free
+                // If the list is empty, the shipping is free for all methods.
+                $couponModules = $coupon->getFreeShippingForModules();
+
+                if (! $couponModules->isEmpty()) {
+
+                    $moduleValid = false;
+
+                    $shippingModuleId = $order->getDeliveryModuleId();
+
+                    /** @var CouponModule $couponModule */
+                    foreach ($couponModules as $couponModule) {
+                        if ($shippingModuleId == $couponModule->getModuleId()) {
+                            $moduleValid = true;
+                            break;
+                        }
+                    }
+
+                    if (! $moduleValid) {
+                        continue;
+                    }
+                }
+
+                // All conditions are met, the shipping is free !
                 return true;
             }
         }
@@ -210,27 +271,64 @@ class CouponManager
      *
      * To call when a coupon is consumed
      *
-     * @param \Thelia\Model\Coupon $coupon Coupon consumed
+     * @param \Thelia\Model\Coupon $coupon     Coupon consumed
+     * @param int|null             $customerId the ID of the ordering customer
      *
      * @return int Usage left after decremental
      */
-    public function decrementQuantity(Coupon $coupon)
+    public function decrementQuantity(Coupon $coupon, $customerId = null)
     {
-        $ret = -1;
+        $ret = false;
+
         try {
 
-        $usageLeft = $coupon->getMaxUsage();
+            $usageLeft = $coupon->getUsagesLeft($customerId);
 
-        if ($usageLeft > 0) {
-            $usageLeft--;
-            $coupon->setMaxUsage($usageLeft);
+            if ($usageLeft > 0) {
 
-            $coupon->save();
-            $ret = $usageLeft;
-        }
+                // If the coupon usage is per user, add an entry to coupon customer usage count table
+                if ($coupon->getPerCustomerUsageCount()) {
 
-        } catch (\Exception $e) {
-            $ret = false;
+                    if (null == $customerId) {
+                        throw new \LogicException("Customer should not be null at this time.");
+                    }
+
+                    $ccc = CouponCustomerCountQuery::create()
+                        ->filterByCouponId($coupon->getId())
+                        ->filterByCustomerId($customerId)
+                        ->findOne()
+                    ;
+
+                    if ($ccc === null) {
+                        $ccc = new CouponCustomerCount();
+
+                        $ccc
+                            ->setCustomerId($customerId)
+                            ->setCouponId($coupon->getId())
+                            ->setCount(0);
+                    }
+
+                    $newCount = 1 + $ccc->getCount();
+
+                    $ccc
+                        ->setCount($newCount)
+                        ->save()
+                    ;
+
+                    $ret = $usageLeft - $newCount;
+                } else {
+                    $usageLeft--;
+
+                    $coupon->setMaxUsage($usageLeft);
+
+                    $coupon->save();
+
+                    $ret = $usageLeft;
+                }
+            }
+        } catch (\Exception $ex) {
+            // Just log the problem.
+            Tlog::getInstance()->addError(sprintf("Failed to decrement coupon %s: %s", $coupon->getCode(), $ex->getMessage()));
         }
 
         return $ret;

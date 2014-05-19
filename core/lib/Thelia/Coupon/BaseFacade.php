@@ -77,9 +77,8 @@ class BaseFacade implements FacadeInterface
     public function getDeliveryAddress()
     {
         try {
-            return AddressQuery::create()->findPk($this->getRequest()->getSession()->getOrder()->chosenDeliveryAddress);
-        }
-        catch(\Exception $ex) {
+            return AddressQuery::create()->findPk($this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress());
+        } catch (\Exception $ex) {
             throw new \LogicException("Failed to get delivery address (" . $ex->getMessage() . ")");
         }
     }

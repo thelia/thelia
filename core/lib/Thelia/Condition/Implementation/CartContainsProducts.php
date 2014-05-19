@@ -15,7 +15,7 @@ namespace Thelia\Condition\Implementation;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
-use Thelia\Model\Base\ProductQuery;
+use Thelia\Model\ProductQuery;
 use Thelia\Model\CartItem;
 use Thelia\Model\Product;
 
@@ -93,13 +93,12 @@ class CartContainsProducts extends ConditionAbstract
         $cartItems = $this->facade->getCart()->getCartItems();
 
         /** @var CartItem $cartItem */
-        foreach($cartItems as $cartItem) {
+        foreach ($cartItems as $cartItem) {
 
             if ($this->conditionValidator->variableOpComparison(
                     $cartItem->getProduct()->getId(),
                     $this->operators[self::PRODUCTS_LIST],
                     $this->values[self::PRODUCTS_LIST])) {
-
                     return true;
             }
         }
@@ -149,7 +148,7 @@ class CartContainsProducts extends ConditionAbstract
         if (null !== $prodList = ProductQuery::create()->findPks($prodIds)) {
 
             /** @var Product $prod */
-            foreach($prodList as $prod) {
+            foreach ($prodList as $prod) {
                 $prodStrList .= $prod->getTitle() . ', ';
             }
 

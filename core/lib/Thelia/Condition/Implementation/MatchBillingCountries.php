@@ -69,8 +69,8 @@ class MatchBillingCountries extends AbstractMatchCountries
         return $toolTip;
     }
 
-    protected function getSummaryLabel($cntryStrList, $i18nOperator) {
-
+    protected function getSummaryLabel($cntryStrList, $i18nOperator)
+    {
         return $this->translator->trans(
             'Only if order billing country is %op% <strong>%countries_list%</strong>', [
                 '%countries_list%' => $cntryStrList,
@@ -79,7 +79,8 @@ class MatchBillingCountries extends AbstractMatchCountries
         );
     }
 
-    protected function getFormLabel() {
+    protected function getFormLabel()
+    {
         return $this->translator->trans(
             'Billing coutry is', [], 'condition'
         );

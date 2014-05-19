@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Base\CustomerQuery;
+use Thelia\Model\CustomerQuery;
 
 /**
  * Class CustomerLogin

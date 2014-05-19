@@ -35,23 +35,7 @@ class RemoveXPercent extends CouponAbstract
     );
 
     /**
-     * Set Coupon
-     *
-     * @param FacadeInterface $facade                     Provides necessary value from Thelia
-     * @param string          $code                       Coupon code (ex: XMAS)
-     * @param string          $title                      Coupon title (ex: Coupon for XMAS)
-     * @param string          $shortDescription           Coupon short description
-     * @param string          $description                Coupon description
-     * @param array           $effects                    Coupon effects params
-     * @param bool            $isCumulative               If Coupon is cumulative
-     * @param bool            $isRemovingPostage          If Coupon is removing postage
-     * @param bool            $isAvailableOnSpecialOffers If available on Product already
-     *                                                    on special offer price
-     * @param bool            $isEnabled                  False if Coupon is disabled by admin
-     * @param int             $maxUsage                   How many usage left
-     * @param \Datetime       $expirationDate             When the Code is expiring
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function set(
         FacadeInterface $facade,
@@ -65,12 +49,20 @@ class RemoveXPercent extends CouponAbstract
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        \DateTime $expirationDate
+        \DateTime $expirationDate,
+        $freeShippingForCountries,
+        $freeShippingForModules,
+        $perCustomerUsageCount
     )
     {
         parent::set(
-            $facade, $code, $title, $shortDescription, $description, $effects, $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate
+            $facade, $code, $title, $shortDescription, $description, $effects,
+            $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate,
+            $freeShippingForCountries,
+            $freeShippingForModules,
+            $perCustomerUsageCount
         );
+
         $this->percentage = $effects[self::INPUT_PERCENTAGE_NAME];
 
         return $this;

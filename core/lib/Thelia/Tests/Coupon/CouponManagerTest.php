@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Coupon;
+use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
@@ -19,6 +20,7 @@ use Thelia\Condition\Operators;
 use Thelia\Coupon\Type\RemoveXAmount;
 use Thelia\Model\Coupon;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Order;
 
 /**
  * Unit Test CouponManager Class
@@ -167,8 +169,13 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $actual = $couponManager->getDiscount();
         $expected = 21 + 21.50;
 
+        $order = new Order();
+
+        $order->setChoosenDeliveryAddress(1);
+        $order->setDeliveryModuleId(1);
+
         $this->assertEquals($expected, $actual);
-        $this->assertTrue($couponManager->isCouponRemovingPostage());
+        $this->assertTrue($couponManager->isCouponRemovingPostage($order));
     }
 
     /**
@@ -390,7 +397,13 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $coupon = new RemoveXAmount($stubFacade);
         $date = new \DateTime();
-        $coupon->set($stubFacade, 'XMAS', '', '', '', array('amount' => 21.00), true, true, true, true, 254, $date->setTimestamp(strtotime("today + 3 months")) );
+        $coupon->set(
+            $stubFacade, 'XMAS', '', '', '', array('amount' => 21.00),
+            true, true, true, true, 254, $date->setTimestamp(strtotime("today + 3 months")),
+            new ObjectCollection(),
+            new ObjectCollection(),
+            false
+        );
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
@@ -433,13 +446,13 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->disableOriginalConstructor()
             ->getMock();
         $stubModel->expects($this->any())
-            ->method('getMaxUsage')
+            ->method('getUsagesLeft')
             ->will($this->returnValue(21));
         $stubModel->expects($this->any())
             ->method('setMaxUsage')
             ->will($this->returnValue(true));
 
-        $actual = $couponManager->decrementQuantity($stubModel);
+        $actual = $couponManager->decrementQuantity($stubModel, null);
         $expected = 20;
 
         $this->assertEquals($expected, $actual);
@@ -455,7 +468,13 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $coupon = new RemoveXAmount($stubFacade);
         $date = new \DateTime();
-        $coupon->set($stubFacade, 'XMAS', '', '', '', array('amount' => 21.00), true, true, true, true, 254, $date->setTimestamp(strtotime("today + 3 months")) );
+        $coupon->set(
+            $stubFacade, 'XMAS', '', '', '', array('amount' => 21.00),
+            true, true, true, true, 254, $date->setTimestamp(strtotime("today + 3 months")),
+            new ObjectCollection(),
+            new ObjectCollection(),
+            false
+        );
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
@@ -504,8 +523,8 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->method('setMaxUsage')
             ->will($this->returnValue(true));
 
-        $actual = $couponManager->decrementQuantity($stubModel);
-        $expected = -1;
+        $actual = $couponManager->decrementQuantity($stubModel, null);
+        $expected = false;
 
         $this->assertEquals($expected, $actual);
     }

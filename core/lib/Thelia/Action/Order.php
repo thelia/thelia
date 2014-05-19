@@ -82,7 +82,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $order = $event->getOrder();
 
-        $order->chosenDeliveryAddress = $event->getDeliveryAddress();
+        $order->setChoosenDeliveryAddress($event->getDeliveryAddress());
 
         $event->setOrder($order);
     }
@@ -125,7 +125,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $order = $event->getOrder();
 
-        $order->chosenInvoiceAddress = $event->getInvoiceAddress();
+        $order->setChoosenInvoiceAddress($event->getInvoiceAddress());
 
         $event->setOrder($order);
     }
@@ -153,9 +153,9 @@ class Order extends BaseAction implements EventSubscriberInterface
         $placedOrder = $sessionOrder->copy();
         $placedOrder->setDispatcher($dispatcher);
 
-        $deliveryAddress = AddressQuery::create()->findPk($sessionOrder->chosenDeliveryAddress);
+        $deliveryAddress = AddressQuery::create()->findPk($sessionOrder->getChoosenDeliveryAddress());
         $taxCountry = $deliveryAddress->getCountry();
-        $invoiceAddress = AddressQuery::create()->findPk($sessionOrder->chosenInvoiceAddress);
+        $invoiceAddress = AddressQuery::create()->findPk($sessionOrder->getChoosenInvoiceAddress());
         $cartItems = $cart->getCartItems();
 
         /* fulfill order */
