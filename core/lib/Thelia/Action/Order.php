@@ -302,6 +302,9 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function createManual(OrderManualEvent $event)
     {
+        if(!$event->getOrder())
+            $event->setOrder(new \Thelia\Model\Order());
+
         $event->setPlacedOrder(
             $this->createOrder(
                 $event->getDispatcher(),
