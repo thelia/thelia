@@ -7,6 +7,11 @@
     - Cart contains product from category
     - For specific customers
 - Free shipping can now be restricted to some countries and/or shipping methods
+- session initialization use now event dispatcher :
+    - name event : thelia_kernel.session (see Thelia\Core\TheliakernelEvents::SESSION
+    - class event : Thelia\Core\Event\SessionEvent
+    - example : Thelia\Core\EventListener\SessionListener
+- Creation of Thelia\Core\TheliakernelEvents class for referencing kernel event
     
 
 #2.0.1

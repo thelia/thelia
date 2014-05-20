@@ -100,6 +100,10 @@
         <service id="response.listener" class="Thelia\Core\EventListener\ResponseListener">
             <tag name="kernel.event_subscriber"/>
         </service>
+
+        <service id="session.listener" class="Thelia\Core\EventListener\SessionListener">
+            <tag name="kernel.event_subscriber"/>
+        </service>
     </services>
 
 </config>
