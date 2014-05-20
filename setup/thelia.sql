@@ -881,6 +881,7 @@ CREATE TABLE `hook`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(255) NOT NULL,
     `type` TINYINT NOT NULL,
+    `by_module` TINYINT(1),
     `native` TINYINT(1),
     `activate` TINYINT(1),
     `position` INTEGER,

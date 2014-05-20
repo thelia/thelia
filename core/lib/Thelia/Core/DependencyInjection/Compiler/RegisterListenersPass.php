@@ -198,9 +198,17 @@ class RegisterListenersPass implements CompilerPassInterface
             }
             // Add the the new listener for active hooks, we have to reverse the priority and the position
             if ($moduleHook->getActive() && $moduleHook->getModuleActive()) {
+                $hook = $moduleHook->getHook();
+                $eventName = sprintf('hook.%s.%s', $hook->getType(), $hook->getCode());
+
+                // we a register an event which is relative to a specific module
+                if ($hook->getByModule()){
+                    $eventName .= '.' . $moduleHook->getModuleId();
+                }
+
                 $definition->addMethodCall('addListenerService',
                     array(
-                        'hook.' . $moduleHook->getHook()->getType() . "." . $moduleHook->getHook()->getCode(),
+                        $eventName,
                         array($moduleHook->getClassname(), $moduleHook->getMethod()),
                         ModuleHook::MAX_POSITION - $moduleHook->getPosition()
                     )

@@ -495,6 +495,6 @@ GNU General Public License : http://www.gnu.org/licenses/
 {javascripts file='assets/js/script.js'}
     <script src="{$asset_url}"></script>
 {/javascripts}
-{hook name="main-body-bottom"}
+{hook name="main.body.bottom"}
 </body>
 </html>

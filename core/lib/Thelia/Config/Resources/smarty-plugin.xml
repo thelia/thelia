@@ -106,6 +106,7 @@
         </service>
 
         <service id="smarty.plugin.hook" class="Thelia\Core\Template\Smarty\Plugins\Hook" scope="request">
+            <argument>%kernel.debug%</argument>
             <tag name="thelia.parser.register_plugin"/>
             <!--
             <argument type="service" id="request" />

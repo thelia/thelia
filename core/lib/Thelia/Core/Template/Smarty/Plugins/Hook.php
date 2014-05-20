@@ -39,11 +39,15 @@ class Hook extends AbstractSmartyPlugin
     /** @var array  */
     protected $hookResults = array();
 
-    public function __construct(ContainerAwareEventDispatcher $dispatcher)
+    /** @var bool debug */
+    protected $debug = false;
+
+    public function __construct($debug, ContainerAwareEventDispatcher $dispatcher)
     {
+        $this->debug = $debug;
         $this->dispatcher = $dispatcher;
-        $this->hookResults = array();
         $this->translator = $dispatcher->getContainer()->get("thelia.translator");
+        $this->hookResults = array();
     }
 
     /**
@@ -68,20 +72,32 @@ class Hook extends AbstractSmartyPlugin
     public function processHookFunction($params, &$smarty)
     {
         $hookName = $this->getParam($params, 'name');
+        $module = intval($this->getParam($params, 'module', 0));
         $type = $smarty->getTemplateDefinition()->getType();
 
         Tlog::getInstance()->addDebug("_HOOK_ process hook : " . $hookName);
 
-        $event = new HookRenderEvent($hookName, $params);
+        $event = new HookRenderEvent($hookName, $params, $module);
         $event->setArguments($this->getArgumentsFromParams($params));
 
         // todo implement a before hook
         // $event = $this->getDispatcher()->dispatch('hook.before.' . $hookName, $event);
-        $this->getDispatcher()->dispatch('hook.' . $type . '.' . $hookName, $event);
+        $eventName = sprintf('hook.%s.%s', $type, $hookName);
+        // thi is a hook specific to a module
+        if (0 !== $module){
+            $eventName .= '.' . $module;
+        }
+        Tlog::getInstance()->addDebug("_HOOK_ dispatch event : " . $eventName);
+        $this->getDispatcher()->dispatch($eventName, $event);
         // todo implement a after hook for post treatment on event
         // $event = $this->getDispatcher()->dispatch('hook.after.' . $hookName, $event);
 
         $content = trim($event->dump());
+
+        if ($this->debug && $smarty->getRequest()->get('SHOW_HOOK')) {
+            $content = sprintf('<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">%s</div>%s', $hookName, $content);
+        }
+
         $this->hookResults[$hookName] = $content;
 
         return $content;
@@ -99,11 +115,16 @@ class Hook extends AbstractSmartyPlugin
     public function processHookBlock($params, $content, $smarty, &$repeat)
     {
 
+        $hookName = $this->getParam($params, 'name');
+
         if (! $repeat) {
+            if ($this->debug && $smarty->getRequest()->get('SHOW_HOOK')) {
+                $content = sprintf('<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">%s</div>', $hookName)
+                    . $content;
+            }
             return $content;
         }
 
-        $hookName = $this->getParam($params, 'name');
         $type = $smarty->getTemplateDefinition()->getType();
 
         Tlog::getInstance()->addDebug("_HOOK_ process hook block : " . $hookName);

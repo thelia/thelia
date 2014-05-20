@@ -78,6 +78,12 @@ abstract class Hook implements ActiveRecordInterface
     protected $type;
 
     /**
+     * The value for the by_module field.
+     * @var        boolean
+     */
+    protected $by_module;
+
+    /**
      * The value for the native field.
      * @var        boolean
      */
@@ -445,6 +451,17 @@ abstract class Hook implements ActiveRecordInterface
     }
 
     /**
+     * Get the [by_module] column value.
+     *
+     * @return   boolean
+     */
+    public function getByModule()
+    {
+
+        return $this->by_module;
+    }
+
+    /**
      * Get the [native] column value.
      *
      * @return   boolean
@@ -579,6 +596,35 @@ abstract class Hook implements ActiveRecordInterface
 
         return $this;
     } // setType()
+
+    /**
+     * Sets the value of the [by_module] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\Hook The current object (for fluent API support)
+     */
+    public function setByModule($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->by_module !== $v) {
+            $this->by_module = $v;
+            $this->modifiedColumns[HookTableMap::BY_MODULE] = true;
+        }
+
+
+        return $this;
+    } // setByModule()
 
     /**
      * Sets the value of the [native] column.
@@ -747,22 +793,25 @@ abstract class Hook implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : HookTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
             $this->type = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : HookTableMap::translateFieldName('Native', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : HookTableMap::translateFieldName('ByModule', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->by_module = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : HookTableMap::translateFieldName('Native', TableMap::TYPE_PHPNAME, $indexType)];
             $this->native = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : HookTableMap::translateFieldName('Activate', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : HookTableMap::translateFieldName('Activate', TableMap::TYPE_PHPNAME, $indexType)];
             $this->activate = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : HookTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : HookTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : HookTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : HookTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : HookTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : HookTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -775,7 +824,7 @@ abstract class Hook implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 8; // 8 = HookTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = HookTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Hook object", 0, $e);
@@ -1042,6 +1091,9 @@ abstract class Hook implements ActiveRecordInterface
         if ($this->isColumnModified(HookTableMap::TYPE)) {
             $modifiedColumns[':p' . $index++]  = '`TYPE`';
         }
+        if ($this->isColumnModified(HookTableMap::BY_MODULE)) {
+            $modifiedColumns[':p' . $index++]  = '`BY_MODULE`';
+        }
         if ($this->isColumnModified(HookTableMap::NATIVE)) {
             $modifiedColumns[':p' . $index++]  = '`NATIVE`';
         }
@@ -1076,6 +1128,9 @@ abstract class Hook implements ActiveRecordInterface
                         break;
                     case '`TYPE`':
                         $stmt->bindValue($identifier, $this->type, PDO::PARAM_INT);
+                        break;
+                    case '`BY_MODULE`':
+                        $stmt->bindValue($identifier, (int) $this->by_module, PDO::PARAM_INT);
                         break;
                     case '`NATIVE`':
                         $stmt->bindValue($identifier, (int) $this->native, PDO::PARAM_INT);
@@ -1164,18 +1219,21 @@ abstract class Hook implements ActiveRecordInterface
                 return $this->getType();
                 break;
             case 3:
-                return $this->getNative();
+                return $this->getByModule();
                 break;
             case 4:
-                return $this->getActivate();
+                return $this->getNative();
                 break;
             case 5:
-                return $this->getPosition();
+                return $this->getActivate();
                 break;
             case 6:
-                return $this->getCreatedAt();
+                return $this->getPosition();
                 break;
             case 7:
+                return $this->getCreatedAt();
+                break;
+            case 8:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1210,11 +1268,12 @@ abstract class Hook implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCode(),
             $keys[2] => $this->getType(),
-            $keys[3] => $this->getNative(),
-            $keys[4] => $this->getActivate(),
-            $keys[5] => $this->getPosition(),
-            $keys[6] => $this->getCreatedAt(),
-            $keys[7] => $this->getUpdatedAt(),
+            $keys[3] => $this->getByModule(),
+            $keys[4] => $this->getNative(),
+            $keys[5] => $this->getActivate(),
+            $keys[6] => $this->getPosition(),
+            $keys[7] => $this->getCreatedAt(),
+            $keys[8] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1272,18 +1331,21 @@ abstract class Hook implements ActiveRecordInterface
                 $this->setType($value);
                 break;
             case 3:
-                $this->setNative($value);
+                $this->setByModule($value);
                 break;
             case 4:
-                $this->setActivate($value);
+                $this->setNative($value);
                 break;
             case 5:
-                $this->setPosition($value);
+                $this->setActivate($value);
                 break;
             case 6:
-                $this->setCreatedAt($value);
+                $this->setPosition($value);
                 break;
             case 7:
+                $this->setCreatedAt($value);
+                break;
+            case 8:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1313,11 +1375,12 @@ abstract class Hook implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setType($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setNative($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setActivate($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setPosition($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[3], $arr)) $this->setByModule($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setNative($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setActivate($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setPosition($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
     }
 
     /**
@@ -1332,6 +1395,7 @@ abstract class Hook implements ActiveRecordInterface
         if ($this->isColumnModified(HookTableMap::ID)) $criteria->add(HookTableMap::ID, $this->id);
         if ($this->isColumnModified(HookTableMap::CODE)) $criteria->add(HookTableMap::CODE, $this->code);
         if ($this->isColumnModified(HookTableMap::TYPE)) $criteria->add(HookTableMap::TYPE, $this->type);
+        if ($this->isColumnModified(HookTableMap::BY_MODULE)) $criteria->add(HookTableMap::BY_MODULE, $this->by_module);
         if ($this->isColumnModified(HookTableMap::NATIVE)) $criteria->add(HookTableMap::NATIVE, $this->native);
         if ($this->isColumnModified(HookTableMap::ACTIVATE)) $criteria->add(HookTableMap::ACTIVATE, $this->activate);
         if ($this->isColumnModified(HookTableMap::POSITION)) $criteria->add(HookTableMap::POSITION, $this->position);
@@ -1402,6 +1466,7 @@ abstract class Hook implements ActiveRecordInterface
     {
         $copyObj->setCode($this->getCode());
         $copyObj->setType($this->getType());
+        $copyObj->setByModule($this->getByModule());
         $copyObj->setNative($this->getNative());
         $copyObj->setActivate($this->getActivate());
         $copyObj->setPosition($this->getPosition());
@@ -1950,6 +2015,7 @@ abstract class Hook implements ActiveRecordInterface
         $this->id = null;
         $this->code = null;
         $this->type = null;
+        $this->by_module = null;
         $this->native = null;
         $this->activate = null;
         $this->position = null;

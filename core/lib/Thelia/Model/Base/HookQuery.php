@@ -25,6 +25,7 @@ use Thelia\Model\Map\HookTableMap;
  * @method     ChildHookQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildHookQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method     ChildHookQuery orderByType($order = Criteria::ASC) Order by the type column
+ * @method     ChildHookQuery orderByByModule($order = Criteria::ASC) Order by the by_module column
  * @method     ChildHookQuery orderByNative($order = Criteria::ASC) Order by the native column
  * @method     ChildHookQuery orderByActivate($order = Criteria::ASC) Order by the activate column
  * @method     ChildHookQuery orderByPosition($order = Criteria::ASC) Order by the position column
@@ -34,6 +35,7 @@ use Thelia\Model\Map\HookTableMap;
  * @method     ChildHookQuery groupById() Group by the id column
  * @method     ChildHookQuery groupByCode() Group by the code column
  * @method     ChildHookQuery groupByType() Group by the type column
+ * @method     ChildHookQuery groupByByModule() Group by the by_module column
  * @method     ChildHookQuery groupByNative() Group by the native column
  * @method     ChildHookQuery groupByActivate() Group by the activate column
  * @method     ChildHookQuery groupByPosition() Group by the position column
@@ -58,6 +60,7 @@ use Thelia\Model\Map\HookTableMap;
  * @method     ChildHook findOneById(int $id) Return the first ChildHook filtered by the id column
  * @method     ChildHook findOneByCode(string $code) Return the first ChildHook filtered by the code column
  * @method     ChildHook findOneByType(int $type) Return the first ChildHook filtered by the type column
+ * @method     ChildHook findOneByByModule(boolean $by_module) Return the first ChildHook filtered by the by_module column
  * @method     ChildHook findOneByNative(boolean $native) Return the first ChildHook filtered by the native column
  * @method     ChildHook findOneByActivate(boolean $activate) Return the first ChildHook filtered by the activate column
  * @method     ChildHook findOneByPosition(int $position) Return the first ChildHook filtered by the position column
@@ -67,6 +70,7 @@ use Thelia\Model\Map\HookTableMap;
  * @method     array findById(int $id) Return ChildHook objects filtered by the id column
  * @method     array findByCode(string $code) Return ChildHook objects filtered by the code column
  * @method     array findByType(int $type) Return ChildHook objects filtered by the type column
+ * @method     array findByByModule(boolean $by_module) Return ChildHook objects filtered by the by_module column
  * @method     array findByNative(boolean $native) Return ChildHook objects filtered by the native column
  * @method     array findByActivate(boolean $activate) Return ChildHook objects filtered by the activate column
  * @method     array findByPosition(int $position) Return ChildHook objects filtered by the position column
@@ -160,7 +164,7 @@ abstract class HookQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `TYPE`, `NATIVE`, `ACTIVATE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `hook` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `TYPE`, `BY_MODULE`, `NATIVE`, `ACTIVATE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `hook` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -358,6 +362,33 @@ abstract class HookQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(HookTableMap::TYPE, $type, $comparison);
+    }
+
+    /**
+     * Filter the query on the by_module column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByByModule(true); // WHERE by_module = true
+     * $query->filterByByModule('yes'); // WHERE by_module = true
+     * </code>
+     *
+     * @param     boolean|string $byModule The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildHookQuery The current query, for fluid interface
+     */
+    public function filterByByModule($byModule = null, $comparison = null)
+    {
+        if (is_string($byModule)) {
+            $by_module = in_array(strtolower($byModule), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(HookTableMap::BY_MODULE, $byModule, $comparison);
     }
 
     /**
