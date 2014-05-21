@@ -37,4 +37,15 @@
 </a>
 {/block}
 
-{block name="after-javascript-include"}{/block}
+
+{block name="stylesheet"}
+{hook name="badresponseorder.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="badresponseorder.after.javascript.include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="badresponseorder.javascript.initialization"}
+{/block}

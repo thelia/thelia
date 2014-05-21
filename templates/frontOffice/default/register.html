@@ -294,3 +294,16 @@
 
     </div><!-- /.layout -->
 {/block}
+
+
+{block name="stylesheet"}
+{hook name="register.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="register.after.javascript.include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="register.after.javascript.initialization"}
+{/block}

@@ -1,8 +1,8 @@
-{hook name="category.view.sidebar.top"}
-{ifHook rel="category.view.sidebar.body"}
-   {hook name="category.view.sidebar.body"}
+{hook name="category.sidebar.top"}
+{ifHook rel="category.sidebar.body"}
+   {hook name="category.sidebar.body"}
 {/ifHook}
-{elseHook rel="category.view.sidebar.body"}
+{elseHook rel="category.sidebar.body"}
 <section id="categories" class="block block-nav" role="navigation" aria-labelledby="categories-label">
     <div class="block-heading"><h3 class="block-title" id="categories-label">{intl l="Categories"}</h3></div>
     <div class="block-content">
@@ -43,4 +43,4 @@
     </div>
 </section>
 {/elseHook}
-{hook name="category.view.sidebar.bottom"}
+{hook name="category.sidebar.bottom"}

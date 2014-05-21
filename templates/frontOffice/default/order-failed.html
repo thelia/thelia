@@ -52,3 +52,16 @@
         </article>
     </div>
 {/block}
+
+
+{block name="stylesheet"}
+{hook name="order.failed.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="order.failed.after.javascript.include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="order.failed.after.javascript.initialization"}
+{/block}

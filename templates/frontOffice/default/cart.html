@@ -221,5 +221,13 @@
         })
     });
 </script>
+{hook name="cart.after.javascript.include"}
 {/block}
 
+{block name="stylesheet"}
+{hook name="cart.stylesheet"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="cart.javascript.initialization"}
+{/block}

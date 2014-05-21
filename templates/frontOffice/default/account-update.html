@@ -132,3 +132,15 @@
 
     </div><!-- /.layout -->
 {/block}
+
+{block name="stylesheet"}
+{hook name="account.update.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="account.update.after.javascript.include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="account.update.after.javascript.initialization"}
+{/block}

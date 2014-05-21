@@ -96,7 +96,18 @@
 
         </div>
     </div>
-    {hook name="folder.top" folder="$folder_id"}
+    {hook name="folder.bottom" folder="$folder_id"}
 {/block}
 
+{block name="stylesheet"}
+{hook name="folder.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="folder.after.javascript.include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="folder.after.javascript.initialization"}
+{/block}
 

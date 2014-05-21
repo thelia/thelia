@@ -41,3 +41,16 @@
         </article>
     </div>
 {/block}
+
+
+{block name="stylesheet"}
+    {hook name="newsletter.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+    {hook name="newsletter.after.javascript.include"}
+{/block}
+
+{block name="javascript-initialization"}
+    {hook name="newsletter.after.javascript.initialization"}
+{/block}

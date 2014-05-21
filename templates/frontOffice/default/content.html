@@ -68,3 +68,16 @@
     </div><!-- /.layout -->
     {hook name="content.bottom" content="$content_id"}
 {/block}
+
+
+c{block name="stylesheet"}
+{hook name="content.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="content.after.javascript.include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="content.after.javascript.initialization"}
+{/block}

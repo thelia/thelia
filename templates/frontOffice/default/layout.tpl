@@ -102,8 +102,8 @@ GNU General Public License : http://www.gnu.org/licenses/
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
             <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="{intl l="Main Navigation"}">
                 {nocache}
-                {hook name="main.navebar.secondary"}
-                {elseHook rel="main.navebar.secondary"}
+                {hook name="main.navbar.secondary"}
+                {elseHook rel="main.navbar.secondary"}
                 <ul class="nav navbar-nav navbar-cart navbar-right">
                     {loop type="auth" name="customer_info_block" role="CUSTOMER"}
                         <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
@@ -148,8 +148,8 @@ GNU General Public License : http://www.gnu.org/licenses/
                 </ul>
                 {/elseHook}
                 {/nocache}
-                {hook name="main.navebar.primary"}
-                {elseHook rel="main.navebar.primary"}
+                {hook name="main.navbar.primary"}
+                {elseHook rel="main.navbar.primary"}
                 <ul class="nav navbar-nav navbar-categories">
                     <li><a href="{navigate to="index"}" class="home">{intl l="Home"}</a></li>
                     {loop type="category" name="category.navigation" parent="0"}

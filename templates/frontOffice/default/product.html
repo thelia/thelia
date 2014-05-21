@@ -278,3 +278,15 @@
 
     </div><!-- /.main -->
 {/block}
+
+{block name="stylesheet"}
+{hook name="product.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="product.after.javascript.include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="product.after.javascript.initialization"}
+{/block}

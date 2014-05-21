@@ -263,3 +263,15 @@
 
     </div><!-- /.layout -->
 {/block}
+
+{block name="stylesheet"}
+{hook name="address.create.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="address.create.after.javascript.include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="address.create.after.javascript.initialization"}
+{/block}

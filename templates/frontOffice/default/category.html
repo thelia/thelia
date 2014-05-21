@@ -122,3 +122,16 @@
     </div>
     {hook name="category.bottom" category="$category_id"}
 {/block}
+
+
+{block name="stylesheet"}
+{hook name="category.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="category.after.javascript.include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="category.after.javascript.initialization"}
+{/block}
