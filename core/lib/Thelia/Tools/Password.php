@@ -24,7 +24,7 @@ class Password
         $string = "";
         do {
             $string .= substr(str_shuffle($letter), 0, 1);
-        } while(strlen($string) < $length);
+        } while (strlen($string) < $length);
 
         return $string;
     }

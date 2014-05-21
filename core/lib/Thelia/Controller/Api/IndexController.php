@@ -14,7 +14,6 @@ namespace Thelia\Controller\Api;
 
 use Symfony\Component\HttpFoundation\Response;
 
-
 /**
  *
  * This controller allow to test if api server is up or down

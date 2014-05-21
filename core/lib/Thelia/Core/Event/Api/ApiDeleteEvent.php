@@ -15,7 +15,6 @@ namespace Thelia\Core\Event\Api;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Api;
 
-
 /**
  * Class ApiDeleteEvent
  * @package Thelia\Core\Event\Api
@@ -32,7 +31,7 @@ class ApiDeleteEvent extends ActionEvent
     /**
      * @param $api
      */
-    function __construct(Api $api)
+    public function __construct(Api $api)
     {
         $this->api = $api;
     }

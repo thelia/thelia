@@ -14,7 +14,6 @@ namespace Thelia\Core\Event\Api;
 
 use Thelia\Core\Event\ActionEvent;
 
-
 /**
  * Class ApiCreateEvent
  * @package Thelia\Core\Event\Api
@@ -25,7 +24,7 @@ class ApiCreateEvent extends ActionEvent
     protected $label;
     protected $profile;
 
-    function __construct($label, $profile)
+    public function __construct($label, $profile)
     {
         $this->label = $label;
         $this->profile = $profile;
@@ -62,8 +61,5 @@ class ApiCreateEvent extends ActionEvent
     {
         return $this->profile;
     }
-
-
-
 
 }

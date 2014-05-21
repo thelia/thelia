@@ -19,7 +19,6 @@ use Thelia\Core\Event\Api\ApiUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Api as ApiModel;
 
-
 /**
  * Class Api
  * @package Thelia\Action

@@ -18,7 +18,6 @@ use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Model\Api;
 
-
 /**
  * Class BaseApiController
  * @package Thelia\Controller\Api
@@ -35,8 +34,7 @@ class BaseApiController extends BaseController
         $modules = is_array($modules) ? $modules : array($modules);
         $accesses = is_array($accesses) ? $accesses : array($accesses);
 
-        if (true !== $this->getSecurityContext()->isUserGranted(array("API"), $resources, $modules, $accesses, $this->getApiUser()))
-        {
+        if (true !== $this->getSecurityContext()->isUserGranted(array("API"), $resources, $modules, $accesses, $this->getApiUser())) {
             throw new AccessDeniedHttpException();
         }
     }
@@ -63,8 +61,8 @@ class BaseApiController extends BaseController
      * Render the given template, and returns the result as an Http Response.
      *
      * @param $content
-     * @param  array $args the template arguments
-     * @param  int $status http code status
+     * @param  array                                $args   the template arguments
+     * @param  int                                  $status http code status
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function render($content, $args = array(), $status = 200, $headers = array())
@@ -76,8 +74,8 @@ class BaseApiController extends BaseController
      * Render the given template, and returns the result as a string.
      *
      * @param $content
-     * @param array $args the template arguments
-     * @param null $templateDir
+     * @param array $args        the template arguments
+     * @param null  $templateDir
      *
      * @return string
      */

@@ -14,7 +14,6 @@ namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -24,7 +23,6 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Exception\AdminAccessDenied;
 use Thelia\Model\ApiQuery;
-
 
 /**
  * Class ControllerListener
@@ -57,7 +55,7 @@ class ControllerListener implements EventSubscriberInterface
     {
         $controller = $event->getController();
 
-        if($controller[0] instanceof BaseApiController && $event->getRequest()->attributes->get('not-logged') != 1) {
+        if ($controller[0] instanceof BaseApiController && $event->getRequest()->attributes->get('not-logged') != 1) {
             $apiAccount = $this->checkApiAccess(
                 $event->getRequest()
             );

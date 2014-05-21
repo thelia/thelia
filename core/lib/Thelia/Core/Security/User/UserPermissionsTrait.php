@@ -12,15 +12,14 @@
 
 namespace Thelia\Core\Security\User;
 
-
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Model\ProfileModuleQuery;
 use Thelia\Model\ProfileResourceQuery;
 
-trait UserPermissionsTrait {
-
+trait UserPermissionsTrait
+{
     abstract public function getProfileId();
 
     public function getPermissions()

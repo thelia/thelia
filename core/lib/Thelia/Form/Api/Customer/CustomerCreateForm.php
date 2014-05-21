@@ -29,12 +29,12 @@ class CustomerCreateForm extends BaseCustomerCreateForm
 
         $this->formBuilder
             ->remove('password_confirm')
+            ->remove('agreed')
             ->add('lang', 'integer', [
                 'constraints' => [
                     new NotBlank()
                 ]
             ]);
     }
-
 
 }

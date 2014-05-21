@@ -122,20 +122,24 @@ class CustomerControllerTest extends ApiTestCase
                 'zipcode'   => 63100,
                 'country'   => 64,
                 'email'     => sprintf("%s@thelia.fr", uniqid()),
-                'password'  => 'azerty'
+                'password'  => 'azerty',
+                'lang'      => 1
             ]
         ];
 
         $requestContent = json_encode($user);
 
         $client = static::createClient();
-
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
         $client->request(
             'POST',
             '/api/customers?&sign='.$this->getSignParameter($requestContent),[],[],
-            $this->getServerParameters()
+            $servers,
+            $requestContent
         );
 
         $this->assertEquals(201, $client->getResponse()->getStatusCode());
+
     }
 }

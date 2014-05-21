@@ -31,7 +31,6 @@ use Thelia\Model\Map\CustomerTitleI18nTableMap;
 use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
 
-
 /**
  * Class CustomerController
  * @package Thelia\Controller\Api
@@ -71,8 +70,6 @@ class CustomerController extends BaseApiController
         $offset = $request->query->get('offset', 0);
         $limit = $request->query->get('limit', 10);
         $order = $request->query->get('order', $orderArgument->default);
-
-
 
         if (!$orderArgument->type->isValid($order)) {
             throw new BadRequestHttpException('{"error": "order parameter is invalid"}');
@@ -181,7 +178,7 @@ class CustomerController extends BaseApiController
     public function createCustomerAction()
     {
         $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::CREATE);
-
+        $request = $this->getRequest();
         $form = new CustomerCreateForm($this->getRequest(), "form",[], ['csrf_protection' => false]);
 
         try {
@@ -189,9 +186,12 @@ class CustomerController extends BaseApiController
             $event = $this->hydrateEvent($customerForm);
 
             $this->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $event);
+            $customer = $event->getCustomer()->toArray();
+            unset($customer['Password']);
+            unset($customer['Algo']);
 
             return Response::create(
-                $event->getCustomer()->toJson()
+                json_encode($customer)
                 , 201
             );
         } catch (FormValidationException $e) {
@@ -216,9 +216,9 @@ class CustomerController extends BaseApiController
             $form->get('email')->getData(),
             $form->get('password')->getData(),
             $form->get('lang')->getData(),
-            $form->get('reseller')->getData(),
-            $form->get('sponsor')->getData(),
-            $form->get('discount')->getData(),
+            $form->has('reseller') ? $form->get('reseller')->getData():null,
+            $form->has('sponsor') ? $form->get('sponsor')->getData():null,
+            $form->has('discount') ? $form->get('discount')->getData():null,
             $form->get('company')->getData(),
             null
         );

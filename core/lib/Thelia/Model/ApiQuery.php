@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ApiQuery as BaseApiQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'api' table.
  *

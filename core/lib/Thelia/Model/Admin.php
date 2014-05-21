@@ -2,9 +2,6 @@
 
 namespace Thelia\Model;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Security\Role\Role;
 
@@ -28,7 +25,6 @@ class Admin extends BaseAdmin implements UserInterface
 {
     use ModelEventDispatcherTrait;
     use UserPermissionsTrait;
-
 
     /**
      * {@inheritDoc}

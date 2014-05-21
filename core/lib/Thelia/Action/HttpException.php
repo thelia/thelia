@@ -15,7 +15,6 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Template\ParserInterface;
@@ -57,7 +56,6 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         if ($exception instanceof BaseHttpException && null === $event->getResponse()) {
             $this->displayException($event);
         }
-
 
     }
 

@@ -28,7 +28,6 @@ use Thelia\Model\Api;
 use Thelia\Model\ApiQuery;
 use Thelia\Tools\URL;
 
-
 /**
  * Class ApiController
  * @package Thelia\Controller\Admin
@@ -68,7 +67,7 @@ class ApiController extends BaseAdminController
     }
 
     /**
-     * @param Api $api
+     * @param  Api                                        $api
      * @return \Symfony\Component\HttpFoundation\Response
      */
     private function retrieveSecureKey(Api $api)
@@ -112,9 +111,9 @@ class ApiController extends BaseAdminController
 
             return RedirectResponse::create($form->getSuccessUrl());
 
-        } catch(FormValidationException $e) {
+        } catch (FormValidationException $e) {
             $error_msg = $this->createStandardFormValidationErrorMessage($e);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $error_msg = $e->getMessage();
         }
 
@@ -167,9 +166,9 @@ class ApiController extends BaseAdminController
 
             $response = RedirectResponse::create(URL::getInstance()->absoluteUrl($this->getRoute('admin.configuration.api')));
 
-        } catch(FormValidationException $e) {
+        } catch (FormValidationException $e) {
             $error_msg = $this->createStandardFormValidationErrorMessage($e);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $error_msg = $e->getMessage();
         }
 
@@ -204,6 +203,7 @@ class ApiController extends BaseAdminController
     protected function renderList($api_id = null)
     {
         $apiAccessList = ApiQuery::create()->find()->toArray();
+
         return $this->render(
             'api',
             [

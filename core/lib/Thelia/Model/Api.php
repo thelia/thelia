@@ -16,8 +16,7 @@ class Api extends BaseApi implements UserInterface
 
     public function preInsert(ConnectionInterface $con = null)
     {
-        if (null === $this->getApiKey())
-        {
+        if (null === $this->getApiKey()) {
             $this->setApiKey(Password::generateHexaRandom(25));
         }
 
@@ -97,8 +96,6 @@ class Api extends BaseApi implements UserInterface
     {
         throw new \RuntimeException("checkPassword is not implemented");
     }
-
-
 
     /**
      * Removes sensitive data from the user.

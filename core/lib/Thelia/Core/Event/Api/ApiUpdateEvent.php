@@ -14,7 +14,6 @@ namespace Thelia\Core\Event\Api;
 
 use Thelia\Core\Event\ActionEvent;
 
-
 /**
  * Class ApiUpdateEvent
  * @package Thelia\Core\Event\Api
@@ -26,7 +25,7 @@ class ApiUpdateEvent extends ActionEvent
 
     protected $profile;
 
-    function __construct($api, $profile)
+    public function __construct($api, $profile)
     {
         $this->api = $api;
         $this->profile = $profile;
@@ -67,8 +66,5 @@ class ApiUpdateEvent extends ActionEvent
     {
         return $this->profile;
     }
-
-
-
 
 }

@@ -17,7 +17,6 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Model\ProfileQuery;
 
-
 /**
  * Class ApiCreateForm
  * @package Thelia\Form\Api
