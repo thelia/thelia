@@ -14,13 +14,16 @@ namespace Thelia\Controller\Api;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Form\CustomerCreateForm;
+use Thelia\Form\Api\Customer\CustomerCreateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
@@ -183,8 +186,43 @@ class CustomerController extends BaseApiController
 
         try {
             $customerForm = $this->validateForm($form);
+            $event = $this->hydrateEvent($customerForm);
+
+            $this->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $event);
+
+            return Response::create(
+                $event->getCustomer()->toJson()
+                , 201
+            );
         } catch (FormValidationException $e) {
             return Response::create($e->getMessage(), 400);
         }
+    }
+
+    protected function hydrateEvent(Form $form)
+    {
+        $customerCreateEvent = new CustomerCreateOrUpdateEvent(
+            $form->get('title')->getData(),
+            $form->get('firstname')->getData(),
+            $form->get('lastname')->getData(),
+            $form->get('address1')->getData(),
+            $form->get('address2')->getData(),
+            $form->get('address3')->getData(),
+            $form->get('phone')->getData(),
+            $form->get('cellphone')->getData(),
+            $form->get('zipcode')->getData(),
+            $form->get('city')->getData(),
+            $form->get('country')->getData(),
+            $form->get('email')->getData(),
+            $form->get('password')->getData(),
+            $form->get('lang')->getData(),
+            $form->get('reseller')->getData(),
+            $form->get('sponsor')->getData(),
+            $form->get('discount')->getData(),
+            $form->get('company')->getData(),
+            null
+        );
+
+        return $customerCreateEvent;
     }
 }

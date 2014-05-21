@@ -109,4 +109,33 @@ class CustomerControllerTest extends ApiTestCase
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode(), 'Http status code must be 404');
     }
+
+    public function testCreate()
+    {
+        $user = [
+            'thelia_customer_create' => [
+                'title' => 1,
+                'firstname' => 'Thelia',
+                'lastname'  => 'Thelia',
+                'address1'  => 'street address 1',
+                'city'      => 'Clermont-Ferrand',
+                'zipcode'   => 63100,
+                'country'   => 64,
+                'email'     => sprintf("%s@thelia.fr", uniqid()),
+                'password'  => 'azerty'
+            ]
+        ];
+
+        $requestContent = json_encode($user);
+
+        $client = static::createClient();
+
+        $client->request(
+            'POST',
+            '/api/customers?&sign='.$this->getSignParameter($requestContent),[],[],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(201, $client->getResponse()->getStatusCode());
+    }
 }
