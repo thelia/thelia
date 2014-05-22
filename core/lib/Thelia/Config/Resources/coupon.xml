@@ -30,12 +30,12 @@
             <argument type="service" id="thelia.facade" />
             <tag name="thelia.coupon.addCoupon"/>
         </service>
-
+<!--
         <service id="thelia.coupon.type.remove_amount_on_categories" class="Thelia\Coupon\Type\RemoveAmountOnCategories">
             <argument type="service" id="thelia.facade" />
             <tag name="thelia.coupon.addCoupon"/>
         </service>
-
+-->
         <!-- Condition module -->
 
         <service id="thelia.condition.factory" class="Thelia\Condition\ConditionFactory">
