@@ -239,6 +239,8 @@ class XmlFileLoader extends FileLoader
                 $definition->setProperty('module', new Reference($type));
             }
             $definition->setProperty('parser', new Reference('thelia.parser'));
+            $definition->setProperty('translator', new Reference('thelia.translator'));
+            $definition->setProperty('assetsManager', new Reference('assetic.asset.manager'));
             $this->container->setDefinition($id, $definition);
         }
     }

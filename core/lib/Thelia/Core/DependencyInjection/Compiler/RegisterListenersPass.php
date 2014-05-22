@@ -123,10 +123,13 @@ class RegisterListenersPass implements CompilerPassInterface
                         ), array('strtoupper("\\0")', ''), $event['event']);
                 }
 
+                Tlog::getInstance()->addAlert(sprintf("New hook %s is not activated.", $event['event']));
+
                 // test if hook is already registered in ModuleHook
                 $moduleHook = ModuleHookQuery::create()
                     ->filterByModuleId($module)
                     ->filterByHook($hook)
+                    ->filterByMethod($event['method'])
                     ->findOne();
 
                 if (null === $moduleHook) {

@@ -243,7 +243,7 @@
             {/strip}
 
             <section id="product-tabs">
-                {hookBlock name="product.additional"}
+                {hookBlock name="product.additional" product="{product attr="id"}"}
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
                     {if $smarty.capture.additional ne ""}<li role="presentation"><a id="tab2" href="#additional" data-toggle="tab" role="tab">{intl l="Additional Info"}</a></li>{/if}
@@ -262,7 +262,7 @@
                     {/if}
                     {forHook rel="product.additional"}
                     <div class="tab-pane" id="{$id}" role="tabpanel" aria-labelledby="tab{$id}">
-                        {$content}
+                        {$content nofilter}
                     </div>
                     {/forHook}
                 </div>
