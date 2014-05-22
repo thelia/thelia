@@ -14,6 +14,8 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Thelia\Core\Event\Hook\HookRenderBlockEvent;
 use Thelia\Core\Event\Hook\HookRenderEvent;
+use Thelia\Core\Hook\Fragment;
+use Thelia\Core\Hook\FragmentBag;
 use Thelia\Core\Template\Smarty\SmartyParser;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
@@ -38,6 +40,9 @@ class Hook extends AbstractSmartyPlugin
 
     /** @var array  */
     protected $hookResults = array();
+
+    /** @var array  */
+    protected $varstack = array();
 
     /** @var bool debug */
     protected $debug = false;
@@ -75,19 +80,19 @@ class Hook extends AbstractSmartyPlugin
         $module = intval($this->getParam($params, 'module', 0));
         $type = $smarty->getTemplateDefinition()->getType();
 
-        Tlog::getInstance()->addDebug("_HOOK_ process hook : " . $hookName);
+        //Tlog::getInstance()->addDebug("_HOOK_ process hook : " . $hookName);
 
-        $event = new HookRenderEvent($hookName, $params, $module);
+        $event = new HookRenderEvent($hookName, $params);
         $event->setArguments($this->getArgumentsFromParams($params));
 
         // todo implement a before hook
         // $event = $this->getDispatcher()->dispatch('hook.before.' . $hookName, $event);
         $eventName = sprintf('hook.%s.%s', $type, $hookName);
-        // thi is a hook specific to a module
+        // this is a hook specific to a module
         if (0 !== $module){
             $eventName .= '.' . $module;
         }
-        Tlog::getInstance()->addDebug("_HOOK_ dispatch event : " . $eventName);
+        //Tlog::getInstance()->addDebug("_HOOK_ dispatch event : " . $eventName);
         $this->getDispatcher()->dispatch($eventName, $event);
         // todo implement a after hook for post treatment on event
         // $event = $this->getDispatcher()->dispatch('hook.after.' . $hookName, $event);
@@ -116,6 +121,7 @@ class Hook extends AbstractSmartyPlugin
     {
 
         $hookName = $this->getParam($params, 'name');
+        $module = intval($this->getParam($params, 'module', 0));
 
         if (! $repeat) {
             if ($this->debug && $smarty->getRequest()->get('SHOW_HOOK')) {
@@ -131,25 +137,114 @@ class Hook extends AbstractSmartyPlugin
 
         $event = new HookRenderBlockEvent($hookName, $params);
 
+        $eventName = sprintf('hook.%s.%s', $type, $hookName);
+        // this is a hook specific to a module
+        if (0 !== $module){
+            $eventName .= '.' . $module;
+        }
+
         // todo implement a before hook
         // $event = $this->getDispatcher()->dispatch('hook.before.' . $hookName, $event);
-        $this->getDispatcher()->dispatch('hook.' . $type . '.' . $hookName, $event);
+        $this->getDispatcher()->dispatch($eventName, $event);
         // todo implement a after hook for post treatment on event
         // $event = $this->getDispatcher()->dispatch('hook.after.' . $hookName, $event);
 
-        $isEmpty = true;
-        foreach ($event->keys() as $key) {
-            // Tlog::getInstance()->addDebug("_HOOK_ block assign : " . $key);
-            $content = $event->get($key);
-            if (0 !== count($content)) {
-                $isEmpty = false;
-            }
-            $smarty->assign($key, $content);
-        }
-        // it's a bit dirty but we just add a content to enable the ifHook/elseHook support
-        $this->hookResults[$hookName] = $isEmpty ? "" : "not empty";
+        // save results so we can use it in forHook block
+        $this->hookResults[$hookName] = $event->get();
 
     }
+
+    /**
+     * Generates the content of the hookBlock block
+     *
+     * @param  array        $params
+     * @param  string       $content
+     * @param  SmartyParser $smarty
+     * @param  bool         $repeat
+     * @return string       no text is returned.
+     */
+    public function processForHookBlock($params, $content, $smarty, &$repeat)
+    {
+
+        $rel = $this->getParam($params, 'rel');
+        if (null == $rel) {
+            throw new \InvalidArgumentException(
+                $this->translator->trans("Missing 'rel' parameter in forHook arguments")
+            );
+        }
+
+        /** @var FragmentBag $fragments */
+        $fragments = null;
+
+        // first call
+        if ($content === null) {
+            if (! array_key_exists($rel, $this->hookResults)) {
+                throw new \InvalidArgumentException(
+                    $this->translator->trans("Related hook name '%name' is not defined.", ['%name' => $rel])
+                );
+            }
+
+            $fragments = $this->hookResults[$rel];
+            $fragments->rewind();
+
+            if ($fragments->isEmpty()) {
+                $repeat = false;
+            }
+
+        } else {
+            $fragments = $this->hookResults[$rel];
+            $fragments->next();
+        }
+
+        if ($fragments->valid()) {
+
+            /** @var Fragment $fragment */
+            $fragment = $fragments->current();
+
+            // On first iteration, save variables that may be overwritten by this loop
+            if (! isset($this->varstack[$rel])) {
+
+                $saved_vars = array();
+
+                $varlist = $fragment->getVars();
+
+                foreach ($varlist as $var) {
+                    $saved_vars[$var] = $smarty->getTemplateVars($var);
+                }
+
+                $this->varstack[$rel] = $saved_vars;
+            }
+
+            foreach ($fragment->getVarVal() as $var => $val) {
+                $smarty->assign($var, $val);
+            }
+            // continue iteration
+            $repeat = true;
+        }
+
+        // end
+        if (! $repeat) {
+            // Restore previous variables values before terminating
+            if (isset($this->varstack[$rel])) {
+                foreach ($this->varstack[$rel] as $var => $value) {
+                    $smarty->assign($var, $value);
+                }
+
+                unset($this->varstack[$rel]);
+            }
+        }
+
+        if ($content !== null) {
+            if ($fragments->isEmpty()) {
+                $content = "";
+            }
+            return $content;
+        }
+
+        return '';
+
+    }
+
 
     /**
      * Process {elseHook rel="hookname"} ... {/elseHook} block
@@ -250,6 +345,7 @@ class Hook extends AbstractSmartyPlugin
         return array(
             new SmartyPluginDescriptor('function', 'hook', $this, 'processHookFunction'),
             new SmartyPluginDescriptor('block', 'hookBlock', $this, 'processHookBlock'),
+            new SmartyPluginDescriptor('block', 'forHook', $this, 'processForHookBlock'),
             new SmartyPluginDescriptor('block', 'elseHook', $this, 'elseHook'),
             new SmartyPluginDescriptor('block', 'ifHook', $this, 'ifHook'),
         );

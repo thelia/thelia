@@ -121,10 +121,10 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
                     $search->orderByPosition(Criteria::DESC);
                     break;
                 case "enabled":
-                    $search->orderByActivate(Criteria::ASC);
+                    $search->orderByActive(Criteria::ASC);
                     break;
                 case "enabled_reverse":
-                    $search->orderByActivate(Criteria::DESC);
+                    $search->orderByActive(Criteria::DESC);
                     break;
              }
         }

@@ -243,9 +243,13 @@
             {/strip}
 
             <section id="product-tabs">
+                {hookBlock name="product.additional"}
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
                     {if $smarty.capture.additional ne ""}<li role="presentation"><a id="tab2" href="#additional" data-toggle="tab" role="tab">{intl l="Additional Info"}</a></li>{/if}
+                    {forHook rel="product.additional"}
+                        <li role="presentation"><a id="tab{$id}" href="#{$id}" data-toggle="tab" role="tab">{$title}</a></li>
+                    {/forHook}
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active in" id="description" itemprop="description" role="tabpanel" aria-labelledby="tab1">
@@ -256,7 +260,13 @@
                         {$smarty.capture.additional nofilter}
                     </div>
                     {/if}
+                    {forHook rel="product.additional"}
+                    <div class="tab-pane" id="{$id}" role="tabpanel" aria-labelledby="tab{$id}">
+                        {$content}
+                    </div>
+                    {/forHook}
                 </div>
+                {/hookBlock}
             </section>
 
             {hook name="product.bottom" product="{$ID}"}

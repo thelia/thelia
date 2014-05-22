@@ -13,6 +13,7 @@
 namespace Thelia\Core\Event\Hook;
 
 use Symfony\Component\EventDispatcher\Event;
+use Thelia\Core\Hook\Fragment;
 use Thelia\Core\Hook\FragmentBag;
 use Thelia\Core\Hook\FragmentBagInterface;
 
@@ -23,9 +24,8 @@ use Thelia\Core\Hook\FragmentBagInterface;
  */
 class HookRenderBlockEvent extends BaseHookRenderEvent
 {
-    const DEFAULT_KEY = "content";
 
-    /** @var  FragmentBagInterface $fragments */
+    /** @var  FragmentBag $fragmentBag */
     protected $fragmentBag;
 
     public function __construct($code, array $arguments = array())
@@ -35,51 +35,38 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     }
 
     /**
+     * Add a new fragment as an array
      *
-     * @param  string $content
-     * @parma string $key
+     * @param  array $data
      * @return $this
      */
-    public function add($content, $key=self::DEFAULT_KEY)
+    public function add($data)
     {
-        $this->fragmentBag->add($key, $content);
-
+        $this->fragmentBag->add($data);
         return $this;
     }
 
     /**
-     * @return array
+     * Add a new fragment
+     *
+     * @param \Thelia\Core\Hook\Fragment $fragment
+     * @return $this
      */
-    public function keys()
+    public function addFragment(Fragment $fragment)
     {
-        return $this->fragmentBag->keys();
+        $this->fragmentBag->addFragment($fragment);
+        return $this;
     }
 
     /**
-     * @param  string $key
-     * @return array
+     * Get all contents
+     *
+     * @return FragmentBag
      */
-    public function get($key=self::DEFAULT_KEY)
+    public function get()
     {
-        return $this->fragmentBag->get($key);
+        return $this->fragmentBag;
     }
 
-    /**
-     * @param  string $key
-     * @param  string $glue
-     * @param  string $before
-     * @param  string $after
-     * @return string
-     */
-    public function dump($key=self::DEFAULT_KEY, $glue='', $before='', $after='')
-    {
-        $ret = '';
-        $fragments = $this->get($key);
-        if (0 !== count($fragments)) {
-            $ret = $before . implode($glue, $fragments) . $after;
-        }
-
-        return $ret;
-    }
 
 }
