@@ -17,8 +17,9 @@ use Thelia\Condition\Operators;
 use Thelia\Condition\SerializableCondition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
+use Thelia\Exception\InvalidConditionOperatorException;
 use Thelia\Exception\InvalidConditionValueException;
-use Thelia\Model\Base\CurrencyQuery;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Currency;
 use Thelia\Type\FloatType;
 
@@ -31,10 +32,6 @@ use Thelia\Type\FloatType;
  */
 abstract class ConditionAbstract implements ConditionInterface
 {
-
-    /** @var string Service Id from Resources/config.xml  */
-    protected $serviceId = null;
-
     /** @var array Available Operators (Operators::CONST) */
     protected $availableOperators = [];
 
@@ -69,13 +66,27 @@ abstract class ConditionAbstract implements ConditionInterface
     }
 
     /**
-     * Return all available Operators for this Condition
+     * @param array  $operatorList  the list of comparison operator values, as entered in the condition parameter form
+     * @param string $parameterName the name of the parameter to check
      *
-     * @return array Operators::CONST
+     * @return $this
+     *
+     * @throws \Thelia\Exception\InvalidConditionOperatorException if the operator value is not in the allowed value
      */
-    public function getAvailableOperators()
+    protected function checkComparisonOperatorValue($operatorList, $parameterName)
     {
-        return $this->availableOperators;
+        $isOperator1Legit = $this->isOperatorLegit(
+            $operatorList[$parameterName],
+            $this->availableOperators[$parameterName]
+        );
+
+        if (!$isOperator1Legit) {
+            throw new InvalidConditionOperatorException(
+                get_class(), $parameterName
+            );
+        }
+
+        return $this;
     }
 
     /**
@@ -88,8 +99,11 @@ abstract class ConditionAbstract implements ConditionInterface
         $this->validators = $this->generateInputs();
 
         $translatedInputs = [];
+
         foreach ($this->validators as $key => $validator) {
+
             $translatedOperators = [];
+
             foreach ($validator['availableOperators'] as $availableOperators) {
                 $translatedOperators[$availableOperators] = Operators::getI18n(
                     $this->translator,
@@ -98,18 +112,23 @@ abstract class ConditionAbstract implements ConditionInterface
             }
 
             $validator['availableOperators'] = $translatedOperators;
+
             $translatedInputs[$key] = $validator;
         }
-        $validators = [];
-        $validators['inputs'] = $translatedInputs;
-        $validators['setOperators'] = $this->operators;
-        $validators['setValues'] = $this->values;
+
+        $validators = [
+            'inputs'       => $translatedInputs,
+            'setOperators' => $this->operators,
+            'setValues'    => $this->values
+        ];
 
         return $validators;
     }
 
     /**
-     * Generate inputs ready to be drawn
+     * Generate inputs ready to be drawn.
+     *
+     * TODO: what these "inputs ready to be drawn" is not clear.
      *
      * @throws \Thelia\Exception\NotImplementedException
      * @return array
@@ -128,7 +147,9 @@ abstract class ConditionAbstract implements ConditionInterface
      */
     public function getServiceId()
     {
-        return $this->serviceId;
+        throw new \Thelia\Exception\NotImplementedException(
+            'The getServiceId method must be implemented in ' . get_class()
+        );
     }
 
     /**
@@ -152,7 +173,7 @@ abstract class ConditionAbstract implements ConditionInterface
     public function getSerializableCondition()
     {
         $serializableCondition = new SerializableCondition();
-        $serializableCondition->conditionServiceId = $this->serviceId;
+        $serializableCondition->conditionServiceId = $this->getServiceId();
         $serializableCondition->operators = $this->operators;
 
         $serializableCondition->values = $this->values;

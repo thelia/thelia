@@ -204,9 +204,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             case 'discount':
                 return $order->getDiscount();
             case 'delivery_address':
-                return $order->chosenDeliveryAddress;
+                return $order->getChoosenDeliveryAddress();
             case 'invoice_address':
-                return $order->chosenInvoiceAddress;
+                return $order->getChoosenInvoiceAddress();
             case 'delivery_module':
                 return $order->getDeliveryModuleId();
             case 'payment_module':

@@ -12,6 +12,8 @@
 
 namespace Thelia\Condition\Implementation;
 
+use Thelia\Coupon\FacadeInterface;
+
 /**
  * Allow every one, perform no check
  *
@@ -21,35 +23,29 @@ namespace Thelia\Condition\Implementation;
  */
 class MatchForEveryone extends ConditionAbstract
 {
-    /** @var string Service Id from Resources/config.xml  */
-    protected $serviceId = 'thelia.condition.match_for_everyone';
-
-    /** @var array Available Operators (Operators::CONST) */
-    protected $availableOperators = [];
-
     /**
-     * Check validators relevancy and store them
-     *
-     * @param array $operators Operators the Admin set in BackOffice
-     * @param array $values    Values the Admin set in BackOffice
-     *
-     * @throws \InvalidArgumentException
-     * @return $this
+     * @inheritdoc
      */
-    public function setValidatorsFromForm(array $operators, array $values)
+    public function __construct(FacadeInterface $facade)
     {
-        $this->setValidators();
+        // Define the allowed comparison operators
+        $this->availableOperators = [];
 
-        return $this;
+        parent::__construct($facade);
     }
 
     /**
-     * Check validators relevancy and store them
-     *
-     * @throws \InvalidArgumentException
-     * @return $this
+     * @inheritdoc
      */
-    protected function setValidators()
+    public function getServiceId()
+    {
+        return 'thelia.condition.match_for_everyone';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setValidatorsFromForm(array $operators, array $values)
     {
         $this->operators = [];
         $this->values = [];
@@ -58,9 +54,7 @@ class MatchForEveryone extends ConditionAbstract
     }
 
     /**
-     * Test if Customer meets conditions
-     *
-     * @return bool
+     * @inheritdoc
      */
     public function isMatching()
     {
@@ -68,9 +62,7 @@ class MatchForEveryone extends ConditionAbstract
     }
 
     /**
-     * Get I18n name
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getName()
     {
@@ -82,10 +74,7 @@ class MatchForEveryone extends ConditionAbstract
     }
 
     /**
-     * Get I18n tooltip
-     * Explain in detail what the Condition checks
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getToolTip()
     {
@@ -99,10 +88,7 @@ class MatchForEveryone extends ConditionAbstract
     }
 
     /**
-     * Get I18n summary
-     * Explain briefly the condition with given values
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getSummary()
     {
@@ -116,20 +102,15 @@ class MatchForEveryone extends ConditionAbstract
     }
 
     /**
-     * Generate inputs ready to be drawn
-     *
-     * @return array
-     */
+     * @inheritdoc
+    */
     protected function generateInputs()
     {
         return [];
     }
 
     /**
-     * Draw the input displayed in the BackOffice
-     * allowing Admin to set its Coupon Conditions
-     *
-     * @return string HTML string
+     * @inheritdoc
      */
     public function drawBackOfficeInputs()
     {

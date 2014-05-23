@@ -20,6 +20,7 @@ use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelper;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
 use Thelia\Cart\CartTrait;
@@ -75,7 +76,11 @@ class BaseFacade implements FacadeInterface
      */
     public function getDeliveryAddress()
     {
-        // @todo: Implement getDeliveryAddress() method.
+        try {
+            return AddressQuery::create()->findPk($this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress());
+        } catch (\Exception $ex) {
+            throw new \LogicException("Failed to get delivery address (" . $ex->getMessage() . ")");
+        }
     }
 
     /**

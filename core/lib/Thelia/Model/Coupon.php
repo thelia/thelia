@@ -23,8 +23,11 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\Propel;
 use Thelia\Model\Base\Coupon as BaseCoupon;
 use Thelia\Model\Exception\InvalidArgumentException;
+use Thelia\Model\Map\CouponTableMap;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
 
 /**
  * Used to provide an effect (mostly a discount)
@@ -38,7 +41,7 @@ use Thelia\Model\Exception\InvalidArgumentException;
 class Coupon extends BaseCoupon
 {
 
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+    use ModelEventDispatcherTrait;
 
     /**
      * Create or Update this Coupon
@@ -57,32 +60,85 @@ class Coupon extends BaseCoupon
      * @param int       $maxUsage                   Coupon quantity
      * @param string    $defaultSerializedRule      Serialized default rule added if none found
      * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
+     * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
+     * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
+     * @param bool      $perCustomerUsageCount      True if usage coiunt is per customer
      *
      * @throws \Exception
      */
-    public function createOrUpdate($code, $title, array $effects, $type, $isRemovingPostage, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $defaultSerializedRule, $locale = null)
+    public function createOrUpdate(
+        $code, $title, array $effects, $type, $isRemovingPostage, $shortDescription, $description,
+        $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $defaultSerializedRule,
+        $locale, $freeShippingForCountries, $freeShippingForMethods,
+        $perCustomerUsageCount)
     {
-        $this
-            ->setCode($code)
-            ->setType($type)
-            ->setEffects($effects)
-            ->setIsRemovingPostage($isRemovingPostage)
-            ->setIsEnabled($isEnabled)
-            ->setExpirationDate($expirationDate)
-            ->setIsAvailableOnSpecialOffers($isAvailableOnSpecialOffers)
-            ->setIsCumulative($isCumulative)
-            ->setMaxUsage($maxUsage)
-            ->setLocale($locale)
-            ->setTitle($title)
-            ->setShortDescription($shortDescription)
-            ->setDescription($description);
+        $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
 
-        // If no rule given, set default rule
-        if (null === $this->getSerializedConditions()) {
-            $this->setSerializedConditions($defaultSerializedRule);
+        $con->beginTransaction();
+
+        try {
+            $this
+                ->setCode($code)
+                ->setType($type)
+                ->setEffects($effects)
+                ->setIsRemovingPostage($isRemovingPostage)
+                ->setIsEnabled($isEnabled)
+                ->setExpirationDate($expirationDate)
+                ->setIsAvailableOnSpecialOffers($isAvailableOnSpecialOffers)
+                ->setIsCumulative($isCumulative)
+                ->setMaxUsage($maxUsage)
+                ->setPerCustomerUsageCount($perCustomerUsageCount)
+                ->setLocale($locale)
+                ->setTitle($title)
+                ->setShortDescription($shortDescription)
+                ->setDescription($description)
+            ;
+
+            // If no rule given, set default rule
+            if (null === $this->getSerializedConditions()) {
+                $this->setSerializedConditions($defaultSerializedRule);
+            }
+
+            $this->save();
+
+            // Update countries and modules relation for free shipping
+            CouponCountryQuery::create()->filterByCouponId($this->id)->delete();
+            CouponModuleQuery::create()->filterByCouponId($this->id)->delete();
+
+            foreach ($freeShippingForCountries as $countryId) {
+
+                if ($countryId <= 0) continue;
+
+                $couponCountry = new CouponCountry();
+
+                $couponCountry
+                    ->setCouponId($this->getId())
+                    ->setCountryId($countryId)
+                    ->save();
+                ;
+            }
+
+            foreach ($freeShippingForMethods as $moduleId) {
+
+                if ($moduleId <= 0) continue;
+
+                $couponModule = new CouponModule();
+
+                $couponModule
+                    ->setCouponId($this->getId())
+                    ->setModuleId($moduleId)
+                    ->save()
+                ;
+            }
+
+            $con->commit();
+
+        } catch (\Exception $ex) {
+
+            $con->rollback();
+
+            throw $ex;
         }
-
-        $this->save();
     }
 
     /**
@@ -197,5 +253,52 @@ class Coupon extends BaseCoupon
         $effects = json_encode($unserializedEffects);
 
         return $effects;
+    }
+
+    /**
+     * Return the countries for which free shipping is valid
+     * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
+     */
+    public function getFreeShippingForCountries()
+    {
+        return CouponCountryQuery::create()->filterByCouponId($this->getId())->find();
+    }
+
+    /**
+     * Return the modules for which free shipping is valid
+     *
+     * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
+     */
+    public function getFreeShippingForModules()
+    {
+        return CouponModuleQuery::create()->filterByCouponId($this->getId())->find();
+    }
+
+    /**
+     * Get coupon usage left, either overall, or per customer.
+     *
+     * @param int|null $customerId the ID of the ordering customer
+     *
+     * @return int the usage left.
+     */
+    public function getUsagesLeft($customerId = null)
+    {
+        $usageLeft = $this->getMaxUsage();
+
+        if ($this->getPerCustomerUsageCount()) {
+
+             // Get usage left for current customer. If the record is not found,
+            // it means that the customer has not yes used this coupon.
+            if (null !== $couponCustomerCount = CouponCustomerCountQuery::create()
+                    ->filterByCouponId($this->getId())
+                    ->filterByCustomerId($customerId)
+                    ->findOne()) {
+
+                // The coupon has already been used -> remove this customer's usage count
+                $usageLeft -= $couponCustomerCount->getCount();
+            }
+        }
+
+        return $usageLeft;
     }
 }

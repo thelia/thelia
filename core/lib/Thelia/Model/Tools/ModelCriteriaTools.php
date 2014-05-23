@@ -14,7 +14,7 @@ namespace Thelia\Model\Tools;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Model\Base\LangQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 

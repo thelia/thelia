@@ -21,7 +21,7 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Base\FeatureProductQuery;
+use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\Map\FeatureAvTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;

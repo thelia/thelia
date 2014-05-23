@@ -34,6 +34,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     ChildOrderCouponQuery orderByIsRemovingPostage($order = Criteria::ASC) Order by the is_removing_postage column
  * @method     ChildOrderCouponQuery orderByIsAvailableOnSpecialOffers($order = Criteria::ASC) Order by the is_available_on_special_offers column
  * @method     ChildOrderCouponQuery orderBySerializedConditions($order = Criteria::ASC) Order by the serialized_conditions column
+ * @method     ChildOrderCouponQuery orderByPerCustomerUsageCount($order = Criteria::ASC) Order by the per_customer_usage_count column
  * @method     ChildOrderCouponQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildOrderCouponQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -50,6 +51,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     ChildOrderCouponQuery groupByIsRemovingPostage() Group by the is_removing_postage column
  * @method     ChildOrderCouponQuery groupByIsAvailableOnSpecialOffers() Group by the is_available_on_special_offers column
  * @method     ChildOrderCouponQuery groupBySerializedConditions() Group by the serialized_conditions column
+ * @method     ChildOrderCouponQuery groupByPerCustomerUsageCount() Group by the per_customer_usage_count column
  * @method     ChildOrderCouponQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildOrderCouponQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -60,6 +62,14 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     ChildOrderCouponQuery leftJoinOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the Order relation
  * @method     ChildOrderCouponQuery rightJoinOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Order relation
  * @method     ChildOrderCouponQuery innerJoinOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the Order relation
+ *
+ * @method     ChildOrderCouponQuery leftJoinOrderCouponCountry($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderCouponCountry relation
+ * @method     ChildOrderCouponQuery rightJoinOrderCouponCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderCouponCountry relation
+ * @method     ChildOrderCouponQuery innerJoinOrderCouponCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderCouponCountry relation
+ *
+ * @method     ChildOrderCouponQuery leftJoinOrderCouponModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderCouponModule relation
+ * @method     ChildOrderCouponQuery rightJoinOrderCouponModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderCouponModule relation
+ * @method     ChildOrderCouponQuery innerJoinOrderCouponModule($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderCouponModule relation
  *
  * @method     ChildOrderCoupon findOne(ConnectionInterface $con = null) Return the first ChildOrderCoupon matching the query
  * @method     ChildOrderCoupon findOneOrCreate(ConnectionInterface $con = null) Return the first ChildOrderCoupon matching the query, or a new ChildOrderCoupon object populated from the query conditions when no match is found
@@ -77,6 +87,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     ChildOrderCoupon findOneByIsRemovingPostage(boolean $is_removing_postage) Return the first ChildOrderCoupon filtered by the is_removing_postage column
  * @method     ChildOrderCoupon findOneByIsAvailableOnSpecialOffers(boolean $is_available_on_special_offers) Return the first ChildOrderCoupon filtered by the is_available_on_special_offers column
  * @method     ChildOrderCoupon findOneBySerializedConditions(string $serialized_conditions) Return the first ChildOrderCoupon filtered by the serialized_conditions column
+ * @method     ChildOrderCoupon findOneByPerCustomerUsageCount(boolean $per_customer_usage_count) Return the first ChildOrderCoupon filtered by the per_customer_usage_count column
  * @method     ChildOrderCoupon findOneByCreatedAt(string $created_at) Return the first ChildOrderCoupon filtered by the created_at column
  * @method     ChildOrderCoupon findOneByUpdatedAt(string $updated_at) Return the first ChildOrderCoupon filtered by the updated_at column
  *
@@ -93,6 +104,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     array findByIsRemovingPostage(boolean $is_removing_postage) Return ChildOrderCoupon objects filtered by the is_removing_postage column
  * @method     array findByIsAvailableOnSpecialOffers(boolean $is_available_on_special_offers) Return ChildOrderCoupon objects filtered by the is_available_on_special_offers column
  * @method     array findBySerializedConditions(string $serialized_conditions) Return ChildOrderCoupon objects filtered by the serialized_conditions column
+ * @method     array findByPerCustomerUsageCount(boolean $per_customer_usage_count) Return ChildOrderCoupon objects filtered by the per_customer_usage_count column
  * @method     array findByCreatedAt(string $created_at) Return ChildOrderCoupon objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildOrderCoupon objects filtered by the updated_at column
  *
@@ -183,7 +195,7 @@ abstract class OrderCouponQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ORDER_ID`, `CODE`, `TYPE`, `AMOUNT`, `TITLE`, `SHORT_DESCRIPTION`, `DESCRIPTION`, `EXPIRATION_DATE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `SERIALIZED_CONDITIONS`, `CREATED_AT`, `UPDATED_AT` FROM `order_coupon` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `ORDER_ID`, `CODE`, `TYPE`, `AMOUNT`, `TITLE`, `SHORT_DESCRIPTION`, `DESCRIPTION`, `EXPIRATION_DATE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `SERIALIZED_CONDITIONS`, `PER_CUSTOMER_USAGE_COUNT`, `CREATED_AT`, `UPDATED_AT` FROM `order_coupon` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -696,6 +708,33 @@ abstract class OrderCouponQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the per_customer_usage_count column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPerCustomerUsageCount(true); // WHERE per_customer_usage_count = true
+     * $query->filterByPerCustomerUsageCount('yes'); // WHERE per_customer_usage_count = true
+     * </code>
+     *
+     * @param     boolean|string $perCustomerUsageCount The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderCouponQuery The current query, for fluid interface
+     */
+    public function filterByPerCustomerUsageCount($perCustomerUsageCount = null, $comparison = null)
+    {
+        if (is_string($perCustomerUsageCount)) {
+            $per_customer_usage_count = in_array(strtolower($perCustomerUsageCount), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(OrderCouponTableMap::PER_CUSTOMER_USAGE_COUNT, $perCustomerUsageCount, $comparison);
+    }
+
+    /**
      * Filter the query on the created_at column
      *
      * Example usage:
@@ -854,6 +893,186 @@ abstract class OrderCouponQuery extends ModelCriteria
         return $this
             ->joinOrder($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Order', '\Thelia\Model\OrderQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\OrderCouponCountry object
+     *
+     * @param \Thelia\Model\OrderCouponCountry|ObjectCollection $orderCouponCountry  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderCouponQuery The current query, for fluid interface
+     */
+    public function filterByOrderCouponCountry($orderCouponCountry, $comparison = null)
+    {
+        if ($orderCouponCountry instanceof \Thelia\Model\OrderCouponCountry) {
+            return $this
+                ->addUsingAlias(OrderCouponTableMap::ID, $orderCouponCountry->getCouponId(), $comparison);
+        } elseif ($orderCouponCountry instanceof ObjectCollection) {
+            return $this
+                ->useOrderCouponCountryQuery()
+                ->filterByPrimaryKeys($orderCouponCountry->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByOrderCouponCountry() only accepts arguments of type \Thelia\Model\OrderCouponCountry or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the OrderCouponCountry relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildOrderCouponQuery The current query, for fluid interface
+     */
+    public function joinOrderCouponCountry($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('OrderCouponCountry');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'OrderCouponCountry');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the OrderCouponCountry relation OrderCouponCountry object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\OrderCouponCountryQuery A secondary query class using the current class as primary query
+     */
+    public function useOrderCouponCountryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinOrderCouponCountry($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderCouponCountry', '\Thelia\Model\OrderCouponCountryQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\OrderCouponModule object
+     *
+     * @param \Thelia\Model\OrderCouponModule|ObjectCollection $orderCouponModule  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderCouponQuery The current query, for fluid interface
+     */
+    public function filterByOrderCouponModule($orderCouponModule, $comparison = null)
+    {
+        if ($orderCouponModule instanceof \Thelia\Model\OrderCouponModule) {
+            return $this
+                ->addUsingAlias(OrderCouponTableMap::ID, $orderCouponModule->getCouponId(), $comparison);
+        } elseif ($orderCouponModule instanceof ObjectCollection) {
+            return $this
+                ->useOrderCouponModuleQuery()
+                ->filterByPrimaryKeys($orderCouponModule->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByOrderCouponModule() only accepts arguments of type \Thelia\Model\OrderCouponModule or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the OrderCouponModule relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildOrderCouponQuery The current query, for fluid interface
+     */
+    public function joinOrderCouponModule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('OrderCouponModule');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'OrderCouponModule');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the OrderCouponModule relation OrderCouponModule object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\OrderCouponModuleQuery A secondary query class using the current class as primary query
+     */
+    public function useOrderCouponModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinOrderCouponModule($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderCouponModule', '\Thelia\Model\OrderCouponModuleQuery');
+    }
+
+    /**
+     * Filter the query by a related Country object
+     * using the order_coupon_country table as cross reference
+     *
+     * @param Country $country the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderCouponQuery The current query, for fluid interface
+     */
+    public function filterByCountry($country, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useOrderCouponCountryQuery()
+            ->filterByCountry($country, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related Module object
+     * using the order_coupon_module table as cross reference
+     *
+     * @param Module $module the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderCouponQuery The current query, for fluid interface
+     */
+    public function filterByModule($module, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useOrderCouponModuleQuery()
+            ->filterByModule($module, $comparison)
+            ->endUse();
     }
 
     /**

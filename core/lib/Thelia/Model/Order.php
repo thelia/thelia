@@ -4,19 +4,54 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
-
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Base\Order as BaseOrder;
-use Thelia\Model\Base\OrderProductTaxQuery;
 use Thelia\Model\Map\OrderProductTaxTableMap;
+use Thelia\Model\Base\Order as BaseOrder;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
 
 class Order extends BaseOrder
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+    use ModelEventDispatcherTrait;
 
-    public $chosenDeliveryAddress = null;
-    public $chosenInvoiceAddress = null;
+    protected $choosenDeliveryAddress = null;
+    protected $choosenInvoiceAddress = null;
+
+    /**
+     * @param null $choosenDeliveryAddress
+     */
+    public function setChoosenDeliveryAddress($choosenDeliveryAddress)
+    {
+        $this->choosenDeliveryAddress = $choosenDeliveryAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getChoosenDeliveryAddress()
+    {
+        return $this->choosenDeliveryAddress;
+    }
+
+    /**
+     * @param null $choosenInvoiceAddress
+     */
+    public function setChoosenInvoiceAddress($choosenInvoiceAddress)
+    {
+        $this->choosenInvoiceAddress = $choosenInvoiceAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getChoosenInvoiceAddress()
+    {
+        return $this->choosenInvoiceAddress;
+    }
 
     /**
      * {@inheritDoc}

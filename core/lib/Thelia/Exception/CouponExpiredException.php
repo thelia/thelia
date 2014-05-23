@@ -12,6 +12,7 @@
 
 namespace Thelia\Exception;
 
+use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 
 /**
@@ -30,7 +31,8 @@ class CouponExpiredException extends \Exception
      */
     public function __construct($couponCode)
     {
-        $message = 'Expired Coupon ' . $couponCode . 'attempt';
+        $message = Translator::getInstance()->trans('Coupon %code is expired.', ['%code' => $couponCode ]);
+
         Tlog::getInstance()->addWarning($message);
 
         parent::__construct($message);

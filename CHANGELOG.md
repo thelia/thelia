@@ -1,3 +1,19 @@
+#2.0.2
+- New coupon conditions :
+    - Start date
+    - Billing country
+    - Shipping country
+    - Cart contains product
+    - Cart contains product from category
+    - For specific customers
+- Free shipping can now be restricted to some countries and/or shipping methods
+- session initialization use now event dispatcher :
+    - name event : thelia_kernel.session (see Thelia\Core\TheliakernelEvents::SESSION
+    - class event : Thelia\Core\Event\SessionEvent
+    - example : Thelia\Core\EventListener\SessionListener
+- Creation of Thelia\Core\TheliakernelEvents class for referencing kernel event
+    
+
 #2.0.1
 - possibility to apply a permanent discount on a customer
 - display estimated shipping on cart page

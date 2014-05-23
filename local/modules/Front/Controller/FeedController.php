@@ -18,7 +18,7 @@ use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Log\Tlog;
-use Thelia\Model\Base\FolderQuery;
+use Thelia\Model\FolderQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Folder;
