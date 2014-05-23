@@ -26,6 +26,7 @@ use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
 use Thelia\Module\BaseModule;
+use Thelia\Tools\URL;
 
 /**
  * The base class for hook. If you provide hooks in your module you have to extends
@@ -88,13 +89,13 @@ abstract class BaseHook
      */
     public function render($templateName, array $parameters = array())
     {
-        $templatePath = $this->resolvePath($templateName);
+        $templateDir = $this->resolveSourcePath($templateName);
 
         $content = "";
-        if (null !== $templatePath) {
+        if (null !== $templateDir) {
             // retrieve the template
             $smartyParser = $this->parser;
-            $content = $smartyParser->render($templatePath, $parameters);
+            $content = $smartyParser->render($templateDir . DS . $templateName, $parameters);
         } else {
             $content = sprintf("ERR: Unknown template %s for module %s", $templateName, $this->module->getCode());
         }
@@ -110,11 +111,11 @@ abstract class BaseHook
      */
     public function dump($fileName)
     {
-        $filePath = $this->resolvePath($fileName);
+        $fileDir = $this->resolveSourcePath($fileName);
 
         $content = "";
-        if (null !== $filePath) {
-            $content = file_get_contents($filePath);
+        if (null !== $fileDir) {
+            $content = file_get_contents($fileDir . DS . $fileName);
             if (false === $content){
                 $content = "";
             }
@@ -138,41 +139,21 @@ abstract class BaseHook
     }
 
     /**
-     * helper function allowing you to generate the HTML style tag
+     * helper function allowing you to generate the HTML link tag
      *
      * @param  string $fileName     the path to the css file
      * @param array   $attributes   the attributes of the tag
-     * @return string               the style tag
+     * @return string               the link tag
      */
     public function addCSS($fileName, $attributes=array())
     {
         $tag = "";
-        /*
-        $fileURL = $this->getAssetManager()->computeAssetUrl(
-            'css',
-            array(
-                'file'   => $fileName,
-                'source' => $this->getModule()->getCode()
-            ),
-            $this->parser);
-        */
 
-        $url = $this->assetsManager->processAsset(
-            $assetSource . DS . $file,
-            $assetSource . DS . self::$assetsDirectory,
-            $this->web_root . $this->path_relative_to_web_root,
-            $templateDefinition->getPath(),
-            $assetOrigin,
-            URL::getInstance()->absoluteUrl($this->path_relative_to_web_root, null, URL::PATH_TO_FILE /* path only */),
-            $assetType,
-            $filters,
-            $debug
-        );
-
-        if ("" !== $fileURL){
+        $url = $this->resolveURL($fileName, "css");
+        if ("" !== $url){
             $tags = array();
             $tags[] = "<link rel='stylesheet' type='text/css' ";
-            $tags[] = " href='" . $fileURL . "' ";
+            $tags[] = " href='" . $url . "' ";
             foreach ($attributes as $name => $val){
                 if (is_string($name) && ! in_array($name, array("href", "rel", "type"))){
                     $tags[] = $name . "='" . $val . "' ";
@@ -185,6 +166,57 @@ abstract class BaseHook
         return $tag;
     }
 
+    /**
+     * helper function allowing you to generate the HTML script tag
+     *
+     * @param  string $fileName     the path to the js file
+     * @param array   $attributes   the attributes of the tag
+     * @return string               the script tag
+     */
+    public function addJS($fileName, $attributes=array())
+    {
+        $tag = "";
+
+        $url = $this->resolveURL($fileName, "js");
+        if ("" !== $url){
+            $tags = array();
+            $tags[] = "<script type='text/javascript' ";
+            $tags[] = " src='" . $url . "' ";
+            foreach ($attributes as $name => $val){
+                if (is_string($name) && ! in_array($name, array("src", "type"))){
+                    $tags[] = $name . "='" . $val . "' ";
+                }
+            }
+            $tags[] = "></script>";
+            $tag = implode($tags);
+        }
+
+        return $tag;
+    }
+
+    protected function resolveURL($fileName, $type)
+    {
+        $url = "";
+
+        $fileDir = $this->resolveSourcePath($fileName);
+        $asset_dir_from_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
+
+        if (null !== $fileDir){
+            $url = $this->assetsManager->processAsset(
+                $fileDir . DS . $fileName,
+                $fileDir,
+                THELIA_WEB_DIR . $asset_dir_from_web_root,
+                $fileDir,
+                $this->module->getCode(),
+                URL::getInstance()->absoluteUrl($asset_dir_from_web_root, null, URL::PATH_TO_FILE /* path only */),
+                $type,
+                array(),
+                false
+            );
+        }
+
+        return $url;
+    }
 
     /**
      * Resolve the file path.
@@ -194,12 +226,13 @@ abstract class BaseHook
      *      - in the module in the current template if it exists
      *      - in the module in the default template
 
-     * @param $fileName     the filename
-     * @return mixed        the resolved file path
+     * @param  $fileName    the filename
+     * @return mixed        the path to directory containing the file if exists
      */
-    protected function resolvePath($fileName)
+    protected function resolveSourcePath($fileName)
     {
-        $filePath = null;
+        $fileDir = null;
+        $found = false;
 
         // retrieve the template
         $smartyParser = $this->parser;
@@ -211,40 +244,37 @@ abstract class BaseHook
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
 
         if (isset($templateDirectories[$templateDefinition->getName()]["0"])) {
-            $filePath = $templateDirectories[$templateDefinition->getName()]["0"]
+            $fileDir = $templateDirectories[$templateDefinition->getName()]["0"]
                 . DS . TemplateDefinition::HOOK_OVERRIDE_SUBDIR
-                . DS . $this->module->getCode()
-                . DS . $fileName;
-            if (! file_exists($filePath)) {
-                $filePath = null;
+                . DS . $this->module->getCode();
+            if (file_exists($fileDir . DS . $fileName)) {
+                $found = true;
             }
         }
 
         // If the smarty template doesn't exist, we try to see if there is an
         // implementation for the template used in the module directory
-        if (null === $filePath) {
+        if (!$found) {
             if (isset($templateDirectories[$templateDefinition->getName()][$this->module->getCode()])) {
-                $filePath = $templateDirectories[$templateDefinition->getName()][$this->module->getCode()]
-                    . DS . $fileName;
-                if (! file_exists($filePath)) {
-                    $filePath = null;
+                $fileDir = $templateDirectories[$templateDefinition->getName()][$this->module->getCode()];
+                if (file_exists($fileDir . DS . $fileName)) {
+                    $found = true;
                 }
             }
         }
 
         // Not here, we finally try to fallback on the default theme in the module
-        if (null === $filePath && $templateDefinition->getName() !== TemplateDefinition::HOOK_DEFAULT_THEME) {
+        if (!$found && $templateDefinition->getName() !== TemplateDefinition::HOOK_DEFAULT_THEME) {
             if ($templateDirectories[TemplateDefinition::HOOK_DEFAULT_THEME]
                 && isset($templateDirectories[TemplateDefinition::HOOK_DEFAULT_THEME][$this->module->getCode()])) {
-                $filePath = $templateDirectories[TemplateDefinition::HOOK_DEFAULT_THEME][$this->module->getCode()]
-                    . DS . $fileName;
-                if (! file_exists($filePath)) {
-                    $filePath = null;
+                $fileDir = $templateDirectories[TemplateDefinition::HOOK_DEFAULT_THEME][$this->module->getCode()];
+                if (file_exists($fileDir . DS . $fileName)) {
+                    $found = true;
                 }
             }
         }
 
-        return $fileName;
+        return $fileDir;
     }
 
 
