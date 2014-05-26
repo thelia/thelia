@@ -104,7 +104,37 @@ GNU General Public License : http://www.gnu.org/licenses/
                 {nocache}
                 {hook name="main.navbar.secondary"}
                 {elseHook rel="main.navbar.secondary"}
+                <ul class="nav navbar-nav navbar-cart navbar-left">
+                    <li class="dropdown">
+                        <a href="{url path="/currency"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Currency:"}--> {currency attr="code"}</a>
+                        <ul class="dropdown-menu">
+                            {loop type="currency" name="currency_available" exclude="{currency attr="id"}" }
+                                <li><a href="{url path="{navigate to="current"}" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
+                            {/loop}
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="{url path="/login"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Language:"}--> {lang attr="title"}</a>
+                        <ul class="dropdown-menu">
+                            {loop type="lang" name="lang_available" exclude="{lang attr="id"}"}
+                                <li><a href="{url path="{navigate to="current"}" lang={$CODE}}">{$TITLE}</a></li>
+                            {/loop}
+                        </ul>
+                    </li>
+                </ul>
+                <div class="search-container navbar-form navbar-left">
+                    <form id="form-search" action="{url path="/search"}" method="get" role="search" aria-labelledby="search-label">
+                        <label id="search-label" for="q">{intl l="Search a product"}</label>
+                        <div class="input-group">
+                            <input type="search" name="q" id="q" placeholder="{intl l="Search..."}" class="form-control" autocomplete="off" aria-required="true" required pattern=".{ldelim}2,{rdelim}" title="{intl l="Minimum 2 characters."}">
+                            <div class="input-group-btn">
+                                <button type="submit" class="btn btn-search"><i class="icon-search"></i> <span>{intl l="Search"}</span></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
                 <ul class="nav navbar-nav navbar-cart navbar-right">
+
                     {loop type="auth" name="customer_info_block" role="CUSTOMER"}
                         <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
                         <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
@@ -148,15 +178,6 @@ GNU General Public License : http://www.gnu.org/licenses/
                 </ul>
                 {/elseHook}
                 {/nocache}
-                {hook name="main.navbar.primary"}
-                {elseHook rel="main.navbar.primary"}
-                <ul class="nav navbar-nav navbar-categories">
-                    <li><a href="{navigate to="index"}" class="home">{intl l="Home"}</a></li>
-                    {loop type="category" name="category.navigation" parent="0"}
-                        <li><a href="{$URL}">{$TITLE}</a></li>
-                    {/loop}
-                </ul>
-                {/elseHook}
             </nav>
         </div>
     </div>
@@ -169,43 +190,25 @@ GNU General Public License : http://www.gnu.org/licenses/
                     {images file='assets/img/logo.gif'}<img src="{$asset_url}" alt="{$store_name}">{/images}
                 </a>
             </h1>
-
-            <div class="language-container">
-                <div class="search-container">
-                    <form id="form-search" action="{url path="/search"}" method="get" role="search" aria-labelledby="search-label">
-                        <label id="search-label" for="q">{intl l="Search a product"}</label>
-                        <div class="input-group">
-                            <input type="search" name="q" id="q" placeholder="{intl l="Search..."}" class="form-control" autocomplete="off" aria-required="true" required pattern=".{ldelim}2,{rdelim}" title="{intl l="Minimum 2 characters."}">
-                            <div class="input-group-btn">
-                                <button type="submit" class="btn btn-search"><i class="icon-search"></i> <span>{intl l="Search"}</span></button>
-                            </div>
-                        </div>
-                    </form>
+            {hook name="main.navbar.primary"}
+            {elseHook rel="main.navbar.primary"}
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="container-fluid">
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav navbar-categories">
+                            <li><a href="{navigate to="index"}" class="home">{intl l="Home"}</a></li>
+                            {loop type="category" name="category.navigation" parent="0"}
+                            <li><a href="{$URL}">{$TITLE}</a></li>
+                            {/loop}
+                        </ul>
+                    </div>
                 </div>
-
-                <div class="language-switch" aria-labelledby="language-label" role="form">
-                    <span id="language-label" class="dropdown-label">{intl l="Language:"}</span>
-                    <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/language"}">{lang attr="title"}</a>
-                    <ul class="select dropdown-menu">
-                        {loop type="lang" name="lang_available" exclude="{lang attr="id"}"}
-                            <li><a href="{url path="{navigate to="current"}" lang={$CODE}}">{$TITLE}</a></li>
-                        {/loop}
-                    </ul>
-                </div>
-
-                <div class="currency-switch" aria-labelledby="currency-label" role="form">
-                    <span id="currency-label" class="dropdown-label">{intl l="Currency:"}</span>
-                    <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/currency"}">{currency attr="code"}</a>
-                    <ul class="select dropdown-menu">
-                        {*loop type="currency" name="currency_available" exclude="{currency attr="id"}" }
-                            <li><a href="{url path="{navigate to="current"}" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
-                        {/loop*}
-                    </ul>
-                </div>
-            </div>
+            </nav>
+            {/elseHook}
         </div>
-
     </header><!-- /.header -->
+
     {hook name="main.header.bottom"}
 </div><!-- /.header-container -->
 
