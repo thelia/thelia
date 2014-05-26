@@ -97,6 +97,8 @@ class SmartyAssetsManager
         $debug            = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
         $webAssetTemplate = isset($params['template']) ? $params['template'] : false;
 
+        $assetSource = "";
+
         /* we trick here relative thinking for file attribute */
         $file = ltrim($file, '/');
         while (substr($file, 0, 3) == '../') {
@@ -114,27 +116,32 @@ class SmartyAssetsManager
         // if not we take the default asset from the assetOrigin (module)
         if (! $webAssetTemplate && $assetOrigin !== "0") {
             if (isset($templateDirectories[$templateDefinition->getName()]["0"])) {
-                if (file_exists($templateDirectories[$templateDefinition->getName()]["0"] . DS . $file)) {
+                $assetSource = $templateDirectories[$templateDefinition->getName()]["0"] . DS . "modules" . DS . $assetOrigin;
+                if (file_exists($assetSource . DS . $file)) {
                     // the file exists, we take the default origin
                     $assetOrigin = "0";
+                } else {
+                    $assetSource = "";
                 }
             }
         }
 
-        if (! isset($templateDirectories[$templateDefinition->getName()][$assetOrigin])) {
-            // we try with the default origin
-            if (! $webAssetTemplate && $assetOrigin !== "0") {
-                $assetOrigin = "0";
-            } else {
+        if ("" === $assetSource){
+            if (! isset($templateDirectories[$templateDefinition->getName()][$assetOrigin])) {
+                // we try with the default origin
+                if (! $webAssetTemplate && $assetOrigin !== "0") {
+                    $assetOrigin = "0";
+                } else {
+                    throw new \Exception("Failed to get real path of '/".dirname($file)."'");
+                }
+            }
+
+            if (! isset($templateDirectories[$templateDefinition->getName()][$assetOrigin])) {
                 throw new \Exception("Failed to get real path of '/".dirname($file)."'");
             }
-        }
 
-        if (! isset($templateDirectories[$templateDefinition->getName()][$assetOrigin])) {
-            throw new \Exception("Failed to get real path of '/".dirname($file)."'");
+            $assetSource = $templateDirectories[$templateDefinition->getName()][$assetOrigin];
         }
-
-        $assetSource = $templateDirectories[$templateDefinition->getName()][$assetOrigin];
 
         if (DS != '/') {
             // Just to be sure to generate a clean pathname
