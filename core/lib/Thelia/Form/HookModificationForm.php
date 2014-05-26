@@ -13,6 +13,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Class HookModificationForm
@@ -29,6 +30,19 @@ class HookModificationForm extends HookCreationForm
 
         $this->formBuilder
             ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
+            ->add("by_module", "checkbox", array(
+                "label" => Translator::getInstance()->trans("By Module"),
+                "label_attr" => array(
+                    "for" => "by_module"
+                )
+            ))
+            ->add("block", "checkbox", array(
+                "label" => Translator::getInstance()->trans("Hook block"),
+                "label_attr" => array(
+                    "for" => "block"
+                )
+            ))
+
         ;
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class

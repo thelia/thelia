@@ -26,7 +26,6 @@ class FragmentBag implements Iterator
     /** @var array $fragments */
     protected $fragments;
 
-
     public function __construct()
     {
         $this->position = 0;
@@ -71,7 +70,7 @@ class FragmentBag implements Iterator
      * Checks if current position is valid
      * @link http://php.net/manual/en/iterator.valid.php
      * @return boolean The return value will be casted to boolean and then evaluated.
-     * Returns true on success or false on failure.
+     *                 Returns true on success or false on failure.
      */
     public function valid()
     {
@@ -89,7 +88,6 @@ class FragmentBag implements Iterator
         $this->position = 0;
     }
 
-
     /**
      * Clears all parameters.
      *
@@ -101,30 +99,26 @@ class FragmentBag implements Iterator
         $this->fragments = array();
     }
 
-
     public function isEmpty()
     {
         return count($this->fragments) == 0;
     }
-
 
     public function getCount()
     {
         return count($this->fragments);
     }
 
-
-    public function add($data){
+    public function add($data)
+    {
         $fragment = new Fragment($data);
         $this->addFragment($fragment);
     }
-
 
     public function addFragment(Fragment $fragment)
     {
         $this->fragments[] = $fragment;
     }
-
 
     /**
      * Gets the all keys fragment.

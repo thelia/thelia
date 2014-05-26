@@ -80,6 +80,31 @@
                                             <label>
                                                 <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $checked}checked="checked"{/if}>
                                                 {$label}
+                                                <span class="label-help-block">{intl l="Core hook of Thelia."}</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {/form_field}
+
+                                    {form_field form=$form field='by_module'}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $checked}checked="checked"{/if}>
+                                                {$label}
+                                                <span class="label-help-block">{intl l="This hook is specific to a module (delivery/payment modules). hook function/block should use module attribute."}</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {/form_field}
+
+                                    {form_field form=$form field='block'}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $checked}checked="checked"{/if}>
+                                                {$label}
+                                                <span class="label-help-block">{intl l="If checked, it indicates that this hook is used by a hook block. Else by hook function."}</span>
                                             </label>
                                         </div>
                                     </div>

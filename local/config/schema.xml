@@ -746,6 +746,7 @@
     <column name="by_module" type="BOOLEAN" />
     <column name="native" type="BOOLEAN" />
     <column name="activate" type="BOOLEAN" />
+    <column name="block" type="BOOLEAN" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />

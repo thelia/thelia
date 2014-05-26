@@ -15,7 +15,6 @@ namespace Thelia\Core\Event\Hook;
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\Hook\Fragment;
 use Thelia\Core\Hook\FragmentBag;
-use Thelia\Core\Hook\FragmentBagInterface;
 
 /**
  * Class HookRenderBlockEvent
@@ -43,18 +42,20 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     public function add($data)
     {
         $this->fragmentBag->add($data);
+
         return $this;
     }
 
     /**
      * Add a new fragment
      *
-     * @param \Thelia\Core\Hook\Fragment $fragment
+     * @param  \Thelia\Core\Hook\Fragment $fragment
      * @return $this
      */
     public function addFragment(Fragment $fragment)
     {
         $this->fragmentBag->addFragment($fragment);
+
         return $this;
     }
 
@@ -67,6 +68,5 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     {
         return $this->fragmentBag;
     }
-
 
 }

@@ -58,7 +58,7 @@ class HookTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 10;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class HookTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 10;
 
     /**
      * the column name for the ID field
@@ -99,6 +99,11 @@ class HookTableMap extends TableMap
      * the column name for the ACTIVATE field
      */
     const ACTIVATE = 'hook.ACTIVATE';
+
+    /**
+     * the column name for the BLOCK field
+     */
+    const BLOCK = 'hook.BLOCK';
 
     /**
      * the column name for the POSITION field
@@ -136,12 +141,12 @@ class HookTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Code', 'Type', 'ByModule', 'Native', 'Activate', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'type', 'byModule', 'native', 'activate', 'position', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(HookTableMap::ID, HookTableMap::CODE, HookTableMap::TYPE, HookTableMap::BY_MODULE, HookTableMap::NATIVE, HookTableMap::ACTIVATE, HookTableMap::POSITION, HookTableMap::CREATED_AT, HookTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'TYPE', 'BY_MODULE', 'NATIVE', 'ACTIVATE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'code', 'type', 'by_module', 'native', 'activate', 'position', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id', 'Code', 'Type', 'ByModule', 'Native', 'Activate', 'Block', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'type', 'byModule', 'native', 'activate', 'block', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(HookTableMap::ID, HookTableMap::CODE, HookTableMap::TYPE, HookTableMap::BY_MODULE, HookTableMap::NATIVE, HookTableMap::ACTIVATE, HookTableMap::BLOCK, HookTableMap::POSITION, HookTableMap::CREATED_AT, HookTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'TYPE', 'BY_MODULE', 'NATIVE', 'ACTIVATE', 'BLOCK', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'code', 'type', 'by_module', 'native', 'activate', 'block', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -151,12 +156,12 @@ class HookTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Type' => 2, 'ByModule' => 3, 'Native' => 4, 'Activate' => 5, 'Position' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'type' => 2, 'byModule' => 3, 'native' => 4, 'activate' => 5, 'position' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
-        self::TYPE_COLNAME       => array(HookTableMap::ID => 0, HookTableMap::CODE => 1, HookTableMap::TYPE => 2, HookTableMap::BY_MODULE => 3, HookTableMap::NATIVE => 4, HookTableMap::ACTIVATE => 5, HookTableMap::POSITION => 6, HookTableMap::CREATED_AT => 7, HookTableMap::UPDATED_AT => 8, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'TYPE' => 2, 'BY_MODULE' => 3, 'NATIVE' => 4, 'ACTIVATE' => 5, 'POSITION' => 6, 'CREATED_AT' => 7, 'UPDATED_AT' => 8, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'type' => 2, 'by_module' => 3, 'native' => 4, 'activate' => 5, 'position' => 6, 'created_at' => 7, 'updated_at' => 8, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Type' => 2, 'ByModule' => 3, 'Native' => 4, 'Activate' => 5, 'Block' => 6, 'Position' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'type' => 2, 'byModule' => 3, 'native' => 4, 'activate' => 5, 'block' => 6, 'position' => 7, 'createdAt' => 8, 'updatedAt' => 9, ),
+        self::TYPE_COLNAME       => array(HookTableMap::ID => 0, HookTableMap::CODE => 1, HookTableMap::TYPE => 2, HookTableMap::BY_MODULE => 3, HookTableMap::NATIVE => 4, HookTableMap::ACTIVATE => 5, HookTableMap::BLOCK => 6, HookTableMap::POSITION => 7, HookTableMap::CREATED_AT => 8, HookTableMap::UPDATED_AT => 9, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'TYPE' => 2, 'BY_MODULE' => 3, 'NATIVE' => 4, 'ACTIVATE' => 5, 'BLOCK' => 6, 'POSITION' => 7, 'CREATED_AT' => 8, 'UPDATED_AT' => 9, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'type' => 2, 'by_module' => 3, 'native' => 4, 'activate' => 5, 'block' => 6, 'position' => 7, 'created_at' => 8, 'updated_at' => 9, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -181,6 +186,7 @@ class HookTableMap extends TableMap
         $this->addColumn('BY_MODULE', 'ByModule', 'BOOLEAN', false, 1, null);
         $this->addColumn('NATIVE', 'Native', 'BOOLEAN', false, 1, null);
         $this->addColumn('ACTIVATE', 'Activate', 'BOOLEAN', false, 1, null);
+        $this->addColumn('BLOCK', 'Block', 'BOOLEAN', false, 1, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -363,6 +369,7 @@ class HookTableMap extends TableMap
             $criteria->addSelectColumn(HookTableMap::BY_MODULE);
             $criteria->addSelectColumn(HookTableMap::NATIVE);
             $criteria->addSelectColumn(HookTableMap::ACTIVATE);
+            $criteria->addSelectColumn(HookTableMap::BLOCK);
             $criteria->addSelectColumn(HookTableMap::POSITION);
             $criteria->addSelectColumn(HookTableMap::CREATED_AT);
             $criteria->addSelectColumn(HookTableMap::UPDATED_AT);
@@ -373,6 +380,7 @@ class HookTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.BY_MODULE');
             $criteria->addSelectColumn($alias . '.NATIVE');
             $criteria->addSelectColumn($alias . '.ACTIVATE');
+            $criteria->addSelectColumn($alias . '.BLOCK');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');

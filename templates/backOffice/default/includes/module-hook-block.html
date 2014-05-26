@@ -21,31 +21,39 @@
                 <td>{$ID}</td>
                 <td>{$MODULE_TITLE}</td>
                 <td class="text-center">
-                    {if $MODULE_ACTIVE && $HOOK_ACTIVE}
-                    <div class="make-switch switch-small module-hook-activation" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
-                        <input type="checkbox" {if $ACTIVE}checked{/if}>
-                    </div>
-                    <noscript>
-                        {if $ACTIVE}
-                        <a title="{intl l="Deactivate hook" title={$TITLE}}" href="{url path="/admin/module-hooks/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
+                    {if ! $by_module }
+                        {if $MODULE_ACTIVE && $HOOK_ACTIVE && !$by_module}
+                        <div class="make-switch switch-small module-hook-activation" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                            <input type="checkbox" {if $ACTIVE}checked{/if}>
+                        </div>
+                        <noscript>
+                            {if $ACTIVE}
+                            <a title="{intl l="Deactivate hook" title={$TITLE}}" href="{url path="/admin/module-hooks/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
+                            {else}
+                            <a title="{intl l="activate hook" title={$TITLE}}" href="{url path="/admin/module-hooks/toggle-activation/{$ID}"}">{intl l="activation"}</a>
+                            {/if}
+                        </noscript>
                         {else}
-                        <a title="{intl l="activate hook" title={$TITLE}}" href="{url path="/admin/module-hooks/toggle-activation/{$ID}"}">{intl l="activation"}</a>
+                            <i class='glyphicon glyphicon-remove-circle'> {intl l="deactivated"}
                         {/if}
-                    </noscript>
                     {else}
-                        <i class='glyphicon glyphicon-remove-circle'> {intl l="deactivated"}
+                        -
                     {/if}
                 </td>
                 <td class="text-center">
-                    {admin_position_block
-                        resource="admin.hooks"
-                        access="UPDATE"
-                        path={url path="admin/module-hooks/update-position"}
-                        url_parameter="module_hook_id"
-                        in_place_edit_class="moduleHookPositionChange"
-                        position=$POSITION
-                        id=$ID
-                    }
+                    {if ! $by_module }
+                        {admin_position_block
+                            resource="admin.hooks"
+                            access="UPDATE"
+                            path={url path="admin/module-hooks/update-position"}
+                            url_parameter="module_hook_id"
+                            in_place_edit_class="moduleHookPositionChange"
+                            position=$POSITION
+                            id=$ID
+                        }
+                    {else}
+                    -
+                    {/if}
                 </td>
             </tr>
             {/loop}

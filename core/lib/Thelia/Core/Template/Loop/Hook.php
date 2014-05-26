@@ -176,6 +176,7 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("NATIVE"       , $hook->getNative())
                     ->set("ACTIVE"       , $hook->getActivate())
                     ->set("BY_MODULE"    , $hook->getByModule())
+                    ->set("BLOCK"        , $hook->getBlock())
                     ->set("POSITION"     , $hook->getPosition())
                 ;
 

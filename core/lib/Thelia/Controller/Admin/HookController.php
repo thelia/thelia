@@ -82,6 +82,8 @@ class HookController extends AbstractCrudController
             'code' => $object->getCode(),
             'type' => $object->getType(),
             'native' => $object->getNative(),
+            'by_module' => $object->getByModule(),
+            'block' => $object->getBlock(),
             'active' => $object->getActivate(),
             'locale' => $object->getLocale(),
             'title' => $object->getTitle(),
@@ -127,6 +129,8 @@ class HookController extends AbstractCrudController
             ->setTitle($formData['title']);
         if ($update) {
             $event
+                ->setByModule($formData['by_module'])
+                ->setBlock($formData['block'])
                 ->setChapo($formData['chapo'])
                 ->setDescription($formData['description']);
         }

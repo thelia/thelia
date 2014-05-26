@@ -126,7 +126,7 @@ class SmartyAssetsManager
             }
         }
 
-        if ("" === $assetSource){
+        if ("" === $assetSource) {
             if (! isset($templateDirectories[$templateDefinition->getName()][$assetOrigin])) {
                 // we try with the default origin
                 if (! $webAssetTemplate && $assetOrigin !== "0") {

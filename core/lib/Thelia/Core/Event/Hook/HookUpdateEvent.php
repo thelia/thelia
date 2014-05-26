@@ -20,6 +20,8 @@ namespace Thelia\Core\Event\Hook;
 class HookUpdateEvent extends HookCreateEvent
 {
     protected $hook_id;
+    protected $by_module;
+    protected $block;
     protected $chapo;
     protected $description;
 
@@ -44,6 +46,42 @@ class HookUpdateEvent extends HookCreateEvent
     public function getHookId()
     {
         return $this->hook_id;
+    }
+
+    /**
+     * @param mixed $block
+     */
+    public function setBlock($block)
+    {
+        $this->block = $block;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBlock()
+    {
+        return $this->block;
+    }
+
+    /**
+     * @param mixed $by_module
+     */
+    public function setByModule($by_module)
+    {
+        $this->by_module = $by_module;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getByModule()
+    {
+        return $this->by_module;
     }
 
     /**

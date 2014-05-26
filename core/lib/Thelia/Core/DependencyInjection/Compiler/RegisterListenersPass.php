@@ -126,15 +126,9 @@ class RegisterListenersPass implements CompilerPassInterface
                 }
 
                 // test if method exists
-                try {
-                    $method = new ReflectionMethod($class, $event['method']);
-                    // todo test if argument is correct depending on the type of hook (function/block)
-                } catch (ReflectionException $ex){
-                    Tlog::getInstance()->addAlert(sprintf("Method %s does not exist in %s.", $event['method'], $class));
+                if (! $this->isValidHookMethod($class, $event['method'], $hook->getBlock())) {
                     continue;
                 }
-
-                //Tlog::getInstance()->addAlert(sprintf("New hook %s for %s.", $event['event'], $module));
 
                 // test if hook is already registered in ModuleHook
                 $moduleHook = ModuleHookQuery::create()
@@ -183,6 +177,36 @@ class RegisterListenersPass implements CompilerPassInterface
         return $type;
     }
 
+
+    protected function isValidHookMethod($className, $methodName, $block)
+    {
+        try {
+            $method = new ReflectionMethod($className, $methodName);
+
+            $parameters = $method->getParameters();
+            if (count($parameters) !== 1) {
+                Tlog::getInstance()->addAlert(sprintf("Method %s does not exist in %s : %s", $methodName, $className, $ex));
+
+                return false;
+            }
+
+            $eventType = ($block) ?
+                'Thelia\Core\Event\Hook\HookRenderBlockEvent' :
+                'Thelia\Core\Event\Hook\HookRenderEvent';
+            if ($parameters[0]->getClass()->getName() !== $eventType) {
+                Tlog::getInstance()->addAlert(sprintf("Method %s should use an event of type %s", $methodName, $eventType));
+
+                return false;;
+            }
+        } catch (ReflectionException $ex) {
+            Tlog::getInstance()->addAlert(sprintf("Method %s does not exist in %s", $methodName, $className));
+
+            return false;;
+        }
+
+        return true;
+    }
+
     protected function addHooksMethodCall(Definition $definition)
     {
         $moduleHooks = ModuleHookQuery::create()
@@ -216,7 +240,7 @@ class RegisterListenersPass implements CompilerPassInterface
                 $eventName = sprintf('hook.%s.%s', $hook->getType(), $hook->getCode());
 
                 // we a register an event which is relative to a specific module
-                if ($hook->getByModule()){
+                if ($hook->getByModule()) {
                     $eventName .= '.' . $moduleHook->getModuleId();
                 }
 

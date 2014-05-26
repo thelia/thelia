@@ -64,7 +64,6 @@ abstract class BaseHook
     /** @var Request $request */
     protected $request = null;
 
-
     /** @var Session $session */
     protected $session = null;
 
@@ -106,8 +105,8 @@ abstract class BaseHook
     /**
      * helper function allowing you to get the content of a file
      *
-     * @param  string $fileName     the template path of the template
-     * @return string               the content of the file
+     * @param  string $fileName the template path of the template
+     * @return string the content of the file
      */
     public function dump($fileName)
     {
@@ -116,7 +115,7 @@ abstract class BaseHook
         $content = "";
         if (null !== $fileDir) {
             $content = file_get_contents($fileDir . DS . $fileName);
-            if (false === $content){
+            if (false === $content) {
                 $content = "";
             }
         } else {
@@ -131,31 +130,32 @@ abstract class BaseHook
      */
     protected function getAssetManager()
     {
-        if (null === $this->assetManager){
+        if (null === $this->assetManager) {
             $asset_dir_from_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
             $this->assetManager = new SmartyAssetsManager($this->assetsManager, THELIA_WEB_DIR, $asset_dir_from_web_root);
         }
+
         return $this->assetManager;
     }
 
     /**
      * helper function allowing you to generate the HTML link tag
      *
-     * @param  string $fileName     the path to the css file
-     * @param array   $attributes   the attributes of the tag
-     * @return string               the link tag
+     * @param  string $fileName   the path to the css file
+     * @param  array  $attributes the attributes of the tag
+     * @return string the link tag
      */
     public function addCSS($fileName, $attributes=array())
     {
         $tag = "";
 
         $url = $this->resolveURL($fileName, "css");
-        if ("" !== $url){
+        if ("" !== $url) {
             $tags = array();
             $tags[] = "<link rel='stylesheet' type='text/css' ";
             $tags[] = " href='" . $url . "' ";
-            foreach ($attributes as $name => $val){
-                if (is_string($name) && ! in_array($name, array("href", "rel", "type"))){
+            foreach ($attributes as $name => $val) {
+                if (is_string($name) && ! in_array($name, array("href", "rel", "type"))) {
                     $tags[] = $name . "='" . $val . "' ";
                 }
             }
@@ -169,21 +169,21 @@ abstract class BaseHook
     /**
      * helper function allowing you to generate the HTML script tag
      *
-     * @param  string $fileName     the path to the js file
-     * @param array   $attributes   the attributes of the tag
-     * @return string               the script tag
+     * @param  string $fileName   the path to the js file
+     * @param  array  $attributes the attributes of the tag
+     * @return string the script tag
      */
     public function addJS($fileName, $attributes=array())
     {
         $tag = "";
 
         $url = $this->resolveURL($fileName, "js");
-        if ("" !== $url){
+        if ("" !== $url) {
             $tags = array();
             $tags[] = "<script type='text/javascript' ";
             $tags[] = " src='" . $url . "' ";
-            foreach ($attributes as $name => $val){
-                if (is_string($name) && ! in_array($name, array("src", "type"))){
+            foreach ($attributes as $name => $val) {
+                if (is_string($name) && ! in_array($name, array("src", "type"))) {
                     $tags[] = $name . "='" . $val . "' ";
                 }
             }
@@ -201,7 +201,7 @@ abstract class BaseHook
         $fileDir = $this->resolveSourcePath($fileName);
         $asset_dir_from_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
 
-        if (null !== $fileDir){
+        if (null !== $fileDir) {
             $url = $this->assetsManager->processAsset(
                 $fileDir . DS . $fileName,
                 $fileDir,
@@ -227,7 +227,7 @@ abstract class BaseHook
      *      - in the module in the default template
 
      * @param  $fileName    the filename
-     * @return mixed        the path to directory containing the file if exists
+     * @return mixed the path to directory containing the file if exists
      */
     protected function resolveSourcePath($fileName)
     {
@@ -276,7 +276,6 @@ abstract class BaseHook
 
         return $fileDir;
     }
-
 
     /**
      * @param \Thelia\Module\BaseModule $module
@@ -435,6 +434,5 @@ abstract class BaseHook
 
         return $this->lang;
     }
-
 
 }

@@ -89,7 +89,7 @@ class Hook extends AbstractSmartyPlugin
         // $event = $this->getDispatcher()->dispatch('hook.before.' . $hookName, $event);
         $eventName = sprintf('hook.%s.%s', $type, $hookName);
         // this is a hook specific to a module
-        if (0 !== $module){
+        if (0 !== $module) {
             $eventName .= '.' . $module;
         }
         //Tlog::getInstance()->addDebug("_HOOK_ dispatch event : " . $eventName);
@@ -128,6 +128,7 @@ class Hook extends AbstractSmartyPlugin
                 $content = sprintf('<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">%s</div>', $hookName)
                     . $content;
             }
+
             return $content;
         }
 
@@ -139,7 +140,7 @@ class Hook extends AbstractSmartyPlugin
 
         $eventName = sprintf('hook.%s.%s', $type, $hookName);
         // this is a hook specific to a module
-        if (0 !== $module){
+        if (0 !== $module) {
             $eventName .= '.' . $module;
         }
 
@@ -238,13 +239,13 @@ class Hook extends AbstractSmartyPlugin
             if ($fragments->isEmpty()) {
                 $content = "";
             }
+
             return $content;
         }
 
         return '';
 
     }
-
 
     /**
      * Process {elseHook rel="hookname"} ... {/elseHook} block
@@ -284,7 +285,6 @@ class Hook extends AbstractSmartyPlugin
         return '';
     }
 
-
     /**
      * Check if a hook has returned results. The hook should have been executed before, or an
      * InvalidArgumentException is thrown
@@ -310,7 +310,6 @@ class Hook extends AbstractSmartyPlugin
 
         return ('' === $this->hookResults[$hookName]);
     }
-
 
     /**
      * Clean the params of the params passed to the hook function or block to feed the arguments of the event

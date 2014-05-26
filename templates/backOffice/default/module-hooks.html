@@ -49,7 +49,7 @@
                 </div>
                 <div class="col-md-3 col-sm-12">
                     <label for="hooks-filter-status">
-                        <input type="checkbox" id="hooks-filter-empty" value="1" /> {intl l="Hide empty hook"}
+                        <input type="checkbox" id="hooks-filter-empty" value="1" checked="checked" /> {intl l="Hide empty hook"}
                     </label>
                 </div>
             </div>
@@ -61,10 +61,29 @@
                 {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
 
                 {loop type="hook" name="hook" order=$hook_order backend_context=1}
-                <div class="hook general-block-decorator" data-id="{$ID}" data-type="{$TYPE}">
+                <div class="hook general-block-decorator{if $BLOCK} hook-block{/if}{if $BY_MODULE} hook-by-module{/if}" data-id="{$ID}" data-type="{$TYPE}" data-block="{$BLOCK}">
                     <p class="title title-without-tabs">{$ID}. {$TITLE}</p>
-                    <p class="hook-description">{$DESCRIPTION}</p>
-                    {include file="includes/module-hook-block.html" hook_id="{$ID}"}
+                    <div class="row">
+                        <div class="hook-description col-md-8">
+                            {if $DESCRIPTION}
+                                {$DESCRIPTION}
+                            {else}
+                                <em>{intl l="No description for this hook"}</em>
+                            {/if}
+                        </div>
+                        <div class="hook-ref col-md-4">
+                            {intl l="Code:"} <strong>{$CODE}</strong><br />
+                            {intl l="Type:"} <strong>
+                                {if $TYPE == 1}{intl l="Front Office"}{/if}
+                                {if $TYPE == 2}{intl l="Back Office"}{/if}
+                                {if $TYPE == 3}{intl l="pdf"}{/if}
+                                {if $TYPE == 4}{intl l="email"}{/if}
+                            </strong><br />
+                            {intl l="By module:"} <strong>{if $BY_MODULE}{intl l="Yes"}{else}{intl l="No"}{/if}</strong><br />
+                            {intl l="Block :"} <strong>{if $BLOCK}{intl l="Yes"}{else}{intl l="No"}{/if}</strong><br />
+                        </div>
+                    </div>
+                    {include file="includes/module-hook-block.html" hook_id="{$ID}" by_module="{$BY_MODULE}"}
                 </div>
                 {/loop}
             </div>
@@ -189,8 +208,7 @@
                 $fType   = $('#hooks-filter-type');
                 $fEmpty  = $('#hooks-filter-empty');
 
-            /* filters */
-            $('.hooks-filter select, .hooks-filter input').on('change', function(){
+            var filterProcess = function filterProcess(){
                 console.log(this, isFilterProcessing);
                 if (! isFilterProcessing) {
                     isFilterProcessing = true;
@@ -206,39 +224,41 @@
                     // filters hook type first
                     $(".hooks .hook").each(function(){
                         var $hook = $(this),
-                            empty = true,
-                            $lines;
+                                empty = true,
+                                $lines;
 
                         if (formData.type == "" || formData.type == $hook.data("type")){
                             $hook.removeClass("hidden");
                             // test each line
                             $lines = $hook.find("tr.hook-module");
                             $lines.each(function(){
-                               var $line = $(this),
-                                   visible;
-                               visible = (formData.status == "" || formData.status == $line.data("visible"))
-                                         && (formData.module == "" || formData.module == $line.data("module-id"));
-                               if (visible) {
-                                   empty = false;
-                                   $line.removeClass("hidden");
-                               } else {
-                                   $line.addClass("hidden");
-                               }
+                                var $line = $(this),
+                                        visible;
+                                visible = (formData.status == "" || formData.status == $line.data("visible"))
+                                        && (formData.module == "" || formData.module == $line.data("module-id"));
+                                if (visible) {
+                                    empty = false;
+                                    $line.removeClass("hidden");
+                                } else {
+                                    $line.addClass("hidden");
+                                }
                             });
                             if (empty && formData.empty) {
                                 $hook.addClass("hidden");
                             } else {
                                 $hook.removeClass("hidden");
                             }
-                       } else {
-                           $hook.addClass("hidden");
-                       }
+                        } else {
+                            $hook.addClass("hidden");
+                        }
                     });
                     isFilterProcessing = false;
                 }
-            });
+            };
 
-
+            /* filters */
+            $('.hooks-filter select, .hooks-filter input').on('change', filterProcess);
+            filterProcess();
         });
     </script>
 

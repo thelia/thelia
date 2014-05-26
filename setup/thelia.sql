@@ -884,6 +884,7 @@ CREATE TABLE `hook`
     `by_module` TINYINT(1),
     `native` TINYINT(1),
     `activate` TINYINT(1),
+    `block` TINYINT(1),
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
