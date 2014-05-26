@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\DependencyInjection\Compiler;
 
+use ReflectionException;
+use ReflectionMethod;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -123,7 +125,16 @@ class RegisterListenersPass implements CompilerPassInterface
                         ), array('strtoupper("\\0")', ''), $event['event']);
                 }
 
-                Tlog::getInstance()->addAlert(sprintf("New hook %s is not activated.", $event['event']));
+                // test if method exists
+                try {
+                    $method = new ReflectionMethod($class, $event['method']);
+                    // todo test if argument is correct depending on the type of hook (function/block)
+                } catch (ReflectionException $ex){
+                    Tlog::getInstance()->addAlert(sprintf("Method %s does not exist in %s.", $event['method'], $class));
+                    continue;
+                }
+
+                //Tlog::getInstance()->addAlert(sprintf("New hook %s for %s.", $event['event'], $module));
 
                 // test if hook is already registered in ModuleHook
                 $moduleHook = ModuleHookQuery::create()
