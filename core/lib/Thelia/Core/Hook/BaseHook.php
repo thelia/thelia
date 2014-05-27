@@ -25,6 +25,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
+use Thelia\Model\Order;
 use Thelia\Module\BaseModule;
 use Thelia\Tools\URL;
 
@@ -72,6 +73,9 @@ abstract class BaseHook
 
     /** @var Cart $cart */
     protected $cart = null;
+
+    /** @var Order $order */
+    protected $order = null;
 
     /** @var Lang $lang */
     protected $lang = null;
@@ -382,6 +386,20 @@ abstract class BaseHook
     {
         if (null === $this->cart) {
             $this->cart = $this->getSession() ? $this->getSession()->getCart() : null;
+        }
+
+        return $this->cart;
+    }
+
+    /**
+     * Get the order from the session
+     *
+     * @return \Thelia\Model\Order|null
+     */
+    protected function getOrder()
+    {
+        if (null === $this->order) {
+            $this->cart = $this->getSession() ? $this->getSession()->getOrder() : null;
         }
 
         return $this->cart;

@@ -73,8 +73,6 @@ class RegisterListenersPass implements CompilerPassInterface
             $definition->addMethodCall('addSubscriberService', array($id, $class));
         }
 
-        //return;
-        // Hook listener
         foreach ($container->findTaggedServiceIds('hook.event_listener') as $id => $events) {
 
             $class = $container->getDefinition($id)->getClass();
@@ -110,7 +108,7 @@ class RegisterListenersPass implements CompilerPassInterface
                     ->filterByType($type)
                     ->findOne();
                 if (null === $hook) {
-                    Tlog::getInstance()->addAlert(sprintf("Hook %s is unknow.", $event['event']));
+                    Tlog::getInstance()->addAlert(sprintf("Hook %s is unknown.", $event['event']));
                     continue;
                 }
                 if (! $hook->getActivate()) {

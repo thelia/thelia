@@ -67,7 +67,7 @@
                                     <div class="form-group {if $error}has-error{/if}">
                                         <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Class name'}">
-                                        <span class="label-help-block">{intl l="The complete class name that will handle the hook (with namespace)."}</span>
+                                        <span class="label-help-block">{intl l="The service id that will handle the hook (defined in the config.xml file of the module)."}</span>
                                     </div>
                                     {/form_field}
 

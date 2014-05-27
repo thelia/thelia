@@ -47,13 +47,13 @@ class ModuleHookModificationForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => Translator::getInstance()->trans("Class name"),
+                "label" => Translator::getInstance()->trans("Service ID"),
                 "label_attr" => array(
                     "for" => "classname"
                 )
             ))
             ->add("method", "text", array(
-                "label" => Translator::getInstance()->trans("Method"),
+                "label" => Translator::getInstance()->trans("Method Name"),
                 "constraints" => array(
                     new NotBlank(),
                     new Callback(array("methods" => array(
