@@ -90,7 +90,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 
             <div class="navbar-header">
                 <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-main">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-secondary">
                     <span class="sr-only">{intl l="Toggle navigation"}</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
@@ -100,7 +100,7 @@ GNU General Public License : http://www.gnu.org/licenses/
             </div>
 
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
-            <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="{intl l="Main Navigation"}">
+            <nav class="navbar-collapse collapse nav-secondary" role="navigation" aria-label="{intl l="Main Navigation"}">
                 {nocache}
                 {hook name="main.navbar.secondary"}
                 {elseHook rel="main.navbar.secondary"}
@@ -192,7 +192,17 @@ GNU General Public License : http://www.gnu.org/licenses/
             </h1>
             {hook name="main.navbar.primary"}
             {elseHook rel="main.navbar.primary"}
-            <nav class="navbar navbar-default" role="navigation">
+            <div class="navbar-header">
+                <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-main">
+                    <span class="sr-only">{intl l="Toggle navigation"}</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{navigate to="index"}">{intl l="menu"}</a>
+            </div>
+            <nav class="navbar navbar-default nav-main" role="navigation">
                 <div class="container-fluid">
                     <!-- Collect the nav links, forms, and other content for toggling -->
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">

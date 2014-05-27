@@ -713,7 +713,9 @@ final class TheliaEvents
     const HOOK_TOGGLE_NATIVE    = 'thelia.hook.action.toggleNative';
     const HOOK_TOGGLE_ACTIVATION= 'thelia.hook.action.toggleActivation';
 
+    const MODULE_HOOK_CREATE            = 'thelia.moduleHook.action.create';
     const MODULE_HOOK_UPDATE            = 'thelia.moduleHook.action.update';
+    const MODULE_HOOK_DELETE            = 'thelia.moduleHook.action.delete';
     const MODULE_HOOK_UPDATE_POSITION   = 'thelia.moduleHook.action.updatePosition';
     const MODULE_HOOK_TOGGLE_ACTIVATION = 'thelia.moduleHook.action.toggleActivation';
 

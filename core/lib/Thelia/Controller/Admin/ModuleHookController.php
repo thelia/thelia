@@ -11,11 +11,17 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\Hook\ModuleHookCreateEvent;
+use Thelia\Core\Event\Hook\ModuleHookDeleteEvent;
+use Thelia\Core\Event\Hook\ModuleHookEvent;
 use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\ModuleHookCreationForm;
+use Thelia\Form\ModuleHookModificationForm;
+use Thelia\Model\ModuleHook;
 use Thelia\Model\ModuleHookQuery;
 
 /**
@@ -34,9 +40,9 @@ class ModuleHookController extends AbstractCrudController
 
             AdminResources::MODULE_HOOK,
 
-            null,
+            TheliaEvents::MODULE_HOOK_CREATE,
             TheliaEvents::MODULE_HOOK_UPDATE,
-            null,
+            TheliaEvents::MODULE_HOOK_DELETE,
             null,
             TheliaEvents::MODULE_HOOK_UPDATE_POSITION
         );
@@ -90,7 +96,7 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function getCreationForm()
     {
-        // TODO: Implement getCreationForm() method.
+        return new ModuleHookCreationForm($this->getRequest());
     }
 
     /**
@@ -98,17 +104,24 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function getUpdateForm()
     {
-        // TODO: Implement getUpdateForm() method.
+        return new ModuleHookModificationForm($this->getRequest());
     }
 
     /**
      * Hydrate the update form for this object, before passing it to the update template
      *
-     * @param unknown $object
+     * @param ModuleHook $object
      */
     protected function hydrateObjectForm($object)
     {
-        // TODO: Implement hydrateObjectForm() method.
+        $data = array(
+            'hook_id' => $object->getHookId(),
+            'classname' => $object->getClassname(),
+            'method' => $object->getMethod(),
+            'active' => $object->getActive(),
+        );
+
+        return new ModuleHookModificationForm($this->getRequest(), 'form', $data);
     }
 
     /**
@@ -118,7 +131,8 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function getCreationEvent($formData)
     {
-        // TODO: Implement getCreationEvent() method.
+        $event = new ModuleHookCreateEvent();
+        return $this->hydrateEvent($event, $formData);
     }
 
     /**
@@ -131,22 +145,41 @@ class ModuleHookController extends AbstractCrudController
         // TODO: Implement getUpdateEvent() method.
     }
 
+    protected function hydrateEvent($event, $formData, $update=false)
+    {
+        if (!$update) {
+            $event
+                ->setModuleId($formData['module_id'])
+                ->setHookId($formData['hook_id']);
+        } else {
+            // todo
+            $event
+                ->setHookId($formData['hook_id'])
+                ->setClassname($formData['classname'])
+                ->setMethod($formData['method'])
+                ->setActive($formData['active'])
+            ;
+        }
+
+        return $event;
+    }
+
     /**
      * Creates the delete event with the provided form data
      */
     protected function getDeleteEvent()
     {
-        // TODO: Implement getDeleteEvent() method.
+        return new ModuleHookDeleteEvent($this->getRequest()->get('hook_id'));
     }
 
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param unknown $event
+     * @param ModuleHookEvent $event
      */
     protected function eventContainsObject($event)
     {
-        // TODO: Implement eventContainsObject() method.
+        return $event->hasModuleHook();
     }
 
     /**
@@ -156,7 +189,7 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function getObjectFromEvent($event)
     {
-        // TODO: Implement getObjectFromEvent() method.
+        return $event->getHook();
     }
 
     /**
@@ -183,11 +216,11 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Returns the object ID from the object
      *
-     * @param unknown $object
+     * @param ModuleHook $object
      */
     protected function getObjectId($object)
     {
-        // TODO: Implement getObjectId() method.
+        return $object->getId();
     }
 
     /**
@@ -208,7 +241,7 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function renderEditionTemplate()
     {
-        // TODO: Implement renderEditionTemplate() method.
+        return $this->render('module-hook-edit', $this->getEditionArgument());
     }
 
     /**
@@ -218,7 +251,7 @@ class ModuleHookController extends AbstractCrudController
     {
         // We always return to the module edition form
         $this->redirectToRoute(
-            "admin.hook.update",
+            "admin.module-hook.update",
             $this->getViewArguments(),
             $this->getRouteArguments()
         );
