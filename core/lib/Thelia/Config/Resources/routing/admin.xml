@@ -1084,21 +1084,21 @@
     </route>
 
     <route id="admin.module-hook.create" path="/admin/module-hooks/create">
-        <default key="_controller">Thelia\Controller\Admin\HookController::createAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::createAction</default>
     </route>
 
-    <route id="admin.module-hook.update" path="/admin/module-hooks/update/{module_hook_id}">
-        <default key="_controller">Thelia\Controller\Admin\HookController::updateAction</default>
+    <route id="admin.module-hook.update" path="/admin/module-hook/update/{module_hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::updateAction</default>
         <requirement key="module_hook_id">\d+</requirement>
     </route>
 
-    <route id="admin.module-hook.save" path="/admin/module-hooks/save/{module_hook_id}">
-        <default key="_controller">Thelia\Controller\Admin\HookController::processUpdateAction</default>
+    <route id="admin.module-hook.save" path="/admin/module-hook/save/{module_hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::processUpdateAction</default>
         <requirement key="module_hook_id">\d+</requirement>
     </route>
 
     <route id="admin.module-hook.delete" path="/admin/module-hooks/delete">
-        <default key="_controller">Thelia\Controller\Admin\HookController::deleteAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::deleteAction</default>
     </route>
 
     <route id="admin.module-hook.toggle-activation" path="/admin/module-hooks/toggle-activation/{module_hook_id}">

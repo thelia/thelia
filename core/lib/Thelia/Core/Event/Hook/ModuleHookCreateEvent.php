@@ -10,17 +10,15 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Event\Hook;
-
 
 /**
  * Class ModuleHookCreateEvent
  * @package Thelia\Core\Event\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleHookCreateEvent extends ModuleHookEvent {
-
+class ModuleHookCreateEvent extends ModuleHookEvent
+{
     protected $module_id;
     protected $hook_id;
 
@@ -30,6 +28,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent {
     public function setHookId($hook_id)
     {
         $this->hook_id = $hook_id;
+
         return $this;
     }
 
@@ -47,6 +46,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent {
     public function setModuleId($module_id)
     {
         $this->module_id = $module_id;
+
         return $this;
     }
 
@@ -58,5 +58,4 @@ class ModuleHookCreateEvent extends ModuleHookEvent {
         return $this->module_id;
     }
 
-
-} 
+}

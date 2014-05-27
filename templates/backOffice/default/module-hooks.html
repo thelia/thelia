@@ -19,9 +19,19 @@
         </div>
 
         <div class="general-block-decorator ">
+            <div class="clearfix">
+                {loop type="auth" name="can_create" role="ADMIN" resource="admin.module-hook" access="CREATE"}
+                <div class="pull-right">
+                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new module in a hook'}" href="#add_module_hook_dialog" data-toggle="modal">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                    </a>
+                </div>
+                {/loop}
+                <p class="title title-without-tabs">{intl l="Hooks position"}</p>
+            </div>
             <div class="hooks-filter row">
                 <div class="col-md-3 col-sm-12">
-                    <label for="hooks-filter-status">{intl l="By status"}</label>
+                    <label for="hooks-filter-status">{intl l="By status"}</label><br />
                     <select id="hooks-filter-status">
                         <option value="">{intl l="All"}</option>
                         <option value="1">{intl l="Active"}</option>
@@ -29,7 +39,7 @@
                     </select>
                 </div>
                 <div class="col-md-3 col-sm-12">
-                    <label for="hooks-filter-module">{intl l="By module"}</label>
+                    <label for="hooks-filter-module">{intl l="By module"}</label><br />
                     <select id="hooks-filter-module">
                         <option value="">{intl l="All"}</option>
                         {loop type="module" name="module" order=$module_order backend_context=1}
@@ -38,7 +48,7 @@
                     </select>
                 </div>
                 <div class="col-md-3 col-sm-12">
-                    <label for="hooks-filter-type">{intl l="By type"}</label>
+                    <label for="hooks-filter-type">{intl l="By type"}</label><br />
                     <select id="hooks-filter-type">
                         <option value="">{intl l="All"}</option>
                         <option value="1">{intl l="Front Office"}</option>
@@ -59,11 +69,15 @@
         <div class="row">
             <div class="col-md-12">
                 {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
-
                 {loop type="hook" name="hook" order=$hook_order backend_context=1}
                 <div class="hook general-block-decorator{if $BLOCK} hook-block{/if}{if $BY_MODULE} hook-by-module{/if}" data-id="{$ID}" data-type="{$TYPE}" data-block="{$BLOCK}">
-                    <p class="title title-without-tabs">{$ID}. {$TITLE}</p>
-                    <div class="row">
+                    <p class="title title-without-tabs">
+                        <a class="btn btn-default btn-primary action-info-btn pull-right" data-target="#hook-info-{$ID}" title="{intl l='Information on this hook'}" href="#hook-info-{$ID}">
+                            <span class="glyphicon glyphicon-info-sign"></span>
+                        </a>
+                        {$ID}. {$TITLE}
+                    </p>
+                    <div class="row hidden" id="hook-info-{$ID}">
                         <div class="hook-description col-md-8">
                             {if $DESCRIPTION}
                                 {$DESCRIPTION}
@@ -92,38 +106,86 @@
     </div>
 </div>
 
+
+
+{* Adding a new Module Hook *}
+
+{form name="thelia.admin.module-hook.creation"}
+
+{* Capture the dialog body, to pass it to the generic dialog *}
+{capture "module_hook_creation_dialog"}
+
+    {form_hidden_fields form=$form}
+
+    {form_field form=$form field='success_url'}
+    {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
+    <input type="hidden" name="{$name}" value="{url path='/admin/module-hook/update/_ID_'}" />
+    {/form_field}
+
+    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+    {form_field form=$form field='module_id'}
+    <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+        <select name="{$name}" id="{$label_attr.for}" class="form-control">
+            {foreach $choices as $choice}
+            <option value="{$choice->value}" {if !$form_error && $choice->value == $ESCAPED_TYPE || $form_error && $choice->value == $value}selected="selected" {/if}>{$choice->label}</option>
+            {/foreach}
+        </select>
+    </div>
+    {/form_field}
+
+    {form_field form=$form field='hook_id'}
+    <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+        <select name="{$name}" id="{$label_attr.for}" class="form-control">
+            {foreach $choices as $choice}
+            <option value="{$choice->value}" {if !$form_error && $choice->value == $ESCAPED_TYPE || $form_error && $choice->value == $value}selected="selected" {/if}>{$choice->label}</option>
+            {/foreach}
+        </select>
+    </div>
+    {/form_field}
+
+    {module_include location='module_hook_create_form'}
+
+{/capture}
+
+{include
+file = "includes/generic-create-dialog.html"
+
+dialog_id    = "add_module_hook_dialog"
+dialog_title = {intl l="Add a module to a hook"}
+dialog_body  = {$smarty.capture.module_hook_creation_dialog nofilter}
+
+dialog_ok_label     = {intl l="Graft this module"}
+dialog_cancel_label = {intl l="Cancel"}
+
+form_action        = {url path='/admin/module-hooks/create'}
+form_enctype       = {form_enctype form=$form}
+form_error_message = $form_error_message
+}
+{/form}
+
+
 {* Delete module confirmation dialog *}
 
 {capture "delete_module_dialog"}
-    <input type="hidden" name="module_id" id="delete_module_id" value="" />
-
-    <div class="row">
-        <div class="col-md-12">
-		    <div class="form-group">
-		        <div class="checkbox">
-		            <label>
-		                <input type="checkbox" name="delete-module-data" value="1">
-		                {intl l="Delete also module data"}
-		            </label>
-		        </div>
-		    </div>
-		</div>
-	</div>
-
+    <input type="hidden" name="module_hook_id" id="delete_module_hook_id" value="" />
+    {module_include location='module_hook_delete_form'}
 {/capture}
 
 {include
     file = "includes/generic-confirm-dialog.html"
 
     dialog_id       = "delete_module_dialog"
-    dialog_title    = {intl l="Delete a module"}
-    dialog_message  = {intl l="Do you really want to delete this module ?"}
+    dialog_title    = {intl l="Remove a module from a hook"}
+    dialog_message  = {intl l="Do you really want to remove this module ?"}
 
-    form_action         = {url path='/admin/module/delete'}
+    form_action         = {url path='/admin/module-hooks/delete'}
     form_content        = {$smarty.capture.delete_module_dialog nofilter}
 }
 
-<div class="modal fade" id="module-failed" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="module-hook-failed" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
 
@@ -177,8 +239,13 @@
 
            });
 
-           $(".module-hook-delete-action").click(function(){
+           $(".module-hook-delete").click(function(){
                 $("#delete_module_hook_id").val($(this).data("id"));
+           });
+
+           $(".action-info-btn").click(function(e){
+               e.preventDefault();
+               $($(this).data("target")).toggleClass("hidden");
            });
 
            {* Inline editing of object position using bootstrap-editable *}

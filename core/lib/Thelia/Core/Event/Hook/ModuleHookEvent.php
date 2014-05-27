@@ -24,9 +24,9 @@ class ModuleHookEvent extends ActionEvent
 {
     public $moduleHook = null;
 
-    public function __construct(ModuleHook $moduleHook = null)
+    public function __construct(ModuleHook $moduleModuleHook = null)
     {
-        $this->moduleHook = $moduleHook;
+        $this->moduleHook = $moduleModuleHook;
     }
 
     public function hasModuleHook()

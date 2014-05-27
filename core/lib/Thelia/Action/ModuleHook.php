@@ -18,14 +18,19 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Hook\HookToggleActivationEvent;
 use Thelia\Core\Event\Hook\HookUpdateEvent;
+use Thelia\Core\Event\Hook\ModuleHookCreateEvent;
+use Thelia\Core\Event\Hook\ModuleHookDeleteEvent;
 use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
+use Thelia\Core\Event\Hook\ModuleHookUpdateEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Model\HookQuery;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\ModuleHook as ModuleHookModel;
 use Thelia\Module\BaseModule;
 
 /**
@@ -65,6 +70,80 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
         }
 
         return $event;
+    }
+
+    protected function isModuleActive($module_id)
+    {
+        if (null !== $module = ModuleQuery::create()->findPk($module_id)) {
+            return $module->getActivate();
+        }
+
+        return false;
+    }
+
+    protected function isHookActive($hook_id)
+    {
+        if (null !== $hook = HookQuery::create()->findPk($hook_id)) {
+            return $hook->getActivate();
+        }
+
+        return false;
+    }
+
+    protected function getLastPositionInHook($hook_id)
+    {
+        $result = ModuleHookQuery::create()
+            ->filterByHookId($hook_id)
+            ->withColumn('MAX(ModuleHook.position)', 'maxPos')
+            ->groupBy('ModuleHook.hook_id')
+            ->select(array('maxPos'))
+            ->findOne();
+
+        return intval($result) + 1;
+    }
+
+    public function createModuleHook(ModuleHookCreateEvent $event)
+    {
+        $moduleHook = new ModuleHookModel();
+
+        $moduleHook
+            ->setModuleId($event->getModuleId())
+            ->setHookId($event->getHookId())
+            ->setActive(false)
+            ->setModuleActive($this->isModuleActive($event->getModuleId()))
+            ->setHookActive($this->isHookActive($event->getHookId()))
+            ->setPosition($this->getLastPositionInHook($event->getHookId()))
+            ->save();
+
+        $event->setModuleHook($moduleHook);
+    }
+
+    public function updateModuleHook(ModuleHookUpdateEvent $event)
+    {
+        if (null !== $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
+
+            // todo: test if classname and method exists
+            $moduleHook
+                ->setHookId($event->getHookId())
+                ->setClassname($event->getClassname())
+                ->setMethod($event->getMethod())
+                ->setActive($event->getActive())
+                ->setHookActive($this->isHookActive($event->getHookId()))
+                ->save();
+
+            $event->setModuleHook($moduleHook);
+
+            $this->cacheClear($event->getDispatcher());
+        }
+    }
+
+    public function deleteModuleHook(ModuleHookDeleteEvent $event)
+    {
+        if (null !== $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
+            $moduleHook->delete();
+            $event->setModuleHook($moduleHook);
+            $this->cacheClear($event->getDispatcher());
+        }
     }
 
     public function toggleModuleHookActivation(ModuleHookToggleActivationEvent $event)
@@ -150,6 +229,9 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
+            TheliaEvents::MODULE_HOOK_CREATE => array('createModuleHook', 128),
+            TheliaEvents::MODULE_HOOK_UPDATE => array('updateModuleHook', 128),
+            TheliaEvents::MODULE_HOOK_DELETE => array('deleteModuleHook', 128),
             TheliaEvents::MODULE_HOOK_UPDATE_POSITION => array('updateModuleHookPosition', 128),
             TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION => array('toggleModuleHookActivation', 128),
 

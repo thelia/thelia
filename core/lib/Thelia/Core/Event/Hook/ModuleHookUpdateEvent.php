@@ -10,21 +10,38 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Event\Hook;
-
 
 /**
  * Class ModuleHookUpdateEvent
  * @package Thelia\Core\Event\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleHookUpdateEvent extends ModuleHookEvent {
-
+class ModuleHookUpdateEvent extends ModuleHookEvent
+{
+    protected $module_hook_id;
     protected $hook_id;
     protected $classname;
     protected $method;
     protected $active;
+
+    /**
+     * @param mixed $module_hook_id
+     */
+    public function setModuleHookId($module_hook_id)
+    {
+        $this->module_hook_id = $module_hook_id;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getModuleHookId()
+    {
+        return $this->module_hook_id;
+    }
 
     /**
      * @param mixed $active
@@ -32,6 +49,7 @@ class ModuleHookUpdateEvent extends ModuleHookEvent {
     public function setActive($active)
     {
         $this->active = $active;
+
         return $this;
     }
 
@@ -49,6 +67,7 @@ class ModuleHookUpdateEvent extends ModuleHookEvent {
     public function setClassname($classname)
     {
         $this->classname = $classname;
+
         return $this;
     }
 
@@ -66,6 +85,7 @@ class ModuleHookUpdateEvent extends ModuleHookEvent {
     public function setHookId($hook_id)
     {
         $this->hook_id = $hook_id;
+
         return $this;
     }
 
@@ -83,6 +103,7 @@ class ModuleHookUpdateEvent extends ModuleHookEvent {
     public function setMethod($method)
     {
         $this->method = $method;
+
         return $this;
     }
 
@@ -94,6 +115,4 @@ class ModuleHookUpdateEvent extends ModuleHookEvent {
         return $this->method;
     }
 
-
-
-} 
+}

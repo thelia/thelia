@@ -54,22 +54,26 @@ class ModuleHookCreationForm extends BaseForm
     protected function getModuleChoices()
     {
         $choices = array();
-        $modules = ModuleQuery::create()->findByActivate(1, Criteria::EQUAL);
+        $modules = ModuleQuery::getActivated();
         /** @var Module $module */
-        foreach($modules as $module){
+        foreach ($modules as $module) {
             $choices[$module->getId()] = $module->getTitle();
         }
+
         return $choices;
     }
 
     protected function getHookChoices()
     {
         $choices = array();
-        $hooks = HookQuery::create()->findByActivate(true, Criteria::EQUAL);
+        $hooks = HookQuery::create()
+            ->filterByActivate(true, Criteria::EQUAL)
+            ->find();
         /** @var Hook $hook */
-        foreach($hooks as $hook){
+        foreach ($hooks as $hook) {
             $choices[$hook->getId()] = $hook->getTitle();
         }
+
         return $choices;
     }
 

@@ -161,7 +161,7 @@
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <select name="{$name}" id="{$label_attr.for}" class="form-control">
                 {foreach $choices as $choice}
-                <option value="{$choice->value}" {if !$form_error && $choice->value == $ESCAPED_TYPE || $form_error && $choice->value == $value}selected="selected" {/if}>{$choice->label}</option>
+                <option value="{$choice->value}" {if $form_error && $choice->value == $value}selected="selected" {/if}>{$choice->label}</option>
                 {/foreach}
             </select>
         </div>

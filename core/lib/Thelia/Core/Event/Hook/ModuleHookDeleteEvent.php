@@ -10,18 +10,21 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Event\Hook;
-
 
 /**
  * Class ModuleHookDeleteEvent
  * @package Thelia\Core\Event\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleHookDeleteEvent extends ModuleHookEvent {
-
+class ModuleHookDeleteEvent extends ModuleHookEvent
+{
     protected $module_hook_id;
+
+    public function __construct($module_hook_id)
+    {
+        $this->module_hook_id = $module_hook_id;
+    }
 
     /**
      * @param mixed $module_hook_id
@@ -29,6 +32,7 @@ class ModuleHookDeleteEvent extends ModuleHookEvent {
     public function setModuleHookId($module_hook_id)
     {
         $this->module_hook_id = $module_hook_id;
+
         return $this;
     }
 
@@ -40,6 +44,4 @@ class ModuleHookDeleteEvent extends ModuleHookEvent {
         return $this->module_hook_id;
     }
 
-
-
-} 
+}

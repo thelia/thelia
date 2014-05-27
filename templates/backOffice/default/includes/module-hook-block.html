@@ -6,6 +6,7 @@
                 <th> {intl l='Module'}</th>
                 <th class="text-center">{intl l='Enable/Disable'}</th>
                 <th class="text-center">{intl l='Position'}</th>
+                <th class="text-center">{intl l='Action'}</th>
             </tr>
         </thead>
         <tbody>
@@ -54,6 +55,21 @@
                     {else}
                     -
                     {/if}
+                </td>
+                <td class="actions">
+                    <div class="btn-group">
+                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.module-hook" access="UPDATE"}
+                        <a class="btn btn-default btn-xs module-hook-change" title="{intl l='Change this hook'}" href="{url path="/admin/module-hook/update/{$ID}"}">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </a>
+                        {/loop}
+
+                        {loop type="auth" name="can_delete" role="ADMIN" resource="admin.module-hook" access="DELETE"}
+                        <a class="btn btn-default btn-xs module-hook-delete" title="{intl l='Delete this hook'}" href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                        {/loop}
+                    </div>
                 </td>
             </tr>
             {/loop}

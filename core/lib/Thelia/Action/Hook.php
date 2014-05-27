@@ -71,6 +71,8 @@ class Hook extends BaseAction  implements EventSubscriberInterface
                 ->setType($event->getType())
                 ->setNative($event->getNative())
                 ->setActivate($event->getActive())
+                ->setBlock($event->getBlock())
+                ->setByModule($event->getByModule())
                 ->setTitle($event->getTitle())
                 ->setChapo($event->getChapo())
                 ->setDescription($event->getDescription())

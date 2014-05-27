@@ -15,6 +15,7 @@ use Thelia\Core\Event\Hook\ModuleHookCreateEvent;
 use Thelia\Core\Event\Hook\ModuleHookDeleteEvent;
 use Thelia\Core\Event\Hook\ModuleHookEvent;
 use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
+use Thelia\Core\Event\Hook\ModuleHookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
@@ -115,6 +116,7 @@ class ModuleHookController extends AbstractCrudController
     protected function hydrateObjectForm($object)
     {
         $data = array(
+            'id' => $object->getId(),
             'hook_id' => $object->getHookId(),
             'classname' => $object->getClassname(),
             'method' => $object->getMethod(),
@@ -132,6 +134,7 @@ class ModuleHookController extends AbstractCrudController
     protected function getCreationEvent($formData)
     {
         $event = new ModuleHookCreateEvent();
+
         return $this->hydrateEvent($event, $formData);
     }
 
@@ -142,7 +145,9 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function getUpdateEvent($formData)
     {
-        // TODO: Implement getUpdateEvent() method.
+        $event = new ModuleHookUpdateEvent();
+
+        return $this->hydrateEvent($event, $formData, true);
     }
 
     protected function hydrateEvent($event, $formData, $update=false)
@@ -154,6 +159,7 @@ class ModuleHookController extends AbstractCrudController
         } else {
             // todo
             $event
+                ->setModuleHookId($formData['id'])
                 ->setHookId($formData['hook_id'])
                 ->setClassname($formData['classname'])
                 ->setMethod($formData['method'])
@@ -169,7 +175,7 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function getDeleteEvent()
     {
-        return new ModuleHookDeleteEvent($this->getRequest()->get('hook_id'));
+        return new ModuleHookDeleteEvent($this->getRequest()->get('module_hook_id'));
     }
 
     /**
@@ -185,11 +191,11 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Get the created object from an event.
      *
-     * @param unknown $event
+     * @param ModuleHookEvent $event
      */
     protected function getObjectFromEvent($event)
     {
-        return $event->getHook();
+        return $event->getModuleHook();
     }
 
     /**
@@ -242,6 +248,13 @@ class ModuleHookController extends AbstractCrudController
     protected function renderEditionTemplate()
     {
         return $this->render('module-hook-edit', $this->getEditionArgument());
+    }
+
+    protected function getEditionArgument()
+    {
+        return array(
+            'module_hook_id'  => $this->getRequest()->get('module_hook_id', 0)
+        );
     }
 
     /**
