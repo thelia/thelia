@@ -72,27 +72,9 @@ class Thelia extends Kernel
         $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
         $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
         if ($this->isDebug()) {
-            $serviceContainer->setLogger('defaultLogger', $this->getPropelLog());
+            $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
             $con->useDebug(true);
         }
-    }
-
-    /**
-     * Initialize a specific logger for propel.
-     *
-     * @return Tlog a Tlog instance
-     */
-    protected function getPropelLog()
-    {
-        $log = Tlog::getNewInstance();
-
-        $logFilePath = THELIA_ROOT."log".DS."propel.log";
-
-        $log->setPrefix("#LEVEL: #DATE #HOUR: ");
-        $log->setDestinations("\\Thelia\\Log\\Destination\\TlogDestinationFile");
-        $log->setConfig("\\Thelia\\Log\\Destination\\TlogDestinationFile", 0, $logFilePath);
-
-        return $log;
     }
 
     /**
