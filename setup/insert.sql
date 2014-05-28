@@ -1202,7 +1202,7 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (268, 'es_ES', 'USA - Alabama', '', '', ''),
 (268, 'fr_FR', 'USA - Alabama', '', '', ''),
 (269, 'en_US', 'Hong Kong', '', '', ''),
-(269, 'er_ES', 'Hong Kong', '', '', ''),
+(269, 'es_ES', 'Hong Kong', '', '', ''),
 (269, 'fr_FR', 'Hong Kong', '', '', '');
 
 INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `updated_at`)
