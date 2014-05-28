@@ -22,7 +22,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Exception\TaxEngineException;
-use Thelia\Model\Base\ProductSaleElementsQuery;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 

@@ -97,8 +97,6 @@ class TheliaLoop extends AbstractSmartyPlugin
 
         $loop = $this->createLoopInstance($params);
 
-        $dummy = null;
-
         return $loop->count();
     }
 

@@ -23,7 +23,9 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Model\CouponModule;
 use Thelia\Model\Coupon as MCoupon;
+use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Map\CouponTableMap;
 use Thelia\Type\EnumListType;
@@ -178,7 +180,10 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 $coupon->getIsAvailableOnSpecialOffers(),
                 $coupon->getIsEnabled(),
                 $coupon->getMaxUsage(),
-                $coupon->getExpirationDate()
+                $coupon->getExpirationDate(),
+                $coupon->getFreeShippingForCountries(),
+                $coupon->getFreeShippingForModules(),
+                $coupon->getPerCustomerUsageCount()
             );
 
             $cleanedConditions = array();
@@ -191,6 +196,18 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 $cleanedConditions[] = $temp;
             }
 
+            $freeShippingForCountriesIds = [];
+            /** @var CouponCountry $couponCountry */
+            foreach ($coupon->getFreeShippingForCountries() as $couponCountry) {
+                $freeShippingForCountriesIds[] = $couponCountry->getCountryId();
+            }
+
+            $freeShippingForModulesIds = [];
+            /** @var CouponModule $couponModule */
+            foreach ($coupon->getFreeShippingForModules() as $couponModule) {
+                $freeShippingForModulesIds[] = $couponModule->getModuleId();
+            }
+
             $loopResultRow
                 ->set("ID", $coupon->getId())
                 ->set("IS_TRANSLATED", $coupon->getVirtualColumn('IS_TRANSLATED'))
@@ -201,6 +218,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("DESCRIPTION", $coupon->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("EXPIRATION_DATE", $coupon->getExpirationDate())
                 ->set("USAGE_LEFT", $coupon->getMaxUsage())
+                ->set("PER_CUSTOMER_USAGE_COUNT", $coupon->getPerCustomerUsageCount())
                 ->set("IS_CUMULATIVE", $coupon->getIsCumulative())
                 ->set("IS_REMOVING_POSTAGE", $coupon->getIsRemovingPostage())
                 ->set("IS_AVAILABLE_ON_SPECIAL_OFFERS", $coupon->getIsAvailableOnSpecialOffers())
@@ -209,7 +227,11 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("APPLICATION_CONDITIONS", $cleanedConditions)
                 ->set("TOOLTIP", $couponManager->getToolTip())
                 ->set("DAY_LEFT_BEFORE_EXPIRATION", max(0, $coupon->getVirtualColumn('days_left')))
-                ->set("SERVICE_ID", $couponManager->getServiceId());
+                ->set("SERVICE_ID", $couponManager->getServiceId())
+                ->set("FREE_SHIPPING_FOR_COUNTRIES_LIST", implode(',', $freeShippingForCountriesIds))
+                ->set("FREE_SHIPPING_FOR_MODULES_LIST", implode(',', $freeShippingForModulesIds))
+            ;
+
             $loopResult->addRow($loopResultRow);
         }
 

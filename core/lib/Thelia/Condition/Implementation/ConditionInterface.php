@@ -14,6 +14,8 @@ namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\SerializableCondition;
 use Thelia\Coupon\FacadeInterface;
+use Thelia\Exception\InvalidConditionOperatorException;
+use Thelia\Exception\InvalidConditionValueException;
 
 /**
  * Manage how the application checks its state in order to check if it matches the implemented condition
@@ -41,10 +43,12 @@ interface ConditionInterface
     /**
      * Check validators relevancy and store them
      *
-     * @param array $operators Operators the Admin set in BackOffice
-     * @param array $values    Values the Admin set in BackOffice
+     * @param array $operators an array of operators (greater than, less than, etc.) entered in the condition parameter input form, one for each condition defined by the Condition
+     * @param array $values    an array of values entered in in the condition parameter input form, one for each condition defined by the Condition
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidConditionOperatorException
+     * @throws InvalidConditionValueException
+     *
      * @return $this
      */
     public function setValidatorsFromForm(array $operators, array $values);
@@ -55,13 +59,6 @@ interface ConditionInterface
      * @return bool
      */
     public function isMatching();
-
-    /**
-     * Return all available Operators for this condition
-     *
-     * @return array Operators::CONST
-     */
-    public function getAvailableOperators();
 
     /**
      * Get I18n name
@@ -107,5 +104,4 @@ interface ConditionInterface
      * @return string HTML string
      */
     public function drawBackOfficeInputs();
-
 }

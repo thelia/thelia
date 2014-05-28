@@ -64,7 +64,7 @@ class Delivery extends BaseSpecificModule
             $loopResultRow = new LoopResultRow($deliveryModule);
 
             /** @var DeliveryModuleInterface $moduleInstance */
-            $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
+            $moduleInstance = $deliveryModule->getModuleInstance($this->container);
 
             if (false === $moduleInstance instanceof DeliveryModuleInterface) {
                 throw new \RuntimeException(sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $deliveryModule->getCode()));

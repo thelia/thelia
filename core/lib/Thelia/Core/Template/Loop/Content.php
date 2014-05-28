@@ -60,7 +60,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse', 'random', 'given_id'))
+                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse', 'random', 'given_id', 'created', 'created_reverse', 'updated', 'updated_reverse'))
                 ),
                 'alpha'
             ),
@@ -178,6 +178,18 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
                     break(2);
+                case "created":
+                    $search->addAscendingOrderByColumn('created_at');
+                    break;
+                case "created_reverse":
+                    $search->addDescendingOrderByColumn('created_at');
+                    break;
+                case "updated":
+                    $search->addAscendingOrderByColumn('updated_at');
+                    break;
+                case "updated_reverse":
+                    $search->addDescendingOrderByColumn('updated_at');
+                    break;
             }
         }
 

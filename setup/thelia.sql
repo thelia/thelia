@@ -377,8 +377,8 @@ CREATE TABLE `product_sale_elements`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_product_sale_element_product_id` (`product_id`),
-    INDEX `idx_product_elements_product_id_promo_is_default` (`product_id`, `promo`, `is_default`),
     INDEX `ref` (`ref`),
+    INDEX `idx_product_elements_product_id_promo_is_default` (`product_id`, `promo`, `is_default`),
     CONSTRAINT `fk_product_sale_element_product_id`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
@@ -1163,6 +1163,7 @@ CREATE TABLE `coupon`
     `is_available_on_special_offers` TINYINT(1) NOT NULL,
     `is_used` TINYINT(1) NOT NULL,
     `serialized_conditions` TEXT NOT NULL,
+    `per_customer_usage_count` TINYINT(1) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -1559,8 +1560,6 @@ CREATE TABLE `rewriting_url`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `url_UNIQUE` (`url`),
     INDEX `idx_rewriting_url_redirected` (`redirected`),
-    INDEX `idx_rewriting_url_view_updated_at` (`view`, `updated_at`),
-    INDEX `idx_rewriting_url_view_id_view_view_locale_updated_at` (`view_id`, `view`, `view_locale`, `updated_at`),
     CONSTRAINT `fk_rewriting_url_redirected`
         FOREIGN KEY (`redirected`)
         REFERENCES `rewriting_url` (`id`)
@@ -1693,6 +1692,7 @@ CREATE TABLE `order_coupon`
     `is_removing_postage` TINYINT(1) NOT NULL,
     `is_available_on_special_offers` TINYINT(1) NOT NULL,
     `serialized_conditions` TEXT NOT NULL,
+    `per_customer_usage_count` TINYINT(1) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1701,6 +1701,116 @@ CREATE TABLE `order_coupon`
         FOREIGN KEY (`order_id`)
         REFERENCES `order` (`id`)
         ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- coupon_country
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `coupon_country`;
+
+CREATE TABLE `coupon_country`
+(
+    `coupon_id` INTEGER NOT NULL,
+    `country_id` INTEGER NOT NULL,
+    PRIMARY KEY (`coupon_id`,`country_id`),
+    INDEX `fk_country_id_idx` (`country_id`),
+    CONSTRAINT `fk_coupon_country_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_coupon_country_coupon_id`
+        FOREIGN KEY (`coupon_id`)
+        REFERENCES `coupon` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- coupon_module
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `coupon_module`;
+
+CREATE TABLE `coupon_module`
+(
+    `coupon_id` INTEGER NOT NULL,
+    `module_id` INTEGER NOT NULL,
+    PRIMARY KEY (`coupon_id`,`module_id`),
+    INDEX `fk_module_id_idx` (`module_id`),
+    CONSTRAINT `fk_coupon_module_coupon_id`
+        FOREIGN KEY (`coupon_id`)
+        REFERENCES `coupon` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_coupon_module_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- order_coupon_country
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_coupon_country`;
+
+CREATE TABLE `order_coupon_country`
+(
+    `coupon_id` INTEGER NOT NULL,
+    `country_id` INTEGER NOT NULL,
+    PRIMARY KEY (`coupon_id`,`country_id`),
+    INDEX `fk_country_id_idx` (`country_id`),
+    CONSTRAINT `fk_order_coupon_country_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_order_coupon_country_coupon_id`
+        FOREIGN KEY (`coupon_id`)
+        REFERENCES `order_coupon` (`id`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- order_coupon_module
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_coupon_module`;
+
+CREATE TABLE `order_coupon_module`
+(
+    `coupon_id` INTEGER NOT NULL,
+    `module_id` INTEGER NOT NULL,
+    PRIMARY KEY (`coupon_id`,`module_id`),
+    INDEX `fk_module_id_idx` (`module_id`),
+    CONSTRAINT `fk_coupon_module_coupon_id0`
+        FOREIGN KEY (`coupon_id`)
+        REFERENCES `order_coupon` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_coupon_module_module_id0`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- coupon_customer_count
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `coupon_customer_count`;
+
+CREATE TABLE `coupon_customer_count`
+(
+    `coupon_id` INTEGER NOT NULL,
+    `customer_id` INTEGER NOT NULL,
+    `count` INTEGER DEFAULT 0 NOT NULL,
+    INDEX `fk_coupon_customer_customer_id_idx` (`customer_id`),
+    INDEX `fk_coupon_customer_coupon_id_idx` (`coupon_id`),
+    CONSTRAINT `fk_coupon_customer_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_coupon_customer_coupon_id`
+        FOREIGN KEY (`coupon_id`)
+        REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
@@ -2497,6 +2607,7 @@ CREATE TABLE `coupon_version`
     `is_available_on_special_offers` TINYINT(1) NOT NULL,
     `is_used` TINYINT(1) NOT NULL,
     `serialized_conditions` TEXT NOT NULL,
+    `per_customer_usage_count` TINYINT(1) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

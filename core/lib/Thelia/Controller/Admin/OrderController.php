@@ -19,7 +19,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Form\OrderUpdateAddress;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Base\OrderAddressQuery;
+use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Tools\URL;

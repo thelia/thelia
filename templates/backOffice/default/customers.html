@@ -54,8 +54,6 @@
                                             }
                                         </th>
 
-                                        {module_include location='customer_list_header'}
-
                                         <th class="object-title">
                                             {admin_sortable_header
                                                 current_order=$customer_order
@@ -77,6 +75,8 @@
                                                 label="{intl l='First name'}"
                                             }
                                         </th>
+
+                                        {module_include location='customer_list_header'}
 
                                         <th class="object-title">
                                             {admin_sortable_header

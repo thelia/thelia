@@ -857,7 +857,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $visible = $this->getVisible();
 
-        if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
+        if ($visible !== Type\BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
 
         $exclude = $this->getExclude();
 

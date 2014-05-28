@@ -128,6 +128,12 @@ abstract class CouponVersion implements ActiveRecordInterface
     protected $serialized_conditions;
 
     /**
+     * The value for the per_customer_usage_count field.
+     * @var        boolean
+     */
+    protected $per_customer_usage_count;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -572,6 +578,17 @@ abstract class CouponVersion implements ActiveRecordInterface
     }
 
     /**
+     * Get the [per_customer_usage_count] column value.
+     *
+     * @return   boolean
+     */
+    public function getPerCustomerUsageCount()
+    {
+
+        return $this->per_customer_usage_count;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -919,6 +936,35 @@ abstract class CouponVersion implements ActiveRecordInterface
     } // setSerializedConditions()
 
     /**
+     * Sets the value of the [per_customer_usage_count] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\CouponVersion The current object (for fluent API support)
+     */
+    public function setPerCustomerUsageCount($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->per_customer_usage_count !== $v) {
+            $this->per_customer_usage_count = $v;
+            $this->modifiedColumns[CouponVersionTableMap::PER_CUSTOMER_USAGE_COUNT] = true;
+        }
+
+
+        return $this;
+    } // setPerCustomerUsageCount()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -1061,19 +1107,22 @@ abstract class CouponVersion implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : CouponVersionTableMap::translateFieldName('SerializedConditions', TableMap::TYPE_PHPNAME, $indexType)];
             $this->serialized_conditions = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : CouponVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : CouponVersionTableMap::translateFieldName('PerCustomerUsageCount', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->per_customer_usage_count = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : CouponVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : CouponVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : CouponVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : CouponVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : CouponVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -1083,7 +1132,7 @@ abstract class CouponVersion implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 15; // 15 = CouponVersionTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 16; // 16 = CouponVersionTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\CouponVersion object", 0, $e);
@@ -1340,6 +1389,9 @@ abstract class CouponVersion implements ActiveRecordInterface
         if ($this->isColumnModified(CouponVersionTableMap::SERIALIZED_CONDITIONS)) {
             $modifiedColumns[':p' . $index++]  = '`SERIALIZED_CONDITIONS`';
         }
+        if ($this->isColumnModified(CouponVersionTableMap::PER_CUSTOMER_USAGE_COUNT)) {
+            $modifiedColumns[':p' . $index++]  = '`PER_CUSTOMER_USAGE_COUNT`';
+        }
         if ($this->isColumnModified(CouponVersionTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -1395,6 +1447,9 @@ abstract class CouponVersion implements ActiveRecordInterface
                         break;
                     case '`SERIALIZED_CONDITIONS`':
                         $stmt->bindValue($identifier, $this->serialized_conditions, PDO::PARAM_STR);
+                        break;
+                    case '`PER_CUSTOMER_USAGE_COUNT`':
+                        $stmt->bindValue($identifier, (int) $this->per_customer_usage_count, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1497,12 +1552,15 @@ abstract class CouponVersion implements ActiveRecordInterface
                 return $this->getSerializedConditions();
                 break;
             case 12:
-                return $this->getCreatedAt();
+                return $this->getPerCustomerUsageCount();
                 break;
             case 13:
-                return $this->getUpdatedAt();
+                return $this->getCreatedAt();
                 break;
             case 14:
+                return $this->getUpdatedAt();
+                break;
+            case 15:
                 return $this->getVersion();
                 break;
             default:
@@ -1546,9 +1604,10 @@ abstract class CouponVersion implements ActiveRecordInterface
             $keys[9] => $this->getIsAvailableOnSpecialOffers(),
             $keys[10] => $this->getIsUsed(),
             $keys[11] => $this->getSerializedConditions(),
-            $keys[12] => $this->getCreatedAt(),
-            $keys[13] => $this->getUpdatedAt(),
-            $keys[14] => $this->getVersion(),
+            $keys[12] => $this->getPerCustomerUsageCount(),
+            $keys[13] => $this->getCreatedAt(),
+            $keys[14] => $this->getUpdatedAt(),
+            $keys[15] => $this->getVersion(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1630,12 +1689,15 @@ abstract class CouponVersion implements ActiveRecordInterface
                 $this->setSerializedConditions($value);
                 break;
             case 12:
-                $this->setCreatedAt($value);
+                $this->setPerCustomerUsageCount($value);
                 break;
             case 13:
-                $this->setUpdatedAt($value);
+                $this->setCreatedAt($value);
                 break;
             case 14:
+                $this->setUpdatedAt($value);
+                break;
+            case 15:
                 $this->setVersion($value);
                 break;
         } // switch()
@@ -1674,9 +1736,10 @@ abstract class CouponVersion implements ActiveRecordInterface
         if (array_key_exists($keys[9], $arr)) $this->setIsAvailableOnSpecialOffers($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setIsUsed($arr[$keys[10]]);
         if (array_key_exists($keys[11], $arr)) $this->setSerializedConditions($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setVersion($arr[$keys[14]]);
+        if (array_key_exists($keys[12], $arr)) $this->setPerCustomerUsageCount($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setCreatedAt($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setUpdatedAt($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setVersion($arr[$keys[15]]);
     }
 
     /**
@@ -1700,6 +1763,7 @@ abstract class CouponVersion implements ActiveRecordInterface
         if ($this->isColumnModified(CouponVersionTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS)) $criteria->add(CouponVersionTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS, $this->is_available_on_special_offers);
         if ($this->isColumnModified(CouponVersionTableMap::IS_USED)) $criteria->add(CouponVersionTableMap::IS_USED, $this->is_used);
         if ($this->isColumnModified(CouponVersionTableMap::SERIALIZED_CONDITIONS)) $criteria->add(CouponVersionTableMap::SERIALIZED_CONDITIONS, $this->serialized_conditions);
+        if ($this->isColumnModified(CouponVersionTableMap::PER_CUSTOMER_USAGE_COUNT)) $criteria->add(CouponVersionTableMap::PER_CUSTOMER_USAGE_COUNT, $this->per_customer_usage_count);
         if ($this->isColumnModified(CouponVersionTableMap::CREATED_AT)) $criteria->add(CouponVersionTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CouponVersionTableMap::UPDATED_AT)) $criteria->add(CouponVersionTableMap::UPDATED_AT, $this->updated_at);
         if ($this->isColumnModified(CouponVersionTableMap::VERSION)) $criteria->add(CouponVersionTableMap::VERSION, $this->version);
@@ -1785,6 +1849,7 @@ abstract class CouponVersion implements ActiveRecordInterface
         $copyObj->setIsAvailableOnSpecialOffers($this->getIsAvailableOnSpecialOffers());
         $copyObj->setIsUsed($this->getIsUsed());
         $copyObj->setSerializedConditions($this->getSerializedConditions());
+        $copyObj->setPerCustomerUsageCount($this->getPerCustomerUsageCount());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         $copyObj->setVersion($this->getVersion());
@@ -1883,6 +1948,7 @@ abstract class CouponVersion implements ActiveRecordInterface
         $this->is_available_on_special_offers = null;
         $this->is_used = null;
         $this->serialized_conditions = null;
+        $this->per_customer_usage_count = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->version = null;

@@ -17,11 +17,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Base\ProductSaleElementsQuery;
-use Thelia\Model\Currency;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Currency;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Tools\ProductPriceTools;
 
 /**

@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Template\Smarty\Assets;
 
+use Symfony\Component\Finder\Finder;
 use Thelia\Log\Tlog;
 use Thelia\Tools\URL;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
@@ -149,8 +150,14 @@ class SmartyAssetsManager
         }
 
         $url = "";
+
         // test if file exists before running the process
-        if (file_exists($assetSource . DS . $file)) {
+        $finder = new Finder();
+
+        $files = $finder->files()->in($assetSource)->name($file);
+
+        if (! empty($files)) {
+
             $url = $this->assetsManager->processAsset(
                 $assetSource . DS . $file,
                 $assetSource . DS . self::$assetsDirectory,
@@ -162,6 +169,8 @@ class SmartyAssetsManager
                 $filters,
                 $debug
             );
+        } else {
+            Tlog::getInstance()->addError("Asset $assetSource".DS."$file was not found.");
         }
 
         return $url;

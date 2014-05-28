@@ -33,6 +33,7 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     ChildCouponVersionQuery orderByIsAvailableOnSpecialOffers($order = Criteria::ASC) Order by the is_available_on_special_offers column
  * @method     ChildCouponVersionQuery orderByIsUsed($order = Criteria::ASC) Order by the is_used column
  * @method     ChildCouponVersionQuery orderBySerializedConditions($order = Criteria::ASC) Order by the serialized_conditions column
+ * @method     ChildCouponVersionQuery orderByPerCustomerUsageCount($order = Criteria::ASC) Order by the per_customer_usage_count column
  * @method     ChildCouponVersionQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCouponVersionQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method     ChildCouponVersionQuery orderByVersion($order = Criteria::ASC) Order by the version column
@@ -49,6 +50,7 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     ChildCouponVersionQuery groupByIsAvailableOnSpecialOffers() Group by the is_available_on_special_offers column
  * @method     ChildCouponVersionQuery groupByIsUsed() Group by the is_used column
  * @method     ChildCouponVersionQuery groupBySerializedConditions() Group by the serialized_conditions column
+ * @method     ChildCouponVersionQuery groupByPerCustomerUsageCount() Group by the per_customer_usage_count column
  * @method     ChildCouponVersionQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCouponVersionQuery groupByUpdatedAt() Group by the updated_at column
  * @method     ChildCouponVersionQuery groupByVersion() Group by the version column
@@ -76,6 +78,7 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     ChildCouponVersion findOneByIsAvailableOnSpecialOffers(boolean $is_available_on_special_offers) Return the first ChildCouponVersion filtered by the is_available_on_special_offers column
  * @method     ChildCouponVersion findOneByIsUsed(boolean $is_used) Return the first ChildCouponVersion filtered by the is_used column
  * @method     ChildCouponVersion findOneBySerializedConditions(string $serialized_conditions) Return the first ChildCouponVersion filtered by the serialized_conditions column
+ * @method     ChildCouponVersion findOneByPerCustomerUsageCount(boolean $per_customer_usage_count) Return the first ChildCouponVersion filtered by the per_customer_usage_count column
  * @method     ChildCouponVersion findOneByCreatedAt(string $created_at) Return the first ChildCouponVersion filtered by the created_at column
  * @method     ChildCouponVersion findOneByUpdatedAt(string $updated_at) Return the first ChildCouponVersion filtered by the updated_at column
  * @method     ChildCouponVersion findOneByVersion(int $version) Return the first ChildCouponVersion filtered by the version column
@@ -92,6 +95,7 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     array findByIsAvailableOnSpecialOffers(boolean $is_available_on_special_offers) Return ChildCouponVersion objects filtered by the is_available_on_special_offers column
  * @method     array findByIsUsed(boolean $is_used) Return ChildCouponVersion objects filtered by the is_used column
  * @method     array findBySerializedConditions(string $serialized_conditions) Return ChildCouponVersion objects filtered by the serialized_conditions column
+ * @method     array findByPerCustomerUsageCount(boolean $per_customer_usage_count) Return ChildCouponVersion objects filtered by the per_customer_usage_count column
  * @method     array findByCreatedAt(string $created_at) Return ChildCouponVersion objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCouponVersion objects filtered by the updated_at column
  * @method     array findByVersion(int $version) Return ChildCouponVersion objects filtered by the version column
@@ -183,7 +187,7 @@ abstract class CouponVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `TYPE`, `SERIALIZED_EFFECTS`, `IS_ENABLED`, `EXPIRATION_DATE`, `MAX_USAGE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `IS_USED`, `SERIALIZED_CONDITIONS`, `CREATED_AT`, `UPDATED_AT`, `VERSION` FROM `coupon_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
+        $sql = 'SELECT `ID`, `CODE`, `TYPE`, `SERIALIZED_EFFECTS`, `IS_ENABLED`, `EXPIRATION_DATE`, `MAX_USAGE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `IS_USED`, `SERIALIZED_CONDITIONS`, `PER_CUSTOMER_USAGE_COUNT`, `CREATED_AT`, `UPDATED_AT`, `VERSION` FROM `coupon_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -660,6 +664,33 @@ abstract class CouponVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CouponVersionTableMap::SERIALIZED_CONDITIONS, $serializedConditions, $comparison);
+    }
+
+    /**
+     * Filter the query on the per_customer_usage_count column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPerCustomerUsageCount(true); // WHERE per_customer_usage_count = true
+     * $query->filterByPerCustomerUsageCount('yes'); // WHERE per_customer_usage_count = true
+     * </code>
+     *
+     * @param     boolean|string $perCustomerUsageCount The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCouponVersionQuery The current query, for fluid interface
+     */
+    public function filterByPerCustomerUsageCount($perCustomerUsageCount = null, $comparison = null)
+    {
+        if (is_string($perCustomerUsageCount)) {
+            $per_customer_usage_count = in_array(strtolower($perCustomerUsageCount), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(CouponVersionTableMap::PER_CUSTOMER_USAGE_COUNT, $perCustomerUsageCount, $comparison);
     }
 
     /**

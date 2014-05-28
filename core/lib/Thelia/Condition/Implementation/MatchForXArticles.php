@@ -13,103 +13,80 @@
 namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\Operators;
-use Thelia\Exception\InvalidConditionOperatorException;
+use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
 
 /**
  * Check a Checkout against its Product number
  *
  * @package Condition
- * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>, Franck Allimant <franck@cqfdev.fr>
  *
  */
 class MatchForXArticles extends ConditionAbstract
 {
     /** Condition 1st parameter : quantity */
-    CONST INPUT1 = 'quantity';
-
-    /** @var string Service Id from Resources/config.xml  */
-    protected $serviceId = 'thelia.condition.match_for_x_articles';
-
-    /** @var array Available Operators (Operators::CONST) */
-    protected $availableOperators = array(
-        self::INPUT1 => array(
-            Operators::INFERIOR,
-            Operators::INFERIOR_OR_EQUAL,
-            Operators::EQUAL,
-            Operators::SUPERIOR_OR_EQUAL,
-            Operators::SUPERIOR
-        )
-    );
+    CONST CART_QUANTITY = 'quantity';
 
     /**
-     * Check validators relevancy and store them
-     *
-     * @param array $operators Operators the Admin set in BackOffice
-     * @param array $values    Values the Admin set in BackOffice
-     *
-     * @throws \InvalidArgumentException
-     * @return $this
+     * @inheritdoc
      */
-    public function setValidatorsFromForm(array $operators, array $values)
+    public function __construct(FacadeInterface $facade)
     {
-        $this->setValidators(
-            $operators[self::INPUT1],
-            $values[self::INPUT1]
+        $this->availableOperators = array(
+            self::CART_QUANTITY => array(
+                Operators::INFERIOR,
+                Operators::INFERIOR_OR_EQUAL,
+                Operators::EQUAL,
+                Operators::SUPERIOR_OR_EQUAL,
+                Operators::SUPERIOR
+            )
         );
 
-        return $this;
+        parent::__construct($facade);
     }
 
     /**
-     * Check validators relevancy and store them
-     *
-     * @param string $quantityOperator Quantity Operator ex <
-     * @param int    $quantityValue    Quantity set to meet condition
-     *
-     * @throws \Thelia\Exception\InvalidConditionValueException
-     * @throws \Thelia\Exception\InvalidConditionOperatorException
-     * @return $this
+     * @inheritdoc
      */
-    protected function setValidators($quantityOperator, $quantityValue)
+    public function getServiceId()
     {
-        $isOperator1Legit = $this->isOperatorLegit(
-            $quantityOperator,
-            $this->availableOperators[self::INPUT1]
-        );
-        if (!$isOperator1Legit) {
-            throw new InvalidConditionOperatorException(
-                get_class(), 'quantity'
-            );
-        }
+        return 'thelia.condition.match_for_x_articles';
+    }
 
-        if ((int) $quantityValue <= 0) {
+    /**
+     * @inheritdoc
+     */
+    public function setValidatorsFromForm(array $operators, array $values)
+    {
+        $this->checkComparisonOperatorValue($operators, self::CART_QUANTITY);
+
+        if (intval($values[self::CART_QUANTITY]) <= 0) {
             throw new InvalidConditionValueException(
                 get_class(), 'quantity'
             );
         }
 
-        $this->operators = array(
-            self::INPUT1 => $quantityOperator,
-        );
-        $this->values = array(
-            self::INPUT1 => $quantityValue,
-        );
+        $this->operators = [
+            self::CART_QUANTITY => $operators[self::CART_QUANTITY]
+        ];
+
+        $this->values = [
+            self::CART_QUANTITY => $values[self::CART_QUANTITY]
+        ];
 
         return $this;
     }
 
     /**
-     * Test if Customer meets conditions
-     *
-     * @return bool
+     * @inheritdoc
      */
     public function isMatching()
     {
         $condition1 = $this->conditionValidator->variableOpComparison(
             $this->facade->getNbArticlesInCart(),
-            $this->operators[self::INPUT1],
-            $this->values[self::INPUT1]
+            $this->operators[self::CART_QUANTITY],
+            $this->values[self::CART_QUANTITY]
         );
 
         if ($condition1) {
@@ -120,24 +97,19 @@ class MatchForXArticles extends ConditionAbstract
     }
 
     /**
-     * Get I18n name
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getName()
     {
         return $this->translator->trans(
-            'Cart item count condition',
+            'Cart item count',
             [],
             'condition'
         );
     }
 
     /**
-     * Get I18n tooltip
-     * Explain in detail what the Condition checks
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getToolTip()
     {
@@ -151,22 +123,19 @@ class MatchForXArticles extends ConditionAbstract
     }
 
     /**
-     * Get I18n summary
-     * Explain briefly the condition with given values
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getSummary()
     {
         $i18nOperator = Operators::getI18n(
-            $this->translator, $this->operators[self::INPUT1]
+            $this->translator, $this->operators[self::CART_QUANTITY]
         );
 
         $toolTip = $this->translator->trans(
             'If cart item count is <strong>%operator%</strong> %quantity%',
             array(
                 '%operator%' => $i18nOperator,
-                '%quantity%' => $this->values[self::INPUT1]
+                '%quantity%' => $this->values[self::CART_QUANTITY]
             ),
             'condition'
         );
@@ -175,15 +144,13 @@ class MatchForXArticles extends ConditionAbstract
     }
 
     /**
-     * Generate inputs ready to be drawn
-     *
-     * @return array
+     * @inheritdoc
      */
     protected function generateInputs()
     {
         return array(
-            self::INPUT1 => array(
-                'availableOperators' => $this->availableOperators[self::INPUT1],
+            self::CART_QUANTITY => array(
+                'availableOperators' => $this->availableOperators[self::CART_QUANTITY],
                 'value' => '',
                 'selectedOperator' => ''
             )
@@ -191,10 +158,7 @@ class MatchForXArticles extends ConditionAbstract
     }
 
     /**
-     * Draw the input displayed in the BackOffice
-     * allowing Admin to set its Coupon Conditions
-     *
-     * @return string HTML string
+     * @inheritdoc
      */
     public function drawBackOfficeInputs()
     {
@@ -202,19 +166,13 @@ class MatchForXArticles extends ConditionAbstract
             ->getTranslator()
             ->trans('Cart item count is', [], 'condition');
 
-        $html = $this->drawBackOfficeBaseInputsText($labelQuantity, self::INPUT1);
+        $html = $this->drawBackOfficeBaseInputsText($labelQuantity, self::CART_QUANTITY);
 
         return $html;
     }
 
     /**
-     * Draw the base input displayed in the BackOffice
-     * allowing Admin to set its Coupon Conditions
-     *
-     * @param string $label    I18n input label
-     * @param string $inputKey Input key (ex: self::INPUT1)
-     *
-     * @return string HTML string
+     * @inheritdoc
      */
     protected function drawBackOfficeBaseInputsText($label, $inputKey)
     {

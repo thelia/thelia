@@ -194,7 +194,11 @@ class CountryTableMap extends TableMap
         $this->addRelation('Area', '\\Thelia\\Model\\Area', RelationMap::MANY_TO_ONE, array('area_id' => 'id', ), 'SET NULL', 'RESTRICT');
         $this->addRelation('TaxRuleCountry', '\\Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'country_id', ), 'CASCADE', 'RESTRICT', 'TaxRuleCountries');
         $this->addRelation('Address', '\\Thelia\\Model\\Address', RelationMap::ONE_TO_MANY, array('id' => 'country_id', ), 'RESTRICT', 'RESTRICT', 'Addresses');
+        $this->addRelation('CouponCountry', '\\Thelia\\Model\\CouponCountry', RelationMap::ONE_TO_MANY, array('id' => 'country_id', ), 'CASCADE', null, 'CouponCountries');
+        $this->addRelation('OrderCouponCountry', '\\Thelia\\Model\\OrderCouponCountry', RelationMap::ONE_TO_MANY, array('id' => 'country_id', ), 'CASCADE', null, 'OrderCouponCountries');
         $this->addRelation('CountryI18n', '\\Thelia\\Model\\CountryI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CountryI18ns');
+        $this->addRelation('Coupon', '\\Thelia\\Model\\Coupon', RelationMap::MANY_TO_MANY, array(), 'CASCADE', null, 'Coupons');
+        $this->addRelation('OrderCoupon', '\\Thelia\\Model\\OrderCoupon', RelationMap::MANY_TO_MANY, array(), null, null, 'OrderCoupons');
     } // buildRelations()
 
     /**
@@ -218,6 +222,8 @@ class CountryTableMap extends TableMap
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 TaxRuleCountryTableMap::clearInstancePool();
+                CouponCountryTableMap::clearInstancePool();
+                OrderCouponCountryTableMap::clearInstancePool();
                 CountryI18nTableMap::clearInstancePool();
             }
 

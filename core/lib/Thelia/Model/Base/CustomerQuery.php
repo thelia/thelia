@@ -75,6 +75,10 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomerQuery rightJoinCart($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Cart relation
  * @method     ChildCustomerQuery innerJoinCart($relationAlias = null) Adds a INNER JOIN clause to the query using the Cart relation
  *
+ * @method     ChildCustomerQuery leftJoinCouponCustomerCount($relationAlias = null) Adds a LEFT JOIN clause to the query using the CouponCustomerCount relation
+ * @method     ChildCustomerQuery rightJoinCouponCustomerCount($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CouponCustomerCount relation
+ * @method     ChildCustomerQuery innerJoinCouponCustomerCount($relationAlias = null) Adds a INNER JOIN clause to the query using the CouponCustomerCount relation
+ *
  * @method     ChildCustomer findOne(ConnectionInterface $con = null) Return the first ChildCustomer matching the query
  * @method     ChildCustomer findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCustomer matching the query, or a new ChildCustomer object populated from the query conditions when no match is found
  *
@@ -1122,6 +1126,96 @@ abstract class CustomerQuery extends ModelCriteria
         return $this
             ->joinCart($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Cart', '\Thelia\Model\CartQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\CouponCustomerCount object
+     *
+     * @param \Thelia\Model\CouponCustomerCount|ObjectCollection $couponCustomerCount  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByCouponCustomerCount($couponCustomerCount, $comparison = null)
+    {
+        if ($couponCustomerCount instanceof \Thelia\Model\CouponCustomerCount) {
+            return $this
+                ->addUsingAlias(CustomerTableMap::ID, $couponCustomerCount->getCustomerId(), $comparison);
+        } elseif ($couponCustomerCount instanceof ObjectCollection) {
+            return $this
+                ->useCouponCustomerCountQuery()
+                ->filterByPrimaryKeys($couponCustomerCount->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCouponCustomerCount() only accepts arguments of type \Thelia\Model\CouponCustomerCount or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CouponCustomerCount relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function joinCouponCustomerCount($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CouponCustomerCount');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CouponCustomerCount');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CouponCustomerCount relation CouponCustomerCount object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CouponCustomerCountQuery A secondary query class using the current class as primary query
+     */
+    public function useCouponCustomerCountQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCouponCustomerCount($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CouponCustomerCount', '\Thelia\Model\CouponCustomerCountQuery');
+    }
+
+    /**
+     * Filter the query by a related Coupon object
+     * using the coupon_customer_count table as cross reference
+     *
+     * @param Coupon $coupon the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByCoupon($coupon, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useCouponCustomerCountQuery()
+            ->filterByCoupon($coupon, $comparison)
+            ->endUse();
     }
 
     /**

@@ -24,9 +24,9 @@ use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\Smarty\SmartyParser;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
-use Thelia\Model\Base\OrderAddressQuery;
-use Thelia\Model\Base\OrderProductQuery;
-use Thelia\Model\Base\OrderQuery;
+use Thelia\Model\OrderAddressQuery;
+use Thelia\Model\OrderProductQuery;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\CurrencyQuery;
@@ -196,7 +196,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             321,
-            $this->orderEvent->getOrder()->chosenDeliveryAddress
+            $this->orderEvent->getOrder()->getChoosenDeliveryAddress()
         );
     }
 
@@ -208,7 +208,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             654,
-            $this->orderEvent->getOrder()->chosenInvoiceAddress
+            $this->orderEvent->getOrder()->getChoosenInvoiceAddress()
         );
     }
 
@@ -263,8 +263,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $paymentModuleClass = $paymentModule->getFullNamespace();
         $this->container->set(sprintf('module.%s', $paymentModule->getCode()), new $paymentModuleClass());
 
-        $this->orderEvent->getOrder()->chosenDeliveryAddress = $validDeliveryAddress->getId();
-        $this->orderEvent->getOrder()->chosenInvoiceAddress = $validInvoiceAddress->getId();
+        $this->orderEvent->getOrder()->setChoosenDeliveryAddress($validDeliveryAddress->getId());
+        $this->orderEvent->getOrder()->setChoosenInvoiceAddress($validInvoiceAddress->getId());
         $this->orderEvent->getOrder()->setDeliveryModuleId($deliveryModule->getId());
         $this->orderEvent->getOrder()->setPostage(20);
         $this->orderEvent->getOrder()->setPaymentModuleId($paymentModule->getId());

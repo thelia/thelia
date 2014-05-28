@@ -21,7 +21,7 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Base\AttributeCombinationQuery;
+use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\Map\AttributeAvTableMap;
 use Thelia\Model\Map\AttributeTableMap;
 use Thelia\Type\TypeCollection;

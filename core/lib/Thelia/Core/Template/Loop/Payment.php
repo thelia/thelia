@@ -37,7 +37,7 @@ class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $paymentModule) {
             $loopResultRow = new LoopResultRow($paymentModule);
 
-            $moduleInstance = $this->container->get(sprintf('module.%s', $paymentModule->getCode()));
+            $moduleInstance = $paymentModule->getModuleInstance($this->container);
 
             if (false === $moduleInstance instanceof PaymentModuleInterface) {
                 throw new \RuntimeException(sprintf("payment module %s is not a Thelia\Module\PaymentModuleInterface", $paymentModule->getCode()));

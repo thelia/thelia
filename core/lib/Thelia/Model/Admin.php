@@ -111,6 +111,7 @@ class Admin extends BaseAdmin implements UserInterface
     public function eraseCredentials()
     {
         parent::setPassword(null);
+        $this->resetModified();
     }
 
     /**

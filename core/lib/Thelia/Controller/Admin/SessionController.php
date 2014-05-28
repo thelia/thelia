@@ -113,7 +113,7 @@ class SessionController extends BaseAdminController
             /**
              * we have tou find a way to send cookie
              */
-            if (intval($adminLoginForm->getForm()->get('remember_me')->getData()) > 0) {
+            if (intval($form->get('remember_me')->getData()) > 0) {
                 // If a remember me field if present and set in the form, create
                 // the cookie thant store "remember me" information
                 $this->createAdminRememberMeCookie($user);

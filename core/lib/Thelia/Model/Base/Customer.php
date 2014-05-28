@@ -21,6 +21,10 @@ use Thelia\Model\Address as ChildAddress;
 use Thelia\Model\AddressQuery as ChildAddressQuery;
 use Thelia\Model\Cart as ChildCart;
 use Thelia\Model\CartQuery as ChildCartQuery;
+use Thelia\Model\Coupon as ChildCoupon;
+use Thelia\Model\CouponCustomerCount as ChildCouponCustomerCount;
+use Thelia\Model\CouponCustomerCountQuery as ChildCouponCustomerCountQuery;
+use Thelia\Model\CouponQuery as ChildCouponQuery;
 use Thelia\Model\Customer as ChildCustomer;
 use Thelia\Model\CustomerQuery as ChildCustomerQuery;
 use Thelia\Model\CustomerTitle as ChildCustomerTitle;
@@ -183,12 +187,29 @@ abstract class Customer implements ActiveRecordInterface
     protected $collCartsPartial;
 
     /**
+     * @var        ObjectCollection|ChildCouponCustomerCount[] Collection to store aggregation of ChildCouponCustomerCount objects.
+     */
+    protected $collCouponCustomerCounts;
+    protected $collCouponCustomerCountsPartial;
+
+    /**
+     * @var        ChildCoupon[] Collection to store aggregation of ChildCoupon objects.
+     */
+    protected $collCoupons;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $couponsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -207,6 +228,12 @@ abstract class Customer implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $cartsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $couponCustomerCountsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Thelia\Model\Base\Customer object.
@@ -1169,6 +1196,9 @@ abstract class Customer implements ActiveRecordInterface
 
             $this->collCarts = null;
 
+            $this->collCouponCustomerCounts = null;
+
+            $this->collCoupons = null;
         } // if (deep)
     }
 
@@ -1314,6 +1344,33 @@ abstract class Customer implements ActiveRecordInterface
                 $this->resetModified();
             }
 
+            if ($this->couponsScheduledForDeletion !== null) {
+                if (!$this->couponsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk  = $this->getPrimaryKey();
+                    foreach ($this->couponsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+
+                    CouponCustomerCountQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->couponsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getCoupons() as $coupon) {
+                    if ($coupon->isModified()) {
+                        $coupon->save($con);
+                    }
+                }
+            } elseif ($this->collCoupons) {
+                foreach ($this->collCoupons as $coupon) {
+                    if ($coupon->isModified()) {
+                        $coupon->save($con);
+                    }
+                }
+            }
+
             if ($this->addressesScheduledForDeletion !== null) {
                 if (!$this->addressesScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\AddressQuery::create()
@@ -1359,6 +1416,23 @@ abstract class Customer implements ActiveRecordInterface
 
                 if ($this->collCarts !== null) {
             foreach ($this->collCarts as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->couponCustomerCountsScheduledForDeletion !== null) {
+                if (!$this->couponCustomerCountsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\CouponCustomerCountQuery::create()
+                        ->filterByPrimaryKeys($this->couponCustomerCountsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->couponCustomerCountsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCouponCustomerCounts !== null) {
+            foreach ($this->collCouponCustomerCounts as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1672,6 +1746,9 @@ abstract class Customer implements ActiveRecordInterface
             if (null !== $this->collCarts) {
                 $result['Carts'] = $this->collCarts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collCouponCustomerCounts) {
+                $result['CouponCustomerCounts'] = $this->collCouponCustomerCounts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
         }
 
         return $result;
@@ -1923,6 +2000,12 @@ abstract class Customer implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getCouponCustomerCounts() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCouponCustomerCount($relObj->copy($deepCopy));
+                }
+            }
+
         } // if ($deepCopy)
 
         if ($makeNew) {
@@ -2023,6 +2106,9 @@ abstract class Customer implements ActiveRecordInterface
         }
         if ('Cart' == $relationName) {
             return $this->initCarts();
+        }
+        if ('CouponCustomerCount' == $relationName) {
+            return $this->initCouponCustomerCounts();
         }
     }
 
@@ -2981,6 +3067,432 @@ abstract class Customer implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collCouponCustomerCounts collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCouponCustomerCounts()
+     */
+    public function clearCouponCustomerCounts()
+    {
+        $this->collCouponCustomerCounts = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCouponCustomerCounts collection loaded partially.
+     */
+    public function resetPartialCouponCustomerCounts($v = true)
+    {
+        $this->collCouponCustomerCountsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCouponCustomerCounts collection.
+     *
+     * By default this just sets the collCouponCustomerCounts collection to an empty array (like clearcollCouponCustomerCounts());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCouponCustomerCounts($overrideExisting = true)
+    {
+        if (null !== $this->collCouponCustomerCounts && !$overrideExisting) {
+            return;
+        }
+        $this->collCouponCustomerCounts = new ObjectCollection();
+        $this->collCouponCustomerCounts->setModel('\Thelia\Model\CouponCustomerCount');
+    }
+
+    /**
+     * Gets an array of ChildCouponCustomerCount objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCustomer is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCouponCustomerCount[] List of ChildCouponCustomerCount objects
+     * @throws PropelException
+     */
+    public function getCouponCustomerCounts($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCouponCustomerCountsPartial && !$this->isNew();
+        if (null === $this->collCouponCustomerCounts || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCouponCustomerCounts) {
+                // return empty collection
+                $this->initCouponCustomerCounts();
+            } else {
+                $collCouponCustomerCounts = ChildCouponCustomerCountQuery::create(null, $criteria)
+                    ->filterByCustomer($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCouponCustomerCountsPartial && count($collCouponCustomerCounts)) {
+                        $this->initCouponCustomerCounts(false);
+
+                        foreach ($collCouponCustomerCounts as $obj) {
+                            if (false == $this->collCouponCustomerCounts->contains($obj)) {
+                                $this->collCouponCustomerCounts->append($obj);
+                            }
+                        }
+
+                        $this->collCouponCustomerCountsPartial = true;
+                    }
+
+                    reset($collCouponCustomerCounts);
+
+                    return $collCouponCustomerCounts;
+                }
+
+                if ($partial && $this->collCouponCustomerCounts) {
+                    foreach ($this->collCouponCustomerCounts as $obj) {
+                        if ($obj->isNew()) {
+                            $collCouponCustomerCounts[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCouponCustomerCounts = $collCouponCustomerCounts;
+                $this->collCouponCustomerCountsPartial = false;
+            }
+        }
+
+        return $this->collCouponCustomerCounts;
+    }
+
+    /**
+     * Sets a collection of CouponCustomerCount objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $couponCustomerCounts A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCustomer The current object (for fluent API support)
+     */
+    public function setCouponCustomerCounts(Collection $couponCustomerCounts, ConnectionInterface $con = null)
+    {
+        $couponCustomerCountsToDelete = $this->getCouponCustomerCounts(new Criteria(), $con)->diff($couponCustomerCounts);
+
+
+        $this->couponCustomerCountsScheduledForDeletion = $couponCustomerCountsToDelete;
+
+        foreach ($couponCustomerCountsToDelete as $couponCustomerCountRemoved) {
+            $couponCustomerCountRemoved->setCustomer(null);
+        }
+
+        $this->collCouponCustomerCounts = null;
+        foreach ($couponCustomerCounts as $couponCustomerCount) {
+            $this->addCouponCustomerCount($couponCustomerCount);
+        }
+
+        $this->collCouponCustomerCounts = $couponCustomerCounts;
+        $this->collCouponCustomerCountsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CouponCustomerCount objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CouponCustomerCount objects.
+     * @throws PropelException
+     */
+    public function countCouponCustomerCounts(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCouponCustomerCountsPartial && !$this->isNew();
+        if (null === $this->collCouponCustomerCounts || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCouponCustomerCounts) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCouponCustomerCounts());
+            }
+
+            $query = ChildCouponCustomerCountQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCustomer($this)
+                ->count($con);
+        }
+
+        return count($this->collCouponCustomerCounts);
+    }
+
+    /**
+     * Method called to associate a ChildCouponCustomerCount object to this object
+     * through the ChildCouponCustomerCount foreign key attribute.
+     *
+     * @param    ChildCouponCustomerCount $l ChildCouponCustomerCount
+     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     */
+    public function addCouponCustomerCount(ChildCouponCustomerCount $l)
+    {
+        if ($this->collCouponCustomerCounts === null) {
+            $this->initCouponCustomerCounts();
+            $this->collCouponCustomerCountsPartial = true;
+        }
+
+        if (!in_array($l, $this->collCouponCustomerCounts->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCouponCustomerCount($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param CouponCustomerCount $couponCustomerCount The couponCustomerCount object to add.
+     */
+    protected function doAddCouponCustomerCount($couponCustomerCount)
+    {
+        $this->collCouponCustomerCounts[]= $couponCustomerCount;
+        $couponCustomerCount->setCustomer($this);
+    }
+
+    /**
+     * @param  CouponCustomerCount $couponCustomerCount The couponCustomerCount object to remove.
+     * @return ChildCustomer The current object (for fluent API support)
+     */
+    public function removeCouponCustomerCount($couponCustomerCount)
+    {
+        if ($this->getCouponCustomerCounts()->contains($couponCustomerCount)) {
+            $this->collCouponCustomerCounts->remove($this->collCouponCustomerCounts->search($couponCustomerCount));
+            if (null === $this->couponCustomerCountsScheduledForDeletion) {
+                $this->couponCustomerCountsScheduledForDeletion = clone $this->collCouponCustomerCounts;
+                $this->couponCustomerCountsScheduledForDeletion->clear();
+            }
+            $this->couponCustomerCountsScheduledForDeletion[]= clone $couponCustomerCount;
+            $couponCustomerCount->setCustomer(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Customer is new, it will return
+     * an empty collection; or if this Customer has previously
+     * been saved, it will retrieve related CouponCustomerCounts from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Customer.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCouponCustomerCount[] List of ChildCouponCustomerCount objects
+     */
+    public function getCouponCustomerCountsJoinCoupon($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCouponCustomerCountQuery::create(null, $criteria);
+        $query->joinWith('Coupon', $joinBehavior);
+
+        return $this->getCouponCustomerCounts($query, $con);
+    }
+
+    /**
+     * Clears out the collCoupons collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCoupons()
+     */
+    public function clearCoupons()
+    {
+        $this->collCoupons = null; // important to set this to NULL since that means it is uninitialized
+        $this->collCouponsPartial = null;
+    }
+
+    /**
+     * Initializes the collCoupons collection.
+     *
+     * By default this just sets the collCoupons collection to an empty collection (like clearCoupons());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initCoupons()
+    {
+        $this->collCoupons = new ObjectCollection();
+        $this->collCoupons->setModel('\Thelia\Model\Coupon');
+    }
+
+    /**
+     * Gets a collection of ChildCoupon objects related by a many-to-many relationship
+     * to the current object by way of the coupon_customer_count cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCustomer is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return ObjectCollection|ChildCoupon[] List of ChildCoupon objects
+     */
+    public function getCoupons($criteria = null, ConnectionInterface $con = null)
+    {
+        if (null === $this->collCoupons || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCoupons) {
+                // return empty collection
+                $this->initCoupons();
+            } else {
+                $collCoupons = ChildCouponQuery::create(null, $criteria)
+                    ->filterByCustomer($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collCoupons;
+                }
+                $this->collCoupons = $collCoupons;
+            }
+        }
+
+        return $this->collCoupons;
+    }
+
+    /**
+     * Sets a collection of Coupon objects related by a many-to-many relationship
+     * to the current object by way of the coupon_customer_count cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param  Collection $coupons A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return ChildCustomer The current object (for fluent API support)
+     */
+    public function setCoupons(Collection $coupons, ConnectionInterface $con = null)
+    {
+        $this->clearCoupons();
+        $currentCoupons = $this->getCoupons();
+
+        $this->couponsScheduledForDeletion = $currentCoupons->diff($coupons);
+
+        foreach ($coupons as $coupon) {
+            if (!$currentCoupons->contains($coupon)) {
+                $this->doAddCoupon($coupon);
+            }
+        }
+
+        $this->collCoupons = $coupons;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of ChildCoupon objects related by a many-to-many relationship
+     * to the current object by way of the coupon_customer_count cross-reference table.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return int the number of related ChildCoupon objects
+     */
+    public function countCoupons($criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        if (null === $this->collCoupons || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCoupons) {
+                return 0;
+            } else {
+                $query = ChildCouponQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCustomer($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collCoupons);
+        }
+    }
+
+    /**
+     * Associate a ChildCoupon object to this object
+     * through the coupon_customer_count cross reference table.
+     *
+     * @param  ChildCoupon $coupon The ChildCouponCustomerCount object to relate
+     * @return ChildCustomer The current object (for fluent API support)
+     */
+    public function addCoupon(ChildCoupon $coupon)
+    {
+        if ($this->collCoupons === null) {
+            $this->initCoupons();
+        }
+
+        if (!$this->collCoupons->contains($coupon)) { // only add it if the **same** object is not already associated
+            $this->doAddCoupon($coupon);
+            $this->collCoupons[] = $coupon;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param    Coupon $coupon The coupon object to add.
+     */
+    protected function doAddCoupon($coupon)
+    {
+        $couponCustomerCount = new ChildCouponCustomerCount();
+        $couponCustomerCount->setCoupon($coupon);
+        $this->addCouponCustomerCount($couponCustomerCount);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$coupon->getCustomers()->contains($this)) {
+            $foreignCollection   = $coupon->getCustomers();
+            $foreignCollection[] = $this;
+        }
+    }
+
+    /**
+     * Remove a ChildCoupon object to this object
+     * through the coupon_customer_count cross reference table.
+     *
+     * @param ChildCoupon $coupon The ChildCouponCustomerCount object to relate
+     * @return ChildCustomer The current object (for fluent API support)
+     */
+    public function removeCoupon(ChildCoupon $coupon)
+    {
+        if ($this->getCoupons()->contains($coupon)) {
+            $this->collCoupons->remove($this->collCoupons->search($coupon));
+
+            if (null === $this->couponsScheduledForDeletion) {
+                $this->couponsScheduledForDeletion = clone $this->collCoupons;
+                $this->couponsScheduledForDeletion->clear();
+            }
+
+            $this->couponsScheduledForDeletion[] = $coupon;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -3035,11 +3547,23 @@ abstract class Customer implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collCouponCustomerCounts) {
+                foreach ($this->collCouponCustomerCounts as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCoupons) {
+                foreach ($this->collCoupons as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         $this->collAddresses = null;
         $this->collOrders = null;
         $this->collCarts = null;
+        $this->collCouponCustomerCounts = null;
+        $this->collCoupons = null;
         $this->aCustomerTitle = null;
     }
 

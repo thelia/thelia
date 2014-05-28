@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Base\ProductSaleElements as BaseProductSaleElements;
 use Thelia\Model\Tools\ProductPriceTools;
 use Thelia\TaxEngine\Calculator;

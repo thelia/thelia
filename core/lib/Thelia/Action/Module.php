@@ -161,7 +161,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             );
         }
 
-        $paymentModuleInstance = $this->container->get(sprintf('module.%s', $paymentModule->getCode()));
+        $paymentModuleInstance = $paymentModule->getModuleInstance($this->container);
 
         $response = $paymentModuleInstance->pay($order);
 
