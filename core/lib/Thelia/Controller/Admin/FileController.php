@@ -31,6 +31,7 @@ use Thelia\Model\ContentDocument;
 use Thelia\Model\ContentImage;
 use Thelia\Model\FolderDocument;
 use Thelia\Model\FolderImage;
+use Thelia\Model\Lang;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductImage;
 use Thelia\Tools\FileManager;
@@ -183,6 +184,7 @@ class FileController extends BaseAdminController
                 }
 
                 $documentModel->setParentId($parentId);
+                $documentModel->setLocale(Lang::getDefaultLanguage()->getLocale());
                 $documentModel->setTitle($fileBeingUploaded->getClientOriginalName());
 
                 $documentCreateOrUpdateEvent = new DocumentCreateOrUpdateEvent(
