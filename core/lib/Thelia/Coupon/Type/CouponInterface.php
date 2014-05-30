@@ -15,6 +15,7 @@ namespace Thelia\Coupon\Type;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
+use Thelia\Form\CouponCreationForm;
 
 /**
  * Represents a Coupon ready to be processed in a Checkout process
@@ -221,13 +222,6 @@ interface CouponInterface
     public function drawBackOfficeInputs();
 
     /**
-     * Get all extended inputs name to manage
-     *
-     * @return mixed
-     */
-    public function getExtendedInputs();
-
-    /**
      * @return ObjectCollection list of country IDs for which shipping is free. All if empty
      */
     public function getFreeShippingForCountries();
@@ -236,4 +230,14 @@ interface CouponInterface
      * @return ObjectCollection list of module IDs for which shipping is free. All if empty
      */
     public function getFreeShippingForModules();
+
+    /**
+     * Create the effect array from the list of fields
+     *
+     * @param array $data the input form data (e.g. $form->getData())
+     *
+     * @return array a filedName => fieldValue array
+     */
+    public function getEffects($data);
+
 }

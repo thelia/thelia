@@ -12,6 +12,7 @@
 
 namespace Thelia\Coupon\Type;
 
+use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 
 /**
@@ -28,11 +29,6 @@ class RemoveXPercent extends CouponAbstract
 
     /** @var float Percentage removed from the Cart */
     protected $percentage = 0;
-
-    /** @var array Extended Inputs to manage */
-    protected $extendedInputs = array(
-        self::INPUT_PERCENTAGE_NAME
-    );
 
     /**
      * @inheritdoc
@@ -88,6 +84,26 @@ class RemoveXPercent extends CouponAbstract
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function checkCouponFieldValue($fieldName, $fieldValue)
+    {
+        if ($fieldName === self::INPUT_PERCENTAGE_NAME) {
+
+            if (floatval($fieldValue) <= 0) {
+                throw new \InvalidArgumentException(
+                    Translator::getInstance()->trans(
+                        'Value %val for Percent Discount is invalid. Please enter a positive value between 1 and 100.',
+                        [ '%val' => $fieldValue]
+                    )
+                );
+            }
+        }
+
+        return $fieldValue;
+    }
+
+    /**
      * Get I18n name
      *
      * @return string
@@ -97,18 +113,6 @@ class RemoveXPercent extends CouponAbstract
         return $this->facade
             ->getTranslator()
             ->trans('Remove X percent to total cart', array(), 'coupon');
-    }
-
-    /**
-     * Get I18n amount input name
-     *
-     * @return string
-     */
-    public function getInputName()
-    {
-        return $this->facade
-            ->getTranslator()
-            ->trans('Percent Discount', array(), 'coupon');
     }
 
     /**
@@ -138,11 +142,17 @@ class RemoveXPercent extends CouponAbstract
     public function drawBackOfficeInputs()
     {
         return $this->facade->getParser()->render('coupon/type-fragments/remove-x-percent.html', [
-            'label'     => $this->getInputName(),
-            'typeKey'   => self::INPUT_AMOUNT_NAME,
-            'fieldId'   => self::INPUT_PERCENTAGE_NAME,
-            'fieldName' => self::INPUT_EXTENDED__NAME,
+            'fieldName' => $this->makeCouponFieldName(self::INPUT_PERCENTAGE_NAME),
             'value'     => $this->percentage
         ]);
+    }
+
+    /**
+     * Return a list of the fields name for this coupon.
+     *
+     * @return array
+     */
+    protected function getFieldList() {
+        return [self::INPUT_PERCENTAGE_NAME];
     }
 }
