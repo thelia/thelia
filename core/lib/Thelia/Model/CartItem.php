@@ -8,6 +8,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\CartItem as BaseCartItem;
 
 use Thelia\Core\Event\Cart\CartEvent;
+use Thelia\Model\ConfigQuery;
 use Thelia\TaxEngine\Calculator;
 
 class CartItem extends BaseCartItem
@@ -87,6 +88,23 @@ class CartItem extends BaseCartItem
     public function getRealPrice()
     {
         return $this->getPromo() == 1 ? $this->getPromoPrice() : $this->getPrice();
+    }
+
+    public function getProduct(ConnectionInterface $con = null, $locale = null)
+    {
+        $product = parent::getProduct($con);
+
+        $translation = $product->getTranslation($locale);
+
+        if ($translation->isNew()) {
+            if (ConfigQuery::getDefaultLangWhenNoTranslationAvailable()) {
+                $locale = Lang::getDefaultLanguage()->getLocale();
+            }
+        }
+
+        $product->setLocale($locale);
+
+        return $product;
     }
 
     public function getRealTaxedPrice(Country $country)
