@@ -2,9 +2,13 @@
 // Thelia: Navbars
 .navbar {
     .navbar-default;
-    .navbar-brand { .visible-xs; } // Visible only Small screen
+    &.navbar-secondary{
+      z-index: 1001;
+    }
 
-    .navbar-cart {
+  .navbar-brand { .visible-xs; } // Visible only Small screen
+
+    .navbar-cart, .navbar-customer {
         @media (min-width: @grid-float-breakpoint) {
             .dropdown > a {
                 .js .dropdown-toggle;
@@ -57,7 +61,6 @@
         }
     }
 
-
     // Subnav Full width
     .full-width {
         position: static;
@@ -75,6 +78,14 @@
     }
 }
 
+@media (min-width: @grid-float-breakpoint){
+  .navbar-collapse .navbar-nav.navbar-right:first-child {
+      margin-right: -@navbar-padding-horizontal;
+  }
+  .navbar-collapse .navbar-nav.navbar-right:last-child {
+    margin-right: 0;
+  }
+}
 
 // Icons (Accordion and Dropdown)
 //.accordion-toggle,

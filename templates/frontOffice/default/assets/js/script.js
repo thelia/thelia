@@ -30,7 +30,7 @@
             .ajaxError(function () { $loader.hide(); });
 
         // Main Navigation Hover
-        $('.nav-main')
+        $('.nav-secondary')
             .on('click.subnav', '[data-toggle=dropdown]', function (event) {
                 if ($(this).parent().hasClass('open') && $(this).is(event.target)) { return false; }
             })

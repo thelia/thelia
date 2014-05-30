@@ -85,7 +85,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 
 <div class="header-container" itemscope itemtype="http://schema.org/WPHeader">
     {hook name="main.header.top"}
-    <div class="navbar" itemscope itemtype="http://schema.org/SiteNavigationElement">
+    <div class="navbar navbar-secondary" itemscope itemtype="http://schema.org/SiteNavigationElement">
         <div class="container">
 
             <div class="navbar-header">
@@ -100,11 +100,11 @@ GNU General Public License : http://www.gnu.org/licenses/
             </div>
 
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
-            <nav class="navbar-collapse collapse nav-secondary" role="navigation" aria-label="{intl l="Main Navigation"}">
+            <nav class="navbar-collapse collapse nav-secondary" role="navigation" aria-label="{intl l="Secondary Navigation"}">
                 {nocache}
                 {hook name="main.navbar.secondary"}
                 {elseHook rel="main.navbar.secondary"}
-                <ul class="nav navbar-nav navbar-cart navbar-left">
+                <ul class="nav navbar-nav navbar-currency navbar-left">
                     <li class="dropdown">
                         <a href="{url path="/currency"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Currency:"}--> {currency attr="code"}</a>
                         <ul class="dropdown-menu">
@@ -113,6 +113,8 @@ GNU General Public License : http://www.gnu.org/licenses/
                             {/loop}
                         </ul>
                     </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-lang navbar-left">
                     <li class="dropdown">
                         <a href="{url path="/login"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Language:"}--> {lang attr="title"}</a>
                         <ul class="dropdown-menu">
@@ -134,7 +136,9 @@ GNU General Public License : http://www.gnu.org/licenses/
                     </form>
                 </div>
                 <ul class="nav navbar-nav navbar-cart navbar-right">
-
+                    {include file="includes/mini-cart.html" nocache}
+                </ul>
+                <ul class="nav navbar-nav navbar-customer navbar-right">
                     {loop type="auth" name="customer_info_block" role="CUSTOMER"}
                         <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
                         <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
@@ -142,7 +146,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     {elseloop rel="customer_info_block"}
                     <li><a href="{url path="/register"}" class="register">{intl l="Register!"}</a></li>
                     <li class="dropdown">
-                        <a href="{url path="/login"}" class="login">{intl l="Log In!"}</a>
+                        <a href="{url path="/login"}" class="login dropdown-toggle">{intl l="Log In!"}</a>
                         <div class="dropdown-menu">
                             {form name="thelia.front.customer.login"}
                             <form id="form-login-mini" action="{url path="/login"}" method="post" {form_enctype form=$form}>
@@ -174,7 +178,6 @@ GNU General Public License : http://www.gnu.org/licenses/
                         </div>
                     </li>
                     {/elseloop}
-                    {include file="includes/mini-cart.html" nocache}
                 </ul>
                 {/elseHook}
                 {/nocache}
