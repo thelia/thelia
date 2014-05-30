@@ -152,8 +152,6 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(254, $coupon->getMaxUsage());
         $this->assertEquals($date, $coupon->getExpirationDate());
 
-        $this->assertEquals(array(RemoveXPercent::INPUT_PERCENTAGE_NAME), $coupon->getExtendedInputs());
-
         $this->assertEquals(40.00, $coupon->exec());
     }
 
@@ -185,22 +183,6 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 
         $actual = $coupon->getToolTip();
         $expected = $tooltip;
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @covers Thelia\Coupon\Type\RemoveXPercent::getToolTip
-     */
-    public function testGetInputName()
-    {
-        $inputName = 'Percentage removed from the cart';
-        $stubFacade = $this->generateFacadeStub(399, 'EUR', $inputName);
-
-        /** @var FacadeInterface $stubFacade */
-        $coupon = new RemoveXPercent($stubFacade);
-
-        $actual = $coupon->getInputName();
-        $expected = $inputName;
         $this->assertEquals($expected, $actual);
     }
 
