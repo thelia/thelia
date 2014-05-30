@@ -622,16 +622,21 @@ class CouponController extends BaseAdminController
             return $response;
         }
 
-        $this->checkXmlHttpRequest();
+        if (! empty($couponServiceId)) {
+            $this->checkXmlHttpRequest();
 
-        /** @var CouponInterface $coupon */
-        $couponManager = $this->container->get($couponServiceId);
+            /** @var CouponInterface $coupon */
+            $couponManager = $this->container->get($couponServiceId);
 
-        if (!$couponManager instanceof CouponInterface) {
-            $this->pageNotFound();
+            if (!$couponManager instanceof CouponInterface) {
+                $this->pageNotFound();
+            }
+
+            $response = new ResponseRest($couponManager->drawBackOfficeInputs());
         }
-
-        $response = new ResponseRest($couponManager->drawBackOfficeInputs());
+        else {
+            $response = new ResponseRest('');
+        }
 
         return $response;
     }
