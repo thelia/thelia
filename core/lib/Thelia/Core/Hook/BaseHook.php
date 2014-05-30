@@ -20,6 +20,7 @@ use Thelia\Core\Template\Assets\AssetManagerInterface;
 use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
 use Thelia\Core\Template\Smarty\SmartyParser;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
@@ -59,8 +60,6 @@ abstract class BaseHook
 
     /** @var AssetManagerInterface $assetManager */
     public $assetsManager = null;
-
-    protected $assetManager = null;
 
     /** @var Request $request */
     protected $request = null;
@@ -130,19 +129,6 @@ abstract class BaseHook
     }
 
     /**
-     * @return null|SmartyAssetsManager
-     */
-    protected function getAssetManager()
-    {
-        if (null === $this->assetManager) {
-            $asset_dir_from_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
-            $this->assetManager = new SmartyAssetsManager($this->assetsManager, THELIA_WEB_DIR, $asset_dir_from_web_root);
-        }
-
-        return $this->assetManager;
-    }
-
-    /**
      * helper function allowing you to generate the HTML link tag
      *
      * @param  string $fileName   the path to the css file
@@ -202,13 +188,19 @@ abstract class BaseHook
     {
         $url = "";
 
-        $fileDir = $this->resolveSourcePath($fileName);
+        $fileRoot = $this->resolveSourcePath($fileName);
+        $fileDir = dirname($fileName);
+        if ("." == $fileDir){
+            $fileDir = "";
+        }
+
         $asset_dir_from_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
+        //Tlog::getInstance()->debug(sprintf(" GU resolveURL %s | %s | %s | %s", $fileName, $fileRoot, $fileDir, $asset_dir_from_web_root ));
 
         if (null !== $fileDir) {
             $url = $this->assetsManager->processAsset(
-                $fileDir . DS . $fileName,
-                $fileDir,
+                $fileRoot . DS . $fileName,
+                $fileRoot,
                 THELIA_WEB_DIR . $asset_dir_from_web_root,
                 $fileDir,
                 $this->module->getCode(),
