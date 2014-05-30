@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="no-return-functions"}
+    {$admin_current_location = 'customer'}
+{/block}
+
 {block name="page-title"}{intl l='Edit a customer'}{/block}
 
 {block name="check-resource"}admin.customer{/block}

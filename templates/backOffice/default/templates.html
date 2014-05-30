@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="no-return-functions"}
+    {$admin_current_location = 'configuration'}
+{/block}
+
 {block name="page-title"}{intl l='Thelia Product Templates'}{/block}
 
 {block name="check-resource"}admin.configuration.template{/block}
