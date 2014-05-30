@@ -685,7 +685,7 @@ Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentes
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
     $coupon1->setEffects(array(
-        RemoveXAmount::INPUT_AMOUNT_NAME => 10.00,
+        RemoveXAmount::AMOUNT_FIELD_NAME => 10.00,
     ));
     $coupon1->setIsUsed(true);
     $coupon1->setIsEnabled(true);
@@ -744,8 +744,7 @@ Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentes
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
     $coupon2->setEffects(array(
-        RemoveXPercent::INPUT_AMOUNT_NAME => 0.00,
-        RemoveXPercent::INPUT_PERCENTAGE_NAME => 10.00,
+        RemoveXPercent::INPUT_PERCENTAGE_NAME => 10.00
     ));
     $coupon2->setIsUsed(true);
     $coupon2->setIsEnabled(true);
@@ -790,7 +789,6 @@ Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentes
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
     $coupon3->setEffects(array(
-        RemoveXPercent::INPUT_AMOUNT_NAME => 0.00,
         RemoveXPercent::INPUT_PERCENTAGE_NAME => 10.00,
     ));
     $coupon3->setIsUsed(false);
