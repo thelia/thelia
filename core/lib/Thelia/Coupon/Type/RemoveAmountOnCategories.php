@@ -12,6 +12,9 @@
 
 namespace Thelia\Coupon\Type;
 
+use Thelia\Core\Translation\Translator;
+use Thelia\Coupon\FacadeInterface;
+
 /**
  * Allow to remove an amount from the checkout total
  *
@@ -25,6 +28,44 @@ class RemoveAmountOnCategories extends CouponAbstract
 
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_amount_on_categories';
+
+    var $category_list = array();
+
+    /**
+     * @inheritdoc
+     */
+    public function set(
+        FacadeInterface $facade,
+        $code,
+        $title,
+        $shortDescription,
+        $description,
+        array $effects,
+        $isCumulative,
+        $isRemovingPostage,
+        $isAvailableOnSpecialOffers,
+        $isEnabled,
+        $maxUsage,
+        \DateTime $expirationDate,
+        $freeShippingForCountries,
+        $freeShippingForModules,
+        $perCustomerUsageCount
+    )
+    {
+        parent::set(
+            $facade, $code, $title, $shortDescription, $description, $effects,
+            $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate,
+            $freeShippingForCountries,
+            $freeShippingForModules,
+            $perCustomerUsageCount
+        );
+
+        $this->category_list = isset($effects[self::CATEGORIES_LIST]) ? $effects[self::CATEGORIES_LIST] : array();
+
+        if (! is_array($this->category_list)) $this->category_list = array($this->category_list);
+
+        return $this;
+    }
 
     /**
      * Get I18n name
@@ -64,18 +105,64 @@ class RemoveAmountOnCategories extends CouponAbstract
      */
     public function exec()
     {
+        // TODO !!!
         return $this->amount;
     }
 
     public function drawBackOfficeInputs()
     {
         return $this->facade->getParser()->render('coupon/type-fragments/remove-amount-on-categories.html', [
-                'amount_field_name'     => self::INPUT_AMOUNT_NAME,
-                'amount_value'          => $this->amount,
 
-                'categories_field_name' => self::CATEGORIES_LIST,
-                'categories_values'     => isset($this->values[self::CATEGORIES_LIST]) ? $this->values[self::CATEGORIES_LIST] : array()
+            // The standard "Amount" field
+            'amount_field_name'     => $this->makeCouponFieldName(self::AMOUNT_FIELD_NAME),
+            'amount_value'          => $this->amount,
 
-            ]);
+            // The categories list field
+            'categories_field_id'   => self::CATEGORIES_LIST,
+            'categories_field_name' => $this->makeCouponFieldName(self::CATEGORIES_LIST),
+
+            // The selected categories
+            'categories_values'     => $this->category_list
+        ]);
     }
+
+    /**
+     * Return a list of the fields name for this coupon.
+     *
+     * @return array
+     */
+    protected function getFieldList() {
+        return [self::AMOUNT_FIELD_NAME, self::CATEGORIES_LIST];
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function checkCouponFieldValue($fieldName, $fieldValue)
+    {
+        if ($fieldName === self::AMOUNT_FIELD_NAME) {
+
+            if (floatval($fieldValue) < 0) {
+                throw new \InvalidArgumentException(
+                    Translator::getInstance()->trans(
+                        'Value %val for Discount Amount is invalid. Please enter a positive value.',
+                        [ '%val' => $fieldValue]
+                    )
+                );
+            }
+        }
+        else if ($fieldName === self::CATEGORIES_LIST) {
+            if (empty($fieldValue)) {
+                throw new \InvalidArgumentException(
+                    Translator::getInstance()->trans(
+                        'Please select at least one category'
+                    )
+                );
+            }
+        }
+
+        return $fieldValue;
+    }
+
 }

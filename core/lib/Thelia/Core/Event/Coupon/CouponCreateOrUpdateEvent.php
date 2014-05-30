@@ -327,10 +327,9 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      */
     public function setEffects(array $effects)
     {
-        if (null === $effects['amount']) {
-            throw new InvalidArgumentException('Missing key \'amount\' in Coupon effect ready to be serialized array');
-        }
-        $this->amount = $effects['amount'];
+        // Amount is now optionnal.
+        $this->amount = isset($effects['amount']) ? $effects['amount'] : 0;
+
         $this->effects = $effects;
     }
 

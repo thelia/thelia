@@ -25,9 +25,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Condition\ConditionCollection;
-use Thelia\Coupon\Type\CouponAbstract;
 use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Coupon\Type\RemoveXPercent;
 use Thelia\Form\CouponCreationForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -577,7 +575,7 @@ class CouponController extends BaseAdminController
             $condition['serviceId'] = $availableCoupon->getServiceId();
             $condition['name'] = $availableCoupon->getName();
             $condition['toolTip'] = $availableCoupon->getToolTip();
-            // $condition['inputName'] = $availableCoupon->getInputName();
+
             $cleanedCoupons[] = $condition;
         }
 
@@ -677,35 +675,6 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Add percentage logic if found in the Coupon post data
-     *
-     * @param array $effects            Effect parameters to populate
-     * @param array $extendedInputNames Extended Inputs to manage
-     *
-     * @return array Populated effect with percentage
-     */
-    protected function addExtendedLogic(array $effects, array $extendedInputNames)
-    {
-        /** @var Request $request */
-        $request = $this->container->get('request');
-        $postData = $request->request;
-        // Validate quantity input
-
-        if ($postData->has(RemoveXPercent::INPUT_EXTENDED__NAME)) {
-            $extentedPostData = $postData->get(RemoveXPercent::INPUT_EXTENDED__NAME);
-
-            foreach ($extendedInputNames as $extendedInputName) {
-                if (isset($extentedPostData[$extendedInputName])) {
-                    $inputValue = $extentedPostData[$extendedInputName];
-                    $effects[$extendedInputName] = $inputValue;
-                }
-            }
-        }
-
-        return $effects;
-    }
-
-    /**
      * Feed the Coupon Create or Update event with the User inputs
      *
      * @param Form   $form  Form containing user data
@@ -718,16 +687,15 @@ class CouponController extends BaseAdminController
         // Get the form field values
         $data = $form->getData();
         $serviceId = $data['type'];
-        /** @var CouponInterface $couponManager */
-        $couponManager = $this->container->get($serviceId);
-        $effects = [CouponAbstract::INPUT_AMOUNT_NAME => $data[CouponAbstract::INPUT_AMOUNT_NAME]];
-        $effects = $this->addExtendedLogic($effects, $couponManager->getExtendedInputs());
+
+        /** @var CouponInterface $coupon */
+        $coupon = $this->container->get($serviceId);
 
         $couponEvent = new CouponCreateOrUpdateEvent(
             $data['code'],
             $serviceId,
             $data['title'],
-            $effects,
+            $coupon->getEffects($data),
             $data['shortDescription'],
             $data['description'],
             $data['isEnabled'],

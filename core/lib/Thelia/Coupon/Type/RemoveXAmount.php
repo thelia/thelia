@@ -12,6 +12,8 @@
 
 namespace Thelia\Coupon\Type;
 
+use Thelia\Core\Translation\Translator;
+
 /**
  * Allow to remove an amount from the checkout total
  *
@@ -37,18 +39,6 @@ class RemoveXAmount extends CouponAbstract
     }
 
     /**
-     * Get I18n amount input name
-     *
-     * @return string
-     */
-    public function getInputName()
-    {
-        return $this->facade
-            ->getTranslator()
-            ->trans('Discount amount', array(), 'coupon');
-    }
-
-    /**
      * Get I18n tooltip
      *
      * @return string
@@ -69,9 +59,38 @@ class RemoveXAmount extends CouponAbstract
     public function drawBackOfficeInputs()
     {
         return $this->facade->getParser()->render('coupon/type-fragments/remove-x-amount.html', [
-                'label'     => $this->getInputName(),
-                'fieldName' => self::INPUT_AMOUNT_NAME,
+                'fieldName' => $this->makeCouponFieldName(self::AMOUNT_FIELD_NAME),
                 'value'     => $this->amount
             ]);
     }
+
+    /**
+     * Return a list of the fields name for this coupon.
+     *
+     * @return array
+     */
+    protected function getFieldList() {
+        return [self::AMOUNT_FIELD_NAME];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function checkCouponFieldValue($fieldName, $fieldValue)
+    {
+        if ($fieldName === self::AMOUNT_FIELD_NAME) {
+
+            if (floatval($fieldValue) < 0) {
+                throw new \InvalidArgumentException(
+                    Translator::getInstance()->trans(
+                        'Value %val for Disount Amount is invalid. Please enter a positive value.',
+                        [ '%val' => $fieldValue]
+                    )
+                );
+            }
+        }
+
+        return $fieldValue;
+    }
+
 }
