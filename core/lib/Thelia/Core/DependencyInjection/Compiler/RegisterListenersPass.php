@@ -102,7 +102,8 @@ class RegisterListenersPass implements CompilerPassInterface
 
             foreach ($events as $event) {
 
-                $priority = isset($event['priority']) ? $event['priority'] : 0;
+                $active = isset($event['active']) ? intval($event['active']) : 1;
+                $active = (1 === $active);
 
                 if (!isset($event['event'])) {
                     throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "hook.event_listener" tags.', $id));
@@ -150,7 +151,7 @@ class RegisterListenersPass implements CompilerPassInterface
                         ->setModuleId($module)
                         ->setClassname($id)
                         ->setMethod($event['method'])
-                        ->setActive(true)
+                        ->setActive($active)
                         ->setHookActive(true)
                         ->setModuleActive(true)
                         ->setPosition(ModuleHook::MAX_POSITION)
