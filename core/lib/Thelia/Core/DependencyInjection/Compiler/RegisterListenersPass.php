@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\DependencyInjection\Compiler;
 
+use Propel\Runtime\Propel;
 use ReflectionException;
 use ReflectionMethod;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -71,6 +72,12 @@ class RegisterListenersPass implements CompilerPassInterface
             }
 
             $definition->addMethodCall('addSubscriberService', array($id, $class));
+        }
+
+        // We have to check if Propel is initialized before registering hooks
+        $managers = Propel::getServiceContainer()->getConnectionManagers();
+        if (! array_key_exists('thelia', $managers)) {
+            return;
         }
 
         foreach ($container->findTaggedServiceIds('hook.event_listener') as $id => $events) {

@@ -31,6 +31,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
 use Thelia\Core\Template\ParserInterface;
@@ -74,6 +75,18 @@ class Thelia extends Kernel
         if ($this->isDebug()) {
             $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
             $con->useDebug(true);
+        }
+    }
+
+    /**
+     * dispatch an event when application is boot
+     */
+    public function boot()
+    {
+        parent::boot();
+
+        if (file_exists(THELIA_CONF_DIR . 'database.yml') === true) {
+            $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
         }
     }
 
