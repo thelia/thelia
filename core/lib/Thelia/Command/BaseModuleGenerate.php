@@ -40,6 +40,7 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
          'I18n',
          Module::ADMIN_INCLUDES_DIRECTORY_NAME,
          'templates',
+         'Hook',
      );
 
      protected function verifyExistingModule()
