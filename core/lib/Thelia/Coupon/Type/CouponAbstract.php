@@ -402,7 +402,8 @@ abstract class CouponAbstract implements CouponInterface
      *
      * @return string
      */
-    public function getInputName() {
+    public function getInputName()
+    {
         return "Please override getInputName() method";
     }
 
@@ -434,33 +435,32 @@ abstract class CouponAbstract implements CouponInterface
      * @return mixed
      * @throws \InvalidArgumentException if the field valiue is not valid.
      */
-    protected function checkCouponFieldValue($fieldName, $fieldValue) {
+    protected function checkCouponFieldValue($fieldName, $fieldValue)
+    {
         return $fieldValue;
     }
 
     /**
      * A helper to get the value of a standard field name
      *
-     * @param string $fieldName the field name
-     * @param array $data the input form data (e.g. $form->getData())
-     * @param mixed $defaultValue the default value if the field is not found.
+     * @param string $fieldName    the field name
+     * @param array  $data         the input form data (e.g. $form->getData())
+     * @param mixed  $defaultValue the default value if the field is not found.
      *
      * @return mixed the input value, or the default one
      *
      * @throws \InvalidArgumentException if the field is not found, and no default value has been defined.
      */
-    protected function getCouponFieldValue($fieldName, $data, $defaultValue = null) {
+    protected function getCouponFieldValue($fieldName, $data, $defaultValue = null)
+    {
         if (isset($data[self::COUPON_DATASET_NAME][$fieldName])) {
-
             return $this->checkCouponFieldValue(
                 $fieldName,
                 $data[self::COUPON_DATASET_NAME][$fieldName]
             );
-        }
-        else if (null !== $defaultValue) {
+        } elseif (null !== $defaultValue) {
             return $defaultValue;
-        }
-        else {
+        } else {
             throw new \InvalidArgumentException(sprintf("The coupon field name %s was not found in the coupon form", $fieldName));
         }
     }
@@ -468,10 +468,11 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * A helper to create an standard field name that will be used in the coupon form
      *
-     * @param string $fieldName the field name
+     * @param  string $fieldName the field name
      * @return string the complete name, ready to be used in a form.
      */
-    protected function makeCouponFieldName($fieldName) {
+    protected function makeCouponFieldName($fieldName)
+    {
         return sprintf("%s[%s][%s]", CouponCreationForm::COUPON_CREATION_FORM_NAME, self::COUPON_DATASET_NAME, $fieldName);
     }
 
@@ -480,20 +481,22 @@ abstract class CouponAbstract implements CouponInterface
      *
      * @return array
      */
-    protected function getFieldList() {
+    protected function getFieldList()
+    {
         return [self::AMOUNT_FIELD_NAME];
     }
 
     /**
      * Create the effect array from the list of fields
      *
-     * @param array $data the input form data (e.g. $form->getData())
+     * @param  array $data the input form data (e.g. $form->getData())
      * @return array a filedName => fieldValue array
      */
-    public function getEffects($data) {
+    public function getEffects($data)
+    {
         $effects = [];
 
-        foreach($this->getFieldList() as $fieldName) {
+        foreach ($this->getFieldList() as $fieldName) {
             $effects[$fieldName] = $this->getCouponFieldValue($fieldName, $data);
         }
 

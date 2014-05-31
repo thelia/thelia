@@ -14,6 +14,8 @@ namespace Thelia\Coupon\Type;
 
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
+use Thelia\Model\CartItem;
+use Thelia\Model\Category;
 
 /**
  * Allow to remove an amount from the checkout total
@@ -29,7 +31,7 @@ class RemoveAmountOnCategories extends CouponAbstract
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_amount_on_categories';
 
-    var $category_list = array();
+    public $category_list = array();
 
     /**
      * @inheritdoc
@@ -105,8 +107,29 @@ class RemoveAmountOnCategories extends CouponAbstract
      */
     public function exec()
     {
-        // TODO !!!
-        return $this->amount;
+        // This coupon subtracts the specified amount from the order total
+        // for each product of the selected categories.
+        $discount = 0;
+
+        $cartItems = $this->facade->getCart()->getCartItems();
+
+        /** @var CartItem $cartItem */
+        foreach ($cartItems as $cartItem) {
+
+            $categories = $cartItem->getProduct()->getCategories();
+
+            /** @var Category $category */
+            foreach ($categories as $category) {
+
+                if (in_array($category->getId(), $this->category_list)) {
+                    $discount += $cartItem->getQuantity() * $this->amount;
+
+                    break;
+                }
+            }
+        }
+
+        return $discount;
     }
 
     public function drawBackOfficeInputs()
@@ -131,10 +154,10 @@ class RemoveAmountOnCategories extends CouponAbstract
      *
      * @return array
      */
-    protected function getFieldList() {
+    protected function getFieldList()
+    {
         return [self::AMOUNT_FIELD_NAME, self::CATEGORIES_LIST];
     }
-
 
     /**
      * @inheritdoc
@@ -151,8 +174,7 @@ class RemoveAmountOnCategories extends CouponAbstract
                     )
                 );
             }
-        }
-        else if ($fieldName === self::CATEGORIES_LIST) {
+        } elseif ($fieldName === self::CATEGORIES_LIST) {
             if (empty($fieldValue)) {
                 throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(

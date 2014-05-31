@@ -15,7 +15,6 @@ namespace Thelia\Coupon\Type;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Form\CouponCreationForm;
 
 /**
  * Represents a Coupon ready to be processed in a Checkout process
