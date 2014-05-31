@@ -69,7 +69,8 @@ class RemoveXAmount extends CouponAbstract
      *
      * @return array
      */
-    protected function getFieldList() {
+    protected function getFieldList()
+    {
         return [self::AMOUNT_FIELD_NAME];
     }
 

@@ -633,8 +633,9 @@ class CouponController extends BaseAdminController
             }
 
             $response = new ResponseRest($couponManager->drawBackOfficeInputs());
-        }
-        else {
+        } else {
+            // Return an empty response if the service ID is not defined
+            // Typically, when the user chooses "Please select a coupon type"
             $response = new ResponseRest('');
         }
 

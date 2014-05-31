@@ -152,7 +152,8 @@ class RemoveXPercent extends CouponAbstract
      *
      * @return array
      */
-    protected function getFieldList() {
+    protected function getFieldList()
+    {
         return [self::INPUT_PERCENTAGE_NAME];
     }
 }
