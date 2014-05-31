@@ -47,20 +47,26 @@ class Translation extends AbstractSmartyPlugin
      */
     public function translate($params, &$smarty)
     {
-        // All parameters other than 'l' and 'd' are supposed to be variables. Build an array of var => value pairs
+        // All parameters other than 'l' and 'd' and 'js' are supposed to be variables. Build an array of var => value pairs
         // and pass it to the translator
         $vars = array();
 
         foreach ($params as $name => $value) {
-            if ($name != 'l' && $name != 'd') $vars["%$name"] = $value;
+            if ($name != 'l' && $name != 'd' && $name != 'js') $vars["%$name"] = $value;
         }
 
-        return $this->translator->trans(
+        $str = $this->translator->trans(
             $this->getParam($params, 'l'),
             $vars,
             $this->getParam($params, 'd', $this->defaultTranslationDomain)
         );
-}
+
+        if ($this->getParam($params, 'js', 0)) {
+            $str = preg_replace("/(['\"])/", "\\\\$1", $str);
+        }
+
+        return $str;
+    }
 
     /**
      * Define the various smarty plugins handled by this class
