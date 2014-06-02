@@ -195,24 +195,22 @@ GNU General Public License : http://www.gnu.org/licenses/
             </h1>
             {hook name="main.navbar.primary"}
             {elseHook rel="main.navbar.primary"}
-            <div class="navbar-header">
-                <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-main">
-                    <span class="sr-only">{intl l="Toggle navigation"}</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="{navigate to="index"}">{intl l="menu"}</a>
-            </div>
-            <nav class="navbar navbar-default nav-main" role="navigation">
+            <nav class="navbar navbar-default nav-main" role="navigation" itemscope itemtype="http://schema.org/SiteNavigationElement">
                 <div class="container-fluid">
-                    <!-- Collect the nav links, forms, and other content for toggling -->
-                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-primary">
+                            <span class="sr-only">{intl l="Toggle navigation" d="hooknavigation.fo.default"}</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="{navigate to="index"}">{intl l="Categories" d="hooknavigation.fo.default"}</a>
+                    </div>
+                    <div class="collapse navbar-collapse" id="navbar-primary">
                         <ul class="nav navbar-nav navbar-categories">
-                            <li><a href="{navigate to="index"}" class="home">{intl l="Home"}</a></li>
+                            <li><a href="{navigate to="index"}" class="home">{intl l="Home" d="hooknavigation.fo.default"}</a></li>
                             {loop type="category" name="category.navigation" parent="0"}
-                            <li><a href="{$URL}">{$TITLE}</a></li>
+                                <li><a href="{$URL}">{$TITLE}</a></li>
                             {/loop}
                         </ul>
                     </div>
@@ -270,7 +268,18 @@ GNU General Public License : http://www.gnu.org/licenses/
     <section class="footer-block">
         <div class="container">
             <div class="blocks block-col-4">
-                {hook name="main.footer.body"}
+                {hookBlock name="main.footer.body"}
+                    {forHook rel="main.footer.body"}
+                    <div class="col">
+                        <section {if $id} id="{$id}"{/if} class="block {if $class} block-{$class}{/if}">
+                            <div class="block-heading"><h3 class="block-title">{$title}</h3></div>
+                            <div class="block-content">
+                                {$content nofilter}
+                            </div>
+                        </section>
+                    </div>
+                    {/forHook}
+                {/hookBlock}
             </div>
         </div>
     </section>
@@ -451,6 +460,7 @@ GNU General Public License : http://www.gnu.org/licenses/
         <div class="container">
             <div class="info">
                 {hook name="main.footer.bottom"}
+                <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
             </div>
         </div>
     </footer>
@@ -464,12 +474,9 @@ GNU General Public License : http://www.gnu.org/licenses/
                         {loop name="footer_links" type="content" folder="2"}
                             <li><a href="{$URL}">{$TITLE}</a></li>
                         {/loop}
-                        {*<li><a href="#">Site Map</a></li>
-                        <li><a href="#">Terms & Conditions</a></li>*}
                         <li><a href="{url path="/contact"}">{intl l="Contact Us"}</a></li>
                     </ul>
                 </nav>
-
                 <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
             </div>
         </div>

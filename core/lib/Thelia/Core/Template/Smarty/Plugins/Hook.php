@@ -308,7 +308,9 @@ class Hook extends AbstractSmartyPlugin
                 $this->translator->trans("Related hook name '%name' is not defined.", ['%name' => $hookName])
             );
 
-        return ('' === $this->hookResults[$hookName]);
+        return ( is_string($this->hookResults[$hookName]) && '' === $this->hookResults[$hookName]
+                  || ! is_string($this->hookResults[$hookName]) && $this->hookResults[$hookName]->isEmpty()
+        );
     }
 
     /**
