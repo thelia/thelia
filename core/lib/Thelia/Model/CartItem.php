@@ -8,7 +8,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\CartItem as BaseCartItem;
 
 use Thelia\Core\Event\Cart\CartEvent;
-use Thelia\Model\ConfigQuery;
 use Thelia\TaxEngine\Calculator;
 
 class CartItem extends BaseCartItem

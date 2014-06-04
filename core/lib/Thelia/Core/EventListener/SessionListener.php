@@ -21,7 +21,6 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernelEvents;
 use Thelia\Model\ConfigQuery;
 
-
 /**
  * Class SessionListener
  * @package Thelia\Core\EventListener
@@ -79,4 +78,4 @@ class SessionListener implements EventSubscriberInterface
             ]
         ];
     }
-} 
+}

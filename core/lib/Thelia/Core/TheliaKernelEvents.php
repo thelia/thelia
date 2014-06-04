@@ -12,7 +12,6 @@
 
 namespace Thelia\Core;
 
-
 /**
  * Class TheliaKernelEvents
  * @package Thelia\Core
@@ -23,4 +22,4 @@ final class TheliaKernelEvents
 
     const SESSION = "thelia_kernel.session";
 
-} 
+}
