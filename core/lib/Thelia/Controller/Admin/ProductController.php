@@ -15,7 +15,6 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Propel\Runtime\ActiveQuery\Criteria;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -442,19 +441,6 @@ class ProductController extends AbstractSeoCrudController
                 'admin.products.default',
                 array('category_id' => $this->getCategoryId())
         );
-    }
-
-    protected function performAdditionalUpdateAction($updateEvent)
-    {
-        if ($this->getRequest()->get('save_mode') != 'stay') {
-
-            $response = new RedirectResponse($this->getRoute('admin.categories.default', array(
-                'category_id' => $this->getCategoryId(),
-                'page' => $this->getRequest()->get('page', 1)
-            )));
-
-            return $response;
-        }
     }
 
     protected function performAdditionalUpdatePositionAction($positionEvent)
