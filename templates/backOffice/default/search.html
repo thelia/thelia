@@ -290,7 +290,7 @@
                                     <td class="actions">
                                         <div class="btn-group">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this product'}" href="{url path='/admin/products/update' product_id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this product'}" href="{url path="/admin/folders/update/{$ID}"}"><i class="glyphicon glyphicon-edit"></i></a>
                                             {/loop}
                                         </div>
                                     </td>
@@ -302,6 +302,49 @@
                     </div>
                 </div>
                 {* end folder search *}
+
+                {* content search *}
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <caption class="clearfix">
+                                {intl l='Content'}
+                            </caption>
+                            <thead>
+                            <tr>
+                                <th>{intl l="ID"}</th>
+                                <th></th>
+                                <th>{intl l="Content title"}</th>
+
+                                <th class="actions">{intl l="Actions"}</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {loop type="content" name="content-search" visible="*" search_mode="sentence" search_term=trim($smarty.get.search_term) search_in="title"}
+
+                                <tr>
+                                    <td>{$ID}</td>
+                                    <td></td>
+
+                                    <td class="object-title"><a href="{url path="/admin/content/update/{$ID}"}">{$TITLE}</a></td>
+
+
+                                    <td class="actions">
+                                        <div class="btn-group">
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
+                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this product'}" href="{url path="/admin/content/update/{$ID}"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                            {/loop}
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            {/loop}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {* end content search *}
 
             </div>
         </div>
