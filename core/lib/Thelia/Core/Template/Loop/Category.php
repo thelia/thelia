@@ -18,6 +18,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
+use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -51,7 +52,7 @@ use Thelia\Model\ProductQuery;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Category extends BaseI18nLoop implements PropelSearchLoopInterface
+class Category extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
     protected $timestampable = true;
     protected $versionable = true;
@@ -81,6 +82,23 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface
             ),
             Argument::createIntListTypeArgument('exclude')
         );
+    }
+
+    /**
+     * @return array of available field to search in
+     */
+    public function getSearchIn()
+    {
+        return [
+            "title"
+        ];
+    }
+
+    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
+    {
+        $search->_and();
+
+        $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$searchCriteria." ?", $searchTerm, \PDO::PARAM_STR);
     }
 
     public function buildModelCriteria()
