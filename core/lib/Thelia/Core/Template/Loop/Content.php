@@ -60,7 +60,20 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse', 'random', 'given_id', 'created', 'created_reverse', 'updated', 'updated_reverse'))
+                    new Type\EnumListType(
+                        array(
+                            'alpha',
+                            'alpha-reverse',
+                            'manual',
+                            'manual_reverse',
+                            'random',
+                            'given_id',
+                            'created',
+                            'created_reverse',
+                            'updated',
+                            'updated_reverse'
+                        )
+                    )
                 ),
                 'alpha'
             ),
