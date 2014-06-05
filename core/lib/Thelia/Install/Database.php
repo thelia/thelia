@@ -65,7 +65,7 @@ class Database
     public function insertSql($dbName = null, array $extraSqlFiles = null)
     {
         if ($dbName) {
-            $this->connection->query(sprintf("use %s", $dbName));
+            $this->connection->query(sprintf("use `%s`", $dbName));
         }
 
         $sql = array();
@@ -146,7 +146,7 @@ class Database
     {
         $this->execute(
             sprintf(
-                "CREATE DATABASE IF NOT EXISTS %s CHARACTER SET utf8",
+                "CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8",
                 $dbName
             )
         );
