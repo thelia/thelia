@@ -33,7 +33,7 @@
     <div class="main">
 
         <div class="col-main" role="main" aria-labelledby="main-label">
-        {hook name="folder.main.top" folder="$folder_id"}
+        {hook name="folder.main-top" folder="$folder_id"}
         {loop name="folder" type="folder" id="{folder attr="id"}"}
             <h1 id="main-label" class="page-header">{$TITLE}</h1>
             {if $CHAPO}
@@ -92,7 +92,7 @@
                 </small>
             {/if}
         {/loop}
-        {hook name="folder.main.bottom" folder="$folder_id"}
+        {hook name="folder.main-bottom" folder="$folder_id"}
 
         </div>
     </div>
@@ -104,10 +104,10 @@
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="folder.after.javascript.include"}
+{hook name="folder.after-javascript-include"}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="folder.after.javascript.initialization"}
+{hook name="folder.after-javascript-initialization"}
 {/block}
 

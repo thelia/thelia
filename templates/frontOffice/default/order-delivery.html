@@ -27,7 +27,7 @@
 
             {include file="misc/checkout-progress.tpl" step="delivery"}
 
-            {hook name="order.delivery.top"}
+            {hook name="order-delivery.top"}
 
             {form name="thelia.order.delivery"}
             {assign var="isPost" value="{$smarty.post|count}"}
@@ -37,7 +37,7 @@
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                {hook name="order.delivery.form.top"}
+                {hook name="order-delivery.form-top"}
 
                 {form_field form=$form field='delivery-address'}
 
@@ -130,7 +130,7 @@
 
                 {/form_field}
 
-                {hook name="order.delivery.form.bottom"}
+                {hook name="order-delivery.form-bottom"}
 
                 <a href="{url path="/cart"}" role="button" class="btn btn-back"><span>{intl l="Back"}</span></a>
                 <button type="submit" class="btn btn-checkout-next"><span>{intl l="Next Step"}</span></button>
@@ -138,7 +138,7 @@
             </form>
             {/form}
 
-            {hook name="order.delivery.bottom"}
+            {hook name="order-delivery.bottom"}
 
         </article>
     </div>
@@ -162,14 +162,14 @@
             });
         });
     </script>
-    {hook name="order.delivery.after.javascript.initialization"}
+    {hook name="order-delivery.after-javascript-initialization"}
 {/block}
 
 
 {block name="stylesheet"}
-{hook name="order.delivery.stylesheet"}
+{hook name="order-delivery.stylesheet"}
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="order.delivery.after.javascript.include"}
+{hook name="order-delivery.after-javascript-include"}
 {/block}

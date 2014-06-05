@@ -23,7 +23,7 @@
 
             <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
 
-            {hook name="order.failed.top"}
+            {hook name="order-failed.top"}
 
             {include file="misc/checkout-progress.tpl" step="last"}
 
@@ -45,7 +45,7 @@
 
             {/loop}
 
-            {hook name="order.failed.bottom"}
+            {hook name="order-failed.bottom"}
 
             <a href="{navigate to="index"}" role="button" class="btn btn-checkout-home"><span>{intl l="Go home"}</span></a>
 
@@ -55,13 +55,13 @@
 
 
 {block name="stylesheet"}
-{hook name="order.failed.stylesheet"}
+{hook name="order-failed.stylesheet"}
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="order.failed.after.javascript.include"}
+{hook name="order-failed.after-javascript-include"}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="order.failed.after.javascript.initialization"}
+{hook name="order-failed.after-javascript-initialization"}
 {/block}

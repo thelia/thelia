@@ -105,7 +105,7 @@
             {/elseHook}
 
             <section id="product-details">
-                {hook name="product.details.top" product="{$ID}"}
+                {hook name="product.details-top" product="{$ID}"}
 
                 <div class="product-info">
                     <h1 class="name"><span itemprop="name">{$TITLE}</span></h1>
@@ -220,7 +220,7 @@
                     </fieldset>
                 </form>
                 {/form}
-                {hook name="product.details.bottom" product="{$ID}"}
+                {hook name="product.details-bottom" product="{$ID}"}
             </section>
 
             {strip}
@@ -294,9 +294,9 @@
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="product.after.javascript.include"}
+{hook name="product.after-javascript-include"}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="product.after.javascript.initialization"}
+{hook name="product.after-javascript-initialization"}
 {/block}

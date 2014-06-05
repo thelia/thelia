@@ -23,7 +23,7 @@
 
         <h1 id="main-label" class="page-header">{intl l="Create New Address"}</h1>
 
-        {hook name="address.create.top"}
+        {hook name="address-create.top"}
 
         {form name="thelia.front.address.create"}
         <form id="form-address" class="form-horizontal" action="{url path="/address/create"}" method="post">
@@ -37,7 +37,7 @@
             {form_hidden_fields form=$form}
             {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-            {hook name="address.create.form.top"}
+            {hook name="address-create.form-top"}
 
             <fieldset class="panel">
                 <div class="panel-heading">
@@ -247,7 +247,7 @@
             <!--/.form-group-->
             {/form_field}
 
-            {hook name="address.create.form.bottom"}
+            {hook name="address-create.form-bottom"}
 
             <div class="form-group group-btn">
                 <div class="control-btn">
@@ -258,20 +258,20 @@
         </form>
         {/form}
 
-        {hook name="address.create.bottom"}
+        {hook name="address-create.bottom"}
     </article>
 
     </div><!-- /.layout -->
 {/block}
 
 {block name="stylesheet"}
-{hook name="address.create.stylesheet"}
+{hook name="address-create.stylesheet"}
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="address.create.after.javascript.include"}
+{hook name="address-create.after-javascript-include"}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="address.create.after.javascript.initialization"}
+{hook name="address-create.after-javascript-initialization"}
 {/block}

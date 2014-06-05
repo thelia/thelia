@@ -35,7 +35,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 <!--[if IE 8 ]><html class="no-js oldie ie8" lang="{lang attr="code"}"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="{lang attr="code"}" class="no-js"> <!--<![endif]-->
 <head>
-    {hook name="main.head.top"}
+    {hook name="main.head-top"}
     {* Test if javascript is enabled *}
     <script>(function(H) { H.className=H.className.replace(/\bno-js\b/,'js') } )(document.documentElement);</script>
 
@@ -58,6 +58,8 @@ GNU General Public License : http://www.gnu.org/licenses/
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 
+    {hook name="main.stylesheet"}
+
     {block name="stylesheet"}{/block}
 
     {* Favicon *}
@@ -74,17 +76,17 @@ GNU General Public License : http://www.gnu.org/licenses/
     <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
-    {hook name="main.head.bottom"}
+    {hook name="main.head-bottom"}
 </head>
 <body class="{block name="body-class"}{/block}" itemscope itemtype="http://schema.org/WebPage">
-{hook name="main.body.top"}
+{hook name="main.body-top"}
 <!-- Accessibility -->
 <a class="sr-only" href="#content">{intl l="Skip to content"}</a>
 
 <div class="page" role="document">
 
 <div class="header-container" itemscope itemtype="http://schema.org/WPHeader">
-    {hook name="main.header.top"}
+    {hook name="main.header-top"}
     <div class="navbar navbar-secondary" itemscope itemtype="http://schema.org/SiteNavigationElement">
         <div class="container">
 
@@ -102,8 +104,8 @@ GNU General Public License : http://www.gnu.org/licenses/
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
             <nav class="navbar-collapse collapse nav-secondary" role="navigation" aria-label="{intl l="Secondary Navigation"}">
                 {nocache}
-                {hook name="main.navbar.secondary"}
-                {elseHook rel="main.navbar.secondary"}
+                {hook name="main.navbar-secondary"}
+                {elseHook rel="main.navbar-secondary"}
                 <ul class="nav navbar-nav navbar-currency navbar-left">
                     <li class="dropdown">
                         <a href="{url path="/currency"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Currency:"}--> {currency attr="code"}</a>
@@ -193,8 +195,8 @@ GNU General Public License : http://www.gnu.org/licenses/
                     {images file='assets/img/logo.gif'}<img src="{$asset_url}" alt="{$store_name}">{/images}
                 </a>
             </h1>
-            {hook name="main.navbar.primary"}
-            {elseHook rel="main.navbar.primary"}
+            {hook name="main.navbar-primary"}
+            {elseHook rel="main.navbar-primary"}
             <nav class="navbar navbar-default nav-main" role="navigation" itemscope itemtype="http://schema.org/SiteNavigationElement">
                 <div class="container-fluid">
                     <div class="navbar-header">
@@ -220,30 +222,30 @@ GNU General Public License : http://www.gnu.org/licenses/
         </div>
     </header><!-- /.header -->
 
-    {hook name="main.header.bottom"}
+    {hook name="main.header-bottom"}
 </div><!-- /.header-container -->
 
 <main class="main-container" role="main">
     <div class="container">
-        {hook name="main.content.top"}
+        {hook name="main.content-top"}
         {block name="breadcrumb"}{include file="misc/breadcrumb.tpl"}{/block}
         <div id="content">{block name="main-content"}{/block}</div>
-        {hook name="main.content.bottom"}
+        {hook name="main.content-bottom"}
     </div><!-- /.container -->
 </main><!-- /.main-container -->
 
 <section class="footer-container" itemscope itemtype="http://schema.org/WPFooter">
 
-    {ifHook rel="main.footer.top"}
+    {ifHook rel="main.footer-top"}
     <section class="footer-block">
         <div class="container">
             <div class="blocks block-col-3">
-                {hook name="main.footer.top"}
+                {hook name="main.footer-top"}
             </div>
         </div>
     </section>
     {/ifHook}
-    {elseHook rel="main.footer.top"}
+    {elseHook rel="main.footer-top"}
     <section class="footer-banner">
         <div class="container">
             <div class="banner banner-col-3">
@@ -264,12 +266,12 @@ GNU General Public License : http://www.gnu.org/licenses/
     </section><!-- /.footer-banner -->
     {/elseHook}
 
-    {ifHook rel="main.footer.body"}
+    {ifHook rel="main.footer-body"}
     <section class="footer-block">
         <div class="container">
             <div class="blocks block-col-4">
-                {hookBlock name="main.footer.body"}
-                    {forHook rel="main.footer.body"}
+                {hookBlock name="main.footer-body"}
+                    {forHook rel="main.footer-body"}
                     <div class="col">
                         <section {if $id} id="{$id}"{/if} class="block {if $class} block-{$class}{/if}">
                             <div class="block-heading"><h3 class="block-title">{$title}</h3></div>
@@ -284,7 +286,7 @@ GNU General Public License : http://www.gnu.org/licenses/
         </div>
     </section>
     {/ifHook}
-    {elseHook rel="main.footer.body"}
+    {elseHook rel="main.footer-body"}
     <section class="footer-block">
         <div class="container">
             <div class="blocks block-col-4">
@@ -455,17 +457,17 @@ GNU General Public License : http://www.gnu.org/licenses/
     </section><!-- /.footer-block -->
     {/elseHook}
 
-    {ifHook rel="main.footer.bottom"}
+    {ifHook rel="main.footer-bottom"}
     <footer class="footer-info" role="contentinfo">
         <div class="container">
             <div class="info">
-                {hook name="main.footer.bottom"}
+                {hook name="main.footer-bottom"}
                 <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
             </div>
         </div>
     </footer>
     {/ifHook}
-    {elseHook rel="main.footer.bottom"}
+    {elseHook rel="main.footer-bottom"}
     <footer class="footer-info" role="contentinfo">
         <div class="container">
             <div class="info">
@@ -510,7 +512,11 @@ GNU General Public License : http://www.gnu.org/licenses/
     <script src="{$asset_url}"></script>
 {/javascripts}
 
+{hook name="main.after-javascript-include"}
+
 {block name="after-javascript-include"}{/block}
+
+{hook name="main.javascript-initialization"}
 
 {block name="javascript-initialization"}{/block}
 
@@ -518,6 +524,6 @@ GNU General Public License : http://www.gnu.org/licenses/
 {javascripts file='assets/js/script.js'}
     <script src="{$asset_url}"></script>
 {/javascripts}
-{hook name="main.body.bottom"}
+{hook name="main.body-bottom"}
 </body>
 </html>

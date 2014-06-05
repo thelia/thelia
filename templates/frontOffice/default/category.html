@@ -36,7 +36,7 @@
     {assign var="$category_id" value="{category attr="id"}"}
     {hook name="category.top" category="$category_id"}
     <div class="main layout-col-2-left">
-        {hook name="category.main.top" category="$category_id"}
+        {hook name="category.main-top" category="$category_id"}
         {$limit={$smarty.get.limit|default:8}}
         {$product_page={$smarty.get.page|default:1}}
         {$product_order={$smarty.get.order|default:'alpha'}}
@@ -112,7 +112,7 @@
                     {intl l="No products available in this category"}
                 </div>
             {/elseloop}
-            {hook name="category.main.bottom" category="$category_id"}
+            {hook name="category.main-bottom" category="$category_id"}
         </article>
 
         <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
@@ -129,9 +129,9 @@
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="category.after.javascript.include"}
+{hook name="category.after-javascript-include"}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="category.after.javascript.initialization"}
+{hook name="category.after-javascript-initialization"}
 {/block}

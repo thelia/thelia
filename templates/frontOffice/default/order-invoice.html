@@ -27,7 +27,7 @@
 
             {include file="misc/checkout-progress.tpl"  step="invoice"}
 
-            {hook name="order.invoice.top"}
+            {hook name="order-invoice.top"}
 
             {form name="thelia.order.coupon"}
 
@@ -185,11 +185,11 @@
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
                 <div id="cart-address">
-                    {ifHook rel="order.invoice.delivery.address"}
+                    {ifHook rel="order-invoice.delivery-address"}
                         {* delivery module can customize the delivery address *}
-                        {hook name="order.invoice.delivery.address" module="{order attr="delivery_module"}"}
+                        {hook name="order-invoice.delivery-address" module="{order attr="delivery_module"}"}
                     {/ifHook}
-                    {elseHook rel="order.invoice.delivery.address"}
+                    {elseHook rel="order-invoice.delivery-address"}
                     <div class="panel">
                         {loop type="address" name="delivery-address" id={order attr="delivery_address"}}
                         <div class="panel-heading">{intl l="Delivery address"}</div>
@@ -282,7 +282,7 @@
                                         {/loop}
                                         {$TITLE}
                                     </label>
-                                    {hook name="order.invoice.payment.extra" module="{$paymentModuleId}"}
+                                    {hook name="order-invoice.payment-extra" module="{$paymentModuleId}"}
                                 </li>
                             {/loop}
                         </ul>
@@ -295,7 +295,7 @@
                 <button type="submit" class="btn btn-checkout-next"><span>{intl l="Next Step"}</span></button>
             </form>
             {/form}
-            {hook name="order.invoice.bottom"}
+            {hook name="order-invoice.bottom"}
         </article>
     </div>
 {/block}
@@ -320,14 +320,14 @@ jQuery(function($) {
     });
 });
 </script>
-{hook name="order.invoice.after.javascript.initialization"}
+{hook name="order-invoice.after-javascript-initialization"}
 {/block}
 
 {block name="stylesheet"}
-{hook name="order.invoice.stylesheet"}
+{hook name="order-invoice.stylesheet"}
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="order.invoice.after.javascript.include"}
+{hook name="order-invoice.after-javascript-include"}
 {/block}
 

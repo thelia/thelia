@@ -23,7 +23,7 @@
 
     <h1 id="main-label" class="page-header">{intl l="Address Update"}</h1>
 
-    {hook name="address.update.top"}
+    {hook name="address-update.top"}
 
     {form name="thelia.front.address.update"}
     {loop name="customer.update" type="address" customer="current" id="{$address_id}"}
@@ -38,7 +38,7 @@
         {form_hidden_fields form=$form}
         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-        {hook name="address.update.form.top"}
+        {hook name="address-update.form-top"}
 
         <fieldset class="panel">
             <div class="panel-heading">
@@ -252,7 +252,7 @@
             {/if}
         {/form_field}
 
-        {hook name="address.update.form.bottom"}
+        {hook name="address-update.form-bottom"}
 
         <div class="form-group group-btn">
             <div class="control-btn">
@@ -263,20 +263,20 @@
         </form>
         {/loop}
     {/form}
-    {hook name="address.update.bottom"}
+    {hook name="address-update.bottom"}
     </article>
 
     </div><!-- /.layout -->
 {/block}
 
 {block name="stylesheet"}
-{hook name="address.update.stylesheet"}
+{hook name="address-update.stylesheet"}
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="address.update.after.javascript.include"}
+{hook name="address-update.after-javascript-include"}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="address.update.after.javascript.initialization"}
+{hook name="address-update.after-javascript-initialization"}
 {/block}

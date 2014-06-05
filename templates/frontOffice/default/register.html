@@ -26,7 +26,7 @@
                 {/form_field}
                 {form_hidden_fields form=$form}
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-                {hook name="register.form.top"}
+                {hook name="register.form-top"}
                 <fieldset id="register-info" class="panel">
                     <div class="panel-heading">
                         1. {intl l="Personal Information"}
@@ -279,7 +279,7 @@
                 </div><!--/.form-group-->
                 {/form_field}
 
-                {hook name="register.form.bottom"}
+                {hook name="register.form-bottom"}
 
                 <div class="form-group group-btn">
                     <div class="control-btn">
@@ -301,9 +301,9 @@
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="register.after.javascript.include"}
+{hook name="register.after-javascript-include"}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="register.after.javascript.initialization"}
+{hook name="register.after-javascript-initialization"}
 {/block}

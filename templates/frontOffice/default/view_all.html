@@ -24,7 +24,7 @@
         <h1 id="main-label" class="page-header">{if $product_type == "new"}{intl l="Latest products"}{elseif $product_type == "offers"}{intl l="Product Offers"}{/if}</h1>
         {assign var="amount" value="{count type="product" promo="{$product_type == "offers"}" new="{$product_type == "new"}"}"}
 
-        {hook name="view-all.top"}
+        {hook name="viewall.top"}
 
         {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order  amount={$amount}}
         <div id="category-products">
@@ -45,7 +45,7 @@
             {include file="includes/toolbar.html" toolbar="bottom" amount={$amount}}
         {/ifloop}
 
-        {hook name="view-all.bottom"}
+        {hook name="viewall.bottom"}
 
     </article>
 
@@ -54,13 +54,13 @@
 
 
 {block name="stylesheet"}
-{hook name="view-all.stylesheet"}
+{hook name="viewall.stylesheet"}
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="view-all.after.javascript.include"}
+{hook name="viewall.after-javascript-include"}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="view-all.after.javascript.initialization"}
+{hook name="viewall.after-javascript-initialization"}
 {/block}

@@ -24,7 +24,7 @@
             <form id="form-contact" action="{url path="/contact"}" method="post">
                 {form_hidden_fields form=$form}
 
-                {hook name="contact.form.top"}
+                {hook name="contact.form-top"}
 
                 <fieldset id="contact-info" class="panel">
                     <div class="panel-heading">
@@ -86,7 +86,7 @@
                     </div>
                 </fieldset>
 
-                {hook name="contact.form.bottom"}
+                {hook name="contact.form-bottom"}
 
                 <div class="form-group group-btn">
                     <div class="control-btn">
@@ -109,9 +109,9 @@
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="contact.after.javascript.include"}
+{hook name="contact.after-javascript-include"}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="contact.after.javascript.initialization"}
+{hook name="contact.after-javascript-initialization"}
 {/block}
