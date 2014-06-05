@@ -39,8 +39,8 @@ class ModuleQuery extends BaseModuleQuery
     }
 
     /**
-     * @param int $moduleType the module type : classic, payment or delivery. Use BaseModule constant here.
-     * @param int $id the module id
+     * @param  int         $moduleType the module type : classic, payment or delivery. Use BaseModule constant here.
+     * @param  int         $id         the module id
      * @return ModuleQuery
      */
     public function filterActivatedByTypeAndId($moduleType, $id)
