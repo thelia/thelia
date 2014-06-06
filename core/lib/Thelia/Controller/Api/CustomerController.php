@@ -23,6 +23,7 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Customer;
 use Thelia\Form\Api\Customer\CustomerCreateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
@@ -43,7 +44,7 @@ class CustomerController extends BaseApiController
     {
         $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::VIEW);
         $request = $this->getRequest();
-
+/*
         $orderArgument = new Argument(
             'order',
             new TypeCollection(
@@ -82,80 +83,30 @@ class CustomerController extends BaseApiController
             ->limit($limit)
         ;
 
-        $query = $this->getOrderClause($orderArgument->getValue(), $query);
+        $query = $this->getOrderClause($orderArgument->getValue(), $query);*/
 
-        $results = $query->find()->toJSON(false, true);
+        $customerLoop = new Customer($this->getContainer());
+        try {
+            $parameters = array_merge($request->query->all(), [
+                'current' => false,
+                'limit' => $request->query->get('limit', 10),
+                'offset' => $request->query->get('offset', 0)
+            ]);
+            $customerLoop->initializeArgs($parameters);
+        } catch (\InvalidArgumentException $e) {
+            throw new BadRequestHttpException(sprintf('{"error": "%s"}', $e->getMessage()));
+        }
+
+
+        $results = $customerLoop
+            ->buildModelCriteria()
+            ->select(['Id', 'Ref', 'TitleId', 'Firstname', 'Lastname', 'Email', 'Reseller', 'Lang', 'Sponsor', 'Discount', 'CreatedAt', 'UpdatedAt'])
+            ->limit($parameters['limit'])
+            ->offset($parameters['offset'])
+            ->find()->toJSON(false, true);
 
         return Response::create($results);
 
-    }
-
-    /**
-     * @return \Thelia\Model\CustomerQuery
-     */
-    private function getBaseCustomerQuery()
-    {
-        $locale = $this->getRequest()->query->get('locale', 'en_US');
-        $titleJoin = new Join();
-        $titleJoin->addExplicitCondition(CustomerTableMap::TABLE_NAME, 'TITLE_ID', null, CustomerTitleI18nTableMap::TABLE_NAME, 'ID', null);
-        $titleJoin->setJoinType(Criteria::LEFT_JOIN);
-
-        $query = CustomerQuery::create()
-            ->select(['Id', 'Ref', 'TitleId', 'Title', 'Firstname', 'Lastname', 'Email', 'Reseller', 'Lang', 'Sponsor', 'Discount', 'CreatedAt', 'UpdatedAt'])
-            ->addJoinObject($titleJoin, 'title_join')
-            ->addJoinCondition('title_join', '`customer_title_i18n`.`locale` = ?', $locale, null, \PDO::PARAM_STR)
-            ->withColumn('`customer_title_i18n`.`long`', 'Title')
-        ;
-
-        return $query;
-    }
-
-    /**
-     * @param $order
-     * @param $search
-     * @return \Thelia\Model\CustomerQuery
-     */
-    private function getOrderClause($order, $search)
-    {
-        switch ($order) {
-            case 'id':
-                $search->orderById(Criteria::ASC);
-                break;
-            case 'id_reverse':
-                $search->orderById(Criteria::DESC);
-                break;
-
-            case 'reference':
-                $search->orderByRef(Criteria::ASC);
-                break;
-            case 'reference_reverse':
-                $search->orderByRef(Criteria::DESC);
-                break;
-
-            case 'lastname':
-                $search->orderByLastname(Criteria::ASC);
-                break;
-            case 'lastname_reverse':
-                $search->orderByLastname(Criteria::DESC);
-                break;
-
-            case 'firstname':
-                $search->orderByFirstname(Criteria::ASC);
-                break;
-            case 'firstname_reverse':
-                $search->orderByFirstname(Criteria::DESC);
-                break;
-
-            case 'registration_date':
-                $search->orderByCreatedAt(Criteria::ASC);
-                break;
-            case 'registration_date_reverse':
-                $search->orderByCreatedAt(Criteria::DESC);
-                break;
-
-        }
-
-        return $search;
     }
 
     public function getCustomerAction($customer_id)
@@ -163,15 +114,26 @@ class CustomerController extends BaseApiController
         $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::VIEW);
         $request = $this->getRequest();
 
-        $customer = $this->getBaseCustomerQuery()
-            ->filterByPrimaryKey($customer_id)
+        $customer = new Customer($this->getContainer());
+
+        try {
+            $customer->initializeArgs([
+                'current'   => false,
+                'id'        => $customer_id
+            ]);
+        } catch(\InvalidArgumentException $e) {
+            throw new BadRequestHttpException(sprintf('{"error": "%s"}', $e->getMessage()));
+        }
+
+        $result = $customer->buildModelCriteria()
+            ->select(['Id', 'Ref', 'TitleId', 'Firstname', 'Lastname', 'Email', 'Reseller', 'Lang', 'Sponsor', 'Discount', 'CreatedAt', 'UpdatedAt'])
             ->find();
 
-        if ($customer->isEmpty()) {
+        if ($result->isEmpty()) {
             throw new HttpException(404, sprintf('{"error": "customer with id %d not found"}', $customer_id));
         }
 
-        return Response::create($customer->toJSON(false, true));
+        return Response::create($result->toJSON(false, true));
 
     }
 

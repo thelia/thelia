@@ -559,6 +559,14 @@ abstract class BaseController extends ContainerAware
     }
 
     /**
+     * @return \Symfony\Component\DependencyInjection\ContainerInterface
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    /**
      * @param null|mixed $template
      * @return \Thelia\Core\Template\ParserInterface instance parser
      */

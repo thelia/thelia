@@ -40,6 +40,7 @@ class CustomerControllerTest extends ApiTestCase
         $content = json_decode($client->getResponse()->getContent(), true);
         $this->assertCount(10, $content);
 
+        $this->customerKeyTest($content[0]);
     }
 
     /**
@@ -76,6 +77,23 @@ class CustomerControllerTest extends ApiTestCase
         $content = json_decode($client->getResponse()->getContent(), true);
         $this->assertCount(1, $content);
 
+        $this->customerKeyTest($content[0]);
+    }
+
+    protected function customerKeyTest($customer)
+    {
+        $this->assertArrayHasKey('Id', $customer, 'customer entity must contains Id key');
+        $this->assertArrayHasKey('Ref', $customer, 'customer entity must contains Ref key');
+        $this->assertArrayHasKey('TitleId', $customer, 'customer entity must contains TitleId key');
+        $this->assertArrayHasKey('Firstname', $customer, 'customer entity must contains Firstname key');
+        $this->assertArrayHasKey('Lastname', $customer, 'customer entity must contains Lastname key');
+        $this->assertArrayHasKey('Email', $customer, 'customer entity must contains Email key');
+        $this->assertArrayHasKey('Reseller', $customer, 'customer entity must contains Reseller key');
+        $this->assertArrayHasKey('Lang', $customer, 'customer entity must contains Lang key');
+        $this->assertArrayHasKey('Sponsor', $customer, 'customer entity must contains Sponsor key');
+        $this->assertArrayHasKey('Discount', $customer, 'customer entity must contains Discount key');
+        $this->assertArrayHasKey('CreatedAt', $customer, 'customer entity must contains CreatedAt key');
+        $this->assertArrayHasKey('UpdatedAt', $customer, 'customer entity must contains UpdatedAt key');
     }
 
     /**
@@ -92,6 +110,11 @@ class CustomerControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), 'Http status code must be 200');
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $this->assertCount(1, $content);
+
+        $this->customerKeyTest($content[0]);
     }
 
     /**
