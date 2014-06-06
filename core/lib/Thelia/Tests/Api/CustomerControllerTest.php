@@ -198,4 +198,66 @@ class CustomerControllerTest extends ApiTestCase
         $this->assertEquals(403, $client->getResponse()->getStatusCode(), "the response code must be 403 because the customer already have orders");
 
     }
+
+    public function testUpdateCustomer()
+    {
+        $user = [
+            'thelia_customer_update' => [
+                'title' => 1,
+                'firstname' => 'Thelia',
+                'lastname'  => 'Thelia',
+                'address1'  => 'street address 1',
+                'city'      => 'Clermont-Ferrand',
+                'zipcode'   => 63100,
+                'country'   => 64,
+                'email'     => sprintf("%s@thelia.fr", uniqid()),
+                'lang'      => 1
+            ]
+        ];
+
+        $requestContent = json_encode($user);
+
+        $client = static::createClient();
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+        $client->request(
+            'PUT',
+            '/api/customers/1?&sign='.$this->getSignParameter($requestContent),[],[],
+            $servers,
+            $requestContent
+        );
+
+        $this->assertEquals(204, $client->getResponse()->getStatusCode());
+    }
+
+    public function testUpdateCustomerWitnUnexistingCustomer()
+    {
+        $user = [
+            'thelia_customer_update' => [
+                'title' => 1,
+                'firstname' => 'Thelia',
+                'lastname'  => 'Thelia',
+                'address1'  => 'street address 1',
+                'city'      => 'Clermont-Ferrand',
+                'zipcode'   => 63100,
+                'country'   => 64,
+                'email'     => sprintf("%s@thelia.fr", uniqid()),
+                'lang'      => 1
+            ]
+        ];
+
+        $requestContent = json_encode($user);
+
+        $client = static::createClient();
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+        $client->request(
+            'PUT',
+            '/api/customers/'.PHP_INT_MAX.'?&sign='.$this->getSignParameter($requestContent),[],[],
+            $servers,
+            $requestContent
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+    }
 }

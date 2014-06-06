@@ -28,6 +28,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Customer;
 use Thelia\Exception\CustomerException;
 use Thelia\Form\Api\Customer\CustomerCreateForm;
+use Thelia\Form\Api\Customer\CustomerUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
@@ -120,7 +121,35 @@ class CustomerController extends BaseApiController
                 , 201
             );
         } catch (FormValidationException $e) {
-            return Response::create($e->getMessage(), 400);
+            return Response::create(sprintf("{'error': '%s'}", $e->getMessage()), 400);
+        }
+    }
+
+    public function updateCustomerAction($customer_id)
+    {
+        $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::UPDATE);
+
+        $form = new CustomerUpdateForm($this->getRequest(), "form",[], ['csrf_protection' => false]);
+
+        $customer = CustomerQuery::create()
+            ->findPk($customer_id);
+
+        if (null === $customer) {
+            throw new HttpException(404, sprintf('{"error": "customer with id %d not found"}', $customer_id));
+        }
+
+        try {
+            $customerForm = $this->validateForm($form);
+            $event = $this->hydrateEvent($customerForm);
+
+            $event->setCustomer($customer);
+
+            $this->dispatch(TheliaEvents::CUSTOMER_UPDATEACCOUNT, $event);
+
+            return Response::create(null, 204);
+
+        } catch (FormValidationException $e) {
+            return Response::create(sprintf("{'error': '%s'}", $e->getMessage()), 400);
         }
     }
 
@@ -130,8 +159,6 @@ class CustomerController extends BaseApiController
 
         $customer = CustomerQuery::create()
             ->findPk($customer_id);
-
-
 
         if (null === $customer) {
             throw new HttpException(404, sprintf('{"error": "customer with id %d not found"}', $customer_id));

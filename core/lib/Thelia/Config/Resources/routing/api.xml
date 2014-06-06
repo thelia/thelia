@@ -22,6 +22,11 @@
         <default key="_controller">Thelia\Controller\Api\CustomerController::createCustomerAction</default>
     </route>
 
+    <route id="api.customer.update" path="/api/customers/{customer_id}" methods="put">
+        <default key="_controller">Thelia\Controller\Api\CustomerController::updateCustomerAction</default>
+        <requirement key="customer_id">\d+</requirement>
+    </route>
+
     <route id="api.customer.delete" path="/api/customers/{customer_id}" methods="delete">
         <default key="_controller">Thelia\Controller\Api\CustomerController::deleteCustomerAction</default>
         <requirement key="customer_id">\d+</requirement>
