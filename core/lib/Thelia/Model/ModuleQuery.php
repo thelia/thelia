@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\ModuleQuery as BaseModuleQuery;
+use Thelia\Module\BaseModule;
 
 /**
  * Skeleton subclass for performing query and update operations on the 'module' table.
@@ -24,7 +25,7 @@ class ModuleQuery extends BaseModuleQuery
     {
         if (null === self::$activated) {
             self::$activated = self::create()
-                ->filterByActivate(1)
+                ->filterByActivate(BaseModule::IS_ACTIVATED)
                 ->orderByPosition()
                 ->find();
         }
@@ -35,6 +36,19 @@ class ModuleQuery extends BaseModuleQuery
     public static function resetActivated()
     {
         self::$activated = null;
+    }
+
+    /**
+     * @param  int         $moduleType the module type : classic, payment or delivery. Use BaseModule constant here.
+     * @param  int         $id         the module id
+     * @return ModuleQuery
+     */
+    public function filterActivatedByTypeAndId($moduleType, $id)
+    {
+        return $this
+            ->filterByType($moduleType)
+            ->filterByActivate(BaseModule::IS_ACTIVATED)
+            ->filterById($id);
     }
 
 } // ModuleQuery
