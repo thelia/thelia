@@ -14,16 +14,19 @@ namespace Thelia\Controller\Api;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Customer;
+use Thelia\Exception\CustomerException;
 use Thelia\Form\Api\Customer\CustomerCreateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
@@ -44,46 +47,6 @@ class CustomerController extends BaseApiController
     {
         $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::VIEW);
         $request = $this->getRequest();
-/*
-        $orderArgument = new Argument(
-            'order',
-            new TypeCollection(
-                new EnumType(array(
-                    'id',
-                    'id_reverse',
-                    'reference',
-                    'reference_reverse',
-                    'firstname',
-                    'firstname_reverse',
-                    'lastname',
-                    'lastname_reverse',
-                    'last_order',
-                    'last_order_reverse',
-                    'order_amount',
-                    'order_amount_reverse',
-                    'registration_date',
-                    'registration_date_reverse'
-                ))
-            ),
-            'lastname'
-        );
-
-        $offset = $request->query->get('offset', 0);
-        $limit = $request->query->get('limit', 10);
-        $order = $request->query->get('order', $orderArgument->default);
-
-        if (!$orderArgument->type->isValid($order)) {
-            throw new BadRequestHttpException('{"error": "order parameter is invalid"}');
-        }
-
-        $orderArgument->setValue($order);
-
-        $query = $this->getBaseCustomerQuery()
-            ->offset($offset)
-            ->limit($limit)
-        ;
-
-        $query = $this->getOrderClause($orderArgument->getValue(), $query);*/
 
         $customerLoop = new Customer($this->getContainer());
         try {
@@ -159,6 +122,30 @@ class CustomerController extends BaseApiController
         } catch (FormValidationException $e) {
             return Response::create($e->getMessage(), 400);
         }
+    }
+
+    public function deleteCustomerAction($customer_id)
+    {
+        $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::DELETE);
+
+        $customer = CustomerQuery::create()
+            ->findPk($customer_id);
+
+
+
+        if (null === $customer) {
+            throw new HttpException(404, sprintf('{"error": "customer with id %d not found"}', $customer_id));
+        }
+
+        $event = new CustomerEvent($customer);
+
+        try {
+            $this->dispatch(TheliaEvents::CUSTOMER_DELETEACCOUNT, $event);
+        } catch (CustomerException $e) {
+            throw new HttpException(403, '{"error": "Impossible to delete a customer who already have orders"}');
+        }
+
+        return Response::create(null, 204);
     }
 
     protected function hydrateEvent(Form $form)

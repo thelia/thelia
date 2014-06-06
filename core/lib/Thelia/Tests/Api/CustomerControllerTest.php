@@ -164,5 +164,38 @@ class CustomerControllerTest extends ApiTestCase
 
         $this->assertEquals(201, $client->getResponse()->getStatusCode());
 
+        $content = json_decode($client->getResponse()->getContent(), true);
+
+        return $content['Id'];
+
+    }
+
+    /**
+     * @depends testCreate
+     */
+    public function testDelete($customer_id)
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'DELETE',
+            '/api/customers/'.$customer_id.'?sign='.$this->getSignParameter(""),[],[],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(204, $client->getResponse()->getStatusCode(), "the response code must be 204");
+    }
+
+    public function testDeleteWithExistingOrders()
+    {
+        $client = static::createClient();
+        $client->request(
+            'DELETE',
+            '/api/customers/1?sign='.$this->getSignParameter(""),[],[],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(403, $client->getResponse()->getStatusCode(), "the response code must be 403 because the customer already have orders");
+
     }
 }
