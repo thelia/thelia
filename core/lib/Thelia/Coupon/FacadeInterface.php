@@ -68,17 +68,19 @@ interface FacadeInterface
     /**
      * Return Products total price
      * CartTotalPrice = Checkout total - discount - postage
+     * @param bool $withItemsInPromo true (default) if item in promotion should be included in the total, false otherwise.
      *
      * @return float
      */
-    public function getCartTotalPrice();
+    public function getCartTotalPrice($withItemsInPromo = true);
 
     /**
      * Return Product total tax price
+     * @param bool $withItemsInPromo true (default) if item in promotion should be included in the total, false otherwise.
      *
      * @return float
      */
-    public function getCartTotalTaxPrice();
+    public function getCartTotalTaxPrice($withItemsInPromo = true);
 
     /**
      * Return the Checkout currency EUR|USD
