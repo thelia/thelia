@@ -65,7 +65,6 @@ class RemoveAmountOnCategories extends CouponAbstract
         $this->category_list = isset($effects[self::CATEGORIES_LIST]) ? $effects[self::CATEGORIES_LIST] : array();
 
         if (! is_array($this->category_list)) $this->category_list = array($this->category_list);
-
         return $this;
     }
 
