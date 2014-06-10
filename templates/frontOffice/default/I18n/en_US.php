@@ -228,6 +228,7 @@ return array(
     'for' => 'for',
     'instead of' => 'instead of',
     'missing or invalid data' => 'missing or invalid data',
+    'out of stock' => 'out of stock',
     'per page' => 'per page',
     'update' => 'update',
     'with:' => 'with:',
