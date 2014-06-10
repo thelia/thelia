@@ -89,6 +89,23 @@ class CartItem extends BaseCartItem
         return $this->getPromo() == 1 ? $this->getPromoPrice() : $this->getPrice();
     }
 
+    public function getProduct(ConnectionInterface $con = null, $locale = null)
+    {
+        $product = parent::getProduct($con);
+
+        $translation = $product->getTranslation($locale);
+
+        if ($translation->isNew()) {
+            if (ConfigQuery::getDefaultLangWhenNoTranslationAvailable()) {
+                $locale = Lang::getDefaultLanguage()->getLocale();
+            }
+        }
+
+        $product->setLocale($locale);
+
+        return $product;
+    }
+
     public function getRealTaxedPrice(Country $country)
     {
         return $this->getPromo() == 1 ? $this->getTaxedPromoPrice($country) : $this->getTaxedPrice($country);

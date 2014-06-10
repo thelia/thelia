@@ -31,10 +31,12 @@ use Thelia\Model\ContentDocument;
 use Thelia\Model\ContentImage;
 use Thelia\Model\FolderDocument;
 use Thelia\Model\FolderImage;
+use Thelia\Model\Lang;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductImage;
 use Thelia\Tools\FileManager;
 use Thelia\Tools\Rest\ResponseRest;
+use Thelia\Tools\URL;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -182,6 +184,7 @@ class FileController extends BaseAdminController
                 }
 
                 $documentModel->setParentId($parentId);
+                $documentModel->setLocale(Lang::getDefaultLanguage()->getLocale());
                 $documentModel->setTitle($fileBeingUploaded->getClientOriginalName());
 
                 $documentCreateOrUpdateEvent = new DocumentCreateOrUpdateEvent(
@@ -389,7 +392,7 @@ class FileController extends BaseAdminController
             $this->adminLogAppend(AdminResources::retrieve($parentType), AccessManager::UPDATE, sprintf('Image with Ref %s (ID %d) modified', $imageUpdated->getTitle(), $imageUpdated->getId()));
 
             if ($this->getRequest()->get('save_mode') == 'close') {
-                $this->redirectToRoute('admin.images');
+                $this->redirect(URL::getInstance()->absoluteUrl($fileManager->getRedirectionUrl($parentType, $image->getParentId(), FileManager::FILE_TYPE_IMAGES)));
             } else {
                 $this->redirectSuccess($imageModification);
             }
@@ -466,7 +469,7 @@ class FileController extends BaseAdminController
             $this->adminLogAppend(AdminResources::retrieve($parentType), AccessManager::UPDATE, sprintf('Document with Ref %s (ID %d) modified', $documentUpdated->getTitle(), $documentUpdated->getId()));
 
             if ($this->getRequest()->get('save_mode') == 'close') {
-                $this->redirectToRoute('admin.documents');
+                $this->redirect(URL::getInstance()->absoluteUrl($fileManager->getRedirectionUrl($parentType, $document->getParentId(), FileManager::FILE_TYPE_DOCUMENTS)));
             } else {
                 $this->redirectSuccess($documentModification);
             }

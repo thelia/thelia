@@ -12,7 +12,8 @@
     - class event : Thelia\Core\Event\SessionEvent
     - example : Thelia\Core\EventListener\SessionListener
 - Creation of Thelia\Core\TheliakernelEvents class for referencing kernel event
-    
+- Add new command line that refresh modules list `Thelia module:refresh`
+
 
 #2.0.1
 - possibility to apply a permanent discount on a customer

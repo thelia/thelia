@@ -12,6 +12,7 @@
         }
 
         {* Be sure to get the product ID, even if the form could not be validated*}
+        <input type="hidden" name="page" value="{$page}" />
         <input type="hidden" name="product_id" value="{$product_id}">
         <input type="hidden" name="current_tab" value="general">
 
@@ -22,7 +23,7 @@
         {/form_field}
 
         {form_field form=$form field='success_url'}
-            <input type="hidden" name="{$name}" value="{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}">
+            <input type="hidden" name="{$name}" value="{url path='/admin/categories' category_id=$DEFAULT_CATEGORY  page=$page}">
         {/form_field}
 
         {form_field form=$form field='locale'}

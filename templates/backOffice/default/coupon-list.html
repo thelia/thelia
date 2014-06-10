@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="no-return-functions"}
+    {$admin_current_location = 'tools'}
+{/block}
+
 {block name="check-resource"}admin.coupon{/block}
 {block name="check-access"}view{/block}
 

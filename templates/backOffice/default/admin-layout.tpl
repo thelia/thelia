@@ -4,6 +4,8 @@
     {check_auth role="ADMIN" resource="{block name="check-resource"}{/block}" access="{block name="check-access"}{/block}" login_tpl="/admin/login"}
 {/block}
 
+{block name="no-return-functions"}{/block}
+
 {* -- Define some stuff for Smarty ------------------------------------------ *}
 {config_load file='variables.conf'}
 

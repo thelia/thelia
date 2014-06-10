@@ -66,16 +66,12 @@ class OrderPayment extends BaseForm
     public function verifyPaymentModule($value, ExecutionContextInterface $context)
     {
         $module = ModuleQuery::create()
-            ->filterByType(BaseModule::PAYMENT_MODULE_TYPE)
-            ->filterByActivate(1)
-            ->filterById($value)
+            ->filterActivatedByTypeAndId(BaseModule::PAYMENT_MODULE_TYPE, $value)
             ->findOne();
 
         if (null === $module) {
             $context->addViolation("Payment module ID not found");
-        }
-
-        if (! $module->isPayementModule()) {
+        } elseif (! $module->isPayementModule()) {
             $context->addViolation(
                 sprintf(Translator::getInstance()->trans("payment module %s is not a Thelia\Module\PaymentModuleInterface"), $module->getCode())
             );

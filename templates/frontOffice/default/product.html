@@ -111,15 +111,11 @@
                     {loop name="combi_meta" type="attribute_combination" product_sale_elements="$ID"}
                        {if $LOOP_COUNT == 0}
                            {if $QUANTITY == 0}
-
                                {assign  var="current_stock_class" value = "out-of-stock"}
                                {assign  var="current_stock_href" value = "http://schema.org/OutOfStock"}
-
-                               {else}
-
-                               {assign  var="current_stock_class" value = "out-of-stock"}
-                               {assign  var="current_stock_href" value = "http://schema.org/OutOfStock"}
-
+                           {else}
+                               {assign  var="current_stock_class" value = "in-stock"}
+                               {assign  var="current_stock_href" value = "http://schema.org/InStock"}
                            {/if}
                        {/if}
                     {/loop}

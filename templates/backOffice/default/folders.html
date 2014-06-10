@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="no-return-functions"}
+    {$admin_current_location = 'folder'}
+{/block}
+
 {block name="page-title"}{intl l='Folders'}{/block}
 
 {block name="check-resource"}admin.folder{/block}
@@ -129,7 +133,7 @@
                                     <td>
                                         {admin_position_block
                                             resource="admin.folder"
-                                            access="update"
+                                            access="UPDATE"
                                             path={url path='admin/folders/update-position' folder_id=$ID}
                                             url_parameter="folder_id"
                                             in_place_edit_class="folderPositionChange"
@@ -287,7 +291,7 @@
                                     <td>
                                         {admin_position_block
                                             resource="admin.content"
-                                            access="update"
+                                            access="UPDATE"
                                             path={url path='/admin/content/update-position' content_id=$ID}
                                             url_parameter="content_id"
                                             in_place_edit_class="contentPositionChange"

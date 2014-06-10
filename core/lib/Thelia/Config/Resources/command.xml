@@ -11,6 +11,7 @@
         <command class="Thelia\Command\ModuleGenerateCommand"/>
         <command class="Thelia\Command\ModuleGenerateModelCommand"/>
         <command class="Thelia\Command\ModuleGenerateSqlCommand"/>
+        <command class="Thelia\Command\ModuleRefreshCommand"/>
         <command class="Thelia\Command\ModuleActivateCommand"/>
         <command class="Thelia\Command\ModuleDeactivateCommand"/>
         <command class="Thelia\Command\CreateAdminUser"/>
