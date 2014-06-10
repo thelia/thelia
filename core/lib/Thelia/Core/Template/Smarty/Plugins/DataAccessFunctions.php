@@ -434,7 +434,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      *
      * @return string the camel cased string.
      */
-    private function underscoreToCamelcase($str) {
+    private function underscoreToCamelcase($str)
+    {
         // Split string in words.
         $words = explode('_', strtolower($str));
 

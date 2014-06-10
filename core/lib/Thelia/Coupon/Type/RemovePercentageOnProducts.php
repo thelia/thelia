@@ -175,8 +175,7 @@ class RemovePercentageOnProducts extends CouponAbstract
                     )
                 );
             }
-        }
-        elseif ($fieldName === self::CATEGORY_ID) {
+        } elseif ($fieldName === self::CATEGORY_ID) {
             if (empty($fieldValue)) {
                 throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(

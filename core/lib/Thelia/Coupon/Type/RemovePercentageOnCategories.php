@@ -66,7 +66,6 @@ class RemovePercentageOnCategories extends CouponAbstract
         $this->percentage    = isset($effects[self::PERCENTAGE]) ? $effects[self::PERCENTAGE] : 0;
 
         if (! is_array($this->category_list)) $this->category_list = array($this->category_list);
-
         return $this;
     }
 
