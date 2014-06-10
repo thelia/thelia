@@ -12,7 +12,13 @@
     - class event : Thelia\Core\Event\SessionEvent
     - example : Thelia\Core\EventListener\SessionListener
 - Creation of Thelia\Core\TheliakernelEvents class for referencing kernel event
-- Add new command line that refresh modules list `Thelia module:refresh`
+- Add new command line that refresh modules list ```Thelia module:refresh```
+- Error messages are displayed in install process
+- Add pagination on catalog page in Back-Office
+- Add Hong Kong to country list
+- Fixed issue #452 when installing Thelia on database with special characters
+- implement search on content, folder and category loop.
+- all form are documented
 
 
 #2.0.1
