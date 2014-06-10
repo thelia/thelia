@@ -49,12 +49,20 @@
             $.couponManager.urlAjaxAdminCouponDrawInputs = '{$urlAjaxAdminCouponDrawInputs}';
             $.couponManager.urlAjaxGetConditionInputFromServiceId = '{$urlAjaxGetConditionInputFromServiceId}';
             $.couponManager.urlAjaxGetConditionInputFromConditionInterface = '{$urlAjaxGetConditionInputFromConditionInterface}';
-            $.couponManager.intlPleaseRetry = '{intl l='Something goes wrong, please try again'}';
-            $.couponManager.intlPleaseSelectAnotherCondition = '{intl l='Please select another condition'}';
-            $.couponManager.intlDoYouReallyWantToSetCouponAvailableForEveryOne = '{intl l='Do you really want to set this coupon available to everyone ?'}';
-            $.couponManager.intlDoYouReallyWantToDeleteThisCondition = '{intl l='Do you really want to delete this condition ?'}';
+            $.couponManager.intlPleaseRetry = '{intl l='Something goes wrong, please try again' js=1}';
+            $.couponManager.intlPleaseSelectAnotherCondition = '{intl l='Please select another condition' js=1}';
+            $.couponManager.intlDoYouReallyWantToSetCouponAvailableForEveryOne = '{intl l='Do you really want to set this coupon available to everyone ?' js=1}';
+            $.couponManager.intlDoYouReallyWantToDeleteThisCondition = '{intl l='Do you really want to delete this condition ?' js=1}';
 
             $('#condition-save-btn').hide();
+
+            // Invoke the coupon setup function if defined.
+            try {
+                couponInputFormSetup();
+            }
+            catch (ex) {
+                // Ignore the error
+            }
         });
     </script>
 {/block}
