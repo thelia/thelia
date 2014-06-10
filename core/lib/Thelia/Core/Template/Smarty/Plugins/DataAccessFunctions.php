@@ -402,7 +402,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                     return $noGetterData[$keyAttribute];
                 }
 
-                $getter = sprintf("get%s", underscoreToCamelcase($attribute));
+                $getter = sprintf("get%s", $this->underscoreToCamelcase($attribute));
                 if (method_exists($data, $getter)) {
                     $return =  $data->$getter();
 
