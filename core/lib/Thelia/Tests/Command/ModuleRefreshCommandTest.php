@@ -42,7 +42,7 @@ class ModuleRefreshCommandTest extends PHPUnit_Framework_TestCase
         $moduleManagement = new ModuleManagement;
         $moduleManagement->updateModules();
 
-        $module = ModuleQuery::create()->orderByPosition(Criteria::DESC)->findOne();
+        $module = ModuleQuery::create()->filterByType(1)->orderByPosition(Criteria::DESC)->findOne();
 
         if ($module !== null) {
             $module->delete();
@@ -61,11 +61,11 @@ class ModuleRefreshCommandTest extends PHPUnit_Framework_TestCase
             ]);
 
             $expected = $module;
-            $actual = ModuleQuery::create()->orderByPosition(Criteria::DESC)->findOne();
+            $actual = ModuleQuery::create()->filterByType(1)->orderByPosition(Criteria::DESC)->findOne();
 
-            $this->assertEquals($expected->getCode(), $actual->getCode(), 'Last module code must be same after deleting this one and calling module:refresh');
-            $this->assertEquals($expected->getType(), $actual->getType(), 'Last module type must be same after deleting this one and calling module:refresh');
-            $this->assertEquals($expected->getFullNamespace(), $actual->getFullNamespace(), 'Last module namespace must be same after deleting this one and calling module:refresh');
+            $this->assertEquals($expected->getCode(), $actual->getCode(), 'Last standard module code must be same after deleting this one and calling module:refresh');
+            $this->assertEquals($expected->getType(), $actual->getType(), 'Last standard module type must be same after deleting this one and calling module:refresh');
+            $this->assertEquals($expected->getFullNamespace(), $actual->getFullNamespace(), 'Last standard module namespace must be same after deleting this one and calling module:refresh');
 
             // Restore activation status
             $actual
@@ -74,7 +74,7 @@ class ModuleRefreshCommandTest extends PHPUnit_Framework_TestCase
 
         } else {
             $this->markTestIncomplete(
-                'This test cannot be complete without at least one module'
+                'This test cannot be complete without at least one standard module module.'
             );
         }
     }
