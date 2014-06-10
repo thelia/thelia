@@ -27,9 +27,7 @@ class RemoveXAmount extends CouponAbstract
     protected $serviceId = 'thelia.coupon.type.remove_x_amount';
 
     /**
-     * Get I18n name
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getName()
     {
@@ -39,9 +37,7 @@ class RemoveXAmount extends CouponAbstract
     }
 
     /**
-     * Get I18n tooltip
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getToolTip()
     {
@@ -56,6 +52,9 @@ class RemoveXAmount extends CouponAbstract
         return $toolTip;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function drawBackOfficeInputs()
     {
         return $this->facade->getParser()->render('coupon/type-fragments/remove-x-amount.html', [
@@ -65,9 +64,7 @@ class RemoveXAmount extends CouponAbstract
     }
 
     /**
-     * Return a list of the fields name for this coupon.
-     *
-     * @return array
+     * @inheritdoc
      */
     protected function getFieldList()
     {
