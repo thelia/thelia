@@ -22,9 +22,6 @@ use Thelia\Module\ModuleManagement;
  *
  * @package Thelia\Command
  * @author  Jérôme Billiras <jbilliras@openstudio.fr>
- *
- * Date: 2014-06-06
- * Time: 17:00
  */
 class ModuleRefreshCommand extends ContainerAwareCommand
 {

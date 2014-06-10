@@ -74,7 +74,7 @@ class ModuleRefreshCommandTest extends PHPUnit_Framework_TestCase
 
         } else {
             $this->markTestIncomplete(
-                'This test cannot be complete without at least one standard module module.'
+                'This test cannot be complete without at least one standard module.'
             );
         }
     }
