@@ -197,6 +197,7 @@ class CouponController extends BaseAdminController
         }
 
         $args['couponCode'] = $coupon->getCode();
+        $args['couponType'] = $coupon->getType();
         $args['availableCoupons'] = $this->getAvailableCoupons();
         $args['couponInputsHtml'] = $couponManager->drawBackOfficeInputs();
         $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
