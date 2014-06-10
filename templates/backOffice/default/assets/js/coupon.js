@@ -235,6 +235,14 @@ $(function($){
             }
         }).done(function(data) {
             inputsDiv.html(data);
+
+            // Invoke coupon setup funtion, if any
+            try {
+                couponInputFormSetup();
+            }
+            catch (ex) {
+                // Ignore the error
+            }
         });
     };
 
