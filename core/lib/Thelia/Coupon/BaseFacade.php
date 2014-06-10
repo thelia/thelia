@@ -118,17 +118,35 @@ class BaseFacade implements FacadeInterface
      *
      * @return float
      */
-    public function getCartTotalPrice()
+    public function getCartTotalPrice($withItemsInPromo = true)
     {
-        return $this->getRequest()->getSession()->getCart()->getTotalAmount();
+        $total = 0;
 
+        $cartItems = $this->getRequest()->getSession()->getCart()->getCartItems();
+
+        foreach ($cartItems as $cartItem) {
+            if ($withItemsInPromo || ! $cartItem->getPromo()) {
+                $total += $cartItem->getRealPrice() * $cartItem->getQuantity();
+            }
+        }
+
+        return $total;
     }
 
-    public function getCartTotalTaxPrice()
+    public function getCartTotalTaxPrice($withItemsInPromo = true)
     {
         $taxCountry = $this->getContainer()->get('thelia.taxEngine')->getDeliveryCountry();
+        $cartItems = $this->getRequest()->getSession()->getCart()->getCartItems();
 
-        return $this->getCart()->getTaxedAmount($taxCountry, false);
+        $total = 0;
+
+        foreach ($cartItems as $cartItem) {
+            if ($withItemsInPromo || ! $cartItem->getPromo()) {
+                $total += $cartItem->getRealTaxedPrice($taxCountry) * $cartItem->getQuantity();
+            }
+        }
+
+        return $total;
     }
 
     /**
