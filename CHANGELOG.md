@@ -26,6 +26,7 @@
 - Fixed issue #452 when installing Thelia on database with special characters
 - implement search on content, folder and category loop.
 - all form are documented
+- template exists for managing google sitemap : sitemap.html
 
 #2.0.1
 - possibility to apply a permanent discount on a customer
