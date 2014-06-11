@@ -197,22 +197,6 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Thelia\Coupon\Type\RemoveXPercent::getToolTip
-     */
-    public function testGetInputName()
-    {
-        $inputName = 'Amount removed from the cart';
-        $stubFacade = $this->generateFacadeStub(399, 'EUR', $inputName);
-
-        /** @var FacadeInterface $stubFacade */
-        $coupon = new RemoveXAmount($stubFacade);
-
-        $actual = $coupon->getInputName();
-        $expected = $inputName;
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */

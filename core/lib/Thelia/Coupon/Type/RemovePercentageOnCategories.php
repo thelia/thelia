@@ -18,20 +18,20 @@ use Thelia\Model\CartItem;
 use Thelia\Model\Category;
 
 /**
- * Allow to remove an amount from the checkout total
- *
- * @package Coupon
- * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ * @author  Franck Allimant <franck@cqfdev.fr>
  *
  */
-class RemoveAmountOnCategories extends CouponAbstract
+class RemovePercentageOnCategories extends CouponAbstract
 {
     const CATEGORIES_LIST = 'categories';
+    const PERCENTAGE      = 'percentage';
 
     /** @var string Service Id  */
-    protected $serviceId = 'thelia.coupon.type.remove_amount_on_categories';
+    protected $serviceId = 'thelia.coupon.type.remove_percentage_on_categories';
 
-    public $category_list = array();
+    protected $category_list = array();
+
+    protected $percentage = 0;
 
     /**
      * @inheritdoc
@@ -63,6 +63,7 @@ class RemoveAmountOnCategories extends CouponAbstract
         );
 
         $this->category_list = isset($effects[self::CATEGORIES_LIST]) ? $effects[self::CATEGORIES_LIST] : array();
+        $this->percentage    = isset($effects[self::PERCENTAGE]) ? $effects[self::PERCENTAGE] : 0;
 
         if (! is_array($this->category_list)) $this->category_list = array($this->category_list);
         return $this;
@@ -75,7 +76,7 @@ class RemoveAmountOnCategories extends CouponAbstract
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Fixed amount discount for selected categories', array(), 'coupon');
+            ->trans('Percentage discount for selected categories', array(), 'coupon');
     }
 
     /**
@@ -86,7 +87,7 @@ class RemoveAmountOnCategories extends CouponAbstract
         $toolTip = $this->facade
             ->getTranslator()
             ->trans(
-                'This coupon subtracts the specified amount from the order total for each product which belongs to the selected categories. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
+                'This coupon subtracts from the order total a percentage of the price of each product which belongs to the selected categories. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
                 array(),
                 'coupon'
             );
@@ -107,7 +108,6 @@ class RemoveAmountOnCategories extends CouponAbstract
 
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
-
             if (! $cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
                 $categories = $cartItem->getProduct()->getCategories();
 
@@ -115,7 +115,7 @@ class RemoveAmountOnCategories extends CouponAbstract
                 foreach ($categories as $category) {
 
                     if (in_array($category->getId(), $this->category_list)) {
-                        $discount += $cartItem->getQuantity() * $this->amount;
+                        $discount += $cartItem->getPrice() * $this->percentage;
 
                         break;
                     }
@@ -131,11 +131,11 @@ class RemoveAmountOnCategories extends CouponAbstract
      */
     public function drawBackOfficeInputs()
     {
-        return $this->facade->getParser()->render('coupon/type-fragments/remove-amount-on-categories.html', [
+        return $this->facade->getParser()->render('coupon/type-fragments/remove-percentage-on-categories.html', [
 
             // The standard "Amount" field
-            'amount_field_name'     => $this->makeCouponFieldName(self::AMOUNT_FIELD_NAME),
-            'amount_value'          => $this->amount,
+            'percentage_field_name'  => $this->makeCouponFieldName(self::PERCENTAGE),
+            'percentage_value'       => $this->percentage,
 
             // The categories list field
             'categories_field_name' => $this->makeCouponFieldName(self::CATEGORIES_LIST),
@@ -148,7 +148,7 @@ class RemoveAmountOnCategories extends CouponAbstract
      */
     protected function getFieldList()
     {
-        return [self::AMOUNT_FIELD_NAME, self::CATEGORIES_LIST];
+        return [self::PERCENTAGE, self::CATEGORIES_LIST];
     }
 
     /**
@@ -156,12 +156,14 @@ class RemoveAmountOnCategories extends CouponAbstract
      */
     protected function checkCouponFieldValue($fieldName, $fieldValue)
     {
-        if ($fieldName === self::AMOUNT_FIELD_NAME) {
+        if ($fieldName === self::PERCENTAGE) {
 
-            if (floatval($fieldValue) < 0) {
+            $pcent = floatval($fieldValue);
+
+            if ($pcent <= 0 || $pcent > 100) {
                 throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(
-                        'Value %val for Discount Amount is invalid. Please enter a positive value.',
+                        'Value %val for Percent Discount is invalid. Please enter a positive value between 1 and 100.',
                         [ '%val' => $fieldValue]
                     )
                 );

@@ -1,4 +1,10 @@
 #2.0.2
+- Coupon UI has been redesigned.
+- New coupon types:
+    - Constant discount on selected products
+    - Constant discount on products of selected categories
+    - Percentage discount on selected products
+    - Percentage discount on products of selected categories
 - New coupon conditions :
     - Start date
     - Billing country
@@ -13,7 +19,7 @@
     - example : Thelia\Core\EventListener\SessionListener
 - Creation of Thelia\Core\TheliakernelEvents class for referencing kernel event
 - Add new command line that refresh modules list `Thelia module:refresh`
-
+- Coupon internals have been simplified and improved.
 
 #2.0.1
 - possibility to apply a permanent discount on a customer

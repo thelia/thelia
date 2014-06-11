@@ -19,7 +19,7 @@
             <form id="form-login" action="{url path="/login"}" method="post" {form_enctype form=$form} novalidate>
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
                 {form_field form=$form field='success_url'}
-                    <input type="hidden" name="{$name}" value="{navigate to="return_to"}"> {* the url the user is redirected to on login success *}
+                    <input type="hidden" name="{$name}" value="{navigate to="previous"}"> {* the url the user is redirected to on login success *}
                 {/form_field}
 
                 {form_field form=$form field='error_message'}

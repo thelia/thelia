@@ -1,14 +1,12 @@
 
-<div class="form-group input-coupon-amount">
+<div class="form-group input-coupon-percentage">
 
-    <label for="coupon-amount" class="control-label">{intl l="Discount amount"}</label>
+    <label for="coupon-percentage" class="control-label">{intl l="Discount percentage"}</label>
 
     <div class="input-group">
-        <input id="coupon-amount" type="money" class="form-control" name="{$amount_field_name}" value="{$amount_value}" placeholder="14.50">
+        <input id="coupon-percentage" type="number" class="form-control" name="{$percentage_field_name}" value="{$percentage_value}" placeholder="5">
 
-        {loop type="currency" name="get-symbol" default_only="true"}
-            <div class="input-group-addon">{$SYMBOL}</div>
-        {/loop}
+        <div class="input-group-addon">%</div>
     </div>
 </div>
 

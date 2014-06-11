@@ -15,7 +15,7 @@ namespace Thelia\Coupon\Type;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
-use Thelia\Model\Category;
+use Thelia\Model\Product;
 
 /**
  * Allow to remove an amount from the checkout total
@@ -24,14 +24,16 @@ use Thelia\Model\Category;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RemoveAmountOnCategories extends CouponAbstract
+class RemoveAmountOnProducts extends CouponAbstract
 {
-    const CATEGORIES_LIST = 'categories';
+    const CATEGORY_ID   = 'category_id';
+    const PRODUCTS_LIST = 'products';
 
     /** @var string Service Id  */
-    protected $serviceId = 'thelia.coupon.type.remove_amount_on_categories';
+    protected $serviceId = 'thelia.coupon.type.remove_amount_on_products';
 
-    public $category_list = array();
+    public $category_id  = 0;
+    public $product_list = array();
 
     /**
      * @inheritdoc
@@ -62,20 +64,25 @@ class RemoveAmountOnCategories extends CouponAbstract
             $perCustomerUsageCount
         );
 
-        $this->category_list = isset($effects[self::CATEGORIES_LIST]) ? $effects[self::CATEGORIES_LIST] : array();
+        $this->product_list = isset($effects[self::PRODUCTS_LIST]) ? $effects[self::PRODUCTS_LIST] : array();
 
-        if (! is_array($this->category_list)) $this->category_list = array($this->category_list);
+        if (! is_array($this->product_list)) $this->product_list = array($this->product_list);
+
+        $this->category_id = isset($effects[self::CATEGORY_ID]) ? $effects[self::CATEGORY_ID] : 0;
+
         return $this;
     }
 
     /**
-     * @inheritdoc
+     * Get I18n name
+     *
+     * @return string
      */
     public function getName()
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Fixed amount discount for selected categories', array(), 'coupon');
+            ->trans('Fixed amount discount for selected products', array(), 'coupon');
     }
 
     /**
@@ -86,7 +93,7 @@ class RemoveAmountOnCategories extends CouponAbstract
         $toolTip = $this->facade
             ->getTranslator()
             ->trans(
-                'This coupon subtracts the specified amount from the order total for each product which belongs to the selected categories. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
+                'This coupon subtracts the specified amount from the order total for each selected product. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
                 array(),
                 'coupon'
             );
@@ -100,7 +107,7 @@ class RemoveAmountOnCategories extends CouponAbstract
     public function exec()
     {
         // This coupon subtracts the specified amount from the order total
-        // for each product of the selected categories.
+        // for each product of the selected products.
         $discount = 0;
 
         $cartItems = $this->facade->getCart()->getCartItems();
@@ -108,17 +115,9 @@ class RemoveAmountOnCategories extends CouponAbstract
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
 
-            if (! $cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
-                $categories = $cartItem->getProduct()->getCategories();
-
-                /** @var Category $category */
-                foreach ($categories as $category) {
-
-                    if (in_array($category->getId(), $this->category_list)) {
-                        $discount += $cartItem->getQuantity() * $this->amount;
-
-                        break;
-                    }
+            if (in_array($cartItem->getProduct()->getId(), $this->product_list)) {
+                if (! $cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
+                    $discount += $cartItem->getQuantity() * $this->amount;
                 }
             }
         }
@@ -131,15 +130,20 @@ class RemoveAmountOnCategories extends CouponAbstract
      */
     public function drawBackOfficeInputs()
     {
-        return $this->facade->getParser()->render('coupon/type-fragments/remove-amount-on-categories.html', [
+        return $this->facade->getParser()->render('coupon/type-fragments/remove-amount-on-products.html', [
 
             // The standard "Amount" field
             'amount_field_name'     => $this->makeCouponFieldName(self::AMOUNT_FIELD_NAME),
             'amount_value'          => $this->amount,
 
-            // The categories list field
-            'categories_field_name' => $this->makeCouponFieldName(self::CATEGORIES_LIST),
-            'categories_values'     => $this->category_list
+            // The category ID field
+            'category_id_field_name' => $this->makeCouponFieldName(self::CATEGORY_ID),
+            'category_id_value'     => $this->category_id,
+
+            // The products list field
+            'products_field_name' => $this->makeCouponFieldName(self::PRODUCTS_LIST),
+            'products_values'     => $this->product_list,
+            'products_values_csv' => implode(', ', $this->product_list)
         ]);
     }
 
@@ -148,7 +152,7 @@ class RemoveAmountOnCategories extends CouponAbstract
      */
     protected function getFieldList()
     {
-        return [self::AMOUNT_FIELD_NAME, self::CATEGORIES_LIST];
+        return [self::AMOUNT_FIELD_NAME, self::CATEGORY_ID, self::PRODUCTS_LIST];
     }
 
     /**
@@ -166,11 +170,19 @@ class RemoveAmountOnCategories extends CouponAbstract
                     )
                 );
             }
-        } elseif ($fieldName === self::CATEGORIES_LIST) {
+        } elseif ($fieldName === self::CATEGORY_ID) {
             if (empty($fieldValue)) {
                 throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(
-                        'Please select at least one category'
+                        'Please select a category'
+                    )
+                );
+            }
+        } elseif ($fieldName === self::PRODUCTS_LIST) {
+            if (empty($fieldValue)) {
+                throw new \InvalidArgumentException(
+                    Translator::getInstance()->trans(
+                        'Please select at least one product'
                     )
                 );
             }
@@ -178,5 +190,4 @@ class RemoveAmountOnCategories extends CouponAbstract
 
         return $fieldValue;
     }
-
 }

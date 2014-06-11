@@ -152,9 +152,9 @@ class UrlGenerator extends AbstractSmartyPlugin
     protected function getNavigateToValues()
     {
         return array(
-            "current"   => "getCurrentUrl",
-            "return_to" => "getReturnToUrl",
-            "index"     => "getIndexUrl",
+            "current"  => "getCurrentUrl",
+            "previous" => "getPreviousUrl",
+            "index"    => "getIndexUrl",
         );
     }
 
@@ -167,7 +167,7 @@ class UrlGenerator extends AbstractSmartyPlugin
         $navigateToValues = $this->getNavigateToValues();
 
         if (!array_key_exists($to, $navigateToValues)) {
-            throw new \InvalidArgumentException("Incorrect value for parameter `to` in `navigate` substitution.");
+            throw new \InvalidArgumentException(sprintf("Incorrect value `%s` for parameter `to` in `navigate` substitution.", $to));
         }
 
         return $navigateToValues[$to];
@@ -178,7 +178,7 @@ class UrlGenerator extends AbstractSmartyPlugin
         return $this->request->getUri();
     }
 
-    protected function getReturnToUrl()
+    protected function getPreviousUrl()
     {
         return URL::getInstance()->absoluteUrl($this->request->getSession()->getReturnToUrl());
     }

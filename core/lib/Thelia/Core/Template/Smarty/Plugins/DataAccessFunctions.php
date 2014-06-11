@@ -402,7 +402,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                     return $noGetterData[$keyAttribute];
                 }
 
-                $getter = sprintf("get%s", ucfirst($attribute));
+                $getter = sprintf("get%s", $this->underscoreToCamelcase($attribute));
                 if (method_exists($data, $getter)) {
                     $return =  $data->$getter();
 
@@ -425,6 +425,27 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         }
 
         return '';
+    }
+
+    /**
+     * Transcode an underscored string into a camel-cased string, eg. default_folder into DefaultFolder
+     *
+     * @param string $str the string to convert from underscore to camel-case
+     *
+     * @return string the camel cased string.
+     */
+    private function underscoreToCamelcase($str)
+    {
+        // Split string in words.
+        $words = explode('_', strtolower($str));
+
+        $return = '';
+
+        foreach ($words as $word) {
+            $return .= ucfirst(trim($word));
+        }
+
+        return $return;
     }
 
     /**
