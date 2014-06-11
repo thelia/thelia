@@ -312,7 +312,8 @@ class FileController extends BaseAdminController
                 'imageId' => $imageId,
                 'imageType' => $parentType,
                 'redirectUrl' => $redirectUrl,
-                'formId' => $fileManager->getFormId($parentType, FileManager::FILE_TYPE_IMAGES)
+                'formId' => $fileManager->getFormId($parentType, FileManager::FILE_TYPE_IMAGES),
+                'breadcrumb' => $image->getBreadcrumb($this->getRouter($this->getCurrentRouter()), $this->container, 'images')
             ));
         } catch (\Exception $e) {
             $this->pageNotFound();
@@ -341,7 +342,8 @@ class FileController extends BaseAdminController
                     'documentId' => $documentId,
                     'documentType' => $parentType,
                     'redirectUrl' => $redirectUrl,
-                    'formId' => $fileManager->getFormId($parentType, FileManager::FILE_TYPE_DOCUMENTS)
+                    'formId' => $fileManager->getFormId($parentType, FileManager::FILE_TYPE_DOCUMENTS),
+                    'breadcrumb' => $document->getBreadcrumb($this->getRouter($this->getCurrentRouter()), $this->container, 'documents')
                 ));
         } catch (\Exception $e) {
             $this->pageNotFound();

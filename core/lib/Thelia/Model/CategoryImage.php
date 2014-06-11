@@ -2,13 +2,20 @@
 
 namespace Thelia\Model;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Router;
 use Thelia\Model\Base\CategoryImage as BaseCategoryImage;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Model\Breadcrumb\BreadcrumbInterface;
+use Thelia\Model\Breadcrumb\CatalogBreadcrumbTrait;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\Model\Tools\PositionManagementTrait;
 
-class CategoryImage extends BaseCategoryImage
+class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
-    use \Thelia\Model\Tools\PositionManagementTrait;
+    use ModelEventDispatcherTrait;
+    use PositionManagementTrait;
+    use CatalogBreadcrumbTrait;
 
     /**
      * Calculate next position relative to our parent
@@ -61,5 +68,16 @@ class CategoryImage extends BaseCategoryImage
         );
 
         return true;
+    }
+
+    /**
+     *
+     * return the complete breadcrumb for a given resource.
+     *
+     * @return array
+     */
+    public function getBreadcrumb(Router $router, ContainerInterface $container, $tab)
+    {
+        return $this->getCategoryBreadcrumb($router, $container, $tab);
     }
 }

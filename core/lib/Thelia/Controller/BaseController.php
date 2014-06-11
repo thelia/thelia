@@ -291,13 +291,22 @@ abstract class BaseController extends ContainerAware
     protected function getRouteFromRouter($routerName, $routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_URL)
     {
         /** @var Router $router */
-        $router =  $this->container->get($routerName);
+        $router =  $this->getRouter($routerName);
 
         if ($router == null) {
             throw new \InvalidArgumentException(sprintf("Router '%s' does not exists.", $routerName));
         }
 
         return $router->generate($routeId, $parameters, $referenceType);
+    }
+
+    /**
+     * @param $routerName
+     * @return Router
+     */
+    protected function getRouter($routerName)
+    {
+        return $this->container->get($routerName);
     }
 
     /**

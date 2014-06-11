@@ -16,7 +16,7 @@
         <default key="_controller">Thelia\Controller\Admin\HomeController::defaultAction</default>
     </route>
 
-    <route id="admin.home.view" path="/admin/latest-thelia-version">
+    <route id="admin.home.latestVersion" path="/admin/latest-thelia-version">
         <default key="_controller">Thelia\Controller\Admin\HomeController::getLatestTheliaVersion</default>
     </route>
 
@@ -466,7 +466,7 @@
         <default key="_controller">Thelia\Controller\Admin\ContentController::createAction</default>
     </route>
 
-    <route id="admin.content.update" path="admin/content/update/{content_id}">
+    <route id="admin.content.update" path="/admin/content/update/{content_id}">
         <default key="_controller">Thelia\Controller\Admin\ContentController::updateAction</default>
         <requirement key="content_id">\d+</requirement>
     </route>
