@@ -4,15 +4,12 @@ namespace Thelia\Model;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
-use Thelia\Core\Template\Loop\CategoryPath;
-use Thelia\Core\Translation\Translator;
 use Thelia\Model\Base\ProductImage as BaseProductImage;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\CatalogBreadcrumbTrait;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 use Thelia\Model\Tools\PositionManagementTrait;
-use Thelia\Tools\URL;
 
 class ProductImage extends BaseProductImage implements BreadcrumbInterface
 {
