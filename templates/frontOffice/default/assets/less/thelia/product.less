@@ -8,9 +8,7 @@
     top: -14px !important;
     margin: 0;
   }
-
 }
-
 
 // Availibility
 .availability {
@@ -18,8 +16,12 @@
 
     // In Stock
     .in-stock {
-        font-style: italic;
+        color: #44B661;
+        font-style: italic; font-weight: bold;
         text-transform: uppercase;
+
+      .in { display: block; }
+      .out { display: none; }
 
       .quantity{
         font-style: italic;
@@ -27,8 +29,12 @@
     }
     // Out of Stock
     .out-of-stock {
+      color: #FF0000;
       font-style: italic; font-weight: bold;
       text-transform: uppercase;
+
+      .in { display: none; }
+      .out { display: block; }
     }
 
     #stock-information {
