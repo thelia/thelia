@@ -55,8 +55,6 @@ trait CatalogBreadcrumbTrait {
 
         $product->setLocale($locale);
 
-        $request = $container->get('request');
-        //$breadcrumb[$product->getTitle()] = $product->getUrl().'&current_tab=images';
         $breadcrumb[$product->getTitle()] = sprintf("%s?product_id=%d&current_tab=%s",
             $router->generate('admin.products.update', [], Router::ABSOLUTE_URL),
             $product->getId(),

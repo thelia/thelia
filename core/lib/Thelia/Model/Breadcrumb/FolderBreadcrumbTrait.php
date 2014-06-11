@@ -74,8 +74,6 @@ trait FolderBreadcrumbTrait {
 
         $content->setLocale($locale);
 
-        $request = $container->get('request');
-        //$breadcrumb[$product->getTitle()] = $product->getUrl().'&current_tab=images';
         $breadcrumb[$content->getTitle()] = sprintf("%s?current_tab=%s",
             $router->generate('admin.content.update', ['content_id' => $content->getId()], Router::ABSOLUTE_URL),
             $tab
