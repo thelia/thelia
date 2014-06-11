@@ -18,7 +18,8 @@ use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\Loop\FolderPath;
 use Thelia\Core\Translation\Translator;
 
-trait FolderBreadcrumbTrait {
+trait FolderBreadcrumbTrait
+{
 
     public function getBaseBreadcrumb(Router $router, ContainerInterface $container, $folderId, &$locale)
     {
