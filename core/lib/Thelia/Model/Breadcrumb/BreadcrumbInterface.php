@@ -12,11 +12,11 @@
 
 namespace Thelia\Model\Breadcrumb;
 
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 
-interface BreadcrumbInterface {
+interface BreadcrumbInterface
+{
 
     /**
      *

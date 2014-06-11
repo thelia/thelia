@@ -12,8 +12,6 @@
 
 namespace Thelia\Install;
 
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Core\Translation\Translator;
 

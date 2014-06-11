@@ -18,7 +18,8 @@ use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\Loop\CategoryPath;
 use Thelia\Core\Translation\Translator;
 
-trait CatalogBreadcrumbTrait {
+trait CatalogBreadcrumbTrait
+{
 
     public function getBaseBreadcrumb(Router $router, ContainerInterface $container, $categoryId, &$locale)
     {
