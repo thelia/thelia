@@ -24,7 +24,7 @@
                             <h3 class="name" style="margin:0">
                                 {$TITLE}
                             </h3>
-                            <a href="{url path="/cart/delete/{$ITEM_ID}"}" class="btn btn-remove" data-tip="tooltip" data-title="Delete" data-original-title=""><i class="icon-trash"></i> <span>{intl l="Remove"}</span></a>
+                            <a href="{url path="/cart/delete/{$ITEM_ID}"}" class="btn btn-remove"><i class="icon-trash"></i> <span>{intl l="Remove"}</span></a>
                         </td>
                         <td class="unitprice text-center">
                             {if $IS_PROMO == 1}
@@ -32,7 +32,7 @@
                             {else}
                                 {assign "real_price" $TAXED_PRICE}
                             {/if}
-                            <span class="qty">{$QUANTITY}</span> X <span class="price" style="font-size:1em;">{$real_price} {currency attr="symbol"}</span></div>
+                            <span class="qty">{$QUANTITY}</span> X <span class="price" style="font-size:1em;">{$real_price} {currency attr="symbol"}</span>
                             {assign "total_price" $total_price + ($QUANTITY * $real_price)}
                         </td>
                     </tr>
@@ -58,7 +58,7 @@
 </li>
 {/ifloop}
 {elseloop rel="cartloop"}
-<li class="dropdown pull-right  cart-container">
+<li class="dropdown pull-right cart-container">
     <a href="{url path="/cart"}" rel="nofollow" class="cart">
         {intl l="Cart"} <span class="badge">0</span>
     </a>
