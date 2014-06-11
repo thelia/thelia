@@ -10,9 +10,7 @@
         <article class="col-main" role="main" aria-labelledby="main-label">
         <h1 id="main-label" class="page-header">{intl l="Contact Us"}</h1>
 
-        <div id="google-map">
-            <iframe class="map" width="100%" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://maps.google.co.uk/maps?f=q&source=s_q&hl=en&geocode=&q=london&aq=&sll=52.8382,-2.327815&sspn=9.377429,22.126465&ie=UTF8&hq=&hnear=London,+United+Kingdom&t=m&z=10&ll=51.511214,-0.119824&output=embed&iwloc=near"></iframe>
-        </div><!-- / #google-map-->
+        <div id="google-map"><!-- Google Map --></div>
 
         {block name="contact-form"}
             {form name="thelia.front.contact"}
@@ -88,4 +86,50 @@
         {/block}
         </article>
     </div>
+{/block}
+
+{block name="javascript-initialization"}
+<script src="//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&language={lang attr="code"}"></script>
+<script>
+var address = '{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}, {config key="store_city"}, {config key="store_country"}';
+var icon_thelia = '{images file="assets/img/googlemap-icon.png"}{$asset_url}{/images}';
+{literal}
+$(function(){
+    $('#google-map').each(function() {
+        var map,
+            $this = $(this),
+            geocoder = new google.maps.Geocoder(),
+            marker,
+            latlng = new google.maps.LatLng(45.79, 3.09),
+            myOptions = {
+                zoom: 9,
+                center:  latlng,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+ 
+        map = new google.maps.Map(document.getElementById($this.attr("id")), myOptions);
+
+        // locate store address
+        geocoder.geocode( { 'address': address}, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                map.setCenter(results[0].geometry.location);
+                latlng = new google.maps.LatLng(results[0].geometry.location.Qa, results[0].geometry.location.Ra),
+                marker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });
+            } else {
+                console.log('Error: The Geolocation service failed.')
+                // Show Thelia address
+                marker = new google.maps.Marker({
+                    map: map,
+                    position: latlng,
+                    icon: icon_thelia
+                });
+            }
+        });
+    });
+});
+{/literal}
+</script>
 {/block}
