@@ -124,7 +124,10 @@
                         bootbox.hideAll();
                         // Show dialog
                         bootbox.dialog({
-                            message : $("#product",data)
+                            message : $("#product",data),
+                            onEscape: function() {
+                                bootbox.hideAll();
+                            }
                         });
                     }
                 ); 
@@ -149,7 +152,9 @@
                                 // Show dialog
                                 bootbox.dialog({
                                     message : data,
-                                    buttons : {}
+                                    onEscape: function() {
+                                        bootbox.hideAll();
+                                    }
                                 });
                             }
                         });
