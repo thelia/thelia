@@ -2,13 +2,18 @@
 
 namespace Thelia\Model;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Router;
 use Thelia\Model\Base\FolderImage as BaseFolderImage;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Model\Breadcrumb\BreadcrumbInterface;
+use Thelia\Model\Breadcrumb\FolderBreadcrumbTrait;
 
-class FolderImage extends BaseFolderImage
+class FolderImage extends BaseFolderImage implements BreadcrumbInterface
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
     use \Thelia\Model\Tools\PositionManagementTrait;
+    use FolderBreadcrumbTrait;
 
     /**
      * Calculate next position relative to our parent
@@ -61,5 +66,16 @@ class FolderImage extends BaseFolderImage
         );
 
         return true;
+    }
+
+    /**
+     *
+     * return the complete breadcrumb for a given resource.
+     *
+     * @return array
+     */
+    public function getBreadcrumb(Router $router, ContainerInterface $container, $tab)
+    {
+        return $this->getFolderBreadcrumb($router, $container, $tab);
     }
 }
