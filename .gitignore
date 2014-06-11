@@ -42,3 +42,8 @@ templates/*
 !templates/email/
 !templates/frontOffice/
 !templates/pdf/
+
+#Ignore CodeKit
+codekit-config.json
+config.codekit
+.codekit-cache
