@@ -50,7 +50,7 @@ class Format extends AbstractSmartyPlugin
      *
      * ex :
      *  {format_date date=$dateTimeObject format="Y-m-d H:i:s"} will output the format with specific format
-     *  {format_date date=$dateTimeObject format="% %B %Y" locale="fr_FR"} will output the format with specific format
+     *  {format_date date=$dateTimeObject format="%e %B %Y" locale="fr_FR"} will output the format with specific format (see strftime function)
      *  {format_date date=$dateTimeObject output="date"} will output the date using the default date system format
      *  {format_date date=$dateTimeObject} will output with the default datetime system format
      *
