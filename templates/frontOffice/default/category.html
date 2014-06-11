@@ -81,7 +81,7 @@
                     <div class="products-content">
                         <ul class="product-col-4">
                             {loop type="product" name="product_list" category={category attr="id"} limit=$limit page=$product_page order=$product_order}
-                                {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="218" height="146"}
+                                {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true hasQuickView=true width="218" height="146"}
                             {/loop}
                         </ul>
                     </div>
