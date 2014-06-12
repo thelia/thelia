@@ -160,6 +160,11 @@
         <default key="_view">order-invoice</default>
     </route>
 
+    <route id="order.coupon.clear" path="/order/clear-coupons">
+        <default key="_controller">Front\Controller\CouponController::clearAllCouponsAction</default>
+        <default key="_view">order-invoice</default>
+    </route>
+
     <route id="order.payment.process" path="/order/pay">
         <default key="_controller">Front\Controller\OrderController::pay</default>
     </route>

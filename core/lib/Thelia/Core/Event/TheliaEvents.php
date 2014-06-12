@@ -465,6 +465,12 @@ final class TheliaEvents
     const COUPON_CONSUME 	= "action.consume_coupon";
 
     /**
+     * Sent when all coupons in the current session should be cleared
+     */
+    const COUPON_CLEAR_ALL 	= "action.clear_all_coupon";
+
+
+    /**
      * Sent just before an attempt to use a Coupon
      */
     const BEFORE_CONSUME_COUPON 	= "action.before_consume_coupon";

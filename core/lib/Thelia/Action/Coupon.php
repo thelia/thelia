@@ -110,6 +110,14 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Clear all coupons in session.
+     */
+    public function clearAllCoupons() {
+
+        $this->request->getSession()->setConsumedCoupons(array());
+    }
+
+    /**
      * Occurring when a Coupon condition is about to be consumed
      *
      * @param CouponConsumeEvent $event Event consuming Coupon
@@ -139,21 +147,22 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                     $consumedCoupons[$event->getCode()] = $event->getCode();
 
                     $this->request->getSession()->setConsumedCoupons($consumedCoupons);
-
-                    $totalDiscount = $this->couponManager->getDiscount();
-
-                    $this->request
-                        ->getSession()
-                        ->getCart()
-                        ->setDiscount($totalDiscount)
-                        ->save();
-                    $this->request
-                        ->getSession()
-                        ->getOrder()
-                        ->setDiscount($totalDiscount)
-                    ;
                 }
-            }
+                
+                $totalDiscount = $this->couponManager->getDiscount();
+
+                $this->request
+                    ->getSession()
+                    ->getCart()
+                    ->setDiscount($totalDiscount)
+                    ->save();
+
+                $this->request
+                    ->getSession()
+                    ->getOrder()
+                    ->setDiscount($totalDiscount)
+                ;
+             }
         }
 
         $event->setIsValid($isValid);
@@ -339,7 +348,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             }
         }
 
-        $this->request->getSession()->setConsumedCoupons(array());
+        // Clear all coupouns.
+        $event->getDispatcher()->dispatch(TheliaEvents::COUPON_CLEAR_ALL);
     }
 
     /**
@@ -368,6 +378,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::COUPON_CREATE => array("create", 128),
             TheliaEvents::COUPON_UPDATE => array("update", 128),
             TheliaEvents::COUPON_CONSUME => array("consume", 128),
+            TheliaEvents::COUPON_CLEAR_ALL => array("clearAllCoupons", 128),
             TheliaEvents::COUPON_CONDITION_UPDATE => array("updateCondition", 128),
             TheliaEvents::ORDER_SET_POSTAGE => array("testFreePostage", 132),
             TheliaEvents::ORDER_BEFORE_PAYMENT => array("afterOrder", 128),
