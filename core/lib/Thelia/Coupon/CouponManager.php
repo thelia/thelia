@@ -278,57 +278,62 @@ class CouponManager
      */
     public function decrementQuantity(Coupon $coupon, $customerId = null)
     {
-        $ret = false;
+        if ($coupon->isUsageUnlimited()) {
+            $ret = true;
+        }
+        else {
+            $ret = false;
 
-        try {
+            try {
 
-            $usageLeft = $coupon->getUsagesLeft($customerId);
+                $usageLeft = $coupon->getUsagesLeft($customerId);
 
-            if ($usageLeft > 0) {
+                if ($usageLeft > 0) {
 
-                // If the coupon usage is per user, add an entry to coupon customer usage count table
-                if ($coupon->getPerCustomerUsageCount()) {
+                    // If the coupon usage is per user, add an entry to coupon customer usage count table
+                    if ($coupon->getPerCustomerUsageCount()) {
 
-                    if (null == $customerId) {
-                        throw new \LogicException("Customer should not be null at this time.");
-                    }
+                        if (null == $customerId) {
+                            throw new \LogicException("Customer should not be null at this time.");
+                        }
 
-                    $ccc = CouponCustomerCountQuery::create()
-                        ->filterByCouponId($coupon->getId())
-                        ->filterByCustomerId($customerId)
-                        ->findOne()
-                    ;
+                        $ccc = CouponCustomerCountQuery::create()
+                            ->filterByCouponId($coupon->getId())
+                            ->filterByCustomerId($customerId)
+                            ->findOne()
+                        ;
 
-                    if ($ccc === null) {
-                        $ccc = new CouponCustomerCount();
+                        if ($ccc === null) {
+                            $ccc = new CouponCustomerCount();
+
+                            $ccc
+                                ->setCustomerId($customerId)
+                                ->setCouponId($coupon->getId())
+                                ->setCount(0);
+                        }
+
+                        $newCount = 1 + $ccc->getCount();
 
                         $ccc
-                            ->setCustomerId($customerId)
-                            ->setCouponId($coupon->getId())
-                            ->setCount(0);
+                            ->setCount($newCount)
+                            ->save()
+                        ;
+
+                        $ret = $usageLeft - $newCount;
+                    } else {
+                        $usageLeft--;
+
+                        $coupon->setMaxUsage($usageLeft);
+
+                        $coupon->save();
+
+                        $ret = $usageLeft;
                     }
-
-                    $newCount = 1 + $ccc->getCount();
-
-                    $ccc
-                        ->setCount($newCount)
-                        ->save()
-                    ;
-
-                    $ret = $usageLeft - $newCount;
-                } else {
-                    $usageLeft--;
-
-                    $coupon->setMaxUsage($usageLeft);
-
-                    $coupon->save();
-
-                    $ret = $usageLeft;
                 }
+            } catch (\Exception $ex) {
+                // Just log the problem.
+                Tlog::getInstance()->addError(sprintf("Failed to decrement coupon %s: %s", $coupon->getCode(), $ex->getMessage()));
             }
-        } catch (\Exception $ex) {
-            // Just log the problem.
-            Tlog::getInstance()->addError(sprintf("Failed to decrement coupon %s: %s", $coupon->getCode(), $ex->getMessage()));
         }
 
         return $ret;
