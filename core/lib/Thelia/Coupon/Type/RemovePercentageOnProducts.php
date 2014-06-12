@@ -21,60 +21,30 @@ use Thelia\Model\Product;
  * Allow to remove an amount from the checkout total
  *
  * @package Coupon
- * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
+ * @author  Franck Allimant <franck@cqfdev.fr>
  */
-class RemovePercentageOnProducts extends CouponAbstract
+class RemovePercentageOnProducts extends AbstractRemoveOnProducts
 {
-    const CATEGORY_ID   = 'category_id';
-    const PRODUCTS_LIST = 'products';
-    const PERCENTAGE    = 'percentage';
+   const PERCENTAGE    = 'percentage';
 
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_percentage_on_products';
 
-    public $category_id  = 0;
-    public $product_list = array();
     public $percentage = 0;
 
     /**
      * @inheritdoc
      */
-    public function set(
-        FacadeInterface $facade,
-        $code,
-        $title,
-        $shortDescription,
-        $description,
-        array $effects,
-        $isCumulative,
-        $isRemovingPostage,
-        $isAvailableOnSpecialOffers,
-        $isEnabled,
-        $maxUsage,
-        \DateTime $expirationDate,
-        $freeShippingForCountries,
-        $freeShippingForModules,
-        $perCustomerUsageCount
-    )
-    {
-        parent::set(
-            $facade, $code, $title, $shortDescription, $description, $effects,
-            $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate,
-            $freeShippingForCountries,
-            $freeShippingForModules,
-            $perCustomerUsageCount
-        );
-
-        $this->product_list = isset($effects[self::PRODUCTS_LIST]) ? $effects[self::PRODUCTS_LIST] : array();
-
-        if (! is_array($this->product_list)) $this->product_list = array($this->product_list);
-
-        $this->category_id = isset($effects[self::CATEGORY_ID]) ? $effects[self::CATEGORY_ID] : 0;
+    protected function setFieldsValue($effects) {
 
         $this->percentage = $effects[self::PERCENTAGE];
+    }
 
-        return $this;
+    /**
+     * @inheritdoc
+     */
+    protected function getCartItemDiscount($cartItem) {
+        return $cartItem->getQuantity() * $cartItem->getPrice() * $this->percentage;
     }
 
     /**
@@ -108,46 +78,12 @@ class RemovePercentageOnProducts extends CouponAbstract
     /**
      * @inheritdoc
      */
-    public function exec()
-    {
-        // This coupon subtracts the specified amount from the order total
-        // for each product of the selected products.
-        $discount = 0;
-
-        $cartItems = $this->facade->getCart()->getCartItems();
-
-        /** @var CartItem $cartItem */
-        foreach ($cartItems as $cartItem) {
-            if (in_array($cartItem->getProduct()->getId(), $this->product_list)) {
-                if (! $cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
-                    $discount += $cartItem->getQuantity() * $cartItem->getPrice() * $this->percentage;
-                }
-            }
-        }
-
-        return $discount;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function drawBackOfficeInputs()
     {
-        return $this->facade->getParser()->render('coupon/type-fragments/remove-percentage-on-products.html', [
-
-            // The standard "Amount" field
-            'percentage_field_name'     => $this->makeCouponFieldName(self::PERCENTAGE),
-            'percentage_value'          => $this->percentage,
-
-            // The category ID field
-            'category_id_field_name' => $this->makeCouponFieldName(self::CATEGORY_ID),
-            'category_id_value'     => $this->category_id,
-
-            // The products list field
-            'products_field_name' => $this->makeCouponFieldName(self::PRODUCTS_LIST),
-            'products_values'     => $this->product_list,
-            'products_values_csv' => implode(', ', $this->product_list)
-        ]);
+        return $this->drawBaseBackOfficeInputs('coupon/type-fragments/remove-percentage-on-products.html', [
+                'percentage_field_name'  => $this->makeCouponFieldName(self::PERCENTAGE),
+                'percentage_value'       => $this->percentage,
+            ]);
     }
 
     /**
@@ -155,7 +91,7 @@ class RemovePercentageOnProducts extends CouponAbstract
      */
     protected function getFieldList()
     {
-        return [self::PERCENTAGE, self::CATEGORY_ID, self::PRODUCTS_LIST];
+        return  $this->getBaseFieldList([self::PERCENTAGE]);
     }
 
     /**
@@ -163,6 +99,8 @@ class RemovePercentageOnProducts extends CouponAbstract
      */
     protected function checkCouponFieldValue($fieldName, $fieldValue)
     {
+        $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
+
         if ($fieldName === self::PERCENTAGE) {
 
             $pcent = floatval($fieldValue);
@@ -172,22 +110,6 @@ class RemovePercentageOnProducts extends CouponAbstract
                     Translator::getInstance()->trans(
                         'Value %val for Percent Discount is invalid. Please enter a positive value between 1 and 100.',
                         [ '%val' => $fieldValue]
-                    )
-                );
-            }
-        } elseif ($fieldName === self::CATEGORY_ID) {
-            if (empty($fieldValue)) {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Please select a category'
-                    )
-                );
-            }
-        } elseif ($fieldName === self::PRODUCTS_LIST) {
-            if (empty($fieldValue)) {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Please select at least one product'
                     )
                 );
             }
