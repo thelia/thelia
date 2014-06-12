@@ -22,13 +22,9 @@ use Thelia\Model\CartItem;
  * @package Coupon
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
-abstract class AbstractRemoveOnCategories extends CouponAbstract implements AmountAndPercentageCouponInterface
+abstract class AbstractRemove extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
-    const CATEGORIES_LIST = 'categories';
-
-    protected $category_list = array();
-
-    /**
+     /**
      * Set the value of specific coupon fields.
      *
      * @param Array $effects the Coupon effects params
@@ -72,9 +68,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
             $perCustomerUsageCount
         );
 
-        $this->category_list = isset($effects[self::CATEGORIES_LIST]) ? $effects[self::CATEGORIES_LIST] : array();
-
-        if (! is_array($this->category_list)) $this->category_list = array($this->category_list);
+        $this->setFieldsValue($effects);
 
         return $this;
     }
@@ -114,12 +108,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
      */
     public function drawBaseBackOfficeInputs($templateName, $otherFields)
     {
-        return $this->facade->getParser()->render($templateName, array_merge($otherFields, [
-
-                // The categories list field
-                'categories_field_name' => $this->makeCouponFieldName(self::CATEGORIES_LIST),
-                'categories_values'     => $this->category_list
-            ]));
+        return $this->facade->getParser()->render($templateName, $otherFields);
     }
 
     /**
@@ -127,7 +116,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
      */
     public function getBaseFieldList($otherFields)
     {
-        return array_merge($otherFields, [self::CATEGORIES_LIST]);
+        return array_merge($otherFields);
     }
 
     /**
@@ -135,16 +124,6 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
      */
     public function checkBaseCouponFieldValue($fieldName, $fieldValue)
     {
-        if ($fieldName === self::CATEGORIES_LIST) {
-            if (empty($fieldValue)) {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Please select at least one category'
-                    )
-                );
-            }
-        }
-
         return $fieldValue;
     }
 }

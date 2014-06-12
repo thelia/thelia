@@ -25,21 +25,13 @@ use Thelia\Model\Category;
  */
 class RemoveAmountOnCategories extends AbstractRemoveOnCategories
 {
+    use AmountCouponTrait;
+
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_amount_on_categories';
 
-    /**
-     * @inheritdoc
-     */
-    protected function setFieldsValue($effects) {
-        // Nothing to do, the amount is processed by CouponAbstract.
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCartItemDiscount($cartItem) {
-        return $cartItem->getQuantity() * $this->amount;
+    protected function getAmountFieldName() {
+        return self::AMOUNT_FIELD_NAME;
     }
 
      /**
@@ -73,39 +65,6 @@ class RemoveAmountOnCategories extends AbstractRemoveOnCategories
      */
     public function drawBackOfficeInputs()
     {
-        return $this->drawBaseBackOfficeInputs('coupon/type-fragments/remove-amount-on-categories.html', [
-                'amount_field_name' => $this->makeCouponFieldName(self::AMOUNT_FIELD_NAME),
-                'amount_value'      => $this->amount
-            ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getFieldList()
-    {
-        return  $this->getBaseFieldList([self::AMOUNT_FIELD_NAME]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function checkCouponFieldValue($fieldName, $fieldValue)
-    {
-        $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
-
-        if ($fieldName === self::AMOUNT_FIELD_NAME) {
-
-            if (floatval($fieldValue) < 0) {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Value %val for Discount Amount is invalid. Please enter a positive value.',
-                        [ '%val' => $fieldValue]
-                    )
-                );
-            }
-        }
-
-        return $fieldValue;
+        return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-amount-on-categories.html');
     }
 }

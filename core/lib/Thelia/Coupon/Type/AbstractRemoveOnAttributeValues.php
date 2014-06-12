@@ -23,7 +23,7 @@ use Thelia\Model\CartItem;
  * @package Coupon
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
-abstract class AbstractRemoveOnAttributeValues extends CouponAbstract
+abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
     const ATTRIBUTES_AV_LIST = 'attribute_avs';
     const ATTRIBUTE          = 'attribute_id';
@@ -35,7 +35,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract
      * Set the value of specific coupon fields.
      * @param Array $effects the Coupon effects params
      */
-    protected abstract function setFieldsValue($effects);
+    public abstract function setFieldsValue($effects);
 
     /**
      * Get the discount for a specific cart item.
@@ -43,7 +43,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract
      * @param CartItem $cartItem the cart item
      * @return float the discount value
      */
-    protected abstract function getCartItemDiscount($cartItem);
+    public abstract function getCartItemDiscount($cartItem);
 
     /**
      * @inheritdoc
@@ -122,7 +122,13 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract
     }
 
     /**
-     * @inheritdoc
+     * Renders the template which implements coupon specific user-input,
+     * using the provided template file, and a list of specific input fields.
+     *
+     * @param string $templateName the path to the template
+     * @param array $otherFields the list of additional fields fields
+     *
+     * @return string the rendered template.
      */
     public function drawBaseBackOfficeInputs($templateName, $otherFields)
     {
@@ -141,7 +147,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract
     /**
      * @inheritdoc
      */
-    protected function getBaseFieldList($otherFields)
+    public function getBaseFieldList($otherFields)
     {
         return array_merge($otherFields, [self::ATTRIBUTE, self::ATTRIBUTES_AV_LIST]);
     }
@@ -149,7 +155,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract
     /**
      * @inheritdoc
      */
-    protected function checkBaseCouponFieldValue($fieldName, $fieldValue)
+    public function checkBaseCouponFieldValue($fieldName, $fieldValue)
     {
         if ($fieldName === self::ATTRIBUTE) {
             if (empty($fieldValue)) {

@@ -22,25 +22,18 @@ use Thelia\Model\Category;
  */
 class RemovePercentageOnCategories extends AbstractRemoveOnCategories
 {
-    const PERCENTAGE      = 'percentage';
+    const PERCENTAGE = 'percentage';
+
+    use PercentageCouponTrait;
 
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_percentage_on_categories';
 
-    protected $percentage = 0;
-
     /**
      * @inheritdoc
      */
-    protected function setFieldsValue($effects) {
-        $this->percentage = $effects[self::PERCENTAGE];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCartItemDiscount($cartItem) {
-        return $cartItem->getQuantity() * $cartItem->getPrice() * $this->percentage;
+    protected function getPercentageFieldName() {
+        return self::PERCENTAGE;
     }
 
     /**
@@ -74,42 +67,6 @@ class RemovePercentageOnCategories extends AbstractRemoveOnCategories
      */
     public function drawBackOfficeInputs()
     {
-        return $this->drawBaseBackOfficeInputs('coupon/type-fragments/remove-percentage-on-categories.html', [
-                'percentage_field_name'  => $this->makeCouponFieldName(self::PERCENTAGE),
-                'percentage_value'       => $this->percentage,
-            ]);
+        return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-percentage-on-categories.html');
     }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getFieldList()
-    {
-        return  $this->getBaseFieldList([self::PERCENTAGE]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function checkCouponFieldValue($fieldName, $fieldValue)
-    {
-        $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
-
-        if ($fieldName === self::PERCENTAGE) {
-
-            $pcent = floatval($fieldValue);
-
-            if ($pcent <= 0 || $pcent > 100) {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Value %val for Percent Discount is invalid. Please enter a positive value between 1 and 100.',
-                        [ '%val' => $fieldValue]
-                    )
-                );
-            }
-        }
-
-        return $fieldValue;
-    }
-
 }

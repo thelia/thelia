@@ -25,26 +25,18 @@ use Thelia\Model\Product;
  */
 class RemovePercentageOnProducts extends AbstractRemoveOnProducts
 {
-   const PERCENTAGE    = 'percentage';
+    const PERCENTAGE = 'percentage';
+
+    use PercentageCouponTrait;
 
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_percentage_on_products';
 
-    public $percentage = 0;
-
     /**
      * @inheritdoc
      */
-    protected function setFieldsValue($effects) {
-
-        $this->percentage = $effects[self::PERCENTAGE];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getCartItemDiscount($cartItem) {
-        return $cartItem->getQuantity() * $cartItem->getPrice() * $this->percentage;
+    protected function getPercentageFieldName() {
+        return self::PERCENTAGE;
     }
 
     /**
@@ -80,41 +72,6 @@ class RemovePercentageOnProducts extends AbstractRemoveOnProducts
      */
     public function drawBackOfficeInputs()
     {
-        return $this->drawBaseBackOfficeInputs('coupon/type-fragments/remove-percentage-on-products.html', [
-                'percentage_field_name'  => $this->makeCouponFieldName(self::PERCENTAGE),
-                'percentage_value'       => $this->percentage,
-            ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getFieldList()
-    {
-        return  $this->getBaseFieldList([self::PERCENTAGE]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function checkCouponFieldValue($fieldName, $fieldValue)
-    {
-        $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
-
-        if ($fieldName === self::PERCENTAGE) {
-
-            $pcent = floatval($fieldValue);
-
-            if ($pcent <= 0 || $pcent > 100) {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Value %val for Percent Discount is invalid. Please enter a positive value between 1 and 100.',
-                        [ '%val' => $fieldValue]
-                    )
-                );
-            }
-        }
-
-        return $fieldValue;
+        return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-percentage-on-products.html');
     }
 }

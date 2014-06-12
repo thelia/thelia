@@ -148,7 +148,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
                     $this->request->getSession()->setConsumedCoupons($consumedCoupons);
                 }
-                
+
                 $totalDiscount = $this->couponManager->getDiscount();
 
                 $this->request

@@ -22,7 +22,7 @@ use Thelia\Model\CartItem;
  * @package Coupon
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
-abstract class AbstractRemoveOnProducts extends CouponAbstract
+abstract class AbstractRemoveOnProducts extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
     const CATEGORY_ID   = 'category_id';
     const PRODUCTS_LIST = 'products';
@@ -35,7 +35,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract
      *
      * @param Array $effects the Coupon effects params
      */
-    protected abstract function setFieldsValue($effects);
+    public abstract function setFieldsValue($effects);
 
     /**
      * Get the discount for a specific cart item.
@@ -43,7 +43,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract
      * @param CartItem $cartItem the cart item
      * @return float the discount value
      */
-    protected abstract function getCartItemDiscount($cartItem);
+    public abstract function getCartItemDiscount($cartItem);
 
     /**
      * @inheritdoc
@@ -129,7 +129,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract
     /**
      * @inheritdoc
      */
-    protected function getBaseFieldList($otherFields)
+    public function getBaseFieldList($otherFields)
     {
         return array_merge($otherFields, [self::CATEGORY_ID, self::PRODUCTS_LIST]);
     }
@@ -137,7 +137,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract
     /**
      * @inheritdoc
      */
-    protected function checkBaseCouponFieldValue($fieldName, $fieldValue)
+    public function checkBaseCouponFieldValue($fieldName, $fieldValue)
     {
         if ($fieldName === self::CATEGORY_ID) {
             if (empty($fieldValue)) {
