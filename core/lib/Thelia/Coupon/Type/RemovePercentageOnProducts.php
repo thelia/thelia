@@ -12,9 +12,6 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\FacadeInterface;
-use Thelia\Model\CartItem;
 use Thelia\Model\Product;
 
 /**
@@ -35,7 +32,8 @@ class RemovePercentageOnProducts extends AbstractRemoveOnProducts
     /**
      * @inheritdoc
      */
-    protected function getPercentageFieldName() {
+    protected function getPercentageFieldName()
+    {
         return self::PERCENTAGE;
     }
 

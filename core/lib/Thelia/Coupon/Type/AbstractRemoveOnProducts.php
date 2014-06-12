@@ -35,15 +35,15 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
      *
      * @param Array $effects the Coupon effects params
      */
-    public abstract function setFieldsValue($effects);
+    abstract public function setFieldsValue($effects);
 
     /**
      * Get the discount for a specific cart item.
      *
-     * @param CartItem $cartItem the cart item
-     * @return float the discount value
+     * @param  CartItem $cartItem the cart item
+     * @return float    the discount value
      */
-    public abstract function getCartItemDiscount($cartItem);
+    abstract public function getCartItemDiscount($cartItem);
 
     /**
      * @inheritdoc

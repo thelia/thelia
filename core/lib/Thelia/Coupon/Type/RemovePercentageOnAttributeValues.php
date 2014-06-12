@@ -12,8 +12,6 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Core\Translation\Translator;
-
 /**
  * Allow to remove an amount from the checkout total
  *
@@ -32,7 +30,8 @@ class RemovePercentageOnAttributeValues extends AbstractRemoveOnAttributeValues
      /**
      * @inheritdoc
      */
-    protected function getPercentageFieldName() {
+    protected function getPercentageFieldName()
+    {
         return self::PERCENTAGE;
     }
 

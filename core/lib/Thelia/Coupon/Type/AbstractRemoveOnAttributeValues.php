@@ -35,15 +35,15 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
      * Set the value of specific coupon fields.
      * @param Array $effects the Coupon effects params
      */
-    public abstract function setFieldsValue($effects);
+    abstract public function setFieldsValue($effects);
 
     /**
      * Get the discount for a specific cart item.
      *
-     * @param CartItem $cartItem the cart item
-     * @return float the discount value
+     * @param  CartItem $cartItem the cart item
+     * @return float    the discount value
      */
-    public abstract function getCartItemDiscount($cartItem);
+    abstract public function getCartItemDiscount($cartItem);
 
     /**
      * @inheritdoc
@@ -126,7 +126,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
      * using the provided template file, and a list of specific input fields.
      *
      * @param string $templateName the path to the template
-     * @param array $otherFields the list of additional fields fields
+     * @param array  $otherFields  the list of additional fields fields
      *
      * @return string the rendered template.
      */

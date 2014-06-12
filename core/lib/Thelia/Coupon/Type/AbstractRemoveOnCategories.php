@@ -33,15 +33,15 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
      *
      * @param Array $effects the Coupon effects params
      */
-    public abstract function setFieldsValue($effects);
+    abstract public function setFieldsValue($effects);
 
     /**
      * Get the discount for a specific cart item.
      *
-     * @param CartItem $cartItem the cart item
-     * @return float the discount value
+     * @param  CartItem $cartItem the cart item
+     * @return float    the discount value
      */
-    public abstract function getCartItemDiscount($cartItem);
+    abstract public function getCartItemDiscount($cartItem);
 
     /**
      * @inheritdoc
@@ -75,7 +75,6 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
         $this->category_list = isset($effects[self::CATEGORIES_LIST]) ? $effects[self::CATEGORIES_LIST] : array();
 
         if (! is_array($this->category_list)) $this->category_list = array($this->category_list);
-
         return $this;
     }
     /**

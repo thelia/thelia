@@ -29,19 +29,21 @@ Trait PercentageCouponTrait {
      *
      * @return string the percentage field name
      */
-    protected abstract function getPercentageFieldName();
+    abstract protected function getPercentageFieldName();
 
     /**
      * @inheritdoc
      */
-    protected function setFieldsValue($effects) {
+    protected function setFieldsValue($effects)
+    {
         $this->percentage = $effects[$this->getPercentageFieldName()];
     }
 
     /**
      * @inheritdoc
      */
-    public function getCartItemDiscount($cartItem) {
+    public function getCartItemDiscount($cartItem)
+    {
         return $cartItem->getQuantity() * $cartItem->getPrice() * ($this->percentage / 100);
     }
 

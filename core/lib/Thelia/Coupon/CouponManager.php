@@ -280,8 +280,7 @@ class CouponManager
     {
         if ($coupon->isUsageUnlimited()) {
             $ret = true;
-        }
-        else {
+        } else {
             $ret = false;
 
             try {

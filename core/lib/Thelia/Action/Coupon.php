@@ -112,8 +112,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     /**
      * Clear all coupons in session.
      */
-    public function clearAllCoupons() {
-
+    public function clearAllCoupons()
+    {
         $this->request->getSession()->setConsumedCoupons(array());
     }
 

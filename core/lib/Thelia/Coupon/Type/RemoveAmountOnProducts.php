@@ -12,9 +12,6 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\FacadeInterface;
-use Thelia\Model\CartItem;
 use Thelia\Model\Product;
 
 /**
@@ -30,7 +27,8 @@ class RemoveAmountOnProducts extends AbstractRemoveOnProducts
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_amount_on_products';
 
-    protected function getAmountFieldName() {
+    protected function getAmountFieldName()
+    {
         return self::AMOUNT_FIELD_NAME;
     }
 

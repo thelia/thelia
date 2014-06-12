@@ -12,7 +12,6 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
 
@@ -29,15 +28,15 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
      *
      * @param Array $effects the Coupon effects params
      */
-    public abstract function setFieldsValue($effects);
+    abstract public function setFieldsValue($effects);
 
     /**
      * Get the discount for a specific cart item.
      *
-     * @param CartItem $cartItem the cart item
-     * @return float the discount value
+     * @param  CartItem $cartItem the cart item
+     * @return float    the discount value
      */
-    public abstract function getCartItemDiscount($cartItem);
+    abstract public function getCartItemDiscount($cartItem);
 
     /**
      * @inheritdoc

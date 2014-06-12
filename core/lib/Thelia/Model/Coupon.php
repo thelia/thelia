@@ -268,7 +268,8 @@ class Coupon extends BaseCoupon
         return CouponModuleQuery::create()->filterByCouponId($this->getId())->find();
     }
 
-    public function isUsageUnlimited() {
+    public function isUsageUnlimited()
+    {
         return $this->getMaxUsage() == self::UNLIMITED_COUPON_USE;
     }
     /**

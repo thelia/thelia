@@ -12,10 +12,6 @@
 
 namespace Thelia\Coupon\Type;
 
-use Propel\Runtime\Collection\ObjectCollection;
-use Thelia\Condition\ConditionCollection;
-use Thelia\Coupon\FacadeInterface;
-
 /**
  * Represents a Coupon ready to be processed in a Checkout process
  *
@@ -35,18 +31,17 @@ interface AmountAndPercentageCouponInterface
     /**
      * Get the discount for a specific cart item.
      *
-     * @param CartItem $cartItem the cart item
-     * @return float the discount value
+     * @param  CartItem $cartItem the cart item
+     * @return float    the discount value
      */
     public function getCartItemDiscount($cartItem);
-
 
     /**
      * Renders the template which implements coupon specific user-input,
      * using the provided template file, and a list of specific input fields.
      *
      * @param string $templateName the path to the template
-     * @param array $otherFields the list of additional fields fields
+     * @param array  $otherFields  the list of additional fields fields
      *
      * @return string the rendered template.
      */

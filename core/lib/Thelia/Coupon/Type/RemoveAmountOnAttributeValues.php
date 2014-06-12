@@ -12,8 +12,6 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Core\Translation\Translator;
-
 /**
  * Allow to remove an amount from the checkout total
  *
@@ -27,7 +25,8 @@ class RemoveAmountOnAttributeValues extends AbstractRemoveOnAttributeValues
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_amount_on_attribute_av';
 
-    protected function getAmountFieldName() {
+    protected function getAmountFieldName()
+    {
         return self::AMOUNT_FIELD_NAME;
     }
     /**

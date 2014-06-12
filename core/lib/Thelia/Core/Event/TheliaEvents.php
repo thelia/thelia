@@ -469,7 +469,6 @@ final class TheliaEvents
      */
     const COUPON_CLEAR_ALL 	= "action.clear_all_coupon";
 
-
     /**
      * Sent just before an attempt to use a Coupon
      */

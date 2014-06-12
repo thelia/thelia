@@ -32,19 +32,21 @@ Trait AmountCouponTrait {
      *
      * @return string the percentage field name
      */
-    protected abstract function getAmountFieldName();
+    abstract protected function getAmountFieldName();
 
     /**
      * @inheritdoc
      */
-    protected function setFieldsValue($effects) {
+    protected function setFieldsValue($effects)
+    {
         $this->amount = $effects[$this->getAmountFieldName()];
     }
 
     /**
      * @inheritdoc
      */
-    public function getCartItemDiscount($cartItem) {
+    public function getCartItemDiscount($cartItem)
+    {
         return $cartItem->getQuantity() * $this->amount;
     }
 

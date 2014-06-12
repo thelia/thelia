@@ -12,9 +12,6 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\FacadeInterface;
-
 /**
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>, Franck Allimant <franck@cqfdev.fr>
@@ -32,7 +29,8 @@ class RemoveXPercent extends AbstractRemove
     /**
      * @inheritdoc
      */
-    protected function getPercentageFieldName() {
+    protected function getPercentageFieldName()
+    {
         return self::INPUT_PERCENTAGE_NAME;
     }
 

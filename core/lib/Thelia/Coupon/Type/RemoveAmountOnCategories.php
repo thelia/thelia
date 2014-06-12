@@ -12,11 +12,6 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\FacadeInterface;
-use Thelia\Model\CartItem;
-use Thelia\Model\Category;
-
 /**
  * Allow to remove an amount from the checkout total
  *
@@ -30,7 +25,8 @@ class RemoveAmountOnCategories extends AbstractRemoveOnCategories
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_amount_on_categories';
 
-    protected function getAmountFieldName() {
+    protected function getAmountFieldName()
+    {
         return self::AMOUNT_FIELD_NAME;
     }
 
