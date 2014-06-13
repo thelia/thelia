@@ -114,6 +114,7 @@ return array(
     'Order details' => 'Détail de commande',
     'Order number' => 'Commande numéro',
     'Orders over $50' => 'Commande supérieure à 50€',
+    'Order Payment' => 'Commande avec obligation de paiement',
     'Out of Stock' => 'Hors stock',
     'Pagination' => 'Pagination',
     'Password' => 'Mot de passe',
