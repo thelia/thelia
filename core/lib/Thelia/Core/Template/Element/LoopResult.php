@@ -15,7 +15,7 @@ namespace Thelia\Core\Template\Element;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Util\PropelModelPager;
 
-class LoopResult implements \Iterator
+class LoopResult implements \Iterator, \JsonSerializable
 {
     private $position;
     protected $collection = array();
@@ -173,5 +173,18 @@ class LoopResult implements \Iterator
             array('VERSION_DATE', 'getVersionCreatedAt'),
             array('VERSION_AUTHOR', 'getVersionCreatedBy'),
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize()
+    {
+        $return = [];
+        foreach ($this->collection as $collection) {
+            $return[] = $collection->getVarVal();
+        }
+
+        return $return;
     }
 }

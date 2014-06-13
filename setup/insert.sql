@@ -2985,6 +2985,7 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (32, 'admin.configuration.translations', NOW(), NOW()),
 (33, 'admin.export', NOW(), NOW()),
 (34, 'admin.tools', NOW(), NOW()),
+<<<<<<< HEAD
 (35, 'admin.brand', NOW(), NOW()),
 (36, 'admin.hook', NOW(), NOW()),
 (37, 'admin.module-hook', NOW(), NOW()),
@@ -3000,6 +3001,10 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (47, 'admin.search', NOW(), NOW()),
 (48, 'admin.configuration.api', NOW(), NOW())
 ;
+=======
+(35, 'admin.configuration.api', NOW(), NOW()),
+(36, 'admin.customer.title', NOW(), NOW());
+>>>>>>> implement title api (list and get)
 
 /**
 generated with command : php Thelia thelia:generate-resources --output sql-i18n
@@ -3073,6 +3078,7 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (33, 'fr_FR', 'gestion des exports'),
 (34, 'en_US', 'Tools panel'),
 (34, 'fr_FR', 'Outils'),
+<<<<<<< HEAD
 (35, 'en_US', 'Brands management'),
 (35, 'fr_FR', 'Gestion des marques'),
 (36, 'en_US', 'Hooks'),
@@ -3102,6 +3108,12 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (48, 'en_US', 'API Configuration'),
 (48, 'fr_FR', "Configuration de l'API")
 ;
+=======
+(35, 'en_US', 'API Configuration'),
+(35, 'fr_FR', "Configuration de l'API"),
+(36, 'en_US', 'Customer title'),
+(36, 'fr_FR', 'civilité client');
+>>>>>>> implement title api (list and get)
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
 (1, 'order_confirmation', NULL, NULL, 'order_confirmation.txt', NULL, 'order_confirmation.html', NOW(), NOW()),

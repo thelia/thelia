@@ -121,4 +121,5 @@ final class AdminResources
 
     const API = "admin.configuration.api";
 
+    const TITLE = "admin.customer.title";
 }

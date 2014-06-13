@@ -12,10 +12,8 @@
 
 namespace Thelia\Controller\Api;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
-use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
@@ -24,17 +22,12 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Customer;
 use Thelia\Exception\CustomerException;
 use Thelia\Form\Api\Customer\CustomerCreateForm;
 use Thelia\Form\Api\Customer\CustomerUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
-use Thelia\Model\Map\CustomerTableMap;
-use Thelia\Model\Map\CustomerTitleI18nTableMap;
-use Thelia\Type\EnumType;
-use Thelia\Type\TypeCollection;
 
 /**
  * Class CustomerController
@@ -61,15 +54,10 @@ class CustomerController extends BaseApiController
             throw new BadRequestHttpException(sprintf('{"error": "%s"}', $e->getMessage()));
         }
 
+        $paginate = 0;
+        $results = $customerLoop->exec($paginate);
 
-        $results = $customerLoop
-            ->buildModelCriteria()
-            ->select(['Id', 'Ref', 'TitleId', 'Firstname', 'Lastname', 'Email', 'Reseller', 'Lang', 'Sponsor', 'Discount', 'CreatedAt', 'UpdatedAt'])
-            ->limit($parameters['limit'])
-            ->offset($parameters['offset'])
-            ->find()->toJSON(false, true);
-
-        return Response::create($results);
+        return JsonResponse::create($results);
 
     }
 
@@ -85,19 +73,17 @@ class CustomerController extends BaseApiController
                 'current'   => false,
                 'id'        => $customer_id
             ]);
-        } catch(\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             throw new BadRequestHttpException(sprintf('{"error": "%s"}', $e->getMessage()));
         }
-
-        $result = $customer->buildModelCriteria()
-            ->select(['Id', 'Ref', 'TitleId', 'Firstname', 'Lastname', 'Email', 'Reseller', 'Lang', 'Sponsor', 'Discount', 'CreatedAt', 'UpdatedAt'])
-            ->find();
+        $paginate = 0;
+        $result = $customer->exec($paginate);
 
         if ($result->isEmpty()) {
             throw new HttpException(404, sprintf('{"error": "customer with id %d not found"}', $customer_id));
         }
 
-        return Response::create($result->toJSON(false, true));
+        return JsonResponse::create($result);
 
     }
 
@@ -112,16 +98,14 @@ class CustomerController extends BaseApiController
             $event = $this->hydrateEvent($customerForm);
 
             $this->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $event);
-            $customer = $event->getCustomer()->toArray();
-            unset($customer['Password']);
-            unset($customer['Algo']);
+            $customer = $event->getCustomer();
 
-            return Response::create(
-                json_encode($customer)
-                , 201
-            );
+            $response = $this->getCustomerAction($customer->getId());
+            $response->setStatusCode(201);
+
+            return $response;
         } catch (FormValidationException $e) {
-            return Response::create(sprintf("{'error': '%s'}", $e->getMessage()), 400);
+            return JsonResponse::create(['error' => $e->getMessage()], 400);
         }
     }
 
@@ -149,7 +133,7 @@ class CustomerController extends BaseApiController
             return Response::create(null, 204);
 
         } catch (FormValidationException $e) {
-            return Response::create(sprintf("{'error': '%s'}", $e->getMessage()), 400);
+            return JsonResponse::create(['error' => $e->getMessage()], 400);
         }
     }
 

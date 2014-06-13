@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Api;
 
+use Thelia\Model\CustomerQuery;
 use Thelia\Tests\ApiTestCase;
 
 
@@ -82,18 +83,17 @@ class CustomerControllerTest extends ApiTestCase
 
     protected function customerKeyTest($customer)
     {
-        $this->assertArrayHasKey('Id', $customer, 'customer entity must contains Id key');
-        $this->assertArrayHasKey('Ref', $customer, 'customer entity must contains Ref key');
-        $this->assertArrayHasKey('TitleId', $customer, 'customer entity must contains TitleId key');
-        $this->assertArrayHasKey('Firstname', $customer, 'customer entity must contains Firstname key');
-        $this->assertArrayHasKey('Lastname', $customer, 'customer entity must contains Lastname key');
-        $this->assertArrayHasKey('Email', $customer, 'customer entity must contains Email key');
-        $this->assertArrayHasKey('Reseller', $customer, 'customer entity must contains Reseller key');
-        $this->assertArrayHasKey('Lang', $customer, 'customer entity must contains Lang key');
-        $this->assertArrayHasKey('Sponsor', $customer, 'customer entity must contains Sponsor key');
-        $this->assertArrayHasKey('Discount', $customer, 'customer entity must contains Discount key');
-        $this->assertArrayHasKey('CreatedAt', $customer, 'customer entity must contains CreatedAt key');
-        $this->assertArrayHasKey('UpdatedAt', $customer, 'customer entity must contains UpdatedAt key');
+        $this->assertArrayHasKey('ID', $customer, 'customer entity must contains Id key');
+        $this->assertArrayHasKey('REF', $customer, 'customer entity must contains Ref key');
+        $this->assertArrayHasKey('TITLE', $customer, 'customer entity must contains TitleId key');
+        $this->assertArrayHasKey('FIRSTNAME', $customer, 'customer entity must contains Firstname key');
+        $this->assertArrayHasKey('LASTNAME', $customer, 'customer entity must contains Lastname key');
+        $this->assertArrayHasKey('EMAIL', $customer, 'customer entity must contains Email key');
+        $this->assertArrayHasKey('RESELLER', $customer, 'customer entity must contains Reseller key');
+        $this->assertArrayHasKey('SPONSOR', $customer, 'customer entity must contains Sponsor key');
+        $this->assertArrayHasKey('DISCOUNT', $customer, 'customer entity must contains Discount key');
+        $this->assertArrayHasKey('CREATE_DATE', $customer, 'customer entity must contains CreatedAt key');
+        $this->assertArrayHasKey('UPDATE_DATE', $customer, 'customer entity must contains UpdatedAt key');
     }
 
     /**
@@ -166,7 +166,42 @@ class CustomerControllerTest extends ApiTestCase
 
         $content = json_decode($client->getResponse()->getContent(), true);
 
-        return $content['Id'];
+        return $content['ID'];
+
+    }
+
+    public function testCreateWithExistingEmail()
+    {
+        $customer = CustomerQuery::create()->addAscendingOrderByColumn('RAND()')->findOne();
+
+        $user = [
+            'thelia_customer_create' => [
+                'title' => 1,
+                'firstname' => 'Thelia',
+                'lastname'  => 'Thelia',
+                'address1'  => 'street address 1',
+                'city'      => 'Clermont-Ferrand',
+                'zipcode'   => 63100,
+                'country'   => 64,
+                'email'     => $customer->getEmail(),
+                'password'  => 'azerty',
+                'lang'      => 1
+            ]
+        ];
+
+        $requestContent = json_encode($user);
+
+        $client = static::createClient();
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+        $client->request(
+            'POST',
+            '/api/customers?&sign='.$this->getSignParameter($requestContent),[],[],
+            $servers,
+            $requestContent
+        );
+
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
 
     }
 

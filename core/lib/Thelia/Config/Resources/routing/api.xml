@@ -9,6 +9,7 @@
         <default key="not-logged">1</default>
     </route>
 
+    <!-- customer routes -->
     <route id="api.customer.list" path="/api/customers" methods="get">
         <default key="_controller">Thelia\Controller\Api\CustomerController::listAction</default>
     </route>
@@ -31,4 +32,16 @@
         <default key="_controller">Thelia\Controller\Api\CustomerController::deleteCustomerAction</default>
         <requirement key="customer_id">\d+</requirement>
     </route>
+
+    <!-- end customer route -->
+    <!-- title route -->
+    <route id="api.title.list" path="/api/title" methods="get">
+        <default key="_controller">Thelia\Controller\Api\TitleController::listAction</default>
+    </route>
+
+    <route id="api.title.get" path="/api/title/{title_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Api\TitleController::getTitleAction</default>
+        <requirement key="title_id">\d+</requirement>
+    </route>
+
 </routes>
