@@ -99,7 +99,9 @@
                                                     {/if}
                                                     <tr>
                                                         <td>
-                                                            <a href="#">{$TITLE}</a>
+                                                            {loop type="product" name="my_product_loop" visible="*" ref="$REF"}
+                                                                <a href="{url path='/admin/products/update' product_id=$ID}">{$TITLE}</a>
+                                                            {/loop}
                                                             {ifloop rel="combinations"}
                                                             <dl class="dl-horizontal">
                                                                 {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
