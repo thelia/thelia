@@ -72,6 +72,24 @@ class TitleControllerTest extends ApiTestCase
 
     }
 
+    public function testGetActionWithLocale()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'GET',
+            '/api/title/1?lang=fr_FR&sign='.$this->getSignParameter(''), [], [],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), 'Http status code must be 200');
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $this->assertCount(1, $content, 'response must contains only 1 result');
+        $firstResult = $content[0];
+        $this->assertEquals('fr_FR', $firstResult['LOCALE'], 'the returned locale must be fr_FR');
+
+    }
+
     public function testGetActionWithUnexistingId()
     {
         $client = static::createClient();

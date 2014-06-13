@@ -166,7 +166,7 @@ class CustomerControllerTest extends ApiTestCase
 
         $content = json_decode($client->getResponse()->getContent(), true);
 
-        return $content['ID'];
+        return $content[0]['ID'];
 
     }
 
