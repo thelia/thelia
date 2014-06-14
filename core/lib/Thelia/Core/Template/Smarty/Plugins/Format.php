@@ -89,12 +89,10 @@ class Format extends AbstractSmartyPlugin
 
         $locale = $this->getParam($params,'locale', false);
 
-        if($locale === false)
-        {
+        if($locale === false) {
             return $date->format($format);
         } else {
-            if(function_exists('setlocale'))
-            {
+            if(function_exists('setlocale')) {
                 // Save the current locale
                 $system_locale = setlocale('LC_TIME', 0);
                 setlocale('LC_TIME', $locale);
@@ -104,7 +102,7 @@ class Format extends AbstractSmartyPlugin
 
                 return $localized_date;
             } else {
-                // No timestamp => error
+                // setlocale() function not available => error
                 throw new SmartyPluginException("The setlocale() function is not available on your system.");
             }
         }
