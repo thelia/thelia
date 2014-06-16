@@ -114,6 +114,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     public function clearAllCoupons()
     {
+        // Tell coupons to clear any data they may have stored
+        $this->couponManager->clear();
+
         $this->request->getSession()->setConsumedCoupons(array());
     }
 
@@ -348,7 +351,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             }
         }
 
-        // Clear all coupouns.
+        // Clear all coupons.
         $event->getDispatcher()->dispatch(TheliaEvents::COUPON_CLEAR_ALL);
     }
 
