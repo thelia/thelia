@@ -58,14 +58,15 @@ class CouponManager
 
     /**
      * Get Discount for the given Coupons
-     *
      * @api
      * @return float checkout discount
      */
     public function getDiscount()
     {
         $discount = 0.00;
+
         $coupons = $this->facade->getCurrentCoupons();
+
         if (count($coupons) > 0) {
             $couponsKept = $this->sortCoupons($coupons);
 
@@ -73,6 +74,7 @@ class CouponManager
 
             // Just In Case test
             $checkoutTotalPrice = $this->facade->getCartTotalTaxPrice();
+
             if ($discount >= $checkoutTotalPrice) {
                 $discount = $checkoutTotalPrice;
             }
@@ -83,6 +85,9 @@ class CouponManager
 
     /**
      * Check if there is a Coupon removing Postage
+     *
+     * @param Order $order the order for which we have to check if postage is free
+     *
      * @return bool
      */
     public function isCouponRemovingPostage(Order $order)
@@ -264,6 +269,19 @@ class CouponManager
     public function getAvailableConditions()
     {
         return $this->availableConditions;
+    }
+
+    /**
+     * Clear all data kept by coupons
+     */
+    public function clear() {
+
+        $coupons = $this->facade->getCurrentCoupons();
+
+        /** @var CouponInterface $coupon */
+        foreach ($coupons as $coupon) {
+            $coupon->clear();
+        }
     }
 
     /**
