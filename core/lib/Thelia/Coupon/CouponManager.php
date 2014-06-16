@@ -274,8 +274,8 @@ class CouponManager
     /**
      * Clear all data kept by coupons
      */
-    public function clear() {
-
+    public function clear()
+    {
         $coupons = $this->facade->getCurrentCoupons();
 
         /** @var CouponInterface $coupon */

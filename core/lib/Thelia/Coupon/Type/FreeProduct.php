@@ -15,12 +15,10 @@ namespace Thelia\Coupon\Type;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
-
 
 /**
  * Allow to remove an amount from the checkout total
@@ -66,7 +64,8 @@ class FreeProduct extends AbstractRemoveOnProducts
     /**
      * @return string The session variable where the cart item IDs for the free products are stored
      */
-    protected function getSessionVarName() {
+    protected function getSessionVarName()
+    {
         return "coupon.free_product.cart_items." . $this->getCode();
    }
     /**
@@ -76,8 +75,8 @@ class FreeProduct extends AbstractRemoveOnProducts
      *
      * @return bool|int|CartItem the cart item which contains the free product, or false if the product is no longer in the cart, or ADD_TO_CART_IN_PROCESS if the adding process is not finished
      */
-    protected function getRelatedCartItem($product) {
-
+    protected function getRelatedCartItem($product)
+    {
         $cartItemIdList =  $this->facade->getRequest()->getSession()->get(
             $this->getSessionVarName(),
             array()
@@ -89,12 +88,10 @@ class FreeProduct extends AbstractRemoveOnProducts
 
             if ($cartItemId == self::ADD_TO_CART_IN_PROCESS) {
                 return self::ADD_TO_CART_IN_PROCESS;
-            }
-            else if (null !== $cartItem = CartItemQuery::create()->findPk($cartItemId)) {
+            } elseif (null !== $cartItem = CartItemQuery::create()->findPk($cartItemId)) {
                 return $cartItem;
             }
-        }
-        else {
+        } else {
             // Maybe the product we're offering is already in the cart ? Search it.
             $cartItems = $this->facade->getCart()->getCartItems();
 
@@ -117,11 +114,11 @@ class FreeProduct extends AbstractRemoveOnProducts
     /**
      * Set the cart item id which contains the free product related to a given product
      *
-     * @param Product $product the product in the cart which triggered the discount
-     * @param  bool|int $cartItemId the cart item ID which contains the free product, or just true if the free product is not yet added.
+     * @param Product  $product    the product in the cart which triggered the discount
+     * @param bool|int $cartItemId the cart item ID which contains the free product, or just true if the free product is not yet added.
      */
-    protected function setRelatedCartItem($product, $cartItemId) {
-
+    protected function setRelatedCartItem($product, $cartItemId)
+    {
         $cartItemIdList = $this->facade->getRequest()->getSession()->get(
             $this->getSessionVarName(),
             array()
@@ -142,7 +139,8 @@ class FreeProduct extends AbstractRemoveOnProducts
      *
      * @return array an array where the free product ID is the key, and the related cart item id the value.
      */
-    protected function getFreeProductsCartItemIds() {
+    protected function getFreeProductsCartItemIds()
+    {
         return $this->facade->getRequest()->getSession()->get(
             $this->getSessionVarName(),
             array()
@@ -152,7 +150,8 @@ class FreeProduct extends AbstractRemoveOnProducts
     /**
      * Clear the session variable.
      */
-    protected function clearFreeProductsCartItemIds() {
+    protected function clearFreeProductsCartItemIds()
+    {
         return $this->facade->getRequest()->getSession()->remove($this->getSessionVarName());
     }
 
@@ -162,7 +161,8 @@ class FreeProduct extends AbstractRemoveOnProducts
      *
      * @inheritdoc
      */
-    public function isMatching() {
+    public function isMatching()
+    {
         $match = parent::isMatching();
 
         if (! $match) {
@@ -279,8 +279,7 @@ class FreeProduct extends AbstractRemoveOnProducts
                     )
                 );
             }
-        }
-        else if ($fieldName === self::OFFERED_CATEGORY_ID) {
+        } elseif ($fieldName === self::OFFERED_CATEGORY_ID) {
             if (empty($fieldValue)) {
                 throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(
@@ -292,7 +291,6 @@ class FreeProduct extends AbstractRemoveOnProducts
 
         return $fieldValue;
     }
-
 
     /**
      * Get I18n name

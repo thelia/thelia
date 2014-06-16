@@ -503,7 +503,8 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * @inheritdoc
      */
-    public function clear() {
+    public function clear()
+    {
         // Does nothing. Override this function as needed.
     }
 }

@@ -150,7 +150,6 @@ class BaseFacade implements FacadeInterface
         return $total;
     }
 
-
     /**
      * @return Country the delivery country
      */
