@@ -66,9 +66,10 @@
             <tag name="thelia.coupon.addCoupon"/>
         </service>
 
-
-
-
+        <service id="thelia.coupon.type.free_product" class="Thelia\Coupon\Type\FreeProduct">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCoupon"/>
+        </service>
 
         <!-- Condition module -->
 
