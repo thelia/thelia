@@ -1,3 +1,6 @@
+#2.0.3
+- New coupon type: Free product if selected products are in the cart.
+
 #2.0.2
 - Coupon UI has been redesigned.
 - New coupon types:
