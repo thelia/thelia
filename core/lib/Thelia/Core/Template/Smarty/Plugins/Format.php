@@ -89,22 +89,29 @@ class Format extends AbstractSmartyPlugin
 
         $locale = $this->getParam($params,'locale', false);
 
-        if($locale === false) {
-            return $date->format($format);
+        if (false === $locale) {
+            $value = $date->format($format);
         } else {
-            if(function_exists('setlocale')) {
-                // Save the current locale
-                $system_locale = setlocale('LC_TIME', 0);
-                setlocale('LC_TIME', $locale);
-                $localized_date =  strftime($format, $date->getTimestamp());
-                // Restore the locale
-                setlocale('LC_TIME', $system_locale);
+            $value = $this->formatDateWithLocale($date, $locale, $format);
+        }
 
-                return $localized_date;
-            } else {
-                // setlocale() function not available => error
-                throw new SmartyPluginException("The setlocale() function is not available on your system.");
-            }
+        return $value;
+    }
+
+    private function formatDateWithLocale(\DateTime $date, $locale, $format)
+    {
+        if (function_exists('setlocale')) {
+            // Save the current locale
+            $systemLocale = setlocale('LC_TIME', 0);
+            setlocale('LC_TIME', $locale);
+            $localizedDate =  strftime($format, $date->getTimestamp());
+            // Restore the locale
+            setlocale('LC_TIME', $systemLocale);
+
+            return $localizedDate;
+        } else {
+            // setlocale() function not available => error
+            throw new SmartyPluginException("The setlocale() function is not available on your system.");
         }
     }
 
