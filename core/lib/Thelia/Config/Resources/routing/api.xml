@@ -34,6 +34,7 @@
     </route>
 
     <!-- end customer route -->
+
     <!-- title route -->
     <route id="api.title.list" path="/api/title" methods="get">
         <default key="_controller">Thelia\Controller\Api\TitleController::listAction</default>
@@ -43,5 +44,19 @@
         <default key="_controller">Thelia\Controller\Api\TitleController::getTitleAction</default>
         <requirement key="title_id">\d+</requirement>
     </route>
+    <!-- end title route -->
+
+    <!-- product route -->
+
+    <route id="api.product.list" path="/api/products" methods="get">
+        <default key="_controller">Thelia\Controller\Api\ProductController::listAction</default>
+    </route>
+
+    <route id="api.product.get" path="/api/products/{product_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Api\ProductController::getProductAction</default>
+        <requirement key="product_id">\d+</requirement>
+    </route>
+
+    <!-- end product route -->
 
 </routes>
