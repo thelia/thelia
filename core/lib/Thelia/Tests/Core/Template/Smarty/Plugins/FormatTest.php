@@ -158,6 +158,23 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($render);
     }
 
+    public function testFormatDateWithLocale()
+    {
+        $dateTime = new \DateTime();
+        // 2014-06-17
+        $dateTime->setTimestamp(1402987842);
+
+        $formatClass = new Format($this->request);
+
+        $render = $formatClass->formatDate(array(
+                'date' => $dateTime,
+                'locale' => ['fr_FR.UTF-8', 'fr_FR'],
+                'format' => '%e %B %Y'
+            ));
+
+        $this->assertEquals('17 juin 2014', $render);
+    }
+
     /**
      * test formatNumber without mandatory parameters
      *
