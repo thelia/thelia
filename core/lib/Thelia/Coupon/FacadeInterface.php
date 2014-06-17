@@ -18,6 +18,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Model\Country;
 use Thelia\Model\Coupon;
 
 /**
@@ -50,6 +51,11 @@ interface FacadeInterface
      * @return \Thelia\Model\Address
      */
     public function getDeliveryAddress();
+
+    /**
+     * @return Country the delivery country
+     */
+    public function getDeliveryCountry();
 
     /**
      * Return an Customer a CouponManager can process

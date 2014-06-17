@@ -14,6 +14,7 @@ namespace Thelia\Core\Event\Cart;
 
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Cart;
+use Thelia\Model\CartItem;
 
 class CartEvent extends ActionEvent
 {
@@ -31,7 +32,8 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $append
+     * @param  bool      $append
+     * @return CartEvent
      */
     public function setAppend($append)
     {
@@ -41,7 +43,7 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getAppend()
     {
@@ -49,7 +51,8 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $cartItem
+     * @param  CartItem  $cartItem
+     * @return CartEvent
      */
     public function setCartItem($cartItem)
     {
@@ -59,7 +62,7 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
+     * @return CartItem
      */
     public function getCartItem()
     {
@@ -67,7 +70,8 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $newness
+     * @param  bool      $newness
+     * @return CartEvent
      */
     public function setNewness($newness)
     {
@@ -77,7 +81,7 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getNewness()
     {
@@ -85,7 +89,8 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $product
+     * @param  int       $product the product ID
+     * @return CartEvent
      */
     public function setProduct($product)
     {
@@ -95,7 +100,7 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
+     * @return int the product ID
      */
     public function getProduct()
     {
@@ -103,7 +108,8 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $productSaleElementsId
+     * @param  int       $productSaleElementsId
+     * @return CartEvent
      */
     public function setProductSaleElementsId($productSaleElementsId)
     {
@@ -113,7 +119,7 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getProductSaleElementsId()
     {
@@ -121,7 +127,8 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $quantity
+     * @param  int       $quantity
+     * @return CartEvent
      */
     public function setQuantity($quantity)
     {
@@ -131,7 +138,7 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getQuantity()
     {

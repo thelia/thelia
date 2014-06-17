@@ -55,6 +55,8 @@ class StartDate extends ConditionAbstract
      */
     public function setValidatorsFromForm(array $operators, array $values)
     {
+        $this->checkComparisonOperatorValue($operators, self::START_DATE);
+
         if (! isset($values[self::START_DATE])) {
             $values[self::START_DATE] = time();
         }

@@ -41,6 +41,9 @@ use Thelia\Model\Tools\ModelEventDispatcherTrait;
 class Coupon extends BaseCoupon
 {
 
+    // Define the value of an unlimited coupon usage.
+    const UNLIMITED_COUPON_USE = -1;
+
     use ModelEventDispatcherTrait;
 
     /**
@@ -265,6 +268,10 @@ class Coupon extends BaseCoupon
         return CouponModuleQuery::create()->filterByCouponId($this->getId())->find();
     }
 
+    public function isUsageUnlimited()
+    {
+        return $this->getMaxUsage() == self::UNLIMITED_COUPON_USE;
+    }
     /**
      * Get coupon usage left, either overall, or per customer.
      *

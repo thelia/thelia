@@ -239,4 +239,9 @@ interface CouponInterface
      */
     public function getEffects($data);
 
+    /**
+     * Clear all the data the coupon may have stored, called after an order is completed.
+     */
+    public function clear();
+
 }

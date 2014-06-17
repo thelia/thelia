@@ -21,6 +21,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Country;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
 use Thelia\Cart\CartTrait;
@@ -147,6 +148,14 @@ class BaseFacade implements FacadeInterface
         }
 
         return $total;
+    }
+
+    /**
+     * @return Country the delivery country
+     */
+    public function getDeliveryCountry()
+    {
+        return $this->getContainer()->get('thelia.taxEngine')->getDeliveryCountry();
     }
 
     /**

@@ -12,19 +12,24 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Core\Translation\Translator;
-
 /**
  * Allow to remove an amount from the checkout total
  *
  * @package Coupon
- * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>, Franck Allimant <franck@cqfdev.fr>
  *
  */
-class RemoveXAmount extends CouponAbstract
+class RemoveXAmount extends AbstractRemove
 {
+    use AmountCouponTrait;
+
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_x_amount';
+
+    protected function getAmountFieldName()
+    {
+        return self::AMOUNT_FIELD_NAME;
+    }
 
     /**
      * @inheritdoc
@@ -55,40 +60,16 @@ class RemoveXAmount extends CouponAbstract
     /**
      * @inheritdoc
      */
+    public function exec()
+    {
+        return $this->amount;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function drawBackOfficeInputs()
     {
-        return $this->facade->getParser()->render('coupon/type-fragments/remove-x-amount.html', [
-                'fieldName' => $this->makeCouponFieldName(self::AMOUNT_FIELD_NAME),
-                'value'     => $this->amount
-            ]);
+        return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-x-amount.html');
     }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getFieldList()
-    {
-        return [self::AMOUNT_FIELD_NAME];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function checkCouponFieldValue($fieldName, $fieldValue)
-    {
-        if ($fieldName === self::AMOUNT_FIELD_NAME) {
-
-            if (floatval($fieldValue) < 0) {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Value %val for Disount Amount is invalid. Please enter a positive value.',
-                        [ '%val' => $fieldValue]
-                    )
-                );
-            }
-        }
-
-        return $fieldValue;
-    }
-
 }

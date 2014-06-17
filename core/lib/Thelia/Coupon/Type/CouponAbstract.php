@@ -499,4 +499,12 @@ abstract class CouponAbstract implements CouponInterface
 
         return $effects;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function clear()
+    {
+        // Does nothing. Override this function as needed.
+    }
 }

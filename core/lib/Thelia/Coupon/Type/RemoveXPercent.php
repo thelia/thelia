@@ -12,86 +12,26 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\FacadeInterface;
-
 /**
  * @package Coupon
- * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>, Franck Allimant <franck@cqfdev.fr>
  *
  */
-class RemoveXPercent extends CouponAbstract
+class RemoveXPercent extends AbstractRemove
 {
     const INPUT_PERCENTAGE_NAME = 'percentage';
+
+    use PercentageCouponTrait;
 
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_x_percent';
 
-    /** @var float Percentage removed from the Cart */
-    protected $percentage = 0;
-
     /**
      * @inheritdoc
      */
-    public function set(
-        FacadeInterface $facade,
-        $code,
-        $title,
-        $shortDescription,
-        $description,
-        array $effects,
-        $isCumulative,
-        $isRemovingPostage,
-        $isAvailableOnSpecialOffers,
-        $isEnabled,
-        $maxUsage,
-        \DateTime $expirationDate,
-        $freeShippingForCountries,
-        $freeShippingForModules,
-        $perCustomerUsageCount
-    )
+    protected function getPercentageFieldName()
     {
-        parent::set(
-            $facade, $code, $title, $shortDescription, $description, $effects,
-            $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate,
-            $freeShippingForCountries,
-            $freeShippingForModules,
-            $perCustomerUsageCount
-        );
-
-        $this->percentage = $effects[self::INPUT_PERCENTAGE_NAME];
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function exec()
-    {
-       return round($this->facade->getCartTotalTaxPrice($this->isAvailableOnSpecialOffers()) *  $this->percentage/100, 2);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function checkCouponFieldValue($fieldName, $fieldValue)
-    {
-        if ($fieldName === self::INPUT_PERCENTAGE_NAME) {
-
-            $pcent = floatval($fieldValue);
-
-            if ($pcent <= 0 || $pcent > 100) {
-                throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans(
-                        'Value %val for Percent Discount is invalid. Please enter a positive value between 1 and 100.',
-                        [ '%val' => $fieldValue]
-                    )
-                );
-            }
-        }
-
-        return $fieldValue;
+        return self::INPUT_PERCENTAGE_NAME;
     }
 
     /**
@@ -123,19 +63,16 @@ class RemoveXPercent extends CouponAbstract
     /**
      * @inheritdoc
      */
-    public function drawBackOfficeInputs()
+    public function exec()
     {
-        return $this->facade->getParser()->render('coupon/type-fragments/remove-x-percent.html', [
-            'fieldName' => $this->makeCouponFieldName(self::INPUT_PERCENTAGE_NAME),
-            'value'     => $this->percentage
-        ]);
+        return round($this->facade->getCartTotalTaxPrice($this->isAvailableOnSpecialOffers()) *  $this->percentage/100, 2);
     }
 
     /**
      * @inheritdoc
      */
-    protected function getFieldList()
+    public function drawBackOfficeInputs()
     {
-        return [self::INPUT_PERCENTAGE_NAME];
+        return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-x-percent.html');
     }
 }
