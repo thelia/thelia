@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
@@ -35,6 +36,7 @@ use Thelia\Model\CouponModule;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Tools\Rest\ResponseRest;
+use Thelia\Tools\URL;
 
 /**
  * Control View and Action (Model) via Events
@@ -78,11 +80,13 @@ class CouponController extends BaseAdminController
         $eventToDispatch = TheliaEvents::COUPON_CREATE;
 
         if ($this->getRequest()->isMethod('POST')) {
-            $this->validateCreateOrUpdateForm(
+            if(null !== $response = $this->validateCreateOrUpdateForm(
                 $eventToDispatch,
                 'created',
                 'creation'
-            );
+            )){
+                return $response;
+            }
         } else {
             // If no input for expirationDate, now + 2 months
             $defaultDate = new \DateTime();
@@ -137,12 +141,14 @@ class CouponController extends BaseAdminController
 
         // Update
         if ($this->getRequest()->isMethod('POST')) {
-            $this->validateCreateOrUpdateForm(
+            if (null !== $response = $this->validateCreateOrUpdateForm(
                 $eventToDispatch,
                 'updated',
                 'update',
                 $coupon
-            );
+            )) {
+                return $response;
+            }
         } else {
             // Display
             // Prepare the data that will hydrate the form
@@ -474,7 +480,7 @@ class CouponController extends BaseAdminController
     {
         // Create the form from the request
         $couponForm = new CouponCreationForm($this->getRequest());
-
+        $response = null;
         $message = false;
         try {
             // Check the form against conditions violations
@@ -498,19 +504,20 @@ class CouponController extends BaseAdminController
             );
 
             if ($this->getRequest()->get('save_mode') == 'stay') {
-                $this->redirect(
-                    str_replace(
-                        '{id}',
-                        $couponEvent->getCouponModel()->getId(),
-                        $couponForm->getSuccessUrl()
-                    )
-                );
+                $response = RedirectResponse::create(str_replace(
+                    '{id}',
+                    $couponEvent->getCouponModel()->getId(),
+                    $couponForm->getSuccessUrl()
+                ));
 
-                exit();
+            } else {
+                // Redirect to the success URL
+                $response = RedirectResponse::create(
+                    URL::getInstance()->absoluteUrl($this->getRoute('admin.coupon.list'))
+                );
             }
 
-            // Redirect to the success URL
-            $this->redirectToRoute('admin.coupon.list');
+
 
         } catch (FormValidationException $ex) {
             // Invalid data entered
@@ -533,7 +540,7 @@ class CouponController extends BaseAdminController
                 ->setGeneralError($message);
         }
 
-        return $this;
+        return $response;
     }
 
     /**

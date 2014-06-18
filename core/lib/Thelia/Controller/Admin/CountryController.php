@@ -20,6 +20,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Form\CountryCreationForm;
 use Thelia\Form\CountryModificationForm;
+use Thelia\Log\Tlog;
 use Thelia\Model\CountryQuery;
 
 /**
@@ -228,7 +229,7 @@ class CountryController extends AbstractCrudController
     public function toggleDefaultAction()
     {
         if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
-        $content = null;
+
         if (null !== $country_id = $this->getRequest()->get('country_id')) {
             $toogleDefaultEvent = new CountryToggleDefaultEvent($country_id);
             try {
@@ -238,7 +239,7 @@ class CountryController extends AbstractCrudController
                     return $this->nullResponse();
                 }
             } catch (\Exception $ex) {
-                $content = $ex->getMessage();
+                Tlog::getInstance()->error($ex->getMessage());
             }
 
         }
