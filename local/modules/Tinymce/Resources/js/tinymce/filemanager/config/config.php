@@ -49,15 +49,10 @@ $base_url = rtrim(ConfigQuery::getConfiguredShopUrl(), '/');
 // Argh, url_site is not defined ?!
 if (empty($base_url)) {
     // A we did not used the router to access this dialog, we cannot use the URL class. Use the good old method.
-    if(isset($_SERVER['HTTPS'])){
-        $base_url = ($_SERVER['HTTPS'] && $_SERVER['HTTPS'] != "off") ? "https" : "http";
-    }
-    else{
-        $base_url = 'http';
-    }
-
-    $base_url .= "://" . $_SERVER['HTTP_HOST'] . preg_replace('!/tinymce/filemanager/dialog.php.*$!', '', $_SERVER['REQUEST_URI']);
+    $base_url = $request->getSchemeAndHttpHost() . preg_replace('!/tinymce/filemanager/dialog.php.*$!', '', $_SERVER['REQUEST_URI']);
 }
+
+echo "b=$base_url";
 
 // path from base_url to base of upload folder (with start and final /)
 $upload_dir = '/media/upload/';
