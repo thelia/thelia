@@ -3,4 +3,12 @@
 <config xmlns="http://thelia.net/schema/dic/config"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <services>
+        <service id="smarty.plugin.tinymce_lang" class="Tinymce\Smarty\TinyMCELanguage" scope="request">
+            <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="request"/>
+        </service>
+    </services>
+
 </config>

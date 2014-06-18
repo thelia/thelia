@@ -14,7 +14,6 @@ namespace Tinymce;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Install\Database;
 use Thelia\Module\BaseModule;
 
 class Tinymce extends BaseModule
@@ -27,7 +26,6 @@ class Tinymce extends BaseModule
     public function __construct()
     {
         $this->jsPath    = __DIR__ . DS .'Resources' . DS . 'js' . DS . 'tinymce';
-        $this->mediaPath = __DIR__ . DS .'Resources' . DS . 'media';
 
         $this->webJsPath    = THELIA_WEB_DIR . 'tinymce';
         $this->webMediaPath = THELIA_WEB_DIR . 'media';
@@ -37,15 +35,14 @@ class Tinymce extends BaseModule
      */
     public function postActivation(ConnectionInterface $con = null)
     {
-        // Create symbolic links in the web directory, to make the TinyMCE code
-        // and the content of the 'media' directory available.
         $fs = new Filesystem();
 
+        // Create symbolic links in the web directory, to make the TinyMCE code available.
         if (false === $fs->exists($this->webJsPath)) {
             $fs->symlink($this->jsPath, $this->webJsPath);
         }
 
-        // Create the media directory in the web root
+        // Create the media directory in the web root, if required
         if (false === $fs->exists($this->webMediaPath)) {
 
             $fs->mkdir($this->webMediaPath."/upload");
@@ -61,7 +58,6 @@ class Tinymce extends BaseModule
         $fs = new Filesystem();
 
         $fs->remove($this->webJsPath);
-        $fs->remove($this->mediaPath);
     }
 
     /**
@@ -69,6 +65,7 @@ class Tinymce extends BaseModule
      */
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
     {
+        // If we have to delete module data, remove the media directory.
         if ($deleteModuleData) {
             $fs = new Filesystem();
 
