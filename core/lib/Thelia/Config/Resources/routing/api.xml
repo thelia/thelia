@@ -73,5 +73,10 @@
         <default key="_controller">Thelia\Controller\Api\CategoryController::createAction</default>
     </route>
 
+    <route id="api.category.update" path="/api/categories/{category_id}" methods="put">
+        <default key="_controller">Thelia\Controller\Api\CategoryController::updateAction</default>
+        <requirement key="category_id">\d+</requirement>
+    </route>
+
     <!-- end category route -->
 </routes>

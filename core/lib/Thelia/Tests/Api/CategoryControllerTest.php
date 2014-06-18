@@ -12,6 +12,8 @@
 
 namespace Thelia\Tests\Api;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Model\CategoryQuery;
 use Thelia\Tests\ApiTestCase;
 
 
@@ -144,5 +146,37 @@ class CategoryControllerTest extends ApiTestCase
 
         $this->assertEquals('fr_FR', $content[0]['LOCALE']);
 
+    }
+
+    public function testUpdate()
+    {
+        $category = CategoryQuery::create()
+            ->orderById(Criteria::DESC)
+            ->findOne();
+
+        $content = [
+            'thelia_category_modification' => [
+                'title' => 'foo',
+                'parent' => 0,
+                'locale' => 'en_US',
+                'visible' => 1,
+                'chapo' => 'cat chapo',
+                'description' => 'cat description',
+                'postscriptum' => 'cat postscriptum'
+            ]
+        ];
+        $requestContent = json_encode($content);
+        $client = static::createClient();
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+
+        $client->request(
+            'PUT',
+            '/api/categories/'.$category->getId().'?sign='.$this->getSignParameter($requestContent), [], [],
+            $servers,
+            $requestContent
+        );
+
+        $this->assertEquals(204, $client->getResponse()->getStatusCode(), 'HTTP status code must be 204');
     }
 }

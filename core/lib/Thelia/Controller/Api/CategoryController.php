@@ -15,12 +15,15 @@ namespace Thelia\Controller\Api;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
+use Thelia\Core\Event\Category\CategoryUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Category;
 use Thelia\Form\CategoryCreationForm;
+use Thelia\Form\CategoryModificationForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Model\CategoryQuery;
 
 
 /**
@@ -85,7 +88,7 @@ class CategoryController extends BaseApiController
         $this->checkAuth(AdminResources::CATEGORY, [], AccessManager::CREATE);
         $request = $this->getRequest();
 
-        $form = new CategoryCreationForm($this->getRequest(), "form",[], ['csrf_protection' => false]);
+        $form = new CategoryCreationForm($request, "form",[], ['csrf_protection' => false]);
 
         try {
             $categoryForm = $this->validateForm($form);
@@ -105,7 +108,41 @@ class CategoryController extends BaseApiController
             $response->setStatusCode(201);
 
             return $response;
-        } catch(FormValidationException $e) {
+        } catch(\Exception $e) {
+            return JsonResponse::create(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function updateAction($category_id)
+    {
+        $this->checkAuth(AdminResources::CATEGORY, [], AccessManager::UPDATE);
+        $request = $this->getRequest();
+
+        $category = CategoryQuery::create()
+            ->findPk($category_id);
+
+        if (null === $category) {
+            throw new HttpException(404, sprintf('{"error": "category with id %d not found"}', $category_id));
+        }
+
+        $form = new CategoryModificationForm($request, 'form', ['id' => $category_id], ['csrf_protection' => false]);
+
+        try {
+            $categoryForm = $this->validateForm($form);
+
+            $event = (new CategoryUpdateEvent($category_id))
+                ->setLocale($categoryForm->get('locale')->getData())
+                ->setParent($categoryForm->get('parent')->getData())
+                ->setTitle($categoryForm->get('title')->getData())
+                ->setChapo($categoryForm->get('chapo')->getData())
+                ->setDescription($categoryForm->get('description')->getData())
+                ->setPostscriptum($categoryForm->get('postscriptum')->getData());
+
+            $this->dispatch(TheliaEvents::CATEGORY_UPDATE, $event);
+
+            return JsonResponse::create(null, 204);
+
+        } catch(\Exception $e) {
             return JsonResponse::create(['error' => $e->getMessage()], 400);
         }
     }
