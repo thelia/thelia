@@ -14,9 +14,13 @@ namespace Thelia\Controller\Api;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Thelia\Core\Event\Category\CategoryCreateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Category;
+use Thelia\Form\CategoryCreationForm;
+use Thelia\Form\Exception\FormValidationException;
 
 
 /**
@@ -74,5 +78,35 @@ class CategoryController extends BaseApiController
         $categoryLoop->initializeArgs($params);
         $paginate = 0;
         return $categoryLoop->exec($paginate);
+    }
+
+    public function createAction()
+    {
+        $this->checkAuth(AdminResources::CATEGORY, [], AccessManager::CREATE);
+        $request = $this->getRequest();
+
+        $form = new CategoryCreationForm($this->getRequest(), "form",[], ['csrf_protection' => false]);
+
+        try {
+            $categoryForm = $this->validateForm($form);
+
+            $event = (new CategoryCreateEvent())
+                ->setTitle($categoryForm->get('title')->getData())
+                ->setLocale($categoryForm->get('locale')->getData())
+                ->setVisible($categoryForm->get('visible')->getData())
+                ->setParent($categoryForm->get('parent')->getData())
+            ;
+
+            $this->dispatch(TheliaEvents::CATEGORY_CREATE, $event);
+            $category = $event->getCategory();
+
+            $request->query->set('lang', $categoryForm->get('locale')->getData());
+            $response = $this->getAction($category->getId());
+            $response->setStatusCode(201);
+
+            return $response;
+        } catch(FormValidationException $e) {
+            return JsonResponse::create(['error' => $e->getMessage()], 400);
+        }
     }
 }

@@ -69,5 +69,9 @@
         <requirement key="category_id">\d+</requirement>
     </route>
 
+    <route id="api.category.create" path="/api/categories" methods="post">
+        <default key="_controller">Thelia\Controller\Api\CategoryController::createAction</default>
+    </route>
+
     <!-- end category route -->
 </routes>

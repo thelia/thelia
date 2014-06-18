@@ -83,4 +83,66 @@ class CategoryControllerTest extends ApiTestCase
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode(), 'Response must be 200 on category list action');
     }
+
+    public function testCreate()
+    {
+        $category = [
+            'thelia_category_creation' => [
+                'title' => 'test en',
+                'locale' => 'en_US',
+                'visible' => 1,
+                'parent' => 0
+            ]
+        ];
+
+        $requestContent = json_encode($category);
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+
+        $client = static::createClient();
+
+        $client->request(
+            'POST',
+            '/api/categories?&sign='.$this->getSignParameter($requestContent), [], [],
+            $servers,
+            $requestContent
+        );
+
+        $this->assertEquals(201, $client->getResponse()->getStatusCode(), 'Http status code must be 201');
+        $content = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals('en_US', $content[0]['LOCALE']);
+
+    }
+
+    public function testCreateFr()
+    {
+        $category = [
+            'thelia_category_creation' => [
+                'title' => 'test fr',
+                'locale' => 'fr_FR',
+                'visible' => 1,
+                'parent' => 0
+            ]
+        ];
+
+        $requestContent = json_encode($category);
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+
+        $client = static::createClient();
+
+        $client->request(
+            'POST',
+            '/api/categories?&sign='.$this->getSignParameter($requestContent), [], [],
+            $servers,
+            $requestContent
+        );
+
+        $this->assertEquals(201, $client->getResponse()->getStatusCode(), 'Http status code must be 201');
+        $content = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals('fr_FR', $content[0]['LOCALE']);
+
+    }
 }
