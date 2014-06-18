@@ -59,4 +59,15 @@
 
     <!-- end product route -->
 
+    <!-- category route -->
+    <route id="api.category.list" path="/api/categories" methods="get">
+        <default key="_controller">Thelia\Controller\Api\CategoryController::listAction</default>
+    </route>
+
+    <route id="api.category.get" path="/api/categories/{category_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Api\CategoryController::getAction</default>
+        <requirement key="category_id">\d+</requirement>
+    </route>
+
+    <!-- end category route -->
 </routes>
