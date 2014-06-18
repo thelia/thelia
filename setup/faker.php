@@ -494,7 +494,7 @@ try {
         }
     }
 
-    echo "Creating orders";
+    echo "Creating orders\n";
 
     for($i=0; $i < 50; ++$i) {
 
