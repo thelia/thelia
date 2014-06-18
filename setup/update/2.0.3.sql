@@ -3,7 +3,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 UPDATE `config` SET `value`='2.0.3' WHERE `name`='thelia_version';
-UPDATE `config` SET `value`='2' WHERE `name`='thelia_release_version';
+UPDATE `config` SET `value`='3' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='' WHERE `name`='thelia_extra_version';
 
 # Add new column to order (version, version_created_at, version_created_by)
