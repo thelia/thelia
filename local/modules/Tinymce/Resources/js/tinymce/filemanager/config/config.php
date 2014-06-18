@@ -1,7 +1,7 @@
 <?php
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Thelia;
-use Thelia\Core\Translation;
+use Thelia\Model\ConfigQuery;
 
 $env = 'prod';
 
@@ -9,7 +9,8 @@ require __DIR__ . '/../../../../../../../../core/bootstrap.php';
 
 $request = Request::createFromGlobals();
 
-$thelia = new Thelia("prod", false);
+$thelia = new Thelia($env, false);
+
 $thelia->boot();
 
 $httpKernel = $thelia->getContainer()->get('http_kernel');
@@ -23,38 +24,60 @@ $securityContext = $httpKernel->getContainer()->get('thelia.securityContext');
 
 // We just check the current user has the ADMIN role.
 $isGranted = $securityContext->isGranted(
-    array('ADMIN'), null, null, null
+    array('ADMIN'), array(), array(), array()
 );
 
 if (false === $isGranted) {
-    echo Translator::getInstance()->trans("Sorry, you can't use this function.");
+    echo "Sorry, it seems that you're not allowed to use this function. ADMIN role is required.";
 
     exit;
 }
 
 //------------------------------------------------------------------------------
-// DON'T COPY THIS VARIABLES IN FOLDERS config.php FILES
+// DO NOT COPY THESE VARIABLES IN FOLDERS config.php FILES
 //------------------------------------------------------------------------------
 
 //**********************
 //Path configuration
 //**********************
-// In this configuration the folder tree is
-// root
-//    |- source <- upload folder
-//    |- thumbs <- thumbnail folder [must have write permission (755)]
-//    |- filemanager
-//    |- js
-//    |   |- tinymce
-//    |   |   |- plugins
-//    |   |   |   |- responsivefilemanager
-//    |   |   |   |   |- plugin.min.js
 
-$base_url = rtrim(\Thelia\Model\ConfigQuery::read('url_site'), '/');  // DON'T TOUCH (base url (only domain) of site (without final /)).
-$upload_dir = '/media/upload/'; // path from base_url to base of upload folder (with start and final /)
-$current_path = '../../../media/upload/'; // relative path from filemanager folder to upload folder (with final /)
-//thumbs folder can't put inside upload folder
-$thumbs_base_path = '../../../media/thumbs/'; // relative path from filemanager folder to thumbs folder (with final /)
+// In this configuration the media folder is located in the /web directory.
+
+// base url of site (without final /). if you prefer relative urls leave empty.
+$base_url = rtrim(ConfigQuery::getConfiguredShopUrl(), '/');
+
+// Argh, url_site is not defined ?!
+if (empty($base_url)) {
+    // A we did not used the router to access this dialog, we cannot use the URL class. Use the good old method.
+    if(isset($_SERVER['HTTPS'])){
+        $base_url = ($_SERVER['HTTPS'] && $_SERVER['HTTPS'] != "off") ? "https" : "http";
+    }
+    else{
+        $base_url = 'http';
+    }
+
+    $base_url .= "://" . $_SERVER['HTTP_HOST'] . preg_replace('!/tinymce/filemanager/dialog.php.*$!', '', $_SERVER['REQUEST_URI']);
+}
+
+// path from base_url to base of upload folder (with start and final /)
+$upload_dir = '/media/upload/';
+
+// path to file manager folder to upload folder (with final /)
+$current_path = THELIA_WEB_DIR . DS . 'media'. DS .'upload'. DS;
+
+// path to file manager folder to thumbs folder (with final /)
+// WARNING: thumbs folder should not be inside the upload folder
+$thumbs_base_path = THELIA_WEB_DIR . DS . 'media'. DS .'thumbs'. DS;
+
+// Set the language to the back-office current language, if it is available
+$current_locale = $request->getSession()->getLang()->getLocale();
+
+if (file_exists(__DIR__.DS.'..'.DS.'lang.'.DS.$current_locale.'.php')) {
+    $default_language = $current_locale;
+}
+else {
+    $default_language = 'en_EN';
+}
 
 // OPTIONAL SECURITY
 // if set to true only those will access RF whose url contains the access key(akey) like: 
@@ -90,7 +113,7 @@ if ((int)(ini_get('post_max_size')) < $MaxSizeUpload){
 	$MaxSizeUpload = (int)(ini_get('post_max_size'));
 }
 
-$default_language 	= "en_EN"; //default language file name
+// $default_language 	= "en_EN"; //default language file name
 $icon_theme 		= "ico"; //ico or ico_dark you can cusatomize just putting a folder inside filemanager/img
 $show_folder_size 	= TRUE; //Show or not show folder size in list view feature in filemanager (is possible, if there is a large folder, to greatly increase the calculations)
 $show_sorting_bar 	= TRUE; //Show or not show sorting feature in filemanager
