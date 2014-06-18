@@ -42,6 +42,25 @@ class ProductControllerTest extends ApiTestCase
     }
 
     /**
+     * @covers \Thelia\Controller\Api\ProductController::listAction
+     */
+    public function testListActionWithLimit()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'GET',
+            '/api/products?limit=2&sign='.$this->getSignParameter(""),[],[],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), 'Http status code must be 200');
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $this->assertCount(2, $content, 'without parameters, the api must return 10 results');
+    }
+
+    /**
      * @covers \Thelia\Controller\Api\ProductController::getAction
      */
     public function testGetAction()
