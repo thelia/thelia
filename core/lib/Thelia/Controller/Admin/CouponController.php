@@ -517,8 +517,6 @@ class CouponController extends BaseAdminController
                 );
             }
 
-
-
         } catch (FormValidationException $ex) {
             // Invalid data entered
             $message = $this->createStandardFormValidationErrorMessage($ex);
