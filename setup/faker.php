@@ -496,7 +496,7 @@ try {
 
     echo "Creating orders\n";
 
-    for($i=0; $i < 50; ++$i) {
+    for ($i=0; $i < 50; ++$i) {
 
         $placedOrder = new \Thelia\Model\Order();
 
@@ -902,11 +902,12 @@ function getRandomObject(\Propel\Runtime\ActiveQuery\ModelCriteria $query)
 {
     $max = $query->count();
 
-    if($max === 0) {
+    if ($max === 0) {
         throw new Exception("There is no entry in ". get_class($query));
     }
 
     $first_id = $query->findOne()->getId();
     $obj = $query->findPk(mt_rand($first_id, $first_id+$max-1));
+
     return $obj;
 }
