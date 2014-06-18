@@ -73,7 +73,6 @@ class ConfigQuery extends BaseConfigQuery
         return true;
     }
 
-
     public static function getConfiguredShopUrl()
     {
         return ConfigQuery::read("url_site", '');
