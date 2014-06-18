@@ -150,6 +150,7 @@ try {
     \Thelia\Model\ContentDocumentQuery::create()->find()->delete();
 
     \Thelia\Model\CouponQuery::create()->find()->delete();
+    \Thelia\Model\OrderQuery::create()->find()->delete();
 
     $stmt = $con->prepare("SET foreign_key_checks = 1");
 
@@ -497,7 +498,6 @@ try {
     echo "Creating orders\n";
 
     for ($i=0; $i < 50; ++$i) {
-
         $placedOrder = new \Thelia\Model\Order();
 
         $deliveryOrderAddress = new OrderAddress();
@@ -512,7 +512,12 @@ try {
             ->setPhone($faker->phoneNumber)
             ->setZipcode($faker->postcode)
             ->setCity($faker->city)
-            ->setCountryId(64)
+            ->setCountryId(
+                \Thelia\Model\CountryQuery::create()
+                    ->addAscendingOrderByColumn('RAND()')
+                    ->findOne()
+                    ->getId()
+            )
         ->save($con)
         ;
 
@@ -528,27 +533,56 @@ try {
             ->setPhone($faker->phoneNumber)
             ->setZipcode($faker->postcode)
             ->setCity($faker->city)
-            ->setCountryId(64)
+            ->setCountryId(
+                \Thelia\Model\CountryQuery::create()
+                    ->addAscendingOrderByColumn('RAND()')
+                    ->findOne()
+                    ->getId()
+            )
         ->save($con)
         ;
 
         $placedOrder
             ->setDeliveryOrderAddressId($deliveryOrderAddress->getId())
             ->setInvoiceOrderAddressId($invoiceOrderAddress->getId())
-            ->setDeliveryModuleId(ModuleQuery::create()->filterByCode("Colissimo")->findOne()->getId())
-            ->setPaymentModuleId(ModuleQuery::create()->filterByCode("Cheque")->findOne()->getId())
+            ->setDeliveryModuleId(
+                ModuleQuery::create()->
+                    filterByCode("Colissimo")
+                    ->findOne()
+                    ->getId()
+            )
+            ->setPaymentModuleId(
+                ModuleQuery::create()
+                    ->filterByCode("Cheque")
+                    ->findOne()->getId()
+            )
             ->setStatusId(mt_rand(1, 5))
-            ->setCurrency(\Thelia\Model\CurrencyQuery::create()->findOne())
-            ->setCustomerId(getRandomObject(new \Thelia\Model\CustomerQuery())->getId())
+            ->setCurrency(
+                \Thelia\Model\CurrencyQuery::create()
+                    ->addAscendingOrderByColumn('RAND()')
+                    ->findOne()
+            )
+            ->setCustomer(
+                \Thelia\Model\CustomerQuery::create()
+                    ->addAscendingOrderByColumn('RAND()')
+                    ->findOne()
+            )
             ->setDiscount(mt_rand(0, 10))
-            ->setLang(getRandomObject(new \Thelia\Model\LangQuery()))
+            ->setLang(
+                \Thelia\Model\LangQuery::create()
+                    ->addAscendingOrderByColumn('RAND()')
+                    ->findOne()
+            )
             ->setPostage(mt_rand(1, 50))
         ;
 
         $placedOrder->save($con);
 
         for ($j=0; $j < mt_rand(1, 10); ++$j) {
-            $pse = getRandomObject(new \Thelia\Model\ProductSaleElementsQuery());
+            $pse = \Thelia\Model\ProductSaleElementsQuery::create()
+                ->addAscendingOrderByColumn('RAND()')
+                ->findOne();
+
             $product = $pse->getProduct();
 
             $orderProduct = new \Thelia\Model\OrderProduct();
@@ -896,18 +930,4 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $coupon3->setIsRemovingPostage(false);
     $coupon3->setIsAvailableOnSpecialOffers(false);
     $coupon3->save();
-}
-
-function getRandomObject(\Propel\Runtime\ActiveQuery\ModelCriteria $query)
-{
-    $max = $query->count();
-
-    if ($max === 0) {
-        throw new Exception("There is no entry in ". get_class($query));
-    }
-
-    $first_id = $query->findOne()->getId();
-    $obj = $query->findPk(mt_rand($first_id, $first_id+$max-1));
-
-    return $obj;
 }
