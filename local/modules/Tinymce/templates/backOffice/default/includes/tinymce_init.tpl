@@ -30,7 +30,7 @@
 
         // File manager configuration
         external_filemanager_path: "{url file='/tinymce/filemanager/'}",
-        filemanager_title: "{intl l='File manager'}" ,
+        filemanager_title: "{intl l='File manager' d='tinymce.bo.default'}" ,
         external_plugins: { "filemanager" : "{url file='/tinymce/filemanager/plugin.min.js'}"},
 
         // Always paste as text, removing external formatting when pasting text
