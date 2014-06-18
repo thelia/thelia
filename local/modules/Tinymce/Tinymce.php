@@ -14,10 +14,14 @@ namespace Tinymce;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Install\Database;
 use Thelia\Module\BaseModule;
 
 class Tinymce extends BaseModule
 {
+    /** The module domain for internationalisation */
+    const MODULE_DOMAIN = "tinymce";
+
     private $jsPath, $mediaPath, $webJsPath, $webMediaPath;
 
     public function __construct()
