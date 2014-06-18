@@ -49,7 +49,6 @@ class Update
         $logger = Tlog::getInstance();
         $logger->setLevel(Tlog::DEBUG);
 
-        $success = true;
         $updatedVersions = array();
 
         $currentVersion = ConfigQuery::read('thelia_version');
