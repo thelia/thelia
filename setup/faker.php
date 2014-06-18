@@ -497,6 +497,16 @@ try {
 
     echo "Creating orders\n";
 
+    $colissimo_id = ModuleQuery::create()->
+        filterByCode("Colissimo")
+        ->findOne()
+        ->getId();
+
+    $cheque_id = ModuleQuery::create()
+        ->filterByCode("Cheque")
+        ->findOne()
+        ->getId();
+
     for ($i=0; $i < 50; ++$i) {
         $placedOrder = new \Thelia\Model\Order();
 
@@ -512,12 +522,7 @@ try {
             ->setPhone($faker->phoneNumber)
             ->setZipcode($faker->postcode)
             ->setCity($faker->city)
-            ->setCountryId(
-                \Thelia\Model\CountryQuery::create()
-                    ->addAscendingOrderByColumn('RAND()')
-                    ->findOne()
-                    ->getId()
-            )
+            ->setCountryId(64)
         ->save($con)
         ;
 
@@ -533,29 +538,15 @@ try {
             ->setPhone($faker->phoneNumber)
             ->setZipcode($faker->postcode)
             ->setCity($faker->city)
-            ->setCountryId(
-                \Thelia\Model\CountryQuery::create()
-                    ->addAscendingOrderByColumn('RAND()')
-                    ->findOne()
-                    ->getId()
-            )
+            ->setCountryId(64)
         ->save($con)
         ;
 
         $placedOrder
             ->setDeliveryOrderAddressId($deliveryOrderAddress->getId())
             ->setInvoiceOrderAddressId($invoiceOrderAddress->getId())
-            ->setDeliveryModuleId(
-                ModuleQuery::create()->
-                    filterByCode("Colissimo")
-                    ->findOne()
-                    ->getId()
-            )
-            ->setPaymentModuleId(
-                ModuleQuery::create()
-                    ->filterByCode("Cheque")
-                    ->findOne()->getId()
-            )
+            ->setDeliveryModuleId($colissimo_id)
+            ->setPaymentModuleId($cheque_id)
             ->setStatusId(mt_rand(1, 5))
             ->setCurrency(
                 \Thelia\Model\CurrencyQuery::create()
