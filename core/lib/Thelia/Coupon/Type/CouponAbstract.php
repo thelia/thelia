@@ -12,11 +12,14 @@
 
 namespace Thelia\Coupon\Type;
 
+use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
+use Thelia\Condition\ConditionOrganizerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Condition\ConditionCollection;
-use Thelia\Condition\ConditionOrganizerInterface;
+use Thelia\Form\CouponCreationForm;
+use Thelia\Model\CouponCountry;
+use Thelia\Model\CouponModule;
 
 /**
  * Assist in writing a CouponInterface
@@ -27,12 +30,21 @@ use Thelia\Condition\ConditionOrganizerInterface;
  */
 abstract class CouponAbstract implements CouponInterface
 {
-    const INPUT_EXTENDED__NAME = 'thelia_coupon_creation_extended';
+     /**
+     * The dataset name for all coupon specific input fields, that do not appear in the CouPonCreationForm form.
+      *
+     * In the input form, these fields have to be created like:
+      *
+     *    thelia_coupon_specific[my_field, thelia_coupon_creation_extended[my_other_field]
+      *
+     * use the makeCouponField() method to do that safely.
+     */
+    const COUPON_DATASET_NAME = 'coupon_specific';
 
-    const INPUT_AMOUNT_NAME = 'amount';
-
-    /** @var array Extended Inputs to manage */
-    protected $extendedInputs = array();
+    /**
+     * A standard 'amount' filed name, thant can be used in coupons which extends this class
+     */
+    const AMOUNT_FIELD_NAME = 'amount';
 
     /** @var  FacadeInterface Provide necessary value from Thelia */
     protected $facade = null;
@@ -88,6 +100,15 @@ abstract class CouponAbstract implements CouponInterface
     /** @var bool if Coupon is available for Products already on special offers */
     protected $isAvailableOnSpecialOffers = false;
 
+    /** @var CouponCountry[] list of country IDs for which shipping is free. All if empty*/
+    protected $freeShippingForCountries = [];
+
+    /** @var CouponModule[] list of shipping module IDs for which shippiog is free. All if empty*/
+    protected $freeShippingForModules = [];
+
+    /** @var true if usage count is per customer only */
+    protected $perCustomerUsageCount;
+
     /**
      * Constructor
      *
@@ -115,23 +136,7 @@ abstract class CouponAbstract implements CouponInterface
     }
 
     /**
-     * Set Coupon
-     *
-     * @param FacadeInterface $facade                     Provides necessary value from Thelia
-     * @param string          $code                       Coupon code (ex: XMAS)
-     * @param string          $title                      Coupon title (ex: Coupon for XMAS)
-     * @param string          $shortDescription           Coupon short description
-     * @param string          $description                Coupon description
-     * @param array           $effects                    Coupon effects params
-     * @param bool            $isCumulative               If Coupon is cumulative
-     * @param bool            $isRemovingPostage          If Coupon is removing postage
-     * @param bool            $isAvailableOnSpecialOffers If available on Product already
-     *                                                    on special offer price
-     * @param bool            $isEnabled                  False if Coupon is disabled by admin
-     * @param int             $maxUsage                   How many usage left
-     * @param \Datetime       $expirationDate             When the Code is expiring
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function set(
         FacadeInterface $facade,
@@ -145,7 +150,10 @@ abstract class CouponAbstract implements CouponInterface
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        \DateTime $expirationDate
+        \DateTime $expirationDate,
+        $freeShippingForCountries,
+        $freeShippingForModules,
+        $perCustomerUsageCount
     )
     {
         $this->code = $code;
@@ -163,9 +171,32 @@ abstract class CouponAbstract implements CouponInterface
         $this->facade = $facade;
 
         $this->effects = $effects;
-        $this->amount = $effects[self::INPUT_AMOUNT_NAME];
+        // Amount is now optional.
+        $this->amount = isset($effects[self::AMOUNT_FIELD_NAME]) ? $effects[self::AMOUNT_FIELD_NAME] : 0;
+
+        $this->freeShippingForCountries = $freeShippingForCountries;
+        $this->freeShippingForModules = $freeShippingForModules;
+        $this->perCustomerUsageCount = $perCustomerUsageCount;
 
         return $this;
+    }
+
+    /**
+     * @param true $perCustomerUsageCount
+     */
+    public function setPerCustomerUsageCount($perCustomerUsageCount)
+    {
+        $this->perCustomerUsageCount = $perCustomerUsageCount;
+
+        return $this;
+    }
+
+    /**
+     * @return true
+     */
+    public function getPerCustomerUsageCount()
+    {
+        return $this->perCustomerUsageCount;
     }
 
     /**
@@ -231,10 +262,23 @@ abstract class CouponAbstract implements CouponInterface
     }
 
     /**
-     * Return effects generated by the coupon
-     * A negative value
-     *
-     * @return float Amount removed from the Total Checkout
+     * @return array list of country IDs for which shipping is free. All if empty
+     */
+    public function getFreeShippingForCountries()
+    {
+        return $this->freeShippingForCountries;
+    }
+
+    /**
+     * @return array list of module IDs for which shipping is free. All if empty
+     */
+    public function getFreeShippingForModules()
+    {
+        return $this->freeShippingForModules;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function exec()
     {
@@ -348,6 +392,19 @@ abstract class CouponAbstract implements CouponInterface
     }
 
     /**
+     * This is the field label than will be displayed in the form.
+     * This method should be overridden to be useful.
+     *
+     * For backward compatibility only.
+     *
+     * @return string
+     */
+    public function getInputName()
+    {
+        return "Please override getInputName() method";
+    }
+
+    /**
      * Draw the input displayed in the BackOffice
      * allowing Admin to set its Coupon effect
      * Override this method to do something useful
@@ -358,19 +415,96 @@ abstract class CouponAbstract implements CouponInterface
     {
         return $this->facade->getParser()->render('coupon/type-fragments/remove-x.html', [
                 'label'     => $this->getInputName(),
-                'fieldName' => self::INPUT_AMOUNT_NAME,
+                'fieldId'   => self::AMOUNT_FIELD_NAME,
+                'fieldName' => $this->makeCouponFieldName(self::AMOUNT_FIELD_NAME),
                 'value'     => $this->amount
             ]);
     }
 
     /**
-     * Get all extended inputs name to manage
+     * This methods checks a field value. If the field has a correct value, this value is returned
+     * Otherwise, an InvalidArgumentException describing the problem should be thrown.
      *
+     * This method should be ovveriden to be useful.
+     *
+     * @param $fieldName
+     * @param $fieldValue
      * @return mixed
+     * @throws \InvalidArgumentException if the field valiue is not valid.
      */
-    public function getExtendedInputs()
+    protected function checkCouponFieldValue($fieldName, $fieldValue)
     {
-        return $this->extendedInputs;
+        return $fieldValue;
     }
 
+    /**
+     * A helper to get the value of a standard field name
+     *
+     * @param string $fieldName    the field name
+     * @param array  $data         the input form data (e.g. $form->getData())
+     * @param mixed  $defaultValue the default value if the field is not found.
+     *
+     * @return mixed the input value, or the default one
+     *
+     * @throws \InvalidArgumentException if the field is not found, and no default value has been defined.
+     */
+    protected function getCouponFieldValue($fieldName, $data, $defaultValue = null)
+    {
+        if (isset($data[self::COUPON_DATASET_NAME][$fieldName])) {
+            return $this->checkCouponFieldValue(
+                $fieldName,
+                $data[self::COUPON_DATASET_NAME][$fieldName]
+            );
+        } elseif (null !== $defaultValue) {
+            return $defaultValue;
+        } else {
+            throw new \InvalidArgumentException(sprintf("The coupon field name %s was not found in the coupon form", $fieldName));
+        }
+    }
+
+    /**
+     * A helper to create an standard field name that will be used in the coupon form
+     *
+     * @param  string $fieldName the field name
+     * @return string the complete name, ready to be used in a form.
+     */
+    protected function makeCouponFieldName($fieldName)
+    {
+        return sprintf("%s[%s][%s]", CouponCreationForm::COUPON_CREATION_FORM_NAME, self::COUPON_DATASET_NAME, $fieldName);
+    }
+
+    /**
+     * Return a list of the fields name for this coupon.
+     *
+     * @return array
+     */
+    protected function getFieldList()
+    {
+        return [self::AMOUNT_FIELD_NAME];
+    }
+
+    /**
+     * Create the effect array from the list of fields
+     *
+     * @param  array $data the input form data (e.g. $form->getData())
+     * @return array a filedName => fieldValue array
+     */
+    public function getEffects($data)
+    {
+        $effects = [];
+
+        foreach ($this->getFieldList() as $fieldName) {
+            $effects[$fieldName] = $this->getCouponFieldValue($fieldName, $data);
+        }
+
+        return $effects;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function clear()
+    {
+        // Does nothing. Override this function as needed.
+    }
 }

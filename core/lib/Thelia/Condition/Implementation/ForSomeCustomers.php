@@ -139,7 +139,7 @@ class ForSomeCustomers extends ConditionAbstract
         if (null !== $custList = CustomerQuery::create()->findPks($custIds)) {
 
             /** @var Customer $cust */
-            foreach($custList as $cust) {
+            foreach ($custList as $cust) {
                 $custStrList .= $cust->getLastname() . ' ' . $cust->getFirstname() . ' ('.$cust->getRef().'), ';
             }
 

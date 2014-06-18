@@ -33,6 +33,7 @@ class Update
         '4' => '2.0.0-RC1',
         '5' => '2.0.0',
         '6' => '2.0.1',
+        '7' => '2.0.2',
     );
 
     protected function isLatestVersion($version)
@@ -48,7 +49,6 @@ class Update
         $logger = Tlog::getInstance();
         $logger->setLevel(Tlog::DEBUG);
 
-        $success = true;
         $updatedVersions = array();
 
         $currentVersion = ConfigQuery::read('thelia_version');

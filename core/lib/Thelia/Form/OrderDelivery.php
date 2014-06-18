@@ -66,19 +66,15 @@ class OrderDelivery extends BaseForm
     public function verifyDeliveryModule($value, ExecutionContextInterface $context)
     {
         $module = ModuleQuery::create()
-            ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
-            ->filterByActivate(1)
-            ->filterById($value)
+            ->filterActivatedByTypeAndId(BaseModule::DELIVERY_MODULE_TYPE, $value)
             ->findOne();
 
         if (null === $module) {
             $context->addViolation(Translator::getInstance()->trans("Delivery module ID not found"));
-        } else {
-            if (! $module->isDeliveryModule()) {
-                $context->addViolation(
-                    sprintf(Translator::getInstance()->trans("delivery module %s is not a Thelia\Module\DeliveryModuleInterface"), $module->getCode())
-                );
-            }
+        } elseif (! $module->isDeliveryModule()) {
+            $context->addViolation(
+                sprintf(Translator::getInstance()->trans("delivery module %s is not a Thelia\Module\DeliveryModuleInterface"), $module->getCode())
+            );
         }
     }
 

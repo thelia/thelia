@@ -214,10 +214,10 @@ $(function($){
     // ***********************************************
 
     $.couponManager.displayEfffect = function(optionSelected) {
-        var mainDiv = $('#coupon-type');
-        mainDiv.find('.typeToolTip').html(optionSelected.data('description'));
+        var typeDiv = $('#coupon-type');
+        typeDiv.find('.typeToolTip').html(optionSelected.data('description'));
 
-        var inputsDiv = mainDiv.find('.inputs');
+        var inputsDiv = $('.inputs', $('#coupon-inputs'));
         inputsDiv.html('<div class="loading" ></div>');
         var url = $.couponManager.urlAjaxAdminCouponDrawInputs;
         url = url.replace('couponServiceId', optionSelected.val());
@@ -235,16 +235,24 @@ $(function($){
             }
         }).done(function(data) {
             inputsDiv.html(data);
+
+            // Invoke coupon setup funtion, if any
+            try {
+                couponInputFormSetup();
+            }
+            catch (ex) {
+                // Ignore the error
+            }
         });
     };
 
     // Reload effect inputs when changing effect
     $.couponManager.onEffectChange = function() {
-        var mainDiv = $('#coupon-type');
-        var optionSelected = mainDiv.find('#type option:selected');
-        mainDiv.find('.typeToolTip').html(optionSelected.data('description'));
+        var typeDiv = $('#coupon-type');
+        var optionSelected = typeDiv.find('#type option:selected');
+        typeDiv.find('.typeToolTip').html(optionSelected.data('description'));
 
-        mainDiv.find('#type').on('change', function () {
+        typeDiv.find('#type').on('change', function () {
             var optionSelected = $('option:selected', this);
             $.couponManager.displayEfffect(optionSelected);
 
@@ -279,29 +287,36 @@ $(function($){
     $.couponManager.onUsageUnlimitedChange = function() {
         var $isUnlimited = $('#is-unlimited');
 
-        var $maxUsage = $('#max-usage');
-
-        if ($maxUsage.val() == -1) {
+        if ($('#max-usage').val() == -1) {
             $isUnlimited.prop('checked', true);
-            $maxUsage.hide();
-            $('#max-usage-label').hide();
+            $('#max-usage-data').hide();
         } else {
             $isUnlimited.prop('checked', false);
-            $maxUsage.show();
-            $('#max-usage-label').show();
+            $('#max-usage-data').show();
         }
 
         $isUnlimited.change(function(){
-            var $this = $(this);
-            if ($this.is(':checked')) {
-                $('#max-usage').hide().val('-1');
-                $('#max-usage-label').hide();
+            if ($(this).is(':checked')) {
+                $('#max-usage-data').hide();
+                $('#max-usage').val('-1');
             } else {
-                $('#max-usage').show().val('');
-                $('#max-usage-label').show();
+                $('#max-usage').val('');
+                $('#max-usage-data').show();
             }
         });
     };
 
+    // Shipping conditions
+    $('#is-removing-postage').change(function(ev) {
+        if ($(this).is(':checked')) {
+            $('.free-postage-conditions').stop().slideDown();
+        }
+        else {
+            $('.free-postage-conditions').stop().slideUp();
+        }
+    })
+
     $.couponManager.onUsageUnlimitedChange();
+
+    $('#is-removing-postage').change();
 });

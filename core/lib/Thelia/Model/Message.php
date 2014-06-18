@@ -75,8 +75,6 @@ class Message extends BaseMessage
     {
         $body = false;
 
-        //$mail_template_path = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath() . DS;
-
         // Try to get the body from template file, if a file is defined
         if (! empty($template)) {
             try {

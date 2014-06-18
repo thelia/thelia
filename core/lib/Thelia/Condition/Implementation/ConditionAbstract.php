@@ -19,7 +19,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionOperatorException;
 use Thelia\Exception\InvalidConditionValueException;
-use Thelia\Model\Base\CurrencyQuery;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Currency;
 use Thelia\Type\FloatType;
 
@@ -66,15 +66,15 @@ abstract class ConditionAbstract implements ConditionInterface
     }
 
     /**
-     * @param array $operatorList the list of comparison operator values, as entered in the condition parameter form
+     * @param array  $operatorList  the list of comparison operator values, as entered in the condition parameter form
      * @param string $parameterName the name of the parameter to check
      *
      * @return $this
      *
      * @throws \Thelia\Exception\InvalidConditionOperatorException if the operator value is not in the allowed value
      */
-    protected function checkComparisonOperatorValue($operatorList, $parameterName) {
-
+    protected function checkComparisonOperatorValue($operatorList, $parameterName)
+    {
         $isOperator1Legit = $this->isOperatorLegit(
             $operatorList[$parameterName],
             $this->availableOperators[$parameterName]

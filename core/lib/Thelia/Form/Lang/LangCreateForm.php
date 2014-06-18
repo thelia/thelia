@@ -110,7 +110,7 @@ class LangCreateForm extends BaseForm
                 'constraints' => array(
                     new NotBlank()
                 ),
-                'label' => Translator::getInstance()->trans('Sets the number of decimal points'),
+                'label' => Translator::getInstance()->trans('Decimal places'),
                 'label_attr' => array(
                     'for' => 'decimals'
                 )

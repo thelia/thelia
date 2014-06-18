@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="no-return-functions"}
+    {$admin_current_location = 'configuration'}
+{/block}
+
 {block name="page-title"}{intl l='Thelia Languages'}{/block}
 
 {block name="check-resource"}admin.configuration.language{/block}
@@ -224,7 +228,7 @@
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="2">
-                <span class="help-block">{intl l='Sets the number of decimal points'}</span>
+                <span class="help-block">{intl l='Decimal places'}</span>
             </div>
         {/form_field}
 

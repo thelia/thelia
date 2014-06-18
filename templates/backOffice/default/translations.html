@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="no-return-functions"}
+    {$admin_current_location = 'configuration'}
+{/block}
+
 {block name="page-title"}{intl l='Translations'}{/block}
 
 {block name="check-resource"}admin.configuration.variable{/block}
@@ -48,7 +52,7 @@
                                                     <option value="ma" {if $item_to_translate=='ma'}selected="selected"{/if}>{intl l='E-mail templates'}</option>
 			                                        <option value="bo" {if $item_to_translate=='bo'}selected="selected"{/if}>{intl l='Back-office templates'}</option>
                                                     <option value="mo" {if $item_to_translate=='mo'}selected="selected"{/if}>{intl l='Modules'}</option>
-                                                   <option value="co" {if $item_to_translate=='co'}selected="selected"{/if}>{intl l='Thelia core'}</option>
+                                                    <option value="co" {if $item_to_translate=='co'}selected="selected"{/if}>{intl l='Thelia core'}</option>
 												</select>
 			                                </div>
 		                                </div>
@@ -299,6 +303,7 @@
 
         $('#item_to_translate').change(function() {
             $('#item-id').val('');
+            $('#item_name').val('');
             $('.item-id-selector').hide();
         });
 
@@ -321,7 +326,7 @@
         	translation_changed = true;
 
         	ev.preventDefault();
-        })
+        });
 
         $('#translation_form').submit(function(ev) {
 

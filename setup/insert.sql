@@ -41,10 +41,10 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('store_name','', 0, 1, NOW(), NOW()),
 ('store_email','', 0, 1, NOW(), NOW()),
 ('one_domain_foreach_lang','0', 1, 1, NOW(), NOW()),
-('thelia_version','2.0.1', 1, 1, NOW(), NOW()),
+('thelia_version','2.0.2', 1, 1, NOW(), NOW()),
 ('thelia_major_version','2', 1, 1, NOW(), NOW()),
 ('thelia_minus_version','0', 1, 1, NOW(), NOW()),
-('thelia_release_version','1', 1, 1, NOW(), NOW()),
+('thelia_release_version','2', 1, 1, NOW(), NOW()),
 ('thelia_extra_version','', 1, 1, NOW(), NOW()),
 ('front_cart_country_cookie_name','fcccn', 1, 1, NOW(), NOW()),
 ('front_cart_country_cookie_expires','2592000', 1, 1, NOW(), NOW()),
@@ -408,7 +408,8 @@ INSERT INTO `country` (`id`, `area_id`, `isocode`, `isoalpha2`, `isoalpha3`, `by
 (265, 7, '540', 'NC', 'NCL', 0, 0, NOW(), NOW()),
 (266, 7, '258', 'PF', 'PYF', 0, 0, NOW(), NOW()),
 (267, 7, '876', 'WF', 'WLF', 0, 0, NOW(), NOW()),
-(268, 4, '840', 'US', 'USA', 0, 0, NOW(), NOW());
+(268, 4, '840', 'US', 'USA', 0, 0, NOW(), NOW()),
+(269, 5, '344', 'HK', 'HKG', 0, 0, NOW(), NOW());
 
 INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (1, 'en_US', 'Afghanistan', '', '', ''),
@@ -1199,7 +1200,10 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (267, 'fr_FR', 'Wallis-et-Futuna', '', '', ''),
 (268, 'en_US', 'USA - Alabama', '', '', ''),
 (268, 'es_ES', 'USA - Alabama', '', '', ''),
-(268, 'fr_FR', 'USA - Alabama', '', '', '');
+(268, 'fr_FR', 'USA - Alabama', '', '', ''),
+(269, 'en_US', 'Hong Kong', '', '', ''),
+(269, 'es_ES', 'Hong Kong', '', '', ''),
+(269, 'fr_FR', 'Hong Kong', '', '', '');
 
 INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `updated_at`)
   VALUES

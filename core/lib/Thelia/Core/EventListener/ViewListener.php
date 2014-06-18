@@ -25,7 +25,6 @@ use Thelia\Core\Template\Exception\ResourceNotFoundException;
 
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Exception\OrderException;
-use Thelia\Tools\Redirect;
 
 use Thelia\Core\Security\Exception\AuthenticationException;
 

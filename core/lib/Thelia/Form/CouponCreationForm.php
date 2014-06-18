@@ -18,7 +18,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Base\LangQuery;
+use Thelia\Model\CountryQuery;
+use Thelia\Model\LangQuery;
+use Thelia\Model\ModuleQuery;
+use Thelia\Model\Module;
+use Thelia\Module\BaseModule;
 
 /**
  * Allow to build a form Coupon
@@ -29,6 +33,8 @@ use Thelia\Model\Base\LangQuery;
  */
 class CouponCreationForm extends BaseForm
 {
+    const COUPON_CREATION_FORM_NAME = 'thelia_coupon_creation';
+
     /**
      * Build Coupon form
      *
@@ -36,6 +42,33 @@ class CouponCreationForm extends BaseForm
      */
     protected function buildForm()
     {
+        // Create countries and shipping modules list
+        $countries = [0 => '   '];
+
+        $list = CountryQuery::create()->find();
+
+        /** @var Country $item */
+        foreach ($list as $item) {
+            $countries[$item->getId()] = $item->getTitle();
+        }
+
+        asort($countries);
+
+        $countries[0] = Translator::getInstance()->trans("All countries");
+
+        $modules = [0 => '   '];
+
+        $list = ModuleQuery::create()->filterByActivate(BaseModule::IS_ACTIVATED)->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->find();
+
+        /** @var Module $item */
+        foreach ($list as $item) {
+            $modules[$item->getId()] = $item->getTitle();
+        }
+
+        asort($modules);
+
+        $modules[0] = Translator::getInstance()->trans("All shipping methods");
+
         $this->formBuilder
             ->add(
                 'code',
@@ -80,14 +113,6 @@ class CouponCreationForm extends BaseForm
                 )
             )
             ->add(
-                'amount',
-                'money',
-                array(
-                    'constraints' => array(
-                    new NotBlank()
-                ))
-            )
-            ->add(
                 'isEnabled',
                 'text',
                 array()
@@ -117,6 +142,22 @@ class CouponCreationForm extends BaseForm
                 array()
             )
             ->add(
+                'freeShippingForCountries',
+                'choice',
+                array(
+                    'multiple' => true,
+                    'choices' => $countries
+                )
+            )
+            ->add(
+                'freeShippingForModules',
+                'choice',
+                array(
+                    'multiple' => true,
+                    'choices' => $modules
+                )
+            )
+            ->add(
                 'isAvailableOnSpecialOffers',
                 'text',
                 array()
@@ -132,6 +173,18 @@ class CouponCreationForm extends BaseForm
                 )
             )
             ->add(
+                'perCustomerUsageCount',
+                'choice',
+                array(
+                    'multiple' => false,
+                    'required' => true,
+                    'choices'  => [
+                        1 => Translator::getInstance()->trans('Per customer'),
+                        0 => Translator::getInstance()->trans('Overall')
+                    ]
+                )
+            )
+            ->add(
                 'locale',
                 'hidden',
                 array(
@@ -139,7 +192,12 @@ class CouponCreationForm extends BaseForm
                         new NotBlank()
                     )
                 )
-            );
+            )
+            ->add('coupon_specific', 'collection', array(
+                    'allow_add'    => true,
+                    'allow_delete' => true,
+            ))
+        ;
     }
 
     /**
@@ -167,6 +225,6 @@ class CouponCreationForm extends BaseForm
      */
     public function getName()
     {
-        return 'thelia_coupon_creation';
+        return self::COUPON_CREATION_FORM_NAME;
     }
 }

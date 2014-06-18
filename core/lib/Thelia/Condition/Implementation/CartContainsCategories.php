@@ -93,12 +93,12 @@ class CartContainsCategories extends ConditionAbstract
         $cartItems = $this->facade->getCart()->getCartItems();
 
         /** @var CartItem $cartItem */
-        foreach($cartItems as $cartItem) {
+        foreach ($cartItems as $cartItem) {
 
             $categories = $cartItem->getProduct()->getCategories();
 
             /** @var Category $category */
-            foreach($categories as $category) {
+            foreach ($categories as $category) {
                 $catecoryInCart = $this->conditionValidator->variableOpComparison(
                     $category->getId(),
                     $this->operators[self::CATEGORIES_LIST],
@@ -156,7 +156,7 @@ class CartContainsCategories extends ConditionAbstract
         if (null !== $catList = CategoryQuery::create()->findPks($catIds)) {
 
             /** @var Category $cat */
-            foreach($catList as $cat) {
+            foreach ($catList as $cat) {
                 $catStrList .= $cat->getTitle() . ', ';
             }
 

@@ -361,7 +361,8 @@ class ProductController extends AbstractSeoCrudController
                 'product_id'            => $this->getRequest()->get('product_id', 0),
                 'folder_id'             => $this->getRequest()->get('folder_id', 0),
                 'accessory_category_id' => $this->getRequest()->get('accessory_category_id', 0),
-                'current_tab'           => $this->getRequest()->get('current_tab', 'general')
+                'current_tab'           => $this->getRequest()->get('current_tab', 'general'),
+                'page'                  => $this->getRequest()->get('page', 1)
         );
     }
 
@@ -386,7 +387,8 @@ class ProductController extends AbstractSeoCrudController
         return $this->render('categories',
                 array(
                     'product_order' => $currentOrder,
-                    'category_id' => $this->getCategoryId()
+                    'category_id' => $this->getCategoryId(),
+                    'page' => $this->getRequest()->get('page', 1)
         ));
     }
 
@@ -394,7 +396,10 @@ class ProductController extends AbstractSeoCrudController
     {
         $this->redirectToRoute(
                 'admin.products.default',
-                array('category_id' => $this->getCategoryId())
+                array(
+                    'category_id' => $this->getCategoryId(),
+                    'page' => $this->getRequest()->get('page', 1)
+                )
         );
     }
 
@@ -436,18 +441,6 @@ class ProductController extends AbstractSeoCrudController
                 'admin.products.default',
                 array('category_id' => $this->getCategoryId())
         );
-    }
-
-    protected function performAdditionalUpdateAction($updateEvent)
-    {
-        if ($this->getRequest()->get('save_mode') != 'stay') {
-
-            // Redirect to parent product list
-            $this->redirectToRoute(
-                    'admin.categories.default',
-                    array('category_id' => $this->getCategoryId())
-            );
-        }
     }
 
     protected function performAdditionalUpdatePositionAction($positionEvent)

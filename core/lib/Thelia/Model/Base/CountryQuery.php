@@ -58,6 +58,14 @@ use Thelia\Model\Map\CountryTableMap;
  * @method     ChildCountryQuery rightJoinAddress($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Address relation
  * @method     ChildCountryQuery innerJoinAddress($relationAlias = null) Adds a INNER JOIN clause to the query using the Address relation
  *
+ * @method     ChildCountryQuery leftJoinCouponCountry($relationAlias = null) Adds a LEFT JOIN clause to the query using the CouponCountry relation
+ * @method     ChildCountryQuery rightJoinCouponCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CouponCountry relation
+ * @method     ChildCountryQuery innerJoinCouponCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the CouponCountry relation
+ *
+ * @method     ChildCountryQuery leftJoinOrderCouponCountry($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderCouponCountry relation
+ * @method     ChildCountryQuery rightJoinOrderCouponCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderCouponCountry relation
+ * @method     ChildCountryQuery innerJoinOrderCouponCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderCouponCountry relation
+ *
  * @method     ChildCountryQuery leftJoinCountryI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the CountryI18n relation
  * @method     ChildCountryQuery rightJoinCountryI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CountryI18n relation
  * @method     ChildCountryQuery innerJoinCountryI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the CountryI18n relation
@@ -808,6 +816,152 @@ abstract class CountryQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related \Thelia\Model\CouponCountry object
+     *
+     * @param \Thelia\Model\CouponCountry|ObjectCollection $couponCountry  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function filterByCouponCountry($couponCountry, $comparison = null)
+    {
+        if ($couponCountry instanceof \Thelia\Model\CouponCountry) {
+            return $this
+                ->addUsingAlias(CountryTableMap::ID, $couponCountry->getCountryId(), $comparison);
+        } elseif ($couponCountry instanceof ObjectCollection) {
+            return $this
+                ->useCouponCountryQuery()
+                ->filterByPrimaryKeys($couponCountry->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCouponCountry() only accepts arguments of type \Thelia\Model\CouponCountry or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CouponCountry relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function joinCouponCountry($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CouponCountry');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CouponCountry');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CouponCountry relation CouponCountry object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CouponCountryQuery A secondary query class using the current class as primary query
+     */
+    public function useCouponCountryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCouponCountry($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CouponCountry', '\Thelia\Model\CouponCountryQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\OrderCouponCountry object
+     *
+     * @param \Thelia\Model\OrderCouponCountry|ObjectCollection $orderCouponCountry  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function filterByOrderCouponCountry($orderCouponCountry, $comparison = null)
+    {
+        if ($orderCouponCountry instanceof \Thelia\Model\OrderCouponCountry) {
+            return $this
+                ->addUsingAlias(CountryTableMap::ID, $orderCouponCountry->getCountryId(), $comparison);
+        } elseif ($orderCouponCountry instanceof ObjectCollection) {
+            return $this
+                ->useOrderCouponCountryQuery()
+                ->filterByPrimaryKeys($orderCouponCountry->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByOrderCouponCountry() only accepts arguments of type \Thelia\Model\OrderCouponCountry or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the OrderCouponCountry relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function joinOrderCouponCountry($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('OrderCouponCountry');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'OrderCouponCountry');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the OrderCouponCountry relation OrderCouponCountry object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\OrderCouponCountryQuery A secondary query class using the current class as primary query
+     */
+    public function useOrderCouponCountryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinOrderCouponCountry($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderCouponCountry', '\Thelia\Model\OrderCouponCountryQuery');
+    }
+
+    /**
      * Filter the query by a related \Thelia\Model\CountryI18n object
      *
      * @param \Thelia\Model\CountryI18n|ObjectCollection $countryI18n  the related object to use as filter
@@ -878,6 +1032,40 @@ abstract class CountryQuery extends ModelCriteria
         return $this
             ->joinCountryI18n($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CountryI18n', '\Thelia\Model\CountryI18nQuery');
+    }
+
+    /**
+     * Filter the query by a related Coupon object
+     * using the coupon_country table as cross reference
+     *
+     * @param Coupon $coupon the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function filterByCoupon($coupon, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useCouponCountryQuery()
+            ->filterByCoupon($coupon, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related OrderCoupon object
+     * using the order_coupon_country table as cross reference
+     *
+     * @param OrderCoupon $orderCoupon the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function filterByOrderCoupon($orderCoupon, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useOrderCouponCountryQuery()
+            ->filterByOrderCoupon($orderCoupon, $comparison)
+            ->endUse();
     }
 
     /**

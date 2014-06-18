@@ -73,6 +73,15 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /** @var string Language code ISO (ex: fr_FR) */
     protected $locale = null;
 
+    /** @var array ID of Countries to which shipping is free */
+    protected $freeShippingForCountries;
+
+    /** @var  array ID of Shipping modules for which shipping is free */
+    protected $freeShippingForMethods;
+
+    /** @var true if usage count is per customer only */
+    protected $perCustomerUsageCount;
+
     /**
      * Constructor
      *
@@ -91,8 +100,15 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param boolean   $isRemovingPostage          Is removing Postage
      * @param int       $maxUsage                   Coupon quantity
      * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
+     * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
+     * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
+     * @param boolean   $perCustomerUsageCount      Usage count is per customer
      */
-    public function __construct($code, $serviceId, $title, array $effects, $shortDescription, $description, $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $isRemovingPostage, $maxUsage, $locale)
+    public function __construct(
+        $code, $serviceId, $title, array $effects, $shortDescription, $description,
+        $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative,
+        $isRemovingPostage, $maxUsage, $locale, $freeShippingForCountries, $freeShippingForMethods,
+        $perCustomerUsageCount)
     {
         $this->code = $code;
         $this->description = $description;
@@ -107,6 +123,65 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         $this->serviceId = $serviceId;
         $this->locale = $locale;
         $this->setEffects($effects);
+        $this->freeShippingForCountries = $freeShippingForCountries;
+        $this->freeShippingForMethods = $freeShippingForMethods;
+        $this->perCustomerUsageCount = $perCustomerUsageCount;
+    }
+
+    /**
+     * @param true $perCustomerUsageCount
+     */
+    public function setPerCustomerUsageCount($perCustomerUsageCount)
+    {
+        $this->perCustomerUsageCount = $perCustomerUsageCount;
+
+        return $this;
+    }
+
+    /**
+     * @return true
+     */
+    public function getPerCustomerUsageCount()
+    {
+        return $this->perCustomerUsageCount;
+    }
+
+    /**
+     * @param  array $freeShippingForCountries
+     * @return $this
+     */
+    public function setFreeShippingForCountries($freeShippingForCountries)
+    {
+        $this->freeShippingForCountries = $freeShippingForCountries;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFreeShippingForCountries()
+    {
+        return $this->freeShippingForCountries;
+    }
+
+    /**
+     * @param  array $freeShippingForMethods
+     * @return $this
+     */
+    public function setFreeShippingForMethods($freeShippingForMethods)
+    {
+        $this->freeShippingForMethods = $freeShippingForMethods;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFreeShippingForMethods()
+    {
+        return $this->freeShippingForMethods;
     }
 
     /**
@@ -252,10 +327,9 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      */
     public function setEffects(array $effects)
     {
-        if (null === $effects['amount']) {
-            throw new InvalidArgumentException('Missing key \'amount\' in Coupon effect ready to be serialized array');
-        }
-        $this->amount = $effects['amount'];
+        // Amount is now optionnal.
+        $this->amount = isset($effects['amount']) ? $effects['amount'] : 0;
+
         $this->effects = $effects;
     }
 

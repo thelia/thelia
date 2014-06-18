@@ -82,7 +82,7 @@ class Security extends AbstractSmartyPlugin
         $order = $this->request->getSession()->getOrder();
         /* Does address and module still exists ? We assume address owner can't change neither module type */
         if ($order !== null) {
-            $checkAddress = AddressQuery::create()->findPk($order->chosenDeliveryAddress);
+            $checkAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress());
             $checkModule = ModuleQuery::create()->findPk($order->getDeliveryModuleId());
         }
         if (null === $order || null == $checkAddress || null === $checkModule) {

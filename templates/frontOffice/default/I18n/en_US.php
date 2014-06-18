@@ -114,6 +114,7 @@ return array(
     'Order details' => 'Order details',
     'Order number' => 'Order number',
     'Orders over $50' => 'Orders over $50',
+    'Order Payment' => 'Order with payment obligation',
     'Out of Stock' => 'Out of stock',
     'Pagination' => 'Pagination',
     'Password' => 'Password',

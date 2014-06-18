@@ -40,9 +40,16 @@ use Thelia\Module\Exception\DeliveryException;
  */
 class CouponController extends BaseFrontController
 {
+    /**
+     * Clear all coupons.
+     */
+    public function clearAllCouponsAction() {
+        // Dispatch Event to the Action
+        $this->getDispatcher()->dispatch(TheliaEvents::COUPON_CLEAR_ALL);
+    }
 
     /**
-     * Test Coupon consuming
+     * Coupon consuming
      */
     public function consumeAction()
     {
@@ -69,12 +76,14 @@ class CouponController extends BaseFrontController
 
             /* recalculate postage amount */
             $order = $this->getSession()->getOrder();
+
             if (null !== $order) {
                 $deliveryModule = $order->getModuleRelatedByDeliveryModuleId();
-                $deliveryAddress = AddressQuery::create()->findPk($order->chosenDeliveryAddress);
+                $deliveryAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress());
 
                 if (null !== $deliveryModule && null !== $deliveryAddress) {
-                    $moduleInstance = $this->container->get(sprintf('module.%s', $deliveryModule->getCode()));
+
+                    $moduleInstance = $deliveryModule->getModuleInstance($this->container);
 
                     $orderEvent = new OrderEvent($order);
 

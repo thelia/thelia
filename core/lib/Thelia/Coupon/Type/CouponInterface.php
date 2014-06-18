@@ -12,6 +12,7 @@
 
 namespace Thelia\Coupon\Type;
 
+use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
 
@@ -32,13 +33,6 @@ interface CouponInterface
     public function getName();
 
     /**
-     * Get I18n amount input name
-     *
-     * @return string
-     */
-    public function getInputName();
-
-    /**
      * Get I18n tooltip
      *
      * @return string
@@ -55,19 +49,22 @@ interface CouponInterface
     /**
      * Set Coupon
      *
-     * @param FacadeInterface $facade                     Provides necessary value from Thelia
-     * @param string          $code                       Coupon code (ex: XMAS)
-     * @param string          $title                      Coupon title (ex: Coupon for XMAS)
-     * @param string          $shortDescription           Coupon short description
-     * @param string          $description                Coupon description
-     * @param array           $effects                    Coupon effects params
-     * @param bool            $isCumulative               If Coupon is cumulative
-     * @param bool            $isRemovingPostage          If Coupon is removing postage
-     * @param bool            $isAvailableOnSpecialOffers If available on Product already
-     *                                                    on special offer price
-     * @param bool            $isEnabled                  False if Coupon is disabled by admin
-     * @param int             $maxUsage                   How many usage left
-     * @param \Datetime       $expirationDate             When the Code is expiring
+     * @param FacadeInterface  $facade                     Provides necessary value from Thelia
+     * @param string           $code                       Coupon code (ex: XMAS)
+     * @param string           $title                      Coupon title (ex: Coupon for XMAS)
+     * @param string           $shortDescription           Coupon short description
+     * @param string           $description                Coupon description
+     * @param array            $effects                    Coupon effects params
+     * @param bool             $isCumulative               If Coupon is cumulative
+     * @param bool             $isRemovingPostage          If Coupon is removing postage
+     * @param bool             $isAvailableOnSpecialOffers If available on Product already
+     *                                                     on special offer price
+     * @param bool             $isEnabled                  False if Coupon is disabled by admin
+     * @param int              $maxUsage                   How many usage left
+     * @param \Datetime        $expirationDate             When the Code is expiring
+     * @param ObjectCollection $freeShippingForCountries   list of countries which shipping is free. All if empty
+     * @param ObjectCollection $freeShippingForModules     list of modules for which shipping is free. All if empty
+     * @param bool             $perCustomerUsageCount      true if usage count is per customer only
      */
     public function set(
         FacadeInterface $facade,
@@ -81,7 +78,11 @@ interface CouponInterface
         $isAvailableOnSpecialOffers,
         $isEnabled,
         $maxUsage,
-        \DateTime $expirationDate);
+        \DateTime $expirationDate,
+        $freeShippingForCountries,
+        $freeShippingForModules,
+        $perCustomerUsageCount
+    );
 
     /**
      * Return Coupon code (ex: XMAS)
@@ -161,6 +162,14 @@ interface CouponInterface
     public function isAvailableOnSpecialOffers();
 
     /**
+     * Check if the Coupon can be used against a
+     * product already with a special offer price
+     *
+     * @return boolean
+     */
+    public function getPerCustomerUsageCount();
+
+    /**
      * Check if Coupon has been disabled by admin
      *
      * @return boolean
@@ -212,10 +221,27 @@ interface CouponInterface
     public function drawBackOfficeInputs();
 
     /**
-     * Get all extended inputs name to manage
-     *
-     * @return mixed
+     * @return ObjectCollection list of country IDs for which shipping is free. All if empty
      */
-    public function getExtendedInputs();
+    public function getFreeShippingForCountries();
+
+    /**
+     * @return ObjectCollection list of module IDs for which shipping is free. All if empty
+     */
+    public function getFreeShippingForModules();
+
+    /**
+     * Create the effect array from the list of fields
+     *
+     * @param array $data the input form data (e.g. $form->getData())
+     *
+     * @return array a filedName => fieldValue array
+     */
+    public function getEffects($data);
+
+    /**
+     * Clear all the data the coupon may have stored, called after an order is completed.
+     */
+    public function clear();
 
 }

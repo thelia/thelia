@@ -21,7 +21,7 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Base\OrderProductAttributeCombinationQuery;
+use Thelia\Model\OrderProductAttributeCombinationQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 

@@ -21,7 +21,7 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Base\TaxRuleCountryQuery;
+use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Model\TaxQuery;

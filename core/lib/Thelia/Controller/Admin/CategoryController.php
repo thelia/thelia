@@ -169,7 +169,8 @@ class CategoryController extends AbstractSeoCrudController
         return array(
                 'category_id' => $this->getRequest()->get('category_id', 0),
                 'folder_id' => $this->getRequest()->get('folder_id', 0),
-                'current_tab' => $this->getRequest()->get('current_tab', 'general')
+                'current_tab' => $this->getRequest()->get('current_tab', 'general'),
+                'page' => $this->getRequest()->get('page', 1)
         );
     }
 
@@ -182,14 +183,17 @@ class CategoryController extends AbstractSeoCrudController
                 array(
                     'category_order' => $currentOrder,
                     'product_order' => $product_order,
-                    'category_id' => $this->getRequest()->get('category_id', 0)
+                    'category_id' => $this->getRequest()->get('category_id', 0),
+                    'page' => $this->getRequest()->get('page', 1)
         ));
     }
 
     protected function redirectToListTemplate()
     {
-        $category_id = $this->getRequest()->get('category_id', 0);
-        $this->redirectToListTemplateWithId($category_id);
+        $this->redirectToRoute('admin.categories', array(
+                'category_id' => $this->getRequest()->get('category_id', 0),
+                'page' => $this->getRequest()->get('page', 1))
+        );
     }
 
     protected function redirectToListTemplateWithId($category_id)

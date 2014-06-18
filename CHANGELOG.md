@@ -1,4 +1,13 @@
+#2.0.3
+- New coupon type: Free product if selected products are in the cart.
+
 #2.0.2
+- Coupon UI has been redesigned.
+- New coupon types:
+    - Constant discount on selected products
+    - Constant discount on products of selected categories
+    - Percentage discount on selected products
+    - Percentage discount on products of selected categories
 - New coupon conditions :
     - Start date
     - Billing country
@@ -6,7 +15,21 @@
     - Cart contains product
     - Cart contains product from category
     - For specific customers
-    
+- Free shipping can now be restricted to some countries and/or shipping methods
+- session initialization use now event dispatcher :
+    - name event : thelia_kernel.session (see Thelia\Core\TheliakernelEvents::SESSION
+    - class event : Thelia\Core\Event\SessionEvent
+    - example : Thelia\Core\EventListener\SessionListener
+- Creation of Thelia\Core\TheliakernelEvents class for referencing kernel event
+- Add new command line that refresh modules list `Thelia module:refresh`
+- Coupon internals have been simplified and improved.
+- Error messages are displayed in install process
+- Add pagination on catalog page in Back-Office
+- Add Hong Kong to country list
+- Fixed issue #452 when installing Thelia on database with special characters
+- implement search on content, folder and category loop.
+- all form are documented
+- template exists for managing google sitemap : sitemap.html
 
 #2.0.1
 - possibility to apply a permanent discount on a customer
