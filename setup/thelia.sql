@@ -669,6 +669,9 @@ CREATE TABLE `order`
     `lang_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
+    `version` INTEGER DEFAULT 0,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_order_currency_id` (`currency_id`),
@@ -2481,6 +2484,43 @@ CREATE TABLE `content_version`
     CONSTRAINT `content_version_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `content` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- order_version
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_version`;
+
+CREATE TABLE `order_version`
+(
+    `id` INTEGER NOT NULL,
+    `ref` VARCHAR(45),
+    `customer_id` INTEGER NOT NULL,
+    `invoice_order_address_id` INTEGER NOT NULL,
+    `delivery_order_address_id` INTEGER NOT NULL,
+    `invoice_date` DATE,
+    `currency_id` INTEGER NOT NULL,
+    `currency_rate` FLOAT NOT NULL,
+    `transaction_ref` VARCHAR(100) COMMENT 'transaction reference - usually use to identify a transaction with banking modules',
+    `delivery_ref` VARCHAR(100) COMMENT 'delivery reference - usually use to identify a delivery progress on a distant delivery tracker website',
+    `invoice_ref` VARCHAR(100) COMMENT 'the invoice reference',
+    `discount` FLOAT,
+    `postage` FLOAT NOT NULL,
+    `payment_module_id` INTEGER NOT NULL,
+    `delivery_module_id` INTEGER NOT NULL,
+    `status_id` INTEGER NOT NULL,
+    `lang_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    `version` INTEGER DEFAULT 0 NOT NULL,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
+    PRIMARY KEY (`id`,`version`),
+    CONSTRAINT `order_version_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `order` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 

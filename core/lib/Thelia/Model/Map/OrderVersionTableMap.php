@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Order;
-use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderVersion;
+use Thelia\Model\OrderVersionQuery;
 
 
 /**
- * This class defines the structure of the 'order' table.
+ * This class defines the structure of the 'order_version' table.
  *
  *
  *
@@ -26,14 +26,14 @@ use Thelia\Model\OrderQuery;
  * (i.e. if it's a text column type).
  *
  */
-class OrderTableMap extends TableMap
+class OrderVersionTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.OrderTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.OrderVersionTableMap';
 
     /**
      * The default database name for this class
@@ -43,17 +43,17 @@ class OrderTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'order';
+    const TABLE_NAME = 'order_version';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Order';
+    const OM_CLASS = '\\Thelia\\Model\\OrderVersion';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Order';
+    const CLASS_DEFAULT = 'Thelia.Model.OrderVersion';
 
     /**
      * The total number of columns
@@ -73,112 +73,112 @@ class OrderTableMap extends TableMap
     /**
      * the column name for the ID field
      */
-    const ID = 'order.ID';
+    const ID = 'order_version.ID';
 
     /**
      * the column name for the REF field
      */
-    const REF = 'order.REF';
+    const REF = 'order_version.REF';
 
     /**
      * the column name for the CUSTOMER_ID field
      */
-    const CUSTOMER_ID = 'order.CUSTOMER_ID';
+    const CUSTOMER_ID = 'order_version.CUSTOMER_ID';
 
     /**
      * the column name for the INVOICE_ORDER_ADDRESS_ID field
      */
-    const INVOICE_ORDER_ADDRESS_ID = 'order.INVOICE_ORDER_ADDRESS_ID';
+    const INVOICE_ORDER_ADDRESS_ID = 'order_version.INVOICE_ORDER_ADDRESS_ID';
 
     /**
      * the column name for the DELIVERY_ORDER_ADDRESS_ID field
      */
-    const DELIVERY_ORDER_ADDRESS_ID = 'order.DELIVERY_ORDER_ADDRESS_ID';
+    const DELIVERY_ORDER_ADDRESS_ID = 'order_version.DELIVERY_ORDER_ADDRESS_ID';
 
     /**
      * the column name for the INVOICE_DATE field
      */
-    const INVOICE_DATE = 'order.INVOICE_DATE';
+    const INVOICE_DATE = 'order_version.INVOICE_DATE';
 
     /**
      * the column name for the CURRENCY_ID field
      */
-    const CURRENCY_ID = 'order.CURRENCY_ID';
+    const CURRENCY_ID = 'order_version.CURRENCY_ID';
 
     /**
      * the column name for the CURRENCY_RATE field
      */
-    const CURRENCY_RATE = 'order.CURRENCY_RATE';
+    const CURRENCY_RATE = 'order_version.CURRENCY_RATE';
 
     /**
      * the column name for the TRANSACTION_REF field
      */
-    const TRANSACTION_REF = 'order.TRANSACTION_REF';
+    const TRANSACTION_REF = 'order_version.TRANSACTION_REF';
 
     /**
      * the column name for the DELIVERY_REF field
      */
-    const DELIVERY_REF = 'order.DELIVERY_REF';
+    const DELIVERY_REF = 'order_version.DELIVERY_REF';
 
     /**
      * the column name for the INVOICE_REF field
      */
-    const INVOICE_REF = 'order.INVOICE_REF';
+    const INVOICE_REF = 'order_version.INVOICE_REF';
 
     /**
      * the column name for the DISCOUNT field
      */
-    const DISCOUNT = 'order.DISCOUNT';
+    const DISCOUNT = 'order_version.DISCOUNT';
 
     /**
      * the column name for the POSTAGE field
      */
-    const POSTAGE = 'order.POSTAGE';
+    const POSTAGE = 'order_version.POSTAGE';
 
     /**
      * the column name for the PAYMENT_MODULE_ID field
      */
-    const PAYMENT_MODULE_ID = 'order.PAYMENT_MODULE_ID';
+    const PAYMENT_MODULE_ID = 'order_version.PAYMENT_MODULE_ID';
 
     /**
      * the column name for the DELIVERY_MODULE_ID field
      */
-    const DELIVERY_MODULE_ID = 'order.DELIVERY_MODULE_ID';
+    const DELIVERY_MODULE_ID = 'order_version.DELIVERY_MODULE_ID';
 
     /**
      * the column name for the STATUS_ID field
      */
-    const STATUS_ID = 'order.STATUS_ID';
+    const STATUS_ID = 'order_version.STATUS_ID';
 
     /**
      * the column name for the LANG_ID field
      */
-    const LANG_ID = 'order.LANG_ID';
+    const LANG_ID = 'order_version.LANG_ID';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'order.CREATED_AT';
+    const CREATED_AT = 'order_version.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'order.UPDATED_AT';
+    const UPDATED_AT = 'order_version.UPDATED_AT';
 
     /**
      * the column name for the VERSION field
      */
-    const VERSION = 'order.VERSION';
+    const VERSION = 'order_version.VERSION';
 
     /**
      * the column name for the VERSION_CREATED_AT field
      */
-    const VERSION_CREATED_AT = 'order.VERSION_CREATED_AT';
+    const VERSION_CREATED_AT = 'order_version.VERSION_CREATED_AT';
 
     /**
      * the column name for the VERSION_CREATED_BY field
      */
-    const VERSION_CREATED_BY = 'order.VERSION_CREATED_BY';
+    const VERSION_CREATED_BY = 'order_version.VERSION_CREATED_BY';
 
     /**
      * The default string format for model objects of the related table
@@ -194,7 +194,7 @@ class OrderTableMap extends TableMap
     protected static $fieldNames = array (
         self::TYPE_PHPNAME       => array('Id', 'Ref', 'CustomerId', 'InvoiceOrderAddressId', 'DeliveryOrderAddressId', 'InvoiceDate', 'CurrencyId', 'CurrencyRate', 'TransactionRef', 'DeliveryRef', 'InvoiceRef', 'Discount', 'Postage', 'PaymentModuleId', 'DeliveryModuleId', 'StatusId', 'LangId', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
         self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'customerId', 'invoiceOrderAddressId', 'deliveryOrderAddressId', 'invoiceDate', 'currencyId', 'currencyRate', 'transactionRef', 'deliveryRef', 'invoiceRef', 'discount', 'postage', 'paymentModuleId', 'deliveryModuleId', 'statusId', 'langId', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
-        self::TYPE_COLNAME       => array(OrderTableMap::ID, OrderTableMap::REF, OrderTableMap::CUSTOMER_ID, OrderTableMap::INVOICE_ORDER_ADDRESS_ID, OrderTableMap::DELIVERY_ORDER_ADDRESS_ID, OrderTableMap::INVOICE_DATE, OrderTableMap::CURRENCY_ID, OrderTableMap::CURRENCY_RATE, OrderTableMap::TRANSACTION_REF, OrderTableMap::DELIVERY_REF, OrderTableMap::INVOICE_REF, OrderTableMap::DISCOUNT, OrderTableMap::POSTAGE, OrderTableMap::PAYMENT_MODULE_ID, OrderTableMap::DELIVERY_MODULE_ID, OrderTableMap::STATUS_ID, OrderTableMap::LANG_ID, OrderTableMap::CREATED_AT, OrderTableMap::UPDATED_AT, OrderTableMap::VERSION, OrderTableMap::VERSION_CREATED_AT, OrderTableMap::VERSION_CREATED_BY, ),
+        self::TYPE_COLNAME       => array(OrderVersionTableMap::ID, OrderVersionTableMap::REF, OrderVersionTableMap::CUSTOMER_ID, OrderVersionTableMap::INVOICE_ORDER_ADDRESS_ID, OrderVersionTableMap::DELIVERY_ORDER_ADDRESS_ID, OrderVersionTableMap::INVOICE_DATE, OrderVersionTableMap::CURRENCY_ID, OrderVersionTableMap::CURRENCY_RATE, OrderVersionTableMap::TRANSACTION_REF, OrderVersionTableMap::DELIVERY_REF, OrderVersionTableMap::INVOICE_REF, OrderVersionTableMap::DISCOUNT, OrderVersionTableMap::POSTAGE, OrderVersionTableMap::PAYMENT_MODULE_ID, OrderVersionTableMap::DELIVERY_MODULE_ID, OrderVersionTableMap::STATUS_ID, OrderVersionTableMap::LANG_ID, OrderVersionTableMap::CREATED_AT, OrderVersionTableMap::UPDATED_AT, OrderVersionTableMap::VERSION, OrderVersionTableMap::VERSION_CREATED_AT, OrderVersionTableMap::VERSION_CREATED_BY, ),
         self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'CUSTOMER_ID', 'INVOICE_ORDER_ADDRESS_ID', 'DELIVERY_ORDER_ADDRESS_ID', 'INVOICE_DATE', 'CURRENCY_ID', 'CURRENCY_RATE', 'TRANSACTION_REF', 'DELIVERY_REF', 'INVOICE_REF', 'DISCOUNT', 'POSTAGE', 'PAYMENT_MODULE_ID', 'DELIVERY_MODULE_ID', 'STATUS_ID', 'LANG_ID', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
         self::TYPE_FIELDNAME     => array('id', 'ref', 'customer_id', 'invoice_order_address_id', 'delivery_order_address_id', 'invoice_date', 'currency_id', 'currency_rate', 'transaction_ref', 'delivery_ref', 'invoice_ref', 'discount', 'postage', 'payment_module_id', 'delivery_module_id', 'status_id', 'lang_id', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, )
@@ -209,7 +209,7 @@ class OrderTableMap extends TableMap
     protected static $fieldKeys = array (
         self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'CustomerId' => 2, 'InvoiceOrderAddressId' => 3, 'DeliveryOrderAddressId' => 4, 'InvoiceDate' => 5, 'CurrencyId' => 6, 'CurrencyRate' => 7, 'TransactionRef' => 8, 'DeliveryRef' => 9, 'InvoiceRef' => 10, 'Discount' => 11, 'Postage' => 12, 'PaymentModuleId' => 13, 'DeliveryModuleId' => 14, 'StatusId' => 15, 'LangId' => 16, 'CreatedAt' => 17, 'UpdatedAt' => 18, 'Version' => 19, 'VersionCreatedAt' => 20, 'VersionCreatedBy' => 21, ),
         self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'customerId' => 2, 'invoiceOrderAddressId' => 3, 'deliveryOrderAddressId' => 4, 'invoiceDate' => 5, 'currencyId' => 6, 'currencyRate' => 7, 'transactionRef' => 8, 'deliveryRef' => 9, 'invoiceRef' => 10, 'discount' => 11, 'postage' => 12, 'paymentModuleId' => 13, 'deliveryModuleId' => 14, 'statusId' => 15, 'langId' => 16, 'createdAt' => 17, 'updatedAt' => 18, 'version' => 19, 'versionCreatedAt' => 20, 'versionCreatedBy' => 21, ),
-        self::TYPE_COLNAME       => array(OrderTableMap::ID => 0, OrderTableMap::REF => 1, OrderTableMap::CUSTOMER_ID => 2, OrderTableMap::INVOICE_ORDER_ADDRESS_ID => 3, OrderTableMap::DELIVERY_ORDER_ADDRESS_ID => 4, OrderTableMap::INVOICE_DATE => 5, OrderTableMap::CURRENCY_ID => 6, OrderTableMap::CURRENCY_RATE => 7, OrderTableMap::TRANSACTION_REF => 8, OrderTableMap::DELIVERY_REF => 9, OrderTableMap::INVOICE_REF => 10, OrderTableMap::DISCOUNT => 11, OrderTableMap::POSTAGE => 12, OrderTableMap::PAYMENT_MODULE_ID => 13, OrderTableMap::DELIVERY_MODULE_ID => 14, OrderTableMap::STATUS_ID => 15, OrderTableMap::LANG_ID => 16, OrderTableMap::CREATED_AT => 17, OrderTableMap::UPDATED_AT => 18, OrderTableMap::VERSION => 19, OrderTableMap::VERSION_CREATED_AT => 20, OrderTableMap::VERSION_CREATED_BY => 21, ),
+        self::TYPE_COLNAME       => array(OrderVersionTableMap::ID => 0, OrderVersionTableMap::REF => 1, OrderVersionTableMap::CUSTOMER_ID => 2, OrderVersionTableMap::INVOICE_ORDER_ADDRESS_ID => 3, OrderVersionTableMap::DELIVERY_ORDER_ADDRESS_ID => 4, OrderVersionTableMap::INVOICE_DATE => 5, OrderVersionTableMap::CURRENCY_ID => 6, OrderVersionTableMap::CURRENCY_RATE => 7, OrderVersionTableMap::TRANSACTION_REF => 8, OrderVersionTableMap::DELIVERY_REF => 9, OrderVersionTableMap::INVOICE_REF => 10, OrderVersionTableMap::DISCOUNT => 11, OrderVersionTableMap::POSTAGE => 12, OrderVersionTableMap::PAYMENT_MODULE_ID => 13, OrderVersionTableMap::DELIVERY_MODULE_ID => 14, OrderVersionTableMap::STATUS_ID => 15, OrderVersionTableMap::LANG_ID => 16, OrderVersionTableMap::CREATED_AT => 17, OrderVersionTableMap::UPDATED_AT => 18, OrderVersionTableMap::VERSION => 19, OrderVersionTableMap::VERSION_CREATED_AT => 20, OrderVersionTableMap::VERSION_CREATED_BY => 21, ),
         self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'CUSTOMER_ID' => 2, 'INVOICE_ORDER_ADDRESS_ID' => 3, 'DELIVERY_ORDER_ADDRESS_ID' => 4, 'INVOICE_DATE' => 5, 'CURRENCY_ID' => 6, 'CURRENCY_RATE' => 7, 'TRANSACTION_REF' => 8, 'DELIVERY_REF' => 9, 'INVOICE_REF' => 10, 'DISCOUNT' => 11, 'POSTAGE' => 12, 'PAYMENT_MODULE_ID' => 13, 'DELIVERY_MODULE_ID' => 14, 'STATUS_ID' => 15, 'LANG_ID' => 16, 'CREATED_AT' => 17, 'UPDATED_AT' => 18, 'VERSION' => 19, 'VERSION_CREATED_AT' => 20, 'VERSION_CREATED_BY' => 21, ),
         self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'customer_id' => 2, 'invoice_order_address_id' => 3, 'delivery_order_address_id' => 4, 'invoice_date' => 5, 'currency_id' => 6, 'currency_rate' => 7, 'transaction_ref' => 8, 'delivery_ref' => 9, 'invoice_ref' => 10, 'discount' => 11, 'postage' => 12, 'payment_module_id' => 13, 'delivery_module_id' => 14, 'status_id' => 15, 'lang_id' => 16, 'created_at' => 17, 'updated_at' => 18, 'version' => 19, 'version_created_at' => 20, 'version_created_by' => 21, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, )
@@ -225,32 +225,32 @@ class OrderTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('order');
-        $this->setPhpName('Order');
-        $this->setClassName('\\Thelia\\Model\\Order');
+        $this->setName('order_version');
+        $this->setPhpName('OrderVersion');
+        $this->setClassName('\\Thelia\\Model\\OrderVersion');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'order', 'ID', true, null, null);
         $this->addColumn('REF', 'Ref', 'VARCHAR', false, 45, null);
-        $this->addForeignKey('CUSTOMER_ID', 'CustomerId', 'INTEGER', 'customer', 'ID', true, null, null);
-        $this->addForeignKey('INVOICE_ORDER_ADDRESS_ID', 'InvoiceOrderAddressId', 'INTEGER', 'order_address', 'ID', true, null, null);
-        $this->addForeignKey('DELIVERY_ORDER_ADDRESS_ID', 'DeliveryOrderAddressId', 'INTEGER', 'order_address', 'ID', true, null, null);
+        $this->addColumn('CUSTOMER_ID', 'CustomerId', 'INTEGER', true, null, null);
+        $this->addColumn('INVOICE_ORDER_ADDRESS_ID', 'InvoiceOrderAddressId', 'INTEGER', true, null, null);
+        $this->addColumn('DELIVERY_ORDER_ADDRESS_ID', 'DeliveryOrderAddressId', 'INTEGER', true, null, null);
         $this->addColumn('INVOICE_DATE', 'InvoiceDate', 'DATE', false, null, null);
-        $this->addForeignKey('CURRENCY_ID', 'CurrencyId', 'INTEGER', 'currency', 'ID', true, null, null);
+        $this->addColumn('CURRENCY_ID', 'CurrencyId', 'INTEGER', true, null, null);
         $this->addColumn('CURRENCY_RATE', 'CurrencyRate', 'FLOAT', true, null, null);
         $this->addColumn('TRANSACTION_REF', 'TransactionRef', 'VARCHAR', false, 100, null);
         $this->addColumn('DELIVERY_REF', 'DeliveryRef', 'VARCHAR', false, 100, null);
         $this->addColumn('INVOICE_REF', 'InvoiceRef', 'VARCHAR', false, 100, null);
         $this->addColumn('DISCOUNT', 'Discount', 'FLOAT', false, null, null);
         $this->addColumn('POSTAGE', 'Postage', 'FLOAT', true, null, null);
-        $this->addForeignKey('PAYMENT_MODULE_ID', 'PaymentModuleId', 'INTEGER', 'module', 'ID', true, null, null);
-        $this->addForeignKey('DELIVERY_MODULE_ID', 'DeliveryModuleId', 'INTEGER', 'module', 'ID', true, null, null);
-        $this->addForeignKey('STATUS_ID', 'StatusId', 'INTEGER', 'order_status', 'ID', true, null, null);
-        $this->addForeignKey('LANG_ID', 'LangId', 'INTEGER', 'lang', 'ID', true, null, null);
+        $this->addColumn('PAYMENT_MODULE_ID', 'PaymentModuleId', 'INTEGER', true, null, null);
+        $this->addColumn('DELIVERY_MODULE_ID', 'DeliveryModuleId', 'INTEGER', true, null, null);
+        $this->addColumn('STATUS_ID', 'StatusId', 'INTEGER', true, null, null);
+        $this->addColumn('LANG_ID', 'LangId', 'INTEGER', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION', 'Version', 'INTEGER', false, null, 0);
+        $this->addPrimaryKey('VERSION', 'Version', 'INTEGER', true, null, 0);
         $this->addColumn('VERSION_CREATED_AT', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('VERSION_CREATED_BY', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
     } // initialize()
@@ -260,43 +260,61 @@ class OrderTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Currency', '\\Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('currency_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('Customer', '\\Thelia\\Model\\Customer', RelationMap::MANY_TO_ONE, array('customer_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('OrderAddressRelatedByInvoiceOrderAddressId', '\\Thelia\\Model\\OrderAddress', RelationMap::MANY_TO_ONE, array('invoice_order_address_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('OrderAddressRelatedByDeliveryOrderAddressId', '\\Thelia\\Model\\OrderAddress', RelationMap::MANY_TO_ONE, array('delivery_order_address_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('OrderStatus', '\\Thelia\\Model\\OrderStatus', RelationMap::MANY_TO_ONE, array('status_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('ModuleRelatedByPaymentModuleId', '\\Thelia\\Model\\Module', RelationMap::MANY_TO_ONE, array('payment_module_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('ModuleRelatedByDeliveryModuleId', '\\Thelia\\Model\\Module', RelationMap::MANY_TO_ONE, array('delivery_module_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('Lang', '\\Thelia\\Model\\Lang', RelationMap::MANY_TO_ONE, array('lang_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('OrderProduct', '\\Thelia\\Model\\OrderProduct', RelationMap::ONE_TO_MANY, array('id' => 'order_id', ), 'CASCADE', 'RESTRICT', 'OrderProducts');
-        $this->addRelation('OrderCoupon', '\\Thelia\\Model\\OrderCoupon', RelationMap::ONE_TO_MANY, array('id' => 'order_id', ), 'CASCADE', 'RESTRICT', 'OrderCoupons');
-        $this->addRelation('OrderVersion', '\\Thelia\\Model\\OrderVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'OrderVersions');
+        $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
     /**
+     * Adds an object to the instance pool.
      *
-     * Gets the list of behaviors registered for this table
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
      *
-     * @return array Associative array (name => parameters) of behaviors
+     * @param \Thelia\Model\OrderVersion $obj A \Thelia\Model\OrderVersion object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
-    public function getBehaviors()
+    public static function addInstanceToPool($obj, $key = null)
     {
-        return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
-            'versionable' => array('version_column' => 'version', 'version_table' => '', 'log_created_at' => 'true', 'log_created_by' => 'true', 'log_comment' => 'false', 'version_created_at_column' => 'version_created_at', 'version_created_by_column' => 'version_created_by', 'version_comment_column' => 'version_comment', ),
-        );
-    } // getBehaviors()
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize(array((string) $obj->getId(), (string) $obj->getVersion()));
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
     /**
-     * Method to invalidate the instance pool of all tables related to order     * by a foreign key with ON DELETE CASCADE
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \Thelia\Model\OrderVersion object or a primary key value.
      */
-    public static function clearRelatedInstancePool()
+    public static function removeInstanceFromPool($value)
     {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                OrderProductTableMap::clearInstancePool();
-                OrderCouponTableMap::clearInstancePool();
-                OrderVersionTableMap::clearInstancePool();
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \Thelia\Model\OrderVersion) {
+                $key = serialize(array((string) $value->getId(), (string) $value->getVersion()));
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize(array((string) $value[0], (string) $value[1]));
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\OrderVersion object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
             }
+
+            unset(self::$instances[$key]);
+        }
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -312,11 +330,11 @@ class OrderTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 19 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 19 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -334,11 +352,7 @@ class OrderTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return (int) $row[
-                            $indexType == TableMap::TYPE_NUM
-                            ? 0 + $offset
-                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-                        ];
+            return $pks;
     }
 
     /**
@@ -354,7 +368,7 @@ class OrderTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? OrderTableMap::CLASS_DEFAULT : OrderTableMap::OM_CLASS;
+        return $withPrefix ? OrderVersionTableMap::CLASS_DEFAULT : OrderVersionTableMap::OM_CLASS;
     }
 
     /**
@@ -368,21 +382,21 @@ class OrderTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Order object, last column rank)
+     * @return array (OrderVersion object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = OrderTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = OrderTableMap::getInstanceFromPool($key))) {
+        $key = OrderVersionTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = OrderVersionTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + OrderTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + OrderVersionTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = OrderTableMap::OM_CLASS;
+            $cls = OrderVersionTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            OrderTableMap::addInstanceToPool($obj, $key);
+            OrderVersionTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -405,8 +419,8 @@ class OrderTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = OrderTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = OrderTableMap::getInstanceFromPool($key))) {
+            $key = OrderVersionTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = OrderVersionTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -415,7 +429,7 @@ class OrderTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                OrderTableMap::addInstanceToPool($obj, $key);
+                OrderVersionTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -436,28 +450,28 @@ class OrderTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(OrderTableMap::ID);
-            $criteria->addSelectColumn(OrderTableMap::REF);
-            $criteria->addSelectColumn(OrderTableMap::CUSTOMER_ID);
-            $criteria->addSelectColumn(OrderTableMap::INVOICE_ORDER_ADDRESS_ID);
-            $criteria->addSelectColumn(OrderTableMap::DELIVERY_ORDER_ADDRESS_ID);
-            $criteria->addSelectColumn(OrderTableMap::INVOICE_DATE);
-            $criteria->addSelectColumn(OrderTableMap::CURRENCY_ID);
-            $criteria->addSelectColumn(OrderTableMap::CURRENCY_RATE);
-            $criteria->addSelectColumn(OrderTableMap::TRANSACTION_REF);
-            $criteria->addSelectColumn(OrderTableMap::DELIVERY_REF);
-            $criteria->addSelectColumn(OrderTableMap::INVOICE_REF);
-            $criteria->addSelectColumn(OrderTableMap::DISCOUNT);
-            $criteria->addSelectColumn(OrderTableMap::POSTAGE);
-            $criteria->addSelectColumn(OrderTableMap::PAYMENT_MODULE_ID);
-            $criteria->addSelectColumn(OrderTableMap::DELIVERY_MODULE_ID);
-            $criteria->addSelectColumn(OrderTableMap::STATUS_ID);
-            $criteria->addSelectColumn(OrderTableMap::LANG_ID);
-            $criteria->addSelectColumn(OrderTableMap::CREATED_AT);
-            $criteria->addSelectColumn(OrderTableMap::UPDATED_AT);
-            $criteria->addSelectColumn(OrderTableMap::VERSION);
-            $criteria->addSelectColumn(OrderTableMap::VERSION_CREATED_AT);
-            $criteria->addSelectColumn(OrderTableMap::VERSION_CREATED_BY);
+            $criteria->addSelectColumn(OrderVersionTableMap::ID);
+            $criteria->addSelectColumn(OrderVersionTableMap::REF);
+            $criteria->addSelectColumn(OrderVersionTableMap::CUSTOMER_ID);
+            $criteria->addSelectColumn(OrderVersionTableMap::INVOICE_ORDER_ADDRESS_ID);
+            $criteria->addSelectColumn(OrderVersionTableMap::DELIVERY_ORDER_ADDRESS_ID);
+            $criteria->addSelectColumn(OrderVersionTableMap::INVOICE_DATE);
+            $criteria->addSelectColumn(OrderVersionTableMap::CURRENCY_ID);
+            $criteria->addSelectColumn(OrderVersionTableMap::CURRENCY_RATE);
+            $criteria->addSelectColumn(OrderVersionTableMap::TRANSACTION_REF);
+            $criteria->addSelectColumn(OrderVersionTableMap::DELIVERY_REF);
+            $criteria->addSelectColumn(OrderVersionTableMap::INVOICE_REF);
+            $criteria->addSelectColumn(OrderVersionTableMap::DISCOUNT);
+            $criteria->addSelectColumn(OrderVersionTableMap::POSTAGE);
+            $criteria->addSelectColumn(OrderVersionTableMap::PAYMENT_MODULE_ID);
+            $criteria->addSelectColumn(OrderVersionTableMap::DELIVERY_MODULE_ID);
+            $criteria->addSelectColumn(OrderVersionTableMap::STATUS_ID);
+            $criteria->addSelectColumn(OrderVersionTableMap::LANG_ID);
+            $criteria->addSelectColumn(OrderVersionTableMap::CREATED_AT);
+            $criteria->addSelectColumn(OrderVersionTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(OrderVersionTableMap::VERSION);
+            $criteria->addSelectColumn(OrderVersionTableMap::VERSION_CREATED_AT);
+            $criteria->addSelectColumn(OrderVersionTableMap::VERSION_CREATED_BY);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.REF');
@@ -493,7 +507,7 @@ class OrderTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(OrderTableMap::DATABASE_NAME)->getTable(OrderTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(OrderVersionTableMap::DATABASE_NAME)->getTable(OrderVersionTableMap::TABLE_NAME);
     }
 
     /**
@@ -501,16 +515,16 @@ class OrderTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(OrderTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(OrderTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new OrderTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(OrderVersionTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(OrderVersionTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new OrderVersionTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Order or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a OrderVersion or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Order object or primary key or array of primary keys
+     * @param mixed               $values Criteria or OrderVersion object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -521,25 +535,35 @@ class OrderTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(OrderTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(OrderVersionTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Order) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\OrderVersion) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(OrderTableMap::DATABASE_NAME);
-            $criteria->add(OrderTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(OrderVersionTableMap::DATABASE_NAME);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(OrderVersionTableMap::ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(OrderVersionTableMap::VERSION, $value[1]));
+                $criteria->addOr($criterion);
+            }
         }
 
-        $query = OrderQuery::create()->mergeWith($criteria);
+        $query = OrderVersionQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { OrderTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { OrderVersionTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { OrderTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { OrderVersionTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -547,20 +571,20 @@ class OrderTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the order table.
+     * Deletes all rows from the order_version table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return OrderQuery::create()->doDeleteAll($con);
+        return OrderVersionQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Order or Criteria object.
+     * Performs an INSERT on the database, given a OrderVersion or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Order object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or OrderVersion object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -569,22 +593,18 @@ class OrderTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(OrderTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(OrderVersionTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Order object
-        }
-
-        if ($criteria->containsKey(OrderTableMap::ID) && $criteria->keyContainsValue(OrderTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.OrderTableMap::ID.')');
+            $criteria = $criteria->buildCriteria(); // build Criteria from OrderVersion object
         }
 
 
         // Set the correct dbName
-        $query = OrderQuery::create()->mergeWith($criteria);
+        $query = OrderVersionQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -600,7 +620,7 @@ class OrderTableMap extends TableMap
         return $pk;
     }
 
-} // OrderTableMap
+} // OrderVersionTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-OrderTableMap::buildTableMap();
+OrderVersionTableMap::buildTableMap();
