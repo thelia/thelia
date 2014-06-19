@@ -97,6 +97,6 @@ SELECT
   `version`,
   `version_created_at`,
   `version_created_by`
-FROM `order`;
+FROM `order`; 
 
 SET FOREIGN_KEY_CHECKS = 1;
