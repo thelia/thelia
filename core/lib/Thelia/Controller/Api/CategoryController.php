@@ -15,8 +15,10 @@ namespace Thelia\Controller\Api;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
+use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Category;
@@ -141,6 +143,28 @@ class CategoryController extends BaseApiController
             $this->dispatch(TheliaEvents::CATEGORY_UPDATE, $event);
 
             return JsonResponse::create(null, 204);
+
+        } catch(\Exception $e) {
+            return JsonResponse::create(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function deleteAction($category_id)
+    {
+        $this->checkAuth(AdminResources::CATEGORY, [], AccessManager::DELETE);
+
+        $category = CategoryQuery::create()
+            ->findPk($category_id);
+
+        if (null === $category) {
+            throw new HttpException(404, sprintf('{"error": "category with id %d not found"}', $category_id));
+        }
+
+        try {
+            $event = new CategoryDeleteEvent($category_id);
+            $this->dispatch(TheliaEvents::CATEGORY_DELETE, $event);
+
+            return Response::create('', 204);
 
         } catch(\Exception $e) {
             return JsonResponse::create(['error' => $e->getMessage()], 400);

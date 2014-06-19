@@ -78,5 +78,10 @@
         <requirement key="category_id">\d+</requirement>
     </route>
 
+    <route id="api.category.delete" path="/api/categories/{category_id}" methods="delete">
+        <default key="_controller">Thelia\Controller\Api\CategoryController::deleteAction</default>
+        <requirement key="category_id">\d+</requirement>
+    </route>
+
     <!-- end category route -->
 </routes>

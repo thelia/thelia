@@ -179,4 +179,21 @@ class CategoryControllerTest extends ApiTestCase
 
         $this->assertEquals(204, $client->getResponse()->getStatusCode(), 'HTTP status code must be 204');
     }
+
+    public function testDeleteAction()
+    {
+        $category = CategoryQuery::create()
+            ->orderById(Criteria::DESC)
+            ->findOne();
+
+        $client = static::createClient();
+
+        $client->request(
+            'DELETE',
+            '/api/categories/'.$category->getId().'?sign='.$this->getSignParameter(''), [], [],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(204, $client->getResponse()->getStatusCode(), 'HTTP status code muse be 204');
+    }
 }
