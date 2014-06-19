@@ -73,6 +73,11 @@ class ConfigQuery extends BaseConfigQuery
         return true;
     }
 
+    public static function getConfiguredShopUrl()
+    {
+        return ConfigQuery::read("url_site", '');
+    }
+
     public static function getDefaultLangWhenNoTranslationAvailable()
     {
         return ConfigQuery::read("default_lang_without_translation", 1);
