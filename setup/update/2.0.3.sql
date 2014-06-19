@@ -45,4 +45,8 @@ CREATE TABLE `order_version`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
+# Add missing columns to coupon (version_created_at, version_created_by)
+ALTER TABLE `order` ADD `version_created_at` DATE AFTER `version`;
+ALTER TABLE `order` ADD `version_created_by` VARCHAR(100) AFTER `version_created_at`;
+
 SET FOREIGN_KEY_CHECKS = 1;
