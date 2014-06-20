@@ -79,7 +79,7 @@ class Address extends BaseAction implements EventSubscriberInterface
                 ->save()
             ;
 
-            if ($event->getIsDefault()) {
+            if ($event->getIsDefault() && !$addressModel->getIsDefault()) {
                 $addressModel->makeItDefault();
             }
 
