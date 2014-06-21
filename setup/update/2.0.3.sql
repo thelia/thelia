@@ -45,4 +45,58 @@ CREATE TABLE `order_version`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
+UPDATE `order` SET
+  `version` = 1,
+  `version_created_at` = NOW(),
+  `version_created_by` = 'Thelia'
+WHERE `version` = 0;
+
+INSERT INTO `order_version`(
+  `id`,
+  `ref`,
+  `customer_id`,
+  `invoice_order_address_id`,
+  `delivery_order_address_id`,
+  `invoice_date`,
+  `currency_id`,
+  `currency_rate`,
+  `transaction_ref`,
+  `delivery_ref`,
+  `invoice_ref`,
+  `discount`,
+  `postage`,
+  `payment_module_id`,
+  `delivery_module_id`,
+  `status_id`,
+  `lang_id`,
+  `created_at`,
+  `updated_at`,
+  `version`,
+  `version_created_at`,
+  `version_created_by`)
+SELECT
+  `id`,
+  `ref`,
+  `customer_id`,
+  `invoice_order_address_id`,
+  `delivery_order_address_id`,
+  `invoice_date`,
+  `currency_id`,
+  `currency_rate`,
+  `transaction_ref`,
+  `delivery_ref`,
+  `invoice_ref`,
+  `discount`,
+  `postage`,
+  `payment_module_id`,
+  `delivery_module_id`,
+  `status_id`,
+  `lang_id`,
+  `created_at`,
+  `updated_at`,
+  `version`,
+  `version_created_at`,
+  `version_created_by`
+FROM `order`;
+
 SET FOREIGN_KEY_CHECKS = 1;
