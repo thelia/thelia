@@ -95,10 +95,11 @@ class FileManager
             if (!$model->save()) {
                 throw new ImageException(
                     sprintf(
-                        '%s %s (%s) failed to be saved (image file)',
+                        '%s %s (%s) with id %d failed to be saved (image file)',
                         ucfirst($parentType),
                         $model->getFile(),
-                        $fileType
+                        $fileType,
+                        $parentId
                     )
                 );
             }

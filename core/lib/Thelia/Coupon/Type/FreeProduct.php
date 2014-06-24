@@ -234,9 +234,6 @@ class FreeProduct extends AbstractRemoveOnProducts
             }
 
             if ($freeProductCartItem instanceof CartItem) {
-
-                $taxCountry = $this->facade->getDeliveryCountry();
-
                 // The discount is the product price.
                 $discount = $freeProductCartItem->getPromo() ?
                     $freeProductCartItem->getPromoPrice() : $freeProductCartItem->getPrice();

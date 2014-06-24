@@ -190,9 +190,6 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             }
         }
 
-        /* @todo */
-        $notEmpty  = $this->getNot_empty();
-
         return $search;
 
     }

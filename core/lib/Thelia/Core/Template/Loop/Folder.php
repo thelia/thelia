@@ -157,9 +157,6 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
             }
         }
 
-        /* @todo */
-        $notEmpty  = $this->getNot_empty();
-
         return $search;
 
     }
