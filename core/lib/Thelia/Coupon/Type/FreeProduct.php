@@ -230,10 +230,6 @@ class FreeProduct extends AbstractRemoveOnProducts
                     $this->setRelatedCartItem($eligibleProduct, $cartEvent->getCartItem()->getId());
 
                     $freeProductCartItem = $cartEvent->getCartItem();
-
-                    // Setting product price is dangerous, as the customer could change the ordered quantity of this product.
-                    // We will instead add the product price to the order discount.
-                    // $cartEvent->getCartItem()->setPrice(0)->save();
                 }
             }
 
