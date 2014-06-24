@@ -14,7 +14,6 @@ namespace Thelia\Core\Event\Coupon;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Model\Coupon;
-use Thelia\Model\Exception\InvalidArgumentException;
 
 /**
  * Occurring when a Coupon is created or updated
