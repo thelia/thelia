@@ -536,5 +536,4 @@ abstract class BaseLoop
      */
     abstract protected function getArgDefinitions();
 
-
 }
