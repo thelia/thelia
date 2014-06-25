@@ -12,8 +12,11 @@
 
 namespace Thelia\Tests\Action;
 
+use Propel\Runtime\Propel;
 use Thelia\Action\Address;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
 
 /**
@@ -119,6 +122,73 @@ class AddressTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($addressEvent->getCellphone(), $updatedAddress->getCellphone());
         $this->assertEquals($addressEvent->getCompany(), $updatedAddress->getCompany());
 
+    }
+
+    /**
+     * Bug found in Thelia 2.0.2
+     */
+    public function testUpdateDefaultAddress()
+    {
+        /**
+         * Disable propel cache in order to get a new instance of the
+         * active record in $updatedAddress
+         */
+        Propel::disableInstancePooling();
+
+        /**
+         * Get a customer and it's default address
+         */
+        $customer = CustomerQuery::create()->findOne();
+        $defaultAddress = $customer->getDefaultAddress();
+        $addressId = $defaultAddress->getId();
+
+        /**
+         * Try to update the address, and set the isDefault argument,
+         * that should keep this address as the default one.
+         */
+        $addressEvent = new AddressCreateOrUpdateEvent(
+            "",
+            1,
+            "Thelia modif",
+            "Thelia modif",
+            "cour des étoiles",
+            "rue des miracles",
+            "",
+            "63000",
+            "clermont-ferrand",
+            64,
+            "0102030405",
+            "",
+            "",
+            1
+        );
+
+        $addressEvent->setAddress($defaultAddress);
+        $addressEvent->setDispatcher(
+            $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface")
+        );
+
+        /**
+         * Do the update
+         */
+        $actionAddress = new Address();
+        $actionAddress->update($addressEvent);
+
+        $updatedAddress = AddressQuery::create()
+            ->findPk($addressId);
+
+        /**
+         * This address should still be the default address
+         */
+        $this->assertEquals(
+            1,
+            $updatedAddress->getIsDefault()
+        );
+
+        /**
+         * Renable it after
+         */
+        Propel::enableInstancePooling();
     }
 
 }

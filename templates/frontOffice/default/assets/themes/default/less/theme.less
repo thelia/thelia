@@ -349,12 +349,11 @@ td.product,
 // Availibility
 .availibity-label { .sr-only; }
 
-
 .products-grid,
 .products-list {
     // Animation
     @media (min-width: @screen-tablet) {
-        .product-image {
+        .product-image { 
             > .mask {
                 .border-radius(@border-radius-base);
             }
@@ -375,6 +374,16 @@ td.product,
                         margin-top: -10px; margin-left: -20px;
                         width: 40px; height: 40px;
                         z-index: 100;
+                    }
+                }
+            }
+            &.product-quickview {
+                &:hover,
+                &:focus {
+                    .mask:before {
+                        .icon(@search);
+                        font-size: 40px;
+                        margin-top: 0;
                     }
                 }
             }
@@ -1242,7 +1251,10 @@ td.product,
 
 // Page Contact
 #google-map {
+  border: none;
+  display: block;
   margin-bottom: @line-height-computed;
+  width: 100%; height: 350px;
   @filter-map: ~"grayscale(100%)";
   -webkit-filter: @filter-map;
   -moz-filter: @filter-map;

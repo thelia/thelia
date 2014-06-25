@@ -44,7 +44,6 @@ class Cart extends BaseCart
         }
 
         $cart->save();
-        $currentDateTime = new \DateTime();
         foreach ($cartItems as $cartItem) {
 
             $product = $cartItem->getProduct();

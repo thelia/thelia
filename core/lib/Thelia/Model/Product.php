@@ -61,7 +61,7 @@ class Product extends BaseProduct
      */
     public function getDefaultSaleElements()
     {
-        return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->find();
+        return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->findOne();
     }
 
     /**

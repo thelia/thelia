@@ -23,7 +23,6 @@ use Thelia\Model\ConfigQuery;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Tools\URL;
-use Thelia\Tools\Redirect;
 use Thelia\Model\AdminLog;
 
 use Thelia\Model\LangQuery;

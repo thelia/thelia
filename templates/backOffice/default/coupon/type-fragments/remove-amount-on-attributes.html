@@ -1,0 +1,16 @@
+{extends file="coupon/type-fragments/base-remove-on-attributes.html"}
+
+{block name="discount-field"}
+    <div class="form-group input-coupon-amount">
+
+        <label for="coupon-amount" class="control-label">{intl l="Discount amount"}</label>
+
+        <div class="input-group">
+            <input id="coupon-amount" type="money" class="form-control" name="{$amount_field_name}" value="{$amount_value}" placeholder="14.50">
+
+            {loop type="currency" name="get-symbol" default_only="true"}
+                <div class="input-group-addon">{$SYMBOL}</div>
+            {/loop}
+        </div>
+    </div>
+{/block}

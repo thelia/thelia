@@ -60,13 +60,13 @@ class TemplateHelper
                 $tplVar = 'active-front-template';
                 break;
              case TemplateDefinition::BACK_OFFICE:
-                 $tplVar = 'active-front-template';
+                 $tplVar = 'active-admin-template';
                  break;
             case TemplateDefinition::PDF:
-                 $tplVar = 'active-front-template';
+                 $tplVar = 'active-pdf-template';
                  break;
             case TemplateDefinition::EMAIL:
-                $tplVar = 'active-front-template';
+                $tplVar = 'active-mail-template';
                 break;
         }
 

@@ -181,13 +181,6 @@ class TranslationsController extends BaseAdminController
                 case 'ma' :
                     $template = new TemplateDefinition($item_name, TemplateDefinition::EMAIL);
                 break;
-
-                default:
-                    /*
-                    throw new \InvalidArgumentException(
-                        $this->getTranslator()->trans("Undefined translation type: %item", ['%item' => $item_to_translate])
-                    );
-                    */
             }
 
             if ($template) {

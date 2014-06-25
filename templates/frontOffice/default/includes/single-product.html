@@ -2,7 +2,7 @@
     {assign var="hasSubmit" value = false}
     {assign var="productTitle" value="{$TITLE}"}
 	{if not $product_id}
-	{assign var="$product_id" value=$ID}
+	   {assign var="product_id" value=$ID}
 	{/if}
     <article itemscope itemtype="http://schema.org/Product">
         <!-- Use the meta tag to specify content that is not visible on the page in any way -->
@@ -17,7 +17,7 @@
         {/loop}
         {/loop}
 
-        <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
+        <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image{if $hasQuickView == true} product-quickview{/if}">
             {loop name="product_thumbnail" type="image" product=$product_id width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
                 <img itemprop="image" src="{$IMAGE_URL}" alt="{$productTitle}">
             {/loop}
@@ -36,12 +36,27 @@
             {/if}
         </div>
 
+        {* Default value *}
+        {assign var="current_stock_content" value = "in_stock"}
+        {assign var="current_stock_href" value = "http://schema.org/InStock"}
+        
+        {loop name="stock_meta" type="product_sale_elements" product=$product_id}
+            {loop name="combi_meta" type="attribute_combination" product_sale_elements="$ID"}
+               {if $LOOP_COUNT == 0}
+                   {if $QUANTITY == 0}
+                       {assign var="current_stock_content" value = "out_stock"}
+                       {assign var="current_stock_href" value = "http://schema.org/OutOfStock"}
+                   {/if}
+               {/if}
+            {/loop}
+        {/loop}
+
         <div class="product-price">
             <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
                 <meta itemprop="category" content="{category attr="title"}">
                 <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
                 <meta itemprop="priceCurrency" content="{currency attr="symbol"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
-                <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
+                <link itemprop="availability" href="{$current_stock_href}" content="{$current_stock_content}" />
                 <!-- List of availibility :
                     out_of_stock : http://schema.org/OutOfStock
                     in_stock : http://schema.org/InStock
@@ -62,7 +77,7 @@
             </div>
             {if $hasBtn == true}
             {form name="thelia.cart.add" }
-            <form id="form-product-details" action="{url path="/cart/add" }" method="post" class="form-product">
+            <form id="form-product-details{$product_id}" action="{url path="/cart/add" }" method="post" class="form-product">
                 {form_hidden_fields form=$form}
                 <input type="hidden" name="view" value="product">
                 <input type="hidden" name="product_id" value="{$product_id}">

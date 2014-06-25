@@ -50,6 +50,7 @@ class Format extends AbstractSmartyPlugin
      *
      * ex :
      *  {format_date date=$dateTimeObject format="Y-m-d H:i:s"} will output the format with specific format
+     *  {format_date date=$dateTimeObject format="%e %B %Y" locale="fr_FR"} will output the format with specific format (see strftime() function)
      *  {format_date date=$dateTimeObject output="date"} will output the date using the default date system format
      *  {format_date date=$dateTimeObject} will output with the default datetime system format
      *
@@ -86,7 +87,32 @@ class Format extends AbstractSmartyPlugin
             $format = DateTimeFormat::getInstance($this->request)->getFormat($this->getParam($params, "output", null));
         }
 
-        return $date->format($format);
+        $locale = $this->getParam($params,'locale', false);
+
+        if (false === $locale) {
+            $value = $date->format($format);
+        } else {
+            $value = $this->formatDateWithLocale($date, $locale, $format);
+        }
+
+        return $value;
+    }
+
+    private function formatDateWithLocale(\DateTime $date, $locale, $format)
+    {
+        if (function_exists('setlocale')) {
+            // Save the current locale
+            $systemLocale = setlocale('LC_TIME', 0);
+            setlocale('LC_TIME', $locale);
+            $localizedDate =  strftime($format, $date->getTimestamp());
+            // Restore the locale
+            setlocale('LC_TIME', $systemLocale);
+
+            return $localizedDate;
+        } else {
+            // setlocale() function not available => error
+            throw new SmartyPluginException("The setlocale() function is not available on your system.");
+        }
     }
 
     /**

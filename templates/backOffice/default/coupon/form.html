@@ -54,7 +54,31 @@
                                 {if $error}{$message}{/if}
                             </div>
                         {/form_field}
+                    </div>
 
+                    <div class="col-md-9">
+                        <div id="coupon-type">
+                            {form_field form=$form field='type'}
+                                <div class="form-group {if $error}has-error{/if}">
+                                    <label for="type" class="control-label">{intl l='Coupon type * :'}</label>
+                                    <select required name="{$name}" id="type" class="col-md-12 form-control">
+                                        <option value="" data-description="" data-inputName="">{intl l='Please select a coupon type'}</option>
+                                        {foreach from=$availableCoupons item=availableCoupon}
+                                            <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}" data-inputName="{$availableCoupon.inputName}" {if $value == $availableCoupon.serviceId}selected{/if}>
+                                                {$availableCoupon.name}
+                                            </option>
+                                        {/foreach}
+                                    </select>
+                                    {if $error}{$message}{/if}
+                                    <span class="help-block typeToolTip">{$availableCoupons.0.toolTip}</span>
+                                </div>
+                            {/form_field}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
                         {form_field form=$form field='isEnabled'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="is-enabled" class="checkbox control-label">
@@ -163,27 +187,9 @@
                     </div>
 
                     <div class="col-md-3">
-                        <div id="coupon-type">
-                            {form_field form=$form field='type'}
-                                <div class="form-group {if $error}has-error{/if}">
-                                    <label for="type" class="control-label">{intl l='Coupon type * :'}</label>
-                                    <select required name="{$name}" id="type" class="col-md-12 form-control">
-                                        <option value="" data-description="" data-inputName="">{intl l='Please select a coupon type'}</option>
-                                        {foreach from=$availableCoupons item=availableCoupon}
-                                            <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}" data-inputName="{$availableCoupon.inputName}" {if $value == $availableCoupon.serviceId}selected{/if}>
-                                                {$availableCoupon.name}
-                                            </option>
-                                        {/foreach}
-                                    </select>
-                                    {if $error}{$message}{/if}
-                                    <span class="help-block typeToolTip">{$availableCoupons.0.toolTip}</span>
-                                </div>
-                            {/form_field}
-
+                        <div id="coupon-inputs">
                             <div class="inputs">
-                                {form_field form=$form field='amount'}
                                 {$couponInputsHtml nofilter}
-                                {/form_field}
                             </div>
                         </div>
                     </div>

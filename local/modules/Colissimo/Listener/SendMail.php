@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\MessageQuery;
@@ -47,7 +48,7 @@ class SendMail implements EventSubscriberInterface
         $order = $event->getOrder();
         $colissimo = new Colissimo();
 
-        if ($order->getStatusId() == OrderStatus::CODE_SENT && $order->getDeliveryModuleId() == $colissimo->getModuleModel()->getId()) {
+        if ($order->isSent() && $order->getDeliveryModuleId() == $colissimo->getModuleModel()->getId()) {
             $contact_email = ConfigQuery::read('store_email');
 
             if ($contact_email) {
@@ -83,6 +84,12 @@ class SendMail implements EventSubscriberInterface
                 $message->buildMessage($this->parser, $instance);
 
                 $this->mailer->send($instance);
+                
+                Tlog::getInstance()->debug("Colissimo shipping message sent to customer ".$customer->getEmail());
+            }
+            else {
+              $customer = $order->getCustomer();
+              Tlog::getInstance()->debug("Colissimo shipping message no contact email customer_id", $customer->getId());
             }
         }
     }

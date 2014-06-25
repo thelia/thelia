@@ -41,7 +41,8 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('order', null, true)
+            Argument::createIntTypeArgument('order', null, true),
+            Argument::createIntListTypeArgument('id')
         );
     }
 
@@ -57,6 +58,10 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
         $order = $this->getOrder();
 
         $search->filterByOrderId($order, Criteria::EQUAL);
+
+        if (null !== $this->getId()) {
+            $search->filterById($this->getId(), Criteria::IN);
+        }
 
         $search->orderById(Criteria::ASC);
 

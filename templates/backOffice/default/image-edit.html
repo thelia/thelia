@@ -11,8 +11,9 @@
 
             {loop type="image" name="image_edit" source="{$imageType}" id="{$imageId}" width="580" backend_context="1" lang="$edit_language_id"}
                 <ul class="breadcrumb">
-        			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
-                    <li><a href="{url path="{$redirectUrl}"}">{intl l="Image"}</a></li>
+                    {foreach $breadcrumb as $label=>$link}
+                    <li><a href="{$link}">{$label}</a></li>
+                    {/foreach}
                     <li>{intl l='Editing image "%name"' name={$TITLE}}</li>
                 </ul>
 
@@ -34,7 +35,7 @@
                                                 hide_submit_buttons = false
 
                                                 page_url  = "{url path="/admin/image/type/{$imageType}/{$ID}/update"}"
-                                                close_url = "{url path="{$redirectUrl}"}"
+                                                close_url = "{url path="{$redirectUrl}" noamp=1}"
                                             }
 
         						        	{form_hidden_fields form=$form}

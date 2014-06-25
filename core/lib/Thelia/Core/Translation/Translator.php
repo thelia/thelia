@@ -14,7 +14,6 @@ namespace Thelia\Core\Translation;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Translator as BaseTranslator;
-use Thelia\Log\Tlog;
 
 class Translator extends BaseTranslator
 {
@@ -74,14 +73,9 @@ class Translator extends BaseTranslator
             $this->loadCatalogue($locale);
         }
 
-        if (! $this->catalogues[$locale]->has((string) $id, $domain)) {
-
-        }
-
         if ($this->catalogues[$locale]->has((string) $id, $domain)) {
             return parent::trans($id, $parameters, $domain, $locale);
         } else {
-            //Tlog::getInstance()->addWarning("Undefined translation: locale: $locale, domain: $domain, ID: $id");
 
             if ($return_default_if_not_available)
                 return strtr($id, $parameters);
