@@ -57,6 +57,28 @@ class Category extends BaseCategory
     }
 
     /**
+     * Get the root category
+     * @param int $categoryId
+     * @return mixed
+     */
+    public function getRoot($categoryId)
+    {
+
+        $category = CategoryQuery::create()->findOneById($categoryId);
+
+        if(0 !== $category->getParent()) {
+            $parentCategory = CategoryQuery::create()->findOneById($category->getParent());
+
+            if (null !== $parentCategory) {
+                $categoryId = $this->getRoot($parentCategory->getId());
+            }
+        }
+
+        return $categoryId;
+
+    }
+
+    /**
      * Calculate next position relative to our parent
      */
     protected function addCriteriaToPositionQuery($query)
