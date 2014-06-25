@@ -23,6 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session;
 
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
+use Thelia\Core\Event\SessionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model;
 
@@ -203,26 +204,13 @@ class TheliaHttpKernel extends HttpKernel
 
     public function initSession(Request $request)
     {
-        if (null === self::$session) {
-            $storage = new Session\Storage\NativeSessionStorage();
+        if (null === $session = self::$session) {
+            $container = $this->getContainer();
+            $event = new SessionEvent($this->container);
+            $dispatcher = $container->get('event_dispatcher');
+            $dispatcher->dispatch(TheliaKernelEvents::SESSION, $event);
 
-            if (Model\ConfigQuery::read("session_config.default")) {
-                $storage->setSaveHandler(new Session\Storage\Handler\NativeFileSessionHandler(Model\ConfigQuery::read("session_config.save_path", THELIA_ROOT . '/local/session/')));
-            } else {
-                $handlerString = Model\ConfigQuery::read("session_config.handlers", 'Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler');
-
-                $handler = new $handlerString;
-
-                $storage->setSaveHandler($handler);
-            }
-
-            if (Model\ConfigQuery::read("session_config.config", null)) {
-                $storage->setOptions(json_decode(Model\ConfigQuery::read("session_config.config")));
-            }
-
-            self::$session = $session = new \Thelia\Core\HttpFoundation\Session\Session($storage);
-        } else {
-            $session = self::$session;
+            self::$session = $session = $event->getSession();
         }
 
         $session->start();
