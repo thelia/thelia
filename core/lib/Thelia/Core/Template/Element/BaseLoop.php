@@ -535,4 +535,6 @@ abstract class BaseLoop
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
     abstract protected function getArgDefinitions();
+
+
 }
