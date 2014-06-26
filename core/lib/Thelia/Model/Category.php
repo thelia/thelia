@@ -3,18 +3,22 @@
 namespace Thelia\Model;
 
 use Thelia\Core\Event\Category\CategoryEvent;
+use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Category as BaseCategory;
 
 use Thelia\Core\Event\TheliaEvents;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\Model\Tools\PositionManagementTrait;
+use Thelia\Model\Tools\UrlRewritingTrait;
 
-class Category extends BaseCategory
+class Category extends BaseCategory implements FileModelParentInterface
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+    use ModelEventDispatcherTrait;
 
-    use \Thelia\Model\Tools\PositionManagementTrait;
+    use PositionManagementTrait;
 
-    use \Thelia\Model\Tools\UrlRewritingTrait;
+    use UrlRewritingTrait;
 
     /**
      * @return int number of child for the current category
