@@ -63,10 +63,10 @@ class Folder extends BaseFolder
     public function getRoot($folderId)
     {
 
-        $folder = FolderQuery::create()->findOneById($folderId);
+        $folder = FolderQuery::create()->findPk($folderId);
 
         if(0 !== $folder->getParent()) {
-            $parentFolder = FolderQuery::create()->findOneById($folder->getParent());
+            $parentFolder = FolderQuery::create()->findPk($folder->getParent());
 
             if (null !== $parentFolder) {
                 $folderId = $this->getRoot($parentFolder->getId());

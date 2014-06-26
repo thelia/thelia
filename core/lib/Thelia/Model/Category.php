@@ -64,10 +64,10 @@ class Category extends BaseCategory
     public function getRoot($categoryId)
     {
 
-        $category = CategoryQuery::create()->findOneById($categoryId);
+        $category = CategoryQuery::create()->findPk($categoryId);
 
         if(0 !== $category->getParent()) {
-            $parentCategory = CategoryQuery::create()->findOneById($category->getParent());
+            $parentCategory = CategoryQuery::create()->findPk($category->getParent());
 
             if (null !== $parentCategory) {
                 $categoryId = $this->getRoot($parentCategory->getId());
