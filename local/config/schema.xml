@@ -46,10 +46,10 @@
     <foreign-key foreignTable="tax_rule" name="fk_product_tax_rule_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_rule_id" />
     </foreign-key>
-    <foreign-key foreignTable="template" name="fk_product_template">
+    <foreign-key foreignTable="template" name="fk_product_template" onDelete="SET NULL">
       <reference foreign="id" local="template_id" />
     </foreign-key>
-    <foreign-key foreignTable="brand" name="fk_product_brand" onDelete="SET NULL">
+    <foreign-key foreignTable="brand" name="fk_product_brand" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="brand_id" />
     </foreign-key>
     <unique name="ref_UNIQUE">

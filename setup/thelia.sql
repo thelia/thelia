@@ -57,11 +57,13 @@ CREATE TABLE `product`
         ON DELETE RESTRICT,
     CONSTRAINT `fk_product_template`
         FOREIGN KEY (`template_id`)
-        REFERENCES `template` (`id`),
+        REFERENCES `template` (`id`)
+        ON DELETE SET NULL,
     CONSTRAINT `fk_product_brand`
         FOREIGN KEY (`brand_id`)
         REFERENCES `brand` (`id`)
-        ON DELETE SET NULL
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

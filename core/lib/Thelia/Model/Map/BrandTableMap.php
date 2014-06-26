@@ -174,7 +174,7 @@ class BrandTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('BrandImageRelatedByLogoImageId', '\\Thelia\\Model\\BrandImage', RelationMap::MANY_TO_ONE, array('logo_image_id' => 'id', ), 'SET NULL', 'RESTRICT');
-        $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::ONE_TO_MANY, array('id' => 'brand_id', ), 'SET NULL', null, 'Products');
+        $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::ONE_TO_MANY, array('id' => 'brand_id', ), 'RESTRICT', 'RESTRICT', 'Products');
         $this->addRelation('BrandDocument', '\\Thelia\\Model\\BrandDocument', RelationMap::ONE_TO_MANY, array('id' => 'brand_id', ), 'CASCADE', 'RESTRICT', 'BrandDocuments');
         $this->addRelation('BrandImageRelatedByBrandId', '\\Thelia\\Model\\BrandImage', RelationMap::ONE_TO_MANY, array('id' => 'brand_id', ), 'CASCADE', 'RESTRICT', 'BrandImagesRelatedByBrandId');
         $this->addRelation('BrandI18n', '\\Thelia\\Model\\BrandI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'BrandI18ns');
@@ -200,7 +200,6 @@ class BrandTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                ProductTableMap::clearInstancePool();
                 BrandDocumentTableMap::clearInstancePool();
                 BrandImageTableMap::clearInstancePool();
                 BrandI18nTableMap::clearInstancePool();
