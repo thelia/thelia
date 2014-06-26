@@ -17,17 +17,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\Loop\FolderPath;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Content;
+use Thelia\Model\Folder;
 
 trait FolderBreadcrumbTrait
 {
 
-    public function getBaseBreadcrumb(Router $router, ContainerInterface $container, $folderId, &$locale)
+    public function getBaseBreadcrumb(Router $router, ContainerInterface $container, $folderId)
     {
         $translator = Translator::getInstance();
         $catalogUrl = $router->generate('admin.catalog', [], Router::ABSOLUTE_URL);
         $breadcrumb = [
-            $translator->trans('Home', [], 'bo.default') => $router->generate('admin.home.view', [], Router::ABSOLUTE_URL),
-            $translator->trans('Folder', [], 'bo.default') => $catalogUrl,
+            $translator->trans('Home') => $router->generate('admin.home.view', [], Router::ABSOLUTE_URL),
+            $translator->trans('Folder') => $catalogUrl,
         ];
 
         $folderPath = new FolderPath($container);
@@ -45,16 +47,14 @@ trait FolderBreadcrumbTrait
             );
         }
 
-        $locale = $result['LOCALE'];
-
         return $breadcrumb;
     }
 
-    public function getFolderBreadcrumb($router, $container, $tab)
+    public function getFolderBreadcrumb(Router $router, $container, $tab, $locale)
     {
-        $locale = null;
+        /** @var Folder $folder */
         $folder = $this->getFolder();
-        $breadcrumb = $this->getBaseBreadcrumb($router, $container, $this->getParentId(), $locale);
+        $breadcrumb = $this->getBaseBreadcrumb($router, $container, $this->getParentId());
 
         $folder->setLocale($locale);
 
@@ -66,12 +66,12 @@ trait FolderBreadcrumbTrait
         return $breadcrumb;
     }
 
-    public function getContentBreadcrumb(Router $router, ContainerInterface $container, $tab)
+    public function getContentBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
+        /** @var Content $content */
         $content = $this->getContent();
-        $locale = null;
 
-        $breadcrumb = $this->getBaseBreadcrumb($router, $container, $content->getDefaultFolderId(), $locale);
+        $breadcrumb = $this->getBaseBreadcrumb($router, $container, $content->getDefaultFolderId());
 
         $content->setLocale($locale);
 

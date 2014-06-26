@@ -41,7 +41,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
     /**
      * @var array Possible document sources
      */
-    protected $possible_sources = array('category', 'product', 'folder', 'content');
+    protected $possible_sources = array('category', 'product', 'folder', 'content', 'brand');
 
     /**
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection

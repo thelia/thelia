@@ -95,8 +95,14 @@ class SmartyParser extends Smarty implements ParserInterface
         // The default HTTP status
         $this->status = 200;
 
-        $this->loadFilter('output', "trimwhitespace");
+        $this->registerFilter('output', array($this, "removeBlankLines"));
+        //$this->loadFilter('output', "trimwhitespace");
         $this->registerFilter('variable', array(__CLASS__, "theliaEscape"));
+    }
+
+    public function removeBlankLines($tpl_source, \Smarty_Internal_Template $template)
+    {
+        return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $tpl_source);
     }
 
     /**

@@ -96,7 +96,7 @@ abstract class BaseForm
 
         // If not already set, define the success_url field
         if (! $this->formBuilder->has('success_url')) {
-            $this->formBuilder->add("success_url", "text");
+            $this->formBuilder->add("success_url", "hidden");
         }
 
         if (! $this->formBuilder->has('error_message')) {

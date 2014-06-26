@@ -14,6 +14,7 @@
         <loop class="Thelia\Core\Template\Loop\AttributeAvailability" name="attribute_availability"/>
         <loop class="Thelia\Core\Template\Loop\AttributeCombination" name="attribute_combination"/>
         <loop class="Thelia\Core\Template\Loop\Auth" name="auth"/>
+        <loop class="Thelia\Core\Template\Loop\Brand" name="brand"/>
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
         <loop class="Thelia\Core\Template\Loop\Content" name="content"/>
         <loop class="Thelia\Core\Template\Loop\Country" name="country"/>

@@ -46,7 +46,104 @@ CREATE TABLE `order_version`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 # Add missing columns to coupon (version_created_at, version_created_by)
-ALTER TABLE `order` ADD `version_created_at` DATE AFTER `version`;
-ALTER TABLE `order` ADD `version_created_by` VARCHAR(100) AFTER `version_created_at`;
+ALTER TABLE `coupon` ADD `version_created_at` DATE AFTER `version`;
+ALTER TABLE `coupon` ADD `version_created_by` VARCHAR(100) AFTER `version_created_at`;
+
+# Add the "brand" resource
+INSERT INTO resource (`code`, `created_at`, `updated_at`) VALUES ('admin.brand', NOW(), NOW());
+
+# Add Brand tables
+
+-- ---------------------------------------------------------------------
+-- brand
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand`;
+
+CREATE TABLE `brand`
+(
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `visible` TINYINT,
+  `title` VARCHAR(255),
+  `description` LONGTEXT,
+  `chapo` TEXT,
+  `postscriptum` TEXT,
+  `meta_title` VARCHAR(255),
+  `meta_description` TEXT,
+  `meta_keywords` TEXT,
+  `logo_image_id` INTEGER,
+  `created_at` DATETIME,
+  `updated_at` DATETIME,
+  PRIMARY KEY (`id`),
+  INDEX `fk_brand_brand_image1_idx` (`logo_image_id`),
+  CONSTRAINT `fk_logo_image_id_brand_image`
+  FOREIGN KEY (`logo_image_id`)
+  REFERENCES `brand_image` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_document
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_document`;
+
+CREATE TABLE `brand_document`
+(
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `brand_id` INTEGER NOT NULL,
+  `file` VARCHAR(255) NOT NULL,
+  `position` INTEGER,
+  `title` VARCHAR(255),
+  `description` LONGTEXT,
+  `chapo` TEXT,
+  `postscriptum` TEXT,
+  `created_at` DATETIME,
+  `updated_at` DATETIME,
+  PRIMARY KEY (`id`),
+  INDEX `idx_brand_document_brand_id` (`brand_id`),
+  CONSTRAINT `fk_brand_document_brand_id`
+  FOREIGN KEY (`brand_id`)
+  REFERENCES `brand` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_image
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_image`;
+
+CREATE TABLE `brand_image`
+(
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `brand_id` INTEGER NOT NULL,
+  `file` VARCHAR(255) NOT NULL,
+  `position` INTEGER,
+  `title` VARCHAR(255),
+  `description` LONGTEXT,
+  `chapo` TEXT,
+  `postscriptum` TEXT,
+  `created_at` DATETIME,
+  `updated_at` DATETIME,
+  PRIMARY KEY (`id`),
+  INDEX `idx_brand_image_brand_id` (`brand_id`),
+  INDEX `idx_brand_image_brand_id_is_brand_logo` (`brand_id`),
+  CONSTRAINT `fk_brand_image_brand_id`
+  FOREIGN KEY (`brand_id`)
+  REFERENCES `brand` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+
+-- ---------------------------------------------------------
+-- Add brand field to product table, and related constraint.
+-- ---------------------------------------------------------
+
+ALTER TABLE `product` ADD `brand_id` INTEGER DEFAULT 0 AFTER `template_id`;
+ALTER TABLE `product` ADD CONSTRAINT `fk_product_brand` FOREIGN KEY (`brand_id`) REFERENCES `brand` (`id`) ON DELETE SET NULL;
 
 SET FOREIGN_KEY_CHECKS = 1;

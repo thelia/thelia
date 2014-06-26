@@ -736,4 +736,24 @@ final class TheliaEvents
 
     const BEFORE_DELETELANG                     = 'action.lang.beforeDelete';
     const AFTER_DELETELANG                      = 'action.lang.afterDelete';
+
+    // -- Brands management -----------------------------------------------
+
+    const BRAND_CREATE = "action.createBrand";
+    const BRAND_UPDATE = "action.updateBrand";
+    const BRAND_DELETE = "action.deleteBrand";
+
+    const BRAND_UPDATE_POSITION   = "action.updateBrandPosition";
+    const BRAND_TOGGLE_VISIBILITY = "action.toggleBrandVisibility";
+
+    const BRAND_UPDATE_SEO = "action.updateBrandSeo";
+
+    const BEFORE_CREATEBRAND = "action.before_createBrand";
+    const AFTER_CREATEBRAND	 = "action.after_createBrand";
+
+    const BEFORE_DELETEBRAND = "action.before_deleteBrand";
+    const AFTER_DELETEBRAND  = "action.after_deleteBrand";
+
+    const BEFORE_UPDATEBRAND = "action.before_updateBrand";
+    const AFTER_UPDATEBRAND  = "action.after_updateBrand";
 }

@@ -41,7 +41,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     /**
      * @var array Possible image sources
      */
-    protected $possible_sources = array('category', 'product', 'folder', 'content', 'module');
+    protected $possible_sources = array('category', 'product', 'folder', 'content', 'module', 'brand');
 
     /**
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection

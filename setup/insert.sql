@@ -1289,7 +1289,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (31, 'admin.configuration.advanced', NOW(), NOW()),
 (32, 'admin.configuration.translations', NOW(), NOW()),
 (33, 'admin.export', NOW(), NOW()),
-(34, 'admin.tools', NOW(), NOW());
+(34, 'admin.tools', NOW(), NOW()),
+(35, 'admin.brand', NOW(), NOW());
 
 /**
 generated with command : php Thelia thelia:generate-resources --output sql-i18n
