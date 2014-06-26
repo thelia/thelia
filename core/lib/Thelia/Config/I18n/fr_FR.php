@@ -271,6 +271,7 @@ return array(
     'Store logs into text file' => 'Conserver les logs dans des fichiers texte',
     'Store logs into text file, up to a certian size, then a new file is created' => 'Sauvegarder les logs dans un fichier texte. A partir d\'une certaine taille un nouveau fichier est créé',
     'Store name' => 'Nom du magasin',
+    'Store description' => 'Description du magasin',
     'Street Address' => 'Adresse',
     'Street Address ' => 'Rue',
     'Strictly use the requested language' => 'Utiliser strictement la langue demandée',

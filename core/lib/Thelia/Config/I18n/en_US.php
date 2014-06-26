@@ -271,6 +271,7 @@ return array(
     'Store logs into text file' => 'Store logs into text file',
     'Store logs into text file, up to a certian size, then a new file is created' => 'Store logs into text file, up to a certian size, then a new file is created',
     'Store name' => 'Store name',
+    'Store description' => 'Store description',
     'Street Address' => 'Street Address',
     'Street Address ' => 'Street Address ',
     'Strictly use the requested language' => 'Strictly use the requested language',
