@@ -1,0 +1,8 @@
+<label for="{$label_attr.for}" class="control-label">
+    {$label} {if $required} <span class="required">*</span>{/if}
+
+    {form_error form=$form field=$field_name}
+        <br />
+        <span class="error">{$message}</span>
+    {/form_error}
+</label>
