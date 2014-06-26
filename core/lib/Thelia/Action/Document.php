@@ -12,18 +12,15 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
 use Thelia\Core\Event\Document\DocumentDeleteEvent;
 use Thelia\Core\Event\Document\DocumentEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdateFilePositionEvent;
+use Thelia\Exception\DocumentException;
 use Thelia\Exception\ImageException;
 use Thelia\Model\ConfigQuery;
-use Thelia\Tools\FileManager;
 use Thelia\Tools\URL;
-
-use Thelia\Exception\DocumentException;
-use Thelia\Core\Event\TheliaEvents;
 
 /**
  *
@@ -71,7 +68,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      */
     public function processDocument(DocumentEvent $event)
     {
-        $subdir      = $event->getCacheSubdirectory();
+        $subdir     = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();
 
         if (null == $subdir || null == $sourceFile) {
@@ -118,7 +115,6 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      */
     public function saveDocument(DocumentCreateOrUpdateEvent $event)
     {
-        $fileManager = new FileManager();
         $model = $event->getModelDocument();
 
         $nbModifiedLines = $model->save();
@@ -128,15 +124,15 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         if (!$nbModifiedLines) {
             throw new ImageException(
                 sprintf(
-                    'Document "%s" with parent id %s (%s) failed to be saved',
+                    'Document "%s" with parent id %s failed to be saved',
                     $event->getParentName(),
-                    $event->getParentId(),
-                    $event->getDocumentType()
+                    $event->getParentId()
                 )
             );
         }
 
-        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getDocumentType(), $event->getModelDocument(), $event->getUploadedFile(), FileManager::FILE_TYPE_DOCUMENTS);
+        $newUploadedFile = $this->fileManager->copyUploadedFile($event->getModelDocument(), $event->getUploadedFile());
+
         $event->setUploadedFile($newUploadedFile);
     }
 
@@ -154,14 +150,15 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
             $event->getModelDocument()->setTitle($event->getUploadedFile()->getClientOriginalName());
         }
 
-        $fileManager = new FileManager();
         // Copy and save file
         if ($event->getUploadedFile()) {
             // Remove old picture file from file storage
-            $url = $fileManager->getUploadDir($event->getDocumentType(), FileManager::FILE_TYPE_DOCUMENTS) . '/' . $event->getOldModelDocument()->getFile();
+            $url = $event->getModelDocument()->getUploadDir() . '/' . $event->getOldModelDocument()->getFile();
+
             unlink(str_replace('..', '', $url));
 
-            $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getDocumentType(), $event->getModelDocument(), $event->getUploadedFile(), FileManager::FILE_TYPE_DOCUMENTS);
+            $newUploadedFile = $this->fileManager->copyUploadedFile($event->getModelDocument(), $event->getUploadedFile());
+
             $event->setUploadedFile($newUploadedFile);
         }
 
@@ -181,13 +178,10 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      * @param \Thelia\Core\Event\Document\DocumentDeleteEvent $event Image event
      *
      * @throws \Exception
-     * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
      */
     public function deleteDocument(DocumentDeleteEvent $event)
     {
-        $fileManager = new FileManager();
-
-        $fileManager->deleteFile($event->getDocumentToDelete(), $event->getDocumentType(), FileManager::FILE_TYPE_DOCUMENTS);
+        $this->fileManager->deleteFile($event->getDocumentToDelete());
     }
 
     public static function getSubscribedEvents()

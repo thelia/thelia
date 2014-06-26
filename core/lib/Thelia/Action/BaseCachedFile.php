@@ -12,6 +12,7 @@
 namespace Thelia\Action;
 
 use Thelia\Core\Event\CachedFileEvent;
+use Thelia\Files\FileManager;
 use Thelia\Tools\URL;
 
 /**
@@ -32,6 +33,16 @@ use Thelia\Tools\URL;
  */
 abstract class BaseCachedFile extends BaseAction
 {
+    /**
+     * @var FileManager
+     */
+    protected $fileManager;
+
+    public function __construct(FileManager $fileManager)
+    {
+        $this->fileManager = $fileManager;
+    }
+
     /**
      * @return string root of the file cache directory in web space
      */
@@ -60,6 +71,7 @@ abstract class BaseCachedFile extends BaseAction
     {
         $iterator = new \DirectoryIterator($path);
 
+        /** @var \DirectoryIterator $fileinfo */
         foreach ($iterator as $fileinfo) {
 
             if ($fileinfo->isDot()) continue;
@@ -75,8 +87,8 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * Return the absolute URL to the cached file
      *
-     * @param  string $subdir   the subdirectory related to cache base
-     * @param  string $filename the safe filename, as returned by getCacheFilePath()
+     * @param  string $subdir        the subdirectory related to cache base
+     * @param  string $safe_filename the safe filename, as returned by getCacheFilePath()
      * @return string the absolute URL to the cached file
      */
     protected function getCacheFileURL($subdir, $safe_filename)
@@ -89,10 +101,10 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * Return the full path of the cached file
      *
-     * @param  string  $subdir                the subdirectory related to cache base
-     * @param  string  $filename              the filename
-     * @param  string  $hashed_options        a hash of transformation options, or null if no transformations have been applied
-     * @param  boolean $forceOriginalDocument if true, the original file path in the cache dir is returned.
+     * @param  string  $subdir            the subdirectory related to cache base
+     * @param  string  $filename          the filename
+     * @param  boolean $forceOriginalFile if true, the original file path in the cache dir is returned.
+     * @param  string  $hashed_options    a hash of transformation options, or null if no transformations have been applied
      * @return string  the cache directory path relative to Web Root
      */
     protected function getCacheFilePath($subdir, $filename, $forceOriginalFile = false, $hashed_options = null)
@@ -132,9 +144,13 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * Return the absolute cache directory path
      *
-     * @param  string            $subdir the subdirectory related to cache base, or null to get the cache base directory.
-     * @throws \RuntimeException if cache directory cannot be created
-     * @return string            the absolute cache directory path
+     * @param string $subdir               the subdirectory related to cache base, or null to get the cache base directory.
+     * @param bool   $create_if_not_exists create the directory if it is not found
+     *
+     * @throws \RuntimeException         if cache directory cannot be created
+     * @throws \InvalidArgumentException ii path is invalid, e.g. not in the cache dir
+     *
+     * @return string the absolute cache directory path
      */
     protected function getCachePath($subdir = null, $create_if_not_exists = true)
     {

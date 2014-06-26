@@ -33,24 +33,7 @@ abstract class ImageModification extends BaseForm
 {
 
     /**
-     *
-     * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->form attribute :
-     *
-     * $this->form->add('name', 'text')
-     *   ->add('email', 'email', array(
-     *           'attr' => array(
-     *               'class' => 'field'
-     *           ),
-     *           'label' => 'email',
-     *           'constraints' => array(
-     *               new NotBlank()
-     *           )
-     *       )
-     *   )
-     *   ->add('age', 'integer');
-     *
-     * @return null
+     * @inheritdoc
      */
     protected function buildForm()
     {
@@ -58,6 +41,7 @@ abstract class ImageModification extends BaseForm
             'file',
             'file',
             array(
+                'required' => false,
                 'constraints' => array(
                     new Image(
                         array(
@@ -71,61 +55,73 @@ abstract class ImageModification extends BaseForm
                     'for' => 'file'
                 )
             )
-        );
-
-        $this->formBuilder
-            ->add(
-                'title',
-                'text',
-                array(
-                    'constraints' => array(
-                        new NotBlank()
-                    ),
-                    'label' => Translator::getInstance()->trans('Title'),
-                    'label_attr' => array(
-                        'for' => 'title'
-                    )
+        )
+        ->add(
+            'title',
+            'text',
+            array(
+                'required' => true,
+                'constraints' => array(
+                    new NotBlank()
+                ),
+                'label' => Translator::getInstance()->trans('Title'),
+                'label_attr' => array(
+                    'for' => 'title'
                 )
             )
-            ->add(
-                'description',
-                'text',
-                array(
-                    'constraints' => array(),
-                    'label' => Translator::getInstance()->trans('Description'),
-                    'label_attr' => array(
-                        'for' => 'description'
-                    )
+        )
+        ->add(
+            'description',
+            'textarea',
+            array(
+                'required' => false,
+                'constraints' => array(),
+                'label' => Translator::getInstance()->trans('Description'),
+                'label_attr' => array(
+                    'for' => 'description',
+                    'rows' => 5
                 )
             )
-            ->add(
-                'chapo',
-                'text',
-                array(
-                    'constraints' => array(),
-                    'label' => Translator::getInstance()->trans('Chapo'),
-                    'label_attr' => array(
-                        'for' => 'chapo'
-                    )
+        )
+        ->add(
+            'chapo',
+            'textarea',
+            array(
+                'required' => false,
+                'constraints' => array(),
+                'label' => Translator::getInstance()->trans('Chapo'),
+                'label_attr' => array(
+                    'for' => 'chapo',
+                    'rows' => 3
                 )
             )
-            ->add(
-                'postscriptum',
-                'text',
-                array(
-                    'constraints' => array(),
-                    'label' => Translator::getInstance()->trans('Post Scriptum'),
-                    'label_attr' => array(
-                        'for' => 'postscriptum'
-                    )
+        )
+        ->add(
+            'postscriptum',
+            'textarea',
+            array(
+                'required' => false,
+                'constraints' => array(),
+                'label' => Translator::getInstance()->trans('Post Scriptum'),
+                'label_attr' => array(
+                    'for' => 'postscriptum',
+                    'rows' => 3
                 )
             )
-            ->add("locale", "text", array(
+        )
+        ->add(
+            "locale",
+            "hidden",
+            array(
+                'required' => true,
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label_attr" => array("for" => "locale_create")
-            ))
+                "label_attr" => array(
+                    "for" => "locale_create"
+                )
+            )
+        )
         ;
     }
 }

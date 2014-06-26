@@ -14,27 +14,20 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Thelia\Core\Event\UpdateFilePositionEvent;
-use Thelia\Core\HttpFoundation\Response;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
 use Thelia\Core\Event\Document\DocumentDeleteEvent;
 use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
 use Thelia\Core\Event\Image\ImageDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdateFilePositionEvent;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Files\FileManager;
+use Thelia\Files\FileModelInterface;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
-use Thelia\Model\CategoryDocument;
-use Thelia\Model\CategoryImage;
-use Thelia\Model\ContentDocument;
-use Thelia\Model\ContentImage;
-use Thelia\Model\FolderDocument;
-use Thelia\Model\FolderImage;
 use Thelia\Model\Lang;
-use Thelia\Model\ProductDocument;
-use Thelia\Model\ProductImage;
-use Thelia\Tools\FileManager;
 use Thelia\Tools\Rest\ResponseRest;
 use Thelia\Tools\URL;
 
@@ -52,6 +45,15 @@ use Thelia\Tools\URL;
  */
 class FileController extends BaseAdminController
 {
+    /**
+     * Get the FileManager
+     *
+     * @return FileManager
+     */
+    public function getFileManager()
+    {
+        return $this->container->get('thelia.file_manager');
+    }
 
     /**
      * Manage how a image collection has to be saved
@@ -66,78 +68,81 @@ class FileController extends BaseAdminController
         $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
-        if ($this->isParentTypeValid($parentType)) {
-            if ($this->getRequest()->isMethod('POST')) {
+        if ($this->getRequest()->isMethod('POST')) {
 
-                /** @var UploadedFile $fileBeingUploaded */
-                $fileBeingUploaded = $this->getRequest()->files->get('file');
+            /** @var UploadedFile $fileBeingUploaded */
+            $fileBeingUploaded = $this->getRequest()->files->get('file');
 
-                $fileManager = new FileManager();
+            $fileManager = $this->getFileManager();
 
-                // Validate if file is too big
-                if ($fileBeingUploaded->getError() == 1) {
-                    $message = $this->getTranslator()
+            // Validate if file is too big
+            if ($fileBeingUploaded->getError() == 1) {
+                $message = $this->getTranslator()
+                ->trans(
+                    'File is too heavy, please retry with a file having a size less than %size%.',
+                    array('%size%' => ini_get('upload_max_filesize')),
+                    'core'
+                );
+
+                return new ResponseRest($message, 'text', 403);
+            }
+            // Validate if it is a image or file
+            if (!$fileManager->isImage($fileBeingUploaded->getMimeType())) {
+                $message = $this->getTranslator()
                     ->trans(
-                        'File is too heavy, please retry with a file having a size less than %size%.',
-                        array('%size%' => ini_get('upload_max_filesize')),
-                        'core'
+                        'You can only upload images (.png, .jpg, .jpeg, .gif)',
+                        array(),
+                        'image'
                     );
 
-                    return new ResponseRest($message, 'text', 403);
-                }
-                // Validate if it is a image or file
-                if (!$fileManager->isImage($fileBeingUploaded->getMimeType())) {
-                    $message = $this->getTranslator()
-                        ->trans(
-                            'You can only upload images (.png, .jpg, .jpeg, .gif)',
-                            array(),
-                            'image'
-                        );
-
-                    return new ResponseRest($message, 'text', 415);
-                }
-
-                $parentModel = $fileManager->getParentFileModel($parentType, $parentId);
-                $imageModel = $fileManager->getImageModel($parentType);
-
-                if ($parentModel === null || $imageModel === null || $fileBeingUploaded === null) {
-                    return new Response('', 404);
-                }
-
-                $defaultTitle = $parentModel->getTitle();
-                $imageModel->setParentId($parentId);
-                $imageModel->setTitle($defaultTitle);
-
-                $imageCreateOrUpdateEvent = new ImageCreateOrUpdateEvent(
-                    $parentType,
-                    $parentId
-                );
-                $imageCreateOrUpdateEvent->setModelImage($imageModel);
-                $imageCreateOrUpdateEvent->setUploadedFile($fileBeingUploaded);
-                $imageCreateOrUpdateEvent->setParentName($parentModel->getTitle());
-
-                // Dispatch Event to the Action
-                $this->dispatch(
-                    TheliaEvents::IMAGE_SAVE,
-                    $imageCreateOrUpdateEvent
-                );
-
-                $this->adminLogAppend(
-                    AdminResources::retrieve($parentType),
-                    AccessManager::UPDATE,
-                    $this->container->get('thelia.translator')->trans(
-                        'Saving images for %parentName% parent id %parentId% (%parentType%)',
-                        array(
-                            '%parentName%' => $imageCreateOrUpdateEvent->getParentName(),
-                            '%parentId%' => $imageCreateOrUpdateEvent->getParentId(),
-                            '%parentType%' => $imageCreateOrUpdateEvent->getImageType()
-                        ),
-                        'image'
-                    )
-                );
-
-                return new ResponseRest(array('status' => true, 'message' => ''));
+                return new ResponseRest($message, 'text', 415);
             }
+
+            $imageModel = $fileManager->getModelInstance('image', $parentType);
+
+            $parentModel = $imageModel->getParentFileModel();
+
+            if ($parentModel === null || $imageModel === null || $fileBeingUploaded === null) {
+                return new Response('', 404);
+            }
+
+            $defaultTitle = $parentModel->getTitle();
+
+            if (empty($defaultTitle)) {
+                $defaultTitle = $fileBeingUploaded->getClientOriginalName();
+            }
+
+            $imageModel
+                ->setParentId($parentId)
+                ->setLocale(Lang::getDefaultLanguage()->getLocale())
+                ->setTitle($defaultTitle)
+            ;
+
+            $imageCreateOrUpdateEvent = new ImageCreateOrUpdateEvent($parentId);
+            $imageCreateOrUpdateEvent->setModelImage($imageModel);
+            $imageCreateOrUpdateEvent->setUploadedFile($fileBeingUploaded);
+            $imageCreateOrUpdateEvent->setParentName($parentModel->getTitle());
+
+            // Dispatch Event to the Action
+            $this->dispatch(
+                TheliaEvents::IMAGE_SAVE,
+                $imageCreateOrUpdateEvent
+            );
+
+            $this->adminLogAppend(
+                AdminResources::retrieve($parentType),
+                AccessManager::UPDATE,
+                $this->container->get('thelia.translator')->trans(
+                    'Saving images for %parentName% parent id %parentId%',
+                    array(
+                        '%parentName%' => $imageCreateOrUpdateEvent->getParentName(),
+                        '%parentId%' => $imageCreateOrUpdateEvent->getParentId()
+                    ),
+                    'image'
+                )
+            );
+
+            return new ResponseRest(array('status' => true, 'message' => ''));
         }
 
         return new Response('', 404);
@@ -156,67 +161,62 @@ class FileController extends BaseAdminController
         $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
-        if ($this->isParentTypeValid($parentType)) {
-            if ($this->getRequest()->isMethod('POST')) {
+        if ($this->getRequest()->isMethod('POST')) {
 
-                /** @var UploadedFile $fileBeingUploaded */
-                $fileBeingUploaded = $this->getRequest()->files->get('file');
+            /** @var UploadedFile $fileBeingUploaded */
+            $fileBeingUploaded = $this->getRequest()->files->get('file');
 
-                $fileManager = new FileManager();
+            $fileManager = $this->getFileManager();
 
-                // Validate if file is too big
-                if ($fileBeingUploaded->getError() == 1) {
-                    $message = $this->getTranslator()
-                        ->trans(
-                            'File is too heavy, please retry with a file having a size less than %size%.',
-                            array('%size%' => ini_get('post_max_size')),
-                            'document'
-                        );
-
-                    return new ResponseRest($message, 'text', 403);
-                }
-
-                $parentModel = $fileManager->getParentFileModel($parentType, $parentId);
-                $documentModel = $fileManager->getDocumentModel($parentType);
-
-                if ($parentModel === null || $documentModel === null || $fileBeingUploaded === null) {
-                    return new Response('', 404);
-                }
-
-                $documentModel->setParentId($parentId);
-                $documentModel->setLocale(Lang::getDefaultLanguage()->getLocale());
-                $documentModel->setTitle($fileBeingUploaded->getClientOriginalName());
-
-                $documentCreateOrUpdateEvent = new DocumentCreateOrUpdateEvent(
-                    $parentType,
-                    $parentId
-                );
-                $documentCreateOrUpdateEvent->setModelDocument($documentModel);
-                $documentCreateOrUpdateEvent->setUploadedFile($fileBeingUploaded);
-                $documentCreateOrUpdateEvent->setParentName($parentModel->getTitle());
-
-                // Dispatch Event to the Action
-                $this->dispatch(
-                    TheliaEvents::DOCUMENT_SAVE,
-                    $documentCreateOrUpdateEvent
-                );
-
-                $this->adminLogAppend(
-                    AdminResources::retrieve($parentType),
-                    AccessManager::UPDATE,
-                    $this->container->get('thelia.translator')->trans(
-                        'Saving documents for %parentName% parent id %parentId% (%parentType%)',
-                        array(
-                            '%parentName%' => $documentCreateOrUpdateEvent->getParentName(),
-                            '%parentId%' => $documentCreateOrUpdateEvent->getParentId(),
-                            '%parentType%' => $documentCreateOrUpdateEvent->getDocumentType()
-                        ),
+            // Validate if file is too big
+            if ($fileBeingUploaded->getError() == 1) {
+                $message = $this->getTranslator()
+                    ->trans(
+                        'File is too large, please retry with a file having a size less than %size%.',
+                        array('%size%' => ini_get('post_max_size')),
                         'document'
-                    )
-                );
+                    );
 
-                return new ResponseRest(array('status' => true, 'message' => ''));
+                return new ResponseRest($message, 'text', 403);
             }
+
+            $documentModel = $fileManager->getModelInstance('document', $parentType);
+            $parentModel = $documentModel->getParentFileModel($parentType, $parentId);
+
+            if ($parentModel === null || $documentModel === null || $fileBeingUploaded === null) {
+                return new Response('', 404);
+            }
+
+            $documentModel->setParentId($parentId);
+            $documentModel->setLocale(Lang::getDefaultLanguage()->getLocale());
+            $documentModel->setTitle($fileBeingUploaded->getClientOriginalName());
+
+            $documentCreateOrUpdateEvent = new DocumentCreateOrUpdateEvent($parentId);
+
+            $documentCreateOrUpdateEvent->setModelDocument($documentModel);
+            $documentCreateOrUpdateEvent->setUploadedFile($fileBeingUploaded);
+            $documentCreateOrUpdateEvent->setParentName($parentModel->getTitle());
+
+            // Dispatch Event to the Action
+            $this->dispatch(
+                TheliaEvents::DOCUMENT_SAVE,
+                $documentCreateOrUpdateEvent
+            );
+
+            $this->adminLogAppend(
+                AdminResources::retrieve($parentType),
+                AccessManager::UPDATE,
+                $this->container->get('thelia.translator')->trans(
+                    'Saving document for %parentName% parent id %parentId%',
+                    array(
+                        '%parentName%' => $documentCreateOrUpdateEvent->getParentName(),
+                        '%parentId%' => $documentCreateOrUpdateEvent->getParentId()
+                    ),
+                    'document'
+                )
+            );
+
+            return new ResponseRest(array('status' => true, 'message' => ''));
         }
 
         return new Response('', 404);
@@ -303,21 +303,25 @@ class FileController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE)) {
             return $response;
         }
-        try {
-            $fileManager = new FileManager();
-            $image = $fileManager->getImageModelQuery($parentType)->findPk($imageId);
-            $redirectUrl = $fileManager->getRedirectionUrl($parentType, $image->getParentId(), FileManager::FILE_TYPE_IMAGES);
+        $fileManager = $this->getFileManager();
+        $imageModel = $fileManager->getModelInstance('image', $parentType);
 
-            return $this->render('image-edit', array(
-                'imageId' => $imageId,
-                'imageType' => $parentType,
-                'redirectUrl' => $redirectUrl,
-                'formId' => $fileManager->getFormId($parentType, FileManager::FILE_TYPE_IMAGES),
-                'breadcrumb' => $image->getBreadcrumb($this->getRouter($this->getCurrentRouter()), $this->container, 'images')
-            ));
-        } catch (\Exception $e) {
-            $this->pageNotFound();
-        }
+        $redirectUrl = $imageModel->getRedirectionUrl($imageId);
+
+        $image = $imageModel->getQueryInstance()->findPk($imageId);
+
+        return $this->render('image-edit', array(
+            'imageId' => $imageId,
+            'imageType' => $parentType,
+            'redirectUrl' => $redirectUrl,
+            'formId' => $imageModel->getUpdateFormId(),
+            'breadcrumb' => $image->getBreadcrumb(
+                    $this->getRouter($this->getCurrentRouter()),
+                    $this->container,
+                    'images',
+                    $this->getCurrentEditionLocale()
+            )
+        ));
     }
 
     /**
@@ -333,21 +337,26 @@ class FileController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE)) {
             return $response;
         }
-        try {
-            $fileManager = new FileManager();
-            $document = $fileManager->getDocumentModelQuery($parentType)->findPk($documentId);
-            $redirectUrl = $fileManager->getRedirectionUrl($parentType, $document->getParentId(), FileManager::FILE_TYPE_DOCUMENTS);
 
-            return $this->render('document-edit', array(
-                    'documentId' => $documentId,
-                    'documentType' => $parentType,
-                    'redirectUrl' => $redirectUrl,
-                    'formId' => $fileManager->getFormId($parentType, FileManager::FILE_TYPE_DOCUMENTS),
-                    'breadcrumb' => $document->getBreadcrumb($this->getRouter($this->getCurrentRouter()), $this->container, 'documents')
-                ));
-        } catch (\Exception $e) {
-            $this->pageNotFound();
-        }
+        $fileManager = $this->getFileManager();
+        $documentModel = $fileManager->getModelInstance('document', $parentType);
+
+        $document = $documentModel->getQueryInstance()->findPk($documentId);
+
+        $redirectUrl = $documentModel->getRedirectionUrl($documentId);
+
+        return $this->render('document-edit', array(
+            'documentId' => $documentId,
+            'documentType' => $parentType,
+            'redirectUrl' => $redirectUrl,
+            'formId' => $documentModel->getUpdateFormId(),
+            'breadcrumb' => $document->getBreadcrumb(
+                    $this->getRouter($this->getCurrentRouter()),
+                    $this->container,
+                    'documents',
+                    $this->getCurrentEditionLocale()
+            )
+        ));
     }
 
     /**
@@ -366,12 +375,18 @@ class FileController extends BaseAdminController
 
         $message = false;
 
-        $fileManager = new FileManager();
-        $imageModification = $fileManager->getImageForm($parentType, $this->getRequest());
+        $fileManager = $this->getFileManager();
+
+        $modelInstance = $fileManager->getModelInstance('image', $parentType);
+
+        $imageModification = $modelInstance->getUpdateFormInstance($this->getRequest());
+
+        /** @var FileModelInterface $image */
+        $image = $modelInstance->getQueryInstance()->findPk($imageId);
 
         try {
-            $image = $fileManager->getImageModelQuery($parentType)->findPk($imageId);
             $oldImage = clone $image;
+
             if (null === $image) {
                 throw new \InvalidArgumentException(sprintf('%d image id does not exist', $imageId));
             }
@@ -394,7 +409,7 @@ class FileController extends BaseAdminController
             $this->adminLogAppend(AdminResources::retrieve($parentType), AccessManager::UPDATE, sprintf('Image with Ref %s (ID %d) modified', $imageUpdated->getTitle(), $imageUpdated->getId()));
 
             if ($this->getRequest()->get('save_mode') == 'close') {
-                $this->redirect(URL::getInstance()->absoluteUrl($fileManager->getRedirectionUrl($parentType, $image->getParentId(), FileManager::FILE_TYPE_IMAGES)));
+                $this->redirect(URL::getInstance()->absoluteUrl($modelInstance->getRedirectionUrl($imageId)));
             } else {
                 $this->redirectSuccess($imageModification);
             }
@@ -417,13 +432,13 @@ class FileController extends BaseAdminController
                 ->setGeneralError($message);
         }
 
-        $redirectUrl = $fileManager->getRedirectionUrl($parentType, $image->getParentId(), FileManager::FILE_TYPE_IMAGES);
+        $redirectUrl = $modelInstance->getRedirectionUrl($imageId);
 
         return $this->render('image-edit', array(
             'imageId' => $imageId,
             'imageType' => $parentType,
-                'redirectUrl' => $redirectUrl,
-            'formId' => $fileManager->getFormId($parentType, FileManager::FILE_TYPE_IMAGES)
+            'redirectUrl' => $redirectUrl,
+            'formId' => $modelInstance->getUpdateFormId()
         ));
     }
 
@@ -443,12 +458,18 @@ class FileController extends BaseAdminController
 
         $message = false;
 
-        $fileManager = new FileManager();
-        $documentModification = $fileManager->getDocumentForm($parentType, $this->getRequest());
+        $fileManager = $this->getFileManager();
+
+        $modelInstance = $fileManager->getModelInstance('document', $parentType);
+
+        $documentModification = $modelInstance->getUpdateFormInstance($this->getRequest());
+
+        /** @var FileModelInterface $document */
+        $document = $modelInstance->getQueryInstance()->findPk($documentId);
 
         try {
-            $document = $fileManager->getDocumentModelQuery($parentType)->findPk($documentId);
             $oldDocument = clone $document;
+
             if (null === $document) {
                 throw new \InvalidArgumentException(sprintf('%d document id does not exist', $documentId));
             }
@@ -471,7 +492,7 @@ class FileController extends BaseAdminController
             $this->adminLogAppend(AdminResources::retrieve($parentType), AccessManager::UPDATE, sprintf('Document with Ref %s (ID %d) modified', $documentUpdated->getTitle(), $documentUpdated->getId()));
 
             if ($this->getRequest()->get('save_mode') == 'close') {
-                $this->redirect(URL::getInstance()->absoluteUrl($fileManager->getRedirectionUrl($parentType, $document->getParentId(), FileManager::FILE_TYPE_DOCUMENTS)));
+                $this->redirect(URL::getInstance()->absoluteUrl($modelInstance->getRedirectionUrl($documentId)));
             } else {
                 $this->redirectSuccess($documentModification);
             }
@@ -494,13 +515,13 @@ class FileController extends BaseAdminController
                 ->setGeneralError($message);
         }
 
-        $redirectUrl = $fileManager->getRedirectionUrl($parentType, $document->getParentId(), FileManager::FILE_TYPE_DOCUMENTS);
+        $redirectUrl = $modelInstance->getRedirectionUrl($documentId);
 
         return $this->render('document-edit', array(
                 'documentId' => $documentId,
                 'documentType' => $parentType,
                 'redirectUrl' => $redirectUrl,
-                'formId' => $fileManager->getFormId($parentType, FileManager::FILE_TYPE_DOCUMENTS)
+                'formId' => $modelInstance->getUpdateFormId()
             ));
     }
 
@@ -519,9 +540,10 @@ class FileController extends BaseAdminController
         $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
-        $fileManager = new FileManager();
-        $imageModelQuery = $fileManager->getImageModelQuery($parentType);
-        $model = $imageModelQuery->findPk($imageId);
+        $fileManager = $this->getFileManager();
+        $modelInstance = $fileManager->getModelInstance('image', $parentType);
+
+        $model = $modelInstance->getQueryInstance()->findPk($imageId);
 
         if ($model == null) {
             return $this->pageNotFound();
@@ -590,7 +612,7 @@ class FileController extends BaseAdminController
         return new Response($message);
     }
 
-    public function updateImagePositionAction($parentType, $parentId)
+    public function updateImagePositionAction($parentType, /** @noinspection PhpUnusedParameterInspection */ $parentId)
     {
         $message = null;
 
@@ -600,9 +622,9 @@ class FileController extends BaseAdminController
         $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
-        $fileManager = new FileManager();
-        $imageModelQuery = $fileManager->getImageModelQuery($parentType);
-        $model = $imageModelQuery->findPk($imageId);
+        $fileManager = $this->getFileManager();
+        $modelInstance = $fileManager->getModelInstance('image', $parentType);
+        $model = $modelInstance->getQueryInstance()->findPk($imageId);
 
         if ($model === null || $position === null) {
             return $this->pageNotFound();
@@ -610,7 +632,7 @@ class FileController extends BaseAdminController
 
         // Feed event
         $imageUpdateImagePositionEvent = new UpdateFilePositionEvent(
-            $fileManager->getImageModelQuery($parentType),
+            $modelInstance->getQueryInstance($parentType),
             $imageId,
             UpdateFilePositionEvent::POSITION_ABSOLUTE,
             $position
@@ -644,7 +666,7 @@ class FileController extends BaseAdminController
         return new Response($message);
     }
 
-    public function updateDocumentPositionAction($parentType, $parentId)
+    public function updateDocumentPositionAction($parentType, /** @noinspection PhpUnusedParameterInspection */  $parentId)
     {
         $message = null;
 
@@ -654,9 +676,9 @@ class FileController extends BaseAdminController
         $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
-        $fileManager = new FileManager();
-        $documentModelQuery = $fileManager->getDocumentModelQuery($parentType);
-        $model = $documentModelQuery->findPk($documentId);
+        $fileManager = $this->getFileManager();
+        $modelInstance = $fileManager->getModelInstance('document', $parentType);
+        $model = $modelInstance->getQueryInstance()->findPk($documentId);
 
         if ($model === null || $position === null) {
             return $this->pageNotFound();
@@ -664,7 +686,7 @@ class FileController extends BaseAdminController
 
         // Feed event
         $documentUpdateDocumentPositionEvent = new UpdateFilePositionEvent(
-            $fileManager->getDocumentModelQuery($parentType),
+            $modelInstance->getQueryInstance(),
             $documentId,
             UpdateFilePositionEvent::POSITION_ABSOLUTE,
             $position
@@ -711,9 +733,9 @@ class FileController extends BaseAdminController
         $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
-        $fileManager = new FileManager();
-        $documentModelQuery = $fileManager->getDocumentModelQuery($parentType);
-        $model = $documentModelQuery->findPk($documentId);
+        $fileManager = $this->getFileManager();
+        $modelInstance = $fileManager->getModelInstance('document', $parentType);
+        $model = $modelInstance->getQueryInstance()->findPk($documentId);
 
         if ($model == null) {
             return $this->pageNotFound();
@@ -794,29 +816,18 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Check if parent type is valid or not
-     *
-     * @param string $parentType Parent type
-     *
-     * @return bool
-     */
-    public function isParentTypeValid($parentType)
-    {
-        return (in_array($parentType, FileManager::getAvailableTypes()));
-    }
-
-    /**
      * Create Image Event instance
      *
-     * @param string                                              $parentType Parent Type owning images being saved
-     * @param CategoryImage|ProductImage|ContentImage|FolderImage $model      Image model
-     * @param array                                               $data       Post data
+     * @param string             $parentType Parent Type owning images being saved
+     * @param FileModelInterface $model      the model
+     * @param array              $data       Post data
      *
      * @return ImageCreateOrUpdateEvent
      */
     protected function createImageEventInstance($parentType, $model, $data)
     {
-        $imageCreateEvent = new ImageCreateOrUpdateEvent($parentType, null);
+        $imageCreateEvent = new ImageCreateOrUpdateEvent(null);
+
         $model->setLocale($data['locale']);
 
         if (isset($data['title'])) {
@@ -843,15 +854,16 @@ class FileController extends BaseAdminController
     /**
      * Create Document Event instance
      *
-     * @param string                                                          $parentType Parent Type owning documents being saved
-     * @param CategoryDocument|ProductDocument|ContentDocument|FolderDocument $model      Document model
-     * @param array                                                           $data       Post data
+     * @param string             $parentType Parent Type owning documents being saved
+     * @param FileModelInterface $model      the model
+     * @param array              $data       Post data
      *
      * @return DocumentCreateOrUpdateEvent
      */
     protected function createDocumentEventInstance($parentType, $model, $data)
     {
-        $documentCreateEvent = new DocumentCreateOrUpdateEvent($parentType, null);
+        $documentCreateEvent = new DocumentCreateOrUpdateEvent(null);
+
         $model->setLocale($data['locale']);
         if (isset($data['title'])) {
             $model->setTitle($data['title']);

@@ -6,19 +6,23 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Content as BaseContent;
 
 use Thelia\Model\Map\ContentTableMap;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\Model\Tools\PositionManagementTrait;
+use Thelia\Model\Tools\UrlRewritingTrait;
 
-class Content extends BaseContent
+class Content extends BaseContent implements FileModelParentInterface
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+    use ModelEventDispatcherTrait;
 
-    use \Thelia\Model\Tools\PositionManagementTrait;
+    use PositionManagementTrait;
 
-    use \Thelia\Model\Tools\UrlRewritingTrait;
+    use UrlRewritingTrait;
 
     /**
      * {@inheritDoc}

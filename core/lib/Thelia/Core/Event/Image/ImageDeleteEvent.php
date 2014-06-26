@@ -13,10 +13,7 @@
 namespace Thelia\Core\Event\Image;
 
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Model\CategoryImage;
-use Thelia\Model\ContentImage;
-use Thelia\Model\FolderImage;
-use Thelia\Model\ProductImage;
+use Thelia\Files\FileModelInterface;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -34,50 +31,23 @@ class ImageDeleteEvent extends ActionEvent
     /** @var string Image type */
     protected $imageType = null;
 
-    /** @var CategoryImage|ProductImage|ContentImage|FolderImage Image about to be deleted */
+    /** @var FileModelInterface Image about to be deleted */
     protected $imageToDelete = null;
 
     /**
      * Constructor
      *
-     * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageToDelete Image about to be deleted
-     * @param string                                              $imageType     Image type
-     *                                                                           ex : FileManager::TYPE_CATEGORY
+     * @param FileModelInterface $imageToDelete Image about to be deleted
      */
-    public function __construct($imageToDelete, $imageType)
+    public function __construct($imageToDelete)
     {
         $this->imageToDelete = $imageToDelete;
-        $this->imageType = $imageType;
-    }
-
-    /**
-     * Set picture type
-     *
-     * @param string $imageType Image type
-     *
-     * @return $this
-     */
-    public function setImageType($imageType)
-    {
-        $this->imageType = $imageType;
-
-        return $this;
-    }
-
-    /**
-     * Get picture type
-     *
-     * @return string
-     */
-    public function getImageType()
-    {
-        return $this->imageType;
     }
 
     /**
      * Set Image about to be deleted
      *
-     * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageToDelete Image about to be deleted
+     * @param FileModelInterface $imageToDelete Image about to be deleted
      *
      * @return $this
      */
@@ -91,7 +61,7 @@ class ImageDeleteEvent extends ActionEvent
     /**
      * Get Image about to be deleted
      *
-     * @return CategoryImage|ProductImage|ContentImage|FolderImage
+     * @return FileModelInterface
      */
     public function getImageToDelete()
     {

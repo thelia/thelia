@@ -13,6 +13,7 @@
 namespace Thelia\Core\Event\Image;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Files\FileModelInterface;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -28,10 +29,10 @@ use Thelia\Core\Event\ActionEvent;
 class ImageCreateOrUpdateEvent extends ActionEvent
 {
 
-    /** @var \Thelia\Model\CategoryImage|\Thelia\Model\ProductImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage model to save */
+    /** @var FileModelInterface model to save */
     protected $modelImage = array();
 
-    /** @var \Thelia\Model\CategoryImage|\Thelia\Model\ProductImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage model to save */
+    /** @var FileModelInterface model to save */
     protected $oldModelImage = array();
 
     /** @var UploadedFile Image file to save */
@@ -39,9 +40,6 @@ class ImageCreateOrUpdateEvent extends ActionEvent
 
     /** @var int Image parent id */
     protected $parentId = null;
-
-    /** @var string Image type */
-    protected $imageType = null;
 
     /** @var string Parent name */
     protected $parentName = null;
@@ -51,18 +49,15 @@ class ImageCreateOrUpdateEvent extends ActionEvent
     /**
      * Constructor
      *
-     * @param string $imageType Image type
-     *                          ex : FileManager::TYPE_CATEGORY
-     * @param int    $parentId  Image parent id
+     * @param int $parentId Image parent id
      */
-    public function __construct($imageType, $parentId)
+    public function __construct($parentId)
     {
-        $this->imageType = $imageType;
         $this->parentId  = $parentId;
     }
 
     /**
-     * @param mixed $locale
+     * @param string $locale
      */
     public function setLocale($locale)
     {
@@ -82,7 +77,7 @@ class ImageCreateOrUpdateEvent extends ActionEvent
     /**
      * Set Image to save
      *
-     * @param $image \Thelia\Model\CategoryImage|\Thelia\Model\ProductImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage
+     * @param FileModelInterface $image
      *
      * @return $this
      */
@@ -96,35 +91,11 @@ class ImageCreateOrUpdateEvent extends ActionEvent
     /**
      * Get Image being saved
      *
-     * @return \Thelia\Model\CategoryImage|\Thelia\Model\ProductImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage
+     * @return FileModelInterface
      */
     public function getModelImage()
     {
         return $this->modelImage;
-    }
-
-    /**
-     * Set picture type
-     *
-     * @param string $imageType Image type
-     *
-     * @return $this
-     */
-    public function setImageType($imageType)
-    {
-        $this->imageType = $imageType;
-
-        return $this;
-    }
-
-    /**
-     * Get picture type
-     *
-     * @return string
-     */
-    public function getImageType()
-    {
-        return $this->imageType;
     }
 
     /**

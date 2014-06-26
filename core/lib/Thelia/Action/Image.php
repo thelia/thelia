@@ -12,23 +12,20 @@
 
 namespace Thelia\Action;
 
+use Imagine\Image\Box;
+use Imagine\Image\Color;
+use Imagine\Image\ImageInterface;
+use Imagine\Image\ImagineInterface;
+use Imagine\Image\Point;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
 use Thelia\Core\Event\Image\ImageDeleteEvent;
 use Thelia\Core\Event\Image\ImageEvent;
-use Thelia\Core\Event\UpdateFilePositionEvent;
-use Thelia\Model\ConfigQuery;
-use Thelia\Tools\FileManager;
-use Thelia\Tools\URL;
-
-use Imagine\Image\ImagineInterface;
-use Imagine\Image\ImageInterface;
-use Imagine\Image\Box;
-use Imagine\Image\Color;
-use Imagine\Image\Point;
-use Thelia\Exception\ImageException;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdateFilePositionEvent;
+use Thelia\Exception\ImageException;
+use Thelia\Model\ConfigQuery;
+use Thelia\Tools\URL;
 
 /**
  *
@@ -242,7 +239,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     public function saveImage(ImageCreateOrUpdateEvent $event)
     {
-        $fileManager = new FileManager();
         $model = $event->getModelImage();
 
         $nbModifiedLines = $model->save();
@@ -251,15 +247,14 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         if (!$nbModifiedLines) {
             throw new ImageException(
                 sprintf(
-                    'Image "%s" with parent id %s (%s) failed to be saved',
+                    'Image "%s" with parent id %s failed to be saved',
                     $event->getParentName(),
-                    $event->getParentId(),
-                    $event->getImageType()
+                    $event->getParentId()
                 )
             );
         }
 
-        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile(), FileManager::FILE_TYPE_IMAGES);
+        $newUploadedFile = $this->fileManager->copyUploadedFile($event->getModelImage(), $event->getUploadedFile());
         $event->setUploadedFile($newUploadedFile);
     }
 
@@ -273,14 +268,13 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     public function updateImage(ImageCreateOrUpdateEvent $event)
     {
-        $fileManager = new FileManager();
         // Copy and save file
         if ($event->getUploadedFile()) {
             // Remove old picture file from file storage
-            $url = $fileManager->getUploadDir($event->getImageType(), FileManager::FILE_TYPE_IMAGES) . '/' . $event->getOldModelImage()->getFile();
+            $url = $event->getModelImage()->getUploadDir() . '/' . $event->getOldModelImage()->getFile();
             unlink(str_replace('..', '', $url));
 
-            $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile(), FileManager::FILE_TYPE_IMAGES);
+            $newUploadedFile = $this->fileManager->copyUploadedFile($event->getModelImage(), $event->getUploadedFile());
             $event->setUploadedFile($newUploadedFile);
         }
 
@@ -304,9 +298,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     public function deleteImage(ImageDeleteEvent $event)
     {
-        $fileManager = new FileManager();
-
-        $fileManager->deleteFile($event->getImageToDelete(), $event->getImageType(), FileManager::FILE_TYPE_IMAGES);
+        $this->fileManager->deleteFile($event->getImageToDelete());
     }
 
     /**

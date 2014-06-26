@@ -13,6 +13,7 @@
 namespace Thelia\Core\Event\Document;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Files\FileModelInterface;
 use Thelia\Model\CategoryDocument;
 use Thelia\Model\ContentDocument;
 use Thelia\Model\FolderDocument;
@@ -44,29 +45,23 @@ class DocumentCreateOrUpdateEvent extends ActionEvent
     /** @var int Document parent id */
     protected $parentId = null;
 
-    /** @var string Document type */
-    protected $documentType = null;
-
     /** @var string Parent name */
     protected $parentName = null;
 
     /**
      * Constructor
      *
-     * @param string $documentType Document type
-     *                             ex : FileManager::TYPE_CATEGORY
-     * @param int    $parentId     Document parent id
+     * @param int $parentId Document parent id
      */
-    public function __construct($documentType, $parentId)
+    public function __construct($parentId)
     {
-        $this->documentType = $documentType;
         $this->parentId  = $parentId;
     }
 
     /**
      * Set Document to save
      *
-     * @param CategoryDocument|ProductDocument|ContentDocument|FolderDocument $document Document to save
+     * @param FileModelInterface $document Document to save
      *
      * @return $this
      */
@@ -80,35 +75,11 @@ class DocumentCreateOrUpdateEvent extends ActionEvent
     /**
      * Get Document being saved
      *
-     * @return CategoryDocument|ProductDocument|ContentDocument|FolderDocument
+     * @return FileModelInterface
      */
     public function getModelDocument()
     {
         return $this->modelDocument;
-    }
-
-    /**
-     * Set document type
-     *
-     * @param string $documentType Document type
-     *
-     * @return $this
-     */
-    public function setDocumentType($documentType)
-    {
-        $this->documentType = $documentType;
-
-        return $this;
-    }
-
-    /**
-     * Get document type
-     *
-     * @return string
-     */
-    public function getDocumentType()
-    {
-        return $this->documentType;
     }
 
     /**
@@ -186,7 +157,7 @@ class DocumentCreateOrUpdateEvent extends ActionEvent
     /**
      * Set old model value
      *
-     * @param CategoryDocument|ContentDocument|FolderDocument|ProductDocument $oldModelDocument
+     * @param FileModelInterface $oldModelDocument
      */
     public function setOldModelDocument($oldModelDocument)
     {
@@ -196,7 +167,7 @@ class DocumentCreateOrUpdateEvent extends ActionEvent
     /**
      * Get old model value
      *
-     * @return CategoryDocument|ContentDocument|FolderDocument|ProductDocument
+     * @return FileModelInterface
      */
     public function getOldModelDocument()
     {

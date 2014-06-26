@@ -13,10 +13,7 @@
 namespace Thelia\Core\Event\Document;
 
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Model\CategoryDocument;
-use Thelia\Model\ContentDocument;
-use Thelia\Model\FolderDocument;
-use Thelia\Model\ProductDocument;
+use Thelia\Files\FileModelInterface;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -31,53 +28,24 @@ use Thelia\Model\ProductDocument;
  */
 class DocumentDeleteEvent extends ActionEvent
 {
-    /** @var string Document type */
-    protected $documentType = null;
 
-    /** @var CategoryDocument|ProductDocument|ContentDocument|FolderDocument Document about to be deleted */
+    /** @var FileModelInterface Document about to be deleted */
     protected $documentToDelete = null;
 
     /**
      * Constructor
      *
-     * @param CategoryDocument|ProductDocument|ContentDocument|FolderDocument $documentToDelete Document about to be deleted
-     * @param string                                                          $documentType     Document type
-     *                                                                                          ex : FileManager::TYPE_CATEGORY
+     * @param FileModelInterface $documentToDelete Document about to be deleted
      */
-    public function __construct($documentToDelete, $documentType)
+    public function __construct($documentToDelete)
     {
         $this->documentToDelete = $documentToDelete;
-        $this->documentType = $documentType;
-    }
-
-    /**
-     * Set picture type
-     *
-     * @param string $documentType Document type
-     *
-     * @return $this
-     */
-    public function setDocumentType($documentType)
-    {
-        $this->documentType = $documentType;
-
-        return $this;
-    }
-
-    /**
-     * Get picture type
-     *
-     * @return string
-     */
-    public function getDocumentType()
-    {
-        return $this->documentType;
     }
 
     /**
      * Set Document about to be deleted
      *
-     * @param CategoryDocument|ProductDocument|ContentDocument|FolderDocument $documentToDelete Document about to be deleted
+     * @param FileModelInterface $documentToDelete Document about to be deleted
      *
      * @return $this
      */
@@ -91,7 +59,7 @@ class DocumentDeleteEvent extends ActionEvent
     /**
      * Get Document about to be deleted
      *
-     * @return CategoryDocument|ProductDocument|ContentDocument|FolderDocument
+     * @return FileModelInterface
      */
     public function getDocumentToDelete()
     {

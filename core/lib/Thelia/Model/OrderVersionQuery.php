@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderVersionQuery as BaseOrderVersionQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'order_version' table.
  *
