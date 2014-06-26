@@ -14,7 +14,6 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
 use Thelia\Condition\ConditionFactory;

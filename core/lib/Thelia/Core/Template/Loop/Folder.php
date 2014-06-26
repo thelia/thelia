@@ -157,9 +157,6 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
             }
         }
 
-        /* @todo */
-        $notEmpty  = $this->getNot_empty();
-
         return $search;
 
     }
@@ -178,6 +175,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 ->set("DESCRIPTION"         , $folder->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM"        , $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("PARENT"              , $folder->getParent())
+                ->set("ROOT"                , $folder->getRoot($folder->getId()))
                 ->set("URL"                 , $folder->getUrl($this->locale))
                 ->set("META_TITLE"          , $folder->getVirtualColumn('i18n_META_TITLE'))
                 ->set("META_DESCRIPTION"    , $folder->getVirtualColumn('i18n_META_DESCRIPTION'))

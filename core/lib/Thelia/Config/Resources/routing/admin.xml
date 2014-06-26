@@ -1165,7 +1165,7 @@
     </route>
 
     <route id="export.customer.newsletter" path="/admin/export/customer/newsletter">
-        <default key="_controller">Thelia\Controller\Admin\CustomerExportController::NewsletterExportAction</default>
+        <default key="_controller">Thelia\Controller\Admin\CustomerExportController::newsletterExportAction</default>
     </route>
 
 

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Coupon\Type;
+use Thelia\Core\Translation\Translator;
 
 /**
  * A trait to manage a coupon which removes a percentage of cart items from the order total.

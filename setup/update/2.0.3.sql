@@ -44,15 +44,69 @@ CREATE TABLE `order_version`
         REFERENCES `order` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
+UPDATE `order` SET
+  `version` = 1,
+  `version_created_at` = NOW(),
+  `version_created_by` = 'Thelia'
+WHERE `version` = 0;
+
+INSERT INTO `order_version`(
+  `id`,
+  `ref`,
+  `customer_id`,
+  `invoice_order_address_id`,
+  `delivery_order_address_id`,
+  `invoice_date`,
+  `currency_id`,
+  `currency_rate`,
+  `transaction_ref`,
+  `delivery_ref`,
+  `invoice_ref`,
+  `discount`,
+  `postage`,
+  `payment_module_id`,
+  `delivery_module_id`,
+  `status_id`,
+  `lang_id`,
+  `created_at`,
+  `updated_at`,
+  `version`,
+  `version_created_at`,
+  `version_created_by`)
+  SELECT
+    `id`,
+    `ref`,
+    `customer_id`,
+    `invoice_order_address_id`,
+    `delivery_order_address_id`,
+    `invoice_date`,
+    `currency_id`,
+    `currency_rate`,
+    `transaction_ref`,
+    `delivery_ref`,
+    `invoice_ref`,
+    `discount`,
+    `postage`,
+    `payment_module_id`,
+    `delivery_module_id`,
+    `status_id`,
+    `lang_id`,
+    `created_at`,
+    `updated_at`,
+    `version`,
+    `version_created_at`,
+    `version_created_by`
+  FROM `order`;
+
 
 # Add missing columns to coupon (version_created_at, version_created_by)
 ALTER TABLE `coupon` ADD `version_created_at` DATE AFTER `version`;
 ALTER TABLE `coupon` ADD `version_created_by` VARCHAR(100) AFTER `version_created_at`;
 
+# Add Brand tables and related resources
+
 # Add the "brand" resource
 INSERT INTO resource (`code`, `created_at`, `updated_at`) VALUES ('admin.brand', NOW(), NOW());
-
-# Add Brand tables
 
 -- ---------------------------------------------------------------------
 -- brand
