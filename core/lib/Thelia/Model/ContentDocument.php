@@ -3,23 +3,24 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\ContentDocumentModification;
 use Thelia\Model\Base\ContentDocument as BaseContentDocument;
-use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Model\Base\ContentDocumentQuery;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\FolderBreadcrumbTrait;
-use Thelia\Files\FileModelInterface;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\Model\Tools\PositionManagementTrait;
 
 class ContentDocument extends BaseContentDocument implements BreadcrumbInterface, FileModelInterface
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
-    use \Thelia\Model\Tools\PositionManagementTrait;
+    use ModelEventDispatcherTrait;
+    use PositionManagementTrait;
     use FolderBreadcrumbTrait;
 
     /**

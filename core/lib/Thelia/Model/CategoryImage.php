@@ -11,7 +11,6 @@ use Thelia\Form\BaseForm;
 use Thelia\Form\CategoryImageModification;
 use Thelia\Model\Base\CategoryImage as BaseCategoryImage;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Model\Base\CategoryImageQuery;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\CatalogBreadcrumbTrait;
 use Thelia\Files\FileModelInterface;

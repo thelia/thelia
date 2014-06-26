@@ -208,7 +208,7 @@ class FileManager
      *
      * @param FileModelInterface $model File being deleted
      */
-    public function c($model)
+    public function deleteFile($model)
     {
         $url = $model->getUploadDir() . DS . $model->getFile();
 
