@@ -706,7 +706,7 @@ class Tlog Implements LoggerInterface
      * @param type  $destinations
      * @param array $actives      array containing classes instanceof AbstractTlogDestination
      */
-    protected function loadDestinations(&$destinations, array $actives = NULL)
+    protected function loadDestinations(&$destinations, array $actives = null)
     {
         foreach ($actives as $active) {
             if (class_exists($active)) {
