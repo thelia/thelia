@@ -11,8 +11,8 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Image;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Thelia\Core\Event\ActionEvent;
+
+use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Files\FileModelInterface;
 
 /**
@@ -24,170 +24,108 @@ use Thelia\Files\FileModelInterface;
  *
  * @package Image
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
+ * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
  */
-class ImageCreateOrUpdateEvent extends ActionEvent
+class ImageCreateOrUpdateEvent extends FileCreateOrUpdateEvent
 {
-
-    /** @var FileModelInterface model to save */
-    protected $modelImage = array();
-
-    /** @var FileModelInterface model to save */
-    protected $oldModelImage = array();
-
-    /** @var UploadedFile Image file to save */
-    protected $uploadedFile = null;
-
-    /** @var int Image parent id */
-    protected $parentId = null;
-
-    /** @var string Parent name */
-    protected $parentName = null;
-
-    protected $locale;
-
     /**
      * Constructor
      *
-     * @param int $parentId Image parent id
+     * @param string $imageType Image type
+     *                          ex : FileManager::TYPE_CATEGORY
+     * @param int    $parentId  Image parent id
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
-    public function __construct($parentId)
+    public function __construct($imageType, $parentId)
     {
-        $this->parentId  = $parentId;
+        parent::__construct($parentId);
     }
 
     /**
-     * @param string $locale
+     * @param mixed $locale
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function setLocale($locale)
     {
-        $this->locale = $locale;
-
         return $this;
     }
 
     /**
      * @return mixed
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function getLocale()
     {
-        return $this->locale;
+        throw new \RuntimeException("getLocale() is deprecated and no longer supported");
     }
 
     /**
      * Set Image to save
      *
-     * @param FileModelInterface $image
+     * @param $image FileModelInterface
      *
      * @return $this
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function setModelImage($image)
     {
-        $this->modelImage = $image;
-
-        return $this;
+        parent::setModel($image);
     }
 
     /**
      * Get Image being saved
      *
      * @return FileModelInterface
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function getModelImage()
     {
-        return $this->modelImage;
+        return parent::getModel();
     }
 
     /**
-     * Set Image parent id
+     * Set picture type
      *
-     * @param int $parentId Image parent id
+     * @param string $imageType Image type
      *
      * @return $this
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
-    public function setParentId($parentId)
+    public function setImageType($imageType)
     {
-        $this->parentId = $parentId;
-
         return $this;
     }
 
     /**
-     * Get Image parent id
-     *
-     * @return int
-     */
-    public function getParentId()
-    {
-        return $this->parentId;
-    }
-
-    /**
-     * Set uploaded file
-     *
-     * @param UploadedFile $uploadedFile File being uploaded
-     *
-     * @return $this
-     */
-    public function setUploadedFile($uploadedFile)
-    {
-        $this->uploadedFile = $uploadedFile;
-
-        return $this;
-    }
-
-    /**
-     * Get uploaded file
-     *
-     * @return UploadedFile
-     */
-    public function getUploadedFile()
-    {
-        return $this->uploadedFile;
-    }
-
-    /**
-     * Set parent name
-     *
-     * @param string $parentName Parent name
-     *
-     * @return $this
-     */
-    public function setParentName($parentName)
-    {
-        $this->parentName = $parentName;
-
-        return $this;
-    }
-
-    /**
-     * Get parent name
+     * Get picture type
      *
      * @return string
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
-    public function getParentName()
+    public function getImageType()
     {
-        return $this->parentName;
+        throw new \RuntimeException("getImageType() is deprecated and no longer supported");
     }
 
     /**
      * Set old model value
      *
-     * @param \Thelia\Model\CategoryImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage|\Thelia\Model\ProductImage $oldModelImage
+     * @param FileModelInterface $oldModelImage
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function setOldModelImage($oldModelImage)
     {
-        $this->oldModelImage = $oldModelImage;
+        parent::setOldModel($oldModelImage);
     }
 
     /**
      * Get old model value
      *
-     * @return \Thelia\Model\CategoryImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage|\Thelia\Model\ProductImage
+     * @return FileModelInterface
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function getOldModelImage()
     {
-        return $this->oldModelImage;
+        return parent::getOldModel();
     }
-
 }

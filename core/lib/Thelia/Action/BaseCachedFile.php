@@ -12,6 +12,10 @@
 namespace Thelia\Action;
 
 use Thelia\Core\Event\CachedFileEvent;
+use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
+use Thelia\Core\Event\Image\FileDeleteEvent;
+use Thelia\Core\Event\UpdateFilePositionEvent;
+use Thelia\Exception\FileException;
 use Thelia\Files\FileManager;
 use Thelia\Tools\URL;
 
@@ -176,4 +180,77 @@ abstract class BaseCachedFile extends BaseAction
 
         return $path;
     }
+
+
+    /**
+     * Take care of saving a file in the database and file storage
+     *
+     * @param FileCreateOrUpdateEvent $event Image event
+     *
+     * @throws \Thelia\Exception\FileException
+     *
+     */
+    public function saveFile(FileCreateOrUpdateEvent $event)
+    {
+        $model = $event->getModel();
+
+        $nbModifiedLines = $model->save();
+        $event->setModel($model);
+
+        if (!$nbModifiedLines) {
+            throw new FileException(
+                sprintf(
+                    'File "%s" (type %s) with parent id %s failed to be saved',
+                    $event->getParentName(),
+                    get_class($model),
+                    $event->getParentId()
+                )
+            );
+        }
+
+        $newUploadedFile = $this->fileManager->copyUploadedFile($event->getModel(), $event->getUploadedFile());
+
+        $event->setUploadedFile($newUploadedFile);
+    }
+
+
+    /**
+     * Take care of updating file in the database and file storage
+     *
+     * @param FileCreateOrUpdateEvent $event Image event
+     *
+     * @throws \Thelia\Exception\FileException
+     */
+    public function updateFile(FileCreateOrUpdateEvent $event)
+    {
+        // Copy and save file
+        if ($event->getUploadedFile()) {
+            // Remove old picture file from file storage
+            $url = $event->getModel()->getUploadDir() . '/' . $event->getOldModel()->getFile();
+            unlink(str_replace('..', '', $url));
+
+            $newUploadedFile = $this->fileManager->copyUploadedFile($event->getModel(), $event->getUploadedFile());
+            $event->setUploadedFile($newUploadedFile);
+        }
+
+        // Update image modifications
+        $event->getModel()->save();
+        $event->setModel($event->getModel());
+    }
+
+    /**
+     * Deleting file in the database and in storage
+     *
+     * @param FileDeleteEvent $event Image event
+     */
+    public function deleteImage(FileDeleteEvent $event)
+    {
+        $this->fileManager->deleteFile($event->getFileToDelete());
+    }
+
+    public function updatePosition(UpdateFilePositionEvent $event)
+    {
+        $this->genericUpdatePosition($event->getQuery(), $event);
+    }
+
 }

@@ -12,8 +12,10 @@
 
 namespace Thelia\Core\Event\Image;
 
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Files\FileModelInterface;
+use Thelia\Model\CategoryImage;
+use Thelia\Model\ContentImage;
+use Thelia\Model\FolderImage;
+use Thelia\Model\ProductImage;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -24,36 +26,58 @@ use Thelia\Files\FileModelInterface;
  *
  * @package Image
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
+ * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
  */
-class ImageDeleteEvent extends ActionEvent
+class ImageDeleteEvent extends FileDeleteEvent
 {
-    /** @var string Image type */
-    protected $imageType = null;
-
-    /** @var FileModelInterface Image about to be deleted */
-    protected $imageToDelete = null;
-
     /**
      * Constructor
      *
-     * @param FileModelInterface $imageToDelete Image about to be deleted
+     * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageToDelete Image about to be deleted
+     * @param string                                              $imageType     Image type
+     *                                                                           ex : FileManager::TYPE_CATEGORY
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
-    public function __construct($imageToDelete)
+    public function __construct($imageToDelete, $imageType)
     {
-        $this->imageToDelete = $imageToDelete;
+        parent::__construct($imageToDelete);
+    }
+
+    /**
+     * Set picture type
+     *
+     * @param string $imageType Image type
+     *
+     * @return $this
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
+     */
+    public function setImageType($imageType)
+    {
+        return $this;
+    }
+
+    /**
+     * Get picture type
+     *
+     * @return string
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
+     */
+    public function getImageType()
+    {
+        throw new \RuntimeException("getImageType() is deprecated and no longer supported");
     }
 
     /**
      * Set Image about to be deleted
      *
-     * @param FileModelInterface $imageToDelete Image about to be deleted
+     * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageToDelete Image about to be deleted
      *
      * @return $this
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
     public function setImageToDelete($imageToDelete)
     {
-        $this->imageToDelete = $imageToDelete;
+        parent::setFileToDelete($imageToDelete);
 
         return $this;
     }
@@ -61,11 +85,12 @@ class ImageDeleteEvent extends ActionEvent
     /**
      * Get Image about to be deleted
      *
-     * @return FileModelInterface
+     * @return CategoryImage|ProductImage|ContentImage|FolderImage
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
     public function getImageToDelete()
     {
-        return $this->imageToDelete;
+        return parent::getFileToDelete();
     }
 
 }

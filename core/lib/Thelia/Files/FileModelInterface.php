@@ -84,10 +84,27 @@ interface FileModelInterface
      */
     public function getQueryInstance();
 
+    /**
+     * Save the model object.
+     *
+     * @return mixed
+     */
     public function save();
 
+
+    /**
+     * Delete the model object.
+     *
+     * @return mixed
+     */
     public function delete();
 
+
+    /**
+     * Get the model object ID
+     *
+     * @return int
+     */
     public function getId();
 
 
@@ -95,12 +112,39 @@ interface FileModelInterface
      * Set the current title
      *
      * @param string $title the title in the current locale
-     * @return FileModelInterface
      */
     public function setTitle($title);
 
+    /**
+     * Get the current title
+     *
+     * @param string $title the title in the current locale
+     * @return FileModelInterface
+     */
+    public function getTitle();
+
+    /**
+     * Set the chapo
+     *
+     * @param string $chapo the chapo in the current locale
+     * @return FileModelInterface
+     */
     public function setChapo($chapo);
+
+    /**
+     * Set the description
+     *
+     * @param string $description the description in the current locale
+     * @return FileModelInterface
+     */
     public function setDescription($description);
+
+    /**
+     * Set the postscriptum
+     *
+     * @param string $postscriptum the postscriptum in the current locale
+     * @return FileModelInterface
+     */
     public function setPostscriptum($postscriptum);
 
     /**

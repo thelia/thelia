@@ -32,13 +32,15 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 
     protected $session;
 
+       public function getDispatcher() {
+           return $this->getMock("Symfony\\Component\\EventDispatcher\\EventDispatcherInterface");
+       }
+
     public function getContainer()
     {
         $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
 
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-
-        $container->set("event_dispatcher", $dispatcher);
+        $container->set("event_dispatcher", $this->getDispatcher());
 
         $request = new Request();
         $request->setSession($this->session);
@@ -137,6 +139,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testProcessNonExistentImage()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $image = new Image($this->getFileManager());
 
@@ -155,6 +158,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testProcessImageOutsideValidPath()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $image = new Image($this->getFileManager());
 
@@ -170,6 +174,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testProcessImageWithoutAnyTransformationsCopy()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $event->setSourceFilepath(__DIR__."/assets/images/sources/test-image-1.png");
          $event->setCacheSubdirectory("tests");
@@ -199,6 +204,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testProcessImageWithoutAnyTransformationsSymlink()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $event->setSourceFilepath(__DIR__."/assets/images/sources/test-image-9.png");
          $event->setCacheSubdirectory("tests");
@@ -228,6 +234,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testProcessImageResizeHorizWithBands()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $event->setSourceFilepath(__DIR__."/assets/images/sources/test-image-2.png");
          $event->setCacheSubdirectory("tests");
@@ -248,6 +255,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testProcessImageResizeVertWithBands()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $event->setSourceFilepath(__DIR__."/assets/images/sources/test-image-3.png");
          $event->setCacheSubdirectory("tests");
@@ -268,6 +276,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testProcessImageWithTransformations()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $event->setSourceFilepath(__DIR__."/assets/images/sources/test-image-4.png");
          $event->setCacheSubdirectory("tests");
@@ -285,6 +294,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testProcessImageResizeHorizWithCrop()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $event->setSourceFilepath(__DIR__."/assets/images/sources/test-image-5.png");
          $event->setCacheSubdirectory("tests");
@@ -305,6 +315,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testProcessImageResizeVertWithCrop()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $event->setSourceFilepath(__DIR__."/assets/images/sources/test-image-6.png");
          $event->setCacheSubdirectory("tests");
@@ -325,6 +336,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testProcessImageResizeHorizKeepRatio()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $event->setSourceFilepath(__DIR__."/assets/images/sources/test-image-7.png");
          $event->setCacheSubdirectory("tests");
@@ -343,6 +355,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testProcessImageResizeVertKeepRatio()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $event->setSourceFilepath(__DIR__."/assets/images/sources/test-image-8.png");
          $event->setCacheSubdirectory("tests");
@@ -358,6 +371,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testClearTestsCache()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $event->setCacheSubdirectory('tests');
 
@@ -369,6 +383,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testClearWholeCache()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $image = new Image($this->getFileManager());
 
@@ -383,6 +398,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      public function testClearUnallowedPathCache()
      {
          $event = new ImageEvent($this->request);
+         $event->setDispatcher($this->getDispatcher());
 
          $event->setCacheSubdirectory('../../../..');
 
