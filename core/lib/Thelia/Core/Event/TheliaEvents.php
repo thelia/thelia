@@ -383,6 +383,16 @@ final class TheliaEvents
     const IMAGE_PROCESS = "action.processImage";
 
     /**
+     * Sent just after creating the image object from the image file
+     */
+    const IMAGE_PREPROCESSING = "action.preProcessImage";
+
+    /**
+     * Sent just before saving the processed image object on disk
+     */
+    const IMAGE_POSTPROCESSING = "action.postProcessImage";
+
+    /**
      * Sent on document processing
      */
     const DOCUMENT_PROCESS = "action.processDocument";
