@@ -139,15 +139,25 @@ try {
         ->find();
     $productPrice->delete();
 
+    $brand = Thelia\Model\BrandQuery::create()
+        ->find();
+    $brand->delete();
+
+    $brand = Thelia\Model\BrandI18nQuery::create()
+        ->find();
+    $brand->delete();
+
     \Thelia\Model\ProductImageQuery::create()->find()->delete();
     \Thelia\Model\CategoryImageQuery::create()->find()->delete();
     \Thelia\Model\FolderImageQuery::create()->find()->delete();
     \Thelia\Model\ContentImageQuery::create()->find()->delete();
+    \Thelia\Model\BrandImageQuery::create()->find()->delete();
 
     \Thelia\Model\ProductDocumentQuery::create()->find()->delete();
     \Thelia\Model\CategoryDocumentQuery::create()->find()->delete();
     \Thelia\Model\FolderDocumentQuery::create()->find()->delete();
     \Thelia\Model\ContentDocumentQuery::create()->find()->delete();
+    \Thelia\Model\BrandDocumentQuery::create()->find()->delete();
 
     \Thelia\Model\CouponQuery::create()->find()->delete();
     \Thelia\Model\OrderQuery::create()->find()->delete();
@@ -384,6 +394,30 @@ try {
         }
     }
 
+    echo "Creating brands\n";
+
+    $brandIdList = [];
+
+    for ($k=0; $k<4; $k++) {
+        $brand = new Thelia\Model\Brand();
+
+        $brand->setVisible(1);
+        $brand->setPosition($k+1);
+        setI18n($faker, $brand);
+
+        $brand->save();
+        $brandId = $brand->getId();
+        $brandIdList[] = $brandId;
+
+        $image = new \Thelia\Model\BrandImage();
+        $image->setBrandId($brandId);
+        generate_image($image, 'brand', $brandId);
+
+        $document = new \Thelia\Model\BrandDocument();
+        $document->setBrandId($brandId);
+        generate_document($document, 'brand', $brandId);
+    }
+
     echo "Creating categories and products\n";
 
     //categories and products
@@ -396,12 +430,12 @@ try {
             $subcategory = createCategory($faker, $category->getId(), $j, $categoryIdList, $contentIdList);
 
             for ($k=0; $k<rand(0, 20); $k++) {
-                createProduct($faker, $subcategory, $k, $template, $productIdList);
+                createProduct($faker, $subcategory, $k, $template, $brandIdList, $productIdList);
             }
         }
 
         for ($k=1; $k<rand(1, 50); $k++) {
-            createProduct($faker, $category, $k, $template, $productIdList);
+            createProduct($faker, $category, $k, $template, $brandIdList, $productIdList);
         }
     }
 
@@ -610,11 +644,13 @@ try {
 
 } catch (Exception $e) {
     echo "error : ".$e->getMessage()."\n";
+    echo "Cause: ".$e->getPrevious()->getMessage()."\n";
     echo $e->getTraceAsString();
+
     $con->rollBack();
 }
 
-function createProduct($faker, Thelia\Model\Category $category, $position, $template, &$productIdList)
+function createProduct($faker, Thelia\Model\Category $category, $position, $template, $brandIdList, &$productIdList)
 {
     $product = new Thelia\Model\Product();
     $product->setRef($category->getId() . '_' . $position . '_' . $faker->randomNumber(8));
@@ -628,6 +664,7 @@ function createProduct($faker, Thelia\Model\Category $category, $position, $temp
     $product->setPosition($position);
     $product->setTaxRuleId(1);
     $product->setTemplate($template);
+    $product->setBrandId($brandIdList[array_rand($brandIdList, 1)]);
 
     setI18n($faker, $product);
 
