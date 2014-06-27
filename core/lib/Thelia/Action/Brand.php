@@ -58,6 +58,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
 
             $brand
                 ->setVisible($event->getVisible())
+                ->setLogoImageId(intval($event->getLogoImageId()) == 0 ? null : $event->getLogoImageId())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())

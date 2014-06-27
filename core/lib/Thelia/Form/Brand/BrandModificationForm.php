@@ -53,6 +53,15 @@ class BrandModificationForm extends BrandCreationForm
                     ]
                 ]
             )
+            ->add("logo_image_id", "integer", [
+                    'constraints' => [ ],
+                    'required'    => false,
+                    'label'       => Translator::getInstance()->trans('Select the brand logo'),
+                    'label_attr'  => [
+                        'for' => 'mode',
+                        'help' => Translator::getInstance()->trans("Select the brand logo amongst the brand images")
+                    ]
+                ])
         ;
 
         // Add standard description fields, excluding title and locale, which are already defined

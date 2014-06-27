@@ -80,13 +80,14 @@ class BrandController extends AbstractSeoCrudController
 
         // Prepare the data that will hydrate the form
         $data = [
-            'id'           => $object->getId(),
-            'locale'       => $object->getLocale(),
-            'title'        => $object->getTitle(),
-            'chapo'        => $object->getChapo(),
-            'description'  => $object->getDescription(),
-            'postscriptum' => $object->getPostscriptum(),
-            'visible'      => $object->getVisible() ? true : false
+            'id'            => $object->getId(),
+            'locale'        => $object->getLocale(),
+            'title'         => $object->getTitle(),
+            'chapo'         => $object->getChapo(),
+            'description'   => $object->getDescription(),
+            'postscriptum'  => $object->getPostscriptum(),
+            'visible'       => $object->getVisible() ? true : false,
+            'logo_image_id' => $object->getLogoImageId()
         ];
 
         // Setup the object form
@@ -123,12 +124,13 @@ class BrandController extends AbstractSeoCrudController
         $brandUpdateEvent = new BrandUpdateEvent($formData['id']);
 
         $brandUpdateEvent
+            ->setLogoImageId($formData['logo_image_id'])
+            ->setVisible($formData['visible'])
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
-            ->setVisible($formData['visible'])
          ;
 
         return $brandUpdateEvent;

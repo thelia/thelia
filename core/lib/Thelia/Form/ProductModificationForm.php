@@ -40,10 +40,8 @@ class ProductModificationForm extends ProductCreationForm
                 'label'       => Translator::getInstance()->trans('Brand / Supplier'),
                 'label_attr'  => [
                     'for' => 'mode',
-                ],
-                'attr' => [
                     'help' => Translator::getInstance()->trans("Select the product brand, or supplier."),
-                ]
+                ],
             ])
         ;
 

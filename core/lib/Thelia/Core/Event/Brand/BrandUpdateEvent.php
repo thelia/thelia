@@ -24,6 +24,7 @@ class BrandUpdateEvent extends BrandCreateEvent
     protected $chapo;
     protected $description;
     protected $postscriptum;
+    protected $logo_image_id;
 
     /**
      * @param int $brandId
@@ -111,5 +112,23 @@ class BrandUpdateEvent extends BrandCreateEvent
     public function getPostscriptum()
     {
         return $this->postscriptum;
+    }
+
+    /**
+     * @param int $logo_image_id
+     * @return $this
+     */
+    public function setLogoImageId($logo_image_id)
+    {
+        $this->logo_image_id = $logo_image_id;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLogoImageId()
+    {
+        return $this->logo_image_id;
     }
 }

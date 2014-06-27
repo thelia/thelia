@@ -159,15 +159,19 @@ class AdminUtilities extends AbstractSmartyPlugin
 
     public function buildFormFieldLabel($params, &$smarty)
     {
-        $form              = $this->getParam($params, 'form', false);
-        $field_name        = $this->getParam($params, 'name', false);
-        $label_attr        = $this->getParam($params, 'label_attr', array());
+        $form       = $this->getParam($params, 'form', false);
+        $field_name = $this->getParam($params, 'name', false);
+        $label_attr = $this->getParam($params, 'label_attr', false);
 
-        return $this->fetchSnippet($smarty, 'forms'.DS.'form-label', array(
-                'form'          => $form,
-                'field_name'    => $field_name,
-                'label_attr'    => $label_attr
-             ));
+        $args = [
+            'form'          => $form,
+            'field_name'    => $field_name,
+        ];
+
+        if ($label_attr !== false)
+            $args['label_attr'] = $label_attr;
+
+        return $this->fetchSnippet($smarty, 'forms'.DS.'form-label', $args);
     }
 
     /**

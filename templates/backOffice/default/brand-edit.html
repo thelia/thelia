@@ -1,5 +1,11 @@
 {extends file="admin-layout.tpl"}
 
+{block name="after-admin-css"}
+    {stylesheets file='assets/js/image-picker/image-picker.css'}
+        <link rel="stylesheet" href="{$asset_url}">
+    {/stylesheets}
+{/block}
+
 {block name="no-return-functions"}
     {$admin_current_location = 'tools'}
 {/block}
@@ -77,6 +83,26 @@
 
                                                     <div class="col-md-4">
                                                         {admin_form_field form=$form name="visible"}
+
+                                                        {form_field form=$form field='logo_image_id'}
+                                                            <div class="form-group {if $error}has-error{/if}">
+
+                                                                {admin_form_field_label form=$form name='logo_image_id'}
+
+                                                                <select id="{$label_attr.for}" {if $required}aria-required="true" required{/if} name="{$name}" class="form-control brand-image-selector">
+                                                                    <option value="">{intl l="No logo image"}</option>
+
+                                                                    {loop name="brand-images" type="image" brand=$ID width="90" height="90" resize_mode="crop"}
+                                                                        <option value="{$ID}" data-img-src="{$IMAGE_URL}" {if $LOGO_IMAGE_ID == $ID}selected="selected"{/if}>{$TITLE}</option>
+                                                                    {/loop}
+                                                                </select>
+
+                                                                {if $label_attr.help}
+                                                                    <span class="help-block">{$label_attr.help}</span>
+                                                                {/if}
+                                                            </div>
+                                                        {/form_field}
+
                                                     </div>
                                                 </div>
 
@@ -152,6 +178,9 @@
     {javascripts file='assets/js/jquery-ui-1.10.3.custom.min.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
+    {javascripts file='assets/js/image-picker/image-picker.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
     <script>
         $(function() {
             // Load active tab
@@ -169,6 +198,8 @@
             {if ! empty($current_tab)}
             $('.nav-tabs a[href="#{$current_tab}"]').trigger("click");
             {/if}
+
+            $('.brand-image-selector').imagepicker();
         });
     </script>
 {/block}
