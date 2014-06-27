@@ -39,7 +39,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
     protected $timestampable = true;
 
     /**
-     * @var array Possible document sources
+     * @var array Possible standard document sources
      */
     protected $possible_sources = array('category', 'product', 'folder', 'content', 'brand');
 
@@ -66,12 +66,8 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                 Argument::createIntTypeArgument('folder'),
                 Argument::createIntTypeArgument('content'),
 
-                new Argument(
-                        'source',
-                        new TypeCollection(
-                                new EnumType($this->possible_sources)
-                        )
-                ),
+                Argument::createAnyTypeArgument('source'),
+
                 Argument::createIntTypeArgument('source_id'),
                 Argument::createBooleanTypeArgument('force_return', true)
         );

@@ -39,7 +39,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     protected $timestampable = true;
 
     /**
-     * @var array Possible image sources
+     * @var array Possible standard image sources
      */
     protected $possible_sources = array('category', 'product', 'folder', 'content', 'module', 'brand');
 
@@ -80,12 +80,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 Argument::createIntTypeArgument('folder'),
                 Argument::createIntTypeArgument('content'),
 
-                new Argument(
-                        'source',
-                        new TypeCollection(
-                                new EnumType($this->possible_sources)
-                        )
-                ),
+                Argument::createAnyTypeArgument('source'),
+
                 Argument::createIntTypeArgument('source_id'),
                 Argument::createBooleanTypeArgument('force_return', true)
         );
