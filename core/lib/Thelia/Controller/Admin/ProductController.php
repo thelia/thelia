@@ -164,6 +164,7 @@ class ProductController extends AbstractSeoCrudController
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
             ->setDefaultCategory($formData['default_category'])
+            ->setBrandId($formData['brand_id'])
         ;
 
         // Create and dispatch the change event
@@ -213,6 +214,10 @@ class ProductController extends AbstractSeoCrudController
         $array[$key][] = $value;
     }
 
+    /**
+     * @param Product $object
+     * @return ProductModificationForm
+     */
     protected function hydrateObjectForm($object)
     {
         // Find product's sale elements
@@ -320,7 +325,8 @@ class ProductController extends AbstractSeoCrudController
             'description'      => $object->getDescription(),
             'postscriptum'     => $object->getPostscriptum(),
             'visible'          => $object->getVisible(),
-            'default_category' => $object->getDefaultCategoryId()
+            'default_category' => $object->getDefaultCategoryId(),
+            'brand_id'         => $object->getBrandId()
         );
 
         // Setup the object form

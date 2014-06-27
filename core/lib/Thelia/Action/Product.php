@@ -99,6 +99,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setChapo($event->getChapo())
                 ->setPostscriptum($event->getPostscriptum())
                 ->setVisible($event->getVisible() ? 1 : 0)
+                ->setBrandId($event->getBrandId() <= 0 ? null : $event->getBrandId())
 
                 ->save()
             ;
