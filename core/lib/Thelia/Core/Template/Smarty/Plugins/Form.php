@@ -135,11 +135,13 @@ class Form extends AbstractSmartyPlugin
         $template->assign("checked", isset($fieldVars['checked']) ? $fieldVars['checked'] : false);
         $template->assign("choices", isset($fieldVars['choices']) ? $fieldVars['choices'] : false);
         $template->assign("multiple", isset($fieldVars['multiple']) ? $fieldVars['multiple'] : false);
+        $template->assign("disabled", isset($fieldVars['disabled']) ? $fieldVars['disabled'] : false);
+        $template->assign("readonly", isset($fieldVars['readonly']) ? $fieldVars['readonly'] : false);
+        $template->assign("max_length", isset($fieldVars['max_length']) ? $fieldVars['max_length'] : false);
+        $template->assign('required', isset($fieldVars['required']) ? $fieldVars['required'] : false);
 
         $template->assign("label", $fieldVars["label"]);
         $template->assign("label_attr", $fieldVars["label_attr"]);
-
-        $template->assign('required', isset($fieldVars['required']) ? $fieldVars['required'] : false);
 
         $template->assign('total_value_count', $total_value_count);
 
