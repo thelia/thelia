@@ -154,7 +154,6 @@ class Calculator
             $position = (int) $taxRule->getTaxRuleCountryPosition();
 
             $taxType = $taxRule->getTypeInstance();
-            $taxType->loadRequirements( $taxRule->getRequirements() );
 
             if ($currentPosition !== $position) {
                 $taxedPrice += $currentTax;
@@ -209,7 +208,6 @@ class Calculator
             $position = (int) $taxRule->getTaxRuleCountryPosition();
 
             $taxType = $taxRule->getTypeInstance();
-            $taxType->loadRequirements( $taxRule->getRequirements() );
 
             if ($currentPosition !== $position) {
                 $untaxedPrice -= $currentFixTax;
