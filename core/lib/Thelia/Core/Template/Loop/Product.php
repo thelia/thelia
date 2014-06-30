@@ -64,6 +64,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 )
             ),
             Argument::createIntListTypeArgument('category'),
+            Argument::createIntListTypeArgument('brand'),
             Argument::createIntListTypeArgument('category_default'),
             Argument::createBooleanTypeArgument('new'),
             Argument::createBooleanTypeArgument('promo'),
@@ -325,6 +326,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->filterById($this->request->get("product_id"), Criteria::EQUAL);
         } elseif ($current === false) {
             $search->filterById($this->request->get("product_id"), Criteria::NOT_IN);
+        }
+
+        $brand_id = $this->getBrand();
+
+        if ($brand_id !== null) {
+            $search->filterByBrandId($brand_id, Criteria::IN);
         }
 
         $current_category = $this->getCurrent_category();
