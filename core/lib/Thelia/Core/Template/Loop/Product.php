@@ -1023,7 +1023,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->set("TEMPLATE"                , $product->getTemplateId())
             ->set("DEFAULT_CATEGORY"        , $default_category_id)
             ->set("TAX_RULE_ID"             , $product->getTaxRuleId())
-            ->set("BRAND_ID"                , $product->getBrandId())
+            ->set("BRAND_ID"                , $product->getBrandId() ?: 0)
         ;
 
 

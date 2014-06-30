@@ -200,7 +200,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                 ->set("META_KEYWORDS"            , $brand->getVirtualColumn('i18n_META_KEYWORDS'))
                 ->set("POSITION"                , $brand->getPosition())
                 ->set("VISIBLE"                 , $brand->getVisible())
-                ->set("LOGO_IMAGE_ID"           , $brand->getLogoImageId())
+                ->set("LOGO_IMAGE_ID"           , $brand->getLogoImageId() ?: 0)
             ;
 
             $loopResult->addRow($loopResultRow);
