@@ -23,7 +23,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\LoopResult;
-use Thelia\Type\EnumType;
 use Thelia\Log\Tlog;
 
 /**

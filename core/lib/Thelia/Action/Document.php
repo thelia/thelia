@@ -12,13 +12,9 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
-use Thelia\Core\Event\Document\DocumentDeleteEvent;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Exception\DocumentException;
-use Thelia\Exception\ImageException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 

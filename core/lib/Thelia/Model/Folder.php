@@ -58,7 +58,7 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
     /**
      * Get the root folder
-     * @param int $folderId
+     * @param  int   $folderId
      * @return mixed
      */
     public function getRoot($folderId)
@@ -66,7 +66,7 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
         $folder = FolderQuery::create()->findPk($folderId);
 
-        if(0 !== $folder->getParent()) {
+        if (0 !== $folder->getParent()) {
             $parentFolder = FolderQuery::create()->findPk($folder->getParent());
 
             if (null !== $parentFolder) {

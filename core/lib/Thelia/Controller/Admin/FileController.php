@@ -15,7 +15,7 @@ namespace Thelia\Controller\Admin;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
-use Thelia\Core\Event\Image\FileDeleteEvent;
+use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Core\HttpFoundation\Response;
@@ -56,10 +56,10 @@ class FileController extends BaseAdminController
     /**
      * Manage how a file collection has to be saved
      *
-     * @param int    $parentId   Parent id owning files being saved
-     * @param string $parentType Parent Type owning files being saved (product, category, content, etc.)
-     * @param string $objectType Object type, e.g. image or document
-     * @param array $validMimeTypes an array of valid mime types. If empty, any mime type is allowed.
+     * @param int    $parentId       Parent id owning files being saved
+     * @param string $parentType     Parent Type owning files being saved (product, category, content, etc.)
+     * @param string $objectType     Object type, e.g. image or document
+     * @param array  $validMimeTypes an array of valid mime types. If empty, any mime type is allowed.
      *
      * @return Response
      */
@@ -322,14 +322,13 @@ class FileController extends BaseAdminController
         ));
     }
 
-
     /**
      * Manage how a file is updated
      *
-     * @param int    $fileId    File identifier
+     * @param int    $fileId     File identifier
      * @param string $parentType Parent Type owning file being saved
      * @param string $objectType the type of the file, image or document
-     * @param string $eventName the event type.
+     * @param string $eventName  the event type.
      *
      * @return FileModelInterface
      */
@@ -421,7 +420,6 @@ class FileController extends BaseAdminController
         return $fileModelInstance;
     }
 
-
     /**
      * Manage how an image is updated
      *
@@ -471,14 +469,13 @@ class FileController extends BaseAdminController
             ));
     }
 
-
     /**
      * Manage how a image has to be deleted (AJAX)
      *
-     * @param int    $fileId    Parent id owning image being deleted
+     * @param int    $fileId     Parent id owning image being deleted
      * @param string $parentType Parent Type owning image being deleted
      * @param string $objectType the type of the file, image or document
-     * @param string $eventName the event type.
+     * @param string $eventName  the event type.
      *
      * @return Response
      */
@@ -545,7 +542,6 @@ class FileController extends BaseAdminController
 
         return new Response($message);
     }
-
 
     /**
      * Manage how a image has to be deleted (AJAX)

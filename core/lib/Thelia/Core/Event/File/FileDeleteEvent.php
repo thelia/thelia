@@ -10,7 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Image;
+namespace Thelia\Core\Event\File;
 
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Files\FileModelInterface;

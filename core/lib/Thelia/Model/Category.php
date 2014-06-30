@@ -62,7 +62,7 @@ class Category extends BaseCategory implements FileModelParentInterface
 
     /**
      * Get the root category
-     * @param int $categoryId
+     * @param  int   $categoryId
      * @return mixed
      */
     public function getRoot($categoryId)
@@ -70,7 +70,7 @@ class Category extends BaseCategory implements FileModelParentInterface
 
         $category = CategoryQuery::create()->findPk($categoryId);
 
-        if(0 !== $category->getParent()) {
+        if (0 !== $category->getParent()) {
             $parentCategory = CategoryQuery::create()->findPk($category->getParent());
 
             if (null !== $parentCategory) {

@@ -115,12 +115,13 @@ class BrandUpdateEvent extends BrandCreateEvent
     }
 
     /**
-     * @param int $logo_image_id
+     * @param  int   $logo_image_id
      * @return $this
      */
     public function setLogoImageId($logo_image_id)
     {
         $this->logo_image_id = $logo_image_id;
+
         return $this;
     }
 

@@ -35,9 +35,9 @@ class BaseFrontController extends BaseController
     /**
      * Return the route path defined for the givent route ID
      *
-     * @param string $routeId the route ID, as found in Config/Resources/routing/admin.xml
-     * @param array $parameters the Route parameters, as a var/value pair array
-     * @param bool $referenceType Router::ABSOLUTE_PATH or Router::ABSOLUTE_URL
+     * @param string $routeId       the route ID, as found in Config/Resources/routing/admin.xml
+     * @param array  $parameters    the Route parameters, as a var/value pair array
+     * @param bool   $referenceType Router::ABSOLUTE_PATH or Router::ABSOLUTE_URL
      *
      * @see \Thelia\Controller\BaseController::getRouteFromRouter()
      *
@@ -51,10 +51,10 @@ class BaseFrontController extends BaseController
     /**
      * Redirect to a specific route.
      *
-     * @param string $routeId the route ID, as found in Config/Resources/routing/admin.xml
-     * @param array $urlParameters the URL parameters, as a var/value pair array
-     * @param array $routeParameters the Route parameters, as a var/value pair array
-     * @param bool $referenceType Router::ABSOLUTE_PATH or Router::ABSOLUTE_URL
+     * @param string $routeId         the route ID, as found in Config/Resources/routing/admin.xml
+     * @param array  $urlParameters   the URL parameters, as a var/value pair array
+     * @param array  $routeParameters the Route parameters, as a var/value pair array
+     * @param bool   $referenceType   Router::ABSOLUTE_PATH or Router::ABSOLUTE_URL
      */
     public function redirectToRoute($routeId, array $urlParameters = [], array $routeParameters = [], $referenceType = Router::ABSOLUTE_PATH)
     {
@@ -140,7 +140,7 @@ class BaseFrontController extends BaseController
      * Render the given template, and returns the result as a string.
      *
      * @param string $templateName the complete template name, with extension
-     * @param array $args          the template arguments
+     * @param array  $args         the template arguments
      * @param string$templateDir
      *
      * @return string

@@ -110,8 +110,8 @@ class SmartyParser extends Smarty implements ParserInterface
      *
      * The trim level is defined by the configuration variable html_output_trim_level
      *
-     * @param string $source the HTML source
-     * @param \Smarty_Internal_Template $template
+     * @param  string                    $source   the HTML source
+     * @param  \Smarty_Internal_Template $template
      * @return string
      */
     public function trimWhitespaces($source, \Smarty_Internal_Template $template)
@@ -136,8 +136,7 @@ class SmartyParser extends Smarty implements ParserInterface
                 '#(([a-z0-9]\s*=\s*(["\'])[^\3]*?\3)|<[a-z0-9_]+)\s+([a-z/>])#is' => '\1 \4',
                 '/(^[\n]*|[\n]+)[\s\t]*[\n]+/' => "\n"
             );
-        }
-        else if ($compressionMode >= 2) {
+        } elseif ($compressionMode >= 2) {
             if (preg_match_all('#<!--\[[^\]]+\]>.*?<!\[[^\]]+\]-->#is', $source, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
                 foreach ($matches as $match) {
                     $store[] = $match[0][0];
@@ -166,8 +165,7 @@ class SmartyParser extends Smarty implements ParserInterface
                 '#>\s+$#Ss' => '>',
 
             );
-        }
-        else {
+        } else {
             $expressions = array();
         }
 

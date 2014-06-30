@@ -215,7 +215,7 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @param Product $object
+     * @param  Product                 $object
      * @return ProductModificationForm
      */
     protected function hydrateObjectForm($object)

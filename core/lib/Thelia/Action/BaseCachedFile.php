@@ -13,7 +13,7 @@ namespace Thelia\Action;
 
 use Thelia\Core\Event\CachedFileEvent;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
-use Thelia\Core\Event\Image\FileDeleteEvent;
+use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Exception\FileException;
 use Thelia\Files\FileManager;
@@ -181,7 +181,6 @@ abstract class BaseCachedFile extends BaseAction
         return $path;
     }
 
-
     /**
      * Take care of saving a file in the database and file storage
      *
@@ -212,7 +211,6 @@ abstract class BaseCachedFile extends BaseAction
 
         $event->setUploadedFile($newUploadedFile);
     }
-
 
     /**
      * Take care of updating file in the database and file storage

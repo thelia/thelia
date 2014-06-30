@@ -998,7 +998,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     /**
      * @param $loopResultRow
-     * @param \Thelia\Model\Product $product
+     * @param  \Thelia\Model\Product $product
      * @param $default_category_id
      * @return mixed
      */

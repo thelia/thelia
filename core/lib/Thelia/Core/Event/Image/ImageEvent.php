@@ -217,19 +217,21 @@ class ImageEvent extends CachedFileEvent
     }
 
     /**
-     * @param ImageInterface $imageObject
+     * @param  ImageInterface $imageObject
      * @return $this
      */
     public function setImageObject($imageObject)
     {
         $this->imageObject = $imageObject;
+
         return $this;
     }
 
     /**
      * @return ImageInterface
      */
-    public function getImageObject() {
+    public function getImageObject()
+    {
         return $this->imageObject;
     }
 }

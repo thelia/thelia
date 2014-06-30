@@ -32,8 +32,8 @@ class DocumentCreateOrUpdateEvent extends FileCreateOrUpdateEvent
      * Constructor
      *
      * @param string $documentType Document type
-     *                          ex : FileManager::TYPE_CATEGORY
-     * @param int    $parentId  Document parent id
+     *                             ex : FileManager::TYPE_CATEGORY
+     * @param int    $parentId     Document parent id
      * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function __construct($documentType, $parentId)

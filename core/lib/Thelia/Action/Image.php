@@ -18,12 +18,8 @@ use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Point;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
-use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
-use Thelia\Core\Event\Image\ImageDeleteEvent;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Exception\ImageException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
@@ -86,7 +82,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      *
      * This method updates the cache_file_path and file_url attributes of the event
      *
-     * @param  ImageEvent $event
+     * @param ImageEvent $event
      *
      * @throws \Thelia\Exception\ImageException
      * @throws \InvalidArgumentException

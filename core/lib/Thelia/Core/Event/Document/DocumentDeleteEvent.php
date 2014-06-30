@@ -12,7 +12,7 @@
 
 namespace Thelia\Core\Event\Document;
 
-use Thelia\Core\Event\Image\FileDeleteEvent;
+use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Model\CategoryDocument;
 use Thelia\Model\ContentDocument;
 use Thelia\Model\FolderDocument;
@@ -35,8 +35,8 @@ class DocumentDeleteEvent extends FileDeleteEvent
      * Constructor
      *
      * @param CategoryDocument|ProductDocument|ContentDocument|FolderDocument $documentToDelete Document about to be deleted
-     * @param string                                              $documentType     Document type
-     *                                                                           ex : FileManager::TYPE_CATEGORY
+     * @param string                                                          $documentType     Document type
+     *                                                                                          ex : FileManager::TYPE_CATEGORY
      * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
     public function __construct($documentToDelete, $documentType)
