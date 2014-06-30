@@ -200,4 +200,12 @@ CREATE TABLE `brand_image`
 ALTER TABLE `product` ADD `brand_id` INTEGER DEFAULT 0 AFTER `template_id`;
 ALTER TABLE `product` ADD CONSTRAINT `fk_product_brand` FOREIGN KEY (`brand_id`) REFERENCES `brand` (`id`) ON DELETE SET NULL;
 
+INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+  ('html_output_trim_level','1', 0, 0, NOW(), NOW());
+
+SELECT @max := MAX(`id`) FROM `config`;
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@max, 'en_US', 'Whitespace trim level of the generated HTML code (0 = none, 1 = medium, 2 = maximum)', NULL, NULL, NULL);
+
+
 SET FOREIGN_KEY_CHECKS = 1;
