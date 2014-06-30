@@ -179,7 +179,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
                 $argValue = intval($this->getArgValue($source));
 
-                if ($argValue > 0) {
+                if ($argValue >= 0) {
 
                     $search = $this->createSearchQuery($source, $argValue);
 
