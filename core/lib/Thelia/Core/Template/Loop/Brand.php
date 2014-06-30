@@ -49,6 +49,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
             Argument::createIntTypeArgument('product'),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createAnyTypeArgument('title'),
+            Argument::createBooleanTypeArgument('current'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -119,6 +120,14 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
 
         if (!is_null($title)) {
             $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
+        }
+
+        $current = $this->getCurrent();
+
+        if ($current === true) {
+            $search->filterById($this->request->get("brand_id"));
+        } elseif ($current === false) {
+            $search->filterById($this->request->get("brand_id"), Criteria::NOT_IN);
         }
 
         $orders  = $this->getOrder();
