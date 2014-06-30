@@ -21,6 +21,7 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\BrandQuery;
+use Thelia\Model\ProductQuery;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
@@ -45,6 +46,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
+            Argument::createIntTypeArgument('product'),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createAnyTypeArgument('title'),
             new Argument(
@@ -101,6 +103,12 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
 
         if (!is_null($id)) {
             $search->filterById($id, Criteria::IN);
+        }
+
+        $product = $this->getProduct();
+
+        if (!is_null($product) && null !== $productObj = ProductQuery::create()->findPk($product)) {
+            $search->filterByProduct($productObj);
         }
 
         $visible = $this->getVisible();
