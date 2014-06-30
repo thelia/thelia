@@ -50,7 +50,7 @@ class BaseFrontController extends BaseController
 
     /**
      * Redirect to a specific route.
-     * 
+     *
      * @param string $routeId the route ID, as found in Config/Resources/routing/admin.xml
      * @param array $urlParameters the URL parameters, as a var/value pair array
      * @param array $routeParameters the Route parameters, as a var/value pair array
