@@ -177,9 +177,11 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             // Check for product="id" folder="id", etc. style arguments
             foreach ($this->possible_sources as $source) {
 
-                $argValue = intval($this->getArgValue($source));
+                $argValue = $this->getArgValue($source);
 
-                if ($argValue >= 0) {
+                if (! empty($argValue)) {
+
+                    $argValue = intval($argValue);
 
                     $search = $this->createSearchQuery($source, $argValue);
 
