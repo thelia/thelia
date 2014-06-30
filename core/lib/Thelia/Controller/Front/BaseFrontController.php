@@ -123,9 +123,9 @@ class BaseFrontController extends BaseController
     /**
      * Render the given template, and returns the result as a string.
      *
-     * @param $templateName the complete template name, with extension
-     * @param array $args        the template arguments
-     * @param null  $templateDir
+     * @param string $templateName the complete template name, with extension
+     * @param array $args          the template arguments
+     * @param string$templateDir
      *
      * @return string
      */
