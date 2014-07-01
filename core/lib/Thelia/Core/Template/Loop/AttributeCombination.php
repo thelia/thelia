@@ -37,6 +37,10 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
 {
     protected $timestampable = true;
 
+    protected $isCacheable = true;
+
+    protected $cacheAttribute = 'product_sale_elements';
+
     /**
      * @return ArgumentCollection
      */
@@ -120,4 +124,10 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
 
         return $loopResult;
     }
+
+    public function getCacheRef()
+    {
+        return sprintf("product_sale_element::%s", $this->getProduct_sale_elements());
+    }
+
 }

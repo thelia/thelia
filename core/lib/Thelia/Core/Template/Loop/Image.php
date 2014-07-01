@@ -40,6 +40,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
     protected $timestampable = true;
 
+    protected $isCacheable = true;
+
     /**
      * @var array Possible standard image sources
      */
@@ -322,4 +324,47 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         return $loopResult;
     }
+
+
+    protected function isCacheable(){
+
+        $this->object_type = null;
+        $this->object_id  = null;
+
+        $source = $this->getSource();
+        if (! is_null($source)) {
+
+            $source_id = $this->getSourceId();
+            $id = $this->getId();
+
+            if (is_null($source_id) && is_null($id)) {
+                throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
+            }
+
+            $this->object_type = $source;
+            $this->object_id   = $source_id;
+
+            return true;
+        } else {
+            foreach ($this->possible_sources as $source) {
+
+                $argValue = intval($this->getArgValue($source));
+
+                if ($argValue > 0) {
+
+                    $this->object_type = $source;
+                    $this->object_id   = $argValue;
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function getCacheRef(){
+        return sprintf("%s::%s", $this->object_type, $this->object_id);
+    }
+
 }
