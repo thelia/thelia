@@ -52,6 +52,11 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 {
     protected $timestampable = true;
 
+    // cache
+    protected $isCacheable = true;
+    protected $cacheByCustomer = true;
+    protected $cacheAttribute = 'product';
+
     /**
      * @return ArgumentCollection
      */
@@ -281,5 +286,10 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->filterByRef($searchTerm, $searchCriteria);
+    }
+
+    public function getCacheRef()
+    {
+        return sprintf("product::%s", $this->getProduct());
     }
 }

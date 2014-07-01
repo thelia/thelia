@@ -12,8 +12,10 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
+use Doctrine\Common\Cache\FilesystemCache;
 use Propel\Runtime\Util\PropelModelPager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Cache\TCache;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
@@ -22,9 +24,12 @@ use TheliaSmarty\Template\SmartyPluginDescriptor;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\Element\Exception\InvalidElementException;
 use Thelia\Core\Translation\Translator;
+use Thelia\Log\Tlog;
 
 class TheliaLoop extends AbstractSmartyPlugin
 {
+    use \Thelia\Cache\TCacheSupportTrait;
+
     /** @var PropelModelPager[] */
     protected static $pagination = null;
 
@@ -141,7 +146,17 @@ class TheliaLoop extends AbstractSmartyPlugin
 
             self::$pagination[$name] = null;
 
-            $loopResults = $loop->exec(self::$pagination[$name]);
+            $cacheKey = $loop->getCacheKey();
+            //$cacheKey = null;
+            if ($cacheKey && (null !== $loopResults = $this->getCache($cacheKey))) {
+                Tlog::getInstance()->debug( sprintf("[LOOP FROM CACHE][%s][%s]", $type, implode($params) ));
+            } else {
+                Tlog::getInstance()->debug( sprintf("[LOOP][%s][%s][%s]", $type, implode($params), $cacheKey ));
+                $loopResults = $loop->exec(self::$pagination[$name]);
+                if (null !== $cacheKey) {
+                    $this->setCache($cacheKey, $loopResults, $loop->getCacheRef());
+                }
+            }
 
             $loopResults->rewind();
 
@@ -202,6 +217,7 @@ class TheliaLoop extends AbstractSmartyPlugin
 
         return '';
     }
+
 
     /**
      * Process {elseloop rel="loopname"} ... {/elseloop} block

@@ -56,6 +56,10 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
     protected $timestampable = true;
 
+    protected $isCacheable = true;
+
+    protected $cacheAttribute = 'product';
+
     /**
      * @return ArgumentCollection
      */
@@ -231,4 +235,10 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
         return $loopResult;
     }
+
+    public function getCacheRef()
+    {
+        return sprintf("product::%s", $this->getProduct());
+    }
+
 }
