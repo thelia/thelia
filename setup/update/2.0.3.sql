@@ -118,18 +118,12 @@ CREATE TABLE `brand`
 (
   `id` INTEGER NOT NULL AUTO_INCREMENT,
   `visible` TINYINT,
-  `title` VARCHAR(255),
-  `description` LONGTEXT,
-  `chapo` TEXT,
-  `postscriptum` TEXT,
-  `meta_title` VARCHAR(255),
-  `meta_description` TEXT,
-  `meta_keywords` TEXT,
+  `position` INTEGER,
   `logo_image_id` INTEGER,
   `created_at` DATETIME,
   `updated_at` DATETIME,
   PRIMARY KEY (`id`),
-  INDEX `fk_brand_brand_image1_idx` (`logo_image_id`),
+  INDEX `fk_brand_brand_image_idx` (`logo_image_id`),
   CONSTRAINT `fk_logo_image_id_brand_image`
   FOREIGN KEY (`logo_image_id`)
   REFERENCES `brand_image` (`id`)
@@ -149,10 +143,6 @@ CREATE TABLE `brand_document`
   `brand_id` INTEGER NOT NULL,
   `file` VARCHAR(255) NOT NULL,
   `position` INTEGER,
-  `title` VARCHAR(255),
-  `description` LONGTEXT,
-  `chapo` TEXT,
-  `postscriptum` TEXT,
   `created_at` DATETIME,
   `updated_at` DATETIME,
   PRIMARY KEY (`id`),
@@ -176,15 +166,10 @@ CREATE TABLE `brand_image`
   `brand_id` INTEGER NOT NULL,
   `file` VARCHAR(255) NOT NULL,
   `position` INTEGER,
-  `title` VARCHAR(255),
-  `description` LONGTEXT,
-  `chapo` TEXT,
-  `postscriptum` TEXT,
   `created_at` DATETIME,
   `updated_at` DATETIME,
   PRIMARY KEY (`id`),
   INDEX `idx_brand_image_brand_id` (`brand_id`),
-  INDEX `idx_brand_image_brand_id_is_brand_logo` (`brand_id`),
   CONSTRAINT `fk_brand_image_brand_id`
   FOREIGN KEY (`brand_id`)
   REFERENCES `brand` (`id`)
@@ -192,6 +177,71 @@ CREATE TABLE `brand_image`
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+-- ---------------------------------------------------------------------
+-- brand_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_i18n`;
+
+CREATE TABLE `brand_i18n`
+(
+  `id` INTEGER NOT NULL,
+  `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+  `title` VARCHAR(255),
+  `description` LONGTEXT,
+  `chapo` TEXT,
+  `postscriptum` TEXT,
+  `meta_title` VARCHAR(255),
+  `meta_description` TEXT,
+  `meta_keywords` TEXT,
+  PRIMARY KEY (`id`,`locale`),
+  CONSTRAINT `brand_i18n_FK_1`
+  FOREIGN KEY (`id`)
+  REFERENCES `brand` (`id`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_document_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_document_i18n`;
+
+CREATE TABLE `brand_document_i18n`
+(
+  `id` INTEGER NOT NULL,
+  `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+  `title` VARCHAR(255),
+  `description` LONGTEXT,
+  `chapo` TEXT,
+  `postscriptum` TEXT,
+  PRIMARY KEY (`id`,`locale`),
+  CONSTRAINT `brand_document_i18n_FK_1`
+  FOREIGN KEY (`id`)
+  REFERENCES `brand_document` (`id`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_image_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_image_i18n`;
+
+CREATE TABLE `brand_image_i18n`
+(
+  `id` INTEGER NOT NULL,
+  `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+  `title` VARCHAR(255),
+  `description` LONGTEXT,
+  `chapo` TEXT,
+  `postscriptum` TEXT,
+  PRIMARY KEY (`id`,`locale`),
+  CONSTRAINT `brand_image_i18n_FK_1`
+  FOREIGN KEY (`id`)
+  REFERENCES `brand_image` (`id`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------
 -- Add brand field to product table, and related constraint.

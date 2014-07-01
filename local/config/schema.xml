@@ -49,7 +49,7 @@
     <foreign-key foreignTable="template" name="fk_product_template" onDelete="SET NULL">
       <reference foreign="id" local="template_id" />
     </foreign-key>
-    <foreign-key foreignTable="brand" name="fk_product_brand" onDelete="RESTRICT" onUpdate="RESTRICT">
+    <foreign-key foreignTable="brand" name="fk_product_brand" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="brand_id" />
     </foreign-key>
     <unique name="ref_UNIQUE">

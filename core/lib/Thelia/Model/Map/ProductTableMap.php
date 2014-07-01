@@ -211,7 +211,7 @@ class ProductTableMap extends TableMap
     {
         $this->addRelation('TaxRule', '\\Thelia\\Model\\TaxRule', RelationMap::MANY_TO_ONE, array('tax_rule_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('Template', '\\Thelia\\Model\\Template', RelationMap::MANY_TO_ONE, array('template_id' => 'id', ), 'SET NULL', null);
-        $this->addRelation('Brand', '\\Thelia\\Model\\Brand', RelationMap::MANY_TO_ONE, array('brand_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('Brand', '\\Thelia\\Model\\Brand', RelationMap::MANY_TO_ONE, array('brand_id' => 'id', ), 'SET NULL', 'RESTRICT');
         $this->addRelation('ProductCategory', '\\Thelia\\Model\\ProductCategory', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'ProductCategories');
         $this->addRelation('FeatureProduct', '\\Thelia\\Model\\FeatureProduct', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'FeatureProducts');
         $this->addRelation('ProductSaleElements', '\\Thelia\\Model\\ProductSaleElements', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'ProductSaleElementss');

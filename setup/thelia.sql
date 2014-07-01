@@ -63,7 +63,7 @@ CREATE TABLE `product`
         FOREIGN KEY (`brand_id`)
         REFERENCES `brand` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
