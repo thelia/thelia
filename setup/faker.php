@@ -398,7 +398,7 @@ try {
 
     $brandIdList = [];
 
-    for ($k=0; $k<4; $k++) {
+    for ($k=0; $k<10; $k++) {
         $brand = new Thelia\Model\Brand();
 
         $brand->setVisible(1);
