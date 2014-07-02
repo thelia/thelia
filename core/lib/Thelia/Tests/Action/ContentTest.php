@@ -24,7 +24,9 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\Folder;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\Map\ContentFolderTableMap;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
@@ -167,6 +169,7 @@ class ContentTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionUp()
     {
         $content = ContentQuery::create()
+            ->filterByFolder($this->getFolderForPositionTest(), Criteria::IN)
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
 
@@ -190,6 +193,7 @@ class ContentTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionDown()
     {
         $content = ContentQuery::create()
+            ->filterByFolder($this->getFolderForPositionTest())
             ->filterByPosition(1)
             ->findOne();
 
@@ -213,6 +217,7 @@ class ContentTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionWithSpecificPosition()
     {
         $content = ContentQuery::create()
+            ->filterByFolder($this->getFolderForPositionTest())
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
 
@@ -294,6 +299,34 @@ class ContentTest extends TestCaseWithURLToolSetup
         }
 
         return $content;
+    }
+
+    /**
+     * get a folder that has enough content to execute position tests
+     *
+     * @return Folder the folder
+     */
+    protected function getFolderForPositionTest()
+    {
+        $content = ContentFolderQuery::create()
+            ->filterByDefaultFolder(true)
+            ->withColumn('count(' . ContentFolderTableMap::FOLDER_ID . ')', 'nb')
+            ->groupBy('FolderId')
+            ->having('count(' . ContentFolderTableMap::FOLDER_ID . ') >= ?', 3, \PDO::PARAM_INT)
+            ->select(array('FolderId', 'nb'))
+            ->findOne()
+            ;
+
+        if (null === $content) {
+            $this->fail('use fixtures before launching test, there is not enough content in database');
+        }
+
+        $folder = FolderQuery::create()->findPK($content["FolderId"]);
+        if (null === $folder) {
+            $this->fail('use fixtures before launching test, there is no folder in database');
+        }
+
+        return $folder;
     }
 
     /**

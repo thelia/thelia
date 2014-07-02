@@ -21,6 +21,7 @@ use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\Map\FolderTableMap;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
@@ -200,6 +201,7 @@ class FolderTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionUp()
     {
         $folder = FolderQuery::create()
+            ->filterByParent($this->getFolderIdForPositionTest())
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
 
@@ -223,6 +225,7 @@ class FolderTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionDown()
     {
         $nextFolder = FolderQuery::create()
+            ->filterByParent($this->getFolderIdForPositionTest())
             ->filterByPosition(2)
             ->findOne();
 
@@ -255,6 +258,7 @@ class FolderTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionWithSpecificPosition()
     {
         $folder = FolderQuery::create()
+            ->filterByParent($this->getFolderIdForPositionTest())
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
 
@@ -272,6 +276,27 @@ class FolderTest extends TestCaseWithURLToolSetup
 
         $this->assertEquals(1, $updatedFolder->getPosition(),sprintf("new position is 1, new position expected is %d for folder %d", $updatedFolder->getPosition(), $updatedFolder->getId()));
 
+    }
+
+    /**
+     * get a folder parent id that has enough folder to execute position tests
+     *
+     * @return int the folder id
+     */
+    protected function getFolderIdForPositionTest()
+    {
+        $f = FolderQuery::create()
+            ->withColumn('count(' . FolderTableMap::PARENT . ')', 'nb')
+            ->groupBy('Parent')
+            ->having('count(' . FolderTableMap::PARENT . ') > ?', 3, \PDO::PARAM_INT)
+            ->select(array('Parent', 'nb'))
+            ->findOne();
+
+        if (null === $f) {
+            $this->fail('use fixtures before launching test, there is no folder in database');
+        }
+
+        return $f["Parent"];
     }
 
     /**
