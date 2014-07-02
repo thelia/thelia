@@ -13,6 +13,7 @@
 namespace Thelia\Tools;
 
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Validator\Constraints\UrlValidator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Rewriting\RewritingRetriever;
@@ -313,4 +314,11 @@ class URL
              strtolower($clean) :
              $clean;
      }
+
+    public function checkUrl($url, array $protocols = ["http", "https"])
+    {
+        $pattern = sprintf(UrlValidator::PATTERN, implode('|', $protocols));
+
+        return (bool) preg_match($pattern, $url);
+    }
 }
