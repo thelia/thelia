@@ -14,6 +14,10 @@ namespace Thelia\Tools\FileDownload;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Define archive builders and formatters
 /**
  * Class FileDownloader
  * @package Thelia\Tools\FileDownload
@@ -22,8 +26,13 @@ use Symfony\Component\Translation\Translator;
 interface FileDownloaderInterface
 {
     /**
+<<<<<<< HEAD
      * @param  string                                  $url
      * @param  string                                  $pathToStore
+=======
+     * @param string $url
+     * @param string $pathToStore
+>>>>>>> Define archive builders and formatters
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \ErrorException
      * @throws \HttpUrlException
@@ -40,4 +49,8 @@ interface FileDownloaderInterface
      * Returns an hydrated instance
      */
     public static function getInstance();
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> Define archive builders and formatters

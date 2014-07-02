@@ -315,7 +315,11 @@ class URL
              $clean;
      }
 
+<<<<<<< HEAD
     public static function checkUrl($url, array $protocols = ["http", "https"])
+=======
+    public function checkUrl($url, array $protocols = ["http", "https"])
+>>>>>>> Define archive builders and formatters
     {
         $pattern = sprintf(UrlValidator::PATTERN, implode('|', $protocols));
 

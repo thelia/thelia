@@ -40,65 +40,115 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->zip = new ZipArchiveBuilder();
 
+<<<<<<< HEAD
         $this->zip->setEnvironment("dev");
 
         $this->loadedZip = $this->zip->loadArchive(
             __DIR__ . DS . "TestResources/well_formatted.zip"
+=======
+        $this->loadedZip = $this->zip->loadArchive(
+            __DIR__ . DS . "TestResources/well_formatted.zip",
+            "dev"
+>>>>>>> Define archive builders and formatters
         );
     }
 
     /**
      * This method formats a path to be compatible with \ZipArchive
+<<<<<<< HEAD
      */
     public function testFormatFilePath()
     {
         $this->assertEquals(
             "foo",
             $this->zip->formatFilePath("foo")
+=======
+     *
+     *
+     */
+    public function testGetFilePath()
+    {
+        $this->assertEquals(
+            "foo",
+            $this->zip->getFilePath("foo")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "foo",
+<<<<<<< HEAD
             $this->zip->formatFilePath("/foo")
+=======
+            $this->zip->getFilePath("/foo")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "foo",
+<<<<<<< HEAD
             $this->zip->formatFilePath("foo/")
+=======
+            $this->zip->getFilePath("foo/")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "foo",
+<<<<<<< HEAD
             $this->zip->formatFilePath("/foo/")
+=======
+            $this->zip->getFilePath("/foo/")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/bar",
+<<<<<<< HEAD
             $this->zip->formatFilePath("foo/bar")
+=======
+            $this->zip->getFilePath("foo/bar")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/bar",
+<<<<<<< HEAD
             $this->zip->formatFilePath("/foo/bar")
+=======
+            $this->zip->getFilePath("/foo/bar")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/bar",
+<<<<<<< HEAD
             $this->zip->formatFilePath("/foo//bar/")
+=======
+            $this->zip->getFilePath("/foo//bar/")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/bar",
+<<<<<<< HEAD
             $this->zip->formatFilePath("/foo/bar/")
+=======
+            $this->zip->getFilePath("/foo/bar/")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/bar/baz",
+<<<<<<< HEAD
             $this->zip->formatFilePath("foo/bar/baz")
+=======
+            $this->zip->getFilePath("foo/bar/baz")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/bar/baz",
+<<<<<<< HEAD
             $this->zip->formatFilePath("//foo/bar///baz/")
         );
     }
@@ -108,58 +158,110 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             "/foo/",
             $this->zip->formatDirectoryPath("foo")
+=======
+            $this->zip->getFilePath("//foo/bar///baz/")
+        );
+    }
+
+    public function testGetDirectoryPath()
+    {
+        $this->assertEquals(
+            "/foo/",
+            $this->zip->getDirectoryPath("foo")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/",
+<<<<<<< HEAD
             $this->zip->formatDirectoryPath("/foo")
+=======
+            $this->zip->getDirectoryPath("/foo")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/",
+<<<<<<< HEAD
             $this->zip->formatDirectoryPath("foo/")
+=======
+            $this->zip->getDirectoryPath("foo/")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/",
+<<<<<<< HEAD
             $this->zip->formatDirectoryPath("/foo/")
+=======
+            $this->zip->getDirectoryPath("/foo/")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/bar/",
+<<<<<<< HEAD
             $this->zip->formatDirectoryPath("foo/bar")
+=======
+            $this->zip->getDirectoryPath("foo/bar")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/bar/",
+<<<<<<< HEAD
             $this->zip->formatDirectoryPath("/foo/bar")
+=======
+            $this->zip->getDirectoryPath("/foo/bar")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/bar/",
+<<<<<<< HEAD
             $this->zip->formatDirectoryPath("/foo//bar/")
+=======
+            $this->zip->getDirectoryPath("/foo//bar/")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/bar/",
+<<<<<<< HEAD
             $this->zip->formatDirectoryPath("/foo/bar/")
+=======
+            $this->zip->getDirectoryPath("/foo/bar/")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/bar/baz/",
+<<<<<<< HEAD
             $this->zip->formatDirectoryPath("foo/bar/baz")
+=======
+            $this->zip->getDirectoryPath("foo/bar/baz")
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertEquals(
             "/foo/bar/baz/",
+<<<<<<< HEAD
             $this->zip->formatDirectoryPath("//foo/bar///baz/")
+=======
+            $this->zip->getDirectoryPath("//foo/bar///baz/")
+>>>>>>> Define archive builders and formatters
         );
     }
 
     public function testLoadValidZip()
     {
         $loadedZip = $this->zip->loadArchive(
+<<<<<<< HEAD
             __DIR__ . DS . "TestResources/well_formatted.zip"
+=======
+            __DIR__ . DS . "TestResources/well_formatted.zip",
+            "dev"
+>>>>>>> Define archive builders and formatters
         );
 
         $this->assertInstanceOf(
@@ -169,13 +271,22 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+<<<<<<< HEAD
      * @expectedException \Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception\ZipArchiveException
+=======
+     * @expectedException \Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveException
+>>>>>>> Define archive builders and formatters
      * @expectedExceptionMessage [Zip Error] The file is not a zip archive
      */
     public function testLoadNotValidZip()
     {
         $this->zip->loadArchive(
+<<<<<<< HEAD
             __DIR__ . DS . "TestResources/bad_formatted.zip"
+=======
+            __DIR__ . DS . "TestResources/bad_formatted.zip",
+            "dev"
+>>>>>>> Define archive builders and formatters
         );
     }
 
@@ -185,31 +296,56 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testLoadNotExistingFile()
     {
         $this->zip->loadArchive(
+<<<<<<< HEAD
             __DIR__ . DS . "TestResources/this_file_doesn_t_exist.zip"
+=======
+            __DIR__ . DS . "TestResources/this_file_doesn_t_exist.zip",
+            "dev"
+>>>>>>> Define archive builders and formatters
         );
     }
 
     public function testLoadOnlineAvailableAndValidFile()
     {
+<<<<<<< HEAD
         $this->zip->setFileDownloader(FakeFileDownloader::getInstance());
 
         $this->zip->loadArchive(
             __DIR__ . DS . "TestResources/well_formatted.zip",
             true
+=======
+        $this->zip->loadArchive(
+            __DIR__ . DS . "TestResources/well_formatted.zip",
+            "dev",
+            true,
+            FakeFileDownloader::getInstance()
+>>>>>>> Define archive builders and formatters
         );
     }
 
     /**
+<<<<<<< HEAD
      * @expectedException \Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception\ZipArchiveException
+=======
+     * @expectedException \Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveException
+>>>>>>> Define archive builders and formatters
      * @expectedExceptionMessage [Zip Error] The file is not a zip archive
      */
     public function testLoadOnlineAvailableAndNotValidFile()
     {
+<<<<<<< HEAD
         $this->zip->setFileDownloader(FakeFileDownloader::getInstance());
 
         $this->zip->loadArchive(
             __DIR__ . DS . "TestResources/bad_formatted.zip",
             true
+=======
+        $this->zip->loadArchive(
+            __DIR__ . DS . "TestResources/bad_formatted.zip",
+            "dev",
+            true,
+            FakeFileDownloader::getInstance()
+>>>>>>> Define archive builders and formatters
         );
     }
 
@@ -218,11 +354,19 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadOnlineNotExistingFile()
     {
+<<<<<<< HEAD
         $this->zip->setFileDownloader(FakeFileDownloader::getInstance());
 
         $this->zip->loadArchive(
             __DIR__ . DS . "TestResources/this_file_doesn_t_exist.zip",
             true
+=======
+        $this->zip->loadArchive(
+            __DIR__ . DS . "TestResources/this_file_doesn_t_exist.zip",
+            "dev",
+            true,
+            FakeFileDownloader::getInstance()
+>>>>>>> Define archive builders and formatters
         );
     }
 
@@ -325,7 +469,11 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testBuildArchiveResponse()
     {
         $loadedArchiveResponse = $this->loadedZip
+<<<<<<< HEAD
             ->buildArchiveResponse("test")
+=======
+            ->buildArchiveResponse()
+>>>>>>> Define archive builders and formatters
         ;
 
         $loadedArchiveResponseContent = $loadedArchiveResponse->getContent();
@@ -337,6 +485,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             $loadedArchiveResponseContent
         );
     }
+<<<<<<< HEAD
 
     public function testAddValidFileFromString()
     {
@@ -396,3 +545,6 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
 }
+=======
+} 
+>>>>>>> Define archive builders and formatters

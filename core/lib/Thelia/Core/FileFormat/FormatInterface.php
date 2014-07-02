@@ -55,4 +55,8 @@ interface FormatInterface
      * return "application/json";
      */
     public function getMimeType();
+<<<<<<< HEAD
 }
+=======
+} 
+>>>>>>> Define archive builders and formatters

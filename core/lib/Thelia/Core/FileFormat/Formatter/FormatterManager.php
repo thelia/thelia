@@ -10,46 +10,60 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Tools\FileDownload;
+namespace Thelia\Core\FileFormat\Formatter;
+use Thelia\Core\Translation\Translator;
 
 /**
- * Trait FileDownloaderAwareTrait
- * @package Thelia\Tools\FileDownload
+ * Class FormatterManager
+ * @package Thelia\Core\FileFormat\Formatter
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-trait FileDownloaderAwareTrait
+class FormatterManager 
 {
-    /** @var  FileDownloaderInterface */
-    protected $fileDownloader;
+
+    protected $formatters = array();
 
     /**
-     * @return FileDownloaderInterface
-     */
-    public function getFileDownloader()
-    {
-        if (!$this->fileDownloader instanceof FileDownloaderInterface) {
-            $this->fileDownloader = FileDownloader::getInstance();
-        }
-
-        return $this->fileDownloader;
-    }
-
-    /**
-<<<<<<< HEAD
-     * @param  FileDownloaderInterface $fileDownloader
-=======
-     * @param FileDownloaderInterface $fileDownloader
->>>>>>> Define archive builders and formatters
+     * @param $archiveCreator
      * @return $this
      */
-    public function setFileDownloader(FileDownloaderInterface $fileDownloader)
+    public function add(AbstractFormatter $formatter)
     {
-        $this->fileDownloader = $fileDownloader;
+        if (null !== $formatter) {
+            $this->formatters[$formatter->getName()] = $formatter;
+        }
 
         return $this;
     }
-<<<<<<< HEAD
-}
-=======
+
+    /**
+     * @param $name
+     * @return $this
+     * @throws \OutOfBoundsException
+     */
+    public function delete($name)
+    {
+        if (!array_key_exists($name, $this->formatters)) {
+            throw new \OutOfBoundsException(
+                Translator::getInstance()->trans(
+                    "The formatter %name doesn't exist",
+                    [
+                        "%name" => $name
+                    ]
+                )
+            );
+        }
+
+        unset($this->formatters[$name]);
+
+        return $this;
+    }
+
+    /**
+     * @return array[AbstractFormatter]
+     */
+    public function getAll()
+    {
+        return $this->formatters;
+    }
 } 
->>>>>>> Define archive builders and formatters

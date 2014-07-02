@@ -787,7 +787,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $stubUploadedFile = $this->getMockBuilder('\Symfony\Component\HttpFoundation\File\UploadedFile')
-            ->setConstructorArgs([__DIR__ . '/fixtures/test.xml', 'test.xml'])
+            ->disableOriginalConstructor()
             ->getMock();
         $stubUploadedFile->expects($this->any())
             ->method('getClientOriginalExtension')
@@ -814,7 +814,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $stubUploadedFile = $this->getMockBuilder('\Symfony\Component\HttpFoundation\File\UploadedFile')
-            ->setConstructorArgs([__DIR__ . '/fixtures/test.xml', 'test.xml'])
+            ->disableOriginalConstructor()
             ->getMock();
         $stubUploadedFile->expects($this->any())
             ->method('getClientOriginalExtension')

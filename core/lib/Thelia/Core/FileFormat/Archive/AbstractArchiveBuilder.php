@@ -12,10 +12,13 @@
 
 namespace Thelia\Core\FileFormat\Archive;
 use Thelia\Core\FileFormat\FormatInterface;
+<<<<<<< HEAD
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\FileNotFoundException;
 use Thelia\Exception\FileNotReadableException;
 use Thelia\Log\Tlog;
+=======
+>>>>>>> Define archive builders and formatters
 use Thelia\Tools\FileDownload\FileDownloaderAwareTrait;
 
 /**
@@ -26,6 +29,7 @@ use Thelia\Tools\FileDownload\FileDownloaderAwareTrait;
 abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilderInterface
 {
     use FileDownloaderAwareTrait;
+<<<<<<< HEAD
 
     const TEMP_DIRECTORY_NAME = "archive_builder";
 
@@ -212,3 +216,6 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
         $this->environment = $environment;
     }
 }
+=======
+} 
+>>>>>>> Define archive builders and formatters

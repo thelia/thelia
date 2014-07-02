@@ -12,10 +12,19 @@
 
 namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
+<<<<<<< HEAD
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception\ZipArchiveException;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Thelia;
 use Thelia\Exception\FileNotReadableException;
+=======
+use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Thelia;
+use Thelia\Core\Translation\Translator;
+use Thelia\Exception\FileNotFoundException;
+use Thelia\Exception\FileNotReadableException;
+use Thelia\Log\Tlog;
+>>>>>>> Define archive builders and formatters
 use Thelia\Tools\FileDownload\FileDownloaderInterface;
 
 /**
@@ -31,34 +40,79 @@ use Thelia\Tools\FileDownload\FileDownloaderInterface;
  */
 class ZipArchiveBuilder extends AbstractArchiveBuilder
 {
+<<<<<<< HEAD
+=======
+    const TEMP_DIRECTORY_NAME = "archive_builder";
+
+>>>>>>> Define archive builders and formatters
     /**
      * @var \ZipArchive
      */
     protected $zip;
 
+<<<<<<< HEAD
     public function __construct()
     {
         parent::__construct();
 
         $this->zip = new \ZipArchive();
+=======
+    /**
+     * @var string This is the absolute path to the zip file in cache
+     */
+    protected $zip_cache_file;
+
+    /**
+     * @var string This is the path of the cache
+     */
+    protected $cache_dir;
+
+    /**
+     * @var \Thelia\Log\Tlog
+     */
+    protected $logger;
+
+    /**
+     * @var Translator
+     */
+    protected $translator;
+
+    public function __construct()
+    {
+        $this->zip = new \ZipArchive();
+
+        $this->logger = Tlog::getNewInstance();
+
+        $this->translator = Translator::getInstance();
+>>>>>>> Define archive builders and formatters
     }
 
     /**
      * On the destruction of the class,
      * remove the temporary file.
      */
+<<<<<<< HEAD
     public function __destruct()
+=======
+    function __destruct()
+>>>>>>> Define archive builders and formatters
     {
         if ($this->zip instanceof \ZipArchive) {
             @$this->zip->close();
 
+<<<<<<< HEAD
             if (file_exists($this->cacheFile)) {
                 unlink($this->cacheFile);
+=======
+            if (file_exists($this->zip_cache_file)) {
+                unlink($this->zip_cache_file);
+>>>>>>> Define archive builders and formatters
             }
         }
     }
 
     /**
+<<<<<<< HEAD
      * @param  string                                     $filePath           It is the path to access the file.
      * @param  string                                     $directoryInArchive This is the directory where it will be stored in the archive
      * @param  null|string                                $name               The name of the file in the archive. if it null or empty, it keeps the same name
@@ -67,6 +121,15 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
      * @throws \ErrorException
+=======
+     * @param string $filePath It is the path to access the file.
+     * @param string $directoryInArchive This is the directory where it will be stored in the archive
+     * @param null|string $name The name of the file in the archive. if it null or empty, it keeps the same name
+     * @param bool $isOnline
+     * @return $this
+     * @throws \Thelia\Exception\FileNotFoundException
+     * @throws \Thelia\Exception\FileNotReadableException
+>>>>>>> Define archive builders and formatters
      *
      * This methods adds a file in the archive.
      * If the file is local, $isOnline must be false,
@@ -74,6 +137,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      */
     public function addFile($filePath, $directoryInArchive = null, $name = null, $isOnline = false)
     {
+<<<<<<< HEAD
         $directoryInArchive = $this->formatDirectoryPath($directoryInArchive);
 
         /**
@@ -178,6 +242,18 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         $directoryInArchive = $this->formatDirectoryPath($directoryPath);
 
         if (!empty($directoryInArchive)) {
+=======
+        /**
+         * Add empty directory if it doesn't exist
+         */
+        if (empty($directoryInArchive) || preg_match("#^\/+$#", $directoryInArchive)) {
+            $directoryInArchive = "";
+        }
+
+        if(!empty($directoryInArchive) && $directoryInArchive != "/") {
+            $directoryInArchive = $this->getDirectoryPath($directoryInArchive);
+
+>>>>>>> Define archive builders and formatters
             if (!$this->zip->addEmptyDir($directoryInArchive)) {
                 throw new \ErrorException(
                     $this->translator->trans(
@@ -190,6 +266,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
             }
         }
 
+<<<<<<< HEAD
         return $this;
     }
 
@@ -263,6 +340,54 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         }
 
         return $initialString . "/";
+=======
+        if ($isOnline) {
+            $fileDownloadCache = $this->cache_dir . DS . "download";
+
+            $this->getFileDownloader()
+                ->download($filePath, $fileDownloadCache)
+            ;
+
+            $filePath = $fileDownloadCache;
+        } else {
+            if (!file_exists($filePath)) {
+                $this->throwFileNotFound($filePath);
+            } else if (!is_readable($filePath)) {
+                throw new FileNotReadableException(
+                    $this->translator
+                        ->trans(
+                            "The file %file is not readable",
+                            [
+                                "%file" => $filePath,
+                            ]
+                        )
+                );
+            }
+        }
+
+        if (empty($name)) {
+            $name = basename($filePath);
+        }
+
+        $destination = $directoryInArchive . $name;
+
+        if (!$this->zip->addFile($filePath,$destination)) {
+            $translatedErrorMessage = $this->translator->trans(
+                "An error occurred while adding this file to the archive: %file",
+                [
+                    "%file" => $filePath
+                ]
+            );
+
+            $this->logger->error($translatedErrorMessage);
+
+            throw new \ErrorException($translatedErrorMessage);
+        }
+
+        $this->commit();
+
+        return $this;
+>>>>>>> Define archive builders and formatters
     }
 
     /**
@@ -275,7 +400,11 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      */
     public function deleteFile($pathInArchive)
     {
+<<<<<<< HEAD
         $pathInArchive = $this->formatFilePath($pathInArchive);
+=======
+        $pathInArchive = $this->getFilePath($pathInArchive);
+>>>>>>> Define archive builders and formatters
 
         if (!$this->hasFile($pathInArchive)) {
             $this->throwFileNotFound($pathInArchive);
@@ -302,28 +431,48 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      *
      * This method return an instance of a Response with the archive as content.
      */
+<<<<<<< HEAD
     public function buildArchiveResponse($filename)
+=======
+    public function buildArchiveResponse()
+>>>>>>> Define archive builders and formatters
     {
         $this->zip->comment = "Generated by Thelia v" . Thelia::THELIA_VERSION;
 
         $this->commit();
 
+<<<<<<< HEAD
         if (!file_exists($this->cacheFile)) {
             $this->throwFileNotFound($this->cacheFile);
         }
 
         if (!is_readable($this->cacheFile)) {
+=======
+        if (!file_exists($this->zip_cache_file)) {
+            $this->throwFileNotFound($this->zip_cache_file);
+        }
+
+        if (!is_readable($this->zip_cache_file)) {
+>>>>>>> Define archive builders and formatters
             throw new FileNotReadableException(
                 $this->translator->trans(
                     "The cache file %file is not readable",
                     [
+<<<<<<< HEAD
                         "%file" => $this->cacheFile
+=======
+                        "%file" => $this->zip_cache_file
+>>>>>>> Define archive builders and formatters
                     ]
                 )
             );
         }
 
+<<<<<<< HEAD
         $content = file_get_contents($this->cacheFile);
+=======
+        $content = file_get_contents($this->zip_cache_file);
+>>>>>>> Define archive builders and formatters
 
         $this->zip->close();
 
@@ -331,22 +480,35 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
             $content,
             200,
             [
+<<<<<<< HEAD
                 "Content-Type" => $this->getMimeType(),
                 "Content-Disposition" => $filename . "." . $this->getExtension(),
+=======
+                "Content-Type" => $this->getMimeType()
+>>>>>>> Define archive builders and formatters
             ]
         );
     }
 
     /**
+<<<<<<< HEAD
      * @param  string                                  $pathToArchive
      * @param  bool                                    $isOnline
      * @param  FileDownloaderInterface                 $fileDownloader
      * @return ZipArchiveBuilder
+=======
+     * @param string $pathToArchive
+     * @param string $environment
+     * @param bool $isOnline
+     * @param FileDownloaderInterface $fileDownloader
+     * @return $this
+>>>>>>> Define archive builders and formatters
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\HttpUrlException
      *
      * Loads an archive
      */
+<<<<<<< HEAD
     public function loadArchive($pathToArchive, $isOnline = false)
     {
         $back = $this->zip;
@@ -369,6 +531,64 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         }
 
         return $zip;
+=======
+    public static function loadArchive(
+        $pathToArchive,
+        $environment,
+        $isOnline = false,
+        FileDownloaderInterface $fileDownloader = null
+    ) {
+        /** @var ZipArchiveBuilder $instance */
+        $instance = new static();
+
+        $instance->setEnvironment($environment);
+        $zip = $instance->getRawZipArchive();
+        $zip->close();
+
+        if ($fileDownloader !== null) {
+            $instance->setFileDownloader($fileDownloader);
+        }
+
+        if ($isOnline) {
+            /**
+             * It's an online file
+             */
+            $instance->getFileDownloader()
+                ->download($pathToArchive, $instance->getZipCacheFile())
+            ;
+        } else {
+            /**
+             * It's a local file
+             */
+            if (!is_file($pathToArchive) || !is_readable($pathToArchive)) {
+                $instance->throwFileNotFound($pathToArchive);
+            }
+
+            if (!copy($pathToArchive, $instance->getZipCacheFile())) {
+                $translatedErrorMessage = $instance->getTranslator()->trans(
+                    "An unknown error happend while copying %prev to %dest",
+                    [
+                        "%prev" => $pathToArchive,
+                        "%dest" => $instance->getZipCacheFile(),
+                    ]
+                );
+
+                $instance->getLogger()
+                    ->error($translatedErrorMessage)
+                ;
+
+                throw new \ErrorException($translatedErrorMessage);
+            }
+        }
+
+        if (true !== $return = $zip->open($instance->getZipCacheFile())) {
+            throw new ZipArchiveException(
+                $instance->getZipErrorMessage($return)
+            );
+        }
+
+        return $instance;
+>>>>>>> Define archive builders and formatters
     }
 
     /**
@@ -380,25 +600,41 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     public function hasFile($pathToFile)
     {
         return $this->zip
+<<<<<<< HEAD
             ->locateName($this->formatFilePath($pathToFile)) !== false
+=======
+            ->locateName($this->getFilePath($pathToFile)) !== false
+>>>>>>> Define archive builders and formatters
         ;
     }
 
     /**
+<<<<<<< HEAD
      * @param  string $directory
+=======
+     * @param string $directory
+>>>>>>> Define archive builders and formatters
      * @return bool
      *
      * Checks if the link $directory exists and if it's not a file.
      */
     public function hasDirectory($directory)
     {
+<<<<<<< HEAD
         $link = $this->zip->locateName($this->formatDirectoryPath($directory));
+=======
+        $link = $this->zip->locateName($this->getDirectoryPath($directory));
+>>>>>>> Define archive builders and formatters
 
         return  $link !== false;
     }
 
     /**
+<<<<<<< HEAD
      * @param  string $environment
+=======
+     * @param string $environment
+>>>>>>> Define archive builders and formatters
      * @return $this
      *
      * Sets the execution environment of the Kernel,
@@ -406,9 +642,42 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      */
     public function setEnvironment($environment)
     {
+<<<<<<< HEAD
         parent::setEnvironment($environment);
 
         $cacheFile = $this->generateCacheFile($environment);
+=======
+        $theliaCacheDir = THELIA_CACHE_DIR . $environment . DS;
+
+        if (!is_writable($theliaCacheDir)) {
+            throw new \ErrorException(
+                $this->translator->trans(
+                    "The cache directory \"%env\" is not writable",
+                    [
+                        "%env" => $environment
+                    ]
+                )
+            );
+        }
+
+        $archiveBuilderCacheDir = $this->cache_dir = $theliaCacheDir . static::TEMP_DIRECTORY_NAME;
+
+        if (!is_dir($archiveBuilderCacheDir) && !mkdir($archiveBuilderCacheDir, 0755)) {
+            throw new \ErrorException(
+                $this->translator->trans(
+                    "Error while creating the directory \"%directory\"",
+                    [
+                        "%directory" => static::TEMP_DIRECTORY_NAME
+                    ]
+                )
+            );
+        }
+
+        $cacheFileName = md5 (uniqid());
+
+        $cacheFile  = $archiveBuilderCacheDir . DS . $cacheFileName;
+        $cacheFile .= "." . $this->getExtension();
+>>>>>>> Define archive builders and formatters
 
         if (file_exists($cacheFile)) {
             unlink($cacheFile);
@@ -419,15 +688,26 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
             \ZipArchive::CREATE
         );
 
+<<<<<<< HEAD
         if ($opening !== true) {
             throw new \ErrorException(
                 $this->translator->trans(
                     "An unknown error append"
+=======
+        if($opening !== true) {
+            throw new \ErrorException(
+                $this->translator->trans(
+                    "Unknown"
+>>>>>>> Define archive builders and formatters
                 )
             );
         }
 
+<<<<<<< HEAD
         $this->cacheFile = $cacheFile;
+=======
+        $this->zip_cache_file = $cacheFile;
+>>>>>>> Define archive builders and formatters
 
         return $this;
     }
@@ -499,7 +779,11 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     public function commit()
     {
         $this->zip->close();
+<<<<<<< HEAD
         $result = $this->zip->open($this->getCacheFile());
+=======
+        $result = $this->zip->open($this->getZipCacheFile());
+>>>>>>> Define archive builders and formatters
 
         if ($result !== true) {
             throw new \ErrorException(
@@ -513,12 +797,20 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
+<<<<<<< HEAD
      * @param  string $initialString
+=======
+     * @param string $initialString
+>>>>>>> Define archive builders and formatters
      * @return string
      *
      * Gives a valid file path for \ZipArchive
      */
+<<<<<<< HEAD
     public function formatFilePath($initialString)
+=======
+    public function getFilePath($initialString)
+>>>>>>> Define archive builders and formatters
     {
         /**
          * Remove the / at the beginning and the end.
@@ -533,27 +825,59 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         if (preg_match("#\/?[^\/]+\/[^/]+\/?#", $initialString)) {
             $initialString = "/" . $initialString;
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> Define archive builders and formatters
         return $initialString;
     }
 
     /**
+<<<<<<< HEAD
      * @param  string $initialString
+=======
+     * @param string $initialString
+>>>>>>> Define archive builders and formatters
      * @return string
      *
      * Gives a valid directory path for \ZipArchive
      */
+<<<<<<< HEAD
     public function formatDirectoryPath($initialString)
     {
         $initialString = $this->formatFilePath($initialString);
 
         if ($initialString !== "" && $initialString[0] !== "/") {
+=======
+    public function getDirectoryPath($initialString)
+    {
+        $initialString = $this->getFilePath($initialString);
+
+        if ($initialString[0] !== "/") {
+>>>>>>> Define archive builders and formatters
             $initialString = "/" . $initialString;
         }
 
         return $initialString . "/";
     }
 
+<<<<<<< HEAD
+=======
+    public function throwFileNotFound($file)
+    {
+
+        throw new FileNotFoundException(
+            $this->getTranslator()
+                ->trans(
+                    "The file %file is missing or is not readable",
+                    [
+                        "%file" => $file,
+                    ]
+                )
+        );
+    }
+
+>>>>>>> Define archive builders and formatters
     /**
      * @return string
      *
@@ -595,10 +919,43 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * @return Tlog
+     */
+    public function getLogger()
+    {
+        return $this->logger;
+    }
+
+    /**
+     * @return Translator
+     */
+    public function getTranslator()
+    {
+        return $this->translator;
+    }
+
+    /**
+>>>>>>> Define archive builders and formatters
      * @return \ZipArchive
      */
     public function getRawZipArchive()
     {
         return $this->zip;
     }
+<<<<<<< HEAD
 }
+=======
+
+    public function getZipCacheFile()
+    {
+        return $this->zip_cache_file;
+    }
+
+    public function getCacheDir()
+    {
+        return $this->cache_dir;
+    }
+} 
+>>>>>>> Define archive builders and formatters

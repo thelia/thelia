@@ -22,8 +22,13 @@ use Thelia\Tools\FileDownload\FileDownloader;
 class FakeFileDownloader extends FileDownloader
 {
     /**
+<<<<<<< HEAD
      * @param  string                                  $url
      * @param  string                                  $pathToStore
+=======
+     * @param string $url
+     * @param string $pathToStore
+>>>>>>> Define archive builders and formatters
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \ErrorException
      * @throws \HttpUrlException
@@ -41,4 +46,8 @@ class FakeFileDownloader extends FileDownloader
         }
     }
 
+<<<<<<< HEAD
 }
+=======
+} 
+>>>>>>> Define archive builders and formatters

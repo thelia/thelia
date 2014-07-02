@@ -14,7 +14,11 @@ namespace Thelia\Tests\Type;
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
+<<<<<<< HEAD
 use Thelia\Tools\FileDownload\FileDownloader;
+=======
+use Thelia\Tools\FileDownloader;
+>>>>>>> Define archive builders and formatters
 
 /**
  * Class FileDownloaderTest
@@ -60,4 +64,8 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->downloader->download("https://github.com/thelia/thelia", "php://temp");
     }
+<<<<<<< HEAD
 }
+=======
+} 
+>>>>>>> Define archive builders and formatters

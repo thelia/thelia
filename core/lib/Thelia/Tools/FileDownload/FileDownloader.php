@@ -17,7 +17,10 @@ use Thelia\Core\Translation\Translator as TheliaTranslator;
 use Thelia\Exception\FileNotFoundException;
 use Thelia\Exception\HttpUrlException;
 use Thelia\Log\Tlog;
+<<<<<<< HEAD
 use Thelia\Tools\URL;
+=======
+>>>>>>> Define archive builders and formatters
 
 /**
  * Class FileDownloader
@@ -45,8 +48,13 @@ class FileDownloader implements FileDownloaderInterface
     }
 
     /**
+<<<<<<< HEAD
      * @param  string                                  $url
      * @param  string                                  $pathToStore
+=======
+     * @param string $url
+     * @param string $pathToStore
+>>>>>>> Define archive builders and formatters
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \ErrorException
      * @throws \HttpUrlException
@@ -125,7 +133,11 @@ class FileDownloader implements FileDownloaderInterface
          */
         $file = @fopen($pathToStore, "w");
 
+<<<<<<< HEAD
         if ($file === false) {
+=======
+        if($file === false) {
+>>>>>>> Define archive builders and formatters
             $translatedErrorMessage = $this->translator->trans(
                 "Failed to open a writing stream on the file: %file",
                 [
@@ -140,4 +152,8 @@ class FileDownloader implements FileDownloaderInterface
         fputs($file, $response);
         fclose($file);
     }
+<<<<<<< HEAD
 }
+=======
+} 
+>>>>>>> Define archive builders and formatters

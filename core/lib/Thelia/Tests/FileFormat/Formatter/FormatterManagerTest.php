@@ -10,21 +10,21 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Tests\FileFormat\Archive;
+namespace Thelia\Tests\FileFormat\Formatter;
 use Symfony\Component\DependencyInjection\Container;
-use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
-use Thelia\Core\FileFormat\Archive\ArchiveBuilderManager;
+use Thelia\Core\FileFormat\Formatter\AbstractFormatter;
+use Thelia\Core\FileFormat\Formatter\FormatterManager;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Class ArchiveBuilderManagerTest
- * @package Thelia\Tests\FileFormat\Archive
+ * Class FormatterManagerTest
+ * @package Thelia\Tests\FileFormat\Formatter
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class ArchiveBuilderManagerTest extends \PHPUnit_Framework_TestCase
+class FormatterManagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ArchiveBuilderManager
+     * @var FormatterManager
      */
     protected $manager;
 
@@ -33,13 +33,13 @@ class ArchiveBuilderManagerTest extends \PHPUnit_Framework_TestCase
         new Translator(
             new Container()
         );
-        $this->manager = new ArchiveBuilderManager("dev");
+        $this->manager = new FormatterManager();
     }
 
-    public function testAddArchiveBuilder()
+    public function testAddFormatter()
     {
-        /** @var AbstractArchiveBuilder $instance */
-        $instance = $this->getMock("Thelia\\Core\\FileFormat\\Archive\\AbstractArchiveBuilder");
+        /** @var AbstractFormatter $instance */
+        $instance = $this->getMock("Thelia\\Core\\FileFormat\\Formatter\\AbstractFormatter");
 
         $this->manager->add($instance);
 
@@ -50,10 +50,10 @@ class ArchiveBuilderManagerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testDeleteArchiveBuilder()
+    public function testDeleteFormatter()
     {
-        /** @var AbstractArchiveBuilder $instance */
-        $instance = $this->getMock("Thelia\\Core\\FileFormat\\Archive\\AbstractArchiveBuilder");
+        /** @var AbstractFormatter $instance */
+        $instance = $this->getMock("Thelia\\Core\\FileFormat\\Formatter\\AbstractFormatter");
 
         $this->manager->add($instance);
 
@@ -67,13 +67,8 @@ class ArchiveBuilderManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \OutOfBoundsException
      */
-    public function testDeleteNotExistingArchiveBuilder()
+    public function testDeleteNotExistingFormatter()
     {
         $this->manager->delete("foo");
     }
-
-<<<<<<< HEAD
-}
-=======
 } 
->>>>>>> Define archive builders and formatters

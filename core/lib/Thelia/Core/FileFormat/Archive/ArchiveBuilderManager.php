@@ -20,8 +20,12 @@ use Thelia\Core\Translation\Translator;
  */
 class ArchiveBuilderManager
 {
+<<<<<<< HEAD
     /** @var array */
     protected $archiveBuilders = array();
+=======
+    protected $archiveCreators = array();
+>>>>>>> Define archive builders and formatters
 
     protected $environment;
 
@@ -30,6 +34,7 @@ class ArchiveBuilderManager
         $this->environment = $environment;
     }
     /**
+<<<<<<< HEAD
      * @param  AbstractArchiveBuilder $archiveBuilder
      * @return $this
      */
@@ -39,6 +44,17 @@ class ArchiveBuilderManager
             $archiveBuilder->setEnvironment($this->environment);
 
             $this->archiveBuilders[$archiveBuilder->getName()] = $archiveBuilder;
+=======
+     * @param AbstractArchiveBuilder $archiveCreator
+     * @return $this
+     */
+    public function add(AbstractArchiveBuilder $archiveCreator)
+    {
+        if (null !== $archiveCreator) {
+            $archiveCreator->setEnvironment($this->environment);
+
+            $this->archiveCreators[$archiveCreator->getName()] = $archiveCreator;
+>>>>>>> Define archive builders and formatters
         }
 
         return $this;
@@ -51,16 +67,32 @@ class ArchiveBuilderManager
      */
     public function delete($name)
     {
+<<<<<<< HEAD
         if (!array_key_exists($name, $this->archiveBuilders)) {
             $this->throwOutOfBounds($name);
         }
 
         unset($this->archiveBuilders[$name]);
+=======
+        if (!array_key_exists($name, $this->archiveCreators)) {
+            throw new \OutOfBoundsException(
+                Translator::getInstance()->trans(
+                    "The archive creator %name doesn't exist",
+                    [
+                        "%name" => $name
+                    ]
+                )
+            );
+        }
+
+        unset($this->archiveCreators[$name]);
+>>>>>>> Define archive builders and formatters
 
         return $this;
     }
 
     /**
+<<<<<<< HEAD
      * @return array
      */
     public function getAll()
@@ -104,3 +136,12 @@ class ArchiveBuilderManager
         );
     }
 }
+=======
+     * @return array[AbstractArchiveBuilder]
+     */
+    public function getAll()
+    {
+        return $this->archiveCreators;
+    }
+} 
+>>>>>>> Define archive builders and formatters

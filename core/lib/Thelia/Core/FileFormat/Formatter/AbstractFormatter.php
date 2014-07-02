@@ -10,46 +10,32 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Tools\FileDownload;
+namespace Thelia\Core\FileFormat\Formatter;
+use Thelia\Core\FileFormat\FormatInterface;
 
 /**
- * Trait FileDownloaderAwareTrait
- * @package Thelia\Tools\FileDownload
+ * Class AbstractFormatter
+ * @package Thelia\Core\FileFormat\Formatter
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-trait FileDownloaderAwareTrait
+abstract class AbstractFormatter implements FormatInterface
 {
-    /** @var  FileDownloaderInterface */
-    protected $fileDownloader;
+    /**
+     * @param array $data
+     * @return mixed
+     *
+     * Encodes an array to the desired format.
+     * $data array only contains array and scalar data.
+     */
+    abstract public function encode(array $data);
 
     /**
-     * @return FileDownloaderInterface
+     * @param $data
+     * @return array
+     * @throws \Thelia\Core\FileFormat\Formatter\Exception\BadFormattedStringException
+     *
+     * this method must do exactly the opposite of encode and return
+     * an array composed of array and scalar data.
      */
-    public function getFileDownloader()
-    {
-        if (!$this->fileDownloader instanceof FileDownloaderInterface) {
-            $this->fileDownloader = FileDownloader::getInstance();
-        }
-
-        return $this->fileDownloader;
-    }
-
-    /**
-<<<<<<< HEAD
-     * @param  FileDownloaderInterface $fileDownloader
-=======
-     * @param FileDownloaderInterface $fileDownloader
->>>>>>> Define archive builders and formatters
-     * @return $this
-     */
-    public function setFileDownloader(FileDownloaderInterface $fileDownloader)
-    {
-        $this->fileDownloader = $fileDownloader;
-
-        return $this;
-    }
-<<<<<<< HEAD
-}
-=======
+    abstract public function decode($data);
 } 
->>>>>>> Define archive builders and formatters
