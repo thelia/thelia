@@ -30,7 +30,9 @@ class Lang extends BaseLang
         if (null === self::$defaultLanguage) {
             self::$defaultLanguage = LangQuery::create()->findOneByByDefault(1);
 
-            if (self::$defaultLanguage == null) throw new \RuntimeException("No default language is defined. Please define one.");
+            if (null === self::$defaultLanguage) {
+                throw new \RuntimeException("No default language is defined. Please define one.");
+            }
         }
 
         return self::$defaultLanguage;
