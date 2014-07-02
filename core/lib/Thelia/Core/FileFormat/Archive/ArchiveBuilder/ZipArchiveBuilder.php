@@ -41,10 +41,13 @@ use Thelia\Tools\FileDownload\FileDownloaderInterface;
 class ZipArchiveBuilder extends AbstractArchiveBuilder
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     const TEMP_DIRECTORY_NAME = "archive_builder";
 
 >>>>>>> Define archive builders and formatters
+=======
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
     /**
      * @var \ZipArchive
      */
@@ -60,31 +63,23 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     /**
      * @var string This is the absolute path to the zip file in cache
      */
-    protected $zip_cache_file;
+    protected $zipCacheFile;
 
     /**
      * @var string This is the path of the cache
      */
-    protected $cache_dir;
-
-    /**
-     * @var \Thelia\Log\Tlog
-     */
-    protected $logger;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
+    protected $cacheDir;
 
     public function __construct()
     {
-        $this->zip = new \ZipArchive();
+        parent::__construct();
 
-        $this->logger = Tlog::getNewInstance();
-
+<<<<<<< HEAD
         $this->translator = Translator::getInstance();
 >>>>>>> Define archive builders and formatters
+=======
+        $this->zip = new \ZipArchive();
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
     }
 
     /**
@@ -101,12 +96,17 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
             @$this->zip->close();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             if (file_exists($this->cacheFile)) {
                 unlink($this->cacheFile);
 =======
             if (file_exists($this->zip_cache_file)) {
                 unlink($this->zip_cache_file);
 >>>>>>> Define archive builders and formatters
+=======
+            if (file_exists($this->zipCacheFile)) {
+                unlink($this->zipCacheFile);
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
             }
         }
     }
@@ -250,7 +250,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
             $directoryInArchive = "";
         }
 
-        if(!empty($directoryInArchive) && $directoryInArchive != "/") {
+        if(!empty($directoryInArchive)) {
             $directoryInArchive = $this->getDirectoryPath($directoryInArchive);
 
 >>>>>>> Define archive builders and formatters
@@ -266,6 +266,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
             }
         }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         return $this;
     }
@@ -341,8 +342,14 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
         return $initialString . "/";
 =======
+=======
+        /**
+         * Download the file if it is online
+         * If it's local check if the file exists and if it is redable
+         */
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
         if ($isOnline) {
-            $fileDownloadCache = $this->cache_dir . DS . "download";
+            $fileDownloadCache = $this->cacheDir . DS . "download";
 
             $this->getFileDownloader()
                 ->download($filePath, $fileDownloadCache)
@@ -368,6 +375,10 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         if (empty($name)) {
             $name = basename($filePath);
         }
+
+        /**
+         * Then write the file in the archive and commit the changes
+         */
 
         $destination = $directoryInArchive . $name;
 
@@ -442,6 +453,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         $this->commit();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         if (!file_exists($this->cacheFile)) {
             $this->throwFileNotFound($this->cacheFile);
         }
@@ -454,25 +466,40 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
         if (!is_readable($this->zip_cache_file)) {
 >>>>>>> Define archive builders and formatters
+=======
+        if (!file_exists($this->zipCacheFile)) {
+            $this->throwFileNotFound($this->zipCacheFile);
+        }
+
+        if (!is_readable($this->zipCacheFile)) {
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
             throw new FileNotReadableException(
                 $this->translator->trans(
                     "The cache file %file is not readable",
                     [
 <<<<<<< HEAD
+<<<<<<< HEAD
                         "%file" => $this->cacheFile
 =======
                         "%file" => $this->zip_cache_file
 >>>>>>> Define archive builders and formatters
+=======
+                        "%file" => $this->zipCacheFile
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
                     ]
                 )
             );
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         $content = file_get_contents($this->cacheFile);
 =======
         $content = file_get_contents($this->zip_cache_file);
 >>>>>>> Define archive builders and formatters
+=======
+        $content = file_get_contents($this->zipCacheFile);
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
 
         $this->zip->close();
 
@@ -643,6 +670,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     public function setEnvironment($environment)
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         parent::setEnvironment($environment);
 
         $cacheFile = $this->generateCacheFile($environment);
@@ -678,6 +706,13 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         $cacheFile  = $archiveBuilderCacheDir . DS . $cacheFileName;
         $cacheFile .= "." . $this->getExtension();
 >>>>>>> Define archive builders and formatters
+=======
+
+        $cacheFileName = md5 (uniqid());
+
+        $cacheFile  = $this->getArchiveBuilderCacheDirectory($environment) . DS;
+        $cacheFile .= $cacheFileName . "." . $this->getExtension();
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
 
         if (file_exists($cacheFile)) {
             unlink($cacheFile);
@@ -697,17 +732,25 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         if($opening !== true) {
             throw new \ErrorException(
                 $this->translator->trans(
+<<<<<<< HEAD
                     "Unknown"
 >>>>>>> Define archive builders and formatters
+=======
+                    "An unknown error append"
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
                 )
             );
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         $this->cacheFile = $cacheFile;
 =======
         $this->zip_cache_file = $cacheFile;
 >>>>>>> Define archive builders and formatters
+=======
+        $this->zipCacheFile = $cacheFile;
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
 
         return $this;
     }
@@ -920,6 +963,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
      * @return Tlog
      */
@@ -938,6 +982,8 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
     /**
 >>>>>>> Define archive builders and formatters
+=======
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
      * @return \ZipArchive
      */
     public function getRawZipArchive()
@@ -950,12 +996,16 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
     public function getZipCacheFile()
     {
-        return $this->zip_cache_file;
+        return $this->zipCacheFile;
     }
 
+<<<<<<< HEAD
     public function getCacheDir()
     {
         return $this->cache_dir;
     }
 } 
 >>>>>>> Define archive builders and formatters
+=======
+} 
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources

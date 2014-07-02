@@ -56,6 +56,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * This method formats a path to be compatible with \ZipArchive
 <<<<<<< HEAD
+<<<<<<< HEAD
      */
     public function testFormatFilePath()
     {
@@ -65,6 +66,8 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 =======
      *
      *
+=======
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
      */
     public function testGetFilePath()
     {

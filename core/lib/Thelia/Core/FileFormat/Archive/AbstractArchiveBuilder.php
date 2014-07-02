@@ -13,12 +13,17 @@
 namespace Thelia\Core\FileFormat\Archive;
 use Thelia\Core\FileFormat\FormatInterface;
 <<<<<<< HEAD
+<<<<<<< HEAD
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\FileNotFoundException;
 use Thelia\Exception\FileNotReadableException;
 use Thelia\Log\Tlog;
 =======
 >>>>>>> Define archive builders and formatters
+=======
+use Thelia\Core\Translation\Translator;
+use Thelia\Log\Tlog;
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
 use Thelia\Tools\FileDownload\FileDownloaderAwareTrait;
 
 /**
@@ -30,12 +35,18 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
 {
     use FileDownloaderAwareTrait;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     const TEMP_DIRECTORY_NAME = "archive_builder";
 
     /** @var  string */
     protected $cacheFile;
 
+=======
+
+    const TEMP_DIRECTORY_NAME = "archive_builder";
+
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
     /** @var \Thelia\Core\Translation\Translator  */
     protected $translator;
 
@@ -45,9 +56,12 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     /** @var string */
     protected $cacheDir;
 
+<<<<<<< HEAD
     /** @var string */
     protected $environment;
 
+=======
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
     public function __construct()
     {
         $this->translator = Translator::getInstance();
@@ -70,7 +84,11 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
             );
         }
 
+<<<<<<< HEAD
         $archiveBuilderCacheDir = $this->cacheDir = $theliaCacheDir . static::TEMP_DIRECTORY_NAME;
+=======
+        $archiveBuilderCacheDir = $this->cache_dir = $theliaCacheDir . static::TEMP_DIRECTORY_NAME;
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
 
         if (!is_dir($archiveBuilderCacheDir) && !mkdir($archiveBuilderCacheDir, 0755)) {
             throw new \ErrorException(
@@ -86,6 +104,7 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
         return $archiveBuilderCacheDir;
     }
 
+<<<<<<< HEAD
     /**
      * @param $pathToFile
      * @param $destination
@@ -177,6 +196,8 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
 
         return $this;
     }
+=======
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
 
     public function getCacheDir()
     {
@@ -198,6 +219,7 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     {
         return $this->translator;
     }
+<<<<<<< HEAD
 
     public function getCacheFile()
     {
@@ -219,3 +241,6 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
 =======
 } 
 >>>>>>> Define archive builders and formatters
+=======
+} 
+>>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources

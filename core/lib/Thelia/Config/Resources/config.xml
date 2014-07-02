@@ -144,7 +144,25 @@
             <argument>%kernel.environment%</argument>
         </service>
 
+        <!-- zip -->
         <service id="thelia.manager.zip_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
+            <tag name="thelia.manager.archive_builder" />
+        </service>
+
+        <!-- tar -->
+        <service id="thelia.manager.tar_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
+            <tag name="thelia.manager.archive_builder" />
+        </service>
+
+        <!-- tar.gz -->
+        <service id="thelia.manager.tar_gz_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
+            <argument id="compressionType" type="string">gz</argument>
+            <tag name="thelia.manager.archive_builder" />
+        </service>
+
+        <!-- tar.bz2 -->
+        <service id="thelia.manager.tar_bz2_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
+            <argument id="compressionType" type="string">bz2</argument>
             <tag name="thelia.manager.archive_builder" />
         </service>
 
