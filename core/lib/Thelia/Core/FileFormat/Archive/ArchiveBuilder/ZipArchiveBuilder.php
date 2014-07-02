@@ -33,8 +33,6 @@ use Thelia\Tools\FileDownload\FileDownloaderInterface;
  */
 class ZipArchiveBuilder extends AbstractArchiveBuilder
 {
-    const TEMP_DIRECTORY_NAME = "archive_builder";
-
     /**
      * @var \ZipArchive
      */
@@ -43,30 +41,18 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     /**
      * @var string This is the absolute path to the zip file in cache
      */
-    protected $zip_cache_file;
+    protected $zipCacheFile;
 
     /**
      * @var string This is the path of the cache
      */
-    protected $cache_dir;
-
-    /**
-     * @var \Thelia\Log\Tlog
-     */
-    protected $logger;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
+    protected $cacheDir;
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->zip = new \ZipArchive();
-
-        $this->logger = Tlog::getNewInstance();
-
-        $this->translator = Translator::getInstance();
     }
 
     /**
@@ -78,8 +64,8 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         if ($this->zip instanceof \ZipArchive) {
             @$this->zip->close();
 
-            if (file_exists($this->zip_cache_file)) {
-                unlink($this->zip_cache_file);
+            if (file_exists($this->zipCacheFile)) {
+                unlink($this->zipCacheFile);
             }
         }
     }
@@ -106,7 +92,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
             $directoryInArchive = "";
         }
 
-        if(!empty($directoryInArchive) && $directoryInArchive != "/") {
+        if(!empty($directoryInArchive)) {
             $directoryInArchive = $this->getDirectoryPath($directoryInArchive);
 
             if (!$this->zip->addEmptyDir($directoryInArchive)) {
@@ -121,8 +107,12 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
             }
         }
 
+        /**
+         * Download the file if it is online
+         * If it's local check if the file exists and if it is redable
+         */
         if ($isOnline) {
-            $fileDownloadCache = $this->cache_dir . DS . "download";
+            $fileDownloadCache = $this->cacheDir . DS . "download";
 
             $this->getFileDownloader()
                 ->download($filePath, $fileDownloadCache)
@@ -148,6 +138,10 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         if (empty($name)) {
             $name = basename($filePath);
         }
+
+        /**
+         * Then write the file in the archive and commit the changes
+         */
 
         $destination = $directoryInArchive . $name;
 
@@ -212,22 +206,22 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
         $this->commit();
 
-        if (!file_exists($this->zip_cache_file)) {
-            $this->throwFileNotFound($this->zip_cache_file);
+        if (!file_exists($this->zipCacheFile)) {
+            $this->throwFileNotFound($this->zipCacheFile);
         }
 
-        if (!is_readable($this->zip_cache_file)) {
+        if (!is_readable($this->zipCacheFile)) {
             throw new FileNotReadableException(
                 $this->translator->trans(
                     "The cache file %file is not readable",
                     [
-                        "%file" => $this->zip_cache_file
+                        "%file" => $this->zipCacheFile
                     ]
                 )
             );
         }
 
-        $content = file_get_contents($this->zip_cache_file);
+        $content = file_get_contents($this->zipCacheFile);
 
         $this->zip->close();
 
@@ -344,36 +338,11 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      */
     public function setEnvironment($environment)
     {
-        $theliaCacheDir = THELIA_CACHE_DIR . $environment . DS;
-
-        if (!is_writable($theliaCacheDir)) {
-            throw new \ErrorException(
-                $this->translator->trans(
-                    "The cache directory \"%env\" is not writable",
-                    [
-                        "%env" => $environment
-                    ]
-                )
-            );
-        }
-
-        $archiveBuilderCacheDir = $this->cache_dir = $theliaCacheDir . static::TEMP_DIRECTORY_NAME;
-
-        if (!is_dir($archiveBuilderCacheDir) && !mkdir($archiveBuilderCacheDir, 0755)) {
-            throw new \ErrorException(
-                $this->translator->trans(
-                    "Error while creating the directory \"%directory\"",
-                    [
-                        "%directory" => static::TEMP_DIRECTORY_NAME
-                    ]
-                )
-            );
-        }
 
         $cacheFileName = md5 (uniqid());
 
-        $cacheFile  = $archiveBuilderCacheDir . DS . $cacheFileName;
-        $cacheFile .= "." . $this->getExtension();
+        $cacheFile  = $this->getArchiveBuilderCacheDirectory($environment) . DS;
+        $cacheFile .= $cacheFileName . "." . $this->getExtension();
 
         if (file_exists($cacheFile)) {
             unlink($cacheFile);
@@ -387,12 +356,12 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         if($opening !== true) {
             throw new \ErrorException(
                 $this->translator->trans(
-                    "Unknown"
+                    "An unknown error append"
                 )
             );
         }
 
-        $this->zip_cache_file = $cacheFile;
+        $this->zipCacheFile = $cacheFile;
 
         return $this;
     }
@@ -573,22 +542,6 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
-     * @return Tlog
-     */
-    public function getLogger()
-    {
-        return $this->logger;
-    }
-
-    /**
-     * @return Translator
-     */
-    public function getTranslator()
-    {
-        return $this->translator;
-    }
-
-    /**
      * @return \ZipArchive
      */
     public function getRawZipArchive()
@@ -598,11 +551,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
     public function getZipCacheFile()
     {
-        return $this->zip_cache_file;
+        return $this->zipCacheFile;
     }
 
-    public function getCacheDir()
-    {
-        return $this->cache_dir;
-    }
 } 

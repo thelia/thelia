@@ -48,8 +48,6 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * This method formats a path to be compatible with \ZipArchive
-     *
-     *
      */
     public function testGetFilePath()
     {
