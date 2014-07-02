@@ -25,7 +25,7 @@ use Thelia\Model\NewsletterQuery;
 class CustomerExportController extends BaseAdminController
 {
 
-    public function NewsletterExportAction()
+    public function newsletterExportAction()
     {
         if (null !== $response = $this->checkAuth([AdminResources::EXPORT_CUSTOMER_NEWSLETTER], [], [AccessManager::VIEW])) {
             return $response;
