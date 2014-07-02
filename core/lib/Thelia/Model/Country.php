@@ -102,7 +102,7 @@ class Country extends BaseCountry
         if (null === self::$defaultCountry) {
             self::$defaultCountry = CountryQuery::create()->findOneByByDefault(true);
 
-            if (self::$defaultCountry == null) {
+            if (null === self::$defaultCountry) {
                 throw new \LogicException(Translator::getInstance()->trans("Cannot find a default country. Please define one."));
             }
         }

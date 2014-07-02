@@ -22,7 +22,7 @@ class Currency extends BaseCurrency
 
             self::$defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
 
-            if (self::$defaultCurrency == null) {
+            if (null === self::$defaultCurrency) {
                 throw new \RuntimeException("No default currency is defined. Please define one.");
             }
         }
