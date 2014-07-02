@@ -135,6 +135,22 @@
         <service id="session.listener" class="Thelia\Core\EventListener\SessionListener">
             <tag name="kernel.event_subscriber"/>
         </service>
+<<<<<<< HEAD
+=======
+
+        <!-- Archive builders and file formatters -->
+
+        <service id="thelia.manager.archive_builder_manager" class="Thelia\Core\FileFormat\Archive\ArchiveBuilderManager">
+            <argument>%kernel.environment%</argument>
+        </service>
+
+        <service id="thelia.manager.zip_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
+            <tag name="thelia.manager.archive_builder" />
+        </service>
+
+        <service id="thelia.manager.formatter_manager" class="Thelia\Core\FileFormat\Formatter\FormatterManager" />
+    </services>
+>>>>>>> Add archive builder manager and formatter manager services
 
         <!-- Archive builders -->
 
