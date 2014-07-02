@@ -17,7 +17,9 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Scope;
 
+use Thelia\Core\DependencyInjection\Compiler\RegisterArchiveBuilderPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterCouponPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterFormatterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterListenersPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterParserPluginPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass;
@@ -57,6 +59,8 @@ class TheliaBundle extends Bundle
             ->addCompilerPass(new RegisterRouterPass())
             ->addCompilerPass(new RegisterCouponPass())
             ->addCompilerPass(new RegisterCouponConditionPass())
+            ->addCompilerPass(new RegisterArchiveBuilderPass())
+            ->addCompilerPass(new RegisterFormatterPass())
         ;
     }
 }
