@@ -9,16 +9,6 @@ fragment uses the following additional variables :
   custom_render_form_field block to pass a custom representation of the input field.
 *}
 
-{* Use the optionnal $field_value parameter if no value is defined *}
-{if empty($value)}
-    {$value = $field_value}
-{/if}
-
-{* Synthetize an ID if none was given *}
-{if empty({$label_attr.for})}
-    {$label_attr.for = "id-{$field_name}"}
-{/if}
-
 {* Get standard fields attributes *}
 {capture assign=attributes}
     {include file="forms/form-field-attributes-$field_template-renderer.html"}

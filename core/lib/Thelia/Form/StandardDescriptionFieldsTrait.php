@@ -49,11 +49,10 @@ trait StandardDescriptionFieldsTrait
                     'required'    => true,
                     'label'       => Translator::getInstance()->trans('Title'),
                     'label_attr'  => [
-                        'for'         => 'title_field',
-                        'placeholder' => Translator::getInstance()->trans('A descriptive title')
+                        'for' => 'title_field'
                     ],
                     'attr' => [
-
+                        'placeholder' => Translator::getInstance()->trans('A descriptive title')
                     ]
                 ]
             );
