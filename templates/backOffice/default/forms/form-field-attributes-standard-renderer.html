@@ -1,0 +1,21 @@
+{*
+This file defines the standard fields attributes, depending on input types.
+
+In addition to the standard form_field block output, this fragment uses the following additional variables :
+
+- field_template : the template style ('standard', or somethingelse)
+- field_value : the value of the input field, which is used if the form_field value is empty.
+- field_extra_class : an extra class to add to the input class (see form-field-attributes-standard-renderer.html)
+*}
+
+{if $type == 'hidden'}
+   id="{$label_attr.for}" name="{$name}" value="{$value}"
+{elseif $type == 'checkbox' || $type == 'radio'}
+   class="{$field_extra_class}" type="checkbox" id="{$label_attr.for}" name="{$name}" value="{$value}" {if $checked}checked="checked"{/if}
+{elseif $type == 'choice'}
+   {if $multiple}multiple{/if} {if $lattr_list.size}size="{$lattr_list.size}"{/if} {if $required}aria-required="true" required{/if} id="{$label_attr.for}" name="{$name}"class="form-control class="{$field_extra_class}"
+{elseif $type == 'textarea'}
+    {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {if $required}aria-required="true" required{/if} placeholder="{$attr_list.placeholder|default:$label}" id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" title="{$label}"
+{else}
+    {if $required}aria-required="true" required{/if} placeholder="{$attr_list.placeholder|default:$label}" id="{$label_attr.for}" name="{$name}" value="{$value}" class="form-control {$field_extra_class}"
+{/if}

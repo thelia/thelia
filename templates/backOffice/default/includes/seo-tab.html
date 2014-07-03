@@ -16,26 +16,21 @@
 
         {form_hidden_fields form=$form}
 
-        {admin_form_field form=$form name="success_url"}
+        {render_form_field form=$form field="success_url"}
 
         {* Display error message if exist *}
         {include file='includes/notifications.html' message=$form_error_message}
 
-        {form_field form=$form field='url'}
-            <div class="form-group {if $error}has-error{/if}">
-
-                {admin_form_field_label form=$form name='url'}
-
-                <div class="input-group">
-                    <span class="input-group-addon">{$url_language|default:{config key="url_site"}}/</span>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" value="{$value}" title="{$label}" {if $required} aria-required="true" required{/if} class="form-control" placeholder="{$label_attr.placeholder}">
-                </div>
+        {custom_render_form_field form=$form field='url'}
+            <div class="input-group">
+                <span class="input-group-addon">{$url_language|default:{config key="url_site"}}/</span>
+                <input type="text" id="{$label_attr.for}" name="{$name}" value="{$value}" title="{$label}" {if $required} aria-required="true" required{/if} class="form-control" placeholder="{$label_attr.placeholder}">
             </div>
-        {/form_field}
+        {/custom_render_form_field}
 
-        {admin_form_field form=$form name="meta_title"}
-        {admin_form_field form=$form name="meta_description"}
-        {admin_form_field form=$form name="meta_keywords"}
+        {render_form_field form=$form field="meta_title"}
+        {render_form_field form=$form field="meta_description"}
+        {render_form_field form=$form field="meta_keywords"}
 
         {include
             file = "includes/inner-form-toolbar.html"

@@ -40,8 +40,8 @@
 
         						        	{form_hidden_fields form=$form}
 
-                                            {admin_form_field form=$form name="success_url" value="{url path="/admin/document/type/{$documentType}/{$ID}/update"}"}
-                                            {admin_form_field form=$form name="locale" value="$edit_language_locale"}
+                                            {render_form_field form=$form field="success_url" value="{url path="/admin/document/type/{$documentType}/{$ID}/update"}"}
+                                            {render_form_field form=$form field="locale" value="$edit_language_locale"}
 
         					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
@@ -57,15 +57,15 @@
                                                 </div>
 
                                                 <div class="col-md-6">
-                                                    {admin_form_field form=$form name="file"}
-                                                    {admin_form_field form=$form name="title" value=$TITLE}
-                                                    {admin_form_field form=$form name="chapo" value=$CHAPO}
-                                                    {admin_form_field form=$form name="postscriptum" value=$POSTSCRIPTUM}
+                                                    {render_form_field form=$form field="file"}
+                                                    {render_form_field form=$form field="title" value=$TITLE}
+                                                    {render_form_field form=$form field="chapo" value=$CHAPO}
+                                                    {render_form_field form=$form field="postscriptum" value=$POSTSCRIPTUM}
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    {admin_form_field form=$form name="description" value=$DESCRIPTION extra_class="wysiwyg"}
+                                                    {render_form_field form=$form field="description" value=$DESCRIPTION extra_class="wysiwyg"}
                                                 </div>
                                             </div>
 

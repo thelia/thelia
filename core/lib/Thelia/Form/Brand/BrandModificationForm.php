@@ -48,8 +48,10 @@ class BrandModificationForm extends BrandCreationForm
                     'required'    => true,
                     'label'       => Translator::getInstance()->trans('Brand name'),
                     'label_attr'  => [
-                        'for'         => 'title',
-                        'placeholder' => Translator::getInstance()->trans('The brand name or title'),
+                        'for'         => 'title'
+                    ],
+                    'attr' => [
+                        'placeholder' => Translator::getInstance()->trans('The brand name or title')
                     ]
                 ]
             )

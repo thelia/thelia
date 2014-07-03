@@ -51,6 +51,9 @@ trait StandardDescriptionFieldsTrait
                     'label_attr'  => [
                         'for'         => 'title_field',
                         'placeholder' => Translator::getInstance()->trans('A descriptive title')
+                    ],
+                    'attr' => [
+
                     ]
                 ]
             );
@@ -65,11 +68,13 @@ trait StandardDescriptionFieldsTrait
                     'label'       => Translator::getInstance()->trans('Summary'),
                     'label_attr'  => [
                         'for'         => 'summary_field',
-                        'rows'        => 3,
-                        'placeholder' => Translator::getInstance()->trans('Short description text'),
                         'help'        => Translator::getInstance()->trans('A short description, used when a summary or an introduction is required')
+                    ],
+                    'attr' => [
+                        'rows'        => 3,
+                        'placeholder' => Translator::getInstance()->trans('Short description text')
                     ]
-                ]
+               ]
             );
 
         if (! in_array('description', $exclude))
@@ -82,8 +87,10 @@ trait StandardDescriptionFieldsTrait
                     'label'       => Translator::getInstance()->trans('Detailed description'),
                     'label_attr'  => [
                         'for'  => 'detailed_description_field',
-                        'rows' => 10,
                         'help' => Translator::getInstance()->trans('The detailed description.')
+                    ],
+                    'attr' => [
+                        'rows' => 10
                     ]
                 ]
             );
@@ -98,9 +105,11 @@ trait StandardDescriptionFieldsTrait
                     'label'       => Translator::getInstance()->trans('Conclusion'),
                     'label_attr'  => [
                         'for'         => 'conclusion_field',
-                        'rows'        => 3,
-                        'placeholder' => Translator::getInstance()->trans('Short additional text'),
                         'help'        => Translator::getInstance()->trans('A short text, used when an additional or supplemental information is required.')
+                    ],
+                    'attr' => [
+                        'placeholder' => Translator::getInstance()->trans('Short additional text'),
+                        'rows'        => 3,
                     ]
                 ]
             );

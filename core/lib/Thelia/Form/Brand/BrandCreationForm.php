@@ -38,12 +38,13 @@ class BrandCreationForm extends BaseForm
                     'label'       => Translator::getInstance()->trans('Brand name'),
                     'label_attr'  => [
                         'for'         => 'title',
-                        'placeholder' => Translator::getInstance()->trans('The brand name or title'),
                         'help'        => Translator::getInstance()->trans(
                             'Enter here the brand name in the default language (%title%)',
                             [ '%title%' => Lang::getDefaultLanguage()->getTitle()]
                         ),
-                        'i18n'        => 'default'
+                    ],
+                    'attr' => [
+                        'placeholder' => Translator::getInstance()->trans('The brand name or title'),
                     ]
                 ]
             )

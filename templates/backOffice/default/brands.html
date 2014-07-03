@@ -190,12 +190,26 @@
                 {* Switch edition to the current locale *}
                 <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                {admin_form_field form=$form name="locale" value=$LOCALE}
+                {render_form_field form=$form field="locale" value=$LOCALE}
             {/loop}
 
-            {admin_form_field form=$form name="success_url" value={url path='/admin/brand/update/_ID_'}}
-            {admin_form_field form=$form name="title"}
-            {admin_form_field form=$form name="visible"}
+            {render_form_field form=$form field="success_url" value={url path='/admin/brand/update/_ID_'}}
+
+            {custom_render_form_field form=$form field="title"}
+                {loop type="lang" name="default-lang" default_only="1"}
+                    {* Switch edition to the current locale *}
+                    <input type="hidden" name="edit_language_id" value="{$ID}" />
+
+                    {render_form_field field="locale" value=$LOCALE}
+
+                    <div class="input-group">
+                        <input type="text" {$form_field_attributes form=$form field="title" template="toto"}>
+                        <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                    </div>
+                {/loop}
+            {/custom_render_form_field}
+
+            {render_form_field form=$form field="visible"}
 
             {module_include location='brand_create_form'}
 

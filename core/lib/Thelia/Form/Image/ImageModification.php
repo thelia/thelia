@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
+use Thelia\Form\StandardDescriptionFieldsTrait;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -23,14 +24,14 @@ use Thelia\Form\BaseForm;
  * Time: 3:56 PM
  *
  * Form allowing to process an image
- * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
- *
+  *
  * @package Image
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
 abstract class ImageModification extends BaseForm
 {
+    use StandardDescriptionFieldsTrait;
 
     /**
      * @inheritdoc
@@ -40,88 +41,24 @@ abstract class ImageModification extends BaseForm
         $this->formBuilder->add(
             'file',
             'file',
-            array(
+            [
                 'required' => false,
-                'constraints' => array(
+                'constraints' => [
                     new Image(
-                        array(
+                        [
 //                            'minWidth' => 200,
 //                            'minHeight' => 200
-                        )
+                        ]
                     )
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('Replace current image by this file'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'file'
-                )
-            )
-        )
-        ->add(
-            'title',
-            'text',
-            array(
-                'required' => true,
-                'constraints' => array(
-                    new NotBlank()
-                ),
-                'label' => Translator::getInstance()->trans('Title'),
-                'label_attr' => array(
-                    'for' => 'title'
-                )
-            )
-        )
-        ->add(
-            'description',
-            'textarea',
-            array(
-                'required' => false,
-                'constraints' => array(),
-                'label' => Translator::getInstance()->trans('Description'),
-                'label_attr' => array(
-                    'for' => 'description',
-                    'rows' => 5
-                )
-            )
-        )
-        ->add(
-            'chapo',
-            'textarea',
-            array(
-                'required' => false,
-                'constraints' => array(),
-                'label' => Translator::getInstance()->trans('Chapo'),
-                'label_attr' => array(
-                    'for' => 'chapo',
-                    'rows' => 3
-                )
-            )
-        )
-        ->add(
-            'postscriptum',
-            'textarea',
-            array(
-                'required' => false,
-                'constraints' => array(),
-                'label' => Translator::getInstance()->trans('Post Scriptum'),
-                'label_attr' => array(
-                    'for' => 'postscriptum',
-                    'rows' => 3
-                )
-            )
-        )
-        ->add(
-            "locale",
-            "hidden",
-            array(
-                'required' => true,
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label_attr" => array(
-                    "for" => "locale_create"
-                )
-            )
-        )
-        ;
+                ]
+            ]
+        );
+
+        // Add standard description fields
+        $this->addStandardDescFields();
     }
 }
