@@ -358,7 +358,6 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-
     public function testDeleteFile()
     {
         $this->tar->addFileFromString(
@@ -375,5 +374,143 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             $this->tar->hasFile("bar")
         );
     }
+<<<<<<< HEAD
 } 
 >>>>>>> Complete zip tests
+=======
+
+    public function testLoadValidArchive()
+    {
+        $tar = TarArchiveBuilder::loadArchive(
+            __DIR__ . DS . "TestResources/well_formatted.tar",
+            "dev"
+        );
+
+        $this->assertInstanceOf(
+            get_class($this->tar),
+            $tar
+        );
+
+        $this->assertTrue(
+            $tar->hasFile("LICENSE.txt")
+        );
+    }
+
+    /**
+     * @expectedException \Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception\TarArchiveException
+     */
+    public function testLoadInvalidArchive()
+    {
+        $tar = TarArchiveBuilder::loadArchive(
+            __DIR__ . DS . "TestResources/bad_formatted.tar",
+            "dev"
+        );
+    }
+
+    public function testFormatDirectoryPath()
+    {
+        $this->assertEquals(
+            "foo/",
+            $this->tar->formatDirectoryPath("foo")
+        );
+
+        $this->assertEquals(
+            "foo/",
+            $this->tar->formatDirectoryPath("/foo")
+        );
+
+        $this->assertEquals(
+            "foo/",
+            $this->tar->formatDirectoryPath("foo/")
+        );
+
+        $this->assertEquals(
+            "foo/",
+            $this->tar->formatDirectoryPath("/foo/")
+        );
+
+        $this->assertEquals(
+            "foo/bar/",
+            $this->tar->formatDirectoryPath("foo/bar")
+        );
+
+        $this->assertEquals(
+            "foo/bar/",
+            $this->tar->formatDirectoryPath("/foo/bar")
+        );
+
+        $this->assertEquals(
+            "foo/bar/",
+            $this->tar->formatDirectoryPath("/foo//bar/")
+        );
+
+        $this->assertEquals(
+            "foo/bar/",
+            $this->tar->formatDirectoryPath("/foo/bar/")
+        );
+
+        $this->assertEquals(
+            "foo/bar/baz/",
+            $this->tar->formatDirectoryPath("foo/bar/baz")
+        );
+
+        $this->assertEquals(
+            "foo/bar/baz/",
+            $this->tar->formatDirectoryPath("//foo/bar///baz/")
+        );
+    }
+    
+    public function testFormatFilePath()
+    {
+        $this->assertEquals(
+            "foo",
+            $this->tar->formatFilePath("foo")
+        );
+
+        $this->assertEquals(
+            "foo",
+            $this->tar->formatFilePath("/foo")
+        );
+
+        $this->assertEquals(
+            "foo",
+            $this->tar->formatFilePath("foo/")
+        );
+
+        $this->assertEquals(
+            "foo",
+            $this->tar->formatFilePath("/foo/")
+        );
+
+        $this->assertEquals(
+            "foo/bar",
+            $this->tar->formatFilePath("foo/bar")
+        );
+
+        $this->assertEquals(
+            "foo/bar",
+            $this->tar->formatFilePath("/foo/bar")
+        );
+
+        $this->assertEquals(
+            "foo/bar",
+            $this->tar->formatFilePath("/foo//bar/")
+        );
+
+        $this->assertEquals(
+            "foo/bar",
+            $this->tar->formatFilePath("/foo/bar/")
+        );
+
+        $this->assertEquals(
+            "foo/bar/baz",
+            $this->tar->formatFilePath("foo/bar/baz")
+        );
+
+        $this->assertEquals(
+            "foo/bar/baz",
+            $this->tar->formatFilePath("//foo/bar///baz/")
+        );
+    }
+} 
+>>>>>>> Finish Tar archive builder

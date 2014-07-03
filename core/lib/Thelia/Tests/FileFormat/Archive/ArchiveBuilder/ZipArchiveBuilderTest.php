@@ -69,7 +69,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 =======
 >>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
      */
-    public function testGetFilePath()
+    public function testFormatFilePath()
     {
         $this->assertEquals(
             "foo",
@@ -194,6 +194,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testFormatDirectoryPath()
+<<<<<<< HEAD
     {
         $this->assertEquals(
             "/foo/",
@@ -207,6 +208,8 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testGetDirectoryPath()
+=======
+>>>>>>> Finish Tar archive builder
     {
         $this->assertEquals(
             "/foo/",
