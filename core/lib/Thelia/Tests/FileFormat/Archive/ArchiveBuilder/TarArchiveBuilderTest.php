@@ -34,18 +34,25 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->tar = new TarArchiveBuilder();
 <<<<<<< HEAD
+<<<<<<< HEAD
         $this->tar->setEnvironment("dev");
 =======
 >>>>>>> Finish implementing and testing zip
+=======
+        $this->tar->setEnvironment("dev");
+>>>>>>> Fix FileDownloader test
     }
 
     public function testAddFileAndDirectory()
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         $this->tar->setEnvironment("dev");
 
 >>>>>>> Finish implementing and testing zip
+=======
+>>>>>>> Fix FileDownloader test
         /**
          * File
          */
@@ -98,8 +105,12 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddValidFileFromString()
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         $this->tar->addFileFromString(
 <<<<<<< HEAD
+=======
+        $this->tar->addFileFromString(
+>>>>>>> Fix FileDownloader test
             "foo", "bar"
         );
 
@@ -111,6 +122,7 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             "foo",
             $this->tar->getFileContent("bar")
         );
+<<<<<<< HEAD
 
         $this->tar->addFileFromString(
             "foo", "bar", "baz"
@@ -309,7 +321,59 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 =======
 =======
 >>>>>>> Fix FileDownloader test
+=======
+>>>>>>> Fix FileDownloader test
 
+        $this->tar->addFileFromString(
+            "foo", "bar", "baz"
+        );
+
+        $this->assertTrue(
+            $this->tar->hasFile("baz/bar")
+        );
+
+        $this->assertEquals(
+            "foo",
+            $this->tar->getFileContent("baz/bar")
+        );
+    }
+
+    /**
+     * @expectedException \ErrorException
+     */
+    public function testAddNotValidFileFromString()
+    {
+        $this->tar->addFileFromString(
+            "foo", $this
+        );
+    }
+
+    /**
+     * @expectedException \ErrorException
+     */
+    public function testAddNotValidFileValueFromString()
+    {
+        $this->tar->addFileFromString(
+            $this, "foo"
+        );
+    }
+
+
+    public function testDeleteFile()
+    {
+        $this->tar->addFileFromString(
+            "foo", "bar"
+        );
+
+        $this->assertTrue(
+            $this->tar->hasFile("bar")
+        );
+
+        $this->tar->deleteFile("bar");
+
+        $this->assertFalse(
+            $this->tar->hasFile("bar")
+        );
     }
 } 
 >>>>>>> Complete zip tests

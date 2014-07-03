@@ -18,9 +18,13 @@ use Thelia\Exception\FileNotFoundException;
 use Thelia\Exception\HttpUrlException;
 use Thelia\Log\Tlog;
 <<<<<<< HEAD
+<<<<<<< HEAD
 use Thelia\Tools\URL;
 =======
 >>>>>>> Define archive builders and formatters
+=======
+use Thelia\Tools\URL;
+>>>>>>> Fix FileDownloader test
 
 /**
  * Class FileDownloader
