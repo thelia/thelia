@@ -49,7 +49,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * This method formats a path to be compatible with \ZipArchive
      */
-    public function testGetFilePath()
+    public function testFormatFilePath()
     {
         $this->assertEquals(
             "foo",
@@ -102,7 +102,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetDirectoryPath()
+    public function testFormatDirectoryPath()
     {
         $this->assertEquals(
             "/foo/",
