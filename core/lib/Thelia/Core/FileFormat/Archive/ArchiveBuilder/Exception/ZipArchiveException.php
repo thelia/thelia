@@ -10,7 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder;
+namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception;
 
 /**
  * Class ZipArchiveException

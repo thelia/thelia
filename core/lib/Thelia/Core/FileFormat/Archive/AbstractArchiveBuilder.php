@@ -13,6 +13,8 @@
 namespace Thelia\Core\FileFormat\Archive;
 use Thelia\Core\FileFormat\FormatInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Exception\FileNotFoundException;
+use Thelia\Exception\FileNotReadableException;
 use Thelia\Log\Tlog;
 use Thelia\Tools\FileDownload\FileDownloaderAwareTrait;
 
@@ -26,6 +28,9 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     use FileDownloaderAwareTrait;
 
     const TEMP_DIRECTORY_NAME = "archive_builder";
+
+    /** @var  string */
+    protected $cacheFile;
 
     /** @var \Thelia\Core\Translation\Translator  */
     protected $translator;
@@ -58,7 +63,7 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
             );
         }
 
-        $archiveBuilderCacheDir = $this->cache_dir = $theliaCacheDir . static::TEMP_DIRECTORY_NAME;
+        $archiveBuilderCacheDir = $this->cacheDir = $theliaCacheDir . static::TEMP_DIRECTORY_NAME;
 
         if (!is_dir($archiveBuilderCacheDir) && !mkdir($archiveBuilderCacheDir, 0755)) {
             throw new \ErrorException(
@@ -74,6 +79,97 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
         return $archiveBuilderCacheDir;
     }
 
+    /**
+     * @param $pathToFile
+     * @param $destination
+     * @param $isOnline
+     * @return $this
+     * @throws \ErrorException
+     */
+    public function copyFile($pathToFile, $destination, $isOnline)
+    {
+        if ($isOnline) {
+            /**
+             * It's an online file
+             */
+            $this->getFileDownloader()
+                ->download($pathToFile, $destination)
+            ;
+        } else {
+            /**
+             * It's a local file
+             */
+            if (!is_file($pathToFile)) {
+                $this->throwFileNotFound($pathToFile);
+            } elseif (!is_readable($pathToFile)) {
+                throw new FileNotReadableException(
+                    $this->translator
+                        ->trans(
+                            "The file %file is not readable",
+                            [
+                                "%file" => $pathToFile,
+                            ]
+                        )
+                );
+            }
+
+            if (!copy($pathToFile, $destination)) {
+                $translatedErrorMessage = $this->translator->trans(
+                    "An error happend while copying %prev to %dest",
+                    [
+                        "%prev" => $pathToFile,
+                        "%dest" => $destination,
+                    ]
+                );
+
+                $this->logger
+                    ->error($translatedErrorMessage)
+                ;
+
+                throw new \ErrorException($translatedErrorMessage);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function generateCacheFile($environment)
+    {
+        $cacheFileName = md5(uniqid());
+
+        $cacheFile  = $this->getArchiveBuilderCacheDirectory($environment) . DS;
+        $cacheFile .= $cacheFileName . "." . $this->getExtension();
+
+        return $cacheFile;
+    }
+
+    public function throwFileNotFound($file)
+    {
+
+        throw new FileNotFoundException(
+            $this->translator
+                ->trans(
+                    "The file %file is missing or is not readable",
+                    [
+                        "%file" => $file,
+                    ]
+                )
+        );
+    }
+
+    /**
+     * @param $path
+     * @return $this
+     */
+    public function setCacheFile($path)
+    {
+        $this->cacheFile = $path;
+
+        return $this;
+    }
 
     public function getCacheDir()
     {
@@ -94,5 +190,10 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     public function getTranslator()
     {
         return $this->translator;
+    }
+
+    public function getCacheFile()
+    {
+        return $this->cacheFile;
     }
 } 

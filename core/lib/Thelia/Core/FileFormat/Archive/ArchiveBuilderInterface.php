@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Archive;
+use Thelia\Tools\FileDownload\FileDownloaderInterface;
 
 /**
  * Interface ArchiveBuilderInterface
@@ -29,6 +30,7 @@ interface ArchiveBuilderInterface
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
+     * @throws \ErrorException
      *
      * This methods adds a file in the archive.
      * If the file is local, $isOnline must be false,
@@ -37,14 +39,44 @@ interface ArchiveBuilderInterface
     public function addFile($filePath, $directoryInArchive = "/", $name = null, $isOnline = false);
 
     /**
+     * @param $content
+     * @param $name
+     * @param string $directoryInArchive
+     * @return mixed
+     * @throws \ErrorException
+     *
+     * This method creates a file in the archive with its content
+     */
+    public function addFileFromString($content, $name, $directoryInArchive = "/");
+
+    /**
+     * @param string $pathToFile
+     * @return null|string
+     * @throws \Thelia\Exception\FileNotFoundException
+     * @throws \Thelia\Exception\FileNotReadableException
+     * @throws \ErrorException
+     *
+     * This method returns a file content
+     */
+    public function getFileContent($pathToFile);
+    /**
      * @param $pathInArchive
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
+     * @throws \ErrorException
      *
      * This method deletes a file in the archive
      */
     public function deleteFile($pathInArchive);
 
+    /**
+     * @param $directoryPath
+     * @return $this
+     * @throws \ErrorException
+     *
+     * This method creates an empty directory
+     */
+    public function addDirectory($directoryPath);
     /**
      * @return \Thelia\Core\HttpFoundation\Response
      *
@@ -54,14 +86,16 @@ interface ArchiveBuilderInterface
 
     /**
      * @param string $pathToArchive
+     * @param string $environment
      * @param bool $isOnline
+     * @param FileDownloaderInterface $fileDownloader
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\HttpUrlException
      *
      * Loads an archive
      */
-    public static function loadArchive($pathToArchive, $environment, $isOnline = false);
+    public static function loadArchive($pathToArchive, $environment, $isOnline = false, FileDownloaderInterface $fileDownloader = null);
 
     /**
      * @param $pathToFile

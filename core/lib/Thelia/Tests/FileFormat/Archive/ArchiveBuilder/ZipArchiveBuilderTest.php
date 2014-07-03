@@ -53,52 +53,52 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             "foo",
-            $this->zip->getFilePath("foo")
+            $this->zip->formatFilePath("foo")
         );
 
         $this->assertEquals(
             "foo",
-            $this->zip->getFilePath("/foo")
+            $this->zip->formatFilePath("/foo")
         );
 
         $this->assertEquals(
             "foo",
-            $this->zip->getFilePath("foo/")
+            $this->zip->formatFilePath("foo/")
         );
 
         $this->assertEquals(
             "foo",
-            $this->zip->getFilePath("/foo/")
+            $this->zip->formatFilePath("/foo/")
         );
 
         $this->assertEquals(
             "/foo/bar",
-            $this->zip->getFilePath("foo/bar")
+            $this->zip->formatFilePath("foo/bar")
         );
 
         $this->assertEquals(
             "/foo/bar",
-            $this->zip->getFilePath("/foo/bar")
+            $this->zip->formatFilePath("/foo/bar")
         );
 
         $this->assertEquals(
             "/foo/bar",
-            $this->zip->getFilePath("/foo//bar/")
+            $this->zip->formatFilePath("/foo//bar/")
         );
 
         $this->assertEquals(
             "/foo/bar",
-            $this->zip->getFilePath("/foo/bar/")
+            $this->zip->formatFilePath("/foo/bar/")
         );
 
         $this->assertEquals(
             "/foo/bar/baz",
-            $this->zip->getFilePath("foo/bar/baz")
+            $this->zip->formatFilePath("foo/bar/baz")
         );
 
         $this->assertEquals(
             "/foo/bar/baz",
-            $this->zip->getFilePath("//foo/bar///baz/")
+            $this->zip->formatFilePath("//foo/bar///baz/")
         );
     }
 
@@ -106,52 +106,52 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             "/foo/",
-            $this->zip->getDirectoryPath("foo")
+            $this->zip->formatDirectoryPath("foo")
         );
 
         $this->assertEquals(
             "/foo/",
-            $this->zip->getDirectoryPath("/foo")
+            $this->zip->formatDirectoryPath("/foo")
         );
 
         $this->assertEquals(
             "/foo/",
-            $this->zip->getDirectoryPath("foo/")
+            $this->zip->formatDirectoryPath("foo/")
         );
 
         $this->assertEquals(
             "/foo/",
-            $this->zip->getDirectoryPath("/foo/")
+            $this->zip->formatDirectoryPath("/foo/")
         );
 
         $this->assertEquals(
             "/foo/bar/",
-            $this->zip->getDirectoryPath("foo/bar")
+            $this->zip->formatDirectoryPath("foo/bar")
         );
 
         $this->assertEquals(
             "/foo/bar/",
-            $this->zip->getDirectoryPath("/foo/bar")
+            $this->zip->formatDirectoryPath("/foo/bar")
         );
 
         $this->assertEquals(
             "/foo/bar/",
-            $this->zip->getDirectoryPath("/foo//bar/")
+            $this->zip->formatDirectoryPath("/foo//bar/")
         );
 
         $this->assertEquals(
             "/foo/bar/",
-            $this->zip->getDirectoryPath("/foo/bar/")
+            $this->zip->formatDirectoryPath("/foo/bar/")
         );
 
         $this->assertEquals(
             "/foo/bar/baz/",
-            $this->zip->getDirectoryPath("foo/bar/baz")
+            $this->zip->formatDirectoryPath("foo/bar/baz")
         );
 
         $this->assertEquals(
             "/foo/bar/baz/",
-            $this->zip->getDirectoryPath("//foo/bar///baz/")
+            $this->zip->formatDirectoryPath("//foo/bar///baz/")
         );
     }
 
@@ -169,7 +169,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveException
+     * @expectedException \Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception\ZipArchiveException
      * @expectedExceptionMessage [Zip Error] The file is not a zip archive
      */
     public function testLoadNotValidZip()
@@ -202,7 +202,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveException
+     * @expectedException \Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception\ZipArchiveException
      * @expectedExceptionMessage [Zip Error] The file is not a zip archive
      */
     public function testLoadOnlineAvailableAndNotValidFile()
@@ -339,4 +339,49 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             $loadedArchiveResponseContent
         );
     }
+
+    public function testAddValidFileFromString()
+    {
+        $this->loadedZip->addFileFromString(
+            "foo", "bar"
+        );
+
+        $this->assertTrue(
+            $this->loadedZip->hasFile("bar")
+        );
+
+        $this->assertEquals(
+            "foo",
+            $this->loadedZip->getFileContent("bar")
+        );
+    }
+
+    /**
+     * @expectedException \Thelia\Exception\FileNotFoundException
+     */
+    public function testGetFileContentFileNotFound()
+    {
+        $this->loadedZip->getFileContent("bar");
+    }
+
+    /**
+     * @expectedException \ErrorException
+     */
+    public function testAddNotValidFileFromString()
+    {
+        $this->loadedZip->addFileFromString(
+            "foo", $this
+        );
+    }
+
+    /**
+     * @expectedException \ErrorException
+     */
+    public function testAddNotValidFileValueFromString()
+    {
+        $this->loadedZip->addFileFromString(
+            $this, "bar"
+        );
+    }
+
 } 
