@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Collection\Collection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Content;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
@@ -40,6 +41,8 @@ class ContentTest extends TestCaseWithURLToolSetup
      * @var EventDispatcherInterface
      */
     protected $dispatcher;
+
+    protected static $folderForPositionTest = null;
 
     public function setUp()
     {
@@ -169,7 +172,7 @@ class ContentTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionUp()
     {
         $content = ContentQuery::create()
-            ->filterByFolder($this->getFolderForPositionTest(), Criteria::IN)
+            ->filterByFolder($this->getFolderForPositionTest(), Criteria::EQUAL)
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
 
@@ -302,31 +305,52 @@ class ContentTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * get a folder that has enough content to execute position tests
+     * generates a folder and its contents to be used in Position tests
      *
-     * @return Folder the folder
+     * @return Folder the parent folder
      */
     protected function getFolderForPositionTest()
     {
-        $content = ContentFolderQuery::create()
-            ->filterByDefaultFolder(true)
-            ->withColumn('count(' . ContentFolderTableMap::FOLDER_ID . ')', 'nb')
-            ->groupBy('FolderId')
-            ->having('count(' . ContentFolderTableMap::FOLDER_ID . ') >= ?', 3, \PDO::PARAM_INT)
-            ->select(array('FolderId', 'nb'))
-            ->findOne()
-            ;
 
-        if (null === $content) {
-            $this->fail('use fixtures before launching test, there is not enough content in database');
+        if (null === self::$folderForPositionTest) {
+
+            $folder = new Folder();
+
+            $folder->setParent(0);
+            $folder->setVisible(1);
+            $folder->setPosition(1);
+
+            $folder
+                ->setLocale('en_US')
+                ->setTitle('folder test');
+
+            $folder->save();
+
+            for ($i = 0; $i < 4; $i++) {
+
+                $content = new \Thelia\Model\Content();
+
+                $content->addFolder($folder);
+                $content->setVisible(1);
+                $content->setPosition($i + 1);
+
+                $content
+                    ->setLocale('en_US')
+                    ->setTitle(sprintf('content test %s', $i));
+
+                $contentFolders = $content->getContentFolders();
+                $collection     = new Collection();
+                $collection->prepend($contentFolders[0]->setDefaultFolder(1));
+                $content->setContentFolders($collection);
+
+                $content->save();
+
+            }
+
+            self::$folderForPositionTest = $folder;
         }
 
-        $folder = FolderQuery::create()->findPK($content["FolderId"]);
-        if (null === $folder) {
-            $this->fail('use fixtures before launching test, there is no folder in database');
-        }
-
-        return $folder;
+        return self::$folderForPositionTest;
     }
 
     /**
