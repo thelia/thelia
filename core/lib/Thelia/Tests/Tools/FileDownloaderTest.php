@@ -15,10 +15,14 @@ use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 <<<<<<< HEAD
+<<<<<<< HEAD
 use Thelia\Tools\FileDownload\FileDownloader;
 =======
 use Thelia\Tools\FileDownloader;
 >>>>>>> Define archive builders and formatters
+=======
+use Thelia\Tools\FileDownload\FileDownloader;
+>>>>>>> Fix FileDownloader test
 
 /**
  * Class FileDownloaderTest
