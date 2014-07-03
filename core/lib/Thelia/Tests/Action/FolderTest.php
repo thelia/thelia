@@ -38,6 +38,9 @@ class FolderTest extends TestCaseWithURLToolSetup
      */
     protected $dispatcher;
 
+    /** @var int folder id used in position tests  */
+    protected static $folderIdForPositionTest = null;
+
     public function setUp()
     {
         $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
@@ -278,26 +281,49 @@ class FolderTest extends TestCaseWithURLToolSetup
 
     }
 
+
     /**
-     * get a folder parent id that has enough folder to execute position tests
+     * generates a folder and its sub folders to be used in Position tests
      *
-     * @return int the folder id
+     * @return int the parent folder id
      */
     protected function getFolderIdForPositionTest()
     {
-        $f = FolderQuery::create()
-            ->withColumn('count(' . FolderTableMap::PARENT . ')', 'nb')
-            ->groupBy('Parent')
-            ->having('count(' . FolderTableMap::PARENT . ') > ?', 3, \PDO::PARAM_INT)
-            ->select(array('Parent', 'nb'))
-            ->findOne();
 
-        if (null === $f) {
-            $this->fail('use fixtures before launching test, there is no folder in database');
+        if (null === self::$folderIdForPositionTest) {
+
+            $folder = new \Thelia\Model\Folder();
+
+            $folder->setParent(0);
+            $folder->setVisible(1);
+            $folder->setPosition(1);
+            $folder
+                ->setLocale('en_US')
+                ->setTitle('folder test');
+
+            $folder->save();
+
+            for ($i = 0; $i < 4; $i++) {
+
+                $subFolder = new \Thelia\Model\Folder();
+
+                $subFolder->setParent($folder->getId());
+                $subFolder->setVisible(1);
+                $subFolder->setPosition($i + 1);
+
+                $folder
+                    ->setLocale('en_US')
+                    ->setTitle(sprintf('folder test %s', $i));
+
+                $subFolder->save();
+            }
+
+            self::$folderIdForPositionTest = $folder->getId();
         }
 
-        return $f["Parent"];
+        return self::$folderIdForPositionTest;
     }
+
 
     /**
      * @return \Thelia\Model\Folder
