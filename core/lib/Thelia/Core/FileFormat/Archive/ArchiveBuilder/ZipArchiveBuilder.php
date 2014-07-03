@@ -235,7 +235,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
          */
         $initialString = preg_replace("#\/{2,}#", "/", $initialString);
 
-        if (preg_match("#\/?[^\/]+\/[^/]+\/?#", $initialString)) {
+        if (preg_match("#\/?[^\/]+\/[^\/]+\/?#", $initialString)) {
             $initialString = "/" . $initialString;
         }
         return $initialString;

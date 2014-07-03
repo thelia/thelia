@@ -14,7 +14,7 @@ namespace Thelia\Tests\Type;
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
-use Thelia\Tools\FileDownloader;
+use Thelia\Tools\FileDownload\FileDownloader;
 
 /**
  * Class FileDownloaderTest
