@@ -19,10 +19,14 @@ use Thelia\Tools\FileDownload\FileDownloaderInterface;
  * @author Benjamin Perche <bperche@openstudio.fr>
  *
 <<<<<<< HEAD
+<<<<<<< HEAD
  * This interface defines the methods that an archive builder must have.
 =======
  * This interface defines the methods that an archive creator must have.
 >>>>>>> Define archive builders and formatters
+=======
+ * This interface defines the methods that an archive builder must have.
+>>>>>>> Complete zip tests
  */
 interface ArchiveBuilderInterface
 {

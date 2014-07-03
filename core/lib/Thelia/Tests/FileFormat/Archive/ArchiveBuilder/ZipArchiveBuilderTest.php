@@ -596,6 +596,9 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             $this->loadedZip->getFileContent("bar")
         );
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Complete zip tests
 
         $this->loadedZip->addFileFromString(
             "foo", "bar", "baz"
@@ -609,8 +612,11 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             "foo",
             $this->loadedZip->getFileContent("baz/bar")
         );
+<<<<<<< HEAD
 =======
 >>>>>>> Finish implementing and testing zip
+=======
+>>>>>>> Complete zip tests
     }
 
     /**

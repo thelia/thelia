@@ -122,10 +122,14 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
          * If it's local check if the file exists and if it is redable
          */
 <<<<<<< HEAD
+<<<<<<< HEAD
         $fileDownloadCache = $this->cacheDir . DS . md5(uniqid()) . ".tmp";
 =======
         $fileDownloadCache = $this->cacheDir . DS . "download.tmp";
 >>>>>>> Finish implementing and testing zip
+=======
+        $fileDownloadCache = $this->cacheDir . DS . md5(uniqid()) . ".tmp";
+>>>>>>> Complete zip tests
         $this->copyFile($filePath, $fileDownloadCache, $isOnline);
 
         /**
@@ -254,6 +258,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     public function getFileContent($pathToFile)
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         $pathToFile = $this->formatFilePath($pathToFile);
 
         if (!$this->hasFile($pathToFile)) {
@@ -276,6 +281,9 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
 
 =======
         
+=======
+
+>>>>>>> Complete zip tests
     }
 
 

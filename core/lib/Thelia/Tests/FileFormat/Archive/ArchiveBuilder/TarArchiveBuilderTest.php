@@ -91,10 +91,14 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Complete zip tests
 
     public function testAddValidFileFromString()
     {
         $this->tar->addFileFromString(
+<<<<<<< HEAD
             "foo", "bar"
         );
 
@@ -301,3 +305,9 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 =======
 } 
 >>>>>>> Finish implementing and testing zip
+=======
+
+        )
+    }
+} 
+>>>>>>> Complete zip tests
