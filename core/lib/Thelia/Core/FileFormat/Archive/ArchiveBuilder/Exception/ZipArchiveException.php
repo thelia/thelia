@@ -20,4 +20,4 @@ namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception;
 class ZipArchiveException extends \ErrorException
 {
 
-}
+} 

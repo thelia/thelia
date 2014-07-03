@@ -33,11 +33,19 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         Tlog::getNewInstance();
 
         $this->tar = new TarArchiveBuilder();
+<<<<<<< HEAD
         $this->tar->setEnvironment("dev");
+=======
+>>>>>>> Finish implementing and testing zip
     }
 
     public function testAddFileAndDirectory()
     {
+<<<<<<< HEAD
+=======
+        $this->tar->setEnvironment("dev");
+
+>>>>>>> Finish implementing and testing zip
         /**
          * File
          */
@@ -82,6 +90,7 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->tar->hasDirectory("bar"));
 
     }
+<<<<<<< HEAD
 
     public function testAddValidFileFromString()
     {
@@ -289,3 +298,6 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
 }
+=======
+} 
+>>>>>>> Finish implementing and testing zip

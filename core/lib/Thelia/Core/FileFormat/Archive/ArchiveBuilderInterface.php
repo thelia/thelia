@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Archive;
+use Thelia\Tools\FileDownload\FileDownloaderInterface;
 
 /**
  * Interface ArchiveBuilderInterface
@@ -43,7 +44,11 @@ interface ArchiveBuilderInterface
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
+<<<<<<< HEAD
 >>>>>>> Define archive builders and formatters
+=======
+     * @throws \ErrorException
+>>>>>>> Finish implementing and testing zip
      *
      * This methods adds a file in the archive.
      * If the file is local, $isOnline must be false,
@@ -53,9 +58,15 @@ interface ArchiveBuilderInterface
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param $content
      * @param $name
      * @param  string          $directoryInArchive
+=======
+     * @param $content
+     * @param $name
+     * @param string $directoryInArchive
+>>>>>>> Finish implementing and testing zip
      * @return mixed
      * @throws \ErrorException
      *
@@ -64,7 +75,11 @@ interface ArchiveBuilderInterface
     public function addFileFromString($content, $name, $directoryInArchive = "/");
 
     /**
+<<<<<<< HEAD
      * @param  string                                     $pathToFile
+=======
+     * @param string $pathToFile
+>>>>>>> Finish implementing and testing zip
      * @return null|string
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -74,6 +89,7 @@ interface ArchiveBuilderInterface
      */
     public function getFileContent($pathToFile);
     /**
+<<<<<<< HEAD
      * @param $pathInArchive
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
@@ -83,6 +99,12 @@ interface ArchiveBuilderInterface
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
 >>>>>>> Define archive builders and formatters
+=======
+     * @param $pathInArchive
+     * @return $this
+     * @throws \Thelia\Exception\FileNotFoundException
+     * @throws \ErrorException
+>>>>>>> Finish implementing and testing zip
      *
      * This method deletes a file in the archive
      */
@@ -90,6 +112,9 @@ interface ArchiveBuilderInterface
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Finish implementing and testing zip
      * @param $directoryPath
      * @return $this
      * @throws \ErrorException
@@ -97,11 +122,15 @@ interface ArchiveBuilderInterface
      * This method creates an empty directory
      */
     public function addDirectory($directoryPath);
+<<<<<<< HEAD
 
     /**
      * @params string $filename
 =======
 >>>>>>> Define archive builders and formatters
+=======
+    /**
+>>>>>>> Finish implementing and testing zip
      * @return \Thelia\Core\HttpFoundation\Response
      *
      * This method return an instance of a Response with the archive as content.
@@ -117,8 +146,13 @@ interface ArchiveBuilderInterface
 
     /**
      * @param string $pathToArchive
+     * @param string $environment
      * @param bool $isOnline
+<<<<<<< HEAD
 >>>>>>> Define archive builders and formatters
+=======
+     * @param FileDownloaderInterface $fileDownloader
+>>>>>>> Finish implementing and testing zip
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\HttpUrlException
@@ -126,10 +160,14 @@ interface ArchiveBuilderInterface
      * Loads an archive
      */
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function loadArchive($pathToArchive, $isOnline = false);
 =======
     public static function loadArchive($pathToArchive, $environment, $isOnline = false);
 >>>>>>> Define archive builders and formatters
+=======
+    public static function loadArchive($pathToArchive, $environment, $isOnline = false, FileDownloaderInterface $fileDownloader = null);
+>>>>>>> Finish implementing and testing zip
 
     /**
      * @param $pathToFile

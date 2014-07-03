@@ -46,7 +46,13 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
 
     const TEMP_DIRECTORY_NAME = "archive_builder";
 
+<<<<<<< HEAD
 >>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
+=======
+    /** @var  string */
+    protected $cacheFile;
+
+>>>>>>> Finish implementing and testing zip
     /** @var \Thelia\Core\Translation\Translator  */
     protected $translator;
 
@@ -85,10 +91,14 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         $archiveBuilderCacheDir = $this->cacheDir = $theliaCacheDir . static::TEMP_DIRECTORY_NAME;
 =======
         $archiveBuilderCacheDir = $this->cache_dir = $theliaCacheDir . static::TEMP_DIRECTORY_NAME;
 >>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
+=======
+        $archiveBuilderCacheDir = $this->cacheDir = $theliaCacheDir . static::TEMP_DIRECTORY_NAME;
+>>>>>>> Finish implementing and testing zip
 
         if (!is_dir($archiveBuilderCacheDir) && !mkdir($archiveBuilderCacheDir, 0755)) {
             throw new \ErrorException(
@@ -105,6 +115,9 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Finish implementing and testing zip
     /**
      * @param $pathToFile
      * @param $destination
@@ -196,8 +209,11 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
 
         return $this;
     }
+<<<<<<< HEAD
 =======
 >>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
+=======
+>>>>>>> Finish implementing and testing zip
 
     public function getCacheDir()
     {
@@ -220,11 +236,15 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
         return $this->translator;
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Finish implementing and testing zip
 
     public function getCacheFile()
     {
         return $this->cacheFile;
     }
+<<<<<<< HEAD
 
     /**
      * @param  string $environment
@@ -244,3 +264,6 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
 =======
 } 
 >>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
+=======
+} 
+>>>>>>> Finish implementing and testing zip

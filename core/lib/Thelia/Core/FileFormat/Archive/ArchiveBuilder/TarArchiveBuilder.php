@@ -13,10 +13,15 @@
 namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception\TarArchiveException;
+<<<<<<< HEAD
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\FileNotReadableException;
+=======
+use Thelia\Core\FileFormat\Archive\ArchiveBuilderInterface;
+use Thelia\Core\Translation\Translator;
+>>>>>>> Finish implementing and testing zip
 use Thelia\Log\Tlog;
 use Thelia\Tools\FileDownload\FileDownloaderInterface;
 
@@ -47,6 +52,32 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     /** @var \Thelia\Log\Tlog */
     protected $logger;
 
+<<<<<<< HEAD
+=======
+    function __construct($compressionType = null)
+    {
+        $this->translator = Translator::getInstance();
+        $this->logger = Tlog::getNewInstance();
+
+        $supportedCompression = [
+            "gz",
+            "bz2",
+            null
+        ];
+
+        if (!in_array($compressionType, $supportedCompression)) {
+            throw new TarArchiveException(
+                $this->translator->trans(
+                    "The compression %type is not supported"
+                )
+            );
+        }
+
+        $this->compression = $compressionType;
+    }
+
+    /**
+>>>>>>> Finish implementing and testing zip
     public function __destruct()
     {
         if ($this->tar instanceof \PharData) {
@@ -54,6 +85,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
                 unlink($this->cacheFile);
             }
         }
+<<<<<<< HEAD
     }
 
     /**
@@ -61,6 +93,15 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      * @param  string                                     $directoryInArchive This is the directory where it will be stored in the archive
      * @param  null|string                                $name               The name of the file in the archive. if it null or empty, it keeps the same name
      * @param  bool                                       $isOnline
+=======
+    }*/
+
+    /**
+     * @param string $filePath It is the path to access the file.
+     * @param string $directoryInArchive This is the directory where it will be stored in the archive
+     * @param null|string $name The name of the file in the archive. if it null or empty, it keeps the same name
+     * @param bool $isOnline
+>>>>>>> Finish implementing and testing zip
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -80,7 +121,11 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
          * Download the file if it is online
          * If it's local check if the file exists and if it is redable
          */
+<<<<<<< HEAD
         $fileDownloadCache = $this->cacheDir . DS . md5(uniqid()) . ".tmp";
+=======
+        $fileDownloadCache = $this->cacheDir . DS . "download.tmp";
+>>>>>>> Finish implementing and testing zip
         $this->copyFile($filePath, $fileDownloadCache, $isOnline);
 
         /**
@@ -96,18 +141,25 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
 
         $this->tar->addFile($filePath, $name);
 
+<<<<<<< HEAD
         /**
          * And clear the download temp file
          */
         unlink($fileDownloadCache);
 
+=======
+>>>>>>> Finish implementing and testing zip
         return $this;
     }
 
     /**
      * @param $content
      * @param $name
+<<<<<<< HEAD
      * @param  string          $directoryInArchive
+=======
+     * @param string $directoryInArchive
+>>>>>>> Finish implementing and testing zip
      * @return mixed
      * @throws \ErrorException
      *
@@ -132,7 +184,11 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
         }
         try {
             $this->tar->addFromString($name, $content);
+<<<<<<< HEAD
         } catch (\Exception $e) {
+=======
+        } catch(\Exception $e) {
+>>>>>>> Finish implementing and testing zip
             throw new \ErrorException(
                 $this->translator->trans(
                     "Error while writing the file into the archive, error message: %errmes",
@@ -144,6 +200,10 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
         }
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Finish implementing and testing zip
     /**
      * @param $directoryPath
      * @return $this
@@ -159,7 +219,11 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
 
             try {
                 $this->tar->addEmptyDir($directoryInArchive);
+<<<<<<< HEAD
             } catch (\Exception $e) {
+=======
+            } catch(\Exception $e) {
+>>>>>>> Finish implementing and testing zip
                 throw new \ErrorException(
                     $this->translator->trans(
                         "The directory %dir has not been created in the archive",
@@ -175,7 +239,11 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
+<<<<<<< HEAD
      * @param  string                                     $pathToFile
+=======
+     * @param string $pathToFile
+>>>>>>> Finish implementing and testing zip
      * @return null|string
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -185,6 +253,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      */
     public function getFileContent($pathToFile)
     {
+<<<<<<< HEAD
         $pathToFile = $this->formatFilePath($pathToFile);
 
         if (!$this->hasFile($pathToFile)) {
@@ -205,6 +274,12 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
         return $content;
     }
 
+=======
+        
+    }
+
+
+>>>>>>> Finish implementing and testing zip
     /**
      * @param $pathInArchive
      * @return $this
@@ -236,6 +311,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      *
      * This method return an instance of a Response with the archive as content.
      */
+<<<<<<< HEAD
     public function buildArchiveResponse($filename)
     {
         $this->tar->setMetadata("Generated by Thelia v" . Thelia::THELIA_VERSION);
@@ -272,6 +348,18 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      * @param  string                                  $environment
      * @param  bool                                    $isOnline
      * @param  FileDownloaderInterface                 $fileDownloader
+=======
+    public function buildArchiveResponse()
+    {
+
+    }
+
+    /**
+     * @param string $pathToArchive
+     * @param string $environment
+     * @param bool $isOnline
+     * @param FileDownloaderInterface $fileDownloader
+>>>>>>> Finish implementing and testing zip
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\HttpUrlException
@@ -279,6 +367,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      *
      * Loads an archive
      */
+<<<<<<< HEAD
     public function loadArchive($pathToArchive, $isOnline = false)
     {
         $tar = clone $this;
@@ -286,13 +375,36 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
         $tar
             ->setCacheFile($tar->generateCacheFile($this->environment))
             ->copyFile($pathToArchive, $tar->getCacheFile(), $isOnline);
+=======
+    public static function loadArchive(
+        $pathToArchive,
+        $environment,
+        $isOnline = false,
+        FileDownloaderInterface $fileDownloader = null
+    ) {
+        /** @var TarArchiveBuilder $instance */
+        $instance = new static();
+
+        if ($fileDownloader !== null) {
+            $instance->setFileDownloader($fileDownloader);
+        }
+
+        $instance->setCacheFile($instance->getCacheFile())
+            ->copyFile($pathToArchive, $isOnline);
+>>>>>>> Finish implementing and testing zip
 
         /**
          * This throws TarArchiveBuilderException if
          * the archive is not valid.
          */
+<<<<<<< HEAD
 
         return $tar->setEnvironment($tar->environment);
+=======
+        $instance->setEnvironment($environment);
+
+        return $instance;
+>>>>>>> Finish implementing and testing zip
     }
 
     /**
@@ -312,19 +424,31 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
             /** @var \PharFileInfo $fileInfo */
             $fileInfo = $this->tar[$pathToFile];
 
+<<<<<<< HEAD
             if ($fileInfo->isFile()) {
+=======
+            if($fileInfo->isFile()) {
+>>>>>>> Finish implementing and testing zip
                 $isFile = true;
             }
             /**
              * Catch the exception to avoid its displaying.
              */
+<<<<<<< HEAD
         } catch (\BadMethodCallException $e) {}
+=======
+        } catch(\BadMethodCallException $e) {}
+>>>>>>> Finish implementing and testing zip
 
         return $isFile;
     }
 
     /**
+<<<<<<< HEAD
      * @param  string $directory
+=======
+     * @param string $directory
+>>>>>>> Finish implementing and testing zip
      * @return bool
      *
      * Check if the archive has a directory
@@ -338,19 +462,31 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
             /** @var \PharFileInfo $fileInfo */
             $fileInfo = $this->tar[$pathToDir];
 
+<<<<<<< HEAD
             if ($fileInfo->isDir()) {
+=======
+            if($fileInfo->isDir()) {
+>>>>>>> Finish implementing and testing zip
                 $isDir = true;
             }
             /**
              * Catch the exception to avoid its displaying.
              */
+<<<<<<< HEAD
         } catch (\BadMethodCallException $e) {}
+=======
+        } catch(\BadMethodCallException $e) {}
+>>>>>>> Finish implementing and testing zip
 
         return $isDir;
     }
 
     /**
+<<<<<<< HEAD
      * @param  string $environment
+=======
+     * @param string $environment
+>>>>>>> Finish implementing and testing zip
      * @return $this
      *
      * Sets the execution environment of the Kernel,
@@ -358,6 +494,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      */
     public function setEnvironment($environment)
     {
+<<<<<<< HEAD
         if (empty($environment)) {
             throw new \ErrorException(
                 $this->translator->trans(
@@ -366,6 +503,8 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
             );
         }
 
+=======
+>>>>>>> Finish implementing and testing zip
         if ($this->cacheFile === null) {
             $cacheFile = $this->generateCacheFile($environment);
 
@@ -381,14 +520,33 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
         try {
             $this->tar = new \PharData($cacheFile, null, null, static::PHAR_FORMAT);
 
+<<<<<<< HEAD
             $this->compressionEntryPoint();
 
         } catch (\BadMethodCallException $e) {
+=======
+            switch ($this->compression) {
+                case "gz":
+                    $this->tar = $this->tar->compress(\Phar::GZ);
+                    $cacheFile .= ".gz";
+                    break;
+                case "bz2":
+                    $this->tar = $this->tar->compress(\Phar::BZ2);
+                    $cacheFile .= ".bz2";
+                    break;
+            }
+
+        } catch(\BadMethodCallException $e) {
+>>>>>>> Finish implementing and testing zip
             /**
              * This should not happen
              */
             $errorMessage = "You have badly called the method setEnvironment twice for %file";
+<<<<<<< HEAD
         } catch (\UnexpectedValueException $e) {
+=======
+        } catch(\UnexpectedValueException $e) {
+>>>>>>> Finish implementing and testing zip
             $errorMessage = "The file %file is corrupted";
         }
 
@@ -404,13 +562,20 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
         }
 
         $this->cacheFile = $cacheFile;
+<<<<<<< HEAD
         $this->environment = $environment;
+=======
+>>>>>>> Finish implementing and testing zip
 
         return $this;
     }
 
     /**
+<<<<<<< HEAD
      * @param  string $initialString
+=======
+     * @param string $initialString
+>>>>>>> Finish implementing and testing zip
      * @return string
      *
      * Gives a valid file path for \ZipArchive
@@ -431,7 +596,11 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
+<<<<<<< HEAD
      * @param  string $initialString
+=======
+     * @param string $initialString
+>>>>>>> Finish implementing and testing zip
      * @return string
      *
      * Gives a valid directory path for \ZipArchive
@@ -453,7 +622,17 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      */
     public function getName()
     {
+<<<<<<< HEAD
         return "tar";
+=======
+        $name = "tar";
+
+        if ($this->compression !== null) {
+            $name .= "." . $this->compression;
+        }
+
+        return $name;
+>>>>>>> Finish implementing and testing zip
     }
 
     /**
@@ -467,7 +646,11 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      */
     public function getExtension()
     {
+<<<<<<< HEAD
         return "tar";
+=======
+        return $this->getName();
+>>>>>>> Finish implementing and testing zip
     }
 
     /**
@@ -480,6 +663,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      */
     public function getMimeType()
     {
+<<<<<<< HEAD
         return "application/x-tar";
     }
 
@@ -496,3 +680,12 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
         return $this->compression;
     }
 }
+=======
+        return $this->compression === null ?
+            "application/x-tar" :
+            "application/x-gtar"
+        ;
+    }
+
+} 
+>>>>>>> Finish implementing and testing zip
