@@ -101,7 +101,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
          * Download the file if it is online
          * If it's local check if the file exists and if it is redable
          */
-        $fileDownloadCache = $this->cacheDir . DS . "download.tmp";
+        $fileDownloadCache = $this->cacheDir . DS . md5(uniqid()) . ".tmp";
         $this->copyFile($filePath, $fileDownloadCache, $isOnline);
 
         /**
@@ -202,7 +202,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      */
     public function getFileContent($pathToFile)
     {
-        
+
     }
 
 

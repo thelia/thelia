@@ -18,7 +18,7 @@ use Thelia\Tools\FileDownload\FileDownloaderInterface;
  * @package Thelia\Core\FileFormat\Archive
  * @author Benjamin Perche <bperche@openstudio.fr>
  *
- * This interface defines the methods that an archive creator must have.
+ * This interface defines the methods that an archive builder must have.
  */
 interface ArchiveBuilderInterface
 {

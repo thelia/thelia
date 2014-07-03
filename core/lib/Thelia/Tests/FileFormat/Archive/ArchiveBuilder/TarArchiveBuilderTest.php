@@ -83,4 +83,11 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->tar->hasDirectory("bar"));
 
     }
+
+    public function testAddValidFileFromString()
+    {
+        $this->tar->addFileFromString(
+
+        )
+    }
 } 

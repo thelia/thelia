@@ -354,6 +354,19 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             "foo",
             $this->loadedZip->getFileContent("bar")
         );
+
+        $this->loadedZip->addFileFromString(
+            "foo", "bar", "baz"
+        );
+
+        $this->assertTrue(
+            $this->loadedZip->hasFile("baz/bar")
+        );
+
+        $this->assertEquals(
+            "foo",
+            $this->loadedZip->getFileContent("baz/bar")
+        );
     }
 
     /**
