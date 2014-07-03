@@ -33,12 +33,11 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         Tlog::getNewInstance();
 
         $this->tar = new TarArchiveBuilder();
+        $this->tar->setEnvironment("dev");
     }
 
     public function testAddFileAndDirectory()
     {
-        $this->tar->setEnvironment("dev");
-
         /**
          * File
          */
@@ -86,6 +85,68 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddValidFileFromString()
     {
+        $this->tar->addFileFromString(
+            "foo", "bar"
+        );
 
+        $this->assertTrue(
+            $this->tar->hasFile("bar")
+        );
+
+        $this->assertEquals(
+            "foo",
+            $this->tar->getFileContent("bar")
+        );
+
+        $this->tar->addFileFromString(
+            "foo", "bar", "baz"
+        );
+
+        $this->assertTrue(
+            $this->tar->hasFile("baz/bar")
+        );
+
+        $this->assertEquals(
+            "foo",
+            $this->tar->getFileContent("baz/bar")
+        );
+    }
+
+    /**
+     * @expectedException \ErrorException
+     */
+    public function testAddNotValidFileFromString()
+    {
+        $this->tar->addFileFromString(
+            "foo", $this
+        );
+    }
+
+    /**
+     * @expectedException \ErrorException
+     */
+    public function testAddNotValidFileValueFromString()
+    {
+        $this->tar->addFileFromString(
+            $this, "foo"
+        );
+    }
+
+
+    public function testDeleteFile()
+    {
+        $this->tar->addFileFromString(
+            "foo", "bar"
+        );
+
+        $this->assertTrue(
+            $this->tar->hasFile("bar")
+        );
+
+        $this->tar->deleteFile("bar");
+
+        $this->assertFalse(
+            $this->tar->hasFile("bar")
+        );
     }
 } 

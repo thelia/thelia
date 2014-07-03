@@ -17,6 +17,7 @@ use Thelia\Core\Translation\Translator as TheliaTranslator;
 use Thelia\Exception\FileNotFoundException;
 use Thelia\Exception\HttpUrlException;
 use Thelia\Log\Tlog;
+use Thelia\Tools\URL;
 
 /**
  * Class FileDownloader

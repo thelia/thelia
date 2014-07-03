@@ -315,7 +315,7 @@ class URL
              $clean;
      }
 
-    public function checkUrl($url, array $protocols = ["http", "https"])
+    public static function checkUrl($url, array $protocols = ["http", "https"])
     {
         $pattern = sprintf(UrlValidator::PATTERN, implode('|', $protocols));
 
