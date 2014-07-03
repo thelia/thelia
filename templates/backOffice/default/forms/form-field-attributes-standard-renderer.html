@@ -19,29 +19,33 @@ In addition to the standard form_field block output, this fragment uses the foll
 {/if}
 
 {if $disabled}
-    {$disabled = 'disabled'}
+    {$sDisabled = 'disabled'}
 {/if}
 
-{if $disabled}
-    {$readonly = 'readonly'}
+{if $read_only}
+    {$sRead_only = 'readonly'}
+{/if}
+
+{if $max_length}
+    {$sMaxLength = "maxlength=\"{$max_length}\""}
 {/if}
 
 {if $required}
-    {$required='aria-required="true" required'}
+    {$sRequired='aria-required="true" required'}
 {/if}
 
 {if $attr_list.placeholder}
-    {$placeholder = "placeholder=\"{$attr_list.placeholder}\""}
+    {$sPlaceholder = "placeholder=\"{$attr_list.placeholder}\""}
 {/if}
 
 {if $type == 'hidden'}
    id="{$label_attr.for}" name="{$name}" value="{$value}"
 {elseif $type == 'checkbox' || $type == 'radio'}
-    id="{$label_attr.for}" name="{$name}" class="{$field_extra_class}" value="{$value}" {if $checked}checked="checked"{/if} {$disabled} {$readonly} {$required}
+    id="{$label_attr.for}" name="{$name}" class="{$field_extra_class}" value="{$value}" {if $checked}checked="checked"{/if} {$sDisabled} {$sReadonly} {$sRequired}
 {elseif $type == 'choice'}
-    id="{$label_attr.for}" name="{$name} "class="form-control class="{$field_extra_class}" {if $multiple}multiple{/if} {if $lattr_list.size}size="{$lattr_list.size}"{/if} {$disabled} {$readonly} {$required}
+    id="{$label_attr.for}" name="{$name} "class="form-control class="{$field_extra_class}" {if $multiple}multiple{/if} {if $lattr_list.size}size="{$lattr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired}
 {elseif $type == 'textarea'}
-    id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {$placeholder nofilter} {$disabled} {$readonly} {$required}
+    id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sPlaceholder nofilter} {$sDisabled} {$sReadonly} {$sRequired}
 {else}
-    id="{$label_attr.for}" name="{$name}" value="{$value}" class="form-control {$field_extra_class}" {$placeholder nofilter} {$disabled} {$readonly} {$required}
+    id="{$label_attr.for}" name="{$name}" value="{$value}" class="form-control {$field_extra_class}" {$sMaxLength nofilter} {$sPlaceholder nofilter} {$sDisabled} {$sReadonly} {$sRequired}
 {/if}
