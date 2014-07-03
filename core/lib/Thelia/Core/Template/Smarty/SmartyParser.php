@@ -211,7 +211,7 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param int     $templateType      the template type (a TemplateDefinition type constant)
      * @param string  $templateName      the template name
      * @param string  $templateDirectory path to the template dirtectory
-     * @param unknown $key               ???
+     * @param string  $key               ???
      * @param boolean $unshift           ??? Etienne ?
      */
     public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false)
