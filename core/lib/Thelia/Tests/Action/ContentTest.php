@@ -38,6 +38,8 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
  */
 class ContentTest extends TestCaseWithURLToolSetup
 {
+    use I18nTestTrait;
+
     /**
      * @var EventDispatcherInterface
      */
@@ -322,7 +324,7 @@ class ContentTest extends TestCaseWithURLToolSetup
             $folder->setVisible(1);
             $folder->setPosition(1);
 
-            $this->setI18N($folder, "folder");
+            $this->setI18n($folder);
 
             $folder->save();
 
@@ -334,7 +336,7 @@ class ContentTest extends TestCaseWithURLToolSetup
                 $content->setVisible(1);
                 $content->setPosition($i + 1);
 
-                $this->setI18N($content, "content");
+                $this->setI18n($content);
 
                 $contentFolders = $content->getContentFolders();
                 $collection     = new Collection();
@@ -349,27 +351,6 @@ class ContentTest extends TestCaseWithURLToolSetup
         }
 
         return self::$folderForPositionTest;
-    }
-
-    /**
-     * Set the title of te object in all locales
-     *
-     * @param mixed  $object
-     * @param string $title
-     */
-    public function setI18N(&$object, $title)
-    {
-
-        $localeList = LangQuery::create()
-            ->select("Locale")
-            ->find()
-            ->toArray();
-
-        foreach ($localeList as $locale) {
-            $object->setLocale($locale);
-            $object->setTitle($locale . ' : ' . $title);
-        }
-
     }
 
     /**
