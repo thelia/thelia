@@ -140,6 +140,7 @@ interface ArchiveBuilderInterface
      */
     public function addDirectory($directoryPath);
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     /**
      * @params string $filename
@@ -148,10 +149,16 @@ interface ArchiveBuilderInterface
 =======
     /**
 >>>>>>> Finish implementing and testing zip
+=======
+
+    /**
+     * @params string $filename
+>>>>>>> Add filename in build archive response
      * @return \Thelia\Core\HttpFoundation\Response
      *
      * This method return an instance of a Response with the archive as content.
      */
+<<<<<<< HEAD
 <<<<<<< HEAD
     public function buildArchiveResponse($filename);
 
@@ -160,6 +167,9 @@ interface ArchiveBuilderInterface
      * @param  bool                                    $isOnline
 =======
     public function buildArchiveResponse();
+=======
+    public function buildArchiveResponse($filename);
+>>>>>>> Add filename in build archive response
 
     /**
 <<<<<<< HEAD
