@@ -20,7 +20,7 @@ use Thelia\Core\Translation\Translator;
  */
 class ArchiveBuilderManager
 {
-    protected $archiveCreators = array();
+    protected $archiveBuilders = array();
 
     protected $environment;
 
@@ -37,7 +37,7 @@ class ArchiveBuilderManager
         if (null !== $archiveCreator) {
             $archiveCreator->setEnvironment($this->environment);
 
-            $this->archiveCreators[$archiveCreator->getName()] = $archiveCreator;
+            $this->archiveBuilders[$archiveCreator->getName()] = $archiveCreator;
         }
 
         return $this;
@@ -50,18 +50,11 @@ class ArchiveBuilderManager
      */
     public function delete($name)
     {
-        if (!array_key_exists($name, $this->archiveCreators)) {
-            throw new \OutOfBoundsException(
-                Translator::getInstance()->trans(
-                    "The archive creator %name doesn't exist",
-                    [
-                        "%name" => $name
-                    ]
-                )
-            );
+        if (!array_key_exists($name, $this->archiveBuilders)) {
+            $this->throwOutOfBounds($name);
         }
 
-        unset($this->archiveCreators[$name]);
+        unset($this->archiveBuilders[$name]);
 
         return $this;
     }
@@ -71,6 +64,27 @@ class ArchiveBuilderManager
      */
     public function getAll()
     {
-        return $this->archiveCreators;
+        return $this->archiveBuilders;
+    }
+
+    public function get($name)
+    {
+        if (!array_key_exists($name, $this->archiveBuilders)) {
+            $this->throwOutOfBounds($name);
+        }
+
+        return $this->archiveBuilders[$name];
+    }
+
+    protected function throwOutOfBounds($name)
+    {
+        throw new \OutOfBoundsException(
+            Translator::getInstance()->trans(
+                "The archive creator %name doesn't exist",
+                [
+                    "%name" => $name
+                ]
+            )
+        );
     }
 }

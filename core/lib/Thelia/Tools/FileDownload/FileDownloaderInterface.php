@@ -14,7 +14,6 @@ namespace Thelia\Tools\FileDownload;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
 
-
 /**
  * Class FileDownloader
  * @package Thelia\Tools\FileDownload
@@ -23,8 +22,8 @@ use Symfony\Component\Translation\Translator;
 interface FileDownloaderInterface
 {
     /**
-     * @param string $url
-     * @param string $pathToStore
+     * @param  string                                  $url
+     * @param  string                                  $pathToStore
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \ErrorException
      * @throws \HttpUrlException

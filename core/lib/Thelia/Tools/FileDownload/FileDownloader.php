@@ -45,8 +45,8 @@ class FileDownloader implements FileDownloaderInterface
     }
 
     /**
-     * @param string $url
-     * @param string $pathToStore
+     * @param  string                                  $url
+     * @param  string                                  $pathToStore
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \ErrorException
      * @throws \HttpUrlException
@@ -125,7 +125,7 @@ class FileDownloader implements FileDownloaderInterface
          */
         $file = @fopen($pathToStore, "w");
 
-        if($file === false) {
+        if ($file === false) {
             $translatedErrorMessage = $this->translator->trans(
                 "Failed to open a writing stream on the file: %file",
                 [
@@ -140,4 +140,4 @@ class FileDownloader implements FileDownloaderInterface
         fputs($file, $response);
         fclose($file);
     }
-} 
+}

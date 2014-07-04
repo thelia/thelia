@@ -11,6 +11,8 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Formatter;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Class FormatterData
@@ -19,5 +21,28 @@ namespace Thelia\Core\FileFormat\Formatter;
  */
 class FormatterData
 {
+    /** @var array */
+    protected $data;
 
+    /** @var Translator */
+    protected $translator;
+
+    public function __construct()
+    {
+        $this->translator = Translator::getInstance();
+    }
+
+    public function loadModelCriteria(ModelCriteria $criteria)
+    {
+
+        $propelData =
+            $criteria
+                ->find()
+        ;
+
+        if (empty($propelData)) {
+            return null;
+        }
+
+    }
 }
