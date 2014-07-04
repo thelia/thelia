@@ -21,6 +21,7 @@ use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Model\Map\FolderTableMap;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
@@ -330,7 +331,10 @@ class FolderTest extends TestCaseWithURLToolSetup
     public function setI18N(&$object, $title)
     {
 
-        $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
+        $localeList = LangQuery::create()
+            ->select("Locale")
+            ->find()
+            ->toArray();
 
         foreach ($localeList as $locale) {
             $object->setLocale($locale);

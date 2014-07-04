@@ -22,6 +22,7 @@ use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Model\LangQuery;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
@@ -359,7 +360,10 @@ class ContentTest extends TestCaseWithURLToolSetup
     public function setI18N(&$object, $title)
     {
 
-        $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
+        $localeList = LangQuery::create()
+            ->select("Locale")
+            ->find()
+            ->toArray();
 
         foreach ($localeList as $locale) {
             $object->setLocale($locale);
