@@ -116,10 +116,10 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
             throw new \ErrorException($translatedErrorMessage);
         }
 
-        // If not too
-        unlink($fileDownloadCache);
-
         $this->commit();
+
+        // Delete the temp file
+        unlink($fileDownloadCache);
 
         return $this;
     }
