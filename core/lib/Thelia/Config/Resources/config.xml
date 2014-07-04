@@ -138,7 +138,7 @@
 <<<<<<< HEAD
 =======
 
-        <!-- Archive builders and file formatters -->
+        <!-- Archive builders -->
 
         <service id="thelia.manager.archive_builder_manager" class="Thelia\Core\FileFormat\Archive\ArchiveBuilderManager">
             <argument>%kernel.environment%</argument>
@@ -156,17 +156,17 @@
 
         <!-- tar.gz -->
         <service id="thelia.manager.tar_gz_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarGzArchiveBuilder">
-            <argument id="compressionType" type="string">gz</argument>
             <tag name="thelia.manager.archive_builder" />
         </service>
 
         <!-- tar.bz2 -->
         <service id="thelia.manager.tar_bz2_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder">
-            <argument id="compressionType" type="string">bz2</argument>
             <tag name="thelia.manager.archive_builder" />
         </service>
 
+        <!-- Formatters -->
         <service id="thelia.manager.formatter_manager" class="Thelia\Core\FileFormat\Formatter\FormatterManager" />
+<<<<<<< HEAD
     </services>
 >>>>>>> Add archive builder manager and formatter manager services
 
@@ -199,5 +199,8 @@
         <!-- Formatters -->
         <service id="thelia.manager.formatter_manager" class="Thelia\Core\FileFormat\Formatter\FormatterManager" />
 
+=======
+
+>>>>>>> Fix services
     </services>
 </config>
