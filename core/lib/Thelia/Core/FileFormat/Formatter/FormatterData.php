@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\FileFormat\Formatter;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Collection\ArrayCollection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -34,14 +36,30 @@ class FormatterData
 
     public function loadModelCriteria(ModelCriteria $criteria)
     {
-
-        $propelData =
-            $criteria
-                ->find()
-        ;
+        $propelData = $criteria->find();
 
         if (empty($propelData)) {
             return null;
+        }
+
+        $asColumns = $propelData->getFormatter()->getAsColumns();
+
+        if (empty($asColumns) && $propelData instanceof ObjectCollection) {
+            /**
+             * Full request ( without select nor join )
+             */
+        } elseif (empty($asColumns) && $propelData instanceof ArrayCollection) {
+            /**
+             * Request with joins, but without select
+             */
+        } elseif (count($asColumns) > 1) {
+            /**
+             * Request with multiple select
+             */
+        } elseif (count($asColumns) === 1) {
+            /**
+             * Request with one select
+             */
         }
 
     }
