@@ -325,7 +325,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testBuildArchiveResponse()
     {
         $loadedArchiveResponse = $this->loadedZip
-            ->buildArchiveResponse()
+            ->buildArchiveResponse("test")
         ;
 
         $loadedArchiveResponseContent = $loadedArchiveResponse->getContent();
