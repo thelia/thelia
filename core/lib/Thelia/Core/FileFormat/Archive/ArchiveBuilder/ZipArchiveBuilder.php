@@ -92,7 +92,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
          * Download the file if it is online
          * If it's local check if the file exists and if it is redable
          */
-        $fileDownloadCache = $this->cacheDir . DS . "download.tmp";
+        $fileDownloadCache = $this->cacheDir . DS . md5(uniqid()) . ".tmp";
         $this->copyFile($filePath, $fileDownloadCache, $isOnline);
 
         /**
@@ -110,8 +110,14 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
             $this->logger->error($translatedErrorMessage);
 
+            // if error delete the cache file
+            unlink($fileDownloadCache);
+
             throw new \ErrorException($translatedErrorMessage);
         }
+
+        // If not too
+        unlink($fileDownloadCache);
 
         $this->commit();
 
@@ -331,41 +337,36 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
     /**
      * @param string $pathToArchive
-     * @param string $environment
      * @param bool $isOnline
      * @param FileDownloaderInterface $fileDownloader
-     * @return $this
+     * @return ZipArchiveBuilder
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\HttpUrlException
      *
      * Loads an archive
      */
-    public static function loadArchive(
-        $pathToArchive,
-        $environment,
-        $isOnline = false,
-        FileDownloaderInterface $fileDownloader = null
-    ) {
-        /** @var ZipArchiveBuilder $instance */
-        $instance = new static();
+    public function loadArchive($pathToArchive, $isOnline = false)
+    {
+        $back = $this->zip;
+        $this->zip = new \ZipArchive();
+        $zip = clone $this;
+        $this->zip = $back;
 
-        $instance->setEnvironment($environment);
-        $zip = $instance->getRawZipArchive();
-        $zip->close();
+        $zip->setEnvironment($this->environment);
 
-        if ($fileDownloader !== null) {
-            $instance->setFileDownloader($fileDownloader);
-        }
+        $zip->copyFile(
+            $pathToArchive,
+            $zip->getCacheFile(),
+            $isOnline
+        );
 
-        $instance->copyFile($pathToArchive, $instance->getCacheFile(), $isOnline);
-
-        if (true !== $return = $zip->open($instance->getCacheFile())) {
+        if (true !== $return = $zip->getRawZipArchive()->open($zip->getCacheFile())) {
             throw new ZipArchiveException(
-                $instance->getZipErrorMessage($return)
+                $zip->getZipErrorMessage($return)
             );
         }
 
-        return $instance;
+        return $zip;
     }
 
     /**
@@ -403,6 +404,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      */
     public function setEnvironment($environment)
     {
+        parent::setEnvironment($environment);
 
         $cacheFile = $this->generateCacheFile($environment);
 

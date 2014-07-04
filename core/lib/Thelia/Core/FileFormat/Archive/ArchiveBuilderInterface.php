@@ -11,7 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Archive;
-use Thelia\Tools\FileDownload\FileDownloaderInterface;
+
 
 /**
  * Interface ArchiveBuilderInterface
@@ -86,16 +86,14 @@ interface ArchiveBuilderInterface
 
     /**
      * @param string $pathToArchive
-     * @param string $environment
      * @param bool $isOnline
-     * @param FileDownloaderInterface $fileDownloader
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\HttpUrlException
      *
      * Loads an archive
      */
-    public static function loadArchive($pathToArchive, $environment, $isOnline = false, FileDownloaderInterface $fileDownloader = null);
+    public function loadArchive($pathToArchive, $isOnline = false);
 
     /**
      * @param $pathToFile
@@ -113,12 +111,4 @@ interface ArchiveBuilderInterface
      */
     public function hasDirectory($directory);
 
-    /**
-     * @param string $environment
-     * @return $this
-     *
-     * Sets the execution environment of the Kernel,
-     * used to know which cache is used.
-     */
-    public function setEnvironment($environment);
 } 

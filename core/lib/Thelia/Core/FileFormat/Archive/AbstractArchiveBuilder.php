@@ -41,6 +41,9 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     /** @var string */
     protected $cacheDir;
 
+    /** @var string */
+    protected $environment;
+
     public function __construct()
     {
         $this->translator = Translator::getInstance();
@@ -195,5 +198,17 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     public function getCacheFile()
     {
         return $this->cacheFile;
+    }
+
+    /**
+     * @param string $environment
+     * @return $this
+     *
+     * Sets the execution environment of the Kernel,
+     * used to know which cache is used.
+     */
+    public function setEnvironment($environment)
+    {
+        $this->environment = $environment;
     }
 } 

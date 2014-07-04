@@ -47,29 +47,6 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     /** @var \Thelia\Log\Tlog */
     protected $logger;
 
-    function __construct($compressionType = null)
-    {
-        $this->translator = Translator::getInstance();
-        $this->logger = Tlog::getNewInstance();
-
-        $supportedCompression = [
-            "gz",
-            "bz2",
-            null
-        ];
-
-        if (!in_array($compressionType, $supportedCompression)) {
-            throw new TarArchiveException(
-                $this->translator->trans(
-                    "The compression %type is not supported"
-                )
-            );
-        }
-
-        $this->compression = $compressionType;
-    }
-
-
     public function __destruct()
     {
         if ($this->tar instanceof \PharData) {
@@ -303,29 +280,19 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      *
      * Loads an archive
      */
-    public static function loadArchive(
-        $pathToArchive,
-        $environment,
-        $isOnline = false,
-        FileDownloaderInterface $fileDownloader = null
-    ) {
-        /** @var TarArchiveBuilder $instance */
-        $instance = new static();
+    public function loadArchive($pathToArchive, $isOnline = false)
+    {
+        $tar = clone $this;
 
-        if ($fileDownloader !== null) {
-            $instance->setFileDownloader($fileDownloader);
-        }
-
-        $instance->setCacheFile($instance->generateCacheFile($environment))
-            ->copyFile($pathToArchive, $instance->getCacheFile(), $isOnline);
+        $tar
+            ->setCacheFile($tar->generateCacheFile($this->environment))
+            ->copyFile($pathToArchive, $tar->getCacheFile(), $isOnline);
 
         /**
          * This throws TarArchiveBuilderException if
          * the archive is not valid.
          */
-        $instance->setEnvironment($environment);
-
-        return $instance;
+        return $tar->setEnvironment($tar->environment);
     }
 
     /**
@@ -391,6 +358,14 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      */
     public function setEnvironment($environment)
     {
+        if (empty($environment)) {
+            throw new \ErrorException(
+                $this->translator->trans(
+                    "You must define an environment when you use an archive builder"
+                )
+            );
+        }
+
         if ($this->cacheFile === null) {
             $cacheFile = $this->generateCacheFile($environment);
 
@@ -406,16 +381,8 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
         try {
             $this->tar = new \PharData($cacheFile, null, null, static::PHAR_FORMAT);
 
-            switch ($this->compression) {
-                case "gz":
-                    $this->tar = $this->tar->compress(\Phar::GZ);
-                    $cacheFile .= ".gz";
-                    break;
-                case "bz2":
-                    $this->tar = $this->tar->compress(\Phar::BZ2);
-                    $cacheFile .= ".bz2";
-                    break;
-            }
+            $this->compressionEntryPoint();
+
 
         } catch(\BadMethodCallException $e) {
             /**
@@ -438,6 +405,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
         }
 
         $this->cacheFile = $cacheFile;
+        $this->environment = $environment;
 
         return $this;
     }
@@ -486,13 +454,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      */
     public function getName()
     {
-        $name = "tar";
-
-        if ($this->compression !== null) {
-            $name .= "." . $this->compression;
-        }
-
-        return $name;
+        return "tar";
     }
 
     /**
@@ -506,7 +468,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      */
     public function getExtension()
     {
-        return $this->getName();
+        return "tar";
     }
 
     /**
@@ -519,10 +481,19 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      */
     public function getMimeType()
     {
-        return $this->compression === null ?
-            "application/x-tar" :
-            "application/x-gtar"
-        ;
+        return "application/x-tar";
     }
 
+    protected function compressionEntryPoint()
+    {
+        /**
+         * This method must be overwritten if you want to do some
+         * stuff to compress you archive
+         */
+    }
+
+    public function getCompression()
+    {
+        return $this->compression;
+    }
 } 

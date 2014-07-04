@@ -40,9 +40,10 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->zip = new ZipArchiveBuilder();
 
+        $this->zip->setEnvironment("dev");
+
         $this->loadedZip = $this->zip->loadArchive(
-            __DIR__ . DS . "TestResources/well_formatted.zip",
-            "dev"
+            __DIR__ . DS . "TestResources/well_formatted.zip"
         );
     }
 
@@ -158,8 +159,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testLoadValidZip()
     {
         $loadedZip = $this->zip->loadArchive(
-            __DIR__ . DS . "TestResources/well_formatted.zip",
-            "dev"
+            __DIR__ . DS . "TestResources/well_formatted.zip"
         );
 
         $this->assertInstanceOf(
@@ -175,8 +175,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testLoadNotValidZip()
     {
         $this->zip->loadArchive(
-            __DIR__ . DS . "TestResources/bad_formatted.zip",
-            "dev"
+            __DIR__ . DS . "TestResources/bad_formatted.zip"
         );
     }
 
@@ -186,18 +185,17 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testLoadNotExistingFile()
     {
         $this->zip->loadArchive(
-            __DIR__ . DS . "TestResources/this_file_doesn_t_exist.zip",
-            "dev"
+            __DIR__ . DS . "TestResources/this_file_doesn_t_exist.zip"
         );
     }
 
     public function testLoadOnlineAvailableAndValidFile()
     {
+        $this->zip->setFileDownloader(FakeFileDownloader::getInstance());
+
         $this->zip->loadArchive(
             __DIR__ . DS . "TestResources/well_formatted.zip",
-            "dev",
-            true,
-            FakeFileDownloader::getInstance()
+            true
         );
     }
 
@@ -207,11 +205,11 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadOnlineAvailableAndNotValidFile()
     {
+        $this->zip->setFileDownloader(FakeFileDownloader::getInstance());
+
         $this->zip->loadArchive(
             __DIR__ . DS . "TestResources/bad_formatted.zip",
-            "dev",
-            true,
-            FakeFileDownloader::getInstance()
+            true
         );
     }
 
@@ -220,11 +218,11 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadOnlineNotExistingFile()
     {
+        $this->zip->setFileDownloader(FakeFileDownloader::getInstance());
+
         $this->zip->loadArchive(
             __DIR__ . DS . "TestResources/this_file_doesn_t_exist.zip",
-            "dev",
-            true,
-            FakeFileDownloader::getInstance()
+            true
         );
     }
 
