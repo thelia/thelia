@@ -297,9 +297,8 @@ class FolderTest extends TestCaseWithURLToolSetup
             $folder->setParent(0);
             $folder->setVisible(1);
             $folder->setPosition(1);
-            $folder
-                ->setLocale('en_US')
-                ->setTitle('folder test');
+
+            $this->setI18N($folder, "folder");
 
             $folder->save();
 
@@ -311,9 +310,7 @@ class FolderTest extends TestCaseWithURLToolSetup
                 $subFolder->setVisible(1);
                 $subFolder->setPosition($i + 1);
 
-                $folder
-                    ->setLocale('en_US')
-                    ->setTitle(sprintf('folder test %s', $i));
+                $this->setI18N($subFolder, "sub folder");
 
                 $subFolder->save();
             }
@@ -324,6 +321,23 @@ class FolderTest extends TestCaseWithURLToolSetup
         return self::$folderIdForPositionTest;
     }
 
+    /**
+     * Set the title of te object in all locales
+     *
+     * @param mixed  $object
+     * @param string $title
+     */
+    public function setI18N(&$object, $title)
+    {
+
+        $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
+
+        foreach ($localeList as $locale) {
+            $object->setLocale($locale);
+            $object->setTitle($locale . ' : ' . $title);
+        }
+
+    }
 
     /**
      * @return \Thelia\Model\Folder
