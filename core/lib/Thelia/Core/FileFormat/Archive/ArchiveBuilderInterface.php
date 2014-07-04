@@ -76,12 +76,14 @@ interface ArchiveBuilderInterface
      * This method creates an empty directory
      */
     public function addDirectory($directoryPath);
+
     /**
+     * @params string $filename
      * @return \Thelia\Core\HttpFoundation\Response
      *
      * This method return an instance of a Response with the archive as content.
      */
-    public function buildArchiveResponse();
+    public function buildArchiveResponse($filename);
 
     /**
      * @param  string                                  $pathToArchive
