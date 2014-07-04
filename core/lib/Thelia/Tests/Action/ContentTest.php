@@ -288,6 +288,7 @@ class ContentTest extends TestCaseWithURLToolSetup
 
         $this->assertNull($testAssociation);
     }
+
     /**
      * @return \Thelia\Model\Content
      */
@@ -320,9 +321,7 @@ class ContentTest extends TestCaseWithURLToolSetup
             $folder->setVisible(1);
             $folder->setPosition(1);
 
-            $folder
-                ->setLocale('en_US')
-                ->setTitle('folder test');
+            $this->setI18N($folder, "folder");
 
             $folder->save();
 
@@ -334,9 +333,7 @@ class ContentTest extends TestCaseWithURLToolSetup
                 $content->setVisible(1);
                 $content->setPosition($i + 1);
 
-                $content
-                    ->setLocale('en_US')
-                    ->setTitle(sprintf('content test %s', $i));
+                $this->setI18N($content, "content");
 
                 $contentFolders = $content->getContentFolders();
                 $collection     = new Collection();
@@ -351,6 +348,24 @@ class ContentTest extends TestCaseWithURLToolSetup
         }
 
         return self::$folderForPositionTest;
+    }
+
+    /**
+     * Set the title of te object in all locales
+     *
+     * @param mixed  $object
+     * @param string $title
+     */
+    public function setI18N(&$object, $title)
+    {
+
+        $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
+
+        foreach ($localeList as $locale) {
+            $object->setLocale($locale);
+            $object->setTitle($locale . ' : ' . $title);
+        }
+
     }
 
     /**
