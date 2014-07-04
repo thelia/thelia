@@ -33,7 +33,7 @@ trait I18nTestTrait
      * @param array $fields     list of field to populate
      * @param array $localeList list of locale to use populate the object
      */
-    protected function setI18n(&$object, $fields = array("title"), $localeList = null)
+    protected function setI18n(&$object, $fields = array("Title"), $localeList = null)
     {
         if (null === $localeList) {
 
@@ -49,14 +49,8 @@ trait I18nTestTrait
         }
 
         foreach ($localeList as $locale) {
-
-            $object->setLocale($locale);
-
             foreach ($fields as $name) {
-
-                $func = "set" . ucfirst(strtolower($name));
-
-                $object->$func($locale . ' : ' . $name);
+                $object->getTranslation($locale)->setByName($name, $locale . ' : ' . $name);
             }
         }
 
