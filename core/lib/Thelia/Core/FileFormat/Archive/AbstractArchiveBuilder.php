@@ -63,11 +63,17 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     protected $cacheDir;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     /** @var string */
     protected $environment;
 
 =======
 >>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
+=======
+    /** @var string */
+    protected $environment;
+
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
     public function __construct()
     {
         $this->translator = Translator::getInstance();
@@ -245,9 +251,15 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
         return $this->cacheFile;
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     /**
      * @param  string $environment
+=======
+
+    /**
+     * @param string $environment
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
      * @return $this
      *
      * Sets the execution environment of the Kernel,
@@ -257,6 +269,7 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     {
         $this->environment = $environment;
     }
+<<<<<<< HEAD
 }
 =======
 } 
@@ -267,3 +280,6 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
 =======
 } 
 >>>>>>> Finish implementing and testing zip
+=======
+} 
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests

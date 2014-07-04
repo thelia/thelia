@@ -41,6 +41,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         $this->zip = new ZipArchiveBuilder();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         $this->zip->setEnvironment("dev");
 
         $this->loadedZip = $this->zip->loadArchive(
@@ -50,6 +51,12 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             __DIR__ . DS . "TestResources/well_formatted.zip",
             "dev"
 >>>>>>> Define archive builders and formatters
+=======
+        $this->zip->setEnvironment("dev");
+
+        $this->loadedZip = $this->zip->loadArchive(
+            __DIR__ . DS . "TestResources/well_formatted.zip"
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
         );
     }
 
@@ -343,11 +350,15 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $loadedZip = $this->zip->loadArchive(
 <<<<<<< HEAD
+<<<<<<< HEAD
             __DIR__ . DS . "TestResources/well_formatted.zip"
 =======
             __DIR__ . DS . "TestResources/well_formatted.zip",
             "dev"
 >>>>>>> Define archive builders and formatters
+=======
+            __DIR__ . DS . "TestResources/well_formatted.zip"
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
         );
 
         $this->assertInstanceOf(
@@ -372,11 +383,15 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->zip->loadArchive(
 <<<<<<< HEAD
+<<<<<<< HEAD
             __DIR__ . DS . "TestResources/bad_formatted.zip"
 =======
             __DIR__ . DS . "TestResources/bad_formatted.zip",
             "dev"
 >>>>>>> Define archive builders and formatters
+=======
+            __DIR__ . DS . "TestResources/bad_formatted.zip"
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
         );
     }
 
@@ -387,16 +402,21 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->zip->loadArchive(
 <<<<<<< HEAD
+<<<<<<< HEAD
             __DIR__ . DS . "TestResources/this_file_doesn_t_exist.zip"
 =======
             __DIR__ . DS . "TestResources/this_file_doesn_t_exist.zip",
             "dev"
 >>>>>>> Define archive builders and formatters
+=======
+            __DIR__ . DS . "TestResources/this_file_doesn_t_exist.zip"
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
         );
     }
 
     public function testLoadOnlineAvailableAndValidFile()
     {
+<<<<<<< HEAD
 <<<<<<< HEAD
         $this->zip->setFileDownloader(FakeFileDownloader::getInstance());
 
@@ -410,6 +430,13 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             true,
             FakeFileDownloader::getInstance()
 >>>>>>> Define archive builders and formatters
+=======
+        $this->zip->setFileDownloader(FakeFileDownloader::getInstance());
+
+        $this->zip->loadArchive(
+            __DIR__ . DS . "TestResources/well_formatted.zip",
+            true
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
         );
     }
 
@@ -428,6 +455,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testLoadOnlineAvailableAndNotValidFile()
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         $this->zip->setFileDownloader(FakeFileDownloader::getInstance());
 
         $this->zip->loadArchive(
@@ -440,6 +468,13 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             true,
             FakeFileDownloader::getInstance()
 >>>>>>> Define archive builders and formatters
+=======
+        $this->zip->setFileDownloader(FakeFileDownloader::getInstance());
+
+        $this->zip->loadArchive(
+            __DIR__ . DS . "TestResources/bad_formatted.zip",
+            true
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
         );
     }
 
@@ -448,6 +483,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadOnlineNotExistingFile()
     {
+<<<<<<< HEAD
 <<<<<<< HEAD
         $this->zip->setFileDownloader(FakeFileDownloader::getInstance());
 
@@ -461,6 +497,13 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             true,
             FakeFileDownloader::getInstance()
 >>>>>>> Define archive builders and formatters
+=======
+        $this->zip->setFileDownloader(FakeFileDownloader::getInstance());
+
+        $this->zip->loadArchive(
+            __DIR__ . DS . "TestResources/this_file_doesn_t_exist.zip",
+            true
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
         );
     }
 

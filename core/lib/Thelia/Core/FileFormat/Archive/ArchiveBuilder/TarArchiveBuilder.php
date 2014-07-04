@@ -61,6 +61,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     protected $logger;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     function __construct($compressionType = null)
     {
@@ -90,6 +91,8 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
 =======
 
 >>>>>>> Finish Tar archive builder
+=======
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
     public function __destruct()
     {
         if ($this->tar instanceof \PharData) {
@@ -434,6 +437,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      * Loads an archive
      */
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function loadArchive($pathToArchive, $isOnline = false)
     {
         $tar = clone $this;
@@ -463,11 +467,21 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
         $instance->setCacheFile($instance->generateCacheFile($environment))
             ->copyFile($pathToArchive, $instance->getCacheFile(), $isOnline);
 >>>>>>> Fix FileDownloader test
+=======
+    public function loadArchive($pathToArchive, $isOnline = false)
+    {
+        $tar = clone $this;
+
+        $tar
+            ->setCacheFile($tar->generateCacheFile($this->environment))
+            ->copyFile($pathToArchive, $tar->getCacheFile(), $isOnline);
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
 
         /**
          * This throws TarArchiveBuilderException if
          * the archive is not valid.
          */
+<<<<<<< HEAD
 <<<<<<< HEAD
 
         return $tar->setEnvironment($tar->environment);
@@ -476,6 +490,9 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
 
         return $instance;
 >>>>>>> Finish implementing and testing zip
+=======
+        return $tar->setEnvironment($tar->environment);
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
     }
 
     /**
@@ -566,6 +583,9 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     public function setEnvironment($environment)
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
         if (empty($environment)) {
             throw new \ErrorException(
                 $this->translator->trans(
@@ -574,8 +594,11 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
             );
         }
 
+<<<<<<< HEAD
 =======
 >>>>>>> Finish implementing and testing zip
+=======
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
         if ($this->cacheFile === null) {
             $cacheFile = $this->generateCacheFile($environment);
 
@@ -592,6 +615,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
             $this->tar = new \PharData($cacheFile, null, null, static::PHAR_FORMAT);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             $this->compressionEntryPoint();
 
         } catch (\BadMethodCallException $e) {
@@ -606,6 +630,10 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
                     $cacheFile .= ".bz2";
                     break;
             }
+=======
+            $this->compressionEntryPoint();
+
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
 
         } catch(\BadMethodCallException $e) {
 >>>>>>> Finish implementing and testing zip
@@ -634,9 +662,13 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
 
         $this->cacheFile = $cacheFile;
 <<<<<<< HEAD
+<<<<<<< HEAD
         $this->environment = $environment;
 =======
 >>>>>>> Finish implementing and testing zip
+=======
+        $this->environment = $environment;
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
 
         return $this;
     }
@@ -694,6 +726,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     public function getName()
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         return "tar";
 =======
         $name = "tar";
@@ -704,6 +737,9 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
 
         return $name;
 >>>>>>> Finish implementing and testing zip
+=======
+        return "tar";
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
     }
 
     /**
@@ -718,10 +754,14 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     public function getExtension()
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         return "tar";
 =======
         return $this->getName();
 >>>>>>> Finish implementing and testing zip
+=======
+        return "tar";
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
     }
 
     /**
@@ -735,6 +775,9 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     public function getMimeType()
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
         return "application/x-tar";
     }
 
@@ -744,6 +787,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
          * This method must be overwritten if you want to do some
          * stuff to compress you archive
          */
+<<<<<<< HEAD
     }
 
     public function getCompression()
@@ -760,3 +804,12 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
 
 } 
 >>>>>>> Finish implementing and testing zip
+=======
+    }
+
+    public function getCompression()
+    {
+        return $this->compression;
+    }
+} 
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests

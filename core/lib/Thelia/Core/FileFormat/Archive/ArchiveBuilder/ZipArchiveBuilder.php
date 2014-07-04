@@ -373,6 +373,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
          * If it's local check if the file exists and if it is redable
          */
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
         if ($isOnline) {
             $fileDownloadCache = $this->cacheDir . DS . "download";
@@ -403,6 +404,9 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         }
 =======
         $fileDownloadCache = $this->cacheDir . DS . "download.tmp";
+=======
+        $fileDownloadCache = $this->cacheDir . DS . md5(uniqid()) . ".tmp";
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
         $this->copyFile($filePath, $fileDownloadCache, $isOnline);
 >>>>>>> Finish implementing and testing zip
 
@@ -421,8 +425,14 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
             $this->logger->error($translatedErrorMessage);
 
+            // if error delete the cache file
+            unlink($fileDownloadCache);
+
             throw new \ErrorException($translatedErrorMessage);
         }
+
+        // If not too
+        unlink($fileDownloadCache);
 
         $this->commit();
 
@@ -714,23 +724,30 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      * @return ZipArchiveBuilder
 =======
      * @param string $pathToArchive
-     * @param string $environment
      * @param bool $isOnline
      * @param FileDownloaderInterface $fileDownloader
+<<<<<<< HEAD
      * @return $this
 >>>>>>> Define archive builders and formatters
+=======
+     * @return ZipArchiveBuilder
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\HttpUrlException
      *
      * Loads an archive
      */
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
     public function loadArchive($pathToArchive, $isOnline = false)
     {
         $back = $this->zip;
         $this->zip = new \ZipArchive();
         $zip = clone $this;
         $this->zip = $back;
+<<<<<<< HEAD
 
         $zip->setEnvironment($this->environment);
 
@@ -764,17 +781,29 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         if ($fileDownloader !== null) {
             $instance->setFileDownloader($fileDownloader);
         }
+=======
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
 
-        $instance->copyFile($pathToArchive, $instance->getCacheFile(), $isOnline);
+        $zip->setEnvironment($this->environment);
 
-        if (true !== $return = $zip->open($instance->getCacheFile())) {
+        $zip->copyFile(
+            $pathToArchive,
+            $zip->getCacheFile(),
+            $isOnline
+        );
+
+        if (true !== $return = $zip->getRawZipArchive()->open($zip->getCacheFile())) {
             throw new ZipArchiveException(
-                $instance->getZipErrorMessage($return)
+                $zip->getZipErrorMessage($return)
             );
         }
 
+<<<<<<< HEAD
         return $instance;
 >>>>>>> Define archive builders and formatters
+=======
+        return $zip;
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
     }
 
     /**
@@ -838,6 +867,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         parent::setEnvironment($environment);
 
         $cacheFile = $this->generateCacheFile($environment);
@@ -874,6 +904,9 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         $cacheFile .= "." . $this->getExtension();
 >>>>>>> Define archive builders and formatters
 =======
+=======
+        parent::setEnvironment($environment);
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
 
 <<<<<<< HEAD
         $cacheFileName = md5 (uniqid());

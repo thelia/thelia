@@ -11,7 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Archive;
-use Thelia\Tools\FileDownload\FileDownloaderInterface;
+
 
 /**
  * Interface ArchiveBuilderInterface
@@ -150,19 +150,22 @@ interface ArchiveBuilderInterface
 
     /**
      * @param string $pathToArchive
-     * @param string $environment
      * @param bool $isOnline
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> Define archive builders and formatters
 =======
      * @param FileDownloaderInterface $fileDownloader
 >>>>>>> Finish implementing and testing zip
+=======
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\HttpUrlException
      *
      * Loads an archive
      */
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     public function loadArchive($pathToArchive, $isOnline = false);
@@ -172,6 +175,9 @@ interface ArchiveBuilderInterface
 =======
     public static function loadArchive($pathToArchive, $environment, $isOnline = false, FileDownloaderInterface $fileDownloader = null);
 >>>>>>> Finish implementing and testing zip
+=======
+    public function loadArchive($pathToArchive, $isOnline = false);
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
 
     /**
      * @param $pathToFile
@@ -194,6 +200,7 @@ interface ArchiveBuilderInterface
     public function hasDirectory($directory);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
     /**
@@ -206,3 +213,6 @@ interface ArchiveBuilderInterface
     public function setEnvironment($environment);
 } 
 >>>>>>> Define archive builders and formatters
+=======
+} 
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests

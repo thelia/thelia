@@ -12,6 +12,10 @@
 
 namespace Thelia\Tests\FileFormat\Archive\ArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarGzArchiveBuilder;
+<<<<<<< HEAD
+=======
+use Thelia\Core\HttpFoundation\Response;
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests
 
 /**
  * Class TarGzArchiveBuilderTest
@@ -35,4 +39,8 @@ class TarGzArchiveBuilderTest extends TarArchiveBuilderTest
             $this->tar->getCompression()
         );
     }
+<<<<<<< HEAD
 }
+=======
+} 
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests

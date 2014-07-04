@@ -381,9 +381,8 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadValidArchive()
     {
-        $tar = TarArchiveBuilder::loadArchive(
-            __DIR__ . DS . "TestResources/well_formatted.tar",
-            "dev"
+        $tar = $this->tar->loadArchive(
+            __DIR__ . DS . "TestResources/well_formatted.tar"
         );
 
         $this->assertInstanceOf(
@@ -401,9 +400,8 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadInvalidArchive()
     {
-        $tar = TarArchiveBuilder::loadArchive(
-            __DIR__ . DS . "TestResources/bad_formatted.tar",
-            "dev"
+        $tar = $this->tar->loadArchive(
+            __DIR__ . DS . "TestResources/bad_formatted.tar"
         );
     }
 
@@ -512,5 +510,17 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             $this->tar->formatFilePath("//foo/bar///baz/")
         );
     }
+<<<<<<< HEAD
 } 
 >>>>>>> Finish Tar archive builder
+=======
+
+    public function testCompression()
+    {
+        $this->assertEquals(
+            null,
+            $this->tar->getCompression()
+        );
+    }
+} 
+>>>>>>> Finish tar, tar.gz, tar.bz2 and tests

@@ -150,18 +150,18 @@
         </service>
 
         <!-- tar -->
-        <service id="thelia.manager.tar_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
+        <service id="thelia.manager.tar_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarArchiveBuilder">
             <tag name="thelia.manager.archive_builder" />
         </service>
 
         <!-- tar.gz -->
-        <service id="thelia.manager.tar_gz_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
+        <service id="thelia.manager.tar_gz_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarGzArchiveBuilder">
             <argument id="compressionType" type="string">gz</argument>
             <tag name="thelia.manager.archive_builder" />
         </service>
 
         <!-- tar.bz2 -->
-        <service id="thelia.manager.tar_bz2_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
+        <service id="thelia.manager.tar_bz2_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder">
             <argument id="compressionType" type="string">bz2</argument>
             <tag name="thelia.manager.archive_builder" />
         </service>
