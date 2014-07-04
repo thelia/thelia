@@ -607,10 +607,14 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $loadedArchiveResponse = $this->loadedZip
 <<<<<<< HEAD
+<<<<<<< HEAD
             ->buildArchiveResponse("test")
 =======
             ->buildArchiveResponse()
 >>>>>>> Define archive builders and formatters
+=======
+            ->buildArchiveResponse("test")
+>>>>>>> Fix Test
         ;
 
         $loadedArchiveResponseContent = $loadedArchiveResponse->getContent();
