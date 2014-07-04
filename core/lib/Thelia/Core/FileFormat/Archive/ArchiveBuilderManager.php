@@ -20,6 +20,7 @@ use Thelia\Core\Translation\Translator;
  */
 class ArchiveBuilderManager
 {
+    /** @var array */
     protected $archiveBuilders = array();
 
     protected $environment;
@@ -29,15 +30,15 @@ class ArchiveBuilderManager
         $this->environment = $environment;
     }
     /**
-     * @param  AbstractArchiveBuilder $archiveCreator
+     * @param  AbstractArchiveBuilder $archiveBuilder
      * @return $this
      */
-    public function add(AbstractArchiveBuilder $archiveCreator)
+    public function add(AbstractArchiveBuilder $archiveBuilder)
     {
-        if (null !== $archiveCreator) {
-            $archiveCreator->setEnvironment($this->environment);
+        if (null !== $archiveBuilder) {
+            $archiveBuilder->setEnvironment($this->environment);
 
-            $this->archiveBuilders[$archiveCreator->getName()] = $archiveCreator;
+            $this->archiveBuilders[$archiveBuilder->getName()] = $archiveBuilder;
         }
 
         return $this;
@@ -60,11 +61,26 @@ class ArchiveBuilderManager
     }
 
     /**
-     * @return array[AbstractArchiveBuilder]
+     * @return array
      */
     public function getAll()
     {
         return $this->archiveBuilders;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNames()
+    {
+        $names = [];
+
+        /** @var AbstractArchiveBuilder $builder */
+        foreach($this->archiveBuilders as $builder) {
+            $names[] = $builder->getName();
+        }
+
+        return $names;
     }
 
     public function get($name)
