@@ -293,15 +293,15 @@ class Form extends AbstractSmartyPlugin
      * @param  string                    $templateTypeName
      * @return string
      */
-    protected function automaticFormFieldRendering($params, $content, $template, $templateTypeName)
+    protected function automaticFormFieldRendering($params, $content, $template, $templateFile)
     {
         $data = '';
 
         $templateStyle = $this->getParam($params, 'template', 'standard');
-        $templateFile  = sprintf($templateTypeName, $templateStyle);
 
-        $snippet_path = sprintf('%s/%s.html',
+        $snippet_path = sprintf('%s'.DS.'forms'.DS.'%s'.DS.'%s.html',
             $this->parser->getTemplateDefinition()->getAbsolutePath(),
+            $templateStyle,
             $templateFile
         );
 
@@ -339,18 +339,18 @@ class Form extends AbstractSmartyPlugin
     public function customFormFieldRendering($params, $content, $template, &$repeat)
     {
         if (! $repeat) {
-            return $this->automaticFormFieldRendering($params, $content, $template, 'forms'.DS.'form-field-%s-renderer');
+            return $this->automaticFormFieldRendering($params, $content, $template, 'form-field-renderer');
         }
     }
 
     public function standardFormFieldRendering($params, \Smarty_Internal_Template $template)
     {
-        return $this->automaticFormFieldRendering($params, '', $template, 'forms'.DS.'form-field-%s-renderer');
+        return $this->automaticFormFieldRendering($params, '', $template, 'form-field-renderer');
     }
 
     public function standardFormFieldAttributes($params, \Smarty_Internal_Template $template)
     {
-        return $this->automaticFormFieldRendering($params, '', $template, 'forms'.DS.'form-field-attributes-%s-renderer');
+        return $this->automaticFormFieldRendering($params, '', $template, 'form-field-attributes-renderer');
     }
 
     public function renderTaggedFormFields($params, $content, \Smarty_Internal_Template $template, &$repeat)

@@ -11,7 +11,7 @@ fragment uses the following additional variables :
 
 {* Get standard fields attributes *}
 {capture assign=attributes}
-    {include file="forms/form-field-attributes-$field_template-renderer.html"}
+    {include file="forms/$field_template/form-field-attributes-renderer.html"}
 {/capture}
 
 {if $type == 'hidden'}
