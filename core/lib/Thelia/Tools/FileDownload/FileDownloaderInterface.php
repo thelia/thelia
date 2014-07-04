@@ -15,9 +15,12 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> Define archive builders and formatters
+=======
+>>>>>>> Fix cs and add get method in managers
 /**
  * Class FileDownloader
  * @package Thelia\Tools\FileDownload
@@ -27,12 +30,17 @@ interface FileDownloaderInterface
 {
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param  string                                  $url
      * @param  string                                  $pathToStore
 =======
      * @param string $url
      * @param string $pathToStore
 >>>>>>> Define archive builders and formatters
+=======
+     * @param  string                                  $url
+     * @param  string                                  $pathToStore
+>>>>>>> Fix cs and add get method in managers
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \ErrorException
      * @throws \HttpUrlException
@@ -50,7 +58,11 @@ interface FileDownloaderInterface
      */
     public static function getInstance();
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
 }
 >>>>>>> Define archive builders and formatters
+=======
+}
+>>>>>>> Fix cs and add get method in managers

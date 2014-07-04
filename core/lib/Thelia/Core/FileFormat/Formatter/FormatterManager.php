@@ -44,19 +44,21 @@ class FormatterManager
     public function delete($name)
     {
         if (!array_key_exists($name, $this->formatters)) {
-            throw new \OutOfBoundsException(
-                Translator::getInstance()->trans(
-                    "The formatter %name doesn't exist",
-                    [
-                        "%name" => $name
-                    ]
-                )
-            );
+            $this->throwOutOfBounds($name);
         }
 
         unset($this->formatters[$name]);
 
         return $this;
+    }
+
+    public function get($name)
+    {
+        if (!array_key_exists($name, $this->formatters)) {
+            $this->throwOutOfBounds($name);
+        }
+
+        return $this->formatters[$name];
     }
 
     /**
@@ -65,5 +67,21 @@ class FormatterManager
     public function getAll()
     {
         return $this->formatters;
+    }
+
+    /**
+     * @param $name
+     * @throws \OutOfBoundsException
+     */
+    protected function throwOutOfBounds($name)
+    {
+        throw new \OutOfBoundsException(
+            Translator::getInstance()->trans(
+                "The formatter %name doesn't exist",
+                [
+                    "%name" => $name
+                ]
+            )
+        );
     }
 }

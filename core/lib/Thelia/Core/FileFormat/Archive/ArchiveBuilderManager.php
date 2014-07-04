@@ -21,11 +21,15 @@ use Thelia\Core\Translation\Translator;
 class ArchiveBuilderManager
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
     /** @var array */
     protected $archiveBuilders = array();
 =======
     protected $archiveCreators = array();
 >>>>>>> Define archive builders and formatters
+=======
+    protected $archiveBuilders = array();
+>>>>>>> Fix cs and add get method in managers
 
     protected $environment;
 
@@ -57,8 +61,12 @@ class ArchiveBuilderManager
         if (null !== $archiveCreator) {
             $archiveCreator->setEnvironment($this->environment);
 
+<<<<<<< HEAD
             $this->archiveCreators[$archiveCreator->getName()] = $archiveCreator;
 >>>>>>> Define archive builders and formatters
+=======
+            $this->archiveBuilders[$archiveCreator->getName()] = $archiveCreator;
+>>>>>>> Fix cs and add get method in managers
         }
 
         return $this;
@@ -71,6 +79,7 @@ class ArchiveBuilderManager
      */
     public function delete($name)
     {
+<<<<<<< HEAD
 <<<<<<< HEAD
         if (!array_key_exists($name, $this->archiveBuilders)) {
             $this->throwOutOfBounds($name);
@@ -91,6 +100,13 @@ class ArchiveBuilderManager
 
         unset($this->archiveCreators[$name]);
 >>>>>>> Define archive builders and formatters
+=======
+        if (!array_key_exists($name, $this->archiveBuilders)) {
+            $this->throwOutOfBounds($name);
+        }
+
+        unset($this->archiveBuilders[$name]);
+>>>>>>> Fix cs and add get method in managers
 
         return $this;
     }
@@ -145,7 +161,28 @@ class ArchiveBuilderManager
      */
     public function getAll()
     {
-        return $this->archiveCreators;
+        return $this->archiveBuilders;
+    }
+
+    public function get($name)
+    {
+        if (!array_key_exists($name, $this->archiveBuilders)) {
+            $this->throwOutOfBounds($name);
+        }
+
+        return $this->archiveBuilders[$name];
+    }
+
+    protected function throwOutOfBounds($name)
+    {
+        throw new \OutOfBoundsException(
+            Translator::getInstance()->trans(
+                "The archive creator %name doesn't exist",
+                [
+                    "%name" => $name
+                ]
+            )
+        );
     }
 <<<<<<< HEAD
 } 
