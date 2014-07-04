@@ -55,4 +55,4 @@ interface FormatInterface
      * return "application/json";
      */
     public function getMimeType();
-} 
+}

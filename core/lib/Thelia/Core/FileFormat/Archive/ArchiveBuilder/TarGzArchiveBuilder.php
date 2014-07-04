@@ -49,4 +49,4 @@ class TarGzArchiveBuilder extends TarArchiveBuilder
         return $this;
     }
 
-} 
+}

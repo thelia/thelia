@@ -12,7 +12,6 @@
 
 namespace Thelia\Core\FileFormat\Archive;
 
-
 /**
  * Interface ArchiveBuilderInterface
  * @package Thelia\Core\FileFormat\Archive
@@ -23,10 +22,10 @@ namespace Thelia\Core\FileFormat\Archive;
 interface ArchiveBuilderInterface
 {
     /**
-     * @param string $filePath It is the path to access the file.
-     * @param string $directoryInArchive This is the directory where it will be stored in the archive
-     * @param null|string $name The name of the file in the archive. if it null or empty, it keeps the same name
-     * @param bool $isOnline
+     * @param  string                                     $filePath           It is the path to access the file.
+     * @param  string                                     $directoryInArchive This is the directory where it will be stored in the archive
+     * @param  null|string                                $name               The name of the file in the archive. if it null or empty, it keeps the same name
+     * @param  bool                                       $isOnline
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -41,7 +40,7 @@ interface ArchiveBuilderInterface
     /**
      * @param $content
      * @param $name
-     * @param string $directoryInArchive
+     * @param  string          $directoryInArchive
      * @return mixed
      * @throws \ErrorException
      *
@@ -50,7 +49,7 @@ interface ArchiveBuilderInterface
     public function addFileFromString($content, $name, $directoryInArchive = "/");
 
     /**
-     * @param string $pathToFile
+     * @param  string                                     $pathToFile
      * @return null|string
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -85,8 +84,8 @@ interface ArchiveBuilderInterface
     public function buildArchiveResponse();
 
     /**
-     * @param string $pathToArchive
-     * @param bool $isOnline
+     * @param  string                                  $pathToArchive
+     * @param  bool                                    $isOnline
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\HttpUrlException
@@ -104,11 +103,11 @@ interface ArchiveBuilderInterface
     public function hasFile($pathToFile);
 
     /**
-     * @param string $directory
+     * @param  string $directory
      * @return bool
      *
      * Check if the archive has a directory
      */
     public function hasDirectory($directory);
 
-} 
+}

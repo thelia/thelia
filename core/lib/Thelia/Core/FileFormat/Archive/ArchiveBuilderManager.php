@@ -29,7 +29,7 @@ class ArchiveBuilderManager
         $this->environment = $environment;
     }
     /**
-     * @param AbstractArchiveBuilder $archiveCreator
+     * @param  AbstractArchiveBuilder $archiveCreator
      * @return $this
      */
     public function add(AbstractArchiveBuilder $archiveCreator)
@@ -73,4 +73,4 @@ class ArchiveBuilderManager
     {
         return $this->archiveCreators;
     }
-} 
+}

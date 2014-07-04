@@ -57,10 +57,10 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
-     * @param string $filePath It is the path to access the file.
-     * @param string $directoryInArchive This is the directory where it will be stored in the archive
-     * @param null|string $name The name of the file in the archive. if it null or empty, it keeps the same name
-     * @param bool $isOnline
+     * @param  string                                     $filePath           It is the path to access the file.
+     * @param  string                                     $directoryInArchive This is the directory where it will be stored in the archive
+     * @param  null|string                                $name               The name of the file in the archive. if it null or empty, it keeps the same name
+     * @param  bool                                       $isOnline
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -107,7 +107,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     /**
      * @param $content
      * @param $name
-     * @param string $directoryInArchive
+     * @param  string          $directoryInArchive
      * @return mixed
      * @throws \ErrorException
      *
@@ -132,7 +132,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
         }
         try {
             $this->tar->addFromString($name, $content);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             throw new \ErrorException(
                 $this->translator->trans(
                     "Error while writing the file into the archive, error message: %errmes",
@@ -143,7 +143,6 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
             );
         }
     }
-
 
     /**
      * @param $directoryPath
@@ -160,7 +159,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
 
             try {
                 $this->tar->addEmptyDir($directoryInArchive);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 throw new \ErrorException(
                     $this->translator->trans(
                         "The directory %dir has not been created in the archive",
@@ -176,7 +175,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
-     * @param string $pathToFile
+     * @param  string                                     $pathToFile
      * @return null|string
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -205,7 +204,6 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
 
         return $content;
     }
-
 
     /**
      * @param $pathInArchive
@@ -269,10 +267,10 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
-     * @param string $pathToArchive
-     * @param string $environment
-     * @param bool $isOnline
-     * @param FileDownloaderInterface $fileDownloader
+     * @param  string                                  $pathToArchive
+     * @param  string                                  $environment
+     * @param  bool                                    $isOnline
+     * @param  FileDownloaderInterface                 $fileDownloader
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\HttpUrlException
@@ -292,6 +290,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
          * This throws TarArchiveBuilderException if
          * the archive is not valid.
          */
+
         return $tar->setEnvironment($tar->environment);
     }
 
@@ -312,19 +311,19 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
             /** @var \PharFileInfo $fileInfo */
             $fileInfo = $this->tar[$pathToFile];
 
-            if($fileInfo->isFile()) {
+            if ($fileInfo->isFile()) {
                 $isFile = true;
             }
             /**
              * Catch the exception to avoid its displaying.
              */
-        } catch(\BadMethodCallException $e) {}
+        } catch (\BadMethodCallException $e) {}
 
         return $isFile;
     }
 
     /**
-     * @param string $directory
+     * @param  string $directory
      * @return bool
      *
      * Check if the archive has a directory
@@ -338,19 +337,19 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
             /** @var \PharFileInfo $fileInfo */
             $fileInfo = $this->tar[$pathToDir];
 
-            if($fileInfo->isDir()) {
+            if ($fileInfo->isDir()) {
                 $isDir = true;
             }
             /**
              * Catch the exception to avoid its displaying.
              */
-        } catch(\BadMethodCallException $e) {}
+        } catch (\BadMethodCallException $e) {}
 
         return $isDir;
     }
 
     /**
-     * @param string $environment
+     * @param  string $environment
      * @return $this
      *
      * Sets the execution environment of the Kernel,
@@ -383,13 +382,12 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
 
             $this->compressionEntryPoint();
 
-
-        } catch(\BadMethodCallException $e) {
+        } catch (\BadMethodCallException $e) {
             /**
              * This should not happen
              */
             $errorMessage = "You have badly called the method setEnvironment twice for %file";
-        } catch(\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException $e) {
             $errorMessage = "The file %file is corrupted";
         }
 
@@ -411,7 +409,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
-     * @param string $initialString
+     * @param  string $initialString
      * @return string
      *
      * Gives a valid file path for \ZipArchive
@@ -432,7 +430,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
-     * @param string $initialString
+     * @param  string $initialString
      * @return string
      *
      * Gives a valid directory path for \ZipArchive
@@ -496,4 +494,4 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     {
         return $this->compression;
     }
-} 
+}

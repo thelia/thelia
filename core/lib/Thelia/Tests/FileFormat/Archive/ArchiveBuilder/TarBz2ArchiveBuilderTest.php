@@ -35,4 +35,4 @@ class TarBz2ArchiveBuilderTest extends TarArchiveBuilderTest
             $this->tar->getCompression()
         );
     }
-} 
+}

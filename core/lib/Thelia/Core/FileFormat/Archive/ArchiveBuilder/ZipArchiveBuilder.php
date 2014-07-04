@@ -47,7 +47,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      * On the destruction of the class,
      * remove the temporary file.
      */
-    function __destruct()
+    public function __destruct()
     {
         if ($this->zip instanceof \ZipArchive) {
             @$this->zip->close();
@@ -59,10 +59,10 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
-     * @param string $filePath It is the path to access the file.
-     * @param string $directoryInArchive This is the directory where it will be stored in the archive
-     * @param null|string $name The name of the file in the archive. if it null or empty, it keeps the same name
-     * @param bool $isOnline
+     * @param  string                                     $filePath           It is the path to access the file.
+     * @param  string                                     $directoryInArchive This is the directory where it will be stored in the archive
+     * @param  null|string                                $name               The name of the file in the archive. if it null or empty, it keeps the same name
+     * @param  bool                                       $isOnline
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -80,7 +80,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
          * Add empty directory if it doesn't exist
          */
 
-        if(!empty($directoryInArchive)) {
+        if (!empty($directoryInArchive)) {
             $this->addDirectory($directoryInArchive);
         }
 
@@ -127,7 +127,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     /**
      * @param $content
      * @param $name
-     * @param string $directoryInArchive
+     * @param  string          $directoryInArchive
      * @return mixed
      * @throws \ErrorException
      *
@@ -194,7 +194,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
-     * @param string $pathToFile
+     * @param  string                                     $pathToFile
      * @return null|string
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -224,7 +224,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
 
     /**
-     * @param string $initialString
+     * @param  string $initialString
      * @return string
      *
      * Gives a valid file path for \ZipArchive
@@ -244,11 +244,12 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         if (preg_match("#\/?[^\/]+\/[^\/]+\/?#", $initialString)) {
             $initialString = "/" . $initialString;
         }
+
         return $initialString;
     }
 
     /**
-     * @param string $initialString
+     * @param  string $initialString
      * @return string
      *
      * Gives a valid directory path for \ZipArchive
@@ -336,9 +337,9 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
-     * @param string $pathToArchive
-     * @param bool $isOnline
-     * @param FileDownloaderInterface $fileDownloader
+     * @param  string                                  $pathToArchive
+     * @param  bool                                    $isOnline
+     * @param  FileDownloaderInterface                 $fileDownloader
      * @return ZipArchiveBuilder
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\HttpUrlException
@@ -383,7 +384,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
-     * @param string $directory
+     * @param  string $directory
      * @return bool
      *
      * Checks if the link $directory exists and if it's not a file.
@@ -396,7 +397,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
-     * @param string $environment
+     * @param  string $environment
      * @return $this
      *
      * Sets the execution environment of the Kernel,
@@ -417,7 +418,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
             \ZipArchive::CREATE
         );
 
-        if($opening !== true) {
+        if ($opening !== true) {
             throw new \ErrorException(
                 $this->translator->trans(
                     "An unknown error append"
@@ -511,7 +512,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
-     * @param string $initialString
+     * @param  string $initialString
      * @return string
      *
      * Gives a valid file path for \ZipArchive
@@ -531,11 +532,12 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         if (preg_match("#\/?[^\/]+\/[^/]+\/?#", $initialString)) {
             $initialString = "/" . $initialString;
         }
+
         return $initialString;
     }
 
     /**
-     * @param string $initialString
+     * @param  string $initialString
      * @return string
      *
      * Gives a valid directory path for \ZipArchive
@@ -598,4 +600,4 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     {
         return $this->zip;
     }
-} 
+}

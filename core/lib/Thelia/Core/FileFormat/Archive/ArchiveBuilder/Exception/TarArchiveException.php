@@ -20,4 +20,4 @@ namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception;
 class TarArchiveException extends \Exception
 {
 
-} 
+}

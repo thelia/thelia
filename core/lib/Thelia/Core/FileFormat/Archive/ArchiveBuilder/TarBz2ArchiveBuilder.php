@@ -44,4 +44,4 @@ class TarBz2ArchiveBuilder extends TarArchiveBuilder
 
         return $this;
     }
-} 
+}

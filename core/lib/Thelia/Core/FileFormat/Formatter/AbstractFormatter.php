@@ -18,24 +18,7 @@ use Thelia\Core\FileFormat\FormatInterface;
  * @package Thelia\Core\FileFormat\Formatter
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-abstract class AbstractFormatter implements FormatInterface
+abstract class AbstractFormatter implements FormatInterface, FormatterInterface
 {
-    /**
-     * @param array $data
-     * @return mixed
-     *
-     * Encodes an array to the desired format.
-     * $data array only contains array and scalar data.
-     */
-    abstract public function encode(array $data);
 
-    /**
-     * @param $data
-     * @return array
-     * @throws \Thelia\Core\FileFormat\Formatter\Exception\BadFormattedStringException
-     *
-     * this method must do exactly the opposite of encode and return
-     * an array composed of array and scalar data.
-     */
-    abstract public function decode($data);
-} 
+}

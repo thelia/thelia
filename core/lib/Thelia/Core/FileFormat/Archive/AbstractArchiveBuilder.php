@@ -201,7 +201,7 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     }
 
     /**
-     * @param string $environment
+     * @param  string $environment
      * @return $this
      *
      * Sets the execution environment of the Kernel,
@@ -211,4 +211,4 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     {
         $this->environment = $environment;
     }
-} 
+}

@@ -18,7 +18,7 @@ use Thelia\Core\Translation\Translator;
  * @package Thelia\Core\FileFormat\Formatter
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class FormatterManager 
+class FormatterManager
 {
 
     protected $formatters = array();
@@ -66,4 +66,4 @@ class FormatterManager
     {
         return $this->formatters;
     }
-} 
+}

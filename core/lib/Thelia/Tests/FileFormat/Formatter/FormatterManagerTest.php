@@ -71,4 +71,4 @@ class FormatterManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->manager->delete("foo");
     }
-} 
+}

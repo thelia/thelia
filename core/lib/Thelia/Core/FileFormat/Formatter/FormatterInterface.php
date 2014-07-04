@@ -10,14 +10,30 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\FileFormat\Formatter\Exception;
+namespace Thelia\Core\FileFormat\Formatter;
 
 /**
- * Class BadFormattedStringException
- * @package Thelia\Core\FileFormat\Formatter\Exception
+ * Interface FormatterInterface
+ * @package Thelia\Core\FileFormat\Formatter
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class BadFormattedStringException extends \ErrorException
+interface FormatterInterface
 {
+    /**
+     * @param  FormatterData $data
+     * @return mixed
+     *
+     * This method must use a FormatterData object and output
+     * a formatted value.
+     */
+    public function encode(FormatterData $data);
 
+    /**
+     * @param $rawData
+     * @return FormatterData
+     *
+     * This must takes raw data as argument and outputs
+     * a FormatterData object.
+     */
+    public function decode($rawData);
 }

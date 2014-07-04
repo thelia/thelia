@@ -10,14 +10,14 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\FileFormat\Formatter\Exception;
+namespace Thelia\Core\FileFormat\Formatter;
 
 /**
- * Class BadFormattedStringException
- * @package Thelia\Core\FileFormat\Formatter\Exception
+ * Class FormatterData
+ * @package Thelia\Core\FileFormat\Formatter
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class BadFormattedStringException extends \ErrorException
+class FormatterData
 {
 
 }
