@@ -25,51 +25,55 @@ use Thelia\Model\Lang;
  */
 class BrandCreationForm extends BaseForm
 {
+    protected function doBuilForm($titleFieldHelpLabel)
+    {
+        $this->formBuilder->add(
+            'title',
+            'text',
+            [
+                'constraints' => [ new NotBlank() ],
+                'required'    => true,
+                'label'       => Translator::getInstance()->trans('Brand name'),
+                'label_attr'  => [
+                    'for'         => 'title',
+                    'help'        => $titleFieldHelpLabel
+                ],
+                'attr' => [
+                    'placeholder' => Translator::getInstance()->trans('The brand name or title'),
+                ]
+            ]
+        )
+        ->add(
+            'locale',
+            'hidden',
+            [
+                'constraints' => [ new NotBlank() ],
+                'required'    => true,
+            ]
+        )
+        // Is this brand online ?
+        ->add(
+            'visible',
+            'checkbox',
+            [
+                'constraints' => [ ],
+                'required'    => false,
+                'label'       => Translator::getInstance()->trans('This brand is online'),
+                'label_attr' => [
+                    'for' => 'visible_create'
+                ]
+            ]
+        );
+    }
+
     protected function buildForm()
     {
-        $this->formBuilder
-            // Brand title
-            ->add(
-                'title',
-                'text',
-                [
-                    'constraints' => [ new NotBlank() ],
-                    'required'    => true,
-                    'label'       => Translator::getInstance()->trans('Brand name'),
-                    'label_attr'  => [
-                        'for'         => 'title',
-                        'help'        => Translator::getInstance()->trans(
-                            'Enter here the brand name in the default language (%title%)',
-                            [ '%title%' => Lang::getDefaultLanguage()->getTitle()]
-                        ),
-                    ],
-                    'attr' => [
-                        'placeholder' => Translator::getInstance()->trans('The brand name or title'),
-                    ]
-                ]
+        $this->doBuilForm(
+            Translator::getInstance()->trans(
+                'Enter here the brand name in the default language (%title%)',
+                [ '%title%' => Lang::getDefaultLanguage()->getTitle()]
             )
-            // Current locale
-            ->add(
-                'locale',
-                'hidden',
-                [
-                    'constraints' => [ new NotBlank() ],
-                    'required'    => true,
-                ]
-            )
-            // Is this brand online ?
-            ->add(
-                'visible',
-                'checkbox',
-                [
-                    'constraints' => [ ],
-                    'required'    => true,
-                    'label'       => Translator::getInstance()->trans('This brand is online'),
-                    'label_attr' => [
-                        'for' => 'visible_create'
-                    ]
-                ]
-            );
+        );
     }
 
     public function getName()

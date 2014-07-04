@@ -28,42 +28,27 @@ class BrandModificationForm extends BrandCreationForm
 
     protected function buildForm()
     {
-        parent::buildForm();
+        $this->doBuilForm(
+            Translator::getInstance()->trans('The brand name or title')
+        );
 
-        $this->formBuilder
-            ->add(
-                'id',
-                'hidden',
-                [
-                    'constraints' => [ new GreaterThan(['value' => 0]) ],
-                    'required'    => true,
+        $this->formBuilder->add(
+            'id',
+            'hidden',
+            [
+                'constraints' => [ new GreaterThan(['value' => 0]) ],
+                'required'    => true,
+            ]
+        )
+        ->add("logo_image_id", "integer", [
+                'constraints' => [ ],
+                'required'    => false,
+                'label'       => Translator::getInstance()->trans('Select the brand logo'),
+                'label_attr'  => [
+                    'for' => 'mode',
+                    'help' => Translator::getInstance()->trans("Select the brand logo amongst the brand images")
                 ]
-            )
-            // Brand title
-            ->add(
-                'title',
-                'text',
-                [
-                    'constraints' => [ new NotBlank() ],
-                    'required'    => true,
-                    'label'       => Translator::getInstance()->trans('Brand name'),
-                    'label_attr'  => [
-                        'for'         => 'title'
-                    ],
-                    'attr' => [
-                        'placeholder' => Translator::getInstance()->trans('The brand name or title')
-                    ]
-                ]
-            )
-            ->add("logo_image_id", "integer", [
-                    'constraints' => [ ],
-                    'required'    => false,
-                    'label'       => Translator::getInstance()->trans('Select the brand logo'),
-                    'label_attr'  => [
-                        'for' => 'mode',
-                        'help' => Translator::getInstance()->trans("Select the brand logo amongst the brand images")
-                    ]
-                ])
+            ])
         ;
 
         // Add standard description fields, excluding title and locale, which are already defined
