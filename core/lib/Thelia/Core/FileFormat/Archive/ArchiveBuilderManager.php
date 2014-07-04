@@ -22,6 +22,9 @@ class ArchiveBuilderManager
 {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Add getNames methods to managers
     /** @var array */
     protected $archiveBuilders = array();
 =======
@@ -40,6 +43,7 @@ class ArchiveBuilderManager
     /**
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param  AbstractArchiveBuilder $archiveBuilder
      * @return $this
      */
@@ -54,19 +58,26 @@ class ArchiveBuilderManager
 =======
      * @param  AbstractArchiveBuilder $archiveCreator
 >>>>>>> Fix cs
+=======
+     * @param  AbstractArchiveBuilder $archiveBuilder
+>>>>>>> Add getNames methods to managers
      * @return $this
      */
-    public function add(AbstractArchiveBuilder $archiveCreator)
+    public function add(AbstractArchiveBuilder $archiveBuilder)
     {
-        if (null !== $archiveCreator) {
-            $archiveCreator->setEnvironment($this->environment);
+        if (null !== $archiveBuilder) {
+            $archiveBuilder->setEnvironment($this->environment);
 
+<<<<<<< HEAD
 <<<<<<< HEAD
             $this->archiveCreators[$archiveCreator->getName()] = $archiveCreator;
 >>>>>>> Define archive builders and formatters
 =======
             $this->archiveBuilders[$archiveCreator->getName()] = $archiveCreator;
 >>>>>>> Fix cs and add get method in managers
+=======
+            $this->archiveBuilders[$archiveBuilder->getName()] = $archiveBuilder;
+>>>>>>> Add getNames methods to managers
         }
 
         return $this;
@@ -113,6 +124,7 @@ class ArchiveBuilderManager
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @return array
      */
     public function getAll()
@@ -158,10 +170,28 @@ class ArchiveBuilderManager
 }
 =======
      * @return array[AbstractArchiveBuilder]
+=======
+     * @return array
+>>>>>>> Add getNames methods to managers
      */
     public function getAll()
     {
         return $this->archiveBuilders;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNames()
+    {
+        $names = [];
+
+        /** @var AbstractArchiveBuilder $builder */
+        foreach($this->archiveBuilders as $builder) {
+            $names[] = $builder->getName();
+        }
+
+        return $names;
     }
 
     public function get($name)

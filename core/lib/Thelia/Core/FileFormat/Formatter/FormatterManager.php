@@ -70,6 +70,21 @@ class FormatterManager
     }
 
     /**
+     * @return array
+     */
+    public function getNames()
+    {
+        $names = [];
+
+        /** @var AbstractFormatter $formatter */
+        foreach($this->formatters as $formatter) {
+            $names[] = $formatter->getName();
+        }
+
+        return $names;
+    }
+
+    /**
      * @param $name
      * @throws \OutOfBoundsException
      */
