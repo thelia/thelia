@@ -45,7 +45,7 @@ class BrandModificationForm extends BrandCreationForm
                 'required'    => false,
                 'label'       => Translator::getInstance()->trans('Select the brand logo'),
                 'label_attr'  => [
-                    'for' => 'mode',
+                    'for' => 'logo_image_id',
                     'help' => Translator::getInstance()->trans("Select the brand logo amongst the brand images")
                 ]
             ])
