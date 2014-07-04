@@ -72,7 +72,7 @@
                 {/form_field}
 
                 {custom_render_form_field form=$form field='brand_id'}
-                    <select {$field_attributes}>
+                    <select {form_field_attributes form=$form field='brand_id'}>
                         <option value="0">{intl l="No brand"}</option>
 
                         {loop name="brand-list" type="brand" visible="*"}

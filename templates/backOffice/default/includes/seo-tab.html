@@ -24,7 +24,7 @@
         {custom_render_form_field form=$form field='url'}
             <div class="input-group">
                 <span class="input-group-addon">{$url_language|default:{config key="url_site"}}/</span>
-                <input type="text" id="{$label_attr.for}" name="{$name}" value="{$value}" title="{$label}" {if $required} aria-required="true" required{/if} class="form-control" placeholder="{$label_attr.placeholder}">
+                <input type="text" {form_field_attributes form=$form field='url'}>
             </div>
         {/custom_render_form_field}
 
