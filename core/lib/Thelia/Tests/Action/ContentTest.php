@@ -22,6 +22,7 @@ use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Model\LangQuery;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
@@ -37,6 +38,8 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
  */
 class ContentTest extends TestCaseWithURLToolSetup
 {
+    use I18nTestTrait;
+
     /**
      * @var EventDispatcherInterface
      */
@@ -288,6 +291,7 @@ class ContentTest extends TestCaseWithURLToolSetup
 
         $this->assertNull($testAssociation);
     }
+
     /**
      * @return \Thelia\Model\Content
      */
@@ -320,9 +324,7 @@ class ContentTest extends TestCaseWithURLToolSetup
             $folder->setVisible(1);
             $folder->setPosition(1);
 
-            $folder
-                ->setLocale('en_US')
-                ->setTitle('folder test');
+            $this->setI18n($folder);
 
             $folder->save();
 
@@ -334,9 +336,7 @@ class ContentTest extends TestCaseWithURLToolSetup
                 $content->setVisible(1);
                 $content->setPosition($i + 1);
 
-                $content
-                    ->setLocale('en_US')
-                    ->setTitle(sprintf('content test %s', $i));
+                $this->setI18n($content);
 
                 $contentFolders = $content->getContentFolders();
                 $collection     = new Collection();
