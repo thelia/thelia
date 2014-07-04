@@ -21,6 +21,7 @@ use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Model\Map\FolderTableMap;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
@@ -32,6 +33,7 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
 class FolderTest extends TestCaseWithURLToolSetup
 {
     use RewrittenUrlTestTrait;
+    use I18nTestTrait;
 
     /**
      * @var EventDispatcherInterface
@@ -297,9 +299,8 @@ class FolderTest extends TestCaseWithURLToolSetup
             $folder->setParent(0);
             $folder->setVisible(1);
             $folder->setPosition(1);
-            $folder
-                ->setLocale('en_US')
-                ->setTitle('folder test');
+
+            $this->setI18n($folder);
 
             $folder->save();
 
@@ -311,9 +312,7 @@ class FolderTest extends TestCaseWithURLToolSetup
                 $subFolder->setVisible(1);
                 $subFolder->setPosition($i + 1);
 
-                $folder
-                    ->setLocale('en_US')
-                    ->setTitle(sprintf('folder test %s', $i));
+                $this->setI18n($subFolder);
 
                 $subFolder->save();
             }
@@ -323,7 +322,6 @@ class FolderTest extends TestCaseWithURLToolSetup
 
         return self::$folderIdForPositionTest;
     }
-
 
     /**
      * @return \Thelia\Model\Folder
