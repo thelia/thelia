@@ -56,7 +56,11 @@ interface FormatInterface
      */
     public function getMimeType();
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
 } 
 >>>>>>> Define archive builders and formatters
+=======
+}
+>>>>>>> Fix cs

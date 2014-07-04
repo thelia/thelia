@@ -95,10 +95,14 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      * remove the temporary file.
      */
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function __destruct()
 =======
     function __destruct()
 >>>>>>> Define archive builders and formatters
+=======
+    public function __destruct()
+>>>>>>> Fix cs
     {
         if ($this->zip instanceof \ZipArchive) {
             @$this->zip->close();
@@ -126,10 +130,14 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Fix cs
      * @param  string                                     $filePath           It is the path to access the file.
      * @param  string                                     $directoryInArchive This is the directory where it will be stored in the archive
      * @param  null|string                                $name               The name of the file in the archive. if it null or empty, it keeps the same name
      * @param  bool                                       $isOnline
+<<<<<<< HEAD
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -139,6 +147,8 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      * @param string $directoryInArchive This is the directory where it will be stored in the archive
      * @param null|string $name The name of the file in the archive. if it null or empty, it keeps the same name
      * @param bool $isOnline
+=======
+>>>>>>> Fix cs
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -163,6 +173,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
          */
 
         if (!empty($directoryInArchive)) {
+<<<<<<< HEAD
             $this->addDirectory($directoryInArchive);
         }
 
@@ -270,6 +281,8 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
          */
 
         if(!empty($directoryInArchive)) {
+=======
+>>>>>>> Fix cs
             $this->addDirectory($directoryInArchive);
         }
 
@@ -443,7 +456,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     /**
      * @param $content
      * @param $name
-     * @param string $directoryInArchive
+     * @param  string          $directoryInArchive
      * @return mixed
      * @throws \ErrorException
      *
@@ -510,7 +523,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     }
 
     /**
-     * @param string $pathToFile
+     * @param  string                                     $pathToFile
      * @return null|string
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -540,7 +553,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
 
     /**
-     * @param string $initialString
+     * @param  string $initialString
      * @return string
      *
      * Gives a valid file path for \ZipArchive
@@ -560,11 +573,12 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         if (preg_match("#\/?[^\/]+\/[^\/]+\/?#", $initialString)) {
             $initialString = "/" . $initialString;
         }
+
         return $initialString;
     }
 
     /**
-     * @param string $initialString
+     * @param  string $initialString
      * @return string
      *
      * Gives a valid directory path for \ZipArchive
@@ -718,6 +732,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param  string                                  $pathToArchive
      * @param  bool                                    $isOnline
      * @param  FileDownloaderInterface                 $fileDownloader
@@ -730,6 +745,11 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      * @return $this
 >>>>>>> Define archive builders and formatters
 =======
+=======
+     * @param  string                                  $pathToArchive
+     * @param  bool                                    $isOnline
+     * @param  FileDownloaderInterface                 $fileDownloader
+>>>>>>> Fix cs
      * @return ZipArchiveBuilder
 >>>>>>> Finish tar, tar.gz, tar.bz2 and tests
      * @throws \Thelia\Exception\FileNotFoundException
@@ -829,10 +849,14 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param  string $directory
 =======
      * @param string $directory
 >>>>>>> Define archive builders and formatters
+=======
+     * @param  string $directory
+>>>>>>> Fix cs
      * @return bool
      *
      * Checks if the link $directory exists and if it's not a file.
@@ -854,10 +878,14 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param  string $environment
 =======
      * @param string $environment
 >>>>>>> Define archive builders and formatters
+=======
+     * @param  string $environment
+>>>>>>> Fix cs
      * @return $this
      *
      * Sets the execution environment of the Kernel,
@@ -928,12 +956,16 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         );
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         if ($opening !== true) {
             throw new \ErrorException(
                 $this->translator->trans(
                     "An unknown error append"
 =======
         if($opening !== true) {
+=======
+        if ($opening !== true) {
+>>>>>>> Fix cs
             throw new \ErrorException(
                 $this->translator->trans(
 <<<<<<< HEAD
@@ -1053,10 +1085,14 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param  string $initialString
 =======
      * @param string $initialString
 >>>>>>> Define archive builders and formatters
+=======
+     * @param  string $initialString
+>>>>>>> Fix cs
      * @return string
      *
      * Gives a valid file path for \ZipArchive
@@ -1085,18 +1121,26 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
             $initialString = "/" . $initialString;
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> Define archive builders and formatters
+=======
+
+>>>>>>> Fix cs
         return $initialString;
     }
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param  string $initialString
 =======
      * @param string $initialString
 >>>>>>> Define archive builders and formatters
+=======
+     * @param  string $initialString
+>>>>>>> Fix cs
      * @return string
      *
      * Gives a valid directory path for \ZipArchive
@@ -1219,6 +1263,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
 
@@ -1240,3 +1285,6 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 =======
 } 
 >>>>>>> Finish implementing and testing zip
+=======
+}
+>>>>>>> Fix cs

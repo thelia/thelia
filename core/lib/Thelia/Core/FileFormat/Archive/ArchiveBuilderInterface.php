@@ -12,7 +12,6 @@
 
 namespace Thelia\Core\FileFormat\Archive;
 
-
 /**
  * Interface ArchiveBuilderInterface
  * @package Thelia\Core\FileFormat\Archive
@@ -32,10 +31,14 @@ interface ArchiveBuilderInterface
 {
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Fix cs
      * @param  string                                     $filePath           It is the path to access the file.
      * @param  string                                     $directoryInArchive This is the directory where it will be stored in the archive
      * @param  null|string                                $name               The name of the file in the archive. if it null or empty, it keeps the same name
      * @param  bool                                       $isOnline
+<<<<<<< HEAD
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -45,6 +48,8 @@ interface ArchiveBuilderInterface
      * @param string $directoryInArchive This is the directory where it will be stored in the archive
      * @param null|string $name The name of the file in the archive. if it null or empty, it keeps the same name
      * @param bool $isOnline
+=======
+>>>>>>> Fix cs
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -69,8 +74,12 @@ interface ArchiveBuilderInterface
 =======
      * @param $content
      * @param $name
+<<<<<<< HEAD
      * @param string $directoryInArchive
 >>>>>>> Finish implementing and testing zip
+=======
+     * @param  string          $directoryInArchive
+>>>>>>> Fix cs
      * @return mixed
      * @throws \ErrorException
      *
@@ -80,10 +89,14 @@ interface ArchiveBuilderInterface
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param  string                                     $pathToFile
 =======
      * @param string $pathToFile
 >>>>>>> Finish implementing and testing zip
+=======
+     * @param  string                                     $pathToFile
+>>>>>>> Fix cs
      * @return null|string
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\FileNotReadableException
@@ -149,6 +162,7 @@ interface ArchiveBuilderInterface
     public function buildArchiveResponse();
 
     /**
+<<<<<<< HEAD
      * @param string $pathToArchive
      * @param bool $isOnline
 <<<<<<< HEAD
@@ -159,6 +173,10 @@ interface ArchiveBuilderInterface
 >>>>>>> Finish implementing and testing zip
 =======
 >>>>>>> Finish tar, tar.gz, tar.bz2 and tests
+=======
+     * @param  string                                  $pathToArchive
+     * @param  bool                                    $isOnline
+>>>>>>> Fix cs
      * @return $this
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \Thelia\Exception\HttpUrlException
@@ -189,16 +207,21 @@ interface ArchiveBuilderInterface
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param  string $directory
 =======
      * @param string $directory
 >>>>>>> Define archive builders and formatters
+=======
+     * @param  string $directory
+>>>>>>> Fix cs
      * @return bool
      *
      * Check if the archive has a directory
      */
     public function hasDirectory($directory);
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 }
@@ -216,3 +239,6 @@ interface ArchiveBuilderInterface
 =======
 } 
 >>>>>>> Finish tar, tar.gz, tar.bz2 and tests
+=======
+}
+>>>>>>> Fix cs

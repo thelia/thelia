@@ -69,7 +69,11 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $this->downloader->download("https://github.com/thelia/thelia", "php://temp");
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
 } 
 >>>>>>> Define archive builders and formatters
+=======
+}
+>>>>>>> Fix cs

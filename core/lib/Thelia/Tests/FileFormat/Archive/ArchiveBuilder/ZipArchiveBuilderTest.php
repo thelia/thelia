@@ -694,6 +694,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
 } 
@@ -701,3 +702,6 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 =======
 } 
 >>>>>>> Finish implementing and testing zip
+=======
+}
+>>>>>>> Fix cs

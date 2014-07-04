@@ -258,8 +258,12 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
 =======
 
     /**
+<<<<<<< HEAD
      * @param string $environment
 >>>>>>> Finish tar, tar.gz, tar.bz2 and tests
+=======
+     * @param  string $environment
+>>>>>>> Fix cs
      * @return $this
      *
      * Sets the execution environment of the Kernel,
@@ -269,6 +273,7 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     {
         $this->environment = $environment;
     }
+<<<<<<< HEAD
 <<<<<<< HEAD
 }
 =======
@@ -283,3 +288,6 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
 =======
 } 
 >>>>>>> Finish tar, tar.gz, tar.bz2 and tests
+=======
+}
+>>>>>>> Fix cs

@@ -457,7 +457,7 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             $this->tar->formatDirectoryPath("//foo/bar///baz/")
         );
     }
-    
+
     public function testFormatFilePath()
     {
         $this->assertEquals(
@@ -522,5 +522,9 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             $this->tar->getCompression()
         );
     }
+<<<<<<< HEAD
 } 
 >>>>>>> Finish tar, tar.gz, tar.bz2 and tests
+=======
+}
+>>>>>>> Fix cs

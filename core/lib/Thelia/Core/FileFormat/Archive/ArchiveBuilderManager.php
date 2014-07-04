@@ -35,6 +35,7 @@ class ArchiveBuilderManager
     }
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param  AbstractArchiveBuilder $archiveBuilder
      * @return $this
      */
@@ -46,6 +47,9 @@ class ArchiveBuilderManager
             $this->archiveBuilders[$archiveBuilder->getName()] = $archiveBuilder;
 =======
      * @param AbstractArchiveBuilder $archiveCreator
+=======
+     * @param  AbstractArchiveBuilder $archiveCreator
+>>>>>>> Fix cs
      * @return $this
      */
     public function add(AbstractArchiveBuilder $archiveCreator)
@@ -143,5 +147,9 @@ class ArchiveBuilderManager
     {
         return $this->archiveCreators;
     }
+<<<<<<< HEAD
 } 
 >>>>>>> Define archive builders and formatters
+=======
+}
+>>>>>>> Fix cs

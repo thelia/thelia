@@ -50,7 +50,11 @@ class TarGzArchiveBuilder extends TarArchiveBuilder
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
 } 
 >>>>>>> Finish tar, tar.gz, tar.bz2 and tests
+=======
+}
+>>>>>>> Fix cs

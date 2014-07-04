@@ -73,7 +73,11 @@ class ArchiveBuilderManagerTest extends \PHPUnit_Framework_TestCase
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
 } 
 >>>>>>> Define archive builders and formatters
+=======
+}
+>>>>>>> Fix cs

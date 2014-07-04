@@ -21,7 +21,11 @@ class TarArchiveException extends \Exception
 {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
 } 
 >>>>>>> Finish implementing and testing zip
+=======
+}
+>>>>>>> Fix cs

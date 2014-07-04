@@ -23,12 +23,17 @@ class FakeFileDownloader extends FileDownloader
 {
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param  string                                  $url
      * @param  string                                  $pathToStore
 =======
      * @param string $url
      * @param string $pathToStore
 >>>>>>> Define archive builders and formatters
+=======
+     * @param  string                                  $url
+     * @param  string                                  $pathToStore
+>>>>>>> Fix cs
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \ErrorException
      * @throws \HttpUrlException
@@ -47,7 +52,11 @@ class FakeFileDownloader extends FileDownloader
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
 } 
 >>>>>>> Define archive builders and formatters
+=======
+}
+>>>>>>> Fix cs
