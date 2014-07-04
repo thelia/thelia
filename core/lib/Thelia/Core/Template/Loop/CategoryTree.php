@@ -61,7 +61,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 
         $search->filterByParent($parent);
 
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible);
 
         if ($exclude != null) $search->filterById($exclude, Criteria::NOT_IN);
 

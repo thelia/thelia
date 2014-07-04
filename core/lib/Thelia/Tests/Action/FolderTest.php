@@ -21,6 +21,7 @@ use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\Map\FolderTableMap;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
@@ -36,6 +37,9 @@ class FolderTest extends TestCaseWithURLToolSetup
      * @var EventDispatcherInterface
      */
     protected $dispatcher;
+
+    /** @var int folder id used in position tests  */
+    protected static $folderIdForPositionTest = null;
 
     public function setUp()
     {
@@ -200,6 +204,7 @@ class FolderTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionUp()
     {
         $folder = FolderQuery::create()
+            ->filterByParent($this->getFolderIdForPositionTest())
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
 
@@ -223,6 +228,7 @@ class FolderTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionDown()
     {
         $nextFolder = FolderQuery::create()
+            ->filterByParent($this->getFolderIdForPositionTest())
             ->filterByPosition(2)
             ->findOne();
 
@@ -255,6 +261,7 @@ class FolderTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionWithSpecificPosition()
     {
         $folder = FolderQuery::create()
+            ->filterByParent($this->getFolderIdForPositionTest())
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
 
@@ -273,6 +280,50 @@ class FolderTest extends TestCaseWithURLToolSetup
         $this->assertEquals(1, $updatedFolder->getPosition(),sprintf("new position is 1, new position expected is %d for folder %d", $updatedFolder->getPosition(), $updatedFolder->getId()));
 
     }
+
+
+    /**
+     * generates a folder and its sub folders to be used in Position tests
+     *
+     * @return int the parent folder id
+     */
+    protected function getFolderIdForPositionTest()
+    {
+
+        if (null === self::$folderIdForPositionTest) {
+
+            $folder = new \Thelia\Model\Folder();
+
+            $folder->setParent(0);
+            $folder->setVisible(1);
+            $folder->setPosition(1);
+            $folder
+                ->setLocale('en_US')
+                ->setTitle('folder test');
+
+            $folder->save();
+
+            for ($i = 0; $i < 4; $i++) {
+
+                $subFolder = new \Thelia\Model\Folder();
+
+                $subFolder->setParent($folder->getId());
+                $subFolder->setVisible(1);
+                $subFolder->setPosition($i + 1);
+
+                $folder
+                    ->setLocale('en_US')
+                    ->setTitle(sprintf('folder test %s', $i));
+
+                $subFolder->save();
+            }
+
+            self::$folderIdForPositionTest = $folder->getId();
+        }
+
+        return self::$folderIdForPositionTest;
+    }
+
 
     /**
      * @return \Thelia\Model\Folder
