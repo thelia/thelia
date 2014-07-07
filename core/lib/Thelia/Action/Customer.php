@@ -74,21 +74,43 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     public function updateProfile(CustomerCreateOrUpdateEvent $event)
     {
-
         $customer = $event->getCustomer();
 
         $customer->setDispatcher($event->getDispatcher());
 
-        $customer
-            ->setTitleId($event->getTitle())
-            ->setFirstname($event->getFirstname())
-            ->setLastname($event->getLastname())
-            ->setEmail($event->getEmail(), true)
-            ->setPassword($event->getPassword())
-            ->setReseller($event->getReseller())
-            ->setSponsor($event->getSponsor())
-            ->setDiscount($event->getDiscount())
-            ->save();
+        if ($event->getTitle() !== null) {
+            $customer->setTitleId($event->getTitle());
+        }
+
+        if ($event->getFirstname() !== null) {
+            $customer->setFirstname($event->getFirstname());
+        }
+
+        if ($event->getLastname() !== null) {
+            $customer->setLastname($event->getLastname());
+        }
+
+        if ($event->getEmail() !== null) {
+            $customer->setEmail($event->getEmail());
+        }
+
+        if ($event->getPassword() !== null) {
+            $customer->setPassword($event->getPassword());
+        }
+
+        if ($event->getReseller() !== null) {
+            $customer->setReseller($event->getReseller());
+        }
+
+        if ($event->getSponsor() !== null) {
+            $customer->setSponsor($event->getSponsor());
+        }
+
+        if ($event->getDiscount() !== null) {
+            $customer->setDiscount($event->getDiscount());
+        }
+
+        $customer->save();
 
         $event->setCustomer($customer);
     }
