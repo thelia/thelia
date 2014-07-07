@@ -1,0 +1,236 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'configuration'}
+{/block}
+
+{block name="page-title"}{intl l='Cache'}{/block}
+
+{block name="check-resource"}admin.configuration.cache{/block}
+{block name="check-access"}update{/block}
+
+{block name="main-content"}
+<div class="variables edit-variable">
+
+    <div id="wrapper" class="container">
+
+        <ul class="breadcrumb">
+			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+            <li>{intl l="Cache"}</li>
+        </ul>
+
+		<div class="row">
+			<div class="col-md-12 general-block-decorator">
+				<div class="row">
+
+					<div class="col-md-12 title title-without-tabs">
+					   {intl l="Cache configuration"}
+					</div>
+                </div>
+
+                <div class="form-container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            {form name='thelia.cache.configuration'}
+	 						<form id="cache-form" method="POST" action="{url path='/admin/configuration/cache/save'}">
+                                {form_hidden_fields form=$form}
+
+                                {form_field form=$form field='success_url'}
+                                    <input type="hidden" name="{$name}" value="{url path='/admin/configuration/cache'}">
+                                {/form_field}
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="title title-without-tabs">{intl l='General'}</p>
+
+                                        {if $form_error}
+                                            <div class="alert alert-danger">{$form_error_message}</div>
+                                        {/if}
+
+                                        <fieldset>
+                                            {form_field form=$form field='enabled'}
+                                                <div class="form-group {if $error}has-error{/if}">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                            <input type="checkbox" class="cacheEnabledToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+                                                            {$label}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            {/form_field}
+
+                                            {form_field form=$form field='driver'}
+                                                <div class="form-group {if $error}has-error{/if}">
+                                                    <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+
+                                                    <select id="{$label_attr.for}" name="{$name}" class="form-control">
+                                                        {foreach $choices as $choice}
+                                                        <option value="{$choice->value}" {if $value == $choice->value}selected="selected"{/if}>{$choice->label}</option>
+                                                        {/foreach}
+                                                    </select>
+
+                                                </div>
+                                            {/form_field}
+
+                                            <div id="return-test">
+
+                                            </div>
+
+                                            <div class="form-group {if $error}has-error{/if}">
+                                                <button id="cache-test" class="btn btn-default btn-primary" >
+                                                    <span class="glyphicon glyphicon-check"></span>
+                                                    {intl l="Test"}
+                                                </button>
+                                                <button id="cache-save" class="btn btn-default btn-primary btn-success" >
+                                                    <span class="glyphicon glyphicon-floppy-save"></span>
+                                                    {intl l="Save"}
+                                                </button>
+                                            </div>
+
+                                        </fieldset>
+                                    </div>
+                                    <div class="col-md-6">
+
+                                        <p class="title title-without-tabs">
+                                            {intl l="Stats"}
+                                            <span id="cache-stats" class="btn btn-default btn-xs btn-primary pull-right" >
+                                                <span class="glyphicon glyphicon-refresh"></span>
+                                            </span>
+                                        </p>
+                                        <div id="return-stats">
+
+                                        </div>
+
+                                        <p class="title title-without-tabs">{intl l="Flush"}</p>
+                                        <div id="flush">
+                                            <button id="cache-flush" class="btn btn-default btn-primary" >
+                                                <span class="glyphicon glyphicon-trash"></span>
+                                                {intl l="Flush the cache"}
+                                            </button>
+                                        </div>
+                                        <div id="return-flush">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+							</form>
+							{/form}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+</div>
+{/block}
+
+
+{block name="javascript-initialization"}
+
+{javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+<script src="{$asset_url}"></script>
+{/javascripts}
+
+<script>
+    $(function() {
+
+        var urls = {
+            save: "{url path="/admin/configuration/cache/save"}",
+            test: "{url path="/admin/configuration/cache/test"}",
+            stats: "{url path="/admin/configuration/cache/stats"}",
+            flush: "{url path="/admin/configuration/cache/flush"}"
+        };
+
+        {literal}
+
+        var fieldsDefinition = {
+            "null": [],
+            "file": {
+                "directory": "file_directory",
+                "extension": "file_extension"
+            },
+            "memcached": {
+                "server": "memcached_server",
+                "port": "memcached_port"
+            }
+        }
+
+        // Set proper category ID in delete from
+        $('#cache-stats').click(function(ev) {
+            $( "#return-stats" ).load( urls.stats  );
+        });
+
+        $( "#cache-stats" ).click();
+
+        var getFormData = function getFormData(){
+
+            var data = {},
+                fields,
+                field;
+
+
+            data['driver'] = $("#driver").val();
+            data['enabled'] = $("#enabled").prop("checked");
+            // data['lifeTime'] = $("#lifeTime").val();
+
+            fields = fieldsDefinition[$("#driver").data("fields")];
+
+            for (field in fields) {
+                if ($("#" + fields[field]).length > 0){
+                    data[field] = $("#" + fields[field]).vale();
+                }
+            }
+
+            return data;
+        };
+
+        $('#cache-form').on('submit', function(ev){
+           ev.preventDefault();
+        });
+
+        $('#cache-test').click(function(ev) {
+
+            ev.preventDefault();
+
+            var data = getFormData();
+
+            $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+
+            $.ajax({
+                url: urls.test,
+                data: {config: data},
+                type: "POST",
+                dataType: "json"
+            }).done(function(data){
+                $("#loading-event").remove();
+                if (data.success){
+                    $("#return-test").html('<p class="alert alert-success">' + data.message + '</p>');
+                } else {
+                    $("#return-test").html('<p class="alert alert-danger">' + data.message + '</p>');
+                }
+            })
+            .fail(function(jqXHR, textStatus, errorThrown){
+                $("#loading-event").remove();
+                $("#return-test").html('<p class="alert alert-danger">' + textStatus + '</p>');
+            });
+
+        });
+
+        /*
+        $('a#cache-flush').click(function(ev) {
+            $( "#result" ).load( urls.flush );
+        });
+        */
+
+
+        {/literal}
+    });
+</script>
+{/block}
+
+
+{block name="javascript-last-call"}
+    {module_include location='config-store-js'}
+{/block}

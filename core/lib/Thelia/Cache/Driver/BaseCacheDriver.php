@@ -13,7 +13,8 @@
 
 namespace Thelia\Cache\Driver;
 
-use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\CacheProvider;
+use Thelia\Model\ConfigQuery;
 
 
 /**
@@ -24,17 +25,35 @@ use Doctrine\Common\Cache\Cache;
 abstract class BaseCacheDriver
 {
 
-    /** @var Cache $cache */
+    const CONFIG_LIFE_TIME = 'tcache_life_time';
+
+    const DEFAULT_LIFE_TIME = 30;
+
+
+    /** @var CacheProvider The doctrine cache instance */
     protected $cache = null;
 
-    /** @var bool $silent */
+    /** @var bool Is the cache feature is activated or not */
     protected $sleep = false;
+
+    /** @var bool Default life time for entry */
+    protected $lifeTime = null;
 
 
     /**
      * Init the cache.
      */
-    public abstract function init();
+    public abstract function init(array $params = null);
+
+
+    protected function initDefault(array $params = null)
+    {
+        $this->lifeTime = $this->getParam(
+            $params,
+            "lifetime",
+            self::CONFIG_LIFE_TIME,
+            self::DEFAULT_LIFE_TIME);
+    }
 
     /**
      * Fetches an entry from the cache.
@@ -70,10 +89,14 @@ abstract class BaseCacheDriver
      *
      * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
      */
-    public function save($id, $data, $refs = array(), $lifeTime = 0)
+    public function save($id, $data, $refs = array(), $lifeTime = null)
     {
         if ($this->sleep) {
             return false;
+        }
+
+        if (null === $lifeTime) {
+            $lifeTime = $this->lifeTime;
         }
 
         $this->cache->save($id, $data, $lifeTime);
@@ -82,7 +105,7 @@ abstract class BaseCacheDriver
             foreach ($refs as $ref) {
                 $this->addRef($ref, $id);
             }
-        } elseif (is_string($refs)){
+        } elseif (is_string($refs)) {
             $this->addRef($refs, $id);
         }
 
@@ -98,6 +121,18 @@ abstract class BaseCacheDriver
     public function delete($id)
     {
         $this->cache->delete($id);
+    }
+
+    /**
+     * Deletes a cache entry.
+     *
+     * @param string $id The cache id.
+     *
+     * @return boolean TRUE if the cache entry was successfully deleted, FALSE otherwise.
+     */
+    public function deleteAll()
+    {
+        $this->cache->deleteAll();
     }
 
     /**
@@ -137,14 +172,27 @@ abstract class BaseCacheDriver
         }
         $content[] = $key;
 
-        return $this->cache->save($ref, $content);
+        return $this->cache->save($ref, $content, 0);
+    }
+
+    protected function getParam($params, $key, $configKey, $default)
+    {
+        $ret = null;
+
+        if (is_array($params) && array_key_exists($key, $params)) {
+            $ret = $params[$key];
+        } else {
+            $ret = ConfigQuery::read($configKey, $default);
+        }
+
+        return $ret;
     }
 
     /**
      * @param $ref
      * @param $key
      *
-     * @return bool
+     * @return int
      */
     public function deleteRef($ref)
     {
@@ -173,5 +221,4 @@ abstract class BaseCacheDriver
     }
 
 
-
-} 
+}

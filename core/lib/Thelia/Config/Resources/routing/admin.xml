@@ -1402,6 +1402,28 @@
         <requirement key="sale_id">\d+</requirement>
     </route>
 
+    <!-- cache -->
+
+    <route id="admin.configuration.cache.main" path="/admin/configuration/cache">
+        <default key="_controller">Thelia\Controller\Admin\CacheConfigurationController::indexAction</default>
+    </route>
+
+    <route id="admin.configuration.cache.test" path="/admin/configuration/cache/test">
+        <default key="_controller">Thelia\Controller\Admin\CacheConfigurationController::testAction</default>
+    </route>
+
+    <route id="admin.configuration.cache.save" path="/admin/configuration/cache/save">
+        <default key="_controller">Thelia\Controller\Admin\CacheConfigurationController::saveAction</default>
+    </route>
+
+    <route id="admin.configuration.cache.stats" path="/admin/configuration/cache/stats">
+        <default key="_controller">Thelia\Controller\Admin\CacheConfigurationController::statsAction</default>
+    </route>
+
+    <route id="admin.configuration.cache.flush" path="/admin/configuration/cache/flush">
+        <default key="_controller">Thelia\Controller\Admin\CacheConfigurationController::flushAction</default>
+    </route>
+
     <!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">

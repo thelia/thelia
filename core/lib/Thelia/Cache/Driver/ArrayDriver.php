@@ -11,49 +11,38 @@
 /*************************************************************************************/
 
 
-namespace Thelia\Cache;
+namespace Thelia\Cache\Driver;
+
+use Doctrine\Common\Cache\ArrayCache;
 
 
-trait TCacheSupportTrait
+/**
+ * Class ArrayDriver
+ * @package Thelia\Cache\Driver
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
+ */
+class ArrayDriver extends BaseCacheDriver
 {
 
-    /** @var \Thelia\Cache\Driver\BaseCacheDriver $cache */
-    protected $cache = null;
-
-    protected function getCacheManager()
+    /**
+     * Init the cache.
+     */
+    public function init(array $params = null)
     {
-        if (null === $this->cache) {
-            $this->cache = TCache::getInstance();
-            //$this->cache->sleep();
-        }
+        $this->initDefault($params);
 
-        return $this->cache;
+        $this->cache = new ArrayCache();
     }
 
-    protected function getCache($key)
+    protected function addRef($ref, $key)
     {
-
-        $cache   = $this->getCacheManager();
-        $content = null;
-        if (null !== $cache && null !== $key) {
-            $content = $cache->fetch($key);
-            if (false === $content) {
-                $content = null;
-            }
-        }
-
-        return $content;
+        return false;
     }
 
-    protected function setCache($key, $content, $refs = array())
+    public function deleteRef($ref)
     {
-
-        $cached = false;
-        if (null !== $cache = $this->getCacheManager()) {
-            $cached = $cache->save($key, $content, $refs);
-        }
-
-        return $cached;
+        return 0;
     }
 
-} 
+
+}

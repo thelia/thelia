@@ -14,16 +14,16 @@
 namespace Thelia\Cache\Driver;
 
 use Doctrine\Common\Cache\MemcachedCache;
-use \Memcached;
-use Thelia\Model\ConfigQuery;
+use Memcached;
 
 
 /**
  * Class MemcachedDriver
  * @package Thelia\Cache\Driver
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class MemcachedDriver extends BaseCacheDriver {
+class MemcachedDriver extends BaseCacheDriver
+{
 
     const CONFIG_SERVER = 'tcache_memcached_server';
 
@@ -37,12 +37,23 @@ class MemcachedDriver extends BaseCacheDriver {
     /**
      * Init the cache.
      */
-    public function init()
+    public function init(array $params = null)
     {
         $memcached = new Memcached();
 
-        $server = ConfigQuery::read(self::CONFIG_SERVER, self::DEFAULT_SERVER);
-        $port = ConfigQuery::read(self::CONFIG_PORT, self::DEFAULT_PORT);
+        $this->initDefault($params);
+
+        $server = $this->getParam(
+            $params,
+            "server",
+            self::CONFIG_SERVER,
+            self::DEFAULT_SERVER);
+
+        $port = $this->getParam(
+            $params,
+            "port",
+            self::CONFIG_PORT,
+            self::DEFAULT_PORT);
 
         $memcached->addServer($server, $port);
 

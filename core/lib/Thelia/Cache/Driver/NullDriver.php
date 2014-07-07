@@ -17,15 +17,16 @@ namespace Thelia\Cache\Driver;
 /**
  * Class NullDriver
  * @package Thelia\Cache\Driver
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class NullDriver extends BaseCacheDriver {
+class NullDriver extends BaseCacheDriver
+{
 
 
     /**
      * Init the cache.
      */
-    public function init()
+    public function init(array $params = null)
     {
 
     }
@@ -40,7 +41,7 @@ class NullDriver extends BaseCacheDriver {
         return false;
     }
 
-    public function save($id, $data, $lifeTime = 0)
+    public function save($id, $data, $refs = array(), $lifeTime = null)
     {
         return false;
     }

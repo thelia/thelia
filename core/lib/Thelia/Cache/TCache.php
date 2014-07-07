@@ -14,6 +14,7 @@
 namespace Thelia\Cache;
 
 use Thelia\Cache\Driver\BaseCacheDriver;
+use Thelia\Cache\Driver\NullDriver;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
@@ -21,22 +22,24 @@ use Thelia\Model\ConfigQuery;
 /**
  * Class TCache
  * @package Thelia\Cache
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class TCache {
+class TCache
+{
 
-    /** @var BaseCacheDriver $instance  */
-    protected static $instance = null;
-
-    const CONFIG_CACHE_DRIVER = 'tcache_driver';
-
+    const CONFIG_CACHE_ENABLED = 'tcache_enabled';
+    const CONFIG_CACHE_DRIVER  = 'tcache_driver';
     const DEFAULT_CACHE_DRIVER = '\Thelia\Cache\Driver\NullDriver';
-
+    /** @var BaseCacheDriver $instance */
+    protected static $instance = null;
+    protected static $isValidParams = true;
 
     /**
      *
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     /**
      *
@@ -45,7 +48,12 @@ class TCache {
     public static function getInstance()
     {
         if (self::$instance == false) {
-            self::$instance = self::getNewInstance();
+            try {
+                self::$instance = self::getNewInstance();
+            } catch (\Exception $ex) {
+                self::$isValidParams = false;
+                self::$instance      = new NullDriver();
+            }
         }
 
         return self::$instance;
@@ -56,16 +64,26 @@ class TCache {
      *
      * @return \Thelia\Cache\Driver\BaseCacheDriver a new TCache instance.
      */
-    public static function getNewInstance()
+    public static function getNewInstance(array $params = null)
     {
-        $driver = ConfigQuery::read(self::CONFIG_CACHE_DRIVER, self::DEFAULT_CACHE_DRIVER);
+
+        if (null !== $params) {
+            $driver = ConfigQuery::read(self::CONFIG_CACHE_DRIVER, self::DEFAULT_CACHE_DRIVER);
+        } else {
+            if (array_key_exists("driver", $params)) {
+                $driver = $params["driver"];
+            } else {
+                throw new \Exception("Missing driver arguments");
+            }
+        }
+
         Tlog::getInstance()->debug(sprintf(" GU Cache : loading Drivr %s ", $driver));
 
         /** @var \Thelia\Cache\Driver\BaseCacheDriver $instance */
-        $r = new \ReflectionClass($driver);
+        $r        = new \ReflectionClass($driver);
         $instance = $r->newInstance();
 
-        $instance->init();
+        $instance->init($params);
 
         return $instance;
     }

@@ -12,21 +12,25 @@
 
 
 namespace Thelia\Cache\Driver;
+
 use Doctrine\Common\Cache\XcacheCache;
 
 
 /**
  * Class XCacheDriver
  * @package Thelia\Cache\Driver
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class XCacheDriver {
+class XCacheDriver extends BaseCacheDriver
+{
 
     /**
      * Init the cache.
      */
-    public function init()
+    public function init(array $params = null)
     {
+        $this->initDefault($params);
+
         $this->cache = new XcacheCache();
     }
 

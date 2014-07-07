@@ -11,49 +11,35 @@
 /*************************************************************************************/
 
 
-namespace Thelia\Cache;
+namespace Thelia\Core\Event;
 
 
-trait TCacheSupportTrait
-{
+/**
+ * Class TCacheEvent
+ * @package Thelia\Core\Event
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ */
+class TCacheEvent extends ActionEvent {
 
-    /** @var \Thelia\Cache\Driver\BaseCacheDriver $cache */
-    protected $cache = null;
+    protected $response = null;
 
-    protected function getCacheManager()
+    /**
+     * @param null $response
+     */
+    public function setResponse($response)
     {
-        if (null === $this->cache) {
-            $this->cache = TCache::getInstance();
-            //$this->cache->sleep();
-        }
-
-        return $this->cache;
+        $this->response = $response;
+        return $this;
     }
 
-    protected function getCache($key)
+    /**
+     * @return null
+     */
+    public function getResponse()
     {
-
-        $cache   = $this->getCacheManager();
-        $content = null;
-        if (null !== $cache && null !== $key) {
-            $content = $cache->fetch($key);
-            if (false === $content) {
-                $content = null;
-            }
-        }
-
-        return $content;
+        return $this->response;
     }
 
-    protected function setCache($key, $content, $refs = array())
-    {
 
-        $cached = false;
-        if (null !== $cache = $this->getCacheManager()) {
-            $cached = $cache->save($key, $content, $refs);
-        }
-
-        return $cached;
-    }
 
 } 
