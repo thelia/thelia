@@ -233,6 +233,7 @@ abstract class BaseCachedFile extends BaseAction
 
         // Update image modifications
         $event->getModel()->save();
+
         $event->setModel($event->getModel());
     }
 
@@ -241,7 +242,7 @@ abstract class BaseCachedFile extends BaseAction
      *
      * @param FileDeleteEvent $event Image event
      */
-    public function deleteImage(FileDeleteEvent $event)
+    public function deleteFile(FileDeleteEvent $event)
     {
         $this->fileManager->deleteFile($event->getFileToDelete());
     }
