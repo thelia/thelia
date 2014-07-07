@@ -10,7 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\FileFormat\Formatter;
+namespace Thelia\Core\FileFormat\Formatting;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\ModelJoin;
@@ -19,7 +19,7 @@ use Thelia\Core\Translation\Translator;
 
 /**
  * Class FormatterData
- * @package Thelia\Core\FileFormat\Formatter
+ * @package Thelia\Core\FileFormat\Formatting
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class FormatterData
@@ -90,10 +90,9 @@ class FormatterData
      * @return $this|null
      *
      * Loads a model criteria.
-     * Warning: if you want to do multi table export,
-     * you'll have to use you own select and not the joinYourTable method.
-     * For more details, please see the unit test
-     * Thelia\Tests\FileFormat\Formatter\FormatterDataTest::testFormatSimpleMultipleTableQuery
+     * Warning: This doesn't goodly support multi table queries.
+     * If you need to use more than one table, use a PDO instance and
+     * use the fetchArray() method, or select every columns you need
      */
     public function loadModelCriteria(ModelCriteria $criteria)
     {

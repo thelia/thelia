@@ -10,12 +10,12 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\FileFormat\Formatter;
+namespace Thelia\Core\FileFormat\Formatting;
 use Thelia\Core\Translation\Translator;
 
 /**
  * Class FormatterManager
- * @package Thelia\Core\FileFormat\Formatter
+ * @package Thelia\Core\FileFormat\Formatting
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class FormatterManager

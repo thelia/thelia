@@ -10,30 +10,15 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\FileFormat\Formatter;
+namespace Thelia\Core\FileFormat\Formatting;
+use Thelia\Core\FileFormat\FormatInterface;
 
 /**
- * Interface FormatterInterface
- * @package Thelia\Core\FileFormat\Formatter
+ * Class AbstractFormatter
+ * @package Thelia\Core\FileFormat\Formatting
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-interface FormatterInterface
+abstract class AbstractFormatter implements FormatInterface, FormatterInterface
 {
-    /**
-     * @param  FormatterData $data
-     * @return mixed
-     *
-     * This method must use a FormatterData object and output
-     * a formatted value.
-     */
-    public function encode(FormatterData $data);
 
-    /**
-     * @param $rawData
-     * @return FormatterData
-     *
-     * This must takes raw data as argument and outputs
-     * a FormatterData object.
-     */
-    public function decode($rawData);
 }

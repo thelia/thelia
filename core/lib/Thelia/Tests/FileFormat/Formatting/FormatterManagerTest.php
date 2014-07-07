@@ -10,15 +10,15 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Tests\FileFormat\Formatter;
+namespace Thelia\Tests\FileFormat\Formatting;
 use Symfony\Component\DependencyInjection\Container;
-use Thelia\Core\FileFormat\Formatter\AbstractFormatter;
-use Thelia\Core\FileFormat\Formatter\FormatterManager;
+use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
+use Thelia\Core\FileFormat\Formatting\FormatterManager;
 use Thelia\Core\Translation\Translator;
 
 /**
  * Class FormatterManagerTest
- * @package Thelia\Tests\FileFormat\Formatter
+ * @package Thelia\Tests\FileFormat\Formatting
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class FormatterManagerTest extends \PHPUnit_Framework_TestCase
@@ -39,7 +39,7 @@ class FormatterManagerTest extends \PHPUnit_Framework_TestCase
     public function testAddFormatter()
     {
         /** @var AbstractFormatter $instance */
-        $instance = $this->getMock("Thelia\\Core\\FileFormat\\Formatter\\AbstractFormatter");
+        $instance = $this->getMock("Thelia\\Core\\FileFormat\\Formatting\\AbstractFormatter");
 
         $this->manager->add($instance);
 
@@ -53,7 +53,7 @@ class FormatterManagerTest extends \PHPUnit_Framework_TestCase
     public function testDeleteFormatter()
     {
         /** @var AbstractFormatter $instance */
-        $instance = $this->getMock("Thelia\\Core\\FileFormat\\Formatter\\AbstractFormatter");
+        $instance = $this->getMock("Thelia\\Core\\FileFormat\\Formatting\\AbstractFormatter");
 
         $this->manager->add($instance);
 

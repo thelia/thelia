@@ -10,26 +10,18 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Tests\FileFormat\Formatter;
-use Propel\Generator\Builder\Om\QueryBuilder;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\DataFetcher\ArrayDataFetcher;
-use Propel\Runtime\Formatter\ArrayFormatter;
-use Propel\Runtime\Map\TableMap;
-use Propel\Runtime\Propel;
+namespace Thelia\Tests\FileFormat\Formatting;
 use Symfony\Component\DependencyInjection\Container;
-use Thelia\Core\FileFormat\Formatter\FormatterData;
-use Thelia\Core\Thelia;
+use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Base\ProductQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
-use Thelia\Model\Product;
 
 /**
  * Class FormatterDataTest
- * @package Thelia\Tests\FileFormat\Formatter
+ * @package Thelia\Tests\FileFormat\Formatting
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class FormatterDataTest extends \PHPUnit_Framework_TestCase
@@ -38,33 +30,6 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         new Translator(new Container());
-
-        /*
-            ->filterById([3,4,5], Criteria::IN);
-
-        $this->data->loadModelCriteria($query);
-
-        $query = ProductSaleElementsQuery::create()
-            ->joinProduct()
-            ->select(["ProductSaleElements.id", "Product.id"])
-            ->filterById([3,4,5], Criteria::IN)
-        ;
-
-        $this->data->loadModelCriteria($query);
-
-        $query = ProductSaleElementsQuery::create()
-            ->joinProduct()
-            ->select(["ProductSaleElements.id"])
-            ->filterById([3,4,5], Criteria::IN)
-        ;
-
-        $this->data->loadModelCriteria($query);
-
-        $query = ProductQuery::create()
-            ->joinProductSaleElements()
-            ->filterById([3,4,5], Criteria::IN);
-
-        $this->data->loadModelCriteria($query);*/
     }
 
     public function testFormatSimpleQuery()
@@ -140,29 +105,20 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($formattedResult,$formattedData);
     }
 
-    public function testFormatSimpleMultipleTableQuery()
+    public function testFormatComplexQuery()
     {
         $formatterData = new FormatterData();
 
-        
-    }
-
-    public function testFormatSimpleMultipleTableQueryWithAliases()
-    {
-        /**
-         * Aliases must not be case sensitive
-         */
-        $aliases = [
-            "coNfiG.iD" => "id",
-            "conFig.NaMe" => "name",
-            "CoNfIg.Value" => "value",
-            "config.hidden" => "hidden",
-            "ConFig.Secured" => "secured",
-        ];
-
-        $formatterData = new FormatterData($aliases);
-
-        $query = ConfigQuery::create()
+        $query = ProductSaleElementsQuery::create()
+            ->useProductQuery()
+                ->addAsColumn("\"".ProductTableMap::ID."\"", ProductTableMap::ID)
+            ->endUse()
+            ->select(
+                [
+                    ProductSaleElementsTableMap::ID,
+                    ProductSaleElementsTableMap::QUANTITY,
+                ]
+            )
             ->limit(1)
         ;
 
@@ -170,23 +126,59 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
             ->loadModelCriteria($query)
             ->getData()
         ;
+        /** @var array $data */
+        $data = $query->findOne();
 
-        /** @var \Thelia\Model\Config $result */
-        $result = $query->findOne();
-
-        $formattedResult = [
+        $expectedData = [
             [
-                "id" => $result->getId(),
-                "name" => $result->getName(),
-                "value" => $result->getValue(),
-                "config.created_at" => $result->getCreatedAt(),
-                "config.updated_at" => $result->getUpdatedAt(),
-                "hidden" => $result->getHidden(),
-                "secured" => $result->getHidden(),
-            ],
+                "product.id" => $data["product.ID"],
+                "product_sale_elements.id" => $data["product_sale_elements.ID"],
+                "product_sale_elements.quantity" => $data["product_sale_elements.QUANTITY"],
+            ]
         ];
 
-        $this->assertEquals($formattedResult,$formattedData);
+        $this->assertEquals($expectedData, $formattedData);
+    }
+
+    public function testFormatComplexQueryWithAliases()
+    {
+        $aliases = [
+            "product.id" => "pid",
+            "product_sale_elements.id" => "pseid",
+            "product_sale_elements.quantity" => "stock"
+        ];
+
+        $formatterData = new FormatterData($aliases);
+
+        $query = ProductSaleElementsQuery::create()
+            ->useProductQuery()
+            ->addAsColumn("\"".ProductTableMap::ID."\"", ProductTableMap::ID)
+            ->endUse()
+            ->select(
+                [
+                    ProductSaleElementsTableMap::ID,
+                    ProductSaleElementsTableMap::QUANTITY,
+                ]
+            )
+            ->limit(1)
+        ;
+
+        $formattedData = $formatterData
+            ->loadModelCriteria($query)
+            ->getData()
+        ;
+        /** @var array $data */
+        $data = $query->findOne();
+
+        $expectedData = [
+            [
+                "pid" => $data["product.ID"],
+                "pseid" => $data["product_sale_elements.ID"],
+                "stock" => $data["product_sale_elements.QUANTITY"],
+            ]
+        ];
+
+        $this->assertEquals($expectedData, $formattedData);
     }
 
     public function testSetRawDataDepth1() {
