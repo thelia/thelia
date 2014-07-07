@@ -14,6 +14,10 @@ fragment uses the following additional variables :
     {include file="forms/$field_template/form-field-attributes-renderer.html"}
 {/capture}
 
+{if empty($value)}
+    {$value = $field_value}
+{/if}
+
 {if $type == 'hidden'}
 
     <input type="hidden" {$attributes nofilter} />
