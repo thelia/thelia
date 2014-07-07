@@ -396,13 +396,18 @@ class Form extends AbstractSmartyPlugin
         $attrFormat = '%s="%s"';
         $field = '<input type="hidden" name="%s" value="%s" %s>';
 
-        $instance = $this->getInstanceFromParams($params);
+        $baseFormInstance = $this->getInstanceFromParams($params);
 
-        $formView = $instance->getView();
+        $formView = $baseFormInstance->getView();
 
         $return = "";
 
+        /** @var FormView $row */
         foreach ($formView->getIterator() as $row) {
+
+            // We have to exclude the fields for which value is defined in the template.
+            if ($baseFormInstance->isTemplateDefinedHiddenField($row)) continue;
+
             if ($this->isHidden($row) && $row->isRendered() === false) {
                 $attributeList = array();
                 if (isset($row->vars["attr"])) {
