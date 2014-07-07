@@ -122,9 +122,9 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
      *
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl($objectId)
+    public function getRedirectionUrl()
     {
-        return '/admin/products/update?product_id=' . $objectId . '?current_tab=image';
+        return '/admin/products/update?product_id=' . $this->getProductId();
     }
 
     /**

@@ -35,7 +35,7 @@
                                                 hide_submit_buttons = false
 
                                                 page_url  = "{url path="/admin/image/type/{$imageType}/{$ID}/update"}"
-                                                close_url = "{url path="{$redirectUrl}" noamp=1}"
+                                                close_url = "{url path="{$redirectUrl}" current_tab="images" noamp=1}"
                                             }
 
         						        	{form_hidden_fields form=$form}
@@ -78,7 +78,7 @@
                                                 hide_flags = true
 
                                                 page_url  = "{url path="/admin/image/type/{$imageType}/{$ID}/update"}"
-                                                close_url = "{url path="{$redirectUrl}"}"
+                                                close_url = "{url path="{$redirectUrl}" current_tab="images"}"
                                             }
                                         </form>
         							{/form}
@@ -98,7 +98,7 @@
                     <div class="col-md-12">
                         <div class="row inner-toolbar clearfix">
                             <div class="col-md-6 inner-actions pull-right">
-                                <a href="{url path="{$redirectUrl}"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
+                                <a href="{url path="{$redirectUrl}" current_tab="images"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
                             </div>
                         </div>
                         <div class="alert alert-error">

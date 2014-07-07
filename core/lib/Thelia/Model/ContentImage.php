@@ -121,9 +121,9 @@ class ContentImage extends BaseContentImage implements BreadcrumbInterface, File
      *
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl($objectId)
+    public function getRedirectionUrl()
     {
-        return '/admin/content/update/' . $objectId . '?current_tab=image';
+        return '/admin/content/update/' . $this->getContentId();
     }
 
     /**

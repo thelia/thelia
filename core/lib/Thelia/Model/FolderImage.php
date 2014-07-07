@@ -120,9 +120,9 @@ class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileMo
      * @param  int    $objectId the ID of the parent object
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl($objectId)
+    public function getRedirectionUrl()
     {
-        return '/admin/folder/update/' . $objectId . '?current_tab=image';
+        return '/admin/folder/update/' . $this->getFolderId();
     }
 
     /**

@@ -113,9 +113,9 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
      *
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl($objectId)
+    public function getRedirectionUrl()
     {
-        return '/admin/brand/update/' . $objectId . '?current_tab=image';
+        return '/admin/brand/update/' . $this->getBrandId();
     }
 
     /**

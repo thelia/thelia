@@ -113,9 +113,9 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
      *
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl($objectId)
+    public function getRedirectionUrl()
     {
-        return '/admin/brand/update/' . $objectId . '?current_tab=document';
+        return '/admin/brand/update/' . $this->getBrandId();
     }
 
     /**

@@ -123,9 +123,9 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
      *
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl($objectId)
+    public function getRedirectionUrl()
     {
-        return '/admin/categories/update?category_id=' . $objectId . '?current_tab=document';
+        return '/admin/categories/update?category_id=' . $this->getCategoryId();
     }
 
     /**

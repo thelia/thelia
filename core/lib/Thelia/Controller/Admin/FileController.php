@@ -269,9 +269,9 @@ class FileController extends BaseAdminController
         $fileManager = $this->getFileManager();
         $imageModel = $fileManager->getModelInstance('image', $parentType);
 
-        $redirectUrl = $imageModel->getRedirectionUrl($imageId);
-
         $image = $imageModel->getQueryInstance()->findPk($imageId);
+
+        $redirectUrl = $image->getRedirectionUrl();
 
         return $this->render('image-edit', array(
             'imageId' => $imageId,
@@ -306,7 +306,7 @@ class FileController extends BaseAdminController
 
         $document = $documentModel->getQueryInstance()->findPk($documentId);
 
-        $redirectUrl = $documentModel->getRedirectionUrl($documentId);
+        $redirectUrl = $document->getRedirectionUrl();
 
         return $this->render('document-edit', array(
             'documentId' => $documentId,
@@ -394,7 +394,13 @@ class FileController extends BaseAdminController
             );
 
             if ($this->getRequest()->get('save_mode') == 'close') {
-                $this->redirect(URL::getInstance()->absoluteUrl($fileModelInstance->getRedirectionUrl($fileId)));
+
+                if ($objectType == 'document')
+                    $tab = 'documents';
+                else
+                    $tab = 'images';
+
+                $this->redirect(URL::getInstance()->absoluteUrl($file->getRedirectionUrl(), ['current_tab' => $tab]));
             } else {
                 $this->redirectSuccess($fileUpdateForm);
             }
@@ -417,7 +423,7 @@ class FileController extends BaseAdminController
                 ->setGeneralError($message);
         }
 
-        return $fileModelInstance;
+        return $file;
     }
 
     /**
@@ -454,7 +460,6 @@ class FileController extends BaseAdminController
      */
     public function updateDocumentAction($documentId, $parentType)
     {
-
         if (null !== $response = $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE)) {
             return $response;
         }
@@ -464,7 +469,7 @@ class FileController extends BaseAdminController
         return $this->render('document-edit', array(
                 'documentId' => $documentId,
                 'documentType' => $parentType,
-                'redirectUrl' => $documentInstance->getRedirectionUrl($documentId),
+                'redirectUrl' => $documentInstance->getRedirectionUrl(),
                 'formId' => $documentInstance->getUpdateFormId()
             ));
     }

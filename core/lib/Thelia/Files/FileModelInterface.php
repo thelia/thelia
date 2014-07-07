@@ -75,7 +75,7 @@ interface FileModelInterface
      *
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl($objectId);
+    public function getRedirectionUrl();
 
     /**
      * Get the Query instance for this object

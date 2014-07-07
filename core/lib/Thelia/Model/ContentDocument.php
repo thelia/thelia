@@ -123,9 +123,9 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
      *
      * @return string the URL to redirect to after update from the back-office
      */
-    public function getRedirectionUrl($objectId)
+    public function getRedirectionUrl()
     {
-        return '/admin/content/update/' . $objectId . '?current_tab=document';
+        return '/admin/content/update/' . $this->getContentId();
     }
 
     /**
