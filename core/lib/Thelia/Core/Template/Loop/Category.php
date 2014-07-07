@@ -247,7 +247,6 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                 ->set("VISIBLE", $category->getVisible() ? "1" : "0")
                 ->set("POSITION", $category->getPosition())
                 ->set("TEMPLATE", $category->getDefaultTemplateId())
-
             ;
 
             if ($this->getNeedCountChild()) {

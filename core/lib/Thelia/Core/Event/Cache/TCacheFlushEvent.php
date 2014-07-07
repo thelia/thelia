@@ -11,27 +11,16 @@
 /*************************************************************************************/
 
 
-namespace Thelia\Cache\Driver;
-
-use Doctrine\Common\Cache\ApcCache;
+namespace Thelia\Core\Event\Cache;
+use Thelia\Core\Event\TCacheEvent;
 
 
 /**
- * Class FileDriver
- * @package Thelia\Cache\Driver
- * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
+ * Class TCacheFlushEvent
+ * @package Thelia\Core\Event\Cache
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ApcDriver extends BaseCacheDriver
+class TCacheFlushEvent extends TCacheEvent
 {
-
-    /**
-     * Init the cache.
-     */
-    public function init(array $params = null)
-    {
-        $this->initDefault($params);
-
-        $this->cache = new ApcCache();
-    }
 
 } 

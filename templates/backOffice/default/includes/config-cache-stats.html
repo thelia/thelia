@@ -1,0 +1,28 @@
+{if $stats}
+
+<ul>
+    <li>
+        <strong>{intl l="hits"}</strong> : {$stats.hits}
+        <br/><small>{intl l="Number of keys that have been requested and found present."}</small>
+    </li>
+    <li>
+        <strong>{intl l="misses"}</strong> : {$stats.misses}
+        <br/><small>{intl l="Number of items that have been requested and not found."}</small>
+    </li>
+    <li>
+        <strong>{intl l="uptime"}</strong> : {$stats.uptime}
+        <br/><small>{intl l="Time that the server is running."}</small>
+    </li>
+    <li>
+        <strong>{intl l="memory_usage"}</strong> : {$stats.memory_usage}
+        <br/><small>{intl l="Memory used by this server to store items."}</small>
+    </li>
+    <li>
+        <strong>{intl l="memory_available"}</strong> : {$stats.memory_available}
+        <br/><small>{intl l="Memory allowed to use for storage."}</small>
+    </li>
+</ul>
+
+{else}
+    <p>{intl l="There is no statistics"} </p>
+{/if}

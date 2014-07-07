@@ -11,27 +11,36 @@
 /*************************************************************************************/
 
 
-namespace Thelia\Cache\Driver;
-
-use Doctrine\Common\Cache\ApcCache;
+namespace Thelia\Core\Event\Cache;
+use Thelia\Core\Event\TCacheEvent;
 
 
 /**
- * Class FileDriver
- * @package Thelia\Cache\Driver
- * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
+ * Class TCacheDiscardRef
+ * @package Thelia\Core\Event\Cache
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ApcDriver extends BaseCacheDriver
+class TCacheDiscardRefEvent extends TCacheEvent
 {
 
-    /**
-     * Init the cache.
-     */
-    public function init(array $params = null)
-    {
-        $this->initDefault($params);
+    protected $ref = null;
 
-        $this->cache = new ApcCache();
+    /**
+     * @param null $ref
+     */
+    public function setRef($ref)
+    {
+        $this->ref = $ref;
+        return $this;
     }
+
+    /**
+     * @return null
+     */
+    public function getRef()
+    {
+        return $this->ref;
+    }
+
 
 } 

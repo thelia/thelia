@@ -14,15 +14,15 @@
 namespace Thelia\Cache\Driver;
 
 use Doctrine\Common\Cache\FilesystemCache;
-use Thelia\Model\ConfigQuery;
 
 
 /**
  * Class FileDriver
  * @package Thelia\Cache\Driver
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class FileDriver extends BaseCacheDriver {
+class FileDriver extends BaseCacheDriver
+{
 
     const CONFIG_DIRECTORY = 'tcache_file_directory';
 
@@ -33,10 +33,21 @@ class FileDriver extends BaseCacheDriver {
     /**
      * Init the cache.
      */
-    public function init()
+    public function init(array $params = null)
     {
-        $directory = ConfigQuery::read(self::CONFIG_DIRECTORY, THELIA_CACHE_DIR . self::DEFAULT_DIRECTORY);
-        $extension = ConfigQuery::read(self::CONFIG_EXTENSION, null);
+        $this->initDefault($params);
+
+        $directory = $this->getParam(
+            $params,
+            "directory",
+            self::CONFIG_DIRECTORY,
+            THELIA_CACHE_DIR . self::DEFAULT_DIRECTORY);
+
+        $extension = $this->getParam(
+            $params,
+            "extension",
+            self::CONFIG_EXTENSION,
+            null);
 
         $this->cache = new FilesystemCache($directory, $extension);
     }
