@@ -160,6 +160,7 @@ return array(
     'Store logs into text file' => 'Archiviare i log in un file di testo',
     'Store logs into text file, up to a certian size, then a new file is created' => 'Archiviare i log in un file di testo, fino ad una certa dimensione, dopo viene creato un nuovo file',
     'Store name' => 'Nome del negozio',
+    'Store description' => 'Descrizione del negozio',
     'Street Address' => 'Indirizzo',
     'Street Address ' => 'Indirizzo ',
     'Strictly use the requested language' => 'Utilizzare rigorosamente la lingua richiesta',
