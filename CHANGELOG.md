@@ -1,5 +1,8 @@
 #2.0.3
 - New coupon type: Free product if selected products are in the cart.
+- Added store description field for SEO
+- Added code editor on textarea on email templates page
+
 
 #2.0.2
 - Coupon UI has been redesigned.
