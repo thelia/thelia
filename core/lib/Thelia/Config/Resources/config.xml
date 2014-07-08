@@ -106,6 +106,10 @@
             <argument >%kernel.debug%</argument>
         </service>
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Readd services
         <!-- The file manager -->
         <service id="thelia.file_manager" class="Thelia\Files\FileManager">
             <argument>%file_model.classes%</argument>
@@ -136,7 +140,10 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> Readd services
 
         <!-- Archive builders -->
 
@@ -166,6 +173,7 @@
 
         <!-- Formatters -->
         <service id="thelia.manager.formatter_manager" class="Thelia\Core\FileFormat\Formatter\FormatterManager" />
+<<<<<<< HEAD
 <<<<<<< HEAD
     </services>
 >>>>>>> Add archive builder manager and formatter manager services
@@ -202,5 +210,8 @@
 =======
 
 >>>>>>> Fix services
+=======
+
+>>>>>>> Readd services
     </services>
 </config>
