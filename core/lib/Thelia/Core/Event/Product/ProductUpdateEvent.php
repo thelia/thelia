@@ -19,6 +19,7 @@ class ProductUpdateEvent extends ProductCreateEvent
     protected $chapo;
     protected $description;
     protected $postscriptum;
+    protected $brand_id;
 
     public function __construct($product_id)
     {
@@ -71,5 +72,24 @@ class ProductUpdateEvent extends ProductCreateEvent
         $this->postscriptum = $postscriptum;
 
         return $this;
+    }
+
+    /**
+     * @param  int   $brand_id
+     * @return $this
+     */
+    public function setBrandId($brand_id)
+    {
+        $this->brand_id = $brand_id;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBrandId()
+    {
+        return $this->brand_id;
     }
 }

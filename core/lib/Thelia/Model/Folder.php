@@ -4,11 +4,12 @@ namespace Thelia\Model;
 
 use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Folder as BaseFolder;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 
-class Folder extends BaseFolder
+class Folder extends BaseFolder implements FileModelParentInterface
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
@@ -57,7 +58,7 @@ class Folder extends BaseFolder
 
     /**
      * Get the root folder
-     * @param int $folderId
+     * @param  int   $folderId
      * @return mixed
      */
     public function getRoot($folderId)
@@ -65,7 +66,7 @@ class Folder extends BaseFolder
 
         $folder = FolderQuery::create()->findPk($folderId);
 
-        if(0 !== $folder->getParent()) {
+        if (0 !== $folder->getParent()) {
             $parentFolder = FolderQuery::create()->findPk($folder->getParent());
 
             if (null !== $parentFolder) {

@@ -52,6 +52,12 @@
         <form name="thelia.admin.content.image.modification" class="Thelia\Form\ContentImageModification"/>
         <form name="thelia.admin.content.document.modification" class="Thelia\Form\ContentDocumentModification"/>
 
+
+        <form name="thelia.admin.brand.creation" class="Thelia\Form\Brand\BrandCreationForm"/>
+        <form name="thelia.admin.brand.modification" class="Thelia\Form\Brand\BrandModificationForm"/>
+        <form name="thelia.admin.brand.image.modification" class="Thelia\Form\Brand\BrandImageModification"/>
+        <form name="thelia.admin.brand.document.modification" class="Thelia\Form\Brand\BrandDocumentModification"/>
+
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
 
         <form name="thelia.order.delivery" class="Thelia\Form\OrderDelivery"/>

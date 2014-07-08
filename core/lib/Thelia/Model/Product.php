@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Product as BaseProduct;
 
 use Thelia\TaxEngine\Calculator;
@@ -13,7 +14,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\ProductTableMap;
 
-class Product extends BaseProduct
+class Product extends BaseProduct implements FileModelParentInterface
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 

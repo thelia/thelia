@@ -15,6 +15,7 @@ namespace Thelia\Controller\Front;
 use Symfony\Component\Routing\Router;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Model\AddressQuery;
@@ -30,17 +31,30 @@ class BaseFrontController extends BaseController
      *
      * @see \Thelia\Controller\BaseController::getRouteFromRouter()
      */
+
+    /**
+     * Return the route path defined for the givent route ID
+     *
+     * @param string $routeId       the route ID, as found in Config/Resources/routing/admin.xml
+     * @param array  $parameters    the Route parameters, as a var/value pair array
+     * @param bool   $referenceType Router::ABSOLUTE_PATH or Router::ABSOLUTE_URL
+     *
+     * @see \Thelia\Controller\BaseController::getRouteFromRouter()
+     *
+     * @return string the route path
+     */
     protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_PATH)
     {
         return $this->getRouteFromRouter('router.front', $routeId, $parameters, $referenceType);
     }
 
     /**
-     * Redirect to à route ID related URL
+     * Redirect to a specific route.
      *
-     * @param string $routeId       the route ID, as found in Config/Resources/routing/admin.xml
-     * @param array  $urlParameters the URL parametrs, as a var/value pair array
-     * @param bool   $referenceType
+     * @param string $routeId         the route ID, as found in Config/Resources/routing/admin.xml
+     * @param array  $urlParameters   the URL parameters, as a var/value pair array
+     * @param array  $routeParameters the Route parameters, as a var/value pair array
+     * @param bool   $referenceType   Router::ABSOLUTE_PATH or Router::ABSOLUTE_URL
      */
     public function redirectToRoute($routeId, array $urlParameters = [], array $routeParameters = [], $referenceType = Router::ABSOLUTE_PATH)
     {
@@ -95,7 +109,9 @@ class BaseFrontController extends BaseController
     }
 
     /**
-     * @return TemplateDefinition the template
+     * @param TemplateDefinition $template the template to process, or null for using the front template
+     *
+     * @return ParserInterface the Thelia parser²
      */
     protected function getParser($template = null)
     {
@@ -123,9 +139,9 @@ class BaseFrontController extends BaseController
     /**
      * Render the given template, and returns the result as a string.
      *
-     * @param $templateName the complete template name, with extension
-     * @param array $args        the template arguments
-     * @param null  $templateDir
+     * @param string $templateName the complete template name, with extension
+     * @param array  $args         the template arguments
+     * @param string$templateDir
      *
      * @return string
      */

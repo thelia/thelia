@@ -71,6 +71,16 @@
                      </div>
                 {/form_field}
 
+                {custom_render_form_field form=$form field='brand_id'}
+                    <select {form_field_attributes form=$form field='brand_id'}>
+                        <option value="0">{intl l="No brand"}</option>
+
+                        {loop name="brand-list" type="brand" visible="*"}
+                            <option value="{$ID}" {if $BRAND_ID == $ID}selected="selected"{/if}>{$TITLE}</option>
+                        {/loop}
+                    </select>
+                {/custom_render_form_field}
+
                 {form_field form=$form field='visible'}
                     <div class="form-group {if $error}has-error{/if}">
                         <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>

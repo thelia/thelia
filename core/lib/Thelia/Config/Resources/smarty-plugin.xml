@@ -52,6 +52,7 @@
 
             <argument type="service" id="request"/>
             <argument type="service" id="thelia.parser.context"/>
+            <argument type="service" id="thelia.parser"/>
 
             <call method="setFormDefinition">
                 <argument>%thelia.parser.forms%</argument>

@@ -67,6 +67,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     {* Feeds *}
     <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}" href="{url path="/feed/catalog/{lang attr="locale"}"}" />
     <link rel="alternate" type="application/rss+xml" title="{intl l='All contents'}" href="{url path="/feed/content/{lang attr="locale"}"}" />
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All brands'}"   href="{url path="/feed/brand/{lang attr='locale'}"}" />
     {block name="feeds"}{/block}
 
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}

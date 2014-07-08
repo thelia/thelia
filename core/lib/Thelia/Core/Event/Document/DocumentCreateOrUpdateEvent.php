@@ -11,196 +11,121 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Document;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Model\CategoryDocument;
-use Thelia\Model\ContentDocument;
-use Thelia\Model\FolderDocument;
-use Thelia\Model\ProductDocument;
+
+use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
+use Thelia\Files\FileModelInterface;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 9/18/13
  * Time: 3:56 PM
  *
- * Occurring when a Document is saved
+ * Occurring when an Document is saved
  *
  * @package Document
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
+ * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
  */
-class DocumentCreateOrUpdateEvent extends ActionEvent
+class DocumentCreateOrUpdateEvent extends FileCreateOrUpdateEvent
 {
-
-    /** @var CategoryDocument|ProductDocument|ContentDocument|FolderDocument model to save */
-    protected $modelDocument = array();
-
-    /** @var CategoryDocument|ProductDocument|ContentDocument|FolderDocument model to save */
-    protected $oldModelDocument = array();
-
-    /** @var UploadedFile Document file to save */
-    protected $uploadedFile = null;
-
-    /** @var int Document parent id */
-    protected $parentId = null;
-
-    /** @var string Document type */
-    protected $documentType = null;
-
-    /** @var string Parent name */
-    protected $parentName = null;
-
     /**
      * Constructor
      *
      * @param string $documentType Document type
      *                             ex : FileManager::TYPE_CATEGORY
      * @param int    $parentId     Document parent id
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function __construct($documentType, $parentId)
     {
-        $this->documentType = $documentType;
-        $this->parentId  = $parentId;
+        parent::__construct($parentId);
+    }
+
+    /**
+     * @param mixed $locale
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
+     */
+    public function setLocale($locale)
+    {
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
+     */
+    public function getLocale()
+    {
+        throw new \RuntimeException("getLocale() is deprecated and no longer supported");
     }
 
     /**
      * Set Document to save
      *
-     * @param CategoryDocument|ProductDocument|ContentDocument|FolderDocument $document Document to save
+     * @param $document FileModelInterface
      *
      * @return $this
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function setModelDocument($document)
     {
-        $this->modelDocument = $document;
-
-        return $this;
+        parent::setModel($document);
     }
 
     /**
      * Get Document being saved
      *
-     * @return CategoryDocument|ProductDocument|ContentDocument|FolderDocument
+     * @return FileModelInterface
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function getModelDocument()
     {
-        return $this->modelDocument;
+        return parent::getModel();
     }
 
     /**
-     * Set document type
+     * Set picture type
      *
      * @param string $documentType Document type
      *
      * @return $this
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function setDocumentType($documentType)
     {
-        $this->documentType = $documentType;
-
         return $this;
     }
 
     /**
-     * Get document type
+     * Get picture type
      *
      * @return string
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function getDocumentType()
     {
-        return $this->documentType;
-    }
-
-    /**
-     * Set Document parent id
-     *
-     * @param int $parentId Document parent id
-     *
-     * @return $this
-     */
-    public function setParentId($parentId)
-    {
-        $this->parentId = $parentId;
-
-        return $this;
-    }
-
-    /**
-     * Get Document parent id
-     *
-     * @return int
-     */
-    public function getParentId()
-    {
-        return $this->parentId;
-    }
-
-    /**
-     * Set uploaded file
-     *
-     * @param UploadedFile $uploadedFile File being uploaded
-     *
-     * @return $this
-     */
-    public function setUploadedFile($uploadedFile)
-    {
-        $this->uploadedFile = $uploadedFile;
-
-        return $this;
-    }
-
-    /**
-     * Get uploaded file
-     *
-     * @return UploadedFile
-     */
-    public function getUploadedFile()
-    {
-        return $this->uploadedFile;
-    }
-
-    /**
-     * Set parent name
-     *
-     * @param string $parentName Parent name
-     *
-     * @return $this
-     */
-    public function setParentName($parentName)
-    {
-        $this->parentName = $parentName;
-
-        return $this;
-    }
-
-    /**
-     * Get parent name
-     *
-     * @return string
-     */
-    public function getParentName()
-    {
-        return $this->parentName;
+        throw new \RuntimeException("getDocumentType() is deprecated and no longer supported");
     }
 
     /**
      * Set old model value
      *
-     * @param CategoryDocument|ContentDocument|FolderDocument|ProductDocument $oldModelDocument
+     * @param FileModelInterface $oldModelDocument
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function setOldModelDocument($oldModelDocument)
     {
-        $this->oldModelDocument = $oldModelDocument;
+        parent::setOldModel($oldModelDocument);
     }
 
     /**
      * Get old model value
      *
-     * @return CategoryDocument|ContentDocument|FolderDocument|ProductDocument
+     * @return FileModelInterface
+     * @deprecated deprecated since version 2.0.3. Use FileCreateOrUpdateEvent instead
      */
     public function getOldModelDocument()
     {
-        return $this->oldModelDocument;
+        return parent::getOldModel();
     }
-
 }

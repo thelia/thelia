@@ -137,6 +137,19 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         }
     }
 
+    public function brandDataAccess($params, &$smarty)
+    {
+        $contentId = $this->request->get('brand_id');
+
+        if ($contentId !== null) {
+
+            $search = ContentQuery::create()
+                ->filterById($contentId);
+
+            return $this->dataAccessWithI18n("Brand",  $params, $search);
+        }
+    }
+
     /**
      * currency global data
      *
@@ -462,6 +475,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'category', $this, 'categoryDataAccess'),
             new SmartyPluginDescriptor('function', 'content', $this, 'contentDataAccess'),
             new SmartyPluginDescriptor('function', 'folder', $this, 'folderDataAccess'),
+            new SmartyPluginDescriptor('function', 'brand', $this, 'brandDataAccess'),
             new SmartyPluginDescriptor('function', 'currency', $this, 'currencyDataAccess'),
             new SmartyPluginDescriptor('function', 'country', $this, 'countryDataAccess'),
             new SmartyPluginDescriptor('function', 'lang', $this, 'langDataAccess'),

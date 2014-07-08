@@ -44,7 +44,6 @@ CREATE TABLE `order_version`
         REFERENCES `order` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
-
 UPDATE `order` SET
   `version` = 1,
   `version_created_at` = NOW(),
@@ -74,29 +73,194 @@ INSERT INTO `order_version`(
   `version`,
   `version_created_at`,
   `version_created_by`)
-SELECT
-  `id`,
-  `ref`,
-  `customer_id`,
-  `invoice_order_address_id`,
-  `delivery_order_address_id`,
-  `invoice_date`,
-  `currency_id`,
-  `currency_rate`,
-  `transaction_ref`,
-  `delivery_ref`,
-  `invoice_ref`,
-  `discount`,
-  `postage`,
-  `payment_module_id`,
-  `delivery_module_id`,
-  `status_id`,
-  `lang_id`,
-  `created_at`,
-  `updated_at`,
-  `version`,
-  `version_created_at`,
-  `version_created_by`
-FROM `order`;
+  SELECT
+    `id`,
+    `ref`,
+    `customer_id`,
+    `invoice_order_address_id`,
+    `delivery_order_address_id`,
+    `invoice_date`,
+    `currency_id`,
+    `currency_rate`,
+    `transaction_ref`,
+    `delivery_ref`,
+    `invoice_ref`,
+    `discount`,
+    `postage`,
+    `payment_module_id`,
+    `delivery_module_id`,
+    `status_id`,
+    `lang_id`,
+    `created_at`,
+    `updated_at`,
+    `version`,
+    `version_created_at`,
+    `version_created_by`
+  FROM `order`;
 
+
+# Add missing columns to coupon (version_created_at, version_created_by)
+ALTER TABLE `coupon` ADD `version_created_at` DATE AFTER `version`;
+ALTER TABLE `coupon` ADD `version_created_by` VARCHAR(100) AFTER `version_created_at`;
+
+# Add Brand tables and related resources
+
+# Add the "brand" resource
+INSERT INTO resource (`code`, `created_at`, `updated_at`) VALUES ('admin.brand', NOW(), NOW());
+
+-- ---------------------------------------------------------------------
+-- brand
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand`;
+
+CREATE TABLE `brand`
+(
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `visible` TINYINT,
+  `position` INTEGER,
+  `logo_image_id` INTEGER,
+  `created_at` DATETIME,
+  `updated_at` DATETIME,
+  PRIMARY KEY (`id`),
+  INDEX `fk_brand_brand_image_idx` (`logo_image_id`),
+  CONSTRAINT `fk_logo_image_id_brand_image`
+  FOREIGN KEY (`logo_image_id`)
+  REFERENCES `brand_image` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_document
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_document`;
+
+CREATE TABLE `brand_document`
+(
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `brand_id` INTEGER NOT NULL,
+  `file` VARCHAR(255) NOT NULL,
+  `position` INTEGER,
+  `created_at` DATETIME,
+  `updated_at` DATETIME,
+  PRIMARY KEY (`id`),
+  INDEX `idx_brand_document_brand_id` (`brand_id`),
+  CONSTRAINT `fk_brand_document_brand_id`
+  FOREIGN KEY (`brand_id`)
+  REFERENCES `brand` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_image
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_image`;
+
+CREATE TABLE `brand_image`
+(
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `brand_id` INTEGER NOT NULL,
+  `file` VARCHAR(255) NOT NULL,
+  `position` INTEGER,
+  `created_at` DATETIME,
+  `updated_at` DATETIME,
+  PRIMARY KEY (`id`),
+  INDEX `idx_brand_image_brand_id` (`brand_id`),
+  CONSTRAINT `fk_brand_image_brand_id`
+  FOREIGN KEY (`brand_id`)
+  REFERENCES `brand` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_i18n`;
+
+CREATE TABLE `brand_i18n`
+(
+  `id` INTEGER NOT NULL,
+  `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+  `title` VARCHAR(255),
+  `description` LONGTEXT,
+  `chapo` TEXT,
+  `postscriptum` TEXT,
+  `meta_title` VARCHAR(255),
+  `meta_description` TEXT,
+  `meta_keywords` TEXT,
+  PRIMARY KEY (`id`,`locale`),
+  CONSTRAINT `brand_i18n_FK_1`
+  FOREIGN KEY (`id`)
+  REFERENCES `brand` (`id`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_document_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_document_i18n`;
+
+CREATE TABLE `brand_document_i18n`
+(
+  `id` INTEGER NOT NULL,
+  `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+  `title` VARCHAR(255),
+  `description` LONGTEXT,
+  `chapo` TEXT,
+  `postscriptum` TEXT,
+  PRIMARY KEY (`id`,`locale`),
+  CONSTRAINT `brand_document_i18n_FK_1`
+  FOREIGN KEY (`id`)
+  REFERENCES `brand_document` (`id`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_image_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_image_i18n`;
+
+CREATE TABLE `brand_image_i18n`
+(
+  `id` INTEGER NOT NULL,
+  `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+  `title` VARCHAR(255),
+  `description` LONGTEXT,
+  `chapo` TEXT,
+  `postscriptum` TEXT,
+  PRIMARY KEY (`id`,`locale`),
+  CONSTRAINT `brand_image_i18n_FK_1`
+  FOREIGN KEY (`id`)
+  REFERENCES `brand_image` (`id`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------
+-- Add brand field to product table, and related constraint.
+-- ---------------------------------------------------------
+
+ALTER TABLE `product` ADD `brand_id` INTEGER DEFAULT 0 AFTER `template_id`;
+ALTER TABLE `product` ADD CONSTRAINT `fk_product_brand` FOREIGN KEY (`brand_id`) REFERENCES `brand` (`id`) ON DELETE SET NULL;
+
+# Add html_output_trim_level config variable
+# ------------------------------------------
+
+INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+  ('html_output_trim_level','1', 0, 0, NOW(), NOW());
+
+SELECT @max := MAX(`id`) FROM `config`;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@max, 'en_US', 'Whitespace trim level of the generated HTML code (0 = none, 1 = medium, 2 = maximum)', NULL, NULL, NULL);
+
+# Done !
+# ------
 SET FOREIGN_KEY_CHECKS = 1;

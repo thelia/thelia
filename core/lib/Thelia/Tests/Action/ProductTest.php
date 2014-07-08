@@ -26,6 +26,7 @@ use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Model\AccessoryQuery;
+use Thelia\Model\BrandQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\CurrencyQuery;
@@ -115,6 +116,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     {
         $event = new ProductUpdateEvent($product->getId());
         $defaultCategory = CategoryQuery::create()->select('id')->addAscendingOrderByColumn('RAND()')->findOne();
+        $brandId = BrandQuery::create()->findOne()->getId();
         $event
             ->setLocale('fr_FR')
             ->setTitle('test MAJ titre en français')
@@ -123,6 +125,7 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->setPostscriptum('test postscriptum fr')
             ->setVisible(1)
             ->setDefaultCategory($defaultCategory)
+            ->setBrandId($brandId)
             ->setDispatcher($this->getDispatcher());
         ;
 
