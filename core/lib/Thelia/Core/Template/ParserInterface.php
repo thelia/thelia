@@ -50,8 +50,8 @@ interface ParserInterface
      *
      * @param int $templateType the template type (
      *
-     * @param string  $templateName      the template name
-     * @param string  $templateDirectory path to the template dirtectory
+     * @param string $templateName      the template name
+     * @param string $templateDirectory path to the template dirtectory
      * @param string $key               ???
      * @param bool   $unshift           ??? Etienne ?
      */

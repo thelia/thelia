@@ -24,7 +24,6 @@ use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
-use Thelia\Core\Template\TemplateHelper;
 use Thelia\Form\BaseForm;
 
 /**
