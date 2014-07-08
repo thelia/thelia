@@ -3,6 +3,7 @@
 - New feature: Product Brands / Suppliers management
 - New 'brand' loop and substitution. product, image and document loop have been updated.
 - Images and document processing have been refactored.
+- Fix bugs on customer update password form and module order by title
 
 #2.0.2
 - Coupon UI has been redesigned.
