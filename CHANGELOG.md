@@ -3,6 +3,10 @@
 - New feature: Product Brands / Suppliers management
 - New 'brand' loop and substitution. product, image and document loop have been updated.
 - Images and document processing have been refactored.
+- Added store description field for SEO
+- Added code editor on textarea on email templates page
+- Fixed issues on position tests
+- Fixed issues on RSS feed links
 
 #2.0.2
 - Coupon UI has been redesigned.

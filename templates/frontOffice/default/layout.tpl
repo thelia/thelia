@@ -27,7 +27,9 @@ GNU General Public License : http://www.gnu.org/licenses/
 
 {block name="no-return-functions"}{/block}
 {assign var="store_name" value="{config key="store_name"}"}
+{assign var="store_description" value="{config key="store_description"}"}
 {if not $store_name}{assign var="store_name" value="{intl l='Thelia V2'}"}{/if}
+{if not $store_description}{assign var="store_description" value="$store_name"}{/if}
 
 {* paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither *}
 <!--[if lt IE 7 ]><html class="no-js oldie ie6" lang="{lang attr="code"}"> <![endif]-->
@@ -49,7 +51,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     {block name="meta"}
-        <meta name="description" content="{if $page_description}{$page_description}{else}{$store_name}{/if}">
+        <meta name="description" content="{if $page_description}{$page_description}{else}{$store_description|strip|truncate:120}{/if}">
         <meta name="robots" content="noindex,nofollow">
     {/block}
 

@@ -40,6 +40,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('session_config.default', '1', 1, 1, NOW(), NOW()),
 ('default_lang_without_translation', '1', 1, 1, NOW(), NOW()),
 ('store_name','', 0, 1, NOW(), NOW()),
+('store_description','', 0, 1, NOW(), NOW()),
 ('store_email','', 0, 1, NOW(), NOW()),
 ('one_domain_foreach_lang','0', 1, 1, NOW(), NOW()),
 ('thelia_version','2.0.2', 1, 1, NOW(), NOW()),

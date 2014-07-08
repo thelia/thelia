@@ -36,6 +36,7 @@ class ConfigStoreController extends BaseAdminController
         // Hydrate the store configuration form
         $configStoreForm = new ConfigStoreForm($this->getRequest(), 'form', array(
             'store_name'             => ConfigQuery::read("store_name"),
+            'store_description'      => ConfigQuery::read("store_description"),
             'store_email'            => ConfigQuery::read("store_email"),
             'store_business_id'      => ConfigQuery::read("store_business_id"),
             'store_phone'            => ConfigQuery::read("store_phone"),
