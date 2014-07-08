@@ -17,17 +17,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\Loop\CategoryPath;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Category;
+use Thelia\Model\Product;
 
 trait CatalogBreadcrumbTrait
 {
 
-    public function getBaseBreadcrumb(Router $router, ContainerInterface $container, $categoryId, &$locale)
+    public function getBaseBreadcrumb(Router $router, ContainerInterface $container, $categoryId)
     {
         $translator = Translator::getInstance();
         $catalogUrl = $router->generate('admin.catalog', [], Router::ABSOLUTE_URL);
         $breadcrumb = [
-            $translator->trans('Home', [], 'bo.default') => $router->generate('admin.home.view', [], Router::ABSOLUTE_URL),
-            $translator->trans('Catalog', [], 'bo.default') => $catalogUrl,
+            $translator->trans('Home') => $router->generate('admin.home.view', [], Router::ABSOLUTE_URL),
+            $translator->trans('Catalog') => $catalogUrl,
         ];
 
         $categoryPath = new CategoryPath($container);
@@ -42,15 +44,13 @@ trait CatalogBreadcrumbTrait
             $breadcrumb[$result['TITLE']] =  sprintf("%s?category_id=%d",$catalogUrl, $result['ID']);
         }
 
-        $locale = $result['LOCALE'];
-
         return $breadcrumb;
     }
 
-    public function getProductBreadcrumb(Router $router, ContainerInterface $container, $tab)
+    public function getProductBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
+        /** @var Product $product */
         $product = $this->getProduct();
-        $locale = null;
 
         $breadcrumb = $this->getBaseBreadcrumb($router, $container, $product->getDefaultCategoryId(), $locale);
 
@@ -65,11 +65,11 @@ trait CatalogBreadcrumbTrait
         return $breadcrumb;
     }
 
-    public function getCategoryBreadcrumb(Router $router, ContainerInterface $container, $tab)
+    public function getCategoryBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
-        $locale = null;
+        /** @var Category $category */
         $category = $this->getCategory();
-        $breadcrumb = $this->getBaseBreadcrumb($router, $container, $this->getParentId(), $locale);
+        $breadcrumb = $this->getBaseBreadcrumb($router, $container, $this->getParentId());
 
         $category->setLocale($locale);
 

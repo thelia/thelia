@@ -51,6 +51,8 @@ final class AdminResources
 
     const ATTRIBUTE = "admin.configuration.attribute";
 
+    const BRAND = "admin.brand";
+
     const CATEGORY = "admin.category";
 
     const CONFIG = "admin.configuration";

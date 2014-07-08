@@ -9,7 +9,33 @@
         <parameter key="esi_listener.class">Symfony\Component\HttpKernel\EventListener\EsiListener</parameter>
         <parameter key="fragment.renderer.esi.class">Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer</parameter>
         <parameter key="fragment.renderer.inline.class">Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
+
+        <!--
+        The list of Model classes which suppoorts image or document management.
+
+        The key should have form type.parent, where type is the file type (document or image)
+        and parent is the parent object of the file, form example product, brand, folder, etc.
+        -->
+
+        <parameter key="file_model.classes" type="collection">
+            <parameter key="document.product">Thelia\Model\ProductDocument</parameter>
+            <parameter key="image.product">Thelia\Model\ProductImage</parameter>
+
+            <parameter key="document.category">Thelia\Model\CategoryDocument</parameter>
+            <parameter key="image.category">Thelia\Model\CategoryImage</parameter>
+
+            <parameter key="document.content">Thelia\Model\ContentDocument</parameter>
+            <parameter key="image.content">Thelia\Model\ContentImage</parameter>
+
+            <parameter key="document.folder">Thelia\Model\FolderDocument</parameter>
+            <parameter key="image.folder">Thelia\Model\FolderImage</parameter>
+
+            <parameter key="document.brand">Thelia\Model\BrandDocument</parameter>
+            <parameter key="image.brand">Thelia\Model\BrandImage</parameter>
+        </parameter>
+
     </parameters>
+
 
     <services>
 
@@ -78,6 +104,11 @@
             <argument type="service" id="thelia.parser.context"/>
             <argument >%kernel.environment%</argument>
             <argument >%kernel.debug%</argument>
+        </service>
+
+        <!-- The file manager -->
+        <service id="thelia.file_manager" class="Thelia\Files\FileManager">
+            <argument>%file_model.classes%</argument>
         </service>
 
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">

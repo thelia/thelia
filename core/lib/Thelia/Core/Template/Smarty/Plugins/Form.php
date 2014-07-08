@@ -12,17 +12,19 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
-use Symfony\Component\Form\FormView;
-use Thelia\Core\Form\Type\TheliaType;
-
-use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
-use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
-use Thelia\Core\Template\ParserContext;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Form\FormView;
+use Thelia\Core\Form\Type\TheliaType;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
+use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
+use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
+use Thelia\Form\BaseForm;
 
 /**
  *
@@ -53,15 +55,22 @@ class Form extends AbstractSmartyPlugin
     private static $taggedFieldsStack = null;
     private static $taggedFieldsStackPosition = null;
 
+    /** @var  Request $request */
     protected $request;
+
+    /** @var  ParserContext $parserContext */
     protected $parserContext;
+
+    /** @var  ParserInterface $parser */
+    protected $parser;
 
     protected $formDefinition = array();
 
-    public function __construct(Request $request, ParserContext $parserContext)
+    public function __construct(Request $request, ParserContext $parserContext, ParserInterface $parser)
     {
         $this->request = $request;
         $this->parserContext = $parserContext;
+        $this->parser = $parser;
     }
 
     public function setFormDefinition($formDefinition)
@@ -78,7 +87,6 @@ class Form extends AbstractSmartyPlugin
 
     public function generateForm($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-
         if ($repeat) {
 
             $name = $this->getParam($params, 'name');
@@ -117,6 +125,14 @@ class Form extends AbstractSmartyPlugin
         }
     }
 
+    /**
+     * @param \Smarty_Internal_Template $template
+     * @param string                    $fieldName
+     * @param string                    $fieldValue
+     * @param string                    $fieldType
+     * @param array                     $fieldVars
+     * @param int                       $total_value_count
+     */
     protected function assignFieldValues(
         $template,
         $fieldName,
@@ -135,11 +151,13 @@ class Form extends AbstractSmartyPlugin
         $template->assign("checked", isset($fieldVars['checked']) ? $fieldVars['checked'] : false);
         $template->assign("choices", isset($fieldVars['choices']) ? $fieldVars['choices'] : false);
         $template->assign("multiple", isset($fieldVars['multiple']) ? $fieldVars['multiple'] : false);
+        $template->assign("disabled", isset($fieldVars['disabled']) ? $fieldVars['disabled'] : false);
+        $template->assign("read_only", isset($fieldVars['read_only']) ? $fieldVars['read_only'] : false);
+        $template->assign("max_length", isset($fieldVars['max_length']) ? $fieldVars['max_length'] : false);
+        $template->assign('required', isset($fieldVars['required']) ? $fieldVars['required'] : false);
 
         $template->assign("label", $fieldVars["label"]);
         $template->assign("label_attr", $fieldVars["label_attr"]);
-
-        $template->assign('required', isset($fieldVars['required']) ? $fieldVars['required'] : false);
 
         $template->assign('total_value_count', $total_value_count);
 
@@ -161,6 +179,11 @@ class Form extends AbstractSmartyPlugin
         $template->assign("attr_list", $fieldVars["attr"]);
     }
 
+    /**
+     * @param \Smarty_Internal_Template $template
+     * @param FormConfigInterface       $formFieldConfig
+     * @param FormView                  $formFieldView
+     */
     protected function assignFormTypeValues($template, $formFieldConfig, $formFieldView)
     {
         $formFieldType = $formFieldConfig->getType()->getInnerType();
@@ -202,56 +225,131 @@ class Form extends AbstractSmartyPlugin
         }
     }
 
+    /**
+     * @param array                     $params
+     * @param \Smarty_Internal_Template $template
+     */
+    protected function processFormField($params, $template)
+    {
+        $formFieldView = $this->getFormFieldView($params);
+        $formFieldConfig = $this->getFormFieldConfig($params);
+
+        $formFieldType = $formFieldConfig->getType()->getName();
+
+        $this->assignFormTypeValues($template, $formFieldConfig, $formFieldView);
+
+        $value = $formFieldView->vars["value"];
+
+        $key = $this->getParam($params, 'value_key', null);
+
+        // We (may) have a collection
+        if ($key !== null) {
+
+            // Force array
+            if (! is_array($value)) $value = array();
+
+            // If the field is not found, use an empty value
+            $name = sprintf("%s[%s]", $formFieldView->vars["full_name"], $key);
+
+            $val = $value[$key];
+
+            $this->assignFieldValues(
+                $template,
+                $name,
+                $val,
+                $formFieldType,
+                $formFieldView->vars,
+                count($formFieldView->children)
+            );
+        } else {
+            $this->assignFieldValues(
+                $template,
+                $formFieldView->vars["full_name"],
+                $formFieldView->vars["value"],
+                $formFieldType,
+                $formFieldView->vars
+            );
+        }
+
+        $formFieldView->setRendered();
+    }
+
     public function renderFormField($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
         if ($repeat) {
 
-            $formFieldView = $this->getFormFieldView($params);
-            $formFieldConfig = $this->getFormFieldConfig($params);
+            $this->processFormField($params, $template);
 
-            $formFieldType = $formFieldConfig->getType()->getName();
-
-            $this->assignFormTypeValues($template, $formFieldConfig, $formFieldView);
-
-            $value = $formFieldView->vars["value"];
-
-            $key = $this->getParam($params, 'value_key', null);
-
-            // We (may) have a collection
-            if ($key !== null) {
-
-                // Force array
-                if (! is_array($value)) $value = array();
-
-                // If the field is not found, use an empty value
-                $val = array_key_exists($key, $value) ? $value[$key] : '';
-
-                $name = sprintf("%s[%s]", $formFieldView->vars["full_name"], $key);
-
-                $val = $value[$key];
-
-                $this->assignFieldValues(
-                    $template,
-                    $name,
-                    $val,
-                    $formFieldType,
-                    $formFieldView->vars,
-                    count($formFieldView->children)
-                );
-            } else {
-                $this->assignFieldValues(
-                    $template,
-                    $formFieldView->vars["full_name"],
-                    $formFieldView->vars["value"],
-                    $formFieldType,
-                    $formFieldView->vars
-                );
-            }
-
-            $formFieldView->setRendered();
-        } else {
+         } else {
             return $content;
         }
+    }
+
+    /**
+     * @param  array                     $params
+     * @param  string                    $content
+     * @param  \Smarty_Internal_Template $template
+     * @param  string                    $templateTypeName
+     * @return string
+     */
+    protected function automaticFormFieldRendering($params, $content, $template, $templateFile)
+    {
+        $data = '';
+
+        $templateStyle = $this->getParam($params, 'template', 'standard');
+
+        $snippet_path = sprintf('%s'.DS.'forms'.DS.'%s'.DS.'%s.html',
+            $this->parser->getTemplateDefinition()->getAbsolutePath(),
+            $templateStyle,
+            $templateFile
+        );
+
+        if (false !== $snippet_content = file_get_contents($snippet_path)) {
+
+            $this->processFormField($params, $template);
+
+            $form              = $this->getParam($params, 'form', false);
+            $field_name        = $this->getParam($params, 'field', false);
+            $field_extra_class = $this->getParam($params, 'extra_class', '');
+            $field_value       = $this->getParam($params, 'value', '');
+
+            $template->assign([
+                    'content'           => trim($content),
+                    'form'              => $form,
+                    'field_name'        => $field_name,
+                    'field_extra_class' => $field_extra_class,
+                    'field_value'       => $field_value,
+                    'field_template'    => $templateStyle
+                ]);
+
+            $data = $template->fetch(sprintf('string:%s', $snippet_content));
+        }
+
+        return $data;
+    }
+
+        /**
+     * @param $params
+     * @param $content
+     * @param  \Smarty_Internal_Template $template
+     * @param $repeat
+     * @return mixed
+     */
+    public function customFormFieldRendering($params, $content, $template, &$repeat)
+    {
+        if (! $repeat) {
+            return $this->automaticFormFieldRendering($params, $content, $template, 'form-field-renderer');
+        }
+    }
+
+    public function standardFormFieldRendering($params, \Smarty_Internal_Template $template)
+    {
+        return $this->automaticFormFieldRendering($params, '', $template, 'form-field-renderer');
+    }
+
+    public function standardFormFieldAttributes($params, \Smarty_Internal_Template $template)
+    {
+        return $this->automaticFormFieldRendering($params, '', $template, 'form-field-attributes-renderer');
     }
 
     public function renderTaggedFormFields($params, $content, \Smarty_Internal_Template $template, &$repeat)
@@ -297,13 +395,18 @@ class Form extends AbstractSmartyPlugin
         $attrFormat = '%s="%s"';
         $field = '<input type="hidden" name="%s" value="%s" %s>';
 
-        $instance = $this->getInstanceFromParams($params);
+        $baseFormInstance = $this->getInstanceFromParams($params);
 
-        $formView = $instance->getView();
+        $formView = $baseFormInstance->getView();
 
         $return = "";
 
+        /** @var FormView $row */
         foreach ($formView->getIterator() as $row) {
+
+            // We have to exclude the fields for which value is defined in the template.
+            if ($baseFormInstance->isTemplateDefinedHiddenField($row)) continue;
+
             if ($this->isHidden($row) && $row->isRendered() === false) {
                 $attributeList = array();
                 if (isset($row->vars["attr"])) {
@@ -358,6 +461,11 @@ class Form extends AbstractSmartyPlugin
         return array_search("hidden", $formView->vars["block_prefixes"]);
     }
 
+    /**
+     * @param $params
+     * @return FormView
+     * @throws \InvalidArgumentException
+     */
     protected function getFormFieldView($params)
     {
         $instance = $this->getInstanceFromParams($params);
@@ -395,6 +503,11 @@ class Form extends AbstractSmartyPlugin
         return $viewList;
     }
 
+    /**
+     * @param $params
+     * @return FormConfigInterface
+     * @throws \InvalidArgumentException
+     */
     protected function getFormFieldConfig($params)
     {
         $instance = $this->getInstanceFromParams($params);
@@ -414,6 +527,11 @@ class Form extends AbstractSmartyPlugin
         return $fieldData->getConfig();
     }
 
+    /**
+     * @param $params
+     * @return BaseForm
+     * @throws \InvalidArgumentException
+     */
     protected function getInstanceFromParams($params)
     {
         $instance = $this->getParam($params, 'form');
@@ -443,7 +561,11 @@ class Form extends AbstractSmartyPlugin
             new SmartyPluginDescriptor("block", "form_tagged_fields", $this, "renderTaggedFormFields"),
             new SmartyPluginDescriptor("function", "form_hidden_fields", $this, "renderHiddenFormField"),
             new SmartyPluginDescriptor("function", "form_enctype", $this, "formEnctype"),
-            new SmartyPluginDescriptor("block", "form_error", $this, "formError")
+            new SmartyPluginDescriptor("block", "form_error", $this, "formError"),
+
+            new SmartyPluginDescriptor("function", "form_field_attributes"   , $this, "standardFormFieldAttributes"),
+            new SmartyPluginDescriptor("function", "render_form_field"       , $this, "standardFormFieldRendering"),
+            new SmartyPluginDescriptor("block"   , "custom_render_form_field", $this, "customFormFieldRendering"),
         );
     }
 }

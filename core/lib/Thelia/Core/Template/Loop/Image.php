@@ -39,9 +39,9 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     protected $timestampable = true;
 
     /**
-     * @var array Possible image sources
+     * @var array Possible standard image sources
      */
-    protected $possible_sources = array('category', 'product', 'folder', 'content', 'module');
+    protected $possible_sources = array('category', 'product', 'folder', 'content', 'module', 'brand');
 
     /**
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
@@ -80,12 +80,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 Argument::createIntTypeArgument('folder'),
                 Argument::createIntTypeArgument('content'),
 
-                new Argument(
-                        'source',
-                        new TypeCollection(
-                                new EnumType($this->possible_sources)
-                        )
-                ),
+                Argument::createAnyTypeArgument('source'),
+
                 Argument::createIntTypeArgument('source_id'),
                 Argument::createBooleanTypeArgument('force_return', true)
         );
@@ -181,9 +177,11 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             // Check for product="id" folder="id", etc. style arguments
             foreach ($this->possible_sources as $source) {
 
-                $argValue = intval($this->getArgValue($source));
+                $argValue = $this->getArgValue($source);
 
-                if ($argValue > 0) {
+                if (! empty($argValue)) {
+
+                    $argValue = intval($argValue);
 
                     $search = $this->createSearchQuery($source, $argValue);
 

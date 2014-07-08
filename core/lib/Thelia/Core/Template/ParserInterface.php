@@ -36,21 +36,31 @@ interface ParserInterface
     public function setTemplateDefinition(TemplateDefinition $templateDefinition);
 
     /**
+     * Get template definition
+     *
+     * @param bool $webAssetTemplate Allow to load asset from another template
+     *                               If the name of the template if provided
+     *
+     * @return TemplateDefinition
+     */
+    public function getTemplateDefinition($webAssetTemplate = false);
+
+    /**
      * Add a template directory to the current template list
      *
-     * @param unknown $templateType the template type (
+     * @param int $templateType the template type (
      *
-     * @param string  $templateName      the template name
-     * @param string  $templateDirectory path to the template dirtectory
-     * @param unknown $key               ???
-     * @param string  $unshift           ??? Etienne ?
+     * @param string $templateName      the template name
+     * @param string $templateDirectory path to the template dirtectory
+     * @param string $key               ???
+     * @param bool   $unshift           ??? Etienne ?
      */
     public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false);
 
     /**
      * Return the registeted template directories for a givent template type
      *
-     * @param  unknown                   $templateType
+     * @param  int                       $templateType
      * @throws \InvalidArgumentException if the templateType is not defined
      * @return array:                    an array of defined templates directories for the given template type
      */

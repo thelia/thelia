@@ -13,6 +13,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
 class ProductModificationForm extends ProductCreationForm
@@ -33,6 +34,15 @@ class ProductModificationForm extends ProductCreationForm
                     "label"       => Translator::getInstance()->trans("Product template"),
                     "label_attr"  => array("for" => "product_template_field")
             ))
+            ->add("brand_id", "integer", [
+                'constraints' => [ new NotBlank() ],
+                'required'    => true,
+                'label'       => Translator::getInstance()->trans('Brand / Supplier'),
+                'label_attr'  => [
+                    'for' => 'mode',
+                    'help' => Translator::getInstance()->trans("Select the product brand, or supplier."),
+                ],
+            ])
         ;
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class

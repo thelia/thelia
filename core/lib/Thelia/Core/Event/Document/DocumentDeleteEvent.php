@@ -12,7 +12,7 @@
 
 namespace Thelia\Core\Event\Document;
 
-use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Model\CategoryDocument;
 use Thelia\Model\ContentDocument;
 use Thelia\Model\FolderDocument;
@@ -27,27 +27,21 @@ use Thelia\Model\ProductDocument;
  *
  * @package Document
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
+ * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
  */
-class DocumentDeleteEvent extends ActionEvent
+class DocumentDeleteEvent extends FileDeleteEvent
 {
-    /** @var string Document type */
-    protected $documentType = null;
-
-    /** @var CategoryDocument|ProductDocument|ContentDocument|FolderDocument Document about to be deleted */
-    protected $documentToDelete = null;
-
     /**
      * Constructor
      *
      * @param CategoryDocument|ProductDocument|ContentDocument|FolderDocument $documentToDelete Document about to be deleted
      * @param string                                                          $documentType     Document type
      *                                                                                          ex : FileManager::TYPE_CATEGORY
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
     public function __construct($documentToDelete, $documentType)
     {
-        $this->documentToDelete = $documentToDelete;
-        $this->documentType = $documentType;
+        parent::__construct($documentToDelete);
     }
 
     /**
@@ -56,11 +50,10 @@ class DocumentDeleteEvent extends ActionEvent
      * @param string $documentType Document type
      *
      * @return $this
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
     public function setDocumentType($documentType)
     {
-        $this->documentType = $documentType;
-
         return $this;
     }
 
@@ -68,10 +61,11 @@ class DocumentDeleteEvent extends ActionEvent
      * Get picture type
      *
      * @return string
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
     public function getDocumentType()
     {
-        return $this->documentType;
+        throw new \RuntimeException("getDocumentType() is deprecated and no longer supported");
     }
 
     /**
@@ -80,10 +74,11 @@ class DocumentDeleteEvent extends ActionEvent
      * @param CategoryDocument|ProductDocument|ContentDocument|FolderDocument $documentToDelete Document about to be deleted
      *
      * @return $this
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
     public function setDocumentToDelete($documentToDelete)
     {
-        $this->documentToDelete = $documentToDelete;
+        parent::setFileToDelete($documentToDelete);
 
         return $this;
     }
@@ -92,10 +87,11 @@ class DocumentDeleteEvent extends ActionEvent
      * Get Document about to be deleted
      *
      * @return CategoryDocument|ProductDocument|ContentDocument|FolderDocument
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
     public function getDocumentToDelete()
     {
-        return $this->documentToDelete;
+        return parent::getFileToDelete();
     }
 
 }

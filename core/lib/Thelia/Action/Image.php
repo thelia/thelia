@@ -12,23 +12,17 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
-use Thelia\Core\Event\Image\ImageDeleteEvent;
-use Thelia\Core\Event\Image\ImageEvent;
-use Thelia\Core\Event\UpdateFilePositionEvent;
-use Thelia\Model\ConfigQuery;
-use Thelia\Tools\FileManager;
-use Thelia\Tools\URL;
-
-use Imagine\Image\ImagineInterface;
-use Imagine\Image\ImageInterface;
 use Imagine\Image\Box;
 use Imagine\Image\Color;
+use Imagine\Image\ImageInterface;
+use Imagine\Image\ImagineInterface;
 use Imagine\Image\Point;
-use Thelia\Exception\ImageException;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Exception\ImageException;
+use Thelia\Model\ConfigQuery;
+use Thelia\Tools\URL;
 
 /**
  *
@@ -88,8 +82,10 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      *
      * This method updates the cache_file_path and file_url attributes of the event
      *
-     * @param  \Thelia\Core\Event\Image\ImageEvent $event
-     * @throws \InvalidArgumentException,          ImageException
+     * @param ImageEvent $event
+     *
+     * @throws \Thelia\Exception\ImageException
+     * @throws \InvalidArgumentException
      */
     public function processImage(ImageEvent $event)
     {
@@ -138,6 +134,11 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                 $image = $imagine->open($source_file);
 
                 if ($image) {
+
+                    // Allow image pre-processing (watermarging, or other stuff...)
+                    $event->setImageObject($image);
+                    $event->getDispatcher()->dispatch(TheliaEvents::IMAGE_PREPROCESSING, $event);
+                    $image = $event->getImageObject();
 
                     $background_color = $event->getBackgroundColor();
 
@@ -208,6 +209,11 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                     if (is_null($quality)) $quality = ConfigQuery::read('default_image_quality_percent', 75);
 
+                    // Allow image post-processing (watermarging, or other stuff...)
+                    $event->setImageObject($image);
+                    $event->getDispatcher()->dispatch(TheliaEvents::IMAGE_POSTPROCESSING, $event);
+                    $image = $event->getImageObject();
+
                     $image->save(
                             $cacheFilePath,
                             array('quality' => $quality)
@@ -230,83 +236,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
         $event->setFileUrl(URL::getInstance()->absoluteUrl($processed_image_url, null, URL::PATH_TO_FILE));
         $event->setOriginalFileUrl(URL::getInstance()->absoluteUrl($original_image_url, null, URL::PATH_TO_FILE));
-    }
-
-    /**
-     * Take care of saving image in the database and file storage
-     *
-     * @param \Thelia\Core\Event\Image\ImageCreateOrUpdateEvent $event Image event
-     *
-     * @throws \Thelia\Exception\ImageException
-     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
-     */
-    public function saveImage(ImageCreateOrUpdateEvent $event)
-    {
-        $fileManager = new FileManager();
-        $model = $event->getModelImage();
-
-        $nbModifiedLines = $model->save();
-        $event->setModelImage($model);
-
-        if (!$nbModifiedLines) {
-            throw new ImageException(
-                sprintf(
-                    'Image "%s" with parent id %s (%s) failed to be saved',
-                    $event->getParentName(),
-                    $event->getParentId(),
-                    $event->getImageType()
-                )
-            );
-        }
-
-        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile(), FileManager::FILE_TYPE_IMAGES);
-        $event->setUploadedFile($newUploadedFile);
-    }
-
-    /**
-     * Take care of updating image in the database and file storage
-     *
-     * @param ImageCreateOrUpdateEvent $event Image event
-     *
-     * @throws \Thelia\Exception\ImageException
-     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
-     */
-    public function updateImage(ImageCreateOrUpdateEvent $event)
-    {
-        $fileManager = new FileManager();
-        // Copy and save file
-        if ($event->getUploadedFile()) {
-            // Remove old picture file from file storage
-            $url = $fileManager->getUploadDir($event->getImageType(), FileManager::FILE_TYPE_IMAGES) . '/' . $event->getOldModelImage()->getFile();
-            unlink(str_replace('..', '', $url));
-
-            $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile(), FileManager::FILE_TYPE_IMAGES);
-            $event->setUploadedFile($newUploadedFile);
-        }
-
-        // Update image modifications
-        $event->getModelImage()->save();
-        $event->setModelImage($event->getModelImage());
-    }
-
-    public function updatePosition(UpdateFilePositionEvent $event)
-    {
-        $this->genericUpdatePosition($event->getQuery(), $event);
-    }
-
-    /**
-     * Take care of deleting image in the database and file storage
-     *
-     * @param ImageDeleteEvent $event Image event
-     *
-     * @throws \Exception
-     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
-     */
-    public function deleteImage(ImageDeleteEvent $event)
-    {
-        $fileManager = new FileManager();
-
-        $fileManager->deleteFile($event->getImageToDelete(), $event->getImageType(), FileManager::FILE_TYPE_IMAGES);
     }
 
     /**
@@ -428,10 +357,12 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::IMAGE_PROCESS => array("processImage", 128),
+
+            // Implemented in parent class BaseCachedFile
             TheliaEvents::IMAGE_CLEAR_CACHE => array("clearCache", 128),
-            TheliaEvents::IMAGE_DELETE => array("deleteImage", 128),
-            TheliaEvents::IMAGE_SAVE => array("saveImage", 128),
-            TheliaEvents::IMAGE_UPDATE => array("updateImage", 128),
+            TheliaEvents::IMAGE_DELETE => array("deleteFile", 128),
+            TheliaEvents::IMAGE_SAVE => array("saveFile", 128),
+            TheliaEvents::IMAGE_UPDATE => array("updateFile", 128),
             TheliaEvents::IMAGE_UPDATE_POSITION => array("updatePosition", 128),
         );
     }

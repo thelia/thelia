@@ -64,6 +64,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 )
             ),
             Argument::createIntListTypeArgument('category'),
+            Argument::createIntListTypeArgument('brand'),
             Argument::createIntListTypeArgument('category_default'),
             Argument::createBooleanTypeArgument('new'),
             Argument::createBooleanTypeArgument('promo'),
@@ -327,6 +328,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->filterById($this->request->get("product_id"), Criteria::NOT_IN);
         }
 
+        $brand_id = $this->getBrand();
+
+        if ($brand_id !== null) {
+            $search->filterByBrandId($brand_id, Criteria::IN);
+        }
+
         $current_category = $this->getCurrent_category();
 
         if ($current_category === true) {
@@ -460,6 +467,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         /** @var \Thelia\Core\Security\SecurityContext $securityContext */
         $securityContext = $this->container->get('thelia.securityContext');
 
+        /** @var \Thelia\Model\Product $product */
         foreach ($loopResult->getResultDataCollection() as $product) {
 
             $loopResultRow = new LoopResultRow($product);
@@ -510,7 +518,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("TAXED_PROMO_PRICE"       , $taxedPromoPrice)
                 ->set("IS_PROMO"                , $product->getVirtualColumn('is_promo'))
                 ->set("IS_NEW"                  , $product->getVirtualColumn('is_new'))
-
             ;
 
 
@@ -989,6 +996,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         return $loopResult;
     }
 
+    /**
+     * @param $loopResultRow
+     * @param  \Thelia\Model\Product $product
+     * @param $default_category_id
+     * @return mixed
+     */
     private function associateValues($loopResultRow, $product, $default_category_id)
     {
         $loopResultRow
@@ -1010,7 +1023,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->set("TEMPLATE"                , $product->getTemplateId())
             ->set("DEFAULT_CATEGORY"        , $default_category_id)
             ->set("TAX_RULE_ID"             , $product->getTaxRuleId())
-
+            ->set("BRAND_ID"                , $product->getBrandId() ?: 0)
         ;
 
 

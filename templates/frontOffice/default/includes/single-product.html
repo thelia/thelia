@@ -6,13 +6,11 @@
 	{/if}
     <article itemscope itemtype="http://schema.org/Product">
         <!-- Use the meta tag to specify content that is not visible on the page in any way -->
-        {loop name="brand.feature" type="feature" product=$product_id title="brand"}
-        {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
+        {loop name="brand" type="brand" product=$product_id }
             <meta itemprop="brand" content="{$TITLE}">
         {/loop}
-        {/loop}
-        {loop name="brand.feature" type="feature" product=$product_id title="isbn"}
-        {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
+        {loop name="isbn.feature" type="feature" product=$product_id title="isbn"}
+        {loop name="isbn.value" type="feature_value" feature=$ID product=$product_id}
             <meta itemprop="productID" content="isbn:{$TITLE}">
         {/loop}
         {/loop}

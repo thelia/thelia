@@ -23,7 +23,7 @@ CREATE TABLE `category`
     PRIMARY KEY (`id`),
     INDEX `idx_parent` (`parent`),
     INDEX `idx_parent_position` (`parent`, `position`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- product
@@ -39,6 +39,7 @@ CREATE TABLE `product`
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER DEFAULT 0 NOT NULL,
     `template_id` INTEGER,
+    `brand_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -48,6 +49,7 @@ CREATE TABLE `product`
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_product_tax_rule_id` (`tax_rule_id`),
     INDEX `fk_product_template_id` (`template_id`),
+    INDEX `fk_product_brand1_idx` (`brand_id`),
     CONSTRAINT `fk_product_tax_rule_id`
         FOREIGN KEY (`tax_rule_id`)
         REFERENCES `tax_rule` (`id`)
@@ -56,7 +58,13 @@ CREATE TABLE `product`
     CONSTRAINT `fk_product_template`
         FOREIGN KEY (`template_id`)
         REFERENCES `template` (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_product_brand`
+        FOREIGN KEY (`brand_id`)
+        REFERENCES `brand` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- product_category
@@ -85,7 +93,7 @@ CREATE TABLE `product_category`
         REFERENCES `category` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- country
@@ -112,7 +120,7 @@ CREATE TABLE `country`
         REFERENCES `area` (`id`)
         ON UPDATE RESTRICT
         ON DELETE SET NULL
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- tax
@@ -128,7 +136,7 @@ CREATE TABLE `tax`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- tax_rule
@@ -143,7 +151,7 @@ CREATE TABLE `tax_rule`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- tax_rule_country
@@ -179,7 +187,7 @@ CREATE TABLE `tax_rule_country`
         REFERENCES `country` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- feature
@@ -195,7 +203,7 @@ CREATE TABLE `feature`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- feature_av
@@ -217,7 +225,7 @@ CREATE TABLE `feature_av`
         REFERENCES `feature` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- feature_product
@@ -255,7 +263,7 @@ CREATE TABLE `feature_product`
         REFERENCES `feature_av` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- feature_template
@@ -283,7 +291,7 @@ CREATE TABLE `feature_template`
     CONSTRAINT `fk_feature_template`
         FOREIGN KEY (`template_id`)
         REFERENCES `template` (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- attribute
@@ -298,7 +306,7 @@ CREATE TABLE `attribute`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- attribute_av
@@ -320,7 +328,7 @@ CREATE TABLE `attribute_av`
         REFERENCES `attribute` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- attribute_combination
@@ -354,7 +362,7 @@ CREATE TABLE `attribute_combination`
         REFERENCES `product_sale_elements` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- product_sale_elements
@@ -384,7 +392,7 @@ CREATE TABLE `product_sale_elements`
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- attribute_template
@@ -411,7 +419,7 @@ CREATE TABLE `attribute_template`
     CONSTRAINT `fk_attribute_template`
         FOREIGN KEY (`template_id`)
         REFERENCES `template` (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- config
@@ -430,7 +438,7 @@ CREATE TABLE `config`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `name_UNIQUE` (`name`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- customer
@@ -464,7 +472,7 @@ CREATE TABLE `customer`
         REFERENCES `customer_title` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- address
@@ -511,7 +519,7 @@ CREATE TABLE `address`
         REFERENCES `country` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- customer_title
@@ -527,7 +535,7 @@ CREATE TABLE `customer_title`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- lang
@@ -554,7 +562,7 @@ CREATE TABLE `lang`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_lang_by_default` (`by_default`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- folder
@@ -574,7 +582,7 @@ CREATE TABLE `folder`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- content
@@ -593,7 +601,7 @@ CREATE TABLE `content`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- product_image
@@ -617,7 +625,7 @@ CREATE TABLE `product_image`
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- product_document
@@ -640,7 +648,7 @@ CREATE TABLE `product_document`
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- order
@@ -722,7 +730,7 @@ CREATE TABLE `order`
         REFERENCES `lang` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- currency
@@ -743,7 +751,7 @@ CREATE TABLE `currency`
     PRIMARY KEY (`id`),
     INDEX `idx_currency_by_default` (`by_default`),
     INDEX `idx_currency_code` (`code`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- order_address
@@ -768,7 +776,7 @@ CREATE TABLE `order_address`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- order_product
@@ -805,7 +813,7 @@ CREATE TABLE `order_product`
         REFERENCES `order` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- order_status
@@ -821,7 +829,7 @@ CREATE TABLE `order_status`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `code_UNIQUE` (`code`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- order_product_attribute_combination
@@ -850,7 +858,7 @@ CREATE TABLE `order_product_attribute_combination`
         REFERENCES `order_product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- module
@@ -871,7 +879,7 @@ CREATE TABLE `module`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `code_UNIQUE` (`code`),
     INDEX `idx_module_activate` (`activate`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- accessory
@@ -900,7 +908,7 @@ CREATE TABLE `accessory`
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- area
@@ -916,7 +924,7 @@ CREATE TABLE `area`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- area_delivery_module
@@ -945,7 +953,7 @@ CREATE TABLE `area_delivery_module`
         REFERENCES `module` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- profile
@@ -961,7 +969,7 @@ CREATE TABLE `profile`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `code_UNIQUE` (`code`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- resource
@@ -977,7 +985,7 @@ CREATE TABLE `resource`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `code_UNIQUE` (`code`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- admin
@@ -1008,7 +1016,7 @@ CREATE TABLE `admin`
         REFERENCES `profile` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- profile_resource
@@ -1036,7 +1044,7 @@ CREATE TABLE `profile_resource`
         REFERENCES `resource` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- profile_module
@@ -1064,7 +1072,7 @@ CREATE TABLE `profile_module`
         REFERENCES `module` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- message
@@ -1088,7 +1096,7 @@ CREATE TABLE `message`
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
     UNIQUE INDEX `name_UNIQUE` (`name`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- coupon
@@ -1114,6 +1122,8 @@ CREATE TABLE `coupon`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
     UNIQUE INDEX `code_UNIQUE` (`code`),
     INDEX `idx_is_enabled` (`is_enabled`),
@@ -1124,7 +1134,7 @@ CREATE TABLE `coupon`
     INDEX `idx_is_removing_postage` (`is_removing_postage`),
     INDEX `idx_max_usage` (`max_usage`),
     INDEX `idx_is_available_on_special_offers` (`is_available_on_special_offers`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- admin_log
@@ -1145,7 +1155,7 @@ CREATE TABLE `admin_log`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- content_folder
@@ -1174,7 +1184,7 @@ CREATE TABLE `content_folder`
         REFERENCES `folder` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- cart
@@ -1219,7 +1229,7 @@ CREATE TABLE `cart`
         REFERENCES `currency` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- cart_item
@@ -1259,7 +1269,7 @@ CREATE TABLE `cart_item`
         REFERENCES `product_sale_elements` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- product_price
@@ -1287,7 +1297,7 @@ CREATE TABLE `product_price`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- category_image
@@ -1311,7 +1321,7 @@ CREATE TABLE `category_image`
         REFERENCES `category` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- folder_image
@@ -1335,7 +1345,7 @@ CREATE TABLE `folder_image`
         REFERENCES `folder` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- content_image
@@ -1359,7 +1369,7 @@ CREATE TABLE `content_image`
         REFERENCES `content` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- category_document
@@ -1382,7 +1392,7 @@ CREATE TABLE `category_document`
         REFERENCES `category` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- content_document
@@ -1405,7 +1415,7 @@ CREATE TABLE `content_document`
         REFERENCES `content` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- folder_document
@@ -1428,7 +1438,7 @@ CREATE TABLE `folder_document`
         REFERENCES `folder` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- product_associated_content
@@ -1457,7 +1467,7 @@ CREATE TABLE `product_associated_content`
         REFERENCES `content` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- category_associated_content
@@ -1486,7 +1496,7 @@ CREATE TABLE `category_associated_content`
         REFERENCES `content` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- rewriting_url
@@ -1512,7 +1522,7 @@ CREATE TABLE `rewriting_url`
         REFERENCES `rewriting_url` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- rewriting_argument
@@ -1534,7 +1544,7 @@ CREATE TABLE `rewriting_argument`
         REFERENCES `rewriting_url` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- template
@@ -1548,7 +1558,7 @@ CREATE TABLE `template`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- module_image
@@ -1572,7 +1582,7 @@ CREATE TABLE `module_image`
         REFERENCES `module` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- order_product_tax
@@ -1597,7 +1607,7 @@ CREATE TABLE `order_product_tax`
         REFERENCES `order_product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- newsletter
@@ -1616,7 +1626,7 @@ CREATE TABLE `newsletter`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `email_UNIQUE` (`email`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- order_coupon
@@ -1649,7 +1659,7 @@ CREATE TABLE `order_coupon`
         REFERENCES `order` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- coupon_country
@@ -1671,7 +1681,7 @@ CREATE TABLE `coupon_country`
         FOREIGN KEY (`coupon_id`)
         REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- coupon_module
@@ -1693,7 +1703,7 @@ CREATE TABLE `coupon_module`
         FOREIGN KEY (`module_id`)
         REFERENCES `module` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- order_coupon_country
@@ -1714,7 +1724,7 @@ CREATE TABLE `order_coupon_country`
     CONSTRAINT `fk_order_coupon_country_coupon_id`
         FOREIGN KEY (`coupon_id`)
         REFERENCES `order_coupon` (`id`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- order_coupon_module
@@ -1736,7 +1746,7 @@ CREATE TABLE `order_coupon_module`
         FOREIGN KEY (`module_id`)
         REFERENCES `module` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- coupon_customer_count
@@ -1754,12 +1764,83 @@ CREATE TABLE `coupon_customer_count`
     CONSTRAINT `fk_coupon_customer_customer_id`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
         ON DELETE CASCADE,
     CONSTRAINT `fk_coupon_customer_coupon_id`
         FOREIGN KEY (`coupon_id`)
         REFERENCES `coupon` (`id`)
+        ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand`;
+
+CREATE TABLE `brand`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `visible` TINYINT,
+    `position` INTEGER,
+    `logo_image_id` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `fk_brand_brand_image_idx` (`logo_image_id`),
+    CONSTRAINT `fk_logo_image_id_brand_image`
+        FOREIGN KEY (`logo_image_id`)
+        REFERENCES `brand_image` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_document
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_document`;
+
+CREATE TABLE `brand_document`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `brand_id` INTEGER NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_brand_document_brand_id` (`brand_id`),
+    CONSTRAINT `fk_brand_document_brand_id`
+        FOREIGN KEY (`brand_id`)
+        REFERENCES `brand` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_image
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_image`;
+
+CREATE TABLE `brand_image`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `brand_id` INTEGER NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_brand_image_brand_id` (`brand_id`),
+    CONSTRAINT `fk_brand_image_brand_id`
+        FOREIGN KEY (`brand_id`)
+        REFERENCES `brand` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- category_i18n
@@ -1783,7 +1864,7 @@ CREATE TABLE `category_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `category` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- product_i18n
@@ -1807,7 +1888,7 @@ CREATE TABLE `product_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `product` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- country_i18n
@@ -1828,7 +1909,7 @@ CREATE TABLE `country_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `country` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- tax_i18n
@@ -1847,7 +1928,7 @@ CREATE TABLE `tax_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `tax` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- tax_rule_i18n
@@ -1866,7 +1947,7 @@ CREATE TABLE `tax_rule_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `tax_rule` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- feature_i18n
@@ -1887,7 +1968,7 @@ CREATE TABLE `feature_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `feature` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- feature_av_i18n
@@ -1908,7 +1989,7 @@ CREATE TABLE `feature_av_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `feature_av` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- attribute_i18n
@@ -1929,7 +2010,7 @@ CREATE TABLE `attribute_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `attribute` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- attribute_av_i18n
@@ -1950,7 +2031,7 @@ CREATE TABLE `attribute_av_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `attribute_av` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- config_i18n
@@ -1971,7 +2052,7 @@ CREATE TABLE `config_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `config` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- customer_title_i18n
@@ -1990,7 +2071,7 @@ CREATE TABLE `customer_title_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `customer_title` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- folder_i18n
@@ -2014,7 +2095,7 @@ CREATE TABLE `folder_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `folder` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- content_i18n
@@ -2038,7 +2119,7 @@ CREATE TABLE `content_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `content` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- product_image_i18n
@@ -2059,7 +2140,7 @@ CREATE TABLE `product_image_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `product_image` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- product_document_i18n
@@ -2080,7 +2161,7 @@ CREATE TABLE `product_document_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `product_document` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- currency_i18n
@@ -2098,7 +2179,7 @@ CREATE TABLE `currency_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `currency` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- order_status_i18n
@@ -2119,7 +2200,7 @@ CREATE TABLE `order_status_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `order_status` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- module_i18n
@@ -2140,7 +2221,7 @@ CREATE TABLE `module_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `module` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- profile_i18n
@@ -2161,7 +2242,7 @@ CREATE TABLE `profile_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `profile` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- resource_i18n
@@ -2182,7 +2263,7 @@ CREATE TABLE `resource_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `resource` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- message_i18n
@@ -2203,7 +2284,7 @@ CREATE TABLE `message_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `message` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- coupon_i18n
@@ -2223,7 +2304,7 @@ CREATE TABLE `coupon_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- category_image_i18n
@@ -2244,7 +2325,7 @@ CREATE TABLE `category_image_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `category_image` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- folder_image_i18n
@@ -2265,7 +2346,7 @@ CREATE TABLE `folder_image_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `folder_image` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- content_image_i18n
@@ -2286,7 +2367,7 @@ CREATE TABLE `content_image_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `content_image` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- category_document_i18n
@@ -2307,7 +2388,7 @@ CREATE TABLE `category_document_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `category_document` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- content_document_i18n
@@ -2328,7 +2409,7 @@ CREATE TABLE `content_document_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `content_document` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- folder_document_i18n
@@ -2349,7 +2430,7 @@ CREATE TABLE `folder_document_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `folder_document` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- template_i18n
@@ -2367,7 +2448,7 @@ CREATE TABLE `template_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `template` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- module_image_i18n
@@ -2388,7 +2469,73 @@ CREATE TABLE `module_image_i18n`
         FOREIGN KEY (`id`)
         REFERENCES `module_image` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_i18n`;
+
+CREATE TABLE `brand_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    `meta_title` VARCHAR(255),
+    `meta_description` TEXT,
+    `meta_keywords` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `brand_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `brand` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_document_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_document_i18n`;
+
+CREATE TABLE `brand_document_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `brand_document_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `brand_document` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- brand_image_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_image_i18n`;
+
+CREATE TABLE `brand_image_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `brand_image_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `brand_image` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- category_version
@@ -2412,7 +2559,7 @@ CREATE TABLE `category_version`
         FOREIGN KEY (`id`)
         REFERENCES `category` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- product_version
@@ -2428,6 +2575,7 @@ CREATE TABLE `product_version`
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER DEFAULT 0 NOT NULL,
     `template_id` INTEGER,
+    `brand_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
@@ -2438,7 +2586,7 @@ CREATE TABLE `product_version`
         FOREIGN KEY (`id`)
         REFERENCES `product` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- folder_version
@@ -2462,7 +2610,7 @@ CREATE TABLE `folder_version`
         FOREIGN KEY (`id`)
         REFERENCES `folder` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- content_version
@@ -2485,7 +2633,7 @@ CREATE TABLE `content_version`
         FOREIGN KEY (`id`)
         REFERENCES `content` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- order_version
@@ -2522,7 +2670,7 @@ CREATE TABLE `order_version`
         FOREIGN KEY (`id`)
         REFERENCES `order` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- message_version
@@ -2549,7 +2697,7 @@ CREATE TABLE `message_version`
         FOREIGN KEY (`id`)
         REFERENCES `message` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- coupon_version
@@ -2575,12 +2723,14 @@ CREATE TABLE `coupon_version`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`,`version`),
     CONSTRAINT `coupon_version_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
+) ENGINE=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

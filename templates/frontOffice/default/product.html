@@ -36,13 +36,12 @@
         <article id="product" class="col-main" role="main" itemscope itemtype="http://schema.org/Product">
 
             <!-- Use the meta tag to specify content that is not visible on the page in any way -->
-            {loop name="brand.feature" type="feature" product="{$ID}" title="brand"}
-                {loop name="brand.value" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
-                    <meta itemprop="brand" content="{$TITLE}">
-                {/loop}
+            {loop name="brand.feature" type="brand" product="{$ID}"}
+                <meta itemprop="brand" content="{$TITLE}">
             {/loop}
-            {loop name="brand.feature" type="feature" product="{$ID}" title="isbn"}
-                {loop name="brand.value" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
+
+            {loop name="isbn.feature" type="feature" product="{$ID}" title="isbn"}
+                {loop name="isbn.value" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
                     <meta itemprop="productID" content="isbn:{$TITLE}">
                 {/loop}
             {/loop}
@@ -101,6 +100,10 @@
                 <div class="product-info">
                     <h1 class="name"><span itemprop="name">{$TITLE}</span></h1>
                     {if $REF}<span itemprop="sku" class="sku">{intl l='Ref.'}: {$REF}</span>{/if}
+
+                    {loop name="brand_info" type="brand" product="{$ID}"}
+                        <p><a href="{$URL}" title="{intl l="More information about this brand"}"><span itemprop="brand">{$TITLE}</span></a></p>
+                    {/loop}
 
                     {if $POSTSCRIPTUM}<div class="short-description">
                         <p>{$POSTSCRIPTUM}</p>
@@ -211,30 +214,59 @@
             </section>
 
             {strip}
-            {capture "additional"}
-                {ifloop rel="feature_info"}
+                {capture "additional"}
+                    {ifloop rel="feature_info"}
 
                         <ul>
                             {loop name="feature_info" type="feature" product="{$ID}"}
-                                {ifloop rel="feature_value_info"}
+                            {ifloop rel="feature_value_info"}
                                 <li>
                                     <strong>{$TITLE}</strong> :
                                     {loop name="feature_value_info" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
                                     {$TITLE}
                                     {/loop}
                                 </li>
-                                {/ifloop}
+                            {/ifloop}
                             {/loop}
                         </ul>
 
-                {/ifloop}
-            {/capture}
+                    {/ifloop}
+                {/capture}
+            {/strip}
+
+            {strip}
+                {capture "brand_info"}
+                    {loop name="brand_info" type="brand" product="{$ID}"}
+                        <p><strong><a href="{$URL}">{$TITLE}</a></strong></p>
+
+                        {loop name="brand.image" type="image" source="brand" id={$LOGO_IMAGE_ID} width=218 height=146 resize_mode="borders"}
+                            <p><a href="{$URL}"><img itemprop="image" src="{$IMAGE_URL}" alt="{$TITLE}"></a></p>
+                        {/loop}
+
+                        {if $CHAPO}
+                            <div class="chapo">
+                                {$CHAPO}
+                            </div>
+                        {/if}
+                        {if $DESCRIPTION}
+                            <div class="description">
+                                {$DESCRIPTION nofilter}
+                            </div>
+                        {/if}
+                        {if $POSTSCRIPTUM}
+                            <small class="postscriptum">
+                                {$POSTSCRIPTUM}
+                            </small>
+                        {/if}
+                    {/loop}
+                {/capture}
             {/strip}
 
             <section id="product-tabs">
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
                     {if $smarty.capture.additional ne ""}<li role="presentation"><a id="tab2" href="#additional" data-toggle="tab" role="tab">{intl l="Additional Info"}</a></li>{/if}
+                    {if $smarty.capture.brand_info ne ""}<li role="presentation"><a id="tab3" href="#brand_info" data-toggle="tab" role="tab">{intl l="Brand information"}</a></li>{/if}
 
                 </ul>
                 <div class="tab-content">
@@ -242,9 +274,14 @@
                         <p>{$DESCRIPTION|default:'N/A' nofilter}</p>
                     </div>
                     {if $smarty.capture.additional ne ""}
-                    <div class="tab-pane" id="additional" role="tabpanel" aria-labelledby="tab2">
-                        {$smarty.capture.additional nofilter}
-                    </div>
+                        <div class="tab-pane" id="additional" role="tabpanel" aria-labelledby="tab2">
+                            {$smarty.capture.additional nofilter}
+                        </div>
+                    {/if}
+                    {if $smarty.capture.brand_info ne ""}
+                        <div class="tab-pane" id="brand_info" role="tabpanel" aria-labelledby="tab3">
+                            {$smarty.capture.brand_info nofilter}
+                        </div>
                     {/if}
                 </div>
             </section>

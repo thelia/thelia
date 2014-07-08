@@ -1,5 +1,8 @@
 #2.0.3
 - New coupon type: Free product if selected products are in the cart.
+- New feature: Product Brands / Suppliers management
+- New 'brand' loop and substitution. product, image and document loop have been updated.
+- Images and document processing have been refactored.
 
 #2.0.2
 - Coupon UI has been redesigned.

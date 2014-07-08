@@ -145,13 +145,13 @@ class AdminUtilities extends AbstractSmartyPlugin
     /**
      * Define the various smarty plugins handled by this class
      *
-     * @return an array of smarty plugin descriptors
+     * @return array of smarty plugin descriptors
      */
     public function getPluginDescriptors()
     {
         return array(
-                new SmartyPluginDescriptor('function', 'admin_sortable_header', $this, 'generateSortableColumnHeader'),
-                new SmartyPluginDescriptor('function', 'admin_position_block' , $this, 'generatePositionChangeBlock'),
+            new SmartyPluginDescriptor('function', 'admin_sortable_header'  , $this, 'generateSortableColumnHeader'),
+            new SmartyPluginDescriptor('function', 'admin_position_block'   , $this, 'generatePositionChangeBlock'),
         );
     }
 }
