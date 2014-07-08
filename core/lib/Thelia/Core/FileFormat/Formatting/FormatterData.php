@@ -11,16 +11,17 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Formatting;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Propel\Runtime\ActiveQuery\ModelJoin;
 use Propel\Runtime\Map\TableMap;
 use Thelia\Core\Translation\Translator;
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 =======
 use Thelia\Model\Map\ProductTableMap;
 >>>>>>> Remove conflicts
+=======
+>>>>>>> Restore
 /**
  * Class FormatterData
  * @package Thelia\Core\FileFormat\Formatting
