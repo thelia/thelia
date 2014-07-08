@@ -16,7 +16,11 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\ModelJoin;
 use Propel\Runtime\Map\TableMap;
 use Thelia\Core\Translation\Translator;
+<<<<<<< HEAD
 
+=======
+use Thelia\Model\Map\ProductTableMap;
+>>>>>>> Remove conflicts
 /**
  * Class FormatterData
  * @package Thelia\Core\FileFormat\Formatting
@@ -25,7 +29,11 @@ use Thelia\Core\Translation\Translator;
 class FormatterData
 {
     /** @var array */
+<<<<<<< HEAD
     protected $data;
+=======
+    protected $data = array();
+>>>>>>> Remove conflicts
 
     /** @var  null|array */
     protected $aliases;
@@ -72,6 +80,10 @@ class FormatterData
      * @return $this
      *
      * Sets raw data with aliases
+<<<<<<< HEAD
+=======
+     * may bug with some formatter
+>>>>>>> Remove conflicts
      */
     public function setData(array $data)
     {
@@ -158,8 +170,80 @@ class FormatterData
         return $formattedData;
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * @param array $row
+     * @return $this
+     */
+    public function addRow(array $row)
+    {
+        $this->data += [$this->applyAliases($row, $this->aliases)];
+
+        return $this;
+    }
+
+    /**
+     * @param int $index
+     * @return array|bool
+     */
+    public function popRow($index = 0)
+    {
+        $row = $this->getRow($index);
+
+        if (false !== $row) {
+            unset($this->data[$index]);
+        }
+
+        return $row;
+    }
+
+    /**
+     * @param int $index
+     * @return array|bool
+     * @throws \OutOfBoundsException
+     */
+    public function getRow($index = 0)
+    {
+        if (empty($this->data)) {
+            return false;
+        } elseif (!isset($this->data[$index])) {
+            throw new \OutOfBoundsException(
+                $this->translator->trans(
+                    "Bad index value %idx",
+                    [
+                        "%idx" => $index
+                    ]
+                )
+            );
+        }
+
+        $row = $this->reverseAliases($this->data[$index], $this->aliases);
+
+        return $row;
+    }
+
+    /**
+     * @param array $data
+     * @param array $aliases
+     * @return array
+     */
+    protected function reverseAliases(array $data, array $aliases)
+    {
+        return $this->applyAliases($data, array_flip($aliases));
+    }
+
+>>>>>>> Remove conflicts
     public function getData()
     {
         return $this->data;
     }
+<<<<<<< HEAD
+=======
+
+    public function getDataReverseAliases()
+    {
+        return $this->reverseAliases($this->data, $this->aliases);
+    }
+>>>>>>> Remove conflicts
 }

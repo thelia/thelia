@@ -359,4 +359,109 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedData,$formattedData);
     }
 
+<<<<<<< HEAD
+=======
+    public function testSetRawDataMultipleDepthWithReverseAliases() {
+        $aliases = [
+            "orange" => "foo",
+            "blackberry" => "banana",
+        ];
+
+        $formatterData = new FormatterData($aliases);
+
+        $data = [
+            "orange" => "banana",
+            "apple" => "pear",
+            [
+                "orange" => "tomato",
+                "pepper" => "pear",
+            ],
+            [
+                [
+                    "strawberry" => "raspberry",
+                    "blackberry" => "cranberry",
+                ],
+                [
+                    "cherry" => "lemon",
+                    "mango" => "cranberry",
+                ]
+            ],
+        ];
+
+        $formattedData = $formatterData
+            ->setData($data)
+            ->getDataReverseAliases()
+        ;
+
+        $this->assertEquals($data,$formattedData);
+    }
+
+    /**
+     * That's why an alias MUST not be the same as a present value
+     */
+    public function testSetRawDataMultipleDepthWithReverseAliasesFail() {
+        $aliases = [
+            "orange" => "cherry",
+            "blackberry" => "banana",
+        ];
+
+        $formatterData = new FormatterData($aliases);
+
+        $data = [
+            "orange" => "banana",
+            "apple" => "pear",
+            [
+                "orange" => "tomato",
+                "pepper" => "pear",
+            ],
+            [
+                [
+                    "strawberry" => "raspberry",
+                    "blackberry" => "cranberry",
+                ],
+                [
+                    "cherry" => "lemon",
+                    "mango" => "cranberry",
+                ]
+            ],
+        ];
+
+        $formattedData = $formatterData
+            ->setData($data)
+            ->getDataReverseAliases()
+        ;
+
+        $this->assertNotEquals($data,$formattedData);
+    }
+
+    public function testAddRow()
+    {
+        $data = new FormatterData();
+
+        $row = [
+            "title" => "A super book",
+            "author" => "Manu",
+        ];
+
+        $data->addRow($row);
+
+        $this->assertEquals([$row], $data->getData());
+        $this->assertEquals($row, $data->getRow());
+    }
+
+    public function testPopRow()
+    {
+        $data = new FormatterData();
+
+        $row = [
+            "title" => "A super book",
+            "author" => "Manu",
+        ];
+
+        $data->addRow($row);
+
+        $this->assertEquals($row, $data->popRow());
+        $this->assertFalse($data->getRow());
+    }
+>>>>>>> Remove conflicts
 }
