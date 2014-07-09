@@ -25,10 +25,14 @@ use Thelia\Model\Map\ImportExportTypeTableMap;
  * @method     ChildImportExportTypeQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildImportExportTypeQuery orderByUrlAction($order = Criteria::ASC) Order by the url_action column
  * @method     ChildImportExportTypeQuery orderByImportExportCategoryId($order = Criteria::ASC) Order by the import_export_category_id column
+ * @method     ChildImportExportTypeQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildImportExportTypeQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildImportExportTypeQuery groupById() Group by the id column
  * @method     ChildImportExportTypeQuery groupByUrlAction() Group by the url_action column
  * @method     ChildImportExportTypeQuery groupByImportExportCategoryId() Group by the import_export_category_id column
+ * @method     ChildImportExportTypeQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildImportExportTypeQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method     ChildImportExportTypeQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildImportExportTypeQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -48,10 +52,14 @@ use Thelia\Model\Map\ImportExportTypeTableMap;
  * @method     ChildImportExportType findOneById(int $id) Return the first ChildImportExportType filtered by the id column
  * @method     ChildImportExportType findOneByUrlAction(string $url_action) Return the first ChildImportExportType filtered by the url_action column
  * @method     ChildImportExportType findOneByImportExportCategoryId(int $import_export_category_id) Return the first ChildImportExportType filtered by the import_export_category_id column
+ * @method     ChildImportExportType findOneByCreatedAt(string $created_at) Return the first ChildImportExportType filtered by the created_at column
+ * @method     ChildImportExportType findOneByUpdatedAt(string $updated_at) Return the first ChildImportExportType filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildImportExportType objects filtered by the id column
  * @method     array findByUrlAction(string $url_action) Return ChildImportExportType objects filtered by the url_action column
  * @method     array findByImportExportCategoryId(int $import_export_category_id) Return ChildImportExportType objects filtered by the import_export_category_id column
+ * @method     array findByCreatedAt(string $created_at) Return ChildImportExportType objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildImportExportType objects filtered by the updated_at column
  *
  */
 abstract class ImportExportTypeQuery extends ModelCriteria
@@ -140,7 +148,7 @@ abstract class ImportExportTypeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `URL_ACTION`, `IMPORT_EXPORT_CATEGORY_ID` FROM `import_export_type` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `URL_ACTION`, `IMPORT_EXPORT_CATEGORY_ID`, `CREATED_AT`, `UPDATED_AT` FROM `import_export_type` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -340,6 +348,92 @@ abstract class ImportExportTypeQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ImportExportTypeTableMap::IMPORT_EXPORT_CATEGORY_ID, $importExportCategoryId, $comparison);
+    }
+
+    /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildImportExportTypeQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(ImportExportTypeTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(ImportExportTypeTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ImportExportTypeTableMap::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildImportExportTypeQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(ImportExportTypeTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(ImportExportTypeTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ImportExportTypeTableMap::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -636,6 +730,72 @@ abstract class ImportExportTypeQuery extends ModelCriteria
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'ImportExportTypeI18n', '\Thelia\Model\ImportExportTypeI18nQuery');
+    }
+
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     ChildImportExportTypeQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ImportExportTypeTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     ChildImportExportTypeQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ImportExportTypeTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     ChildImportExportTypeQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ImportExportTypeTableMap::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     ChildImportExportTypeQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ImportExportTypeTableMap::UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     ChildImportExportTypeQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ImportExportTypeTableMap::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     ChildImportExportTypeQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ImportExportTypeTableMap::CREATED_AT);
     }
 
 } // ImportExportTypeQuery

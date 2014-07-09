@@ -1899,6 +1899,8 @@ CREATE TABLE `import_export_type`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `url_action` VARCHAR(255) NOT NULL,
     `import_export_category_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_import_export_type_import_export_category_id` (`import_export_category_id`),
     CONSTRAINT `fk_import_export_type_import_export_category_id`

@@ -1536,5 +1536,6 @@
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description" />
     </behavior>
+    <behavior name="timestampable" />
   </table>
 </database>

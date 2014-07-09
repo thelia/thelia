@@ -58,7 +58,7 @@ class ImportExportTypeTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class ImportExportTypeTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the ID field
@@ -84,6 +84,16 @@ class ImportExportTypeTableMap extends TableMap
      * the column name for the IMPORT_EXPORT_CATEGORY_ID field
      */
     const IMPORT_EXPORT_CATEGORY_ID = 'import_export_type.IMPORT_EXPORT_CATEGORY_ID';
+
+    /**
+     * the column name for the CREATED_AT field
+     */
+    const CREATED_AT = 'import_export_type.CREATED_AT';
+
+    /**
+     * the column name for the UPDATED_AT field
+     */
+    const UPDATED_AT = 'import_export_type.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -106,12 +116,12 @@ class ImportExportTypeTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'UrlAction', 'ImportExportCategoryId', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'urlAction', 'importExportCategoryId', ),
-        self::TYPE_COLNAME       => array(ImportExportTypeTableMap::ID, ImportExportTypeTableMap::URL_ACTION, ImportExportTypeTableMap::IMPORT_EXPORT_CATEGORY_ID, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'URL_ACTION', 'IMPORT_EXPORT_CATEGORY_ID', ),
-        self::TYPE_FIELDNAME     => array('id', 'url_action', 'import_export_category_id', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id', 'UrlAction', 'ImportExportCategoryId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'urlAction', 'importExportCategoryId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ImportExportTypeTableMap::ID, ImportExportTypeTableMap::URL_ACTION, ImportExportTypeTableMap::IMPORT_EXPORT_CATEGORY_ID, ImportExportTypeTableMap::CREATED_AT, ImportExportTypeTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'URL_ACTION', 'IMPORT_EXPORT_CATEGORY_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'url_action', 'import_export_category_id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -121,12 +131,12 @@ class ImportExportTypeTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'UrlAction' => 1, 'ImportExportCategoryId' => 2, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'urlAction' => 1, 'importExportCategoryId' => 2, ),
-        self::TYPE_COLNAME       => array(ImportExportTypeTableMap::ID => 0, ImportExportTypeTableMap::URL_ACTION => 1, ImportExportTypeTableMap::IMPORT_EXPORT_CATEGORY_ID => 2, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'URL_ACTION' => 1, 'IMPORT_EXPORT_CATEGORY_ID' => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'url_action' => 1, 'import_export_category_id' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'UrlAction' => 1, 'ImportExportCategoryId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'urlAction' => 1, 'importExportCategoryId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(ImportExportTypeTableMap::ID => 0, ImportExportTypeTableMap::URL_ACTION => 1, ImportExportTypeTableMap::IMPORT_EXPORT_CATEGORY_ID => 2, ImportExportTypeTableMap::CREATED_AT => 3, ImportExportTypeTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'URL_ACTION' => 1, 'IMPORT_EXPORT_CATEGORY_ID' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'url_action' => 1, 'import_export_category_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -148,6 +158,8 @@ class ImportExportTypeTableMap extends TableMap
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('URL_ACTION', 'UrlAction', 'VARCHAR', true, 255, null);
         $this->addForeignKey('IMPORT_EXPORT_CATEGORY_ID', 'ImportExportCategoryId', 'INTEGER', 'import_export_category', 'ID', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -169,6 +181,7 @@ class ImportExportTypeTableMap extends TableMap
     {
         return array(
             'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
     /**
@@ -322,10 +335,14 @@ class ImportExportTypeTableMap extends TableMap
             $criteria->addSelectColumn(ImportExportTypeTableMap::ID);
             $criteria->addSelectColumn(ImportExportTypeTableMap::URL_ACTION);
             $criteria->addSelectColumn(ImportExportTypeTableMap::IMPORT_EXPORT_CATEGORY_ID);
+            $criteria->addSelectColumn(ImportExportTypeTableMap::CREATED_AT);
+            $criteria->addSelectColumn(ImportExportTypeTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.URL_ACTION');
             $criteria->addSelectColumn($alias . '.IMPORT_EXPORT_CATEGORY_ID');
+            $criteria->addSelectColumn($alias . '.CREATED_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 
