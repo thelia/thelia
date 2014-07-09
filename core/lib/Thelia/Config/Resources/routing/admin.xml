@@ -1164,8 +1164,9 @@
         <default key="_controller">Thelia\Controller\Admin\ExportController::indexAction</default>
     </route>
 
-    <route id="export.customer.newsletter" path="/admin/export/customer/newsletter">
-        <default key="_controller">Thelia\Controller\Admin\CustomerExportController::newsletterExportAction</default>
+    <route id="export.customer.newsletter" path="/admin/export/{exportType}">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::export</default>
+        <requirement key="exportType">.+</requirement>
     </route>
 
 

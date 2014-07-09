@@ -24,43 +24,18 @@ use Thelia\Model\NewsletterQuery;
  */
 class CustomerExportController extends BaseAdminController
 {
-
-    public function newsletterExportAction()
+    public function newsletterSubscribers()
     {
-        if (null !== $response = $this->checkAuth([AdminResources::EXPORT_CUSTOMER_NEWSLETTER], [], [AccessManager::VIEW])) {
-            return $response;
-        }
-
-        $data = NewsletterQuery::create()
-            ->select([
-                    'email',
-                    'firstname',
-                    'lastname',
-                    'locale'
-                ])
-            ->find();
-
-        $handle = fopen('php://memory', 'r+');
-
-        fputcsv($handle, ['email','firstname','lastname','locale'], ';', '"');
-
-        foreach ($data->toArray() as $customer) {
-            fputcsv($handle, $customer, ';', '"');
-        }
-
-        rewind($handle);
-        $content = stream_get_contents($handle);
-        fclose($handle);
-
-        return Response::create(
-            $content,
-            200,
-            array(
-                "Content-Type"=>"application/csv-tab-delimited-table",
-                "Content-disposition"=>"filename=export_customer_newsletter.csv"
-            )
-        );
 
     }
 
+    public function customers()
+    {
+
+    }
+
+    public function mailing()
+    {
+        
+    }
 }

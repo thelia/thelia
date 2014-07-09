@@ -24,7 +24,7 @@ class RegisterFormatterPass implements CompilerPassInterface
 {
     const MANAGER_DEFINITION = "thelia.manager.formatter_manager";
 
-    const SERVICE_TAG = "thelia.manager.formatter";
+    const SERVICE_TAG = "thelia.formatter";
 
     /**
      * You can modify the container here before it is dumped to PHP code.

@@ -24,7 +24,7 @@ class RegisterArchiveBuilderPass implements CompilerPassInterface
 {
     const MANAGER_DEFINITION = "thelia.manager.archive_builder_manager";
 
-    const SERVICE_TAG = "thelia.manager.archive_builder";
+    const SERVICE_TAG = "thelia.archive_builder";
 
     /**
      * You can modify the container here before it is dumped to PHP code.

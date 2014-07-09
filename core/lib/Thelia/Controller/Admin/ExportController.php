@@ -31,4 +31,9 @@ class ExportController extends BaseAdminController
 
         return $this->render('export');
     }
+
+    public function export($exportType)
+    {
+
+    }
 }

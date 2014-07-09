@@ -152,26 +152,27 @@
         </service>
 
         <!-- zip -->
-        <service id="thelia.manager.zip_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
-            <tag name="thelia.manager.archive_builder" />
+        <service id="thelia.archive_builder.zip_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
+            <tag name="thelia.archive_builder" />
         </service>
 
         <!-- tar -->
-        <service id="thelia.manager.tar_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarArchiveBuilder">
-            <tag name="thelia.manager.archive_builder" />
+        <service id="thelia.archive_builder.tar_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarArchiveBuilder">
+            <tag name="thelia.archive_builder" />
         </service>
 
         <!-- tar.gz -->
-        <service id="thelia.manager.tar_gz_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarGzArchiveBuilder">
-            <tag name="thelia.manager.archive_builder" />
+        <service id="thelia.archive_builder.tar_gz_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarGzArchiveBuilder">
+            <tag name="thelia.archive_builder" />
         </service>
 
         <!-- tar.bz2 -->
-        <service id="thelia.manager.tar_bz2_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder">
-            <tag name="thelia.manager.archive_builder" />
+        <service id="thelia.archive_builder.tar_bz2_archive_builder" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder">
+            <tag name="thelia.archive_builder" />
         </service>
 
         <!-- Formatters -->
+<<<<<<< HEAD
         <service id="thelia.manager.formatter_manager" class="Thelia\Core\FileFormat\Formatter\FormatterManager" />
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -213,5 +214,16 @@
 =======
 
 >>>>>>> Readd services
+=======
+        <service id="thelia.manager.formatter_manager" class="Thelia\Core\FileFormat\Formatting\FormatterManager" />
+
+        <service id="thelia.formatter.xml_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\XMLFormatter">
+            <tag name="thelia.formatter" />
+        </service>
+
+        <service id="thelia.formatter.json_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\JsonFormatter">
+            <tag name="thelia.formatter" />
+        </service>
+>>>>>>> Begin import export management
     </services>
 </config>

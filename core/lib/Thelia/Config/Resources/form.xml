@@ -133,6 +133,8 @@
         <form name="thelia.assets.flush" class="Thelia\Form\Cache\AssetsFlushForm"/>
         <form name="thelia.images-and-documents-cache.flush" class="Thelia\Form\Cache\ImagesAndDocumentsCacheFlushForm"/>
 
+        <form name="thelia.admin.export" class="Thelia\Form\ExportForm" />
+
     </forms>
 
 </config>

@@ -10,49 +10,85 @@
 {block name="check-access"}view{/block}
 
 {block name="main-content"}
-    <div class="configuration">
 
-        <div id="wrapper" class="container">
+    {form name="thelia.admin.export"}
+    <form id="export-form" method="post" {form_enctype form=$form} class="clearfix">
+        <div class="configuration">
 
-            <nav>
-                <ul class="breadcrumb">
-                    <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
-                    <li><a href="{url path='admin/tools'}">{intl l='Tools'}</a></li>
-                    <li>{intl l="Exports"}</li>
-                </ul>
-            </nav>
+            <div id="wrapper" class="container">
 
-            {module_include location='tools_top'}
+                <nav>
+                    <ul class="breadcrumb">
+                        <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
+                        <li><a href="{url path='admin/tools'}">{intl l='Tools'}</a></li>
+                        <li>{intl l="Exports"}</li>
+                    </ul>
+                </nav>
 
-            <div class="row">
+                {module_include location='tools_top'}
 
-                <div class="col-md-4">
-                    <div class="menu-list-table general-block-decorator">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-condensed">
-                                <caption>{intl l='Customer export'}</caption>
+                {include file='includes/export-form-definition.html' form=$form}
+                <div class="row">
 
-                                {module_include location='tools_col1_top'}
+                    <div class="col-md-4">
+                        <div class="menu-list-table general-block-decorator">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-condensed">
+                                    <caption>{intl l='Customer export'}</caption>
 
-                                {loop name="auth-export" type="auth" role="ADMIN" resource="admin.export.customer.newsletter"  access="VIEW"}
-                                    <tr>
-                                        <td><a href="{url path='/admin/export/customer/newsletter'}">{intl l="newsletter subscribers"}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/export/customer/newsletter'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-                                    </tr>
-                                {/loop}
+                                    {module_include location='tools_col1_top'}
 
-                                {module_include location='tools_col1_bottom'}
-                            </table>
+                                    {loop name="auth-export" type="auth" role="ADMIN" resource="admin.export.customer.newsletter" access="VIEW"}
+                                        <tr>
+                                            <td><a href="{url path='/admin/export/customer/newsletter'}">{intl l="newsletter subscribers"}</a></td>
+                                        </tr>
+                                    {/loop}
+
+                                    {module_include location='tools_col1_bottom'}
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {module_include location='configuration_bottom'}
+                    {module_include location='configuration_bottom'}
+                </div>
             </div>
         </div>
-    </div>
+    </form>
+    {/form}
+
+{/block}
+
+
+{block name="javascript-initialization"}
+    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 {/block}
 
 {block name="javascript-last-call"}
+    <!-- -->
+    <script>
+        $(document).ready(function() {
+            var compression_switch = $(".export-compression-switch");
+            var compression_row = $(".export-compression-selection-row");
+
+            compression_switch.on("switch-change", function(e, data) {
+                    var is_checked = data.value;
+
+                    if (is_checked) {
+                        compression_row.show();
+                    } else {
+                        compression_row.hide();
+                    }
+                });
+
+            if ($("input[type=checkbox]", compression_switch).is(":checked")) {
+                compression_row.show();
+            } else {
+                compression_row.hide();
+            }
+        });
+    </script>
     {module_include location='configuration-js'}
 {/block}
