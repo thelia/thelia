@@ -1899,6 +1899,7 @@ CREATE TABLE `import_export_type`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `url_action` VARCHAR(255) NOT NULL,
     `import_export_category_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),

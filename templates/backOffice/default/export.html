@@ -27,31 +27,45 @@
 
                 {module_include location='tools_top'}
 
-                {include file='includes/export-form-definition.html' form=$form}
-                <div class="row">
+                {loop name="import-export-category" type="import-export-category"}
+                    {if $LOOP_COUNT % 3}
+                    <div class="row">
+                    {/if}
 
-                    <div class="col-md-4">
-                        <div class="menu-list-table general-block-decorator">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-condensed">
-                                    <caption>{intl l='Customer export'}</caption>
-
-                                    {module_include location='tools_col1_top'}
-
-                                    {loop name="auth-export" type="auth" role="ADMIN" resource="admin.export.customer.newsletter" access="VIEW"}
-                                        <tr>
-                                            <td><a href="{url path='/admin/export/customer/newsletter'}">{intl l="newsletter subscribers"}</a></td>
-                                        </tr>
-                                    {/loop}
-
-                                    {module_include location='tools_col1_bottom'}
-                                </table>
+                        <div class="col-md-4">
+                            <div class="menu-list-table general-block-decorator">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-condensed">
+                                        <caption>
+                                            <!-- add up and down arrows -->
+                                            {$TITLE}
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th class="col-md-10">
+                                                    {intl l="Name"}
+                                                </th>
+                                                <th class="col-md-2">
+                                                    {intl l="Position"}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><a href="{url path="/admin/export"}/">n</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {module_include location='configuration_bottom'}
-                </div>
+                    {if $LOOP_COUNT % 3}
+                    </div>
+                    {/if}
+                {/loop}
+
+                {module_include location='configuration_bottom'}
             </div>
         </div>
     </form>

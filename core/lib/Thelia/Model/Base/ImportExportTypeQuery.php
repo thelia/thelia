@@ -25,12 +25,14 @@ use Thelia\Model\Map\ImportExportTypeTableMap;
  * @method     ChildImportExportTypeQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildImportExportTypeQuery orderByUrlAction($order = Criteria::ASC) Order by the url_action column
  * @method     ChildImportExportTypeQuery orderByImportExportCategoryId($order = Criteria::ASC) Order by the import_export_category_id column
+ * @method     ChildImportExportTypeQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildImportExportTypeQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildImportExportTypeQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildImportExportTypeQuery groupById() Group by the id column
  * @method     ChildImportExportTypeQuery groupByUrlAction() Group by the url_action column
  * @method     ChildImportExportTypeQuery groupByImportExportCategoryId() Group by the import_export_category_id column
+ * @method     ChildImportExportTypeQuery groupByPosition() Group by the position column
  * @method     ChildImportExportTypeQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildImportExportTypeQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -52,12 +54,14 @@ use Thelia\Model\Map\ImportExportTypeTableMap;
  * @method     ChildImportExportType findOneById(int $id) Return the first ChildImportExportType filtered by the id column
  * @method     ChildImportExportType findOneByUrlAction(string $url_action) Return the first ChildImportExportType filtered by the url_action column
  * @method     ChildImportExportType findOneByImportExportCategoryId(int $import_export_category_id) Return the first ChildImportExportType filtered by the import_export_category_id column
+ * @method     ChildImportExportType findOneByPosition(int $position) Return the first ChildImportExportType filtered by the position column
  * @method     ChildImportExportType findOneByCreatedAt(string $created_at) Return the first ChildImportExportType filtered by the created_at column
  * @method     ChildImportExportType findOneByUpdatedAt(string $updated_at) Return the first ChildImportExportType filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildImportExportType objects filtered by the id column
  * @method     array findByUrlAction(string $url_action) Return ChildImportExportType objects filtered by the url_action column
  * @method     array findByImportExportCategoryId(int $import_export_category_id) Return ChildImportExportType objects filtered by the import_export_category_id column
+ * @method     array findByPosition(int $position) Return ChildImportExportType objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildImportExportType objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildImportExportType objects filtered by the updated_at column
  *
@@ -148,7 +152,7 @@ abstract class ImportExportTypeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `URL_ACTION`, `IMPORT_EXPORT_CATEGORY_ID`, `CREATED_AT`, `UPDATED_AT` FROM `import_export_type` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `URL_ACTION`, `IMPORT_EXPORT_CATEGORY_ID`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `import_export_type` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -348,6 +352,47 @@ abstract class ImportExportTypeQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ImportExportTypeTableMap::IMPORT_EXPORT_CATEGORY_ID, $importExportCategoryId, $comparison);
+    }
+
+    /**
+     * Filter the query on the position column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPosition(1234); // WHERE position = 1234
+     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
+     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * </code>
+     *
+     * @param     mixed $position The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildImportExportTypeQuery The current query, for fluid interface
+     */
+    public function filterByPosition($position = null, $comparison = null)
+    {
+        if (is_array($position)) {
+            $useMinMax = false;
+            if (isset($position['min'])) {
+                $this->addUsingAlias(ImportExportTypeTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($position['max'])) {
+                $this->addUsingAlias(ImportExportTypeTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ImportExportTypeTableMap::POSITION, $position, $comparison);
     }
 
     /**

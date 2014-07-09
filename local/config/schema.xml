@@ -1527,6 +1527,7 @@
     <column name="description" type="CLOB" />
     <column name="url_action" type="VARCHAR" size="255" required="true" />
     <column name="import_export_category_id" type="INTEGER" required="true" />
+    <column name="position" type="INTEGER" required="true" />
     <foreign-key foreignTable="import_export_category" name="fk_import_export_type_import_export_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="import_export_category_id" />
     </foreign-key>
