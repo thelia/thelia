@@ -315,15 +315,7 @@ class URL
              $clean;
      }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     public static function checkUrl($url, array $protocols = ["http", "https"])
-=======
-    public function checkUrl($url, array $protocols = ["http", "https"])
->>>>>>> Define archive builders and formatters
-=======
-    public static function checkUrl($url, array $protocols = ["http", "https"])
->>>>>>> Fix FileDownloader test
     {
         $pattern = sprintf(UrlValidator::PATTERN, implode('|', $protocols));
 
