@@ -7,6 +7,8 @@
 - Added code editor on textarea on email templates page
 - Fixed issues on position tests
 - Fixed issues on RSS feed links
+- Update SwiftMailer
+- Fix bugs on customer change password form and module "order by title"
 
 #2.0.2
 - Coupon UI has been redesigned.
