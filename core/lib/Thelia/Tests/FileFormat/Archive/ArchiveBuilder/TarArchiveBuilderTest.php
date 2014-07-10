@@ -33,26 +33,11 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         Tlog::getNewInstance();
 
         $this->tar = new TarArchiveBuilder();
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->tar->setEnvironment("dev");
-=======
->>>>>>> Finish implementing and testing zip
-=======
-        $this->tar->setEnvironment("dev");
->>>>>>> Fix FileDownloader test
     }
 
     public function testAddFileAndDirectory()
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-        $this->tar->setEnvironment("dev");
-
->>>>>>> Finish implementing and testing zip
-=======
->>>>>>> Fix FileDownloader test
         /**
          * File
          */
@@ -97,20 +82,10 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->tar->hasDirectory("bar"));
 
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Complete zip tests
 
     public function testAddValidFileFromString()
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->tar->addFileFromString(
-<<<<<<< HEAD
-=======
-        $this->tar->addFileFromString(
->>>>>>> Fix FileDownloader test
             "foo", "bar"
         );
 
@@ -122,7 +97,6 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             "foo",
             $this->tar->getFileContent("bar")
         );
-<<<<<<< HEAD
 
         $this->tar->addFileFromString(
             "foo", "bar", "baz"
@@ -315,216 +289,3 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
 }
-=======
-} 
->>>>>>> Finish implementing and testing zip
-=======
-=======
->>>>>>> Fix FileDownloader test
-=======
->>>>>>> Fix FileDownloader test
-
-        $this->tar->addFileFromString(
-            "foo", "bar", "baz"
-        );
-
-        $this->assertTrue(
-            $this->tar->hasFile("baz/bar")
-        );
-
-        $this->assertEquals(
-            "foo",
-            $this->tar->getFileContent("baz/bar")
-        );
-    }
-
-    /**
-     * @expectedException \ErrorException
-     */
-    public function testAddNotValidFileFromString()
-    {
-        $this->tar->addFileFromString(
-            "foo", $this
-        );
-    }
-
-    /**
-     * @expectedException \ErrorException
-     */
-    public function testAddNotValidFileValueFromString()
-    {
-        $this->tar->addFileFromString(
-            $this, "foo"
-        );
-    }
-
-    public function testDeleteFile()
-    {
-        $this->tar->addFileFromString(
-            "foo", "bar"
-        );
-
-        $this->assertTrue(
-            $this->tar->hasFile("bar")
-        );
-
-        $this->tar->deleteFile("bar");
-
-        $this->assertFalse(
-            $this->tar->hasFile("bar")
-        );
-    }
-<<<<<<< HEAD
-} 
->>>>>>> Complete zip tests
-=======
-
-    public function testLoadValidArchive()
-    {
-        $tar = $this->tar->loadArchive(
-            __DIR__ . DS . "TestResources/well_formatted.tar"
-        );
-
-        $this->assertInstanceOf(
-            get_class($this->tar),
-            $tar
-        );
-
-        $this->assertTrue(
-            $tar->hasFile("LICENSE.txt")
-        );
-    }
-
-    /**
-     * @expectedException \Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception\TarArchiveException
-     */
-    public function testLoadInvalidArchive()
-    {
-        $tar = $this->tar->loadArchive(
-            __DIR__ . DS . "TestResources/bad_formatted.tar"
-        );
-    }
-
-    public function testFormatDirectoryPath()
-    {
-        $this->assertEquals(
-            "foo/",
-            $this->tar->formatDirectoryPath("foo")
-        );
-
-        $this->assertEquals(
-            "foo/",
-            $this->tar->formatDirectoryPath("/foo")
-        );
-
-        $this->assertEquals(
-            "foo/",
-            $this->tar->formatDirectoryPath("foo/")
-        );
-
-        $this->assertEquals(
-            "foo/",
-            $this->tar->formatDirectoryPath("/foo/")
-        );
-
-        $this->assertEquals(
-            "foo/bar/",
-            $this->tar->formatDirectoryPath("foo/bar")
-        );
-
-        $this->assertEquals(
-            "foo/bar/",
-            $this->tar->formatDirectoryPath("/foo/bar")
-        );
-
-        $this->assertEquals(
-            "foo/bar/",
-            $this->tar->formatDirectoryPath("/foo//bar/")
-        );
-
-        $this->assertEquals(
-            "foo/bar/",
-            $this->tar->formatDirectoryPath("/foo/bar/")
-        );
-
-        $this->assertEquals(
-            "foo/bar/baz/",
-            $this->tar->formatDirectoryPath("foo/bar/baz")
-        );
-
-        $this->assertEquals(
-            "foo/bar/baz/",
-            $this->tar->formatDirectoryPath("//foo/bar///baz/")
-        );
-    }
-
-    public function testFormatFilePath()
-    {
-        $this->assertEquals(
-            "foo",
-            $this->tar->formatFilePath("foo")
-        );
-
-        $this->assertEquals(
-            "foo",
-            $this->tar->formatFilePath("/foo")
-        );
-
-        $this->assertEquals(
-            "foo",
-            $this->tar->formatFilePath("foo/")
-        );
-
-        $this->assertEquals(
-            "foo",
-            $this->tar->formatFilePath("/foo/")
-        );
-
-        $this->assertEquals(
-            "foo/bar",
-            $this->tar->formatFilePath("foo/bar")
-        );
-
-        $this->assertEquals(
-            "foo/bar",
-            $this->tar->formatFilePath("/foo/bar")
-        );
-
-        $this->assertEquals(
-            "foo/bar",
-            $this->tar->formatFilePath("/foo//bar/")
-        );
-
-        $this->assertEquals(
-            "foo/bar",
-            $this->tar->formatFilePath("/foo/bar/")
-        );
-
-        $this->assertEquals(
-            "foo/bar/baz",
-            $this->tar->formatFilePath("foo/bar/baz")
-        );
-
-        $this->assertEquals(
-            "foo/bar/baz",
-            $this->tar->formatFilePath("//foo/bar///baz/")
-        );
-    }
-<<<<<<< HEAD
-} 
->>>>>>> Finish Tar archive builder
-=======
-
-    public function testCompression()
-    {
-        $this->assertEquals(
-            null,
-            $this->tar->getCompression()
-        );
-    }
-<<<<<<< HEAD
-} 
->>>>>>> Finish tar, tar.gz, tar.bz2 and tests
-=======
-}
->>>>>>> Fix cs

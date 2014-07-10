@@ -359,8 +359,6 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedData,$formattedData);
     }
 
-<<<<<<< HEAD
-=======
     public function testSetRawDataMultipleDepthWithReverseAliases() {
         $aliases = [
             "orange" => "foo",
@@ -463,5 +461,4 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($row, $data->popRow());
         $this->assertFalse($data->getRow());
     }
->>>>>>> Remove conflicts
 }

@@ -14,14 +14,6 @@ namespace Thelia\Core\FileFormat\Formatting;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
 use Thelia\Core\Translation\Translator;
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
-use Thelia\Model\Map\ProductTableMap;
->>>>>>> Remove conflicts
-=======
->>>>>>> Restore
 /**
  * Class FormatterData
  * @package Thelia\Core\FileFormat\Formatting
@@ -30,11 +22,7 @@ use Thelia\Model\Map\ProductTableMap;
 class FormatterData
 {
     /** @var array */
-<<<<<<< HEAD
-    protected $data;
-=======
     protected $data = array();
->>>>>>> Remove conflicts
 
     /** @var  null|array */
     protected $aliases;
@@ -81,10 +69,7 @@ class FormatterData
      * @return $this
      *
      * Sets raw data with aliases
-<<<<<<< HEAD
-=======
      * may bug with some formatter
->>>>>>> Remove conflicts
      */
     public function setData(array $data)
     {
@@ -171,8 +156,6 @@ class FormatterData
         return $formattedData;
     }
 
-<<<<<<< HEAD
-=======
     /**
      * @param array $row
      * @return $this
@@ -234,17 +217,13 @@ class FormatterData
         return $this->applyAliases($data, array_flip($aliases));
     }
 
->>>>>>> Remove conflicts
     public function getData()
     {
         return $this->data;
     }
-<<<<<<< HEAD
-=======
 
     public function getDataReverseAliases()
     {
         return $this->reverseAliases($this->data, $this->aliases);
     }
->>>>>>> Remove conflicts
 }

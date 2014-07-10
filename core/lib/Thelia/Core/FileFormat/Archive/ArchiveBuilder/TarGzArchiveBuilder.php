@@ -49,12 +49,4 @@ class TarGzArchiveBuilder extends TarArchiveBuilder
         return $this;
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 }
-=======
-} 
->>>>>>> Finish tar, tar.gz, tar.bz2 and tests
-=======
-}
->>>>>>> Fix cs

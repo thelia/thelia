@@ -12,11 +12,8 @@
 
 namespace Thelia\Core\FileFormat\Formatting;
 use Thelia\Core\FileFormat\FormatInterface;
-<<<<<<< HEAD
-=======
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
->>>>>>> Remove conflicts
 
 /**
  * Class AbstractFormatter
@@ -25,9 +22,6 @@ use Thelia\Log\Tlog;
  */
 abstract class AbstractFormatter implements FormatInterface, FormatterInterface
 {
-<<<<<<< HEAD
-
-=======
     /** @var \Thelia\Core\Translation\Translator  */
     protected $translator;
 
@@ -55,5 +49,4 @@ abstract class AbstractFormatter implements FormatInterface, FormatterInterface
     {
         return $this->aliases;
     }
->>>>>>> Remove conflicts
 }

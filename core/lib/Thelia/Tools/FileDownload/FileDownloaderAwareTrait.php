@@ -35,15 +35,7 @@ trait FileDownloaderAwareTrait
     }
 
     /**
-<<<<<<< HEAD
-<<<<<<< HEAD
      * @param  FileDownloaderInterface $fileDownloader
-=======
-     * @param FileDownloaderInterface $fileDownloader
->>>>>>> Define archive builders and formatters
-=======
-     * @param  FileDownloaderInterface $fileDownloader
->>>>>>> Fix cs and add get method in managers
      * @return $this
      */
     public function setFileDownloader(FileDownloaderInterface $fileDownloader)
@@ -52,12 +44,4 @@ trait FileDownloaderAwareTrait
 
         return $this;
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
 }
-=======
-} 
->>>>>>> Define archive builders and formatters
-=======
-}
->>>>>>> Fix cs and add get method in managers

@@ -20,12 +20,4 @@ namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception;
 class TarArchiveException extends \Exception
 {
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 }
-=======
-} 
->>>>>>> Finish implementing and testing zip
-=======
-}
->>>>>>> Fix cs

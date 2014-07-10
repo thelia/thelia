@@ -10,21 +10,17 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\FileFormat;
+namespace Thelia\Core\FileFormat\Formatting\Formatter;
+use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
+use Thelia\Core\FileFormat\Formatting\FormatterData;
 
 /**
- * Interface FormatInterface
- * @package Thelia\Core\FileFormat
+ * Class JsonFormatter
+ * @package Thelia\Core\FileFormat\Formatting\Formatter
  * @author Benjamin Perche <bperche@openstudio.fr>
- *
- * This interface defines what a formatter must have:
- *     - A name ( example: XML, JSON, yaml )
- *     - An extension ( example: xml, json, yml )
- *     - A mime type ( example: application/xml, application/json, ... )
  */
-interface FormatInterface
+class JsonFormatter extends AbstractFormatter
 {
-
     /**
      * @return string
      *
@@ -33,7 +29,10 @@ interface FormatInterface
      * example:
      * return "XML";
      */
-    public function getName();
+    public function getName()
+    {
+        return "Json";
+    }
 
     /**
      * @return string
@@ -44,7 +43,10 @@ interface FormatInterface
      * example:
      * return "xml";
      */
-    public function getExtension();
+    public function getExtension()
+    {
+        return "json";
+    }
 
     /**
      * @return string
@@ -54,5 +56,35 @@ interface FormatInterface
      * example:
      * return "application/json";
      */
-    public function getMimeType();
-}
+    public function getMimeType()
+    {
+        return "application/json";
+    }
+
+    /**
+     * @param  FormatterData $data
+     * @return mixed
+     *
+     * This method must use a FormatterData object and output
+     * a formatted value.
+     */
+    public function encode(FormatterData $data)
+    {
+        return json_encode($data->getData());
+    }
+
+    /**
+     * @param $rawData
+     * @return FormatterData
+     *
+     * This must takes raw data as argument and outputs
+     * a FormatterData object.
+     */
+    public function decode($rawData)
+    {
+        return (new FormatterData($this->getAliases()))->setData(
+            json_decode($rawData, true)
+        );
+    }
+
+} 

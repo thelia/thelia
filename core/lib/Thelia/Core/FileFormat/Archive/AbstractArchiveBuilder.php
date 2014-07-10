@@ -12,18 +12,10 @@
 
 namespace Thelia\Core\FileFormat\Archive;
 use Thelia\Core\FileFormat\FormatInterface;
-<<<<<<< HEAD
-<<<<<<< HEAD
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\FileNotFoundException;
 use Thelia\Exception\FileNotReadableException;
 use Thelia\Log\Tlog;
-=======
->>>>>>> Define archive builders and formatters
-=======
-use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
->>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
 use Thelia\Tools\FileDownload\FileDownloaderAwareTrait;
 
 /**
@@ -34,25 +26,12 @@ use Thelia\Tools\FileDownload\FileDownloaderAwareTrait;
 abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilderInterface
 {
     use FileDownloaderAwareTrait;
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     const TEMP_DIRECTORY_NAME = "archive_builder";
 
     /** @var  string */
     protected $cacheFile;
 
-=======
-
-    const TEMP_DIRECTORY_NAME = "archive_builder";
-
-<<<<<<< HEAD
->>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
-=======
-    /** @var  string */
-    protected $cacheFile;
-
->>>>>>> Finish implementing and testing zip
     /** @var \Thelia\Core\Translation\Translator  */
     protected $translator;
 
@@ -62,18 +41,9 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     /** @var string */
     protected $cacheDir;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     /** @var string */
     protected $environment;
 
-=======
->>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
-=======
-    /** @var string */
-    protected $environment;
-
->>>>>>> Finish tar, tar.gz, tar.bz2 and tests
     public function __construct()
     {
         $this->translator = Translator::getInstance();
@@ -96,15 +66,7 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
             );
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $archiveBuilderCacheDir = $this->cacheDir = $theliaCacheDir . static::TEMP_DIRECTORY_NAME;
-=======
-        $archiveBuilderCacheDir = $this->cache_dir = $theliaCacheDir . static::TEMP_DIRECTORY_NAME;
->>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
-=======
-        $archiveBuilderCacheDir = $this->cacheDir = $theliaCacheDir . static::TEMP_DIRECTORY_NAME;
->>>>>>> Finish implementing and testing zip
 
         if (!is_dir($archiveBuilderCacheDir) && !mkdir($archiveBuilderCacheDir, 0755)) {
             throw new \ErrorException(
@@ -120,10 +82,6 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
         return $archiveBuilderCacheDir;
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Finish implementing and testing zip
     /**
      * @param $pathToFile
      * @param $destination
@@ -215,11 +173,6 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
 
         return $this;
     }
-<<<<<<< HEAD
-=======
->>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
-=======
->>>>>>> Finish implementing and testing zip
 
     public function getCacheDir()
     {
@@ -241,29 +194,14 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     {
         return $this->translator;
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Finish implementing and testing zip
 
     public function getCacheFile()
     {
         return $this->cacheFile;
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     /**
      * @param  string $environment
-=======
-
-    /**
-<<<<<<< HEAD
-     * @param string $environment
->>>>>>> Finish tar, tar.gz, tar.bz2 and tests
-=======
-     * @param  string $environment
->>>>>>> Fix cs
      * @return $this
      *
      * Sets the execution environment of the Kernel,
@@ -273,21 +211,4 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     {
         $this->environment = $environment;
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
 }
-=======
-} 
->>>>>>> Define archive builders and formatters
-=======
-} 
->>>>>>> Begin tar, tar.bz2 and tar.gz formatter, fix zip test resources
-=======
-} 
->>>>>>> Finish implementing and testing zip
-=======
-} 
->>>>>>> Finish tar, tar.gz, tar.bz2 and tests
-=======
-}
->>>>>>> Fix cs

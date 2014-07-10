@@ -17,14 +17,7 @@ use Thelia\Core\Translation\Translator as TheliaTranslator;
 use Thelia\Exception\FileNotFoundException;
 use Thelia\Exception\HttpUrlException;
 use Thelia\Log\Tlog;
-<<<<<<< HEAD
-<<<<<<< HEAD
 use Thelia\Tools\URL;
-=======
->>>>>>> Define archive builders and formatters
-=======
-use Thelia\Tools\URL;
->>>>>>> Fix FileDownloader test
 
 /**
  * Class FileDownloader
@@ -52,18 +45,8 @@ class FileDownloader implements FileDownloaderInterface
     }
 
     /**
-<<<<<<< HEAD
-<<<<<<< HEAD
      * @param  string                                  $url
      * @param  string                                  $pathToStore
-=======
-     * @param string $url
-     * @param string $pathToStore
->>>>>>> Define archive builders and formatters
-=======
-     * @param  string                                  $url
-     * @param  string                                  $pathToStore
->>>>>>> Fix cs and add get method in managers
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \ErrorException
      * @throws \HttpUrlException
@@ -142,15 +125,7 @@ class FileDownloader implements FileDownloaderInterface
          */
         $file = @fopen($pathToStore, "w");
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         if ($file === false) {
-=======
-        if($file === false) {
->>>>>>> Define archive builders and formatters
-=======
-        if ($file === false) {
->>>>>>> Fix cs and add get method in managers
             $translatedErrorMessage = $this->translator->trans(
                 "Failed to open a writing stream on the file: %file",
                 [
@@ -165,12 +140,4 @@ class FileDownloader implements FileDownloaderInterface
         fputs($file, $response);
         fclose($file);
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
 }
-=======
-} 
->>>>>>> Define archive builders and formatters
-=======
-}
->>>>>>> Fix cs and add get method in managers
