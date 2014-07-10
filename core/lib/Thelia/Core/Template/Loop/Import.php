@@ -22,7 +22,7 @@ class Import extends ImportExportType
 {
     protected function getBaseUrl()
     {
-        return $this->container->getParameter("export.base_url");
+        return $this->container->getParameter("import.base_url");
     }
 
     protected function getQueryModel()
