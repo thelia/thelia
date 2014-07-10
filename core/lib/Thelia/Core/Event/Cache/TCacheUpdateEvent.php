@@ -11,55 +11,20 @@
 /*************************************************************************************/
 
 
-namespace Thelia\Cache\Driver;
+namespace Thelia\Core\Event\Cache;
+use Thelia\Core\Event\ActionEvent;
 
 
 /**
- * Class NullDriver
- * @package Thelia\Cache\Driver
- * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
+ * Class TCacheUpdateEvent
+ * @package Thelia\Core\Event\Cache
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class NullDriver extends BaseCacheDriver
+class TCacheUpdateEvent extends ActionEvent
 {
 
-
-    /**
-     * Init the cache.
-     */
-    public function init(array $params = null)
+    public function all()
     {
-
+        return $this->parameters;
     }
-
-    public function fetch($id)
-    {
-        return false;
-    }
-
-    public function contains($id)
-    {
-        return false;
-    }
-
-    public function save($id, $data, $refs = array(), $lifeTime = null)
-    {
-        return false;
-    }
-
-    public function delete($id)
-    {
-        return false;
-    }
-
-    public function deleteAll()
-    {
-        return false;
-    }
-
-    public function getStats()
-    {
-        return null;
-    }
-
-
-}
+} 

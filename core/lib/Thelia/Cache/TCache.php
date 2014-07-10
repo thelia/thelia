@@ -67,7 +67,7 @@ class TCache
     public static function getNewInstance(array $params = null)
     {
 
-        if (null !== $params) {
+        if (null === $params) {
             $driver = ConfigQuery::read(self::CONFIG_CACHE_DRIVER, self::DEFAULT_CACHE_DRIVER);
         } else {
             if (array_key_exists("driver", $params)) {

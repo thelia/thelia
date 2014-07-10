@@ -179,10 +179,13 @@ abstract class BaseCacheDriver
     {
         $ret = null;
 
-        if (is_array($params) && array_key_exists($key, $params)) {
+        if (is_array($params) && array_key_exists($key, $params) && "" !== $params[$key]) {
             $ret = $params[$key];
         } else {
             $ret = ConfigQuery::read($configKey, $default);
+            if ("" === $ret) {
+                $ret = $default;
+            }
         }
 
         return $ret;

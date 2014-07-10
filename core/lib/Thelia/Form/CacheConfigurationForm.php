@@ -58,6 +58,16 @@ class CacheConfigurationForm extends BaseForm {
                     ),
                 )
             )
+            ->add(
+                'namespace',
+                "text",
+                array(
+                    "label" => Translator::getInstance()->trans('Namespace'),
+                    "label_attr" => array(
+                        "for" => "namespace"
+                    ),
+                )
+            )
             // File
             ->add(
                 'file_directory',
@@ -91,6 +101,11 @@ class CacheConfigurationForm extends BaseForm {
                 )
             )
         ;
+    }
+
+    public function getEvent()
+    {
+
     }
 
     protected function getDriverList()

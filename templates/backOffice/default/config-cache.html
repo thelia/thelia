@@ -33,7 +33,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             {form name='thelia.cache.configuration'}
-	 						<form id="cache-form" method="POST" action="{url path='/admin/configuration/cache/save'}">
+	 						<form id="cache-form" method="POST" action="{url path="/admin/configuration/cache/save"}">
                                 {form_hidden_fields form=$form}
 
                                 {form_field form=$form field='success_url'}
@@ -53,7 +53,7 @@
                                                 <div class="form-group {if $error}has-error{/if}">
                                                     <div class="checkbox">
                                                         <label>
-                                                            <input type="checkbox" class="cacheEnabledToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+                                                            <input id="{$label_attr.for}" name="{$name}"  type="checkbox" class="cacheEnabledToggle" {if $checked}checked="checked"{/if}>
                                                             {$label}
                                                         </label>
                                                     </div>
@@ -73,9 +73,7 @@
                                                 </div>
                                             {/form_field}
 
-                                            <div id="return-test">
-
-                                            </div>
+                                            <div id="return-test"></div>
 
                                             <div class="form-group {if $error}has-error{/if}">
                                                 <button id="cache-test" class="btn btn-default btn-primary" >
@@ -98,20 +96,17 @@
                                                 <span class="glyphicon glyphicon-refresh"></span>
                                             </span>
                                         </p>
-                                        <div id="return-stats">
-
-                                        </div>
+                                        <div id="return-stats"></div>
 
                                         <p class="title title-without-tabs">{intl l="Flush"}</p>
+                                        <div id="return-flush"></div>
                                         <div id="flush">
                                             <button id="cache-flush" class="btn btn-default btn-primary" >
                                                 <span class="glyphicon glyphicon-trash"></span>
                                                 {intl l="Flush the cache"}
                                             </button>
                                         </div>
-                                        <div id="return-flush">
 
-                                        </div>
                                     </div>
                                 </div>
 
@@ -146,55 +141,60 @@
         {literal}
 
         var fieldsDefinition = {
-            "null": [],
-            "file": {
+            "\\Thelia\\Cache\\Driver\\FileDriver": {
                 "directory": "file_directory",
                 "extension": "file_extension"
             },
-            "memcached": {
+            "\\Thelia\\Cache\\Driver\\MemcachedDriver": {
                 "server": "memcached_server",
                 "port": "memcached_port"
             }
         }
 
-        // Set proper category ID in delete from
-        $('#cache-stats').click(function(ev) {
-            $( "#return-stats" ).load( urls.stats  );
-        });
-
-        $( "#cache-stats" ).click();
-
         var getFormData = function getFormData(){
 
             var data = {},
-                fields,
-                field;
+                    fields,
+                    field;
 
 
             data['driver'] = $("#driver").val();
             data['enabled'] = $("#enabled").prop("checked");
             // data['lifeTime'] = $("#lifeTime").val();
 
-            fields = fieldsDefinition[$("#driver").data("fields")];
+            fields = fieldsDefinition[$("#driver").val()] || [];
 
             for (field in fields) {
                 if ($("#" + fields[field]).length > 0){
-                    data[field] = $("#" + fields[field]).vale();
+                    data[field] = $("#" + fields[field]).val();
                 }
             }
 
             return data;
         };
 
+
+        // stats
+        $('#cache-stats').click(function(ev) {
+            $( "#return-stats" ).load( urls.stats  );
+        });
+        $( "#cache-stats" ).click();
+
+
+        // save
         $('#cache-form').on('submit', function(ev){
-           ev.preventDefault();
+           //ev.preventDefault();
         });
 
-        $('#cache-test').click(function(ev) {
+        // test
+        $('#cache-test, #cache-save').click(function(ev) {
+
+            var data = getFormData(),
+                save = false;
 
             ev.preventDefault();
 
-            var data = getFormData();
+            save = (ev.currentTarget.id == "cache-save");
 
             $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
 
@@ -207,6 +207,9 @@
                 $("#loading-event").remove();
                 if (data.success){
                     $("#return-test").html('<p class="alert alert-success">' + data.message + '</p>');
+                    if (save) {
+                        $("#cache-form").submit();
+                    }
                 } else {
                     $("#return-test").html('<p class="alert alert-danger">' + data.message + '</p>');
                 }
@@ -218,12 +221,29 @@
 
         });
 
-        /*
-        $('a#cache-flush').click(function(ev) {
-            $( "#result" ).load( urls.flush );
-        });
-        */
+        // flush
+        $('#cache-flush').click(function(ev) {
 
+            ev.preventDefault();
+            $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+
+            $.ajax({
+                url: urls.flush,
+                type: "GET",
+                dataType: "json"
+            }).done(function(data){
+                $("#loading-event").remove();
+                if (data.success){
+                    $("#return-flush").html('<p class="alert alert-success">' + data.message + '</p>');
+                } else {
+                    $("#return-flush").html('<p class="alert alert-danger">' + data.message + '</p>');
+                }
+            })
+            .fail(function(jqXHR, textStatus, errorThrown){
+                $("#loading-event").remove();
+                $("#return-flush").html('<p class="alert alert-danger">' + textStatus + '</p>');
+            });
+        });
 
         {/literal}
     });

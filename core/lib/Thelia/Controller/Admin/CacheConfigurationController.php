@@ -15,26 +15,24 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Thelia\Cache\TCache;
+use Thelia\Core\Event\Cache\TCacheUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\NotImplementedException;
 use Thelia\Form\CacheConfigurationForm;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 
 /**
  * Class CacheConfigurationController
  * @package Thelia\Controller\Admin
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class CacheConfigurationController extends BaseAdminController {
-
-
-    protected function renderTemplate()
-    {
-        return $this->render('config-cache');
-    }
+class CacheConfigurationController extends BaseAdminController
+{
 
 
     public function indexAction()
@@ -45,12 +43,17 @@ class CacheConfigurationController extends BaseAdminController {
 
         // Hydrate the store configuration form
         $cacheConfigForm = new CacheConfigurationForm($this->getRequest(), 'form', array(
-            'enabled'             => ConfigQuery::read(TCache::CONFIG_CACHE_ENABLED),
-            'driver'              => ConfigQuery::read(TCache::CONFIG_CACHE_DRIVER),
+            'enabled' => (bool)ConfigQuery::read(TCache::CONFIG_CACHE_ENABLED, false),
+            'driver'  => ConfigQuery::read(TCache::CONFIG_CACHE_DRIVER, TCache::DEFAULT_CACHE_DRIVER),
         ));
         $this->getParserContext()->addForm($cacheConfigForm);
 
         return $this->renderTemplate();
+    }
+
+    protected function renderTemplate()
+    {
+        return $this->render('config-cache');
     }
 
     public function testAction()
@@ -61,6 +64,8 @@ class CacheConfigurationController extends BaseAdminController {
 
         $config = $this->getRequest()->request->get("config", null);
 
+        //Tlog::getInstance()->debug(" GU " . print_r($config, true));
+
         if (null !== $config) {
             $message = $this->testConfig($config);
         } else {
@@ -68,14 +73,15 @@ class CacheConfigurationController extends BaseAdminController {
         }
 
         return $this->jsonResponse(json_encode(array(
-            "success" => (null === $message),
-            "message" => (null !== $message)
-                         ? $message
-                         : Translator::getInstance()->trans("The configuration is valid.")
+                "success" => (null === $message),
+                "message" => (null !== $message)
+                        ? $message
+                        : Translator::getInstance()->trans("The configuration is valid.")
             )
         ));
 
     }
+
 
     protected function testConfig(array $config)
     {
@@ -96,10 +102,57 @@ class CacheConfigurationController extends BaseAdminController {
         return $message;
     }
 
+
     public function saveAction()
     {
-        throw New NotImplementedException("Not yet implemented");
+        if (null !== $response = $this->checkAuth(AdminResources::CACHE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $error_message = false;
+        $cacheForm     = new CacheConfigurationForm($this->getRequest());
+
+        try {
+
+            $form = $this->validateForm($cacheForm);
+
+            $event = $this->createModificationEvent($form);
+
+            $this->dispatch(TheliaEvents::TCACHE_UPDATE, $event);
+
+            $this->redirect($cacheForm->getSuccessUrl());
+
+        } catch (\Exception $ex) {
+            $error_message = $ex->getMessage();
+        }
+
+        // error
+        $this->setupFormErrorContext(
+            $this->getTranslator()->trans("Cache configuration failed."),
+            $error_message,
+            $cacheForm,
+            $ex
+        );
+
+        return $this->renderTemplate();
     }
+
+
+    protected function createModificationEvent($form)
+    {
+        $event = new TCacheUpdateEvent();
+        $data  = $form->getData();
+
+        foreach ($data as $key => $value) {
+            if (!in_array($key, array('success_url', 'error_message'))) {
+                $event->__set("tcache_$key", $value);
+            }
+        }
+
+        return $event;
+
+    }
+
 
     public function statsAction()
     {
@@ -112,10 +165,21 @@ class CacheConfigurationController extends BaseAdminController {
         return $this->render("includes/config-cache-stats", array("stats" => $stats));
     }
 
+
     public function flushAction()
     {
+        if (null !== $response = $this->checkAuth(AdminResources::CACHE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
         $ret = TCache::getInstance()->deleteAll();
-        return $this->jsonResponse(json_encode(array("success" => $ret)));
+
+        return $this->jsonResponse(json_encode(array(
+            "success" => $ret,
+            "message" => $ret ?
+                    Translator::getInstance()->trans("The cache has been flushed.") :
+                    Translator::getInstance()->trans("The cache can't be flushed.")
+        )));
     }
 
 } 
