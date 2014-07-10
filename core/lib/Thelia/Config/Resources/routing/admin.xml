@@ -1160,13 +1160,14 @@
 
     <!-- export management -->
 
-    <route id="export.main" path="/admin/export">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::indexAction</default>
+    <route id="export.generic" path="/admin/export/{key}">
+        <default key="_controller">Thelia\Controller\Admin\ImportExportController::export</default>
+        <requirement key="key">\d+</requirement>
     </route>
 
-    <route id="export.customer.newsletter" path="/admin/export/{exportType}">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::export</default>
-        <requirement key="exportType">.+</requirement>
+    <route id="import.generic" path="/admin/import/{key}">
+        <default key="_controller">Thelia\Controller\Admin\ImportExportController::import</default>
+        <requirement key="key">\d+</requirement>
     </route>
 
 

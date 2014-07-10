@@ -12,81 +12,85 @@ use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\ImportExportCategory as ChildImportExportCategory;
-use Thelia\Model\ImportExportCategoryI18nQuery as ChildImportExportCategoryI18nQuery;
-use Thelia\Model\ImportExportCategoryQuery as ChildImportExportCategoryQuery;
-use Thelia\Model\Map\ImportExportCategoryTableMap;
+use Thelia\Model\Export as ChildExport;
+use Thelia\Model\ExportI18nQuery as ChildExportI18nQuery;
+use Thelia\Model\ExportQuery as ChildExportQuery;
+use Thelia\Model\Map\ExportTableMap;
 
 /**
- * Base class that represents a query for the 'import_export_category' table.
+ * Base class that represents a query for the 'export' table.
  *
  *
  *
- * @method     ChildImportExportCategoryQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildImportExportCategoryQuery orderByPosition($order = Criteria::ASC) Order by the position column
- * @method     ChildImportExportCategoryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
- * @method     ChildImportExportCategoryQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method     ChildExportQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildExportQuery orderByExportCategoryId($order = Criteria::ASC) Order by the export_category_id column
+ * @method     ChildExportQuery orderByPosition($order = Criteria::ASC) Order by the position column
+ * @method     ChildExportQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildExportQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildImportExportCategoryQuery groupById() Group by the id column
- * @method     ChildImportExportCategoryQuery groupByPosition() Group by the position column
- * @method     ChildImportExportCategoryQuery groupByCreatedAt() Group by the created_at column
- * @method     ChildImportExportCategoryQuery groupByUpdatedAt() Group by the updated_at column
+ * @method     ChildExportQuery groupById() Group by the id column
+ * @method     ChildExportQuery groupByExportCategoryId() Group by the export_category_id column
+ * @method     ChildExportQuery groupByPosition() Group by the position column
+ * @method     ChildExportQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildExportQuery groupByUpdatedAt() Group by the updated_at column
  *
- * @method     ChildImportExportCategoryQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildImportExportCategoryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildImportExportCategoryQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildExportQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildExportQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildExportQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildImportExportCategoryQuery leftJoinImportExportType($relationAlias = null) Adds a LEFT JOIN clause to the query using the ImportExportType relation
- * @method     ChildImportExportCategoryQuery rightJoinImportExportType($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ImportExportType relation
- * @method     ChildImportExportCategoryQuery innerJoinImportExportType($relationAlias = null) Adds a INNER JOIN clause to the query using the ImportExportType relation
+ * @method     ChildExportQuery leftJoinExportCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the ExportCategory relation
+ * @method     ChildExportQuery rightJoinExportCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ExportCategory relation
+ * @method     ChildExportQuery innerJoinExportCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the ExportCategory relation
  *
- * @method     ChildImportExportCategoryQuery leftJoinImportExportCategoryI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ImportExportCategoryI18n relation
- * @method     ChildImportExportCategoryQuery rightJoinImportExportCategoryI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ImportExportCategoryI18n relation
- * @method     ChildImportExportCategoryQuery innerJoinImportExportCategoryI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ImportExportCategoryI18n relation
+ * @method     ChildExportQuery leftJoinExportI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ExportI18n relation
+ * @method     ChildExportQuery rightJoinExportI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ExportI18n relation
+ * @method     ChildExportQuery innerJoinExportI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ExportI18n relation
  *
- * @method     ChildImportExportCategory findOne(ConnectionInterface $con = null) Return the first ChildImportExportCategory matching the query
- * @method     ChildImportExportCategory findOneOrCreate(ConnectionInterface $con = null) Return the first ChildImportExportCategory matching the query, or a new ChildImportExportCategory object populated from the query conditions when no match is found
+ * @method     ChildExport findOne(ConnectionInterface $con = null) Return the first ChildExport matching the query
+ * @method     ChildExport findOneOrCreate(ConnectionInterface $con = null) Return the first ChildExport matching the query, or a new ChildExport object populated from the query conditions when no match is found
  *
- * @method     ChildImportExportCategory findOneById(int $id) Return the first ChildImportExportCategory filtered by the id column
- * @method     ChildImportExportCategory findOneByPosition(int $position) Return the first ChildImportExportCategory filtered by the position column
- * @method     ChildImportExportCategory findOneByCreatedAt(string $created_at) Return the first ChildImportExportCategory filtered by the created_at column
- * @method     ChildImportExportCategory findOneByUpdatedAt(string $updated_at) Return the first ChildImportExportCategory filtered by the updated_at column
+ * @method     ChildExport findOneById(int $id) Return the first ChildExport filtered by the id column
+ * @method     ChildExport findOneByExportCategoryId(int $export_category_id) Return the first ChildExport filtered by the export_category_id column
+ * @method     ChildExport findOneByPosition(int $position) Return the first ChildExport filtered by the position column
+ * @method     ChildExport findOneByCreatedAt(string $created_at) Return the first ChildExport filtered by the created_at column
+ * @method     ChildExport findOneByUpdatedAt(string $updated_at) Return the first ChildExport filtered by the updated_at column
  *
- * @method     array findById(int $id) Return ChildImportExportCategory objects filtered by the id column
- * @method     array findByPosition(int $position) Return ChildImportExportCategory objects filtered by the position column
- * @method     array findByCreatedAt(string $created_at) Return ChildImportExportCategory objects filtered by the created_at column
- * @method     array findByUpdatedAt(string $updated_at) Return ChildImportExportCategory objects filtered by the updated_at column
+ * @method     array findById(int $id) Return ChildExport objects filtered by the id column
+ * @method     array findByExportCategoryId(int $export_category_id) Return ChildExport objects filtered by the export_category_id column
+ * @method     array findByPosition(int $position) Return ChildExport objects filtered by the position column
+ * @method     array findByCreatedAt(string $created_at) Return ChildExport objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildExport objects filtered by the updated_at column
  *
  */
-abstract class ImportExportCategoryQuery extends ModelCriteria
+abstract class ExportQuery extends ModelCriteria
 {
 
     /**
-     * Initializes internal state of \Thelia\Model\Base\ImportExportCategoryQuery object.
+     * Initializes internal state of \Thelia\Model\Base\ExportQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\ImportExportCategory', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Export', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildImportExportCategoryQuery object.
+     * Returns a new ChildExportQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildImportExportCategoryQuery
+     * @return ChildExportQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof \Thelia\Model\ImportExportCategoryQuery) {
+        if ($criteria instanceof \Thelia\Model\ExportQuery) {
             return $criteria;
         }
-        $query = new \Thelia\Model\ImportExportCategoryQuery();
+        $query = new \Thelia\Model\ExportQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -109,19 +113,19 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildImportExportCategory|array|mixed the result, formatted by the current formatter
+     * @return ChildExport|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = ImportExportCategoryTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = ExportTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(ImportExportCategoryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ExportTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -140,11 +144,11 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return   ChildImportExportCategory A model object, or null if the key is not found
+     * @return   ChildExport A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `import_export_category` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `EXPORT_CATEGORY_ID`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `export` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -155,9 +159,9 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            $obj = new ChildImportExportCategory();
+            $obj = new ChildExport();
             $obj->hydrate($row);
-            ImportExportCategoryTableMap::addInstanceToPool($obj, (string) $key);
+            ExportTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -170,7 +174,7 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildImportExportCategory|array|mixed the result, formatted by the current formatter
+     * @return ChildExport|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -212,12 +216,12 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return ChildExportQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(ImportExportCategoryTableMap::ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(ExportTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -225,12 +229,12 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return ChildExportQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(ImportExportCategoryTableMap::ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(ExportTableMap::ID, $keys, Criteria::IN);
     }
 
     /**
@@ -249,18 +253,18 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return ChildExportQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(ImportExportCategoryTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ExportTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(ImportExportCategoryTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ExportTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -271,7 +275,50 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ImportExportCategoryTableMap::ID, $id, $comparison);
+        return $this->addUsingAlias(ExportTableMap::ID, $id, $comparison);
+    }
+
+    /**
+     * Filter the query on the export_category_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByExportCategoryId(1234); // WHERE export_category_id = 1234
+     * $query->filterByExportCategoryId(array(12, 34)); // WHERE export_category_id IN (12, 34)
+     * $query->filterByExportCategoryId(array('min' => 12)); // WHERE export_category_id > 12
+     * </code>
+     *
+     * @see       filterByExportCategory()
+     *
+     * @param     mixed $exportCategoryId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildExportQuery The current query, for fluid interface
+     */
+    public function filterByExportCategoryId($exportCategoryId = null, $comparison = null)
+    {
+        if (is_array($exportCategoryId)) {
+            $useMinMax = false;
+            if (isset($exportCategoryId['min'])) {
+                $this->addUsingAlias(ExportTableMap::EXPORT_CATEGORY_ID, $exportCategoryId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($exportCategoryId['max'])) {
+                $this->addUsingAlias(ExportTableMap::EXPORT_CATEGORY_ID, $exportCategoryId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ExportTableMap::EXPORT_CATEGORY_ID, $exportCategoryId, $comparison);
     }
 
     /**
@@ -290,18 +337,18 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return ChildExportQuery The current query, for fluid interface
      */
     public function filterByPosition($position = null, $comparison = null)
     {
         if (is_array($position)) {
             $useMinMax = false;
             if (isset($position['min'])) {
-                $this->addUsingAlias(ImportExportCategoryTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ExportTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($position['max'])) {
-                $this->addUsingAlias(ImportExportCategoryTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ExportTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -312,7 +359,7 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ImportExportCategoryTableMap::POSITION, $position, $comparison);
+        return $this->addUsingAlias(ExportTableMap::POSITION, $position, $comparison);
     }
 
     /**
@@ -333,18 +380,18 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return ChildExportQuery The current query, for fluid interface
      */
     public function filterByCreatedAt($createdAt = null, $comparison = null)
     {
         if (is_array($createdAt)) {
             $useMinMax = false;
             if (isset($createdAt['min'])) {
-                $this->addUsingAlias(ImportExportCategoryTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ExportTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($createdAt['max'])) {
-                $this->addUsingAlias(ImportExportCategoryTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ExportTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -355,7 +402,7 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ImportExportCategoryTableMap::CREATED_AT, $createdAt, $comparison);
+        return $this->addUsingAlias(ExportTableMap::CREATED_AT, $createdAt, $comparison);
     }
 
     /**
@@ -376,18 +423,18 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return ChildExportQuery The current query, for fluid interface
      */
     public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
         if (is_array($updatedAt)) {
             $useMinMax = false;
             if (isset($updatedAt['min'])) {
-                $this->addUsingAlias(ImportExportCategoryTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ExportTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($updatedAt['max'])) {
-                $this->addUsingAlias(ImportExportCategoryTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ExportTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -398,44 +445,46 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ImportExportCategoryTableMap::UPDATED_AT, $updatedAt, $comparison);
+        return $this->addUsingAlias(ExportTableMap::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\ImportExportType object
+     * Filter the query by a related \Thelia\Model\ExportCategory object
      *
-     * @param \Thelia\Model\ImportExportType|ObjectCollection $importExportType  the related object to use as filter
+     * @param \Thelia\Model\ExportCategory|ObjectCollection $exportCategory The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return ChildExportQuery The current query, for fluid interface
      */
-    public function filterByImportExportType($importExportType, $comparison = null)
+    public function filterByExportCategory($exportCategory, $comparison = null)
     {
-        if ($importExportType instanceof \Thelia\Model\ImportExportType) {
+        if ($exportCategory instanceof \Thelia\Model\ExportCategory) {
             return $this
-                ->addUsingAlias(ImportExportCategoryTableMap::ID, $importExportType->getImportExportCategoryId(), $comparison);
-        } elseif ($importExportType instanceof ObjectCollection) {
+                ->addUsingAlias(ExportTableMap::EXPORT_CATEGORY_ID, $exportCategory->getId(), $comparison);
+        } elseif ($exportCategory instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useImportExportTypeQuery()
-                ->filterByPrimaryKeys($importExportType->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(ExportTableMap::EXPORT_CATEGORY_ID, $exportCategory->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByImportExportType() only accepts arguments of type \Thelia\Model\ImportExportType or Collection');
+            throw new PropelException('filterByExportCategory() only accepts arguments of type \Thelia\Model\ExportCategory or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the ImportExportType relation
+     * Adds a JOIN clause to the query using the ExportCategory relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return ChildExportQuery The current query, for fluid interface
      */
-    public function joinImportExportType($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinExportCategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ImportExportType');
+        $relationMap = $tableMap->getRelation('ExportCategory');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -450,14 +499,14 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'ImportExportType');
+            $this->addJoinObject($join, 'ExportCategory');
         }
 
         return $this;
     }
 
     /**
-     * Use the ImportExportType relation ImportExportType object
+     * Use the ExportCategory relation ExportCategory object
      *
      * @see useQuery()
      *
@@ -465,50 +514,50 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ImportExportTypeQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ExportCategoryQuery A secondary query class using the current class as primary query
      */
-    public function useImportExportTypeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useExportCategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinImportExportType($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ImportExportType', '\Thelia\Model\ImportExportTypeQuery');
+            ->joinExportCategory($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ExportCategory', '\Thelia\Model\ExportCategoryQuery');
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\ImportExportCategoryI18n object
+     * Filter the query by a related \Thelia\Model\ExportI18n object
      *
-     * @param \Thelia\Model\ImportExportCategoryI18n|ObjectCollection $importExportCategoryI18n  the related object to use as filter
+     * @param \Thelia\Model\ExportI18n|ObjectCollection $exportI18n  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return ChildExportQuery The current query, for fluid interface
      */
-    public function filterByImportExportCategoryI18n($importExportCategoryI18n, $comparison = null)
+    public function filterByExportI18n($exportI18n, $comparison = null)
     {
-        if ($importExportCategoryI18n instanceof \Thelia\Model\ImportExportCategoryI18n) {
+        if ($exportI18n instanceof \Thelia\Model\ExportI18n) {
             return $this
-                ->addUsingAlias(ImportExportCategoryTableMap::ID, $importExportCategoryI18n->getId(), $comparison);
-        } elseif ($importExportCategoryI18n instanceof ObjectCollection) {
+                ->addUsingAlias(ExportTableMap::ID, $exportI18n->getId(), $comparison);
+        } elseif ($exportI18n instanceof ObjectCollection) {
             return $this
-                ->useImportExportCategoryI18nQuery()
-                ->filterByPrimaryKeys($importExportCategoryI18n->getPrimaryKeys())
+                ->useExportI18nQuery()
+                ->filterByPrimaryKeys($exportI18n->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByImportExportCategoryI18n() only accepts arguments of type \Thelia\Model\ImportExportCategoryI18n or Collection');
+            throw new PropelException('filterByExportI18n() only accepts arguments of type \Thelia\Model\ExportI18n or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the ImportExportCategoryI18n relation
+     * Adds a JOIN clause to the query using the ExportI18n relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return ChildExportQuery The current query, for fluid interface
      */
-    public function joinImportExportCategoryI18n($relationAlias = null, $joinType = 'LEFT JOIN')
+    public function joinExportI18n($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ImportExportCategoryI18n');
+        $relationMap = $tableMap->getRelation('ExportI18n');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -523,14 +572,14 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'ImportExportCategoryI18n');
+            $this->addJoinObject($join, 'ExportI18n');
         }
 
         return $this;
     }
 
     /**
-     * Use the ImportExportCategoryI18n relation ImportExportCategoryI18n object
+     * Use the ExportI18n relation ExportI18n object
      *
      * @see useQuery()
      *
@@ -538,33 +587,33 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ImportExportCategoryI18nQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ExportI18nQuery A secondary query class using the current class as primary query
      */
-    public function useImportExportCategoryI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    public function useExportI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
-            ->joinImportExportCategoryI18n($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ImportExportCategoryI18n', '\Thelia\Model\ImportExportCategoryI18nQuery');
+            ->joinExportI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ExportI18n', '\Thelia\Model\ExportI18nQuery');
     }
 
     /**
      * Exclude object from result
      *
-     * @param   ChildImportExportCategory $importExportCategory Object to remove from the list of results
+     * @param   ChildExport $export Object to remove from the list of results
      *
-     * @return ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return ChildExportQuery The current query, for fluid interface
      */
-    public function prune($importExportCategory = null)
+    public function prune($export = null)
     {
-        if ($importExportCategory) {
-            $this->addUsingAlias(ImportExportCategoryTableMap::ID, $importExportCategory->getId(), Criteria::NOT_EQUAL);
+        if ($export) {
+            $this->addUsingAlias(ExportTableMap::ID, $export->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
     }
 
     /**
-     * Deletes all rows from the import_export_category table.
+     * Deletes all rows from the export table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -572,7 +621,7 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ImportExportCategoryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ExportTableMap::DATABASE_NAME);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
@@ -583,8 +632,8 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            ImportExportCategoryTableMap::clearInstancePool();
-            ImportExportCategoryTableMap::clearRelatedInstancePool();
+            ExportTableMap::clearInstancePool();
+            ExportTableMap::clearRelatedInstancePool();
 
             $con->commit();
         } catch (PropelException $e) {
@@ -596,9 +645,9 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
     }
 
     /**
-     * Performs a DELETE on the database, given a ChildImportExportCategory or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ChildExport or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildImportExportCategory object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ChildExport object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -609,13 +658,13 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      public function delete(ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ImportExportCategoryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ExportTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(ImportExportCategoryTableMap::DATABASE_NAME);
+        $criteria->setDbName(ExportTableMap::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -625,10 +674,10 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
             $con->beginTransaction();
 
 
-        ImportExportCategoryTableMap::removeInstanceFromPool($criteria);
+        ExportTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            ImportExportCategoryTableMap::clearRelatedInstancePool();
+            ExportTableMap::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -647,14 +696,14 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return    ChildExportQuery The current query, for fluid interface
      */
     public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
-        $relationName = $relationAlias ? $relationAlias : 'ImportExportCategoryI18n';
+        $relationName = $relationAlias ? $relationAlias : 'ExportI18n';
 
         return $this
-            ->joinImportExportCategoryI18n($relationAlias, $joinType)
+            ->joinExportI18n($relationAlias, $joinType)
             ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
     }
 
@@ -665,14 +714,14 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return    ChildExportQuery The current query, for fluid interface
      */
     public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
-            ->with('ImportExportCategoryI18n');
-        $this->with['ImportExportCategoryI18n']->setIsWithOneToMany(false);
+            ->with('ExportI18n');
+        $this->with['ExportI18n']->setIsWithOneToMany(false);
 
         return $this;
     }
@@ -686,13 +735,13 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildImportExportCategoryI18nQuery A secondary query class using the current class as primary query
+     * @return    ChildExportI18nQuery A secondary query class using the current class as primary query
      */
     public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ImportExportCategoryI18n', '\Thelia\Model\ImportExportCategoryI18nQuery');
+            ->useQuery($relationAlias ? $relationAlias : 'ExportI18n', '\Thelia\Model\ExportI18nQuery');
     }
 
     // timestampable behavior
@@ -702,11 +751,11 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return     ChildExportQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(ImportExportCategoryTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(ExportTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
@@ -714,51 +763,51 @@ abstract class ImportExportCategoryQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of in days
      *
-     * @return     ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return     ChildExportQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(ImportExportCategoryTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(ExportTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
      * Order by update date desc
      *
-     * @return     ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return     ChildExportQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
-        return $this->addDescendingOrderByColumn(ImportExportCategoryTableMap::UPDATED_AT);
+        return $this->addDescendingOrderByColumn(ExportTableMap::UPDATED_AT);
     }
 
     /**
      * Order by update date asc
      *
-     * @return     ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return     ChildExportQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
-        return $this->addAscendingOrderByColumn(ImportExportCategoryTableMap::UPDATED_AT);
+        return $this->addAscendingOrderByColumn(ExportTableMap::UPDATED_AT);
     }
 
     /**
      * Order by create date desc
      *
-     * @return     ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return     ChildExportQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
-        return $this->addDescendingOrderByColumn(ImportExportCategoryTableMap::CREATED_AT);
+        return $this->addDescendingOrderByColumn(ExportTableMap::CREATED_AT);
     }
 
     /**
      * Order by create date asc
      *
-     * @return     ChildImportExportCategoryQuery The current query, for fluid interface
+     * @return     ChildExportQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(ImportExportCategoryTableMap::CREATED_AT);
+        return $this->addAscendingOrderByColumn(ExportTableMap::CREATED_AT);
     }
 
-} // ImportExportCategoryQuery
+} // ExportQuery

@@ -18,7 +18,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Model\Base\ImportExportCategoryQuery;
 use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
@@ -27,7 +26,7 @@ use Thelia\Type\TypeCollection;
  * @package Thelia\Core\Template\Loop
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class ImportExportCategory extends BaseLoop implements PropelSearchLoopInterface
+abstract class ImportExportCategory extends BaseLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
@@ -38,7 +37,6 @@ class ImportExportCategory extends BaseLoop implements PropelSearchLoopInterface
      */
     public function parseResults(LoopResult $loopResult)
     {
-        /** @var \Thelia\Model\ImportExportCategory $category */
         foreach ($loopResult->getResultDataCollection() as $category)
         {
             $loopResultRow = new LoopResultRow($category);
@@ -62,7 +60,7 @@ class ImportExportCategory extends BaseLoop implements PropelSearchLoopInterface
      */
     public function buildModelCriteria()
     {
-        $query = ImportExportCategoryQuery::create();
+        $query = $this->getQueryModel();
 
         if (null !== $ids = $this->getId()) {
             $query->filterById($ids, Criteria::IN);
@@ -133,4 +131,6 @@ class ImportExportCategory extends BaseLoop implements PropelSearchLoopInterface
             )
         );
     }
+
+    abstract protected function getQueryModel();
 } 

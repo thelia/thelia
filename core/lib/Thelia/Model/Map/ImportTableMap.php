@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\ImportExportCategory;
-use Thelia\Model\ImportExportCategoryQuery;
+use Thelia\Model\Import;
+use Thelia\Model\ImportQuery;
 
 
 /**
- * This class defines the structure of the 'import_export_category' table.
+ * This class defines the structure of the 'import' table.
  *
  *
  *
@@ -26,14 +26,14 @@ use Thelia\Model\ImportExportCategoryQuery;
  * (i.e. if it's a text column type).
  *
  */
-class ImportExportCategoryTableMap extends TableMap
+class ImportTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.ImportExportCategoryTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.ImportTableMap';
 
     /**
      * The default database name for this class
@@ -43,22 +43,22 @@ class ImportExportCategoryTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'import_export_category';
+    const TABLE_NAME = 'import';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\ImportExportCategory';
+    const OM_CLASS = '\\Thelia\\Model\\Import';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.ImportExportCategory';
+    const CLASS_DEFAULT = 'Thelia.Model.Import';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -68,27 +68,32 @@ class ImportExportCategoryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'import_export_category.ID';
+    const ID = 'import.ID';
+
+    /**
+     * the column name for the IMPORT_CATEGORY_ID field
+     */
+    const IMPORT_CATEGORY_ID = 'import.IMPORT_CATEGORY_ID';
 
     /**
      * the column name for the POSITION field
      */
-    const POSITION = 'import_export_category.POSITION';
+    const POSITION = 'import.POSITION';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'import_export_category.CREATED_AT';
+    const CREATED_AT = 'import.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'import_export_category.UPDATED_AT';
+    const UPDATED_AT = 'import.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -111,12 +116,12 @@ class ImportExportCategoryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'position', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ImportExportCategoryTableMap::ID, ImportExportCategoryTableMap::POSITION, ImportExportCategoryTableMap::CREATED_AT, ImportExportCategoryTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'position', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'ImportCategoryId', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'importCategoryId', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ImportTableMap::ID, ImportTableMap::IMPORT_CATEGORY_ID, ImportTableMap::POSITION, ImportTableMap::CREATED_AT, ImportTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'IMPORT_CATEGORY_ID', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'import_category_id', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -126,12 +131,12 @@ class ImportExportCategoryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Position' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'position' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(ImportExportCategoryTableMap::ID => 0, ImportExportCategoryTableMap::POSITION => 1, ImportExportCategoryTableMap::CREATED_AT => 2, ImportExportCategoryTableMap::UPDATED_AT => 3, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'POSITION' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'position' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ImportCategoryId' => 1, 'Position' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'importCategoryId' => 1, 'position' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(ImportTableMap::ID => 0, ImportTableMap::IMPORT_CATEGORY_ID => 1, ImportTableMap::POSITION => 2, ImportTableMap::CREATED_AT => 3, ImportTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'IMPORT_CATEGORY_ID' => 1, 'POSITION' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'import_category_id' => 1, 'position' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -144,13 +149,14 @@ class ImportExportCategoryTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('import_export_category');
-        $this->setPhpName('ImportExportCategory');
-        $this->setClassName('\\Thelia\\Model\\ImportExportCategory');
+        $this->setName('import');
+        $this->setPhpName('Import');
+        $this->setClassName('\\Thelia\\Model\\Import');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('IMPORT_CATEGORY_ID', 'ImportCategoryId', 'INTEGER', 'import_category', 'ID', true, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -161,8 +167,8 @@ class ImportExportCategoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ImportExportType', '\\Thelia\\Model\\ImportExportType', RelationMap::ONE_TO_MANY, array('id' => 'import_export_category_id', ), 'CASCADE', 'RESTRICT', 'ImportExportTypes');
-        $this->addRelation('ImportExportCategoryI18n', '\\Thelia\\Model\\ImportExportCategoryI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ImportExportCategoryI18ns');
+        $this->addRelation('ImportCategory', '\\Thelia\\Model\\ImportCategory', RelationMap::MANY_TO_ONE, array('import_category_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('ImportI18n', '\\Thelia\\Model\\ImportI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ImportI18ns');
     } // buildRelations()
 
     /**
@@ -174,19 +180,18 @@ class ImportExportCategoryTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
     /**
-     * Method to invalidate the instance pool of all tables related to import_export_category     * by a foreign key with ON DELETE CASCADE
+     * Method to invalidate the instance pool of all tables related to import     * by a foreign key with ON DELETE CASCADE
      */
     public static function clearRelatedInstancePool()
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                ImportExportTypeTableMap::clearInstancePool();
-                ImportExportCategoryI18nTableMap::clearInstancePool();
+                ImportI18nTableMap::clearInstancePool();
             }
 
     /**
@@ -245,7 +250,7 @@ class ImportExportCategoryTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? ImportExportCategoryTableMap::CLASS_DEFAULT : ImportExportCategoryTableMap::OM_CLASS;
+        return $withPrefix ? ImportTableMap::CLASS_DEFAULT : ImportTableMap::OM_CLASS;
     }
 
     /**
@@ -259,21 +264,21 @@ class ImportExportCategoryTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (ImportExportCategory object, last column rank)
+     * @return array (Import object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = ImportExportCategoryTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = ImportExportCategoryTableMap::getInstanceFromPool($key))) {
+        $key = ImportTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ImportTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + ImportExportCategoryTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ImportTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = ImportExportCategoryTableMap::OM_CLASS;
+            $cls = ImportTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            ImportExportCategoryTableMap::addInstanceToPool($obj, $key);
+            ImportTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -296,8 +301,8 @@ class ImportExportCategoryTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = ImportExportCategoryTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = ImportExportCategoryTableMap::getInstanceFromPool($key))) {
+            $key = ImportTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ImportTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -306,7 +311,7 @@ class ImportExportCategoryTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                ImportExportCategoryTableMap::addInstanceToPool($obj, $key);
+                ImportTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -327,12 +332,14 @@ class ImportExportCategoryTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ImportExportCategoryTableMap::ID);
-            $criteria->addSelectColumn(ImportExportCategoryTableMap::POSITION);
-            $criteria->addSelectColumn(ImportExportCategoryTableMap::CREATED_AT);
-            $criteria->addSelectColumn(ImportExportCategoryTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(ImportTableMap::ID);
+            $criteria->addSelectColumn(ImportTableMap::IMPORT_CATEGORY_ID);
+            $criteria->addSelectColumn(ImportTableMap::POSITION);
+            $criteria->addSelectColumn(ImportTableMap::CREATED_AT);
+            $criteria->addSelectColumn(ImportTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
+            $criteria->addSelectColumn($alias . '.IMPORT_CATEGORY_ID');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
@@ -348,7 +355,7 @@ class ImportExportCategoryTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(ImportExportCategoryTableMap::DATABASE_NAME)->getTable(ImportExportCategoryTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ImportTableMap::DATABASE_NAME)->getTable(ImportTableMap::TABLE_NAME);
     }
 
     /**
@@ -356,16 +363,16 @@ class ImportExportCategoryTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ImportExportCategoryTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(ImportExportCategoryTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new ImportExportCategoryTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ImportTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(ImportTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new ImportTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a ImportExportCategory or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a Import or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ImportExportCategory object or primary key or array of primary keys
+     * @param mixed               $values Criteria or Import object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -376,25 +383,25 @@ class ImportExportCategoryTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ImportExportCategoryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ImportTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\ImportExportCategory) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\Import) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(ImportExportCategoryTableMap::DATABASE_NAME);
-            $criteria->add(ImportExportCategoryTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ImportTableMap::DATABASE_NAME);
+            $criteria->add(ImportTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = ImportExportCategoryQuery::create()->mergeWith($criteria);
+        $query = ImportQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { ImportExportCategoryTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { ImportTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { ImportExportCategoryTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { ImportTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -402,20 +409,20 @@ class ImportExportCategoryTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the import_export_category table.
+     * Deletes all rows from the import table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return ImportExportCategoryQuery::create()->doDeleteAll($con);
+        return ImportQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a ImportExportCategory or Criteria object.
+     * Performs an INSERT on the database, given a Import or Criteria object.
      *
-     * @param mixed               $criteria Criteria or ImportExportCategory object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or Import object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -424,22 +431,22 @@ class ImportExportCategoryTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ImportExportCategoryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ImportTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from ImportExportCategory object
+            $criteria = $criteria->buildCriteria(); // build Criteria from Import object
         }
 
-        if ($criteria->containsKey(ImportExportCategoryTableMap::ID) && $criteria->keyContainsValue(ImportExportCategoryTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ImportExportCategoryTableMap::ID.')');
+        if ($criteria->containsKey(ImportTableMap::ID) && $criteria->keyContainsValue(ImportTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ImportTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = ImportExportCategoryQuery::create()->mergeWith($criteria);
+        $query = ImportQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -455,7 +462,7 @@ class ImportExportCategoryTableMap extends TableMap
         return $pk;
     }
 
-} // ImportExportCategoryTableMap
+} // ImportTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-ImportExportCategoryTableMap::buildTableMap();
+ImportTableMap::buildTableMap();

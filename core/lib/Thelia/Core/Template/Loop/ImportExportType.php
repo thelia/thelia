@@ -11,11 +11,14 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Tools\URL;
 use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
@@ -24,8 +27,10 @@ use Thelia\Type\TypeCollection;
  * @package Thelia\Core\Template\Loop
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class ImportExportType extends BaseLoop implements PropelSearchLoopInterface
+abstract class ImportExportType extends BaseLoop implements PropelSearchLoopInterface
 {
+    protected $timestampable = true;
+
     /**
      * @param LoopResult $loopResult
      *
@@ -33,9 +38,27 @@ class ImportExportType extends BaseLoop implements PropelSearchLoopInterface
      */
     public function parseResults(LoopResult $loopResult)
     {
-        // TODO: Implement parseResults() method.
-    }
+        foreach ($loopResult->getResultDataCollection() as $type) {
+            $loopResultRow = new LoopResultRow($type);
 
+            $url = URL::getInstance()->absoluteUrl(
+                $this->getBaseUrl() . DS . $type->getId()
+            );
+
+            $loopResultRow
+                ->set("ID", $type->getId())
+                ->set("TITLE", $type->getTitle())
+                ->set("DESCRIPTION", $type->getDescription())
+                ->set("URL", $type->isImport() ? $url : null)
+                ->set("POSITION", $type->getPosition())
+                ->set("CATEGORY_ID", $type->getImportExportCategoryId())
+            ;
+
+            $loopResult->addRow($loopResultRow);
+        }
+
+        return $loopResult;
+    }
 
     /**
      * this method returns a Propel ModelCriteria
@@ -44,7 +67,42 @@ class ImportExportType extends BaseLoop implements PropelSearchLoopInterface
      */
     public function buildModelCriteria()
     {
-        // TODO: Implement buildModelCriteria() method.
+        $query = $this->getQueryModel();
+
+        if (null !== $ids = $this->getId()) {
+            $query->filterById($ids);
+        }
+
+        if (null !== $categories = $this->getCategory()) {
+            $query->filterBy($this->getCategoryName(), $categories, Criteria::IN);
+        }
+
+        if (null !== $orders = $this->getOrder()) {
+            foreach ($orders as $order) {
+                switch($order) {
+                    case "id":
+                        $query->orderById();
+                        break;
+                    case "id_reverse":
+                        $query->orderById(Criteria::DESC);
+                        break;
+                    case "alpha":
+                        $query->addAscendingOrderByColumn("i18n_TITLE");
+                        break;
+                    case "alpha_reverse":
+                        $query->addDescendingOrderByColumn("i18n_TITLE");
+                        break;
+                    case "manual":
+                        $query->orderByPosition();
+                        break;
+                    case "manual_reverse":
+                        $query->orderByPosition(Criteria::DESC);
+                        break;
+                }
+            }
+        }
+
+        return $query;
     }
 
     /**
@@ -75,6 +133,7 @@ class ImportExportType extends BaseLoop implements PropelSearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
+            Argument::createIntListTypeArgument('category'),
             new Argument(
                 "order",
                 new TypeCollection(
@@ -84,4 +143,10 @@ class ImportExportType extends BaseLoop implements PropelSearchLoopInterface
             )
         );
     }
+
+    abstract protected function getBaseUrl();
+
+    abstract protected function getQueryModel();
+
+    abstract protected function getCategoryName();
 } 

@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\ImportExportTypeI18n;
-use Thelia\Model\ImportExportTypeI18nQuery;
+use Thelia\Model\ExportCategory;
+use Thelia\Model\ExportCategoryQuery;
 
 
 /**
- * This class defines the structure of the 'import_export_type_i18n' table.
+ * This class defines the structure of the 'export_category' table.
  *
  *
  *
@@ -26,14 +26,14 @@ use Thelia\Model\ImportExportTypeI18nQuery;
  * (i.e. if it's a text column type).
  *
  */
-class ImportExportTypeI18nTableMap extends TableMap
+class ExportCategoryTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.ImportExportTypeI18nTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.ExportCategoryTableMap';
 
     /**
      * The default database name for this class
@@ -43,17 +43,17 @@ class ImportExportTypeI18nTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'import_export_type_i18n';
+    const TABLE_NAME = 'export_category';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\ImportExportTypeI18n';
+    const OM_CLASS = '\\Thelia\\Model\\ExportCategory';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.ImportExportTypeI18n';
+    const CLASS_DEFAULT = 'Thelia.Model.ExportCategory';
 
     /**
      * The total number of columns
@@ -73,27 +73,36 @@ class ImportExportTypeI18nTableMap extends TableMap
     /**
      * the column name for the ID field
      */
-    const ID = 'import_export_type_i18n.ID';
+    const ID = 'export_category.ID';
 
     /**
-     * the column name for the LOCALE field
+     * the column name for the POSITION field
      */
-    const LOCALE = 'import_export_type_i18n.LOCALE';
+    const POSITION = 'export_category.POSITION';
 
     /**
-     * the column name for the TITLE field
+     * the column name for the CREATED_AT field
      */
-    const TITLE = 'import_export_type_i18n.TITLE';
+    const CREATED_AT = 'export_category.CREATED_AT';
 
     /**
-     * the column name for the DESCRIPTION field
+     * the column name for the UPDATED_AT field
      */
-    const DESCRIPTION = 'import_export_type_i18n.DESCRIPTION';
+    const UPDATED_AT = 'export_category.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
+
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations.
+     *
+     * @var string
+     */
+    const DEFAULT_LOCALE = 'en_US';
 
     /**
      * holds an array of fieldnames
@@ -102,11 +111,11 @@ class ImportExportTypeI18nTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Locale', 'Title', 'Description', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'locale', 'title', 'description', ),
-        self::TYPE_COLNAME       => array(ImportExportTypeI18nTableMap::ID, ImportExportTypeI18nTableMap::LOCALE, ImportExportTypeI18nTableMap::TITLE, ImportExportTypeI18nTableMap::DESCRIPTION, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', 'TITLE', 'DESCRIPTION', ),
-        self::TYPE_FIELDNAME     => array('id', 'locale', 'title', 'description', ),
+        self::TYPE_PHPNAME       => array('Id', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ExportCategoryTableMap::ID, ExportCategoryTableMap::POSITION, ExportCategoryTableMap::CREATED_AT, ExportCategoryTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'position', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
@@ -117,11 +126,11 @@ class ImportExportTypeI18nTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, 'Title' => 2, 'Description' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, ),
-        self::TYPE_COLNAME       => array(ImportExportTypeI18nTableMap::ID => 0, ImportExportTypeI18nTableMap::LOCALE => 1, ImportExportTypeI18nTableMap::TITLE => 2, ImportExportTypeI18nTableMap::DESCRIPTION => 3, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, 'TITLE' => 2, 'DESCRIPTION' => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Position' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'position' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        self::TYPE_COLNAME       => array(ExportCategoryTableMap::ID => 0, ExportCategoryTableMap::POSITION => 1, ExportCategoryTableMap::CREATED_AT => 2, ExportCategoryTableMap::UPDATED_AT => 3, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'POSITION' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'position' => 1, 'created_at' => 2, 'updated_at' => 3, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
@@ -135,16 +144,16 @@ class ImportExportTypeI18nTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('import_export_type_i18n');
-        $this->setPhpName('ImportExportTypeI18n');
-        $this->setClassName('\\Thelia\\Model\\ImportExportTypeI18n');
+        $this->setName('export_category');
+        $this->setPhpName('ExportCategory');
+        $this->setClassName('\\Thelia\\Model\\ExportCategory');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'import_export_type', 'ID', true, null, null);
-        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_US');
-        $this->addColumn('TITLE', 'Title', 'VARCHAR', true, 255, null);
-        $this->addColumn('DESCRIPTION', 'Description', 'CLOB', false, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -152,61 +161,33 @@ class ImportExportTypeI18nTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ImportExportType', '\\Thelia\\Model\\ImportExportType', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Export', '\\Thelia\\Model\\Export', RelationMap::ONE_TO_MANY, array('id' => 'export_category_id', ), 'CASCADE', 'RESTRICT', 'Exports');
+        $this->addRelation('ExportCategoryI18n', '\\Thelia\\Model\\ExportCategoryI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ExportCategoryI18ns');
     } // buildRelations()
 
     /**
-     * Adds an object to the instance pool.
      *
-     * Propel keeps cached copies of objects in an instance pool when they are retrieved
-     * from the database. In some cases you may need to explicitly add objects
-     * to the cache in order to ensure that the same objects are always returned by find*()
-     * and findPk*() calls.
+     * Gets the list of behaviors registered for this table
      *
-     * @param \Thelia\Model\ImportExportTypeI18n $obj A \Thelia\Model\ImportExportTypeI18n object.
-     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
+     * @return array Associative array (name => parameters) of behaviors
      */
-    public static function addInstanceToPool($obj, $key = null)
+    public function getBehaviors()
     {
-        if (Propel::isInstancePoolingEnabled()) {
-            if (null === $key) {
-                $key = serialize(array((string) $obj->getId(), (string) $obj->getLocale()));
-            } // if key === null
-            self::$instances[$key] = $obj;
-        }
-    }
-
+        return array(
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
+        );
+    } // getBehaviors()
     /**
-     * Removes an object from the instance pool.
-     *
-     * Propel keeps cached copies of objects in an instance pool when they are retrieved
-     * from the database.  In some cases -- especially when you override doDelete
-     * methods in your stub classes -- you may need to explicitly remove objects
-     * from the cache in order to prevent returning objects that no longer exist.
-     *
-     * @param mixed $value A \Thelia\Model\ImportExportTypeI18n object or a primary key value.
+     * Method to invalidate the instance pool of all tables related to export_category     * by a foreign key with ON DELETE CASCADE
      */
-    public static function removeInstanceFromPool($value)
+    public static function clearRelatedInstancePool()
     {
-        if (Propel::isInstancePoolingEnabled() && null !== $value) {
-            if (is_object($value) && $value instanceof \Thelia\Model\ImportExportTypeI18n) {
-                $key = serialize(array((string) $value->getId(), (string) $value->getLocale()));
-
-            } elseif (is_array($value) && count($value) === 2) {
-                // assume we've been passed a primary key";
-                $key = serialize(array((string) $value[0], (string) $value[1]));
-            } elseif ($value instanceof Criteria) {
-                self::$instances = [];
-
-                return;
-            } else {
-                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\ImportExportTypeI18n object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
-                throw $e;
+        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+                ExportTableMap::clearInstancePool();
+                ExportCategoryI18nTableMap::clearInstancePool();
             }
-
-            unset(self::$instances[$key]);
-        }
-    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -222,11 +203,11 @@ class ImportExportTypeI18nTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)]));
+        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -244,7 +225,11 @@ class ImportExportTypeI18nTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return $pks;
+            return (int) $row[
+                            $indexType == TableMap::TYPE_NUM
+                            ? 0 + $offset
+                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                        ];
     }
 
     /**
@@ -260,7 +245,7 @@ class ImportExportTypeI18nTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? ImportExportTypeI18nTableMap::CLASS_DEFAULT : ImportExportTypeI18nTableMap::OM_CLASS;
+        return $withPrefix ? ExportCategoryTableMap::CLASS_DEFAULT : ExportCategoryTableMap::OM_CLASS;
     }
 
     /**
@@ -274,21 +259,21 @@ class ImportExportTypeI18nTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (ImportExportTypeI18n object, last column rank)
+     * @return array (ExportCategory object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = ImportExportTypeI18nTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = ImportExportTypeI18nTableMap::getInstanceFromPool($key))) {
+        $key = ExportCategoryTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ExportCategoryTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + ImportExportTypeI18nTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ExportCategoryTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = ImportExportTypeI18nTableMap::OM_CLASS;
+            $cls = ExportCategoryTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            ImportExportTypeI18nTableMap::addInstanceToPool($obj, $key);
+            ExportCategoryTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -311,8 +296,8 @@ class ImportExportTypeI18nTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = ImportExportTypeI18nTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = ImportExportTypeI18nTableMap::getInstanceFromPool($key))) {
+            $key = ExportCategoryTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ExportCategoryTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -321,7 +306,7 @@ class ImportExportTypeI18nTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                ImportExportTypeI18nTableMap::addInstanceToPool($obj, $key);
+                ExportCategoryTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -342,15 +327,15 @@ class ImportExportTypeI18nTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ImportExportTypeI18nTableMap::ID);
-            $criteria->addSelectColumn(ImportExportTypeI18nTableMap::LOCALE);
-            $criteria->addSelectColumn(ImportExportTypeI18nTableMap::TITLE);
-            $criteria->addSelectColumn(ImportExportTypeI18nTableMap::DESCRIPTION);
+            $criteria->addSelectColumn(ExportCategoryTableMap::ID);
+            $criteria->addSelectColumn(ExportCategoryTableMap::POSITION);
+            $criteria->addSelectColumn(ExportCategoryTableMap::CREATED_AT);
+            $criteria->addSelectColumn(ExportCategoryTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.LOCALE');
-            $criteria->addSelectColumn($alias . '.TITLE');
-            $criteria->addSelectColumn($alias . '.DESCRIPTION');
+            $criteria->addSelectColumn($alias . '.POSITION');
+            $criteria->addSelectColumn($alias . '.CREATED_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 
@@ -363,7 +348,7 @@ class ImportExportTypeI18nTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(ImportExportTypeI18nTableMap::DATABASE_NAME)->getTable(ImportExportTypeI18nTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ExportCategoryTableMap::DATABASE_NAME)->getTable(ExportCategoryTableMap::TABLE_NAME);
     }
 
     /**
@@ -371,16 +356,16 @@ class ImportExportTypeI18nTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ImportExportTypeI18nTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(ImportExportTypeI18nTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new ImportExportTypeI18nTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ExportCategoryTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(ExportCategoryTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new ExportCategoryTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a ImportExportTypeI18n or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ExportCategory or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ImportExportTypeI18n object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ExportCategory object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -391,35 +376,25 @@ class ImportExportTypeI18nTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ImportExportTypeI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ExportCategoryTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\ImportExportTypeI18n) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\ExportCategory) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(ImportExportTypeI18nTableMap::DATABASE_NAME);
-            // primary key is composite; we therefore, expect
-            // the primary key passed to be an array of pkey values
-            if (count($values) == count($values, COUNT_RECURSIVE)) {
-                // array is not multi-dimensional
-                $values = array($values);
-            }
-            foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(ImportExportTypeI18nTableMap::ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(ImportExportTypeI18nTableMap::LOCALE, $value[1]));
-                $criteria->addOr($criterion);
-            }
+            $criteria = new Criteria(ExportCategoryTableMap::DATABASE_NAME);
+            $criteria->add(ExportCategoryTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = ImportExportTypeI18nQuery::create()->mergeWith($criteria);
+        $query = ExportCategoryQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { ImportExportTypeI18nTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { ExportCategoryTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { ImportExportTypeI18nTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { ExportCategoryTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -427,20 +402,20 @@ class ImportExportTypeI18nTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the import_export_type_i18n table.
+     * Deletes all rows from the export_category table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return ImportExportTypeI18nQuery::create()->doDeleteAll($con);
+        return ExportCategoryQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a ImportExportTypeI18n or Criteria object.
+     * Performs an INSERT on the database, given a ExportCategory or Criteria object.
      *
-     * @param mixed               $criteria Criteria or ImportExportTypeI18n object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or ExportCategory object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -449,18 +424,22 @@ class ImportExportTypeI18nTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ImportExportTypeI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ExportCategoryTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from ImportExportTypeI18n object
+            $criteria = $criteria->buildCriteria(); // build Criteria from ExportCategory object
+        }
+
+        if ($criteria->containsKey(ExportCategoryTableMap::ID) && $criteria->keyContainsValue(ExportCategoryTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ExportCategoryTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = ImportExportTypeI18nQuery::create()->mergeWith($criteria);
+        $query = ExportCategoryQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -476,7 +455,7 @@ class ImportExportTypeI18nTableMap extends TableMap
         return $pk;
     }
 
-} // ImportExportTypeI18nTableMap
+} // ExportCategoryTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-ImportExportTypeI18nTableMap::buildTableMap();
+ExportCategoryTableMap::buildTableMap();

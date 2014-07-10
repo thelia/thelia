@@ -14,17 +14,17 @@ use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
-use Thelia\Model\ImportExportType as ChildImportExportType;
-use Thelia\Model\ImportExportTypeI18nQuery as ChildImportExportTypeI18nQuery;
-use Thelia\Model\ImportExportTypeQuery as ChildImportExportTypeQuery;
-use Thelia\Model\Map\ImportExportTypeI18nTableMap;
+use Thelia\Model\ImportCategory as ChildImportCategory;
+use Thelia\Model\ImportCategoryI18nQuery as ChildImportCategoryI18nQuery;
+use Thelia\Model\ImportCategoryQuery as ChildImportCategoryQuery;
+use Thelia\Model\Map\ImportCategoryI18nTableMap;
 
-abstract class ImportExportTypeI18n implements ActiveRecordInterface
+abstract class ImportCategoryI18n implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\ImportExportTypeI18nTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\ImportCategoryI18nTableMap';
 
 
     /**
@@ -73,15 +73,9 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
     protected $title;
 
     /**
-     * The value for the description field.
-     * @var        string
+     * @var        ImportCategory
      */
-    protected $description;
-
-    /**
-     * @var        ImportExportType
-     */
-    protected $aImportExportType;
+    protected $aImportCategory;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -103,7 +97,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
     }
 
     /**
-     * Initializes internal state of Thelia\Model\Base\ImportExportTypeI18n object.
+     * Initializes internal state of Thelia\Model\Base\ImportCategoryI18n object.
      * @see applyDefaults()
      */
     public function __construct()
@@ -200,9 +194,9 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>ImportExportTypeI18n</code> instance.  If
-     * <code>obj</code> is an instance of <code>ImportExportTypeI18n</code>, delegates to
-     * <code>equals(ImportExportTypeI18n)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>ImportCategoryI18n</code> instance.  If
+     * <code>obj</code> is an instance of <code>ImportCategoryI18n</code>, delegates to
+     * <code>equals(ImportCategoryI18n)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -285,7 +279,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return ImportExportTypeI18n The current object, for fluid interface
+     * @return ImportCategoryI18n The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -317,7 +311,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return ImportExportTypeI18n The current object, for fluid interface
+     * @return ImportCategoryI18n The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -396,21 +390,10 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
     }
 
     /**
-     * Get the [description] column value.
-     *
-     * @return   string
-     */
-    public function getDescription()
-    {
-
-        return $this->description;
-    }
-
-    /**
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\ImportExportTypeI18n The current object (for fluent API support)
+     * @return   \Thelia\Model\ImportCategoryI18n The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -420,11 +403,11 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[ImportExportTypeI18nTableMap::ID] = true;
+            $this->modifiedColumns[ImportCategoryI18nTableMap::ID] = true;
         }
 
-        if ($this->aImportExportType !== null && $this->aImportExportType->getId() !== $v) {
-            $this->aImportExportType = null;
+        if ($this->aImportCategory !== null && $this->aImportCategory->getId() !== $v) {
+            $this->aImportCategory = null;
         }
 
 
@@ -435,7 +418,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      * Set the value of [locale] column.
      *
      * @param      string $v new value
-     * @return   \Thelia\Model\ImportExportTypeI18n The current object (for fluent API support)
+     * @return   \Thelia\Model\ImportCategoryI18n The current object (for fluent API support)
      */
     public function setLocale($v)
     {
@@ -445,7 +428,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
 
         if ($this->locale !== $v) {
             $this->locale = $v;
-            $this->modifiedColumns[ImportExportTypeI18nTableMap::LOCALE] = true;
+            $this->modifiedColumns[ImportCategoryI18nTableMap::LOCALE] = true;
         }
 
 
@@ -456,7 +439,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      * Set the value of [title] column.
      *
      * @param      string $v new value
-     * @return   \Thelia\Model\ImportExportTypeI18n The current object (for fluent API support)
+     * @return   \Thelia\Model\ImportCategoryI18n The current object (for fluent API support)
      */
     public function setTitle($v)
     {
@@ -466,33 +449,12 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
 
         if ($this->title !== $v) {
             $this->title = $v;
-            $this->modifiedColumns[ImportExportTypeI18nTableMap::TITLE] = true;
+            $this->modifiedColumns[ImportCategoryI18nTableMap::TITLE] = true;
         }
 
 
         return $this;
     } // setTitle()
-
-    /**
-     * Set the value of [description] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\ImportExportTypeI18n The current object (for fluent API support)
-     */
-    public function setDescription($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->description !== $v) {
-            $this->description = $v;
-            $this->modifiedColumns[ImportExportTypeI18nTableMap::DESCRIPTION] = true;
-        }
-
-
-        return $this;
-    } // setDescription()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -535,17 +497,14 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ImportExportTypeI18nTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ImportCategoryI18nTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ImportExportTypeI18nTableMap::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ImportCategoryI18nTableMap::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)];
             $this->locale = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ImportExportTypeI18nTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ImportCategoryI18nTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
             $this->title = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ImportExportTypeI18nTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->description = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -554,10 +513,10 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = ImportExportTypeI18nTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = ImportCategoryI18nTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\ImportExportTypeI18n object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\ImportCategoryI18n object", 0, $e);
         }
     }
 
@@ -576,8 +535,8 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aImportExportType !== null && $this->id !== $this->aImportExportType->getId()) {
-            $this->aImportExportType = null;
+        if ($this->aImportCategory !== null && $this->id !== $this->aImportCategory->getId()) {
+            $this->aImportCategory = null;
         }
     } // ensureConsistency
 
@@ -602,13 +561,13 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(ImportExportTypeI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ImportCategoryI18nTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildImportExportTypeI18nQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildImportCategoryI18nQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -618,7 +577,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aImportExportType = null;
+            $this->aImportCategory = null;
         } // if (deep)
     }
 
@@ -628,8 +587,8 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see ImportExportTypeI18n::setDeleted()
-     * @see ImportExportTypeI18n::isDeleted()
+     * @see ImportCategoryI18n::setDeleted()
+     * @see ImportCategoryI18n::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -638,12 +597,12 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ImportExportTypeI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ImportCategoryI18nTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildImportExportTypeI18nQuery::create()
+            $deleteQuery = ChildImportCategoryI18nQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -680,7 +639,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ImportExportTypeI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ImportCategoryI18nTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -700,7 +659,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                ImportExportTypeI18nTableMap::addInstanceToPool($this);
+                ImportCategoryI18nTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -735,11 +694,11 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aImportExportType !== null) {
-                if ($this->aImportExportType->isModified() || $this->aImportExportType->isNew()) {
-                    $affectedRows += $this->aImportExportType->save($con);
+            if ($this->aImportCategory !== null) {
+                if ($this->aImportCategory->isModified() || $this->aImportCategory->isNew()) {
+                    $affectedRows += $this->aImportCategory->save($con);
                 }
-                $this->setImportExportType($this->aImportExportType);
+                $this->setImportCategory($this->aImportCategory);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -775,21 +734,18 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ImportExportTypeI18nTableMap::ID)) {
+        if ($this->isColumnModified(ImportCategoryI18nTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = '`ID`';
         }
-        if ($this->isColumnModified(ImportExportTypeI18nTableMap::LOCALE)) {
+        if ($this->isColumnModified(ImportCategoryI18nTableMap::LOCALE)) {
             $modifiedColumns[':p' . $index++]  = '`LOCALE`';
         }
-        if ($this->isColumnModified(ImportExportTypeI18nTableMap::TITLE)) {
+        if ($this->isColumnModified(ImportCategoryI18nTableMap::TITLE)) {
             $modifiedColumns[':p' . $index++]  = '`TITLE`';
-        }
-        if ($this->isColumnModified(ImportExportTypeI18nTableMap::DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '`DESCRIPTION`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `import_export_type_i18n` (%s) VALUES (%s)',
+            'INSERT INTO `import_category_i18n` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -806,9 +762,6 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
                         break;
                     case '`TITLE`':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
-                        break;
-                    case '`DESCRIPTION`':
-                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -849,7 +802,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ImportExportTypeI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ImportCategoryI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -874,9 +827,6 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
             case 2:
                 return $this->getTitle();
                 break;
-            case 3:
-                return $this->getDescription();
-                break;
             default:
                 return null;
                 break;
@@ -900,16 +850,15 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['ImportExportTypeI18n'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['ImportCategoryI18n'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['ImportExportTypeI18n'][serialize($this->getPrimaryKey())] = true;
-        $keys = ImportExportTypeI18nTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['ImportCategoryI18n'][serialize($this->getPrimaryKey())] = true;
+        $keys = ImportCategoryI18nTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getLocale(),
             $keys[2] => $this->getTitle(),
-            $keys[3] => $this->getDescription(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -917,8 +866,8 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aImportExportType) {
-                $result['ImportExportType'] = $this->aImportExportType->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aImportCategory) {
+                $result['ImportCategory'] = $this->aImportCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -938,7 +887,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ImportExportTypeI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ImportCategoryI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -963,9 +912,6 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
             case 2:
                 $this->setTitle($value);
                 break;
-            case 3:
-                $this->setDescription($value);
-                break;
         } // switch()
     }
 
@@ -988,12 +934,11 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = ImportExportTypeI18nTableMap::getFieldNames($keyType);
+        $keys = ImportCategoryI18nTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setLocale($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setTitle($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setDescription($arr[$keys[3]]);
     }
 
     /**
@@ -1003,12 +948,11 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(ImportExportTypeI18nTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ImportCategoryI18nTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ImportExportTypeI18nTableMap::ID)) $criteria->add(ImportExportTypeI18nTableMap::ID, $this->id);
-        if ($this->isColumnModified(ImportExportTypeI18nTableMap::LOCALE)) $criteria->add(ImportExportTypeI18nTableMap::LOCALE, $this->locale);
-        if ($this->isColumnModified(ImportExportTypeI18nTableMap::TITLE)) $criteria->add(ImportExportTypeI18nTableMap::TITLE, $this->title);
-        if ($this->isColumnModified(ImportExportTypeI18nTableMap::DESCRIPTION)) $criteria->add(ImportExportTypeI18nTableMap::DESCRIPTION, $this->description);
+        if ($this->isColumnModified(ImportCategoryI18nTableMap::ID)) $criteria->add(ImportCategoryI18nTableMap::ID, $this->id);
+        if ($this->isColumnModified(ImportCategoryI18nTableMap::LOCALE)) $criteria->add(ImportCategoryI18nTableMap::LOCALE, $this->locale);
+        if ($this->isColumnModified(ImportCategoryI18nTableMap::TITLE)) $criteria->add(ImportCategoryI18nTableMap::TITLE, $this->title);
 
         return $criteria;
     }
@@ -1023,9 +967,9 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(ImportExportTypeI18nTableMap::DATABASE_NAME);
-        $criteria->add(ImportExportTypeI18nTableMap::ID, $this->id);
-        $criteria->add(ImportExportTypeI18nTableMap::LOCALE, $this->locale);
+        $criteria = new Criteria(ImportCategoryI18nTableMap::DATABASE_NAME);
+        $criteria->add(ImportCategoryI18nTableMap::ID, $this->id);
+        $criteria->add(ImportCategoryI18nTableMap::LOCALE, $this->locale);
 
         return $criteria;
     }
@@ -1072,7 +1016,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\ImportExportTypeI18n (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\ImportCategoryI18n (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -1082,7 +1026,6 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
         $copyObj->setId($this->getId());
         $copyObj->setLocale($this->getLocale());
         $copyObj->setTitle($this->getTitle());
-        $copyObj->setDescription($this->getDescription());
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -1097,7 +1040,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\ImportExportTypeI18n Clone of current object.
+     * @return                 \Thelia\Model\ImportCategoryI18n Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1111,13 +1054,13 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildImportExportType object.
+     * Declares an association between this object and a ChildImportCategory object.
      *
-     * @param                  ChildImportExportType $v
-     * @return                 \Thelia\Model\ImportExportTypeI18n The current object (for fluent API support)
+     * @param                  ChildImportCategory $v
+     * @return                 \Thelia\Model\ImportCategoryI18n The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setImportExportType(ChildImportExportType $v = null)
+    public function setImportCategory(ChildImportCategory $v = null)
     {
         if ($v === null) {
             $this->setId(NULL);
@@ -1125,12 +1068,12 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
             $this->setId($v->getId());
         }
 
-        $this->aImportExportType = $v;
+        $this->aImportCategory = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildImportExportType object, it will not be re-added.
+        // If this object has already been added to the ChildImportCategory object, it will not be re-added.
         if ($v !== null) {
-            $v->addImportExportTypeI18n($this);
+            $v->addImportCategoryI18n($this);
         }
 
 
@@ -1139,26 +1082,26 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildImportExportType object
+     * Get the associated ChildImportCategory object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildImportExportType The associated ChildImportExportType object.
+     * @return                 ChildImportCategory The associated ChildImportCategory object.
      * @throws PropelException
      */
-    public function getImportExportType(ConnectionInterface $con = null)
+    public function getImportCategory(ConnectionInterface $con = null)
     {
-        if ($this->aImportExportType === null && ($this->id !== null)) {
-            $this->aImportExportType = ChildImportExportTypeQuery::create()->findPk($this->id, $con);
+        if ($this->aImportCategory === null && ($this->id !== null)) {
+            $this->aImportCategory = ChildImportCategoryQuery::create()->findPk($this->id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aImportExportType->addImportExportTypeI18ns($this);
+                $this->aImportCategory->addImportCategoryI18ns($this);
              */
         }
 
-        return $this->aImportExportType;
+        return $this->aImportCategory;
     }
 
     /**
@@ -1169,7 +1112,6 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
         $this->id = null;
         $this->locale = null;
         $this->title = null;
-        $this->description = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
@@ -1192,7 +1134,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aImportExportType = null;
+        $this->aImportCategory = null;
     }
 
     /**
@@ -1202,7 +1144,7 @@ abstract class ImportExportTypeI18n implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(ImportExportTypeI18nTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ImportCategoryI18nTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**

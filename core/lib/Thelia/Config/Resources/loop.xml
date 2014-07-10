@@ -57,7 +57,10 @@
         <loop class="Thelia\Core\Template\Loop\TaxRuleCountry" name="tax-rule-country"/>
         <loop class="Thelia\Core\Template\Loop\Formatter" name="formatter" />
         <loop class="Thelia\Core\Template\Loop\ArchiveBuilder" name="archive-builder" />
-        <loop class="Thelia\Core\Template\Loop\ImportExportCategory" name="import-export-category" />
+        <loop class="Thelia\Core\Template\Loop\ImportCategory" name="import-category" />
+        <loop class="Thelia\Core\Template\Loop\ExportCategory" name="export-category" />
+        <loop class="Thelia\Core\Template\Loop\Import" name="import" />
+        <loop class="Thelia\Core\Template\Loop\Export" name="export" />
     </loops>
 
 

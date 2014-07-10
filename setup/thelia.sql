@@ -1874,12 +1874,12 @@ CREATE TABLE `form_firewall`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- import_export_category
+-- import_category
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `import_export_category`;
+DROP TABLE IF EXISTS `import_category`;
 
-CREATE TABLE `import_export_category`
+CREATE TABLE `import_category`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `position` INTEGER NOT NULL,
@@ -1889,24 +1889,60 @@ CREATE TABLE `import_export_category`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- import_export_type
+-- export_category
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `import_export_type`;
+DROP TABLE IF EXISTS `export_category`;
 
-CREATE TABLE `import_export_type`
+CREATE TABLE `export_category`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `url_action` VARCHAR(255) NOT NULL,
-    `import_export_category_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- import
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `import`;
+
+CREATE TABLE `import`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `import_category_id` INTEGER NOT NULL,
     `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_import_export_type_import_export_category_id` (`import_export_category_id`),
-    CONSTRAINT `fk_import_export_type_import_export_category_id`
-        FOREIGN KEY (`import_export_category_id`)
-        REFERENCES `import_export_category` (`id`)
+    INDEX `idx_import_import_category_id` (`import_category_id`),
+    CONSTRAINT `fk_import_import_category_id`
+        FOREIGN KEY (`import_category_id`)
+        REFERENCES `import_category` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- export
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `export`;
+
+CREATE TABLE `export`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `export_category_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_export_export_category_id` (`export_category_id`),
+    CONSTRAINT `fk_export_export_category_id`
+        FOREIGN KEY (`export_category_id`)
+        REFERENCES `export_category` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -2607,39 +2643,76 @@ CREATE TABLE `brand_image_i18n`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- import_export_category_i18n
+-- import_category_i18n
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `import_export_category_i18n`;
+DROP TABLE IF EXISTS `import_category_i18n`;
 
-CREATE TABLE `import_export_category_i18n`
+CREATE TABLE `import_category_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `import_export_category_i18n_FK_1`
+    CONSTRAINT `import_category_i18n_FK_1`
         FOREIGN KEY (`id`)
-        REFERENCES `import_export_category` (`id`)
+        REFERENCES `import_category` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- import_export_type_i18n
+-- export_category_i18n
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `import_export_type_i18n`;
+DROP TABLE IF EXISTS `export_category_i18n`;
 
-CREATE TABLE `import_export_type_i18n`
+CREATE TABLE `export_category_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `export_category_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `export_category` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- import_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `import_i18n`;
+
+CREATE TABLE `import_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     `description` LONGTEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `import_export_type_i18n_FK_1`
+    CONSTRAINT `import_i18n_FK_1`
         FOREIGN KEY (`id`)
-        REFERENCES `import_export_type` (`id`)
+        REFERENCES `import` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- export_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `export_i18n`;
+
+CREATE TABLE `export_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `description` LONGTEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `export_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `export` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

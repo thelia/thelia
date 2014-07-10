@@ -27,7 +27,7 @@
 
                 {module_include location='tools_top'}
 
-                {loop name="import-export-category" type="import-export-category"}
+                {loop name="export-category" type="export-category"}
                     {if $LOOP_COUNT % 3}
                     <div class="row">
                     {/if}
@@ -51,9 +51,11 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td><a href="{url path="/admin/export"}/">n</a></td>
-                                            </tr>
+                                            {loop name="export-categ-list" type="export" category=$ID}
+                                                <tr>
+                                                    <td><a href="{$URL}">{$TITLE}</a></td>
+                                                </tr>
+                                            {/loop}
                                         </tbody>
                                     </table>
                                 </div>

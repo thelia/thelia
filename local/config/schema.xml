@@ -1512,7 +1512,7 @@
 
     <behavior name="timestampable" />
   </table>
-  <table name="import_export_category" namespace="Thelia\Model">
+  <table name="import_category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="title" type="VARCHAR" size="255" required="true" />
     <column name="position" type="INTEGER" required="true" />
@@ -1521,18 +1521,43 @@
     </behavior>
     <behavior name="timestampable" />
   </table>
-  <table name="import_export_type" namespace="Thelia\Model">
+  <table name="export_category" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="title" type="VARCHAR" size="255" required="true" />
+    <column name="position" type="INTEGER" required="true" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title" />
+    </behavior>
+    <behavior name="timestampable" />
+  </table>
+  <table name="import" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="title" type="VARCHAR" size="255" required="true" />
     <column name="description" type="CLOB" />
-    <column name="url_action" type="VARCHAR" size="255" required="true" />
-    <column name="import_export_category_id" type="INTEGER" required="true" />
+    <column name="import_category_id" type="INTEGER" required="true" />
     <column name="position" type="INTEGER" required="true" />
-    <foreign-key foreignTable="import_export_category" name="fk_import_export_type_import_export_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="import_export_category_id" />
+    <foreign-key foreignTable="import_category" name="fk_import_import_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="import_category_id" />
     </foreign-key>
-    <index name="idx_import_export_type_import_export_category_id">
-      <index-column name="import_export_category_id" />
+    <index name="idx_import_import_category_id">
+      <index-column name="import_category_id" />
+    </index>
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description" />
+    </behavior>
+    <behavior name="timestampable" />
+  </table>
+  <table name="export" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="title" type="VARCHAR" size="255" required="true" />
+    <column name="description" type="CLOB" />
+    <column name="export_category_id" type="INTEGER" required="true" />
+    <column name="position" type="INTEGER" required="true" />
+    <foreign-key foreignTable="export_category" name="fk_export_export_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="export_category_id" />
+    </foreign-key>
+    <index name="idx_export_export_category_id">
+      <index-column name="export_category_id" />
     </index>
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description" />
