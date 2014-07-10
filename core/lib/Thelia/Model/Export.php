@@ -3,6 +3,8 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\ImportExport\ExportHandlerInterface;
 use Thelia\Model\Base\Export as BaseExport;
 use Thelia\Model\Map\ExportTableMap;
 
@@ -10,6 +12,7 @@ class Export extends BaseExport
 {
     public function upPosition()
     {
+
         if (($position = $this->getPosition()) > 1) {
 
             $previous = ExportQuery::create()
@@ -69,5 +72,33 @@ class Export extends BaseExport
         }
 
         $this->setPosition($position)->save();
+    }
+
+    public function getHandleClassInstance(ContainerInterface $container)
+    {
+        $class = $this->getHandleClass();
+
+        if (!class_exists($class)) {
+            throw new \ErrorException(
+                "The class \"%class\" doesn't exist",
+                [
+                    "%class" => $class
+                ]
+            );
+        }
+
+        $instance = new $class($container);
+
+        if (!$class instanceof ExportHandlerInterface) {
+            throw new \ErrorException(
+                "The class \"%class\" must implement %interface",
+                [
+                    "%class" => $class,
+                    "%interface" => "\\Thelia\\ImportExport\\ExportHandlerInterface",
+                ]
+            );
+        }
+
+        return $instance;
     }
 }

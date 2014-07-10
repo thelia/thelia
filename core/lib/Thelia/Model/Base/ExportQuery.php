@@ -25,12 +25,14 @@ use Thelia\Model\Map\ExportTableMap;
  * @method     ChildExportQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildExportQuery orderByExportCategoryId($order = Criteria::ASC) Order by the export_category_id column
  * @method     ChildExportQuery orderByPosition($order = Criteria::ASC) Order by the position column
+ * @method     ChildExportQuery orderByHandleclass($order = Criteria::ASC) Order by the handleClass column
  * @method     ChildExportQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildExportQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildExportQuery groupById() Group by the id column
  * @method     ChildExportQuery groupByExportCategoryId() Group by the export_category_id column
  * @method     ChildExportQuery groupByPosition() Group by the position column
+ * @method     ChildExportQuery groupByHandleclass() Group by the handleClass column
  * @method     ChildExportQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildExportQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -52,12 +54,14 @@ use Thelia\Model\Map\ExportTableMap;
  * @method     ChildExport findOneById(int $id) Return the first ChildExport filtered by the id column
  * @method     ChildExport findOneByExportCategoryId(int $export_category_id) Return the first ChildExport filtered by the export_category_id column
  * @method     ChildExport findOneByPosition(int $position) Return the first ChildExport filtered by the position column
+ * @method     ChildExport findOneByHandleclass(string $handleClass) Return the first ChildExport filtered by the handleClass column
  * @method     ChildExport findOneByCreatedAt(string $created_at) Return the first ChildExport filtered by the created_at column
  * @method     ChildExport findOneByUpdatedAt(string $updated_at) Return the first ChildExport filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildExport objects filtered by the id column
  * @method     array findByExportCategoryId(int $export_category_id) Return ChildExport objects filtered by the export_category_id column
  * @method     array findByPosition(int $position) Return ChildExport objects filtered by the position column
+ * @method     array findByHandleclass(string $handleClass) Return ChildExport objects filtered by the handleClass column
  * @method     array findByCreatedAt(string $created_at) Return ChildExport objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildExport objects filtered by the updated_at column
  *
@@ -148,7 +152,7 @@ abstract class ExportQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `EXPORT_CATEGORY_ID`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `export` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `EXPORT_CATEGORY_ID`, `POSITION`, `HANDLECLASS`, `CREATED_AT`, `UPDATED_AT` FROM `export` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -360,6 +364,35 @@ abstract class ExportQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ExportTableMap::POSITION, $position, $comparison);
+    }
+
+    /**
+     * Filter the query on the handleClass column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByHandleclass('fooValue');   // WHERE handleClass = 'fooValue'
+     * $query->filterByHandleclass('%fooValue%'); // WHERE handleClass LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $handleclass The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildExportQuery The current query, for fluid interface
+     */
+    public function filterByHandleclass($handleclass = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($handleclass)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $handleclass)) {
+                $handleclass = str_replace('*', '%', $handleclass);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ExportTableMap::HANDLECLASS, $handleclass, $comparison);
     }
 
     /**

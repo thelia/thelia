@@ -58,7 +58,7 @@ class ImportTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class ImportTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the ID field
@@ -84,6 +84,11 @@ class ImportTableMap extends TableMap
      * the column name for the POSITION field
      */
     const POSITION = 'import.POSITION';
+
+    /**
+     * the column name for the HANDLECLASS field
+     */
+    const HANDLECLASS = 'import.HANDLECLASS';
 
     /**
      * the column name for the CREATED_AT field
@@ -116,12 +121,12 @@ class ImportTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ImportCategoryId', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'importCategoryId', 'position', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ImportTableMap::ID, ImportTableMap::IMPORT_CATEGORY_ID, ImportTableMap::POSITION, ImportTableMap::CREATED_AT, ImportTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'IMPORT_CATEGORY_ID', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'import_category_id', 'position', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id', 'ImportCategoryId', 'Position', 'Handleclass', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'importCategoryId', 'position', 'handleclass', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ImportTableMap::ID, ImportTableMap::IMPORT_CATEGORY_ID, ImportTableMap::POSITION, ImportTableMap::HANDLECLASS, ImportTableMap::CREATED_AT, ImportTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'IMPORT_CATEGORY_ID', 'POSITION', 'HANDLECLASS', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'import_category_id', 'position', 'handleClass', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -131,12 +136,12 @@ class ImportTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ImportCategoryId' => 1, 'Position' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'importCategoryId' => 1, 'position' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        self::TYPE_COLNAME       => array(ImportTableMap::ID => 0, ImportTableMap::IMPORT_CATEGORY_ID => 1, ImportTableMap::POSITION => 2, ImportTableMap::CREATED_AT => 3, ImportTableMap::UPDATED_AT => 4, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'IMPORT_CATEGORY_ID' => 1, 'POSITION' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'import_category_id' => 1, 'position' => 2, 'created_at' => 3, 'updated_at' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ImportCategoryId' => 1, 'Position' => 2, 'Handleclass' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'importCategoryId' => 1, 'position' => 2, 'handleclass' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(ImportTableMap::ID => 0, ImportTableMap::IMPORT_CATEGORY_ID => 1, ImportTableMap::POSITION => 2, ImportTableMap::HANDLECLASS => 3, ImportTableMap::CREATED_AT => 4, ImportTableMap::UPDATED_AT => 5, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'IMPORT_CATEGORY_ID' => 1, 'POSITION' => 2, 'HANDLECLASS' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'import_category_id' => 1, 'position' => 2, 'handleClass' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -158,6 +163,7 @@ class ImportTableMap extends TableMap
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('IMPORT_CATEGORY_ID', 'ImportCategoryId', 'INTEGER', 'import_category', 'ID', true, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
+        $this->addColumn('HANDLECLASS', 'Handleclass', 'CLOB', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -335,12 +341,14 @@ class ImportTableMap extends TableMap
             $criteria->addSelectColumn(ImportTableMap::ID);
             $criteria->addSelectColumn(ImportTableMap::IMPORT_CATEGORY_ID);
             $criteria->addSelectColumn(ImportTableMap::POSITION);
+            $criteria->addSelectColumn(ImportTableMap::HANDLECLASS);
             $criteria->addSelectColumn(ImportTableMap::CREATED_AT);
             $criteria->addSelectColumn(ImportTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.IMPORT_CATEGORY_ID');
             $criteria->addSelectColumn($alias . '.POSITION');
+            $criteria->addSelectColumn($alias . '.HANDLECLASS');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

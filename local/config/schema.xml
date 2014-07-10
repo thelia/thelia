@@ -1536,6 +1536,7 @@
     <column name="description" type="CLOB" />
     <column name="import_category_id" type="INTEGER" required="true" />
     <column name="position" type="INTEGER" required="true" />
+    <column name="handleClass" type="CLOB" required="true"/>
     <foreign-key foreignTable="import_category" name="fk_import_import_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="import_category_id" />
     </foreign-key>
@@ -1553,6 +1554,7 @@
     <column name="description" type="CLOB" />
     <column name="export_category_id" type="INTEGER" required="true" />
     <column name="position" type="INTEGER" required="true" />
+    <column name="handleClass" type="CLOB" required="true"/>
     <foreign-key foreignTable="export_category" name="fk_export_export_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="export_category_id" />
     </foreign-key>
