@@ -761,6 +761,7 @@ final class TheliaEvents
     /**
      * sent for clearing tcache
      */
+    const TCACHE_UPDATE      = 'thelia.tcache.update';
     const TCACHE_DISCARD_REF = 'thelia.tcache.clear.ref';
     const TCACHE_DISCARD_KEY = 'thelia.tcache.clear.key';
     const TCACHE_FLUSH       = 'thelia.tcache.flush';
