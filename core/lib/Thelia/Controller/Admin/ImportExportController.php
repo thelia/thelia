@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\HttpFoundation\Response;
 
 /**
  * Class ImportExportController
@@ -27,5 +28,15 @@ class ImportExportController extends BaseAdminController
     public function export()
     {
 
+    }
+
+    public function importView()
+    {
+        return $this->render("import-page");
+    }
+
+    public function exportView()
+    {
+        return $this->render("export-page");
     }
 } 

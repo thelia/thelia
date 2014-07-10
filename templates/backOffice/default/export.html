@@ -42,18 +42,41 @@
                                         </caption>
                                         <thead>
                                             <tr>
-                                                <th class="col-md-10">
-                                                    {intl l="Name"}
+                                                <th class="col-md-1">
+                                                    <a href="{url path="/admin/export"}?export_order=id{if $export_order == "id"}_reverse{/if}">
+                                                        {intl l="ID"}
+                                                    </a>
+                                                </th>
+                                                <th class="col-md-9">
+                                                    <a href="{url path="/admin/export"}?export_order=alpha{if $export_order == "alpha"}_reverse{/if}">
+                                                        {intl l="Name"}
+                                                    </a>
                                                 </th>
                                                 <th class="col-md-2">
-                                                    {intl l="Position"}
+                                                    <a href="{url path="/admin/export"}?export_order=manual{if $export_order == "manual"}_reverse{/if}">
+                                                        {intl l="Position"}
+                                                    </a>
                                                 </th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {loop name="export-categ-list" type="export" category=$ID}
+                                            {loop name="export-categ-list" type="export" order=$export_order category=$ID}
                                                 <tr>
-                                                    <td><a href="{$URL}">{$TITLE}</a></td>
+                                                    <td>
+                                                        {$ID}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{$URL}">{$TITLE}</a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="{url path="/admin/export"}/position/up/{$ID}">
+                                                            <span class="glyphicon glyphicon-arrow-up"></span>
+                                                        </a>
+                                                        {$POSITION}
+                                                        <a href="{url path="/admin/export/position/down"}/{$ID}">
+                                                            <span class="glyphicon glyphicon-arrow-down"></span>
+                                                        </a>
+                                                    </td>
                                                 </tr>
                                             {/loop}
                                         </tbody>

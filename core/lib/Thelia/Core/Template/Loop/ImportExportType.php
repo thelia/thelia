@@ -29,6 +29,8 @@ use Thelia\Type\TypeCollection;
  */
 abstract class ImportExportType extends BaseLoop implements PropelSearchLoopInterface
 {
+    const DEFAULT_ORDER = "manual";
+
     protected $timestampable = true;
 
     /**
@@ -49,9 +51,9 @@ abstract class ImportExportType extends BaseLoop implements PropelSearchLoopInte
                 ->set("ID", $type->getId())
                 ->set("TITLE", $type->getTitle())
                 ->set("DESCRIPTION", $type->getDescription())
-                ->set("URL", $type->isImport() ? $url : null)
+                ->set("URL", $url)
                 ->set("POSITION", $type->getPosition())
-                ->set("CATEGORY_ID", $type->getImportExportCategoryId())
+                ->set("CATEGORY_ID", $type->getByName($this->getCategoryName()))
             ;
 
             $loopResult->addRow($loopResultRow);
@@ -137,11 +139,16 @@ abstract class ImportExportType extends BaseLoop implements PropelSearchLoopInte
             new Argument(
                 "order",
                 new TypeCollection(
-                    new EnumListType(["id", "id_reverse", "alpha", "alpha_reverse", "manual", "manual_reverse"])
+                    new EnumListType(static::getAllowedOrders())
                 ),
-                "manual"
+                static::DEFAULT_ORDER
             )
         );
+    }
+
+    public static function getAllowedOrders()
+    {
+        return ["id", "id_reverse", "alpha", "alpha_reverse", "manual", "manual_reverse"];
     }
 
     abstract protected function getBaseUrl();
