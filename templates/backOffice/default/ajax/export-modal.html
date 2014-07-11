@@ -1,0 +1,93 @@
+{form name="thelia.export"}
+<form action="{$URL}" method="post" {form_enctype form=$form}>
+    <div class="modal fade" id="real-export-modal" tabindex="-1" role="dialog" aria-labelledby="export-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="export-modal-label">Export: {$TITLE}</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                        {ifloop rel="export-formatters"}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {custom_render_form_field form=$form field="formatter"}
+                                        <select>
+                                            {loop name="export-formatters" type="formatter" export=$ID}
+                                                <option value="{$NAME}" {if $value == $NAME}selected{/if}>
+                                                    {$NAME} (.{$EXTENSION})
+                                                </option>
+                                            {/loop}
+                                        </select>
+                                    {/custom_render_form_field}
+                                </div>
+                                <div class="col-md-6">
+                                    {form_field form=$form field="do_compress"}
+                                    <label for="{$label_attr.for}">
+                                        {$label}
+                                    </label>
+                                    <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;" data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;" data-on="success" class="make-switch switch-small" id="export-compression-switch">
+                                        <input type="checkbox" name="{$name}" id="{$label_attr.for}"/>
+                                    </div>
+                                    {/form_field}
+                                </div>
+                            </div>
+                            <div class="row export-compression-selection-row">
+                                <div class="col-md-4">
+                                    {custom_render_form_field form=$form field="archive_builder"}
+                                        <select name="{$name}">
+                                            {loop name="export-archive-builder" type="archive-builder"}
+                                                <option value="{$NAME}" {if $value == $NAME}selected{/if}>
+                                                    {$NAME} (.{$EXTENSION})
+                                                </option>
+                                            {/loop}
+                                        </select>
+                                    {/custom_render_form_field}
+                                </div>
+                                <div class="col-md-4">
+                                    {form_field form=$form field="images"}
+                                        <label for="{$label_attr.for}">
+                                            {$label}
+                                        </label>
+
+                                        <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;" data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;" data-on="success" class="make-switch switch-small">
+                                            <input type="checkbox" name="{$name}" id="{$label_attr.for}" />
+                                        </div>
+                                    {/form_field}
+                                </div>
+                                <div class="col-md-4">
+                                    {form_field form=$form field="documents"}
+                                        <label for="{$label_attr.for}">
+                                            {$label}
+                                        </label>
+
+                                        <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;" data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;" data-on="success" class="make-switch switch-small">
+                                            <input type="checkbox" name="{$name}" id="{$label_attr.for}" />
+                                        </div>
+                                    {/form_field}
+                                </div>
+                            </div>
+                        {/ifloop}
+                        {elseloop rel="export-formatters"}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="alert alert-warning">
+                                        {intl l="You can't do exports, you don't have any formatter that handles this."}
+                                    </div>
+                                </div>
+                            </div>
+                        {/elseloop}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{intl l="Close"}</button>
+                    <button type="submit" class="btn btn-primary">{intl l="Export"}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{/form}

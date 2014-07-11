@@ -47,6 +47,11 @@ class ExportForm extends BaseForm
                 "multiple" => false,
                 "choices" => $this->formattersNames,
             ))
+            ->add("do_compress", "checkbox", array(
+                "label" => $this->translator->trans("Do compress"),
+                "label_attr" => ["for" => "do_compress"],
+                "required" => false,
+            ))
             ->add("archive_builder", "choice", array(
                 "label" => $this->translator->trans("Archive Format"),
                 "label_attr" => ["for" => "archive_builder"],

@@ -13,27 +13,20 @@
 namespace Thelia\ImportExport\Export;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
-use Thelia\ImportExport\ExportHandlerInterface;
+use Thelia\Core\Translation\Translator;
+use Thelia\ImportExport\ExportHandler;
+use Thelia\Model\CustomerQuery;
+use Thelia\Model\Map\CustomerTableMap;
+use Thelia\Model\Map\NewsletterTableMap;
+use Thelia\Model\NewsletterQuery;
 
 /**
  * Class MailingExport
  * @package Thelia\ImportExport\Export
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class MailingExport implements ExportHandlerInterface
+class MailingExport extends ExportHandler
 {
-    protected $container;
-
-    /**
-     * @param ContainerInterface $container
-     *
-     * Dependency injection: load the container to be able to get parameters and services
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
     /**
      * @return \Thelia\Core\FileFormat\Formatting\FormatterData
      *
@@ -41,7 +34,49 @@ class MailingExport implements ExportHandlerInterface
      */
     public function buildFormatterData()
     {
-        $data = new FormatterData();
+        $translator = Translator::getInstance();
+
+        $email = $translator->trans("email");
+        $lastName = $translator->trans("last name");
+        $firstName = $translator->trans("first name");
+
+
+        $aliases = [
+            NewsletterTableMap::EMAIL       => $email,
+            CustomerTableMap::EMAIL         => $email,
+
+            NewsletterTableMap::LASTNAME    => $lastName,
+            CustomerTableMap::LASTNAME      => $lastName,
+
+            NewsletterTableMap::FIRSTNAME   => $firstName,
+            CustomerTableMap::FIRSTNAME     => $firstName,
+        ];
+
+        $data = new FormatterData($aliases);
+
+        $newsletter = NewsletterQuery::create()
+            ->select([
+                NewsletterTableMap::EMAIL,
+                NewsletterTableMap::LASTNAME,
+                NewsletterTableMap::FIRSTNAME,
+            ])
+            ->find()
+            ->toArray()
+        ;
+        
+        $customers = CustomerQuery::create()
+            ->select([
+                CustomerTableMap::EMAIL,
+                CustomerTableMap::LASTNAME,
+                CustomerTableMap::FIRSTNAME,
+            ])
+            ->find()
+            ->toArray()
+        ;
+
+        $both = $newsletter + $customers;
+
+        return $data->setData($both);
     }
 
     /**

@@ -14,25 +14,29 @@ namespace Thelia\ImportExport;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Interface ExportHandlerInterface
+ * Interface ExportHandler
  * @package Thelia\ImportExport
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-interface ExportHandlerInterface
+abstract class ExportHandler
 {
+    protected $container;
+
     /**
      * @param ContainerInterface $container
      *
      * Dependency injection: load the container to be able to get parameters and services
      */
-    public function __construct(ContainerInterface $container);
+    public function __construct(ContainerInterface $container) {
+        $this->container = $container;
+    }
 
     /**
      * @return \Thelia\Core\FileFormat\Formatting\FormatterData
      *
-     * The method builds
+     * The method builds the FormatterData for the formatter
      */
-    public function buildFormatterData();
+    abstract public function buildFormatterData();
 
     /**
      * @return string|array
@@ -49,5 +53,5 @@ interface ExportHandlerInterface
      *     ExportType::EXPORT_UNBOUNDED,
      * );
      */
-    public function getHandledType();
+    abstract public function getHandledType();
 } 

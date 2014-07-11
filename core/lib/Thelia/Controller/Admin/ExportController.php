@@ -108,11 +108,11 @@ class ExportController extends BaseAdminController
     protected function setOrders($category = null, $export = null)
     {
         if ($category === null) {
-            $category = $this->getRequest()->query->get("category_order");
+            $category = $this->getRequest()->query->get("category_order", "manual");
         }
 
         if ($export === null) {
-            $export = $this->getRequest()->query->get("export_order");
+            $export = $this->getRequest()->query->get("export_order", "manual");
         }
 
         $this->getParserContext()

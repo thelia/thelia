@@ -42,6 +42,7 @@ class Formatter extends BaseLoop implements ArraySearchLoopInterface
 
         $exportId = $this->getExport();
         $formatters = [];
+
         if ($exportId !== null) {
             $export = ExportQuery::create()->findPk($exportId);
 

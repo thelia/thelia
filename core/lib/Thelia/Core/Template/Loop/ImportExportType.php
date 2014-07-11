@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Template\Loop;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -27,7 +29,7 @@ use Thelia\Type\TypeCollection;
  * @package Thelia\Core\Template\Loop
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-abstract class ImportExportType extends BaseLoop implements PropelSearchLoopInterface
+abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     const DEFAULT_ORDER = "manual";
 
@@ -49,8 +51,8 @@ abstract class ImportExportType extends BaseLoop implements PropelSearchLoopInte
 
             $loopResultRow
                 ->set("ID", $type->getId())
-                ->set("TITLE", $type->getTitle())
-                ->set("DESCRIPTION", $type->getDescription())
+                ->set("TITLE", $type->getVirtualColumn("i18n_TITLE"))
+                ->set("DESCRIPTION", $type->getVirtualColumn("i18n_DESCRIPTION"))
                 ->set("URL", $url)
                 ->set("POSITION", $type->getPosition())
                 ->set("CATEGORY_ID", $type->getByName($this->getCategoryName()))
@@ -69,7 +71,11 @@ abstract class ImportExportType extends BaseLoop implements PropelSearchLoopInte
      */
     public function buildModelCriteria()
     {
+        /** @var ModelCriteria $query */
         $query = $this->getQueryModel();
+
+        $this->configureI18nProcessing($query, array('TITLE', 'DESCRIPTION'));
+
 
         if (null !== $ids = $this->getId()) {
             $query->filterById($ids);

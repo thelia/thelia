@@ -146,7 +146,7 @@
 
         <!-- zip -->
         <service id="thelia.archive_builder.zip" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
-            <tag name="thelia.manager.archive_builder" />
+            <tag name="thelia.archive_builder" />
         </service>
 
         <!-- tar -->

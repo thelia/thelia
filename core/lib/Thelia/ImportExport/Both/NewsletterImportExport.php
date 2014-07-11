@@ -13,7 +13,7 @@
 namespace Thelia\ImportExport\Both;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
-use Thelia\ImportExport\ExportHandlerInterface;
+use Thelia\ImportExport\ExportHandler;
 use Thelia\ImportExport\ImportHandlerInterface;
 
 /**
@@ -21,7 +21,7 @@ use Thelia\ImportExport\ImportHandlerInterface;
  * @package Thelia\ImportExport\Both
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class NewsletterImportExport implements ExportHandlerInterface, ImportHandlerInterface
+class NewsletterImportExport implements ExportHandler, ImportHandlerInterface
 {
     protected $container;
 
