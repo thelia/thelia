@@ -46,6 +46,11 @@ class ImportExportController extends BaseAdminController
             return $this->render("404");
         }
 
+        $this->getParserContext()
+            ->set("ID", $export->getId())
+            ->set("TITLE", $export->getTitle())
+        ;
+
         return $this->render("export-page");
     }
 

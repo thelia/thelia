@@ -4,6 +4,7 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\ExportHandlerInterface;
 use Thelia\Model\Base\Export as BaseExport;
 use Thelia\Model\Map\ExportTableMap;
@@ -83,24 +84,32 @@ class Export extends BaseExport
     {
         $class = $this->getHandleClass();
 
+        if ($class[0] !== "\\") {
+            $class = "\\" . $class;
+        }
+
         if (!class_exists($class)) {
             throw new \ErrorException(
-                "The class \"%class\" doesn't exist",
-                [
-                    "%class" => $class
-                ]
+                Translator::getInstance()->trans(
+                    "The class \"%class\" doesn't exist",
+                    [
+                        "%class" => $class
+                    ]
+                )
             );
         }
 
         $instance = new $class($container);
 
-        if (!$class instanceof ExportHandlerInterface) {
+        if (!$instance instanceof ExportHandlerInterface) {
             throw new \ErrorException(
-                "The class \"%class\" must implement %interface",
-                [
-                    "%class" => $class,
-                    "%interface" => "\\Thelia\\ImportExport\\ExportHandlerInterface",
-                ]
+                Translator::getInstance()->trans(
+                    "The class \"%class\" must implement %interface",
+                    [
+                        "%class" => $class,
+                        "%interface" => "\\Thelia\\ImportExport\\ExportHandlerInterface",
+                    ]
+                )
             );
         }
 

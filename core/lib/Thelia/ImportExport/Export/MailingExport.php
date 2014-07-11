@@ -44,4 +44,26 @@ class MailingExport implements ExportHandlerInterface
         $data = new FormatterData();
     }
 
+    /**
+     * @return string|array
+     *
+     * Define all the type of export/formatters that this can handle
+     * return a string if it handle a single type ( specific exports ),
+     * or an array if multiple.
+     *
+     * Thelia types are defined in \Thelia\ImportExport\Export\ExportType
+     *
+     * example:
+     * return array(
+     *     ExportType::EXPORT_TABLE,
+     *     ExportType::EXPORT_UNBOUNDED,
+     * );
+     */
+    public function getHandledType()
+    {
+        return array(
+            ExportType::EXPORT_TABLE,
+            ExportType::EXPORT_UNBOUNDED,
+        );
+    }
 } 

@@ -145,9 +145,6 @@ class XMLFormatter extends AbstractFormatter
 
     public function getExportType()
     {
-        return array(
-            ExportType::EXPORT_TABLE,
-            ExportType::EXPORT_UNBOUNDED,
-        );
+        return ExportType::EXPORT_UNBOUNDED;
     }
 } 
