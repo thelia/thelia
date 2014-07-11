@@ -22,31 +22,18 @@ use Thelia\Log\Tlog;
  */
 abstract class AbstractFormatter implements FormatInterface, FormatterInterface
 {
+    const FILENAME = "export";
+
     /** @var \Thelia\Core\Translation\Translator  */
     protected $translator;
 
     /** @var \Thelia\Log\Tlog */
     protected $logger;
 
-    /** @var array  */
-    protected $aliases = array();
-
     public function __construct()
     {
         $this->translator = Translator::getInstance();
 
         $this->logger = Tlog::getInstance();
-    }
-
-    public function setAliases(array $aliases)
-    {
-        $this->aliases = $aliases;
-
-        return $this;
-    }
-
-    public function getAliases()
-    {
-        return $this->aliases;
     }
 }

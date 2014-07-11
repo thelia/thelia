@@ -21,6 +21,16 @@
             </ul>
         </nav>
 
+        {form name="thelia.export"}
+
+        {if $form_error}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-danger">{$form_error_message}</div>
+                </div>
+            </div>
+        {/if}
+
         <div class="row">
             <div class="col-md-6">
                 <div class="general-block-decorator">
@@ -29,21 +39,22 @@
                         {intl l='Export: '}{$TITLE}
                     </div>
 
-                    {form name="thelia.export"}
+
                     <form action="{$URL}" method="post" {form_enctype form=$form}>
+                        {form_hidden_fields form=$form}
                         <div class="row">
                             <div class="col-md-12">
                                 {ifloop rel="export-formatters"}
                                     <div class="row">
                                         <div class="col-md-6">
                                             {custom_render_form_field form=$form field="formatter"}
-                                                <select>
-                                                    {loop name="export-formatters" type="formatter" export=$ID}
-                                                        <option value="{$NAME}" {if $value == $NAME}selected{/if}>
-                                                            {$NAME} (.{$EXTENSION})
-                                                        </option>
-                                                    {/loop}
-                                                </select>
+                                                    <select>
+                                                        {loop name="export-formatters" type="formatter" export=$ID}
+                                                            <option value="{$NAME}" {if $value == $NAME}selected{/if}>
+                                                                {$NAME} (.{$EXTENSION})
+                                                            </option>
+                                                        {/loop}
+                                                    </select>
                                             {/custom_render_form_field}
                                         </div>
                                         <div class="col-md-6">
@@ -107,11 +118,12 @@
 
                         <button type="submit" class="btn btn-primary">{intl l="Export"}</button>
                     </form>
-                    {/form}
                 </div>
             </div>
         </div>
     </div>
+
+    {/form}
 {/block}
 
 {block name="javascript-initialization"}
