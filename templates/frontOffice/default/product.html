@@ -111,10 +111,14 @@
                 </div>
 
                 {* Default value *}
-                {assign var="current_stock_class" value = "in-stock"}
-                {assign var="current_stock_href" value = "http://schema.org/InStock"}
-                
+                {assign var="current_stock_class" value = "out-of-stock"}
+                {assign var="current_stock_href" value = "http://schema.org/OutOfStock"}
+
                 {loop name="stock_meta" type="product_sale_elements" product="$ID"}
+                    {if $QUANTITY > 0}
+                        {$current_stock_class = "in-stock"}
+                        {$current_stock_href = "http://schema.org/InStock"}
+                    {/if}
                     {loop name="combi_meta" type="attribute_combination" product_sale_elements="$ID"}
                        {if $LOOP_COUNT == 0}
                            {if $QUANTITY == 0}
