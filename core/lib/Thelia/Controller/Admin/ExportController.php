@@ -16,6 +16,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\ImportExportType;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
 
 /**
@@ -31,15 +32,7 @@ class ExportController extends BaseAdminController
             return $response;
         }
 
-        $export_order = $this->getRequest()->query->get("export_order");
-
-        if (!in_array($export_order, ImportExportType::getAllowedOrders())) {
-            $export_order = ImportExportType::DEFAULT_ORDER;
-        }
-
-        $this->getParserContext()
-            ->set("export_order", $export_order)
-        ;
+        $this->setOrders();
 
         return $this->render('export');
     }
@@ -58,9 +51,7 @@ class ExportController extends BaseAdminController
             $export->downPosition();
         }
 
-        $this->getParserContext()
-            ->set("export_order", "manual")
-        ;
+        $this->setOrders(null, "manual");
 
         return $this->render('export');
     }
@@ -75,13 +66,63 @@ class ExportController extends BaseAdminController
 
         $export->updatePosition($value);
 
-        $this->getParserContext()
-            ->set("export_order", "manual")
-        ;
+        $this->setOrders(null, "manual");
 
         return $this->render('export');
     }
 
+    public function changeCategoryPosition($action, $id)
+    {
+        if (null !== $response = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE])) {
+            return $response;
+        }
+
+        $category = $this->getCategory($id);
+
+        if ($action === "up") {
+            $category->upPosition();
+        } elseif ($action === "down") {
+            $category->downPosition();
+        }
+
+        $this->setOrders("manual");
+
+        return $this->render('export');
+    }
+
+    public function updateCategoryPosition($id, $value)
+    {
+        if (null !== $response = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE])) {
+            return $response;
+        }
+
+        $category = $this->getCategory($id);
+
+        $category->updatePosition($value);
+
+        $this->setOrders("manual");
+
+        return $this->render('export');
+    }
+
+    protected function setOrders($category = null, $export = null)
+    {
+        if ($category === null) {
+            $category = $this->getRequest()->query->get("category_order");
+        }
+
+        if ($export === null) {
+            $export = $this->getRequest()->query->get("export_order");
+        }
+
+        $this->getParserContext()
+            ->set("category_order", $category)
+        ;
+
+        $this->getParserContext()
+            ->set("export_order", $export)
+        ;
+    }
 
     protected function getExport($id)
     {
@@ -98,5 +139,22 @@ class ExportController extends BaseAdminController
             );
         }
         return $export;
+    }
+
+    protected function getCategory($id)
+    {
+        $category = ExportCategoryQuery::create()->findPk($id);
+
+        if (null === $category) {
+            throw new \ErrorException(
+                Translator::getInstance()->trans(
+                    "There is no id \"%id\" in the export categories",
+                    [
+                        "%id" => $id
+                    ]
+                )
+            );
+        }
+        return $category;
     }
 }

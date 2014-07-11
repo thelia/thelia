@@ -13,6 +13,7 @@
 namespace Thelia\Core\FileFormat\Formatting\Formatter;
 use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
+use Thelia\ImportExport\Export\ExportType;
 
 /**
  * Class JsonFormatter
@@ -87,4 +88,11 @@ class JsonFormatter extends AbstractFormatter
         );
     }
 
+    public function getExportType()
+    {
+        return array(
+            ExportType::EXPORT_TABLE,
+            ExportType::EXPORT_UNBOUNDED,
+        );
+    }
 } 

@@ -74,6 +74,11 @@ class Export extends BaseExport
         $this->setPosition($position)->save();
     }
 
+    /**
+     * @param ContainerInterface $container
+     * @return ExportHandlerInterface
+     * @throws \ErrorException
+     */
     public function getHandleClassInstance(ContainerInterface $container)
     {
         $class = $this->getHandleClass();

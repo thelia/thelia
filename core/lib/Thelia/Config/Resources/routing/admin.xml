@@ -1158,7 +1158,7 @@
         <default key="_controller">Thelia\Controller\Admin\TranslationsController::updateAction</default>
     </route>
 
-    <!-- export management -->
+    <!-- import and export management -->
 
     <route id="export.list" path="/admin/export">
         <default key="_controller">Thelia\Controller\Admin\ExportController::indexAction</default>
@@ -1172,6 +1172,18 @@
 
     <route id="export.position.update" path="/admin/export/position/update/{id}/{value}">
         <default key="_controller">Thelia\Controller\Admin\ExportController::updatePosition</default>
+        <requirement key="id">\d+</requirement>
+        <requirement key="value">\d+</requirement>
+    </route>
+
+    <route id="export.category.position" path="/admin/export/position/category/{action}/{id}">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::changeCategoryPosition</default>
+        <requirement key="action">up|down</requirement>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="export.category.position.update" path="/admin/export/position/category/update/{id}/{value}">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::updateCategoryPosition</default>
         <requirement key="id">\d+</requirement>
         <requirement key="value">\d+</requirement>
     </route>

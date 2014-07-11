@@ -1,0 +1,46 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'tools'}
+{/block}
+
+{block name="page-title"}{intl l='Export: %name' name=$NAME}{/block}
+
+{block name="check-resource"}admin.export{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+{/block}
+
+{block name="javascript-initialization"}
+    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+{/block}
+
+{block name="javascript-last-call"}
+    <!-- -->
+    <script>
+        $(document).ready(function() {
+            var compression_switch = $(".export-compression-switch");
+            var compression_row = $(".export-compression-selection-row");
+
+            compression_switch.on("switch-change", function(e, data) {
+                var is_checked = data.value;
+
+                if (is_checked) {
+                    compression_row.show();
+                } else {
+                    compression_row.hide();
+                }
+            });
+
+            if ($("input[type=checkbox]", compression_switch).is(":checked")) {
+                compression_row.show();
+            } else {
+                compression_row.hide();
+            }
+        });
+    </script>
+    {module_include location='configuration-js'}
+{/block}

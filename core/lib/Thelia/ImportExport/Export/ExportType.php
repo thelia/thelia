@@ -10,28 +10,24 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Loop;
-use Thelia\Model\ExportQuery;
+namespace Thelia\ImportExport\Export;
 
 /**
- * Class Export
- * @package Thelia\Core\Template\Loop
+ * Class ExportType
+ * @package Thelia\ImportExport\Export
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class Export extends ImportExportType
+class ExportType 
 {
-    protected function getBaseUrl()
-    {
-        return $this->container->getParameter("export.base_url");
-    }
+    /**
+     * This type is for unbounded formats, in general serialization formats
+     * example: XML, json, yaml
+     */
+    const EXPORT_UNBOUNDED  = "export.unbounded";
 
-    protected function getQueryModel()
-    {
-        return ExportQuery::create();
-    }
-
-    protected function getCategoryName()
-    {
-        return "ExportCategoryId";
-    }
+    /**
+     * This type is for tabled format ( matrix ), most used by spreadsheet application.
+     * example:  CSV, ODS, XLS
+     */
+    const EXPORT_TABLE      = "export.table";
 } 

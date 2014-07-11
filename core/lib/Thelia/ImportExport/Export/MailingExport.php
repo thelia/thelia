@@ -10,28 +10,38 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Loop;
-use Thelia\Model\ExportQuery;
+namespace Thelia\ImportExport\Export;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Core\FileFormat\Formatting\FormatterData;
+use Thelia\ImportExport\ExportHandlerInterface;
 
 /**
- * Class Export
- * @package Thelia\Core\Template\Loop
+ * Class MailingExport
+ * @package Thelia\ImportExport\Export
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class Export extends ImportExportType
+class MailingExport implements ExportHandlerInterface
 {
-    protected function getBaseUrl()
+    protected $container;
+
+    /**
+     * @param ContainerInterface $container
+     *
+     * Dependency injection: load the container to be able to get parameters and services
+     */
+    public function __construct(ContainerInterface $container)
     {
-        return $this->container->getParameter("export.base_url");
+        $this->container = $container;
     }
 
-    protected function getQueryModel()
+    /**
+     * @return \Thelia\Core\FileFormat\Formatting\FormatterData
+     *
+     * The method builds
+     */
+    public function buildFormatterData()
     {
-        return ExportQuery::create();
+        $data = new FormatterData();
     }
 
-    protected function getCategoryName()
-    {
-        return "ExportCategoryId";
-    }
 } 

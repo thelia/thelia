@@ -21,7 +21,7 @@
                             <div class="col-md-3">
                                 {custom_render_form_field form=$form field="formatter"}
                                     <select>
-                                        {loop name="export-formatters" type="formatter"}
+                                        {loop name="export-formatters" type="formatter" export=$ID}
                                             <option value="{$NAME}" {if $value == $NAME}selected{/if}>
                                                 {$NAME} (.{$EXTENSION})
                                             </option>

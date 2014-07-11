@@ -36,4 +36,17 @@ interface FormatterInterface
      * a FormatterData object.
      */
     public function decode($rawData);
+
+    /**
+     * @return string
+     *
+     * return a string that defines the handled format type.
+     *
+     * Thelia types are defined in \Thelia\ImportExport\Export\ExportType
+     *
+     * examples:
+     *   return ExportType::EXPORT_TABLE;
+     *   return ExportType::EXPORT_UNBOUNDED;
+     */
+    public function getExportType();
 }

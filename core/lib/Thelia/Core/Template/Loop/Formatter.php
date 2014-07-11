@@ -17,6 +17,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\ExportQuery;
 use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
 
@@ -39,19 +40,27 @@ class Formatter extends BaseLoop implements ArraySearchLoopInterface
 
         $rawFormatters = array_change_key_case($service->getAll());
 
-        $allowedFormatter = $this->getAllowed_formatter();
+        $exportId = $this->getExport();
         $formatters = [];
-        if ($allowedFormatter !== null) {
-            $allowedFormatter = explode(",", $allowedFormatter);
+        if ($exportId !== null) {
+            $export = ExportQuery::create()->findPk($exportId);
 
+            if (null !== $export) {
+                $types = $export->getHandleClassInstance($this->container)
+                    ->getHandledType();
 
-            foreach($allowedFormatter as $formatter) {
-                $formatter = trim(strtolower($formatter));
+                if (is_scalar($types)) {
+                    $types = [$types];
+                }
 
-                if (isset($rawFormatters[$formatter])) {
-                    $formatters[$formatter] = $rawFormatters[$formatter];
+                /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
+                foreach ($rawFormatters as $key=>$formatter) {
+                    if (in_array($formatter->getExportType(), $types)) {
+                        $formatters[$key] = $formatter;
+                    }
                 }
             }
+
         } else {
             $formatters = $rawFormatters;
         }
@@ -118,7 +127,7 @@ class Formatter extends BaseLoop implements ArraySearchLoopInterface
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createAnyTypeArgument("allowed_formatter"),
+            Argument::createIntTypeArgument("export"),
             new Argument(
                 "order",
                 new TypeCollection(

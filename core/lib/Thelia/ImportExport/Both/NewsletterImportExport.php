@@ -10,44 +10,49 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\ImportExport;
+namespace Thelia\ImportExport\Both;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Core\FileFormat\Formatting\FormatterData;
+use Thelia\ImportExport\ExportHandlerInterface;
+use Thelia\ImportExport\ImportHandlerInterface;
 
 /**
- * Interface ExportHandlerInterface
- * @package Thelia\ImportExport
+ * Class NewsletterImportExport
+ * @package Thelia\ImportExport\Both
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-interface ExportHandlerInterface
+class NewsletterImportExport implements ExportHandlerInterface, ImportHandlerInterface
 {
+    protected $container;
+
     /**
      * @param ContainerInterface $container
      *
      * Dependency injection: load the container to be able to get parameters and services
      */
-    public function __construct(ContainerInterface $container);
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * @return \Thelia\Core\FileFormat\Formatting\FormatterData
      *
      * The method builds
      */
-    public function buildFormatterData();
+    public function buildFormatterData()
+    {
+        // TODO: Implement buildFormatterData() method.
+    }
 
     /**
-     * @return string|array
+     * @return \Thelia\Core\FileFormat\Formatting\FormatterData
      *
-     * Define all the type of export/formatters that this can handle
-     * return a string if it handle a single type ( specific exports ),
-     * or an array if multiple.
-     *
-     * Thelia types are defined in \Thelia\ImportExport\Export\ExportType
-     *
-     * example:
-     * return array(
-     *     ExportType::EXPORT_TABLE,
-     *     ExportType::EXPORT_UNBOUNDED,
-     * );
+     * The method builds
      */
-    public function getHandledType();
+    public function importFromFormatterData(FormatterData $data)
+    {
+        // TODO: Implement importFromFormatterData() method.
+    }
+
 } 

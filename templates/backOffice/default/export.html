@@ -10,6 +10,14 @@
 {block name="check-access"}view{/block}
 
 {block name="main-content"}
+    {if $category_order != "manual"}
+        {assign url_category "category_order="|cat:$category_order}
+    {/if}
+    {if $export_order != "manual"}
+        {assign url_export "export_order="|cat:$export_order}
+    {/if}
+
+
     <div class="configuration">
 
         <div id="wrapper" class="container">
@@ -24,35 +32,41 @@
 
             {module_include location='tools_top'}
 
-            {loop name="export-category" type="export-category"}
-                {if $LOOP_COUNT % 3}
+            {loop name="export-category" type="export-category" order=$category_order}
                 <div class="row">
-                {/if}
-
-                    <div class="col-md-4">
-                        <div class="menu-list-table general-block-decorator">
+                    <div class="col-md-12">
+                        <div class="general-block-decorator">
                             <div class="table-responsive">
-                                <table class="table table-striped table-condensed">
-                                    <caption>
-                                        <!-- add up and down arrows -->
+                                <table class="table table-striped table-condensed table-left-aligned">
+                                    <caption class="clearfix">
+                                        <a href="{url path="/admin/export/position/category/up/{$ID}{if $url_export}?{$url_export}{/if}"}">
+                                            <span class="glyphicon glyphicon-arrow-up"></span>
+                                        </a>
+                                        {$POSITION}
+                                        <a href="{url path="/admin/export/position/category/down/{$ID}{if $url_export}?{$url_export}{/if}"}">
+                                            <span class="glyphicon glyphicon-arrow-down"></span>
+                                        </a>
                                         {$TITLE}
                                     </caption>
                                     <thead>
                                         <tr>
                                             <th class="col-md-1">
-                                                <a href="{url path="/admin/export"}?export_order=id{if $export_order == "id"}_reverse{/if}">
+                                                <a href="{url path="/admin/export"}?{if $url_category}{$url_category}&{/if}export_order=id{if $export_order == "id"}_reverse{/if}">
                                                     {intl l="ID"}
                                                 </a>
                                             </th>
-                                            <th class="col-md-9">
-                                                <a href="{url path="/admin/export"}?export_order=alpha{if $export_order == "alpha"}_reverse{/if}">
+                                            <th class="col-md-8">
+                                                <a href="{url path="/admin/export"}?{if $url_category}{$url_category}&{/if}export_order=alpha{if $export_order == "alpha"}_reverse{/if}">
                                                     {intl l="Name"}
                                                 </a>
                                             </th>
                                             <th class="col-md-2">
-                                                <a href="{url path="/admin/export"}?export_order=manual{if $export_order == "manual"}_reverse{/if}">
+                                                <a href="{url path="/admin/export"}?{if $url_category}{$url_category}&{/if}export_order=manual{if $export_order == "manual"}_reverse{/if}">
                                                     {intl l="Position"}
                                                 </a>
+                                            </th>
+                                            <th class="col-md-1">
+                                                {intl l="Actions"}
                                             </th>
                                         </tr>
                                     </thead>
@@ -66,13 +80,20 @@
                                                     <a href="{$URL}">{$TITLE}</a>
                                                 </td>
                                                 <td>
-                                                    <a href="{url path="/admin/export"}/position/up/{$ID}">
+                                                    <a href="{url path="/admin/export/position/up/{if $url_category}?{$url_category}{/if}{$ID}"}">
                                                         <span class="glyphicon glyphicon-arrow-up"></span>
                                                     </a>
                                                     {$POSITION}
-                                                    <a href="{url path="/admin/export/position/down"}/{$ID}">
+                                                    <a href="{url path="/admin/export/position/down/{$ID}{if $url_category}?{$url_category}{/if}"}">
                                                         <span class="glyphicon glyphicon-arrow-down"></span>
                                                     </a>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <a class="btn btn-default btn-xs" href="{$URL}" title="{intl l="Do this export"}">
+                                                            <span class="glyphicon glyphicon-open"></span>
+                                                        </a>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         {/loop}
@@ -82,46 +103,16 @@
                         </div>
                     </div>
 
-                {if $LOOP_COUNT % 3}
                 </div>
-                {/if}
             {/loop}
+
+            {elseloop rel="export-category"}
+                <div class="alert alert-info">
+                    {intl l="You don't have any export"}
+                </div>
+            {/elseloop}
 
             {module_include location='configuration_bottom'}
         </div>
     </div>
-{/block}
-
-
-{block name="javascript-initialization"}
-    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
-{/block}
-
-{block name="javascript-last-call"}
-    <!-- -->
-    <script>
-        $(document).ready(function() {
-            var compression_switch = $(".export-compression-switch");
-            var compression_row = $(".export-compression-selection-row");
-
-            compression_switch.on("switch-change", function(e, data) {
-                    var is_checked = data.value;
-
-                    if (is_checked) {
-                        compression_row.show();
-                    } else {
-                        compression_row.hide();
-                    }
-                });
-
-            if ($("input[type=checkbox]", compression_switch).is(":checked")) {
-                compression_row.show();
-            } else {
-                compression_row.hide();
-            }
-        });
-    </script>
-    {module_include location='configuration-js'}
 {/block}

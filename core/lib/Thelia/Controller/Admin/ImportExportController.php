@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 use Thelia\Core\HttpFoundation\Response;
+use Thelia\Model\ExportQuery;
 
 /**
  * Class ImportExportController
@@ -20,23 +21,40 @@ use Thelia\Core\HttpFoundation\Response;
  */
 class ImportExportController extends BaseAdminController
 {
-    public function import()
+    public function import($id)
     {
 
     }
 
-    public function export()
+    public function export($id)
     {
 
     }
 
-    public function importView()
+    public function importView($id)
     {
+        if (null === $export = $this->getExport($id))  {
+            return $this->render("404");
+        }
+
         return $this->render("import-page");
     }
 
-    public function exportView()
+    public function exportView($id)
     {
+        if (null === $export = $this->getExport($id))  {
+            return $this->render("404");
+        }
+
         return $this->render("export-page");
+    }
+
+    protected function getExport($id)
+    {
+        $export = ExportQuery::create()
+            ->findPk($id)
+        ;
+
+        return $export;
     }
 } 

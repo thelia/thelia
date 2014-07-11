@@ -10,6 +10,14 @@
 {block name="check-access"}view{/block}
 
 {block name="main-content"}
+    {if $category_order != "manual"}
+        {assign url_category "category_order="|cat:$category_order}
+    {/if}
+    {if $import_order != "manual"}
+        {assign url_import "import_order="|cat:$import_order}
+    {/if}
+
+
     <div class="configuration">
 
         <div id="wrapper" class="container">
@@ -24,68 +32,85 @@
 
             {module_include location='tools_top'}
 
-            {loop name="import-category" type="import-category"}
-                {if $LOOP_COUNT % 3}
+            {loop name="import-category" type="import-category" order=$category_order}
                 <div class="row">
-                {/if}
-
-                    <div class="col-md-4">
-                        <div class="menu-list-table general-block-decorator">
+                    <div class="col-md-12">
+                        <div class="general-block-decorator">
                             <div class="table-responsive">
-                                <table class="table table-striped table-condensed">
-                                    <caption>
-                                        <!-- add up and down arrows -->
+                                <table class="table table-striped table-condensed table-left-aligned">
+                                    <caption class="clearfix">
+                                        <a href="{url path="/admin/import/position/category/up/{$ID}{if $url_import}?{$url_import}{/if}"}">
+                                            <span class="glyphicon glyphicon-arrow-up"></span>
+                                        </a>
+                                        {$POSITION}
+                                        <a href="{url path="/admin/import/position/category/down/{$ID}{if $url_import}?{$url_import}{/if}"}">
+                                            <span class="glyphicon glyphicon-arrow-down"></span>
+                                        </a>
                                         {$TITLE}
                                     </caption>
                                     <thead>
-                                        <tr>
-                                            <th class="col-md-1">
-                                                <a href="{url path="/admin/import"}?import_order=id{if $import_order == "id"}_reverse{/if}">
-                                                    {intl l="ID"}
-                                                </a>
-                                            </th>
-                                            <th class="col-md-9">
-                                                <a href="{url path="/admin/import"}?import_order=alpha{if $import_order == "alpha"}_reverse{/if}">
-                                                    {intl l="Name"}
-                                                </a>
-                                            </th>
-                                            <th class="col-md-2">
-                                                <a href="{url path="/admin/import"}?import_order=manual{if $import_order == "manual"}_reverse{/if}">
-                                                    {intl l="Position"}
-                                                </a>
-                                            </th>
-                                        </tr>
+                                    <tr>
+                                        <th class="col-md-1">
+                                            <a href="{url path="/admin/import"}?{if $url_category}{$url_category}&{/if}import_order=id{if $import_order == "id"}_reverse{/if}">
+                                                {intl l="ID"}
+                                            </a>
+                                        </th>
+                                        <th class="col-md-8">
+                                            <a href="{url path="/admin/import"}?{if $url_category}{$url_category}&{/if}import_order=alpha{if $import_order == "alpha"}_reverse{/if}">
+                                                {intl l="Name"}
+                                            </a>
+                                        </th>
+                                        <th class="col-md-2">
+                                            <a href="{url path="/admin/import"}?{if $url_category}{$url_category}&{/if}import_order=manual{if $import_order == "manual"}_reverse{/if}">
+                                                {intl l="Position"}
+                                            </a>
+                                        </th>
+                                        <th class="col-md-1">
+                                            {intl l="Actions"}
+                                        </th>
+                                    </tr>
                                     </thead>
                                     <tbody>
-                                        {loop name="import-categ-list" type="import" order=$import_order category=$ID}
-                                            <tr>
-                                                <td>
-                                                    {$ID}
-                                                </td>
-                                                <td>
-                                                    <a href="{$URL}">{$TITLE}</a>
-                                                </td>
-                                                <td>
-                                                    <a href="{url path="/admin/import"}/position/up/{$ID}">
-                                                        <span class="glyphicon glyphicon-arrow-up"></span>
+                                    {loop name="import-categ-list" type="import" order=$import_order category=$ID}
+                                        <tr>
+                                            <td>
+                                                {$ID}
+                                            </td>
+                                            <td>
+                                                <a href="{$URL}">{$TITLE}</a>
+                                            </td>
+                                            <td>
+                                                <a href="{url path="/admin/import/position/up/{if $url_category}?{$url_category}{/if}{$ID}"}">
+                                                    <span class="glyphicon glyphicon-arrow-up"></span>
+                                                </a>
+                                                {$POSITION}
+                                                <a href="{url path="/admin/import/position/down/{$ID}{if $url_category}?{$url_category}{/if}"}">
+                                                    <span class="glyphicon glyphicon-arrow-down"></span>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a class="btn btn-default btn-xs" href="{$URL}" title="{intl l="Do this import"}">
+                                                        <span class="glyphicon glyphicon-open"></span>
                                                     </a>
-                                                    {$POSITION}
-                                                    <a href="{url path="/admin/import/position/down"}/{$ID}">
-                                                        <span class="glyphicon glyphicon-arrow-down"></span>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        {/loop}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {/loop}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
 
-                {if $LOOP_COUNT % 3}
                 </div>
-                {/if}
             {/loop}
+
+            {elseloop rel="import-category"}
+                <div class="alert alert-info">
+                    {intl l="You don't have any import"}
+                </div>
+            {/elseloop}
 
             {module_include location='configuration_bottom'}
         </div>
@@ -107,14 +132,14 @@
             var compression_row = $(".import-compression-selection-row");
 
             compression_switch.on("switch-change", function(e, data) {
-                    var is_checked = data.value;
+                var is_checked = data.value;
 
-                    if (is_checked) {
-                        compression_row.show();
-                    } else {
-                        compression_row.hide();
-                    }
-                });
+                if (is_checked) {
+                    compression_row.show();
+                } else {
+                    compression_row.hide();
+                }
+            });
 
             if ($("input[type=checkbox]", compression_switch).is(":checked")) {
                 compression_row.show();
