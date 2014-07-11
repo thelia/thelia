@@ -17,7 +17,10 @@ use Thelia\Core\Template\Loop\Export as ExportLoop;
 use Thelia\Core\Template\Loop\Import as ImportLoop;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ExportForm;
+use Thelia\ImportExport\DocumentsAwareInterface;
+use Thelia\ImportExport\ImagesAwareInterface;
 use Thelia\Model\ExportQuery;
+use Thelia\Model\ImportQuery;
 
 /**
  * Class ImportExportController
@@ -41,7 +44,14 @@ class ImportExportController extends BaseAdminController
 
     public function import($id)
     {
+        if (null === $import = $this->getImport($id))  {
+            return $this->render("404");
+        }
 
+        /**
+         * Get needed services
+         */
+        $this->hydrate();
     }
 
     public function export($id)
@@ -102,8 +112,7 @@ class ImportExportController extends BaseAdminController
 
             $formattedContent = $formatter->encode($data);
 
-            if (!$boundForm->get("do_compress")->getData())
-            {
+            if (!$boundForm->get("do_compress")->getData()) {
                 return new Response(
                     $formattedContent,
                     200,
@@ -112,6 +121,37 @@ class ImportExportController extends BaseAdminController
                         "Content-Disposition" => $formatter::FILENAME . "." . $formatter->getExtension(),
                     ]
                 );
+            } else {
+                /** @var \Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder $archiveBuilder */
+                $archiveBuilder = $this->archiveBuilderManager->get($boundForm->get("archive_builder")->getData());
+
+                /**
+                 * Put the images in the archive
+                 */
+                if ($boundForm->get("images")->getData() && $handler instanceof ImagesAwareInterface) {
+                    foreach ($handler->getImagesPaths() as $image) {
+                        $archiveBuilder->addFile($image, "images");
+                    }
+                }
+
+                /**
+                 * Then the documents
+                 */
+                if ($boundForm->get("documents")->getData() && $handler instanceof DocumentsAwareInterface) {
+                    foreach ($handler->getDocumentsPaths() as $document) {
+                        $archiveBuilder->addFile($document, "documents");
+                    }
+                }
+
+                /**
+                 * Then add the export file
+                 */
+                $archiveBuilder->addFileFromString(
+                    $formattedContent,
+                    $formatter::FILENAME . "." . $formatter->getExtension()
+                );
+
+                return $archiveBuilder->buildArchiveResponse($formatter::FILENAME);
             }
 
         } catch(FormValidationException $e) {
@@ -137,7 +177,7 @@ class ImportExportController extends BaseAdminController
 
     public function importView($id)
     {
-        if (null === $export = $this->getExport($id))  {
+        if (null === $import = $this->getImport($id))  {
             return $this->render("404");
         }
 
@@ -147,7 +187,7 @@ class ImportExportController extends BaseAdminController
         $loop = new ImportLoop($this->container);
 
         $loop->initializeArgs([
-            "export" => $export->getId()
+            "export" => $import->getId()
         ]);
 
         $query = $loop->buildModelCriteria();
@@ -216,6 +256,15 @@ class ImportExportController extends BaseAdminController
     protected function getExport($id)
     {
         $export = ExportQuery::create()
+            ->findPk($id)
+        ;
+
+        return $export;
+    }
+
+    protected function getImport($id)
+    {
+        $export = ImportQuery::create()
             ->findPk($id)
         ;
 
