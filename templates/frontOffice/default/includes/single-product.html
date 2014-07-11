@@ -102,7 +102,7 @@
                             <div class="option-content">
                                 <select name="options" class="form-control">
                                     {loop name="stock" type="product_sale_elements" product="$product_id" order="min_price"}
-                                    {if $LOOP_TOTAL == 1}
+                                    {if $LOOP_TOTAL == 1 && $QUANTITY > 0}
                                         {assign var="hasSubmit" value = true}
                                     {/if}
                                     {loop name="combi" type="attribute_combination" product_sale_elements="$product_id" order="alpha"}
