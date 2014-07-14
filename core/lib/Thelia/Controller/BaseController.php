@@ -25,6 +25,7 @@ use Symfony\Component\Routing\Router;
 
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
+use Thelia\Form\FirewallForm;
 use Thelia\Model\OrderQuery;
 
 use Thelia\Tools\Redirect;
@@ -200,6 +201,14 @@ abstract class BaseController extends ContainerAware
             $form->bind($aBaseForm->getRequest());
 
             if ($form->isValid()) {
+                if ($aBaseForm instanceof FirewallForm && !$aBaseForm->isFirewallOk()) {
+                    throw new FormValidationException(
+                        $this->getTranslator()->trans(
+                            "You have too much sent this form. Please wait before trying again."
+                        )
+                    );
+                }
+
                 return $form;
             } else {
                 $errorMessage = null;
