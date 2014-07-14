@@ -22,8 +22,14 @@ use Thelia\Model\FormFirewallQuery;
  */
 abstract class FirewallForm extends BaseForm
 {
+    /**
+     * Those values are for a "normal" security context
+     */
+    const DEFAULT_TIME_TO_WAIT = 1;
+    const DEFAULT_ATTEMPTS = 3;
+
     /** @var  \Thelia\Model\FormFirewall */
-    protected static  $cachedInstance;
+    protected static $cachedInstance;
 
     public function __construct(Request $request, $type = "form", $data = array(), $options = array())
     {
@@ -81,7 +87,7 @@ abstract class FirewallForm extends BaseForm
      */
     public function getConfigTime()
     {
-        return ConfigQuery::read("form_firewall_time_to_wait", 1);
+        return ConfigQuery::read("form_firewall_time_to_wait", static::DEFAULT_TIME_TO_WAIT);
     }
 
     /**
@@ -91,6 +97,6 @@ abstract class FirewallForm extends BaseForm
      */
     public function getConfigAttempts()
     {
-        return ConfigQuery::read("form_firewall_attempts", 2);
+        return ConfigQuery::read("form_firewall_attempts", static::DEFAULT_ATTEMPTS);
     }
-} 
+}

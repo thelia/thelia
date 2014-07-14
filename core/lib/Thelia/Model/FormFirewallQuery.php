@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\FormFirewallQuery as BaseFormFirewallQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'form_firewall' table.
  *
