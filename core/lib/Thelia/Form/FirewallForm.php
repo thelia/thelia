@@ -59,7 +59,7 @@ abstract class FirewallForm extends BaseForm
                 $firewallRow->resetAttempts();
             }
 
-            if ($firewallRow->getAttempts() <= $this->getConfigAttempts()) {
+            if ($firewallRow->getAttempts() < $this->getConfigAttempts()) {
                 $firewallRow->incrementAttempts();
             } else {
                 /** Set updated_at at NOW() */

@@ -8,7 +8,7 @@ class FormFirewall extends BaseFormFirewall
 {
     public function resetAttempts()
     {
-        $this->setAttempts(1)->save();
+        $this->setAttempts(0)->save();
 
         return $this;
     }
