@@ -92,7 +92,7 @@ class FormatterManager
     {
         throw new \OutOfBoundsException(
             Translator::getInstance()->trans(
-                "The formatter %name doesn't exist",
+                "The formatter \"%name\" doesn't exist",
                 [
                     "%name" => $name
                 ]

@@ -96,7 +96,7 @@ class ArchiveBuilderManager
     {
         throw new \OutOfBoundsException(
             Translator::getInstance()->trans(
-                "The archive creator %name doesn't exist",
+                "The archive builder \"%name\" doesn't exist",
                 [
                     "%name" => $name
                 ]

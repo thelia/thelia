@@ -96,9 +96,14 @@ class ImportExportController extends BaseAdminController
         /**
          * Define and validate the form
          */
-        $form = new ExportForm($this->getRequest());
-        $form->setArchiveBuilderNames($archiveBuilders);
-        $form->setFormatters($formatters);
+        $form = new ExportForm(
+            $this->getRequest(),
+            "form",
+            array(),
+            array(),
+            $archiveBuilders,
+            $formatters
+        );
         $errorMessage = null;
 
         try {
@@ -118,7 +123,9 @@ class ImportExportController extends BaseAdminController
                     200,
                     [
                         "Content-Type" => $formatter->getMimeType(),
-                        "Content-Disposition" => $formatter::FILENAME . "." . $formatter->getExtension(),
+                        "Content-Disposition" =>
+                            "attachment; filename=\"".$formatter::FILENAME .
+                            "." . $formatter->getExtension() ."\"",
                     ]
                 );
             } else {
