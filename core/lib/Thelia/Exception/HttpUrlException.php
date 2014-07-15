@@ -20,4 +20,4 @@ namespace Thelia\Exception;
 class HttpUrlException extends \Exception
 {
 
-} 
+}

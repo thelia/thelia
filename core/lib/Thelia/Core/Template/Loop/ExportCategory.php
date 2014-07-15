@@ -25,4 +25,4 @@ class ExportCategory extends ImportExportCategory
         return ExportCategoryQuery::create();
     }
 
-} 
+}

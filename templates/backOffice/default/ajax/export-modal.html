@@ -53,6 +53,7 @@
                                         </select>
                                     {/form_field}
                                 </div>
+                                {if $HAS_IMAGES}
                                 <div class="col-md-4">
                                     {form_field form=$form field="images"}
                                         <label for="{$label_attr.for}">
@@ -64,6 +65,8 @@
                                         </div>
                                     {/form_field}
                                 </div>
+                                {/if}
+                                {if $HAS_DOCUMENTS}
                                 <div class="col-md-4">
                                     {form_field form=$form field="documents"}
                                         <label for="{$label_attr.for}">
@@ -75,6 +78,7 @@
                                         </div>
                                     {/form_field}
                                 </div>
+                                {/if}
                             </div>
                         {/ifloop}
                         {elseloop rel="export-formatters"}

@@ -76,7 +76,7 @@ class ArchiveBuilderManager
         $names = [];
 
         /** @var AbstractArchiveBuilder $builder */
-        foreach($this->archiveBuilders as $builder) {
+        foreach ($this->archiveBuilders as $builder) {
             $names[] = $builder->getName();
         }
 

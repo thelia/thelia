@@ -11,7 +11,6 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Export;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\ExportHandler;

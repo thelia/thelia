@@ -14,7 +14,6 @@ namespace Thelia\Core\Template\Loop;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
-use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
@@ -56,6 +55,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
                 ->set("URL", $url)
                 ->set("POSITION", $type->getPosition())
                 ->set("CATEGORY_ID", $type->getByName($this->getCategoryName()))
+                ->set("HANDLE_CLASS", $type->getHandleClass())
             ;
 
             $loopResult->addRow($loopResultRow);
@@ -76,7 +76,6 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
 
         $this->configureI18nProcessing($query, array('TITLE', 'DESCRIPTION'));
 
-
         if (null !== $ids = $this->getId()) {
             $query->filterById($ids);
         }
@@ -87,7 +86,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
 
         if (null !== $orders = $this->getOrder()) {
             foreach ($orders as $order) {
-                switch($order) {
+                switch ($order) {
                     case "id":
                         $query->orderById();
                         break;
@@ -162,4 +161,4 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
     abstract protected function getQueryModel();
 
     abstract protected function getCategoryName();
-} 
+}

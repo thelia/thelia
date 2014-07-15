@@ -92,4 +92,4 @@ class JsonFormatter extends AbstractFormatter
     {
         return ExportType::EXPORT_UNBOUNDED;
     }
-} 
+}

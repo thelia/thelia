@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ExportCategoryI18nQuery as BaseExportCategoryI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'export_category_i18n' table.
  *

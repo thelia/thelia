@@ -23,16 +23,18 @@ use Thelia\Model\Map\ImportTableMap;
  *
  *
  * @method     ChildImportQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildImportQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildImportQuery orderByImportCategoryId($order = Criteria::ASC) Order by the import_category_id column
  * @method     ChildImportQuery orderByPosition($order = Criteria::ASC) Order by the position column
- * @method     ChildImportQuery orderByHandleclass($order = Criteria::ASC) Order by the handleClass column
+ * @method     ChildImportQuery orderByHandleClass($order = Criteria::ASC) Order by the handle_class column
  * @method     ChildImportQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildImportQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildImportQuery groupById() Group by the id column
+ * @method     ChildImportQuery groupByRef() Group by the ref column
  * @method     ChildImportQuery groupByImportCategoryId() Group by the import_category_id column
  * @method     ChildImportQuery groupByPosition() Group by the position column
- * @method     ChildImportQuery groupByHandleclass() Group by the handleClass column
+ * @method     ChildImportQuery groupByHandleClass() Group by the handle_class column
  * @method     ChildImportQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildImportQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -52,16 +54,18 @@ use Thelia\Model\Map\ImportTableMap;
  * @method     ChildImport findOneOrCreate(ConnectionInterface $con = null) Return the first ChildImport matching the query, or a new ChildImport object populated from the query conditions when no match is found
  *
  * @method     ChildImport findOneById(int $id) Return the first ChildImport filtered by the id column
+ * @method     ChildImport findOneByRef(string $ref) Return the first ChildImport filtered by the ref column
  * @method     ChildImport findOneByImportCategoryId(int $import_category_id) Return the first ChildImport filtered by the import_category_id column
  * @method     ChildImport findOneByPosition(int $position) Return the first ChildImport filtered by the position column
- * @method     ChildImport findOneByHandleclass(string $handleClass) Return the first ChildImport filtered by the handleClass column
+ * @method     ChildImport findOneByHandleClass(string $handle_class) Return the first ChildImport filtered by the handle_class column
  * @method     ChildImport findOneByCreatedAt(string $created_at) Return the first ChildImport filtered by the created_at column
  * @method     ChildImport findOneByUpdatedAt(string $updated_at) Return the first ChildImport filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildImport objects filtered by the id column
+ * @method     array findByRef(string $ref) Return ChildImport objects filtered by the ref column
  * @method     array findByImportCategoryId(int $import_category_id) Return ChildImport objects filtered by the import_category_id column
  * @method     array findByPosition(int $position) Return ChildImport objects filtered by the position column
- * @method     array findByHandleclass(string $handleClass) Return ChildImport objects filtered by the handleClass column
+ * @method     array findByHandleClass(string $handle_class) Return ChildImport objects filtered by the handle_class column
  * @method     array findByCreatedAt(string $created_at) Return ChildImport objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildImport objects filtered by the updated_at column
  *
@@ -152,7 +156,7 @@ abstract class ImportQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `IMPORT_CATEGORY_ID`, `POSITION`, `HANDLECLASS`, `CREATED_AT`, `UPDATED_AT` FROM `import` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `REF`, `IMPORT_CATEGORY_ID`, `POSITION`, `HANDLE_CLASS`, `CREATED_AT`, `UPDATED_AT` FROM `import` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -283,6 +287,35 @@ abstract class ImportQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the ref column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByRef('fooValue');   // WHERE ref = 'fooValue'
+     * $query->filterByRef('%fooValue%'); // WHERE ref LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $ref The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildImportQuery The current query, for fluid interface
+     */
+    public function filterByRef($ref = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($ref)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $ref)) {
+                $ref = str_replace('*', '%', $ref);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ImportTableMap::REF, $ref, $comparison);
+    }
+
+    /**
      * Filter the query on the import_category_id column
      *
      * Example usage:
@@ -367,32 +400,32 @@ abstract class ImportQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the handleClass column
+     * Filter the query on the handle_class column
      *
      * Example usage:
      * <code>
-     * $query->filterByHandleclass('fooValue');   // WHERE handleClass = 'fooValue'
-     * $query->filterByHandleclass('%fooValue%'); // WHERE handleClass LIKE '%fooValue%'
+     * $query->filterByHandleClass('fooValue');   // WHERE handle_class = 'fooValue'
+     * $query->filterByHandleClass('%fooValue%'); // WHERE handle_class LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $handleclass The value to use as filter.
+     * @param     string $handleClass The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildImportQuery The current query, for fluid interface
      */
-    public function filterByHandleclass($handleclass = null, $comparison = null)
+    public function filterByHandleClass($handleClass = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($handleclass)) {
+            if (is_array($handleClass)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $handleclass)) {
-                $handleclass = str_replace('*', '%', $handleclass);
+            } elseif (preg_match('/[\%\*]/', $handleClass)) {
+                $handleClass = str_replace('*', '%', $handleClass);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(ImportTableMap::HANDLECLASS, $handleclass, $comparison);
+        return $this->addUsingAlias(ImportTableMap::HANDLE_CLASS, $handleClass, $comparison);
     }
 
     /**

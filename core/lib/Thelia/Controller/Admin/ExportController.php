@@ -14,7 +14,6 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Template\Loop\ImportExportType;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
@@ -138,6 +137,7 @@ class ExportController extends BaseAdminController
                 )
             );
         }
+
         return $export;
     }
 
@@ -155,6 +155,7 @@ class ExportController extends BaseAdminController
                 )
             );
         }
+
         return $category;
     }
 }

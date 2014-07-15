@@ -37,8 +37,7 @@ abstract class ImportExportCategory extends BaseLoop implements PropelSearchLoop
      */
     public function parseResults(LoopResult $loopResult)
     {
-        foreach ($loopResult->getResultDataCollection() as $category)
-        {
+        foreach ($loopResult->getResultDataCollection() as $category) {
             $loopResultRow = new LoopResultRow($category);
 
             $loopResultRow
@@ -68,7 +67,7 @@ abstract class ImportExportCategory extends BaseLoop implements PropelSearchLoop
 
         if (null !== $orders = $this->getOrder()) {
             foreach ($orders as $order) {
-                switch($order) {
+                switch ($order) {
                     case "id":
                         $query->orderById();
                         break;
@@ -133,4 +132,4 @@ abstract class ImportExportCategory extends BaseLoop implements PropelSearchLoop
     }
 
     abstract protected function getQueryModel();
-} 
+}

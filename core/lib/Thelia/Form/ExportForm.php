@@ -13,7 +13,6 @@
 namespace Thelia\Form;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;
-use Thelia\Form\BaseForm;
 
 /**
  * Class ExportForm
@@ -24,7 +23,8 @@ class ExportForm extends BaseForm
 {
     protected $translator;
 
-    public function __construct(Request $request, $type= "form", $data = array(), $options = array()) {
+    public function __construct(Request $request, $type= "form", $data = array(), $options = array())
+    {
         $this->translator = Translator::getInstance();
 
         parent::__construct($request, $type, $data, $options);
@@ -65,4 +65,4 @@ class ExportForm extends BaseForm
     {
         return "thelia_export";
     }
-} 
+}

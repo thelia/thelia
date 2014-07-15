@@ -39,15 +39,13 @@ class ArchiveBuilder extends BaseLoop implements ArraySearchLoopInterface
 
         $rawArchiveBuilders = array_change_key_case($service->getAll());
 
-
         $allowedArchiveBuilder = $this->getAllowed_archive_builder();
         $archiveBuilders = [];
 
         if ($allowedArchiveBuilder !== null) {
             $allowedArchiveBuilder = explode(",", $allowedArchiveBuilder);
 
-
-            foreach($allowedArchiveBuilder as $archiveBuilder) {
+            foreach ($allowedArchiveBuilder as $archiveBuilder) {
                 $archiveBuilder = trim(strtolower($archiveBuilder));
 
                 if (isset($rawArchiveBuilders[$archiveBuilder])) {
@@ -131,4 +129,4 @@ class ArchiveBuilder extends BaseLoop implements ArraySearchLoopInterface
             )
         );
     }
-} 
+}

@@ -51,4 +51,4 @@ class RegisterArchiveBuilderPass implements CompilerPassInterface
             );
         }
     }
-} 
+}

@@ -34,4 +34,4 @@ class Import extends ImportExportType
     {
         return "ImportCategoryId";
     }
-} 
+}

@@ -140,4 +140,4 @@ class Formatter extends BaseLoop implements ArraySearchLoopInterface
         );
     }
 
-} 
+}

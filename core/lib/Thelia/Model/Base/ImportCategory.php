@@ -66,6 +66,12 @@ abstract class ImportCategory implements ActiveRecordInterface
     protected $id;
 
     /**
+     * The value for the ref field.
+     * @var        string
+     */
+    protected $ref;
+
+    /**
      * The value for the position field.
      * @var        int
      */
@@ -399,6 +405,17 @@ abstract class ImportCategory implements ActiveRecordInterface
     }
 
     /**
+     * Get the [ref] column value.
+     *
+     * @return   string
+     */
+    public function getRef()
+    {
+
+        return $this->ref;
+    }
+
+    /**
      * Get the [position] column value.
      *
      * @return   int
@@ -469,6 +486,27 @@ abstract class ImportCategory implements ActiveRecordInterface
 
         return $this;
     } // setId()
+
+    /**
+     * Set the value of [ref] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\ImportCategory The current object (for fluent API support)
+     */
+    public function setRef($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->ref !== $v) {
+            $this->ref = $v;
+            $this->modifiedColumns[ImportCategoryTableMap::REF] = true;
+        }
+
+
+        return $this;
+    } // setRef()
 
     /**
      * Set the value of [position] column.
@@ -573,16 +611,19 @@ abstract class ImportCategory implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ImportCategoryTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ImportCategoryTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ImportCategoryTableMap::translateFieldName('Ref', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->ref = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ImportCategoryTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ImportCategoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ImportCategoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ImportCategoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ImportCategoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -595,7 +636,7 @@ abstract class ImportCategory implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = ImportCategoryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = ImportCategoryTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\ImportCategory object", 0, $e);
@@ -856,6 +897,9 @@ abstract class ImportCategory implements ActiveRecordInterface
         if ($this->isColumnModified(ImportCategoryTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = '`ID`';
         }
+        if ($this->isColumnModified(ImportCategoryTableMap::REF)) {
+            $modifiedColumns[':p' . $index++]  = '`REF`';
+        }
         if ($this->isColumnModified(ImportCategoryTableMap::POSITION)) {
             $modifiedColumns[':p' . $index++]  = '`POSITION`';
         }
@@ -878,6 +922,9 @@ abstract class ImportCategory implements ActiveRecordInterface
                 switch ($columnName) {
                     case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
+                    case '`REF`':
+                        $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
                         break;
                     case '`POSITION`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
@@ -954,12 +1001,15 @@ abstract class ImportCategory implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getPosition();
+                return $this->getRef();
                 break;
             case 2:
-                return $this->getCreatedAt();
+                return $this->getPosition();
                 break;
             case 3:
+                return $this->getCreatedAt();
+                break;
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -992,9 +1042,10 @@ abstract class ImportCategory implements ActiveRecordInterface
         $keys = ImportCategoryTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getPosition(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[1] => $this->getRef(),
+            $keys[2] => $this->getPosition(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1046,12 +1097,15 @@ abstract class ImportCategory implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setPosition($value);
+                $this->setRef($value);
                 break;
             case 2:
-                $this->setCreatedAt($value);
+                $this->setPosition($value);
                 break;
             case 3:
+                $this->setCreatedAt($value);
+                break;
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1079,9 +1133,10 @@ abstract class ImportCategory implements ActiveRecordInterface
         $keys = ImportCategoryTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setPosition($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[1], $arr)) $this->setRef($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPosition($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -1094,6 +1149,7 @@ abstract class ImportCategory implements ActiveRecordInterface
         $criteria = new Criteria(ImportCategoryTableMap::DATABASE_NAME);
 
         if ($this->isColumnModified(ImportCategoryTableMap::ID)) $criteria->add(ImportCategoryTableMap::ID, $this->id);
+        if ($this->isColumnModified(ImportCategoryTableMap::REF)) $criteria->add(ImportCategoryTableMap::REF, $this->ref);
         if ($this->isColumnModified(ImportCategoryTableMap::POSITION)) $criteria->add(ImportCategoryTableMap::POSITION, $this->position);
         if ($this->isColumnModified(ImportCategoryTableMap::CREATED_AT)) $criteria->add(ImportCategoryTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ImportCategoryTableMap::UPDATED_AT)) $criteria->add(ImportCategoryTableMap::UPDATED_AT, $this->updated_at);
@@ -1160,6 +1216,7 @@ abstract class ImportCategory implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setRef($this->getRef());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1679,6 +1736,7 @@ abstract class ImportCategory implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
+        $this->ref = null;
         $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;

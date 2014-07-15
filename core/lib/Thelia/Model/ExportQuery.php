@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ExportQuery as BaseExportQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'export' table.
  *

@@ -1882,10 +1882,12 @@ DROP TABLE IF EXISTS `import_category`;
 CREATE TABLE `import_category`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `ref` VARCHAR(255) NOT NULL,
     `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1897,10 +1899,12 @@ DROP TABLE IF EXISTS `export_category`;
 CREATE TABLE `export_category`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `ref` VARCHAR(255) NOT NULL,
     `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1912,12 +1916,14 @@ DROP TABLE IF EXISTS `import`;
 CREATE TABLE `import`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `ref` VARCHAR(255) NOT NULL,
     `import_category_id` INTEGER NOT NULL,
     `position` INTEGER NOT NULL,
-    `handleClass` LONGTEXT NOT NULL,
+    `handle_class` LONGTEXT NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_import_import_category_id` (`import_category_id`),
     CONSTRAINT `fk_import_import_category_id`
         FOREIGN KEY (`import_category_id`)
@@ -1935,12 +1941,14 @@ DROP TABLE IF EXISTS `export`;
 CREATE TABLE `export`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `ref` VARCHAR(255) NOT NULL,
     `export_category_id` INTEGER NOT NULL,
     `position` INTEGER NOT NULL,
-    `handleClass` LONGTEXT NOT NULL,
+    `handle_class` LONGTEXT NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_export_export_category_id` (`export_category_id`),
     CONSTRAINT `fk_export_export_category_id`
         FOREIGN KEY (`export_category_id`)

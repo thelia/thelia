@@ -5,12 +5,16 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\ImportExport\DocumentsExportInterface;
 use Thelia\ImportExport\ExportHandler;
+use Thelia\ImportExport\ImagesExportInterface;
 use Thelia\Model\Base\Export as BaseExport;
 use Thelia\Model\Map\ExportTableMap;
 
 class Export extends BaseExport
 {
+    protected static $cache;
+
     public function upPosition()
     {
 
@@ -75,8 +79,25 @@ class Export extends BaseExport
         $this->setPosition($position)->save();
     }
 
+    public function setPositionToLast()
+    {
+        $max = ExportQuery::create()
+            ->orderByPosition(Criteria::DESC)
+            ->select(ExportTableMap::POSITION)
+            ->findOne()
+        ;
+
+        if (null === $max) {
+            $this->setPosition(1);
+        } else {
+            $this->setPosition($max+1);
+        }
+
+        return $this;
+    }
+
     /**
-     * @param ContainerInterface $container
+     * @param  ContainerInterface $container
      * @return ExportHandler
      * @throws \ErrorException
      */
@@ -113,6 +134,24 @@ class Export extends BaseExport
             );
         }
 
-        return $instance;
+        return static::$cache = $instance;
+    }
+
+    public function hasImages(ContainerInterface $container)
+    {
+        if (static::$cache === null) {
+            $this->getHandleClassInstance($container);
+        }
+
+        return static::$cache instanceof ImagesExportInterface;
+    }
+
+    public function hasDocuments(ContainerInterface $container)
+    {
+        if (static::$cache === null) {
+            $this->getHandleClassInstance($container);
+        }
+
+        return static::$cache instanceof DocumentsExportInterface;
     }
 }

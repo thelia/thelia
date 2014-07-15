@@ -58,7 +58,7 @@ class ExportCategoryTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -68,12 +68,17 @@ class ExportCategoryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the ID field
      */
     const ID = 'export_category.ID';
+
+    /**
+     * the column name for the REF field
+     */
+    const REF = 'export_category.REF';
 
     /**
      * the column name for the POSITION field
@@ -111,12 +116,12 @@ class ExportCategoryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'position', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ExportCategoryTableMap::ID, ExportCategoryTableMap::POSITION, ExportCategoryTableMap::CREATED_AT, ExportCategoryTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'position', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'Ref', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ExportCategoryTableMap::ID, ExportCategoryTableMap::REF, ExportCategoryTableMap::POSITION, ExportCategoryTableMap::CREATED_AT, ExportCategoryTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'ref', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -126,12 +131,12 @@ class ExportCategoryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Position' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'position' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(ExportCategoryTableMap::ID => 0, ExportCategoryTableMap::POSITION => 1, ExportCategoryTableMap::CREATED_AT => 2, ExportCategoryTableMap::UPDATED_AT => 3, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'POSITION' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'position' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'Position' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'position' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(ExportCategoryTableMap::ID => 0, ExportCategoryTableMap::REF => 1, ExportCategoryTableMap::POSITION => 2, ExportCategoryTableMap::CREATED_AT => 3, ExportCategoryTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'POSITION' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'position' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -151,6 +156,7 @@ class ExportCategoryTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -328,11 +334,13 @@ class ExportCategoryTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(ExportCategoryTableMap::ID);
+            $criteria->addSelectColumn(ExportCategoryTableMap::REF);
             $criteria->addSelectColumn(ExportCategoryTableMap::POSITION);
             $criteria->addSelectColumn(ExportCategoryTableMap::CREATED_AT);
             $criteria->addSelectColumn(ExportCategoryTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
+            $criteria->addSelectColumn($alias . '.REF');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');

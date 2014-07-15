@@ -66,6 +66,12 @@ abstract class Export implements ActiveRecordInterface
     protected $id;
 
     /**
+     * The value for the ref field.
+     * @var        string
+     */
+    protected $ref;
+
+    /**
      * The value for the export_category_id field.
      * @var        int
      */
@@ -78,10 +84,10 @@ abstract class Export implements ActiveRecordInterface
     protected $position;
 
     /**
-     * The value for the handleclass field.
+     * The value for the handle_class field.
      * @var        string
      */
-    protected $handleclass;
+    protected $handle_class;
 
     /**
      * The value for the created_at field.
@@ -404,6 +410,17 @@ abstract class Export implements ActiveRecordInterface
     }
 
     /**
+     * Get the [ref] column value.
+     *
+     * @return   string
+     */
+    public function getRef()
+    {
+
+        return $this->ref;
+    }
+
+    /**
      * Get the [export_category_id] column value.
      *
      * @return   int
@@ -426,14 +443,14 @@ abstract class Export implements ActiveRecordInterface
     }
 
     /**
-     * Get the [handleclass] column value.
+     * Get the [handle_class] column value.
      *
      * @return   string
      */
-    public function getHandleclass()
+    public function getHandleClass()
     {
 
-        return $this->handleclass;
+        return $this->handle_class;
     }
 
     /**
@@ -498,6 +515,27 @@ abstract class Export implements ActiveRecordInterface
     } // setId()
 
     /**
+     * Set the value of [ref] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Export The current object (for fluent API support)
+     */
+    public function setRef($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->ref !== $v) {
+            $this->ref = $v;
+            $this->modifiedColumns[ExportTableMap::REF] = true;
+        }
+
+
+        return $this;
+    } // setRef()
+
+    /**
      * Set the value of [export_category_id] column.
      *
      * @param      int $v new value
@@ -544,25 +582,25 @@ abstract class Export implements ActiveRecordInterface
     } // setPosition()
 
     /**
-     * Set the value of [handleclass] column.
+     * Set the value of [handle_class] column.
      *
      * @param      string $v new value
      * @return   \Thelia\Model\Export The current object (for fluent API support)
      */
-    public function setHandleclass($v)
+    public function setHandleClass($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->handleclass !== $v) {
-            $this->handleclass = $v;
-            $this->modifiedColumns[ExportTableMap::HANDLECLASS] = true;
+        if ($this->handle_class !== $v) {
+            $this->handle_class = $v;
+            $this->modifiedColumns[ExportTableMap::HANDLE_CLASS] = true;
         }
 
 
         return $this;
-    } // setHandleclass()
+    } // setHandleClass()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -646,22 +684,25 @@ abstract class Export implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ExportTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ExportTableMap::translateFieldName('ExportCategoryId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ExportTableMap::translateFieldName('Ref', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->ref = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ExportTableMap::translateFieldName('ExportCategoryId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->export_category_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ExportTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ExportTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ExportTableMap::translateFieldName('Handleclass', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->handleclass = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ExportTableMap::translateFieldName('HandleClass', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->handle_class = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ExportTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ExportTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ExportTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ExportTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -674,7 +715,7 @@ abstract class Export implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = ExportTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = ExportTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Export object", 0, $e);
@@ -932,14 +973,17 @@ abstract class Export implements ActiveRecordInterface
         if ($this->isColumnModified(ExportTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = '`ID`';
         }
+        if ($this->isColumnModified(ExportTableMap::REF)) {
+            $modifiedColumns[':p' . $index++]  = '`REF`';
+        }
         if ($this->isColumnModified(ExportTableMap::EXPORT_CATEGORY_ID)) {
             $modifiedColumns[':p' . $index++]  = '`EXPORT_CATEGORY_ID`';
         }
         if ($this->isColumnModified(ExportTableMap::POSITION)) {
             $modifiedColumns[':p' . $index++]  = '`POSITION`';
         }
-        if ($this->isColumnModified(ExportTableMap::HANDLECLASS)) {
-            $modifiedColumns[':p' . $index++]  = '`HANDLECLASS`';
+        if ($this->isColumnModified(ExportTableMap::HANDLE_CLASS)) {
+            $modifiedColumns[':p' . $index++]  = '`HANDLE_CLASS`';
         }
         if ($this->isColumnModified(ExportTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
@@ -961,14 +1005,17 @@ abstract class Export implements ActiveRecordInterface
                     case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
+                    case '`REF`':
+                        $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
+                        break;
                     case '`EXPORT_CATEGORY_ID`':
                         $stmt->bindValue($identifier, $this->export_category_id, PDO::PARAM_INT);
                         break;
                     case '`POSITION`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case '`HANDLECLASS`':
-                        $stmt->bindValue($identifier, $this->handleclass, PDO::PARAM_STR);
+                    case '`HANDLE_CLASS`':
+                        $stmt->bindValue($identifier, $this->handle_class, PDO::PARAM_STR);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1042,18 +1089,21 @@ abstract class Export implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getExportCategoryId();
+                return $this->getRef();
                 break;
             case 2:
-                return $this->getPosition();
+                return $this->getExportCategoryId();
                 break;
             case 3:
-                return $this->getHandleclass();
+                return $this->getPosition();
                 break;
             case 4:
-                return $this->getCreatedAt();
+                return $this->getHandleClass();
                 break;
             case 5:
+                return $this->getCreatedAt();
+                break;
+            case 6:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1086,11 +1136,12 @@ abstract class Export implements ActiveRecordInterface
         $keys = ExportTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getExportCategoryId(),
-            $keys[2] => $this->getPosition(),
-            $keys[3] => $this->getHandleclass(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[1] => $this->getRef(),
+            $keys[2] => $this->getExportCategoryId(),
+            $keys[3] => $this->getPosition(),
+            $keys[4] => $this->getHandleClass(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1142,18 +1193,21 @@ abstract class Export implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setExportCategoryId($value);
+                $this->setRef($value);
                 break;
             case 2:
-                $this->setPosition($value);
+                $this->setExportCategoryId($value);
                 break;
             case 3:
-                $this->setHandleclass($value);
+                $this->setPosition($value);
                 break;
             case 4:
-                $this->setCreatedAt($value);
+                $this->setHandleClass($value);
                 break;
             case 5:
+                $this->setCreatedAt($value);
+                break;
+            case 6:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1181,11 +1235,12 @@ abstract class Export implements ActiveRecordInterface
         $keys = ExportTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setExportCategoryId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setPosition($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setHandleclass($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[1], $arr)) $this->setRef($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setExportCategoryId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPosition($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setHandleClass($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
 
     /**
@@ -1198,9 +1253,10 @@ abstract class Export implements ActiveRecordInterface
         $criteria = new Criteria(ExportTableMap::DATABASE_NAME);
 
         if ($this->isColumnModified(ExportTableMap::ID)) $criteria->add(ExportTableMap::ID, $this->id);
+        if ($this->isColumnModified(ExportTableMap::REF)) $criteria->add(ExportTableMap::REF, $this->ref);
         if ($this->isColumnModified(ExportTableMap::EXPORT_CATEGORY_ID)) $criteria->add(ExportTableMap::EXPORT_CATEGORY_ID, $this->export_category_id);
         if ($this->isColumnModified(ExportTableMap::POSITION)) $criteria->add(ExportTableMap::POSITION, $this->position);
-        if ($this->isColumnModified(ExportTableMap::HANDLECLASS)) $criteria->add(ExportTableMap::HANDLECLASS, $this->handleclass);
+        if ($this->isColumnModified(ExportTableMap::HANDLE_CLASS)) $criteria->add(ExportTableMap::HANDLE_CLASS, $this->handle_class);
         if ($this->isColumnModified(ExportTableMap::CREATED_AT)) $criteria->add(ExportTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ExportTableMap::UPDATED_AT)) $criteria->add(ExportTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1266,9 +1322,10 @@ abstract class Export implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setRef($this->getRef());
         $copyObj->setExportCategoryId($this->getExportCategoryId());
         $copyObj->setPosition($this->getPosition());
-        $copyObj->setHandleclass($this->getHandleclass());
+        $copyObj->setHandleClass($this->getHandleClass());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1611,9 +1668,10 @@ abstract class Export implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
+        $this->ref = null;
         $this->export_category_id = null;
         $this->position = null;
-        $this->handleclass = null;
+        $this->handle_class = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

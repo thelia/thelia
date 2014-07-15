@@ -51,4 +51,4 @@ class RegisterFormatterPass implements CompilerPassInterface
             );
         }
     }
-} 
+}

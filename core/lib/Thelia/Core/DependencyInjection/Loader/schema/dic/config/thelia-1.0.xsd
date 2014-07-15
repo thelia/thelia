@@ -17,6 +17,8 @@
             <xsd:element name="commands" type="commands"/>
             <xsd:element name="forms" type="forms" />
             <xsd:element name="routing" type="routing" />
+            <xsd:element name="export_categories" type="export_categories" />
+            <xsd:element name="exports" type="exports" />
         </xsd:choice>
     </xsd:complexType>
 
@@ -210,6 +212,53 @@
         <xsd:attribute name="class" type="xsd:string" />
         <xsd:attribute name="method" type="xsd:string" />
         <xsd:attribute name="function" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="export_categories">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="export_category" type="export_category"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="export_category">
+        <xsd:choice maxOccurs="unbounded" minOccurs="1">
+            <xsd:element name="title" type="export_category_title" />
+        </xsd:choice>
+
+        <xsd:attribute name="id" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="export_category_title">
+        <xsd:simpleContent>
+            <xsd:extension id="title" base="xsd:string">
+                <xsd:attribute name="locale" type="xsd:string" use="required"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="exports">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="export" type="export"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="export">
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="export_descriptive" type="export_descriptive" />
+        </xsd:choice>
+
+        <xsd:attribute name="id" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="category_id" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="export_descriptive">
+        <xsd:sequence minOccurs="1" maxOccurs="1">
+            <xsd:element name="title" type="xsd:string" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="description" type="xsd:string" />
+        </xsd:sequence>
+
+        <xsd:attribute name="locale" type="xsd:string" use="required" />
     </xsd:complexType>
 
 </xsd:schema>

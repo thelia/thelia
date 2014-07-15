@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <export_categories>
+        <export_category id="thelia.export.customer">
+            <title locale="en_US">Customers</title>
+            <title locale="fr_FR">Clients</title>
+        </export_category>
+    </export_categories>
+
+    <exports>
+        <export id="thelia.export.mailing" category_id="thelia.export.customer" class="Thelia\ImportExport\Export\MailingExport">
+            <export_descriptive locale="fr_FR">
+                <title>Mailing</title>
+                <description>Exporter le nom, prénom et adresse mail des clients inscrits et des abonnées à la newsletter</description>
+            </export_descriptive>
+            <export_descriptive locale="en_US">
+                <title>Mailing</title>
+                <description>Export the last name, first name and email address of the customers and the newsletter subscribers</description>
+            </export_descriptive>
+        </export>
+    </exports>
+</config>

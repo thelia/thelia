@@ -1513,33 +1513,45 @@
     <behavior name="timestampable" />
   </table>
   <table name="import_category" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+    <column name="ref" required="true" type="VARCHAR" size="255" />
     <column name="title" type="VARCHAR" size="255" required="true" />
     <column name="position" type="INTEGER" required="true" />
+    <unique name="ref_UNIQUE">
+      <unique-column name="ref" />
+    </unique>
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title" />
     </behavior>
     <behavior name="timestampable" />
   </table>
   <table name="export_category" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+    <column name="ref"  required="true" type="VARCHAR" size="255" />
     <column name="title" type="VARCHAR" size="255" required="true" />
     <column name="position" type="INTEGER" required="true" />
+    <unique name="ref_UNIQUE">
+      <unique-column name="ref" />
+    </unique>
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title" />
     </behavior>
     <behavior name="timestampable" />
   </table>
   <table name="import" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
+    <column name="ref" required="true" type="VARCHAR" size="255" />
     <column name="title" type="VARCHAR" size="255" required="true" />
     <column name="description" type="CLOB" />
     <column name="import_category_id" type="INTEGER" required="true" />
     <column name="position" type="INTEGER" required="true" />
-    <column name="handleClass" type="CLOB" required="true"/>
+    <column name="handle_class" type="CLOB" required="true"/>
     <foreign-key foreignTable="import_category" name="fk_import_import_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="import_category_id" />
     </foreign-key>
+    <unique name="ref_UNIQUE">
+      <unique-column name="ref" />
+    </unique>
     <index name="idx_import_import_category_id">
       <index-column name="import_category_id" />
     </index>
@@ -1549,15 +1561,19 @@
     <behavior name="timestampable" />
   </table>
   <table name="export" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="id" primaryKey="true" autoIncrement="true" required="true" type="INTEGER" />
+    <column name="ref" required="true" type="VARCHAR" size="255" />
     <column name="title" type="VARCHAR" size="255" required="true" />
     <column name="description" type="CLOB" />
     <column name="export_category_id" type="INTEGER" required="true" />
     <column name="position" type="INTEGER" required="true" />
-    <column name="handleClass" type="CLOB" required="true"/>
+    <column name="handle_class" type="CLOB" required="true"/>
     <foreign-key foreignTable="export_category" name="fk_export_export_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="export_category_id" />
     </foreign-key>
+    <unique name="ref_UNIQUE">
+      <unique-column name="ref" />
+    </unique>
     <index name="idx_export_export_category_id">
       <index-column name="export_category_id" />
     </index>

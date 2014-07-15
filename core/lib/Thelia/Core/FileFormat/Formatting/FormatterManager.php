@@ -77,7 +77,7 @@ class FormatterManager
         $names = [];
 
         /** @var AbstractFormatter $formatter */
-        foreach($this->formatters as $formatter) {
+        foreach ($this->formatters as $formatter) {
             $names[] = $formatter->getName();
         }
 

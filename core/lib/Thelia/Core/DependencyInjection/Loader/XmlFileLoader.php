@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\DependencyInjection\Loader;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
@@ -24,6 +25,14 @@ use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
+use Thelia\Core\Translation\Translator;
+use Thelia\ImportExport\ExportHandler;
+use Thelia\Model\Export;
+use Thelia\Model\ExportCategory;
+use Thelia\Model\ExportCategoryQuery;
+use Thelia\Model\ExportQuery;
+use Thelia\Model\Map\ExportCategoryTableMap;
+use Thelia\Model\Map\ExportTableMap;
 
 /**
  *
@@ -63,6 +72,10 @@ class XmlFileLoader extends FileLoader
         $this->parseForms($xml);
 
         $this->parseDefinitions($xml, $path);
+
+        $this->parseExportCategories($xml);
+
+        $this->parseExports($xml);
     }
 
     protected function parseCommands(SimpleXMLElement $xml)
@@ -274,6 +287,157 @@ class XmlFileLoader extends FileLoader
         }
 
         $this->container->setDefinition($id, $definition);
+    }
+
+    protected function parseExportCategories(SimpleXMLElement $xml)
+    {
+        if (false === $exportCategories = $xml->xpath('//config:export_categories/config:export_category')) {
+            return;
+        }
+
+        $con = Propel::getWriteConnection(ExportCategoryTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            /** @var SimpleXMLElement $exportCategory */
+            foreach ($exportCategories as $exportCategory) {
+                $id = (string) $exportCategory->getAttributeAsPhp("id");
+
+                $exportCategoryModel = ExportCategoryQuery::create()->findOneByRef($id);
+
+                if ($exportCategoryModel === null) {
+                    $exportCategoryModel = new ExportCategory();
+                    $exportCategoryModel
+                        ->setRef($id)
+                        ->setPositionToLast()
+                        ->save($con)
+                    ;
+                }
+
+                /** @var SimpleXMLElement $child */
+                foreach ($exportCategory->children() as $child) {
+                    $locale = (string) $child->getAttributeAsPhp("locale");
+                    $value = (string) $child;
+
+                    $exportCategoryModel
+                        ->setLocale($locale)
+                        ->setTitle($value)
+                        ->save($con);
+                    ;
+                }
+            }
+
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            throw $e;
+        }
+    }
+
+    protected function parseExports(SimpleXMLElement $xml)
+    {
+        if (false === $exports = $xml->xpath('//config:exports/config:export')) {
+            return;
+        }
+
+        $con = Propel::getWriteConnection(ExportTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            /** @var SimpleXMLElement $export */
+            foreach ($exports as $export) {
+                $id = (string) $export->getAttributeAsPhp("id");
+                $class = (string) $export->getAttributeAsPhp("class");
+                $categoryRef = (string) $export->getAttributeAsPhp("category_id");
+
+                if (!class_exists($class)) {
+                    throw new \ErrorException(
+                        Translator::getInstance()->trans(
+                            "The class \"%class\" doesn't exist",
+                            [
+                                "%class" => $class
+                            ]
+                        )
+                    );
+                }
+
+                $classInstance = new $class($this->container);
+
+                if (!$classInstance instanceof ExportHandler) {
+                    throw new \ErrorException(
+                        Translator::getInstance()->trans(
+                            "The class \"%class\" must extend %baseClass",
+                            [
+                                "%class" => $class,
+                                "%baseClass" => "Thelia\\ImportExport\\ExportHandler",
+                            ]
+                        )
+                    );
+                }
+
+                $category = ExportCategoryQuery::create()->findOneByRef($categoryRef);
+
+                if (null === $category) {
+                    throw new \ErrorException(
+                        Translator::getInstance()->trans(
+                            "The export category \"%category\" doesn't exist",
+                            [
+                                "%category" => $categoryRef
+                            ]
+                        )
+                    );
+                }
+
+                $exportModel = ExportQuery::create()->findOneByRef($id);
+
+                if (null === $exportModel) {
+                    $exportModel = new Export();
+                    $exportModel
+                        ->setRef($id)
+                        ->setPositionToLast()
+                    ;
+                }
+
+                $exportModel
+                    ->setExportCategory($category)
+                    ->setHandleClass($class)
+                    ->save($con)
+                ;
+
+                /** @var SimpleXMLElement $descriptive */
+                foreach ($export->children() as $descriptive) {
+                    $locale = $descriptive->getAttributeAsPhp("locale");
+                    $title = null;
+                    $description = null;
+
+                    /** @var SimpleXMLElement $row */
+                    foreach ($descriptive->children() as $row) {
+                        switch ($row->getName()) {
+                            case "title":
+                                $title = (string) $row;
+                                break;
+                            case "description":
+                                $description = (string) $row;
+                                break;
+                        }
+                    }
+
+                    $exportModel
+                        ->setLocale($locale)
+                        ->setTitle($title)
+                        ->setDescription($description)
+                        ->save($con)
+                    ;
+                }
+            }
+
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            throw $e;
+        }
     }
 
     /**

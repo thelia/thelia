@@ -23,11 +23,13 @@ use Thelia\Model\Map\ImportCategoryTableMap;
  *
  *
  * @method     ChildImportCategoryQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildImportCategoryQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildImportCategoryQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildImportCategoryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildImportCategoryQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildImportCategoryQuery groupById() Group by the id column
+ * @method     ChildImportCategoryQuery groupByRef() Group by the ref column
  * @method     ChildImportCategoryQuery groupByPosition() Group by the position column
  * @method     ChildImportCategoryQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildImportCategoryQuery groupByUpdatedAt() Group by the updated_at column
@@ -48,11 +50,13 @@ use Thelia\Model\Map\ImportCategoryTableMap;
  * @method     ChildImportCategory findOneOrCreate(ConnectionInterface $con = null) Return the first ChildImportCategory matching the query, or a new ChildImportCategory object populated from the query conditions when no match is found
  *
  * @method     ChildImportCategory findOneById(int $id) Return the first ChildImportCategory filtered by the id column
+ * @method     ChildImportCategory findOneByRef(string $ref) Return the first ChildImportCategory filtered by the ref column
  * @method     ChildImportCategory findOneByPosition(int $position) Return the first ChildImportCategory filtered by the position column
  * @method     ChildImportCategory findOneByCreatedAt(string $created_at) Return the first ChildImportCategory filtered by the created_at column
  * @method     ChildImportCategory findOneByUpdatedAt(string $updated_at) Return the first ChildImportCategory filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildImportCategory objects filtered by the id column
+ * @method     array findByRef(string $ref) Return ChildImportCategory objects filtered by the ref column
  * @method     array findByPosition(int $position) Return ChildImportCategory objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildImportCategory objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildImportCategory objects filtered by the updated_at column
@@ -144,7 +148,7 @@ abstract class ImportCategoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `import_category` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `REF`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `import_category` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -272,6 +276,35 @@ abstract class ImportCategoryQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ImportCategoryTableMap::ID, $id, $comparison);
+    }
+
+    /**
+     * Filter the query on the ref column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByRef('fooValue');   // WHERE ref = 'fooValue'
+     * $query->filterByRef('%fooValue%'); // WHERE ref LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $ref The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildImportCategoryQuery The current query, for fluid interface
+     */
+    public function filterByRef($ref = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($ref)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $ref)) {
+                $ref = str_replace('*', '%', $ref);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ImportCategoryTableMap::REF, $ref, $comparison);
     }
 
     /**

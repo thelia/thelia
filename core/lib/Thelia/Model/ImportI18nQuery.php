@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ImportI18nQuery as BaseImportI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'import_i18n' table.
  *

@@ -29,7 +29,7 @@ class ExportCategory extends BaseExportCategory
 
     public function downPosition()
     {
-        $max = CategoryQuery::create()
+        $max = ExportCategoryQuery::create()
             ->orderByPosition(Criteria::DESC)
             ->select(ExportCategoryTableMap::POSITION)
             ->findOne()
@@ -70,5 +70,22 @@ class ExportCategory extends BaseExportCategory
         }
 
         $this->setPosition($position)->save();
+    }
+
+    public function setPositionToLast()
+    {
+        $max = ExportCategoryQuery::create()
+            ->orderByPosition(Criteria::DESC)
+            ->select(ExportCategoryTableMap::POSITION)
+            ->findOne()
+        ;
+
+        if (null === $max) {
+            $this->setPosition(1);
+        } else {
+            $this->setPosition($max+1);
+        }
+
+        return $this;
     }
 }

@@ -24,4 +24,4 @@ class ImportCategory extends ImportExportCategory
     {
         return ImportCategoryQuery::create();
     }
-} 
+}

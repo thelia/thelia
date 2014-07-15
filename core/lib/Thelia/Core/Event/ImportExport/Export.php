@@ -32,7 +32,7 @@ class Export extends ActionEvent
     /** @var  \Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder */
     protected $archiveBuilder;
 
-    function __construct(
+    public function __construct(
         AbstractFormatter $formatter,
         ExportHandler $handler,
         AbstractArchiveBuilder $archiveBuilder = null
@@ -43,7 +43,7 @@ class Export extends ActionEvent
     }
 
     /**
-     * @param AbstractArchiveBuilder $archiveBuilder
+     * @param  AbstractArchiveBuilder $archiveBuilder
      * @return $this
      */
     public function setArchiveBuilder(AbstractArchiveBuilder $archiveBuilder)
@@ -62,7 +62,7 @@ class Export extends ActionEvent
     }
 
     /**
-     * @param AbstractFormatter $formatter
+     * @param  AbstractFormatter $formatter
      * @return $this
      */
     public function setFormatter(AbstractFormatter $formatter)
@@ -81,7 +81,7 @@ class Export extends ActionEvent
     }
 
     /**
-     * @param ExportHandler $handler
+     * @param  ExportHandler $handler
      * @return $this
      */
     public function setHandler(ExportHandler $handler)
@@ -98,4 +98,4 @@ class Export extends ActionEvent
     {
         return $this->handler;
     }
-} 
+}

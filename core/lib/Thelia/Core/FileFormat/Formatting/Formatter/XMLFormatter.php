@@ -153,6 +153,7 @@ class XMLFormatter extends AbstractFormatter
         }
 
         $data = new FormatterData($this->getAliases());
+
         return $data->setData($array);
     }
 
@@ -160,4 +161,4 @@ class XMLFormatter extends AbstractFormatter
     {
         return ExportType::EXPORT_UNBOUNDED;
     }
-} 
+}

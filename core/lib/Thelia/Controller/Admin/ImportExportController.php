@@ -58,7 +58,7 @@ class ImportExportController extends BaseAdminController
 
     public function export($id)
     {
-        if (null === $export = $this->getExport($id))  {
+        if (null === $export = $this->getExport($id)) {
             return $this->render("404");
         }
 
@@ -74,7 +74,6 @@ class ImportExportController extends BaseAdminController
         foreach ($this->archiveBuilderManager->getNames() as $archiveBuilder) {
             $archiveBuilders[$archiveBuilder] = $archiveBuilder;
         }
-
 
         /**
          * Get the allowed formatters to inject them into the form
@@ -121,30 +120,30 @@ class ImportExportController extends BaseAdminController
 
             if (!$boundForm->get("do_compress")->getData()) {
 
-            /**
-             * Build an event containing the formatter and the handler.
-             * Used for specific configuration (e.g: XML node names)
-             */
-            $event = new ExportEvent($formatter, $handler);
-
-            if (!$boundForm->get("do_compress")->getData())
-            {
                 /**
-                 * Dispatch the event
+                 * Build an event containing the formatter and the handler.
+                 * Used for specific configuration (e.g: XML node names)
                  */
-                $this->dispatch(TheliaEvents::BEFORE_EXPORT, $event);
+                $event = new ExportEvent($formatter, $handler);
 
-                $formattedContent = $formatter->encode($data);
+                if (!$boundForm->get("do_compress")->getData()) {
+                    /**
+                     * Dispatch the event
+                     */
+                    $this->dispatch(TheliaEvents::BEFORE_EXPORT, $event);
 
-                return new Response(
-                    $formattedContent,
-                    200,
-                    [
-                        "Content-Type" => $formatter->getMimeType(),
-                        "Content-Disposition" =>
-                            "attachment; filename=\"" . $filename . "\"",
-                    ]
-                );
+                    $formattedContent = $formatter->encode($data);
+
+                    return new Response(
+                        $formattedContent,
+                        200,
+                        [
+                            "Content-Type" => $formatter->getMimeType(),
+                            "Content-Disposition" =>
+                                "attachment; filename=\"" . $filename . "\"",
+                        ]
+                    );
+                }
             } else {
                 /** @var \Thelia\Core\FileFormat\Archive\ArchiveBuilderInterface $archiveBuilder */
                 $archiveBuilder = $this->archiveBuilderManager->get(
@@ -186,9 +185,9 @@ class ImportExportController extends BaseAdminController
                 return $archiveBuilder->buildArchiveResponse($formatter::FILENAME);
             }
 
-        } catch(FormValidationException $e) {
+        } catch (FormValidationException $e) {
             $errorMessage = $this->createStandardFormValidationErrorMessage($e);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
         }
 
@@ -248,7 +247,7 @@ class ImportExportController extends BaseAdminController
 
     public function exportView($id)
     {
-        if (null === $export = $this->getExport($id))  {
+        if (null === $export = $this->getExport($id)) {
             return $this->render("404");
         }
 
@@ -277,6 +276,11 @@ class ImportExportController extends BaseAdminController
             }
         }
 
+        $this->getParserContext()
+            ->set("HAS_IMAGES", $export->hasImages($this->container))
+            ->set("HAS_DOCUMENTS", $export->hasDocuments($this->container))
+        ;
+
         /** Then render the form */
         if ($this->getRequest()->isXmlHttpRequest()) {
             return $this->render("ajax/export-modal");
@@ -302,4 +306,4 @@ class ImportExportController extends BaseAdminController
 
         return $export;
     }
-} 
+}

@@ -65,7 +65,7 @@ class FormatterData
     }
 
     /**
-     * @param array $data
+     * @param  array $data
      * @return $this
      *
      * Sets raw data with aliases
@@ -75,6 +75,7 @@ class FormatterData
     {
         if (empty($this->aliases)) {
             $this->data = $data;
+
             return $this;
         }
 
@@ -84,7 +85,7 @@ class FormatterData
     }
 
     /**
-     * @param ModelCriteria $criteria
+     * @param  ModelCriteria $criteria
      * @return $this|null
      *
      * Loads a model criteria.
@@ -157,7 +158,7 @@ class FormatterData
     }
 
     /**
-     * @param array $row
+     * @param  array $row
      * @return $this
      */
     public function addRow(array $row)
@@ -168,7 +169,7 @@ class FormatterData
     }
 
     /**
-     * @param int $index
+     * @param  int        $index
      * @return array|bool
      */
     public function popRow($index = 0)
@@ -183,7 +184,7 @@ class FormatterData
     }
 
     /**
-     * @param int $index
+     * @param  int                   $index
      * @return array|bool
      * @throws \OutOfBoundsException
      */
@@ -208,8 +209,8 @@ class FormatterData
     }
 
     /**
-     * @param array $data
-     * @param array $aliases
+     * @param  array $data
+     * @param  array $aliases
      * @return array
      */
     protected function reverseAliases(array $data, array $aliases)
