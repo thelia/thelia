@@ -146,8 +146,8 @@ class TheliaLoop extends AbstractSmartyPlugin
 
             self::$pagination[$name] = null;
 
-            $cacheKey = $loop->getCacheKey();
-            //$cacheKey = null;
+            //$cacheKey = $loop->getCacheKey();
+            $cacheKey = null;
             if ($cacheKey && (null !== $loopResults = $this->getCache($cacheKey))) {
                 Tlog::getInstance()->debug( sprintf("[LOOP FROM CACHE][%s][%s]", $type, implode($params) ));
             } else {

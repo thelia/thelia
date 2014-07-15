@@ -65,7 +65,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
     protected $timestampable = true;
 
-    protected $isCacheable = true;
+    protected $isCacheable = false;
 
     /**
      * @var array Possible standard image sources

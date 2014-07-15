@@ -212,6 +212,14 @@
                                 </tr>
                                 {/loop}
                                 {hook name="configuration.system-bottom" location="configuration_system_bottom" }
+                                {loop type="auth" name="pcc12" role="ADMIN" resource="admin.configuration.cache" access="VIEW"}
+                                <tr>
+                                    <td><a href="{url path='/admin/configuration/cache'}">{intl l='Cache configuration'}</a></td>
+                                    <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/cache'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                </tr>
+                                {/loop}
+
+                                {module_include location='system_configuration_bottom'}
                             </table>
                         </div>
                     </div>

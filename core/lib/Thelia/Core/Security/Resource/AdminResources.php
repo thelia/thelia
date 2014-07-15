@@ -123,5 +123,5 @@ final class AdminResources
 
     const TITLE = "admin.customer.title";
 
-    const CACHE = "admin.cache";
+    const CACHE = "admin.configuration.cache";
 }

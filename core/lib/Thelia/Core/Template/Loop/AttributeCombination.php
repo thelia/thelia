@@ -43,7 +43,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
 {
     protected $timestampable = true;
 
-    protected $isCacheable = true;
+    protected $isCacheable = false;
 
     protected $cacheAttribute = 'product_sale_elements';
 
