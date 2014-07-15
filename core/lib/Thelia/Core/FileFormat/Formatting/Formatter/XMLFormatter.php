@@ -25,6 +25,7 @@ class XMLFormatter extends AbstractFormatter
 {
     public $root = "data";
     public $nodeName = "node";
+    public $rowName = "row";
 
     /**
      * @return string
@@ -85,7 +86,13 @@ class XMLFormatter extends AbstractFormatter
                 $node = $container->appendChild(new \DOMElement($this->nodeName));
                 $this->recursiveBuild($entry, $node);
             } else {
-                $container->appendChild(new \DOMElement($key, $entry));
+                $node = new \DOMElement($this->nodeName);
+                $container->appendChild($node);
+
+                /** @var \DOMElement $lastChild */
+                $lastChild = $container->lastChild;
+                $lastChild->setAttribute("name",$key);
+                $lastChild->setAttribute("value", $entry);
             }
         }
 
@@ -102,7 +109,13 @@ class XMLFormatter extends AbstractFormatter
                 $newNode = $node->appendChild(new \DOMElement($key));
                 $this->recursiveBuild($entry, $newNode);
             } else {
-                $node->appendChild(new \DOMElement($key, $entry));
+                $inputNode = new \DOMElement($this->rowName);
+                $node->appendChild($inputNode);
+
+                /** @var \DOMElement $lastChild */
+                $lastChild = $node->lastChild;
+                $lastChild->setAttribute("name",$key);
+                $lastChild->setAttribute("value", $entry);
             }
         }
     }

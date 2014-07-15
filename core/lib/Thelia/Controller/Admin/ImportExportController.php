@@ -11,6 +11,8 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\ImportExport\Export as ExportEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Export as ExportLoop;
@@ -115,12 +117,24 @@ class ImportExportController extends BaseAdminController
                 $boundForm->get("formatter")->getData()
             );
 
-            $formattedContent = $formatter->encode($data);
-
             $filename = $formatter::FILENAME . "." . $formatter->getExtension();
 
             if (!$boundForm->get("do_compress")->getData()) {
 
+            /**
+             * Build an event containing the formatter and the handler.
+             * Used for specific configuration (e.g: XML node names)
+             */
+            $event = new ExportEvent($formatter, $handler);
+
+            if (!$boundForm->get("do_compress")->getData())
+            {
+                /**
+                 * Dispatch the event
+                 */
+                $this->dispatch(TheliaEvents::BEFORE_EXPORT, $event);
+
+                $formattedContent = $formatter->encode($data);
 
                 return new Response(
                     $formattedContent,
@@ -137,21 +151,31 @@ class ImportExportController extends BaseAdminController
                     $boundForm->get("archive_builder")->getData()
                 );
 
-                /**
-                 * Put the images in the archive
-                 */
-                if ($boundForm->get("images")->getData() && $handler instanceof ImagesExportInterface) {
-                    foreach ($handler->getImagesPaths() as $image) {
-                        $archiveBuilder->addFile($image, "images");
+                $event->setArchiveBuilder($archiveBuilder);
+                $this->dispatch(TheliaEvents::BEFORE_EXPORT, $event);
+
+                $formattedContent = $formatter->encode($data);
+
+                $includeImages = $boundForm->get("images")->getData();
+                $includeDocuments = $boundForm->get("documents")->getData();
+
+                if ($includeImages && $handler instanceof ImagesExportInterface) {
+                    foreach ($handler->getImagesPaths() as $name => $documentPath) {
+                        $archiveBuilder->addFile(
+                            $documentPath,
+                            $handler::IMAGES_DIRECTORY,
+                            is_integer($name) ? null : $name
+                        );
                     }
                 }
 
-                /**
-                 * Then the documents
-                 */
-                if ($boundForm->get("documents")->getData() && $handler instanceof DocumentsExportInterface) {
-                    foreach ($handler->getDocumentsPaths() as $document) {
-                        $archiveBuilder->addFile($document, "documents");
+                if ($includeDocuments && $handler instanceof DocumentsExportInterface) {
+                    foreach ($handler->getDocumentsPaths() as $name => $documentPath) {
+                        $archiveBuilder->addFile(
+                            $documentPath,
+                            $handler::DOCUMENTS_DIRECTORY,
+                            is_integer($name) ? null : $name
+                        );
                     }
                 }
 

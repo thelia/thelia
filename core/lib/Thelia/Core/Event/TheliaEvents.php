@@ -766,4 +766,8 @@ final class TheliaEvents
 
     const BEFORE_UPDATEBRAND = "action.before_updateBrand";
     const AFTER_UPDATEBRAND  = "action.after_updateBrand";
+
+    // -- Export ----------------------------------------------
+
+    const BEFORE_EXPORT = "Thelia.before.export";
 }

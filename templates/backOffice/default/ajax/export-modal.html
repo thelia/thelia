@@ -15,21 +15,16 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     {form_field form=$form field="formatter"}
-                                        <div class="form-group {if $error}has-error{/if}">
-                                            <label for="{$label_attr.for}">
-                                                {$label}
-                                            </label>
-                                            <select name="{$name}" id="{$label_attr.for}">
-                                                {loop name="export-formatters" type="formatter" export=$ID}
-                                                    <option value="{$NAME}" {if $value == $NAME}selected{/if}>
-                                                        {$NAME} (.{$EXTENSION})
-                                                    </option>
-                                                {/loop}
-                                            </select>
-                                            {if $error}
-                                                <div class="error-field">{$message}</div>
-                                            {/if}
-                                        </div>
+                                        <label for="{$label_attr.for}">
+                                            {$label}
+                                        </label>
+                                        <select name="{$name}" id="{$label_attr.for}">
+                                            {loop name="export-formatters" type="formatter" export=$ID}
+                                                <option value="{$NAME}" {if $value == $NAME}selected{/if}>
+                                                    {$NAME} (.{$EXTENSION})
+                                                </option>
+                                            {/loop}
+                                        </select>
                                     {/form_field}
                                 </div>
                                 <div class="col-md-6">
@@ -45,7 +40,10 @@
                             </div>
                             <div class="row export-compression-selection-row">
                                 <div class="col-md-4">
-                                    {custom_render_form_field form=$form field="archive_builder"}
+                                    {form_field form=$form field="archive_builder"}
+                                        <label for="{$label_attr.for}">
+                                            {$label}
+                                        </label>
                                         <select name="{$name}" id="{$label_attr.for}">
                                             {loop name="export-archive-builder" type="archive-builder"}
                                                 <option value="{$NAME}" {if $value == $NAME}selected{/if}>
@@ -53,7 +51,7 @@
                                                 </option>
                                             {/loop}
                                         </select>
-                                    {/custom_render_form_field}
+                                    {/form_field}
                                 </div>
                                 <div class="col-md-4">
                                     {form_field form=$form field="images"}
