@@ -17,8 +17,8 @@ use Thelia\Core\Template\Loop\Export as ExportLoop;
 use Thelia\Core\Template\Loop\Import as ImportLoop;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ExportForm;
-use Thelia\ImportExport\DocumentsAwareInterface;
-use Thelia\ImportExport\ImagesAwareInterface;
+use Thelia\ImportExport\DocumentsExportInterface;
+use Thelia\ImportExport\ImagesExportInterface;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\ImportQuery;
 
@@ -118,24 +118,27 @@ class ImportExportController extends BaseAdminController
             $formattedContent = $formatter->encode($data);
 
             if (!$boundForm->get("do_compress")->getData()) {
+                $filename = $formatter::FILENAME . "." . $formatter->getExtension();
+
                 return new Response(
                     $formattedContent,
                     200,
                     [
                         "Content-Type" => $formatter->getMimeType(),
                         "Content-Disposition" =>
-                            "attachment; filename=\"".$formatter::FILENAME .
-                            "." . $formatter->getExtension() ."\"",
+                            "attachment; filename=\"" . $filename . "\"",
                     ]
                 );
             } else {
-                /** @var \Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder $archiveBuilder */
-                $archiveBuilder = $this->archiveBuilderManager->get($boundForm->get("archive_builder")->getData());
+                /** @var \Thelia\Core\FileFormat\Archive\ArchiveBuilderInterface $archiveBuilder */
+                $archiveBuilder = $this->archiveBuilderManager->get(
+                    $boundForm->get("archive_builder")->getData()
+                );
 
                 /**
                  * Put the images in the archive
                  */
-                if ($boundForm->get("images")->getData() && $handler instanceof ImagesAwareInterface) {
+                if ($boundForm->get("images")->getData() && $handler instanceof ImagesExportInterface) {
                     foreach ($handler->getImagesPaths() as $image) {
                         $archiveBuilder->addFile($image, "images");
                     }
@@ -144,7 +147,7 @@ class ImportExportController extends BaseAdminController
                 /**
                  * Then the documents
                  */
-                if ($boundForm->get("documents")->getData() && $handler instanceof DocumentsAwareInterface) {
+                if ($boundForm->get("documents")->getData() && $handler instanceof DocumentsExportInterface) {
                     foreach ($handler->getDocumentsPaths() as $document) {
                         $archiveBuilder->addFile($document, "documents");
                     }

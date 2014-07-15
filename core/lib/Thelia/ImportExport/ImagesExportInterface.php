@@ -11,17 +11,20 @@
 /*************************************************************************************/
 namespace Thelia\ImportExport;
 
+
 /**
- * Interface DocumentsAwareInterface
+ * interface ImagesExportInterface
  * @package Thelia\ImportExport
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-interface DocumentsAwareInterface
+interface ImagesExportInterface
 {
+    const IMAGES_DIRECTORY = "images";
+
     /**
      * @return array
      *
-     * return an array with the paths to the documents to include in the archive
+     * return an array with the paths to the images to include in the archive
      */
-    public function getDocumentsPaths();
+    public function getImagesPaths();
 } 
