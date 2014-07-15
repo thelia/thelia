@@ -794,9 +794,15 @@
                 captureLength: 1,
                 wait         : 300,
                 callback     : function () {
+                    var price = $(this).val();
+                    $(this).val(sanitizeFloat(price));
                     update_price($(this).val(), $(this).data('price-type'), $(this).data('rel-price'));
                 }
             });
+
+            function sanitizeFloat(numVal) {
+                return numVal.replace(",", ".");
+            };
 
         });
     </script>
