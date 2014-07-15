@@ -332,7 +332,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
             200,
             [
                 "Content-Type" => $this->getMimeType(),
-                "Content-Disposition" => $filename . "." . $this->getExtension(),
+                "Content-Disposition" => "attachment; filename=\"". $filename . "." . $this->getExtension() ."\"",
             ]
         );
     }

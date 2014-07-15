@@ -117,8 +117,10 @@ class ImportExportController extends BaseAdminController
 
             $formattedContent = $formatter->encode($data);
 
+            $filename = $formatter::FILENAME . "." . $formatter->getExtension();
+
             if (!$boundForm->get("do_compress")->getData()) {
-                $filename = $formatter::FILENAME . "." . $formatter->getExtension();
+
 
                 return new Response(
                     $formattedContent,
@@ -153,12 +155,8 @@ class ImportExportController extends BaseAdminController
                     }
                 }
 
-                /**
-                 * Then add the export file
-                 */
                 $archiveBuilder->addFileFromString(
-                    $formattedContent,
-                    $formatter::FILENAME . "." . $formatter->getExtension()
+                    $formattedContent, $filename
                 );
 
                 return $archiveBuilder->buildArchiveResponse($formatter::FILENAME);
