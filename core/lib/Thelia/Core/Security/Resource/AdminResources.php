@@ -119,6 +119,6 @@ final class AdminResources
 
     const SALES = "admin.sales";
 
-    const CACHE = "admin.cache";
+    const CACHE = "admin.configuration.cache";
 
 }

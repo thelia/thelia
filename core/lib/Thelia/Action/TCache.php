@@ -15,6 +15,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Cache\TCacheDiscardKeyEvent;
 use Thelia\Core\Event\Cache\TCacheDiscardRefEvent;
 use Thelia\Core\Event\Cache\TCacheFlushEvent;
@@ -22,7 +23,7 @@ use Thelia\Core\Event\Cache\TCacheUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use \Thelia\Cache\TCache as TCacheManager;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Config;
+
 
 /**
  * Class TCache
@@ -64,7 +65,7 @@ class TCache extends BaseAction implements EventSubscriberInterface
 
             // dependencies
             // cache
-            TheliaEvents::CACHE_CLEAR        => array('flush', 128),
+            TheliaEvents::CACHE_CLEAR        => array('flushCache', 128),
 
             // product
             TheliaEvents::PRODUCT_UPDATE     => array('discardProduct', 128),
@@ -101,6 +102,13 @@ class TCache extends BaseAction implements EventSubscriberInterface
         $cache = TCacheManager::getInstance();
         $event->setResponse($cache->deleteRef($event->getRef()));
     }
+
+    public function flushCache(CacheEvent $event)
+    {
+        $eventFlush = new TCacheFlushEvent();
+        $this->flush($eventFlush);
+    }
+
 
     public function flush(TCacheFlushEvent $event)
     {
