@@ -99,9 +99,15 @@
                                                     {/if}
                                                     <tr>
                                                         <td>
-                                                            {loop type="product" name="my_product_loop" visible="*" ref="$REF"}
-                                                                <a href="{url path='/admin/products/update' product_id=$ID}">{$TITLE}</a>
-                                                            {/loop}
+                                                            {ifloop rel="my_product_loop"}
+                                                                {loop type="product" name="my_product_loop" visible="*" ref="$REF"}
+                                                                    <a href="{url path='/admin/products/update' product_id=$ID}">{$TITLE}</a>
+                                                                {/loop}
+                                                            {/ifloop}
+                                                            {elseloop rel="my_product_loop"}
+                                                                {* The product doesn't exist anymore *}
+                                                                {$TITLE}
+                                                            {/elseloop}
                                                             {ifloop rel="combinations"}
                                                             <dl class="dl-horizontal">
                                                                 {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
