@@ -27,12 +27,19 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\ExportHandler;
+use Thelia\ImportExport\ImportHandler;
 use Thelia\Model\Export;
 use Thelia\Model\ExportCategory;
 use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
+use Thelia\Model\Import;
+use Thelia\Model\ImportCategory;
+use Thelia\Model\ImportCategoryQuery;
+use Thelia\Model\ImportQuery;
 use Thelia\Model\Map\ExportCategoryTableMap;
 use Thelia\Model\Map\ExportTableMap;
+use Thelia\Model\Map\ImportCategoryTableMap;
+use Thelia\Model\Map\ImportTableMap;
 
 /**
  *
@@ -76,6 +83,10 @@ class XmlFileLoader extends FileLoader
         $this->parseExportCategories($xml);
 
         $this->parseExports($xml);
+
+        $this->parseImportCategories($xml);
+
+        $this->parseImports($xml);
     }
 
     protected function parseCommands(SimpleXMLElement $xml)
@@ -424,6 +435,157 @@ class XmlFileLoader extends FileLoader
                     }
 
                     $exportModel
+                        ->setLocale($locale)
+                        ->setTitle($title)
+                        ->setDescription($description)
+                        ->save($con)
+                    ;
+                }
+            }
+
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            throw $e;
+        }
+    }
+
+    protected function parseImportCategories(SimpleXMLElement $xml)
+    {
+        if (false === $importCategories = $xml->xpath('//config:import_categories/config:import_category')) {
+            return;
+        }
+
+        $con = Propel::getWriteConnection(ImportCategoryTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            /** @var SimpleXMLElement $importCategory */
+            foreach ($importCategories as $importCategory) {
+                $id = (string) $importCategory->getAttributeAsPhp("id");
+
+                $importCategoryModel = ImportCategoryQuery::create()->findOneByRef($id);
+
+                if ($importCategoryModel === null) {
+                    $importCategoryModel = new ImportCategory();
+                    $importCategoryModel
+                        ->setRef($id)
+                        ->setPositionToLast()
+                        ->save($con)
+                    ;
+                }
+
+                /** @var SimpleXMLElement $child */
+                foreach ($importCategory->children() as $child) {
+                    $locale = (string) $child->getAttributeAsPhp("locale");
+                    $value = (string) $child;
+
+                    $importCategoryModel
+                        ->setLocale($locale)
+                        ->setTitle($value)
+                        ->save($con);
+                    ;
+                }
+            }
+
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            throw $e;
+        }
+    }
+
+    protected function parseImports(SimpleXMLElement $xml)
+    {
+        if (false === $imports = $xml->xpath('//config:imports/config:import')) {
+            return;
+        }
+
+        $con = Propel::getWriteConnection(ImportTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            /** @var SimpleXMLElement $import */
+            foreach ($imports as $import) {
+                $id = (string) $import->getAttributeAsPhp("id");
+                $class = (string) $import->getAttributeAsPhp("class");
+                $categoryRef = (string) $import->getAttributeAsPhp("category_id");
+
+                if (!class_exists($class)) {
+                    throw new \ErrorException(
+                        Translator::getInstance()->trans(
+                            "The class \"%class\" doesn't exist",
+                            [
+                                "%class" => $class
+                            ]
+                        )
+                    );
+                }
+
+                $classInstance = new $class($this->container);
+
+                if (!$classInstance instanceof ImportHandler) {
+                    throw new \ErrorException(
+                        Translator::getInstance()->trans(
+                            "The class \"%class\" must extend %baseClass",
+                            [
+                                "%class" => $class,
+                                "%baseClass" => "Thelia\\ImportImport\\ImportHandler",
+                            ]
+                        )
+                    );
+                }
+
+                $category = ImportCategoryQuery::create()->findOneByRef($categoryRef);
+
+                if (null === $category) {
+                    throw new \ErrorException(
+                        Translator::getInstance()->trans(
+                            "The import category \"%category\" doesn't exist",
+                            [
+                                "%category" => $categoryRef
+                            ]
+                        )
+                    );
+                }
+
+                $importModel = ImportQuery::create()->findOneByRef($id);
+
+                if (null === $importModel) {
+                    $importModel = new Import();
+                    $importModel
+                        ->setRef($id)
+                        ->setPositionToLast()
+                    ;
+                }
+
+                $importModel
+                    ->setImportCategory($category)
+                    ->setHandleClass($class)
+                    ->save($con)
+                ;
+
+                /** @var SimpleXMLElement $descriptive */
+                foreach ($import->children() as $descriptive) {
+                    $locale = $descriptive->getAttributeAsPhp("locale");
+                    $title = null;
+                    $description = null;
+
+                    /** @var SimpleXMLElement $row */
+                    foreach ($descriptive->children() as $row) {
+                        switch ($row->getName()) {
+                            case "title":
+                                $title = (string) $row;
+                                break;
+                            case "description":
+                                $description = (string) $row;
+                                break;
+                        }
+                    }
+
+                    $importModel
                         ->setLocale($locale)
                         ->setTitle($title)
                         ->setDescription($description)

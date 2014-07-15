@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+    <import_categories>
+        <import_category id="thelia.import.products">
+            <title locale="fr_FR">Produits</title>
+            <title locale="en_US">Products</title>
+        </import_category>
+    </import_categories>
+
+    <imports>
+        <import id="thelia.import.stock" class="Thelia\ImportExport\Import\ProductStockImport" category_id="thelia.import.products">
+            <import_descriptive locale="fr_FR">
+                <title>Importez votre stock</title>
+            </import_descriptive>
+            <import_descriptive locale="en_US">
+                <title>Import your stock</title>
+            </import_descriptive>
+        </import>
+    </imports>
+</config>

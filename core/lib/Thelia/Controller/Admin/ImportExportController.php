@@ -39,7 +39,6 @@ class ImportExportController extends BaseAdminController
 
     public function hydrate()
     {
-
         $this->archiveBuilderManager = $this->container->get("thelia.manager.archive_builder_manager");
         $this->formatterManager = $this->container->get("thelia.manager.formatter_manager");
     }

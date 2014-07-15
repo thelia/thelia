@@ -28,7 +28,7 @@ class ImportCategory extends BaseImportCategory
 
     public function downPosition()
     {
-        $max = CategoryQuery::create()
+        $max = ImportCategoryQuery::create()
             ->orderByPosition(Criteria::DESC)
             ->select(ImportCategoryTableMap::POSITION)
             ->findOne()
@@ -69,5 +69,22 @@ class ImportCategory extends BaseImportCategory
         }
 
         $this->setPosition($position)->save();
+    }
+
+    public function setPositionToLast()
+    {
+        $max = ImportCategoryQuery::create()
+            ->orderByPosition(Criteria::DESC)
+            ->select(ImportCategoryTableMap::POSITION)
+            ->findOne()
+        ;
+
+        if (null === $max) {
+            $this->setPosition(1);
+        } else {
+            $this->setPosition($max+1);
+        }
+
+        return $this;
     }
 }
