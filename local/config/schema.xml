@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <database defaultIdMethod="native" name="thelia">
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
@@ -1490,5 +1491,19 @@
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
     </behavior>
+  </table>
+  <table name="form_firewall" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="form_name" required="true" type="VARCHAR" size="255" />
+    <column name="ip_address" required="true" type="VARCHAR" size="15" />
+    <column defaultValue="1" name="attempts" type="TINYINT" />
+    <index name="idx_form_firewall_form_name">
+      <index-column name="form_name" />
+    </index>
+    <index name="idx_form_firewall_ip_address">
+      <index-column name="ip_address" />
+    </index>
+
+    <behavior name="timestampable" />
   </table>
 </database>

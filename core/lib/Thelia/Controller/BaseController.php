@@ -25,6 +25,7 @@ use Symfony\Component\Routing\Router;
 
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
+use Thelia\Form\FirewallForm;
 use Thelia\Model\OrderQuery;
 
 use Thelia\Tools\Redirect;
@@ -200,6 +201,17 @@ abstract class BaseController extends ContainerAware
             $form->bind($aBaseForm->getRequest());
 
             if ($form->isValid()) {
+                if ($aBaseForm instanceof FirewallForm && !$aBaseForm->isFirewallOk()) {
+                    throw new FormValidationException(
+                        $this->getTranslator()->trans(
+                            "You've submitted this form too many times. Further submissions will be ignored during %time",
+                            [
+                                "%time" => $aBaseForm->getWaitingTime(),
+                            ]
+                        )
+                    );
+                }
+
                 return $form;
             } else {
                 $errorMessage = null;

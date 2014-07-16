@@ -24,7 +24,7 @@ use Thelia\Model\CustomerQuery;
  * @package Thelia\Form
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CustomerLostPasswordForm extends BaseForm
+class CustomerLostPasswordForm extends FirewallForm
 {
     /**
      *

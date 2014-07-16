@@ -1843,6 +1843,25 @@ CREATE TABLE `brand_image`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- form_firewall
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `form_firewall`;
+
+CREATE TABLE `form_firewall`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `form_name` VARCHAR(255) NOT NULL,
+    `ip_address` VARCHAR(15) NOT NULL,
+    `attempts` TINYINT DEFAULT 1,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_form_firewall_form_name` (`form_name`),
+    INDEX `idx_form_firewall_ip_address` (`ip_address`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 

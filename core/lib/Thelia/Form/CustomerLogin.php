@@ -24,7 +24,7 @@ use Thelia\Model\CustomerQuery;
  * @package Thelia\Form
  * @author  Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CustomerLogin extends BaseForm
+class CustomerLogin extends BruteforceForm
 {
     protected function buildForm()
     {

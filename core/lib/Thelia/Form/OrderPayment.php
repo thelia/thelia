@@ -24,7 +24,7 @@ use Thelia\Module\BaseModule;
  * @package Thelia\Form
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class OrderPayment extends BaseForm
+class OrderPayment extends FirewallForm
 {
     protected function buildForm()
     {
