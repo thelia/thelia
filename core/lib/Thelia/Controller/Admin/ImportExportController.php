@@ -115,15 +115,15 @@ class ImportExportController extends BaseAdminController
                 $boundForm->get("formatter")->getData()
             );
 
+            /**
+             * Build an event containing the formatter and the handler.
+             * Used for specific configuration (e.g: XML node names)
+             */
+            $event = new ExportEvent($formatter, $handler);
+
             $filename = $formatter::FILENAME . "." . $formatter->getExtension();
 
             if (!$boundForm->get("do_compress")->getData()) {
-
-                /**
-                 * Build an event containing the formatter and the handler.
-                 * Used for specific configuration (e.g: XML node names)
-                 */
-                $event = new ExportEvent($formatter, $handler);
 
                 if (!$boundForm->get("do_compress")->getData()) {
                     /**
