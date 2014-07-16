@@ -9,6 +9,7 @@
 - Fixed issues on RSS feed links
 - Update SwiftMailer
 - Fix bugs on customer change password form and module "order by title"
+- Add the ability to place a firewall on forms. To use this in a module, extend Thelia\Form\FirewallForm instead of BaseForm
 
 #2.0.2
 - Coupon UI has been redesigned.
