@@ -250,8 +250,12 @@ CREATE TABLE `brand_image_i18n`
 -- Add brand field to product table, and related constraint.
 -- ---------------------------------------------------------
 
-ALTER TABLE `product` ADD `brand_id` INTEGER DEFAULT 0 AFTER `template_id`;
+ALTER TABLE `product` ADD `brand_id` INTEGER AFTER `template_id`;
 ALTER TABLE `product` ADD CONSTRAINT `fk_product_brand` FOREIGN KEY (`brand_id`) REFERENCES `brand` (`id`) ON DELETE SET NULL;
+
+ALTER TABLE `product_version` ADD `brand_id` INTEGER AFTER `template_id`;
+ALTER TABLE `product_version` ADD CONSTRAINT `fk_product_version_brand` FOREIGN KEY (`brand_id`) REFERENCES `brand` (`id`) ON DELETE SET NULL;
+
 
 # Add html_output_trim_level config variable
 # ------------------------------------------

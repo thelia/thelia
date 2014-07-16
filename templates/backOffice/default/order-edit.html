@@ -99,9 +99,15 @@
                                                     {/if}
                                                     <tr>
                                                         <td>
-                                                            {loop type="product" name="my_product_loop" visible="*" ref="$REF"}
-                                                                <a href="{url path='/admin/products/update' product_id=$ID}">{$TITLE}</a>
-                                                            {/loop}
+                                                            {ifloop rel="my_product_loop"}
+                                                                {loop type="product" name="my_product_loop" visible="*" ref="$REF"}
+                                                                    <a href="{url path='/admin/products/update' product_id=$ID}">{$TITLE}</a>
+                                                                {/loop}
+                                                            {/ifloop}
+                                                            {elseloop rel="my_product_loop"}
+                                                                {* The product doesn't exist anymore *}
+                                                                {$TITLE}
+                                                            {/elseloop}
                                                             {ifloop rel="combinations"}
                                                             <dl class="dl-horizontal">
                                                                 {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
@@ -158,6 +164,32 @@
                                                         <td colspan="3" class="last"><strong>{intl l="Total"}</strong></td>
                                                         <td class="last text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</strong></td>
                                                     </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+
+                                        {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
+                                            {assign "orderInvoiceFirstName" $FIRSTNAME}
+                                            {assign "orderInvoiceLastName" $LASTNAME}
+                                            {assign "orderInvoiceCompany" $COMPANY}
+                                        {/loop}
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-condensed table-left-aligned">
+                                                <caption class="clearfix">
+                                                    {intl l='Customer information'}
+                                                </caption>
+                                                <tbody>
+                                                <tr>
+                                                    <th>{intl l="Customer"}</th>
+                                                    <td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
+                                                </tr>
+                                                {if $orderInvoiceCompany}
+                                                <tr>
+                                                    <th>{intl l="Company"}</th>
+                                                    <td>{$orderInvoiceCompany}</td>
+                                                </tr>
+                                                {/if}
                                                 </tbody>
                                             </table>
                                         </div>

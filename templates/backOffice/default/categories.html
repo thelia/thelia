@@ -50,7 +50,7 @@
                                             current_order=$category_order
                                             order='id'
                                             reverse_order='id_reverse'
-                                            path={url path='/admin/categories' id_category=$category_id}
+                                            path={url path='/admin/catalog' category_id=$category_id}
                                             request_parameter_name='category_order'
                                             label="{intl l='ID'}"
                                          }
@@ -63,7 +63,7 @@
                                             current_order=$category_order
                                             order='alpha'
                                             reverse_order='alpha_reverse'
-                                            path={url path='/admin/categories' id_category=$category_id}
+                                            path={url path='/admin/catalog' category_id=$category_id}
                                             request_parameter_name='category_order'
                                             label="{intl l='Category title'}"
                                          }
@@ -76,7 +76,7 @@
                                             current_order=$category_order
                                             order='visible'
                                             reverse_order='visible_reverse'
-                                            path={url path='/admin/categories' id_category=$category_id}
+                                            path={url path='/admin/catalog' category_id=$category_id}
                                             request_parameter_name='category_order'
                                             label="{intl l='Online'}"
                                          }
@@ -87,7 +87,7 @@
                                             current_order=$category_order
                                             order='manual'
                                             reverse_order='manual_reverse'
-                                            path={url path='/admin/categories' id_category=$category_id}
+                                            path={url path='/admin/catalog' category_id=$category_id}
                                             request_parameter_name='category_order'
                                             label="{intl l='Position'}"
                                          }
@@ -187,6 +187,10 @@
 
      {* No product on toplevel category, e.g. id_category = 0 *}
 
+     {loop type="currency" name="product-currency" id=$edit_currency_id backend_context="1"}
+        {$currency_symbol = $SYMBOL}
+     {/loop}
+
      {if $category_id > 0}
      <div class="row">
          <div class="col-md-12">
@@ -218,7 +222,8 @@
                                     current_order=$product_order
                                     order='id'
                                     reverse_order='id_reverse'
-                                    path={url path='/admin/categories' id_category=$category_id target='products'}
+                                    path={url path='/admin/catalog' category_id=$category_id target='products'}
+                                    request_parameter_name='product_order'
                                     label="{intl l='ID'}"
                                  }
 
@@ -229,7 +234,8 @@
                                     current_order=$product_order
                                     order='ref'
                                     reverse_order='ref_reverse'
-                                    path={url path='/admin/categories' id_category=$category_id target='products'}
+                                    path={url path='/admin/catalog' category_id=$category_id target='products'}
+                                    request_parameter_name='product_order'
                                     label="{intl l='Reference'}"
                                  }
                                  </th>
@@ -239,28 +245,42 @@
                                     current_order=$product_order
                                     order='alpha'
                                     reverse_order='alpha_reverse'
-                                    path={url path='/admin/categories' id_category=$category_id target='products'}
+                                    path={url path='/admin/catalog' category_id=$category_id target='products'}
+                                    request_parameter_name='product_order'
                                     label="{intl l='Product title'}"
                                  }
 
                                  {module_include location='product_list_header'}
 
-                                 <th>
-                                 {admin_sortable_header
-                                    current_order=$product_order
-                                    order='visible'
-                                    reverse_order='visible_reverse'
-                                    path={url path='/admin/categories' id_category=$category_id target='products'}
-                                    label="{intl l='Online'}"
-                                 }
+                                 <th class="text-right">
+                                     {admin_sortable_header
+                                     current_order=$product_order
+                                     order='min_price'
+                                     reverse_order='max_price'
+                                     path={url path='/admin/catalog' category_id=$category_id target='products'}
+                                     request_parameter_name='product_order'
+                                     label="{intl l='Price'}"
+                                     }
                                  </th>
 
-                                 <th>
+                                 <th class="text-center">
+                                     {admin_sortable_header
+                                     current_order=$product_order
+                                     order='visible'
+                                     reverse_order='visible_reverse'
+                                     path={url path='/admin/catalog' category_id=$category_id target='products'}
+                                     request_parameter_name='product_order'
+                                     label="{intl l='Online'}"
+                                     }
+                                 </th>
+
+                                 <th class="text-center">
                                  {admin_sortable_header
                                     current_order=$product_order
                                     order='manual'
                                     reverse_order='manual_reverse'
-                                    path={url path='/admin/categories' id_category=$category_id target='products'}
+                                    path={url path='/admin/catalog' category_id=$category_id target='products'}
+                                    request_parameter_name='product_order'
                                     label="{intl l='Position'}"
                                  }
                                  </th>
@@ -280,6 +300,7 @@
                                  <img src="{$IMAGE_URL}" alt="{$TITLE}" />
                                </a>
                              {/loop}
+                             </td>
 
                              <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$REF}</a></td>
 
@@ -287,7 +308,9 @@
 
                              {module_include location='product_list_row'}
 
-                             <td>
+                             <td class="text-right"><a href="{url path='/admin/products/update' product_id=$ID page=$page current_tab='prices'}" title="{intl l='Edit Prices'}">{format_money number=$BEST_PRICE symbol=$currency_symbol}</a></td>
+
+                             <td class="text-center">
                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
                                         <div class="make-switch switch-small productVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                             <input type="checkbox" class="productVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
@@ -301,7 +324,7 @@
                                     {/elseloop}
                              </td>
 
-                             <td>
+                             <td class="text-center">
                              {admin_position_block
                                  resource="admin.product"
                                  access="UPDATE"
@@ -329,13 +352,13 @@
                          </tbody>
                          <tfoot>
                          <tr>
-                             <td colspan="6">
+                             <td colspan="9">
                                  {include
                                  file = "includes/pagination.html"
 
                                  loop_ref       = "product_list"
                                  max_page_count = 10
-                                 page_url       = "{url path="/admin/categories" category_id=$category_id product_order=$product_order}"
+                                 page_url       = "{url path="/admin/catalog" category_id=$category_id product_order=$product_order}"
                                  }
 
                              </td>
@@ -794,9 +817,15 @@
                 captureLength: 1,
                 wait         : 300,
                 callback     : function () {
+                    var price = $(this).val();
+                    $(this).val(sanitizeFloat(price));
                     update_price($(this).val(), $(this).data('price-type'), $(this).data('rel-price'));
                 }
             });
+
+            function sanitizeFloat(numVal) {
+                return numVal.replace(",", ".");
+            };
 
         });
     </script>
