@@ -11,6 +11,7 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\FormFirewall;
 use Thelia\Model\FormFirewallQuery;
@@ -35,7 +36,7 @@ abstract class FirewallForm extends BaseForm
     {
         $this->firewallInstance = FormFirewallQuery::create()
             ->filterByFormName($this->getName())
-            ->filterByIpAddress($this->request->getClientIp())
+            ->filterByIpAddress($request->getClientIp())
             ->findOne()
         ;
         parent::__construct($request, $type, $data, $options);
@@ -102,5 +103,19 @@ abstract class FirewallForm extends BaseForm
     public function isFirewallActive()
     {
         return ConfigQuery::read("form_firewall_active", true);
+    }
+
+    public function getWaitingTime()
+    {
+        $time = $this->getConfigTime();
+        $name = "hour(s)";
+
+        if ($time < 1) {
+            $time *= 60;
+            $name = "minute(s)";
+        }
+        $time = round($time);
+
+        return $time . " " . Translator::getInstance()->trans($name);
     }
 }

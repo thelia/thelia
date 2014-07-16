@@ -204,7 +204,10 @@ abstract class BaseController extends ContainerAware
                 if ($aBaseForm instanceof FirewallForm && !$aBaseForm->isFirewallOk()) {
                     throw new FormValidationException(
                         $this->getTranslator()->trans(
-                            "You have too much sent this form. Please wait before trying again."
+                            "You've submitted this form too many times. Further submissions will be ignored during %time",
+                            [
+                                "%time" => $aBaseForm->getWaitingTime(),
+                            ]
                         )
                     );
                 }
