@@ -57,10 +57,11 @@ abstract class FirewallForm extends BaseForm
             } else {
                 /** Set updated_at at NOW() */
                 $firewallInstance->save();
+
                 return false;
             }
         } else {
-            $this->firewallInstance = $firewallInstance = (new FormFirewall())
+            $firewallInstance = (new FormFirewall())
                 ->setIpAddress($this->request->getClientIp())
                 ->setFormName($this->getName())
             ;
