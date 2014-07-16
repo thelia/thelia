@@ -25,8 +25,10 @@ abstract class FirewallForm extends BaseForm
 {
     /**
      * Those values are for a "normal" security policy
+     *
+     * Time is in minutes
      */
-    const DEFAULT_TIME_TO_WAIT = 1;
+    const DEFAULT_TIME_TO_WAIT = 60; // 1 hour
     const DEFAULT_ATTEMPTS = 6;
 
     /** @var  \Thelia\Model\FormFirewall */
@@ -54,7 +56,7 @@ abstract class FirewallForm extends BaseForm
             /**
              * Get the last request execution time in hour.
              */
-            $lastRequest = (time() - $lastRequestTimestamp) / 3600;
+            $lastRequest = (time() - $lastRequestTimestamp) / 60;
 
             if ($lastRequest > $this->getConfigTime()) {
                 $firewallRow->resetAttempts();
@@ -107,15 +109,21 @@ abstract class FirewallForm extends BaseForm
 
     public function getWaitingTime()
     {
-        $time = $this->getConfigTime();
-        $name = "hour(s)";
+        $translator = Translator::getInstance();
+        $minutes = $this->getConfigTime();
+        $minutesName = $translator->trans("minute(s)");
+        $text = "";
 
-        if ($time < 1) {
-            $time *= 60;
-            $name = "minute(s)";
+        if ($minutes > 60) {
+            $hour = floor($minutes / 60);
+            $minutes %= 60;
+            $text = $hour . " " . $translator->trans("hour(s)") . " ";
         }
-        $time = round($time);
 
-        return $time . " " . Translator::getInstance()->trans($name);
+        if ($minutes !== 0) {
+            $text .= $minutes . " " . $minutesName;
+        }
+
+        return $text;
     }
 }

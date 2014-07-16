@@ -53,8 +53,8 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('sitemap_ttl','7200', 1, 1, NOW(), NOW()),
 ('feed_ttl','7200', 1, 1, NOW(), NOW()),
 
-('form_firewall_bruteforce_time_to_wait', '0.166667', 0, 0, NOW(), NOW()),
-('form_firewall_time_to_wait', '1', 0, 0, NOW(), NOW()),
+('form_firewall_bruteforce_time_to_wait', '10', 0, 0, NOW(), NOW()),
+('form_firewall_time_to_wait', '60', 0, 0, NOW(), NOW()),
 ('form_firewall_bruteforce_attempts', '10', 0, 0, NOW(), NOW()),
 ('form_firewall_attempts', '6', 0, 0, NOW(), NOW()),
 ('from_firewall_active', '1', 0, 0, NOW(), NOW());
