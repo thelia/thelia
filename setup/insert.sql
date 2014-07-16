@@ -53,7 +53,9 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('sitemap_ttl','7200', 1, 1, NOW(), NOW()),
 ('feed_ttl','7200', 1, 1, NOW(), NOW()),
 
+('form_firewall_bruteforce_time_to_wait', '0.166667', 0, 0, NOW(), NOW()),
 ('form_firewall_time_to_wait', '1', 0, 0, NOW(), NOW()),
+('form_firewall_bruteforce_attempts', '10', 0, 0, NOW(), NOW()),
 ('form_firewall_attempts', '6', 0, 0, NOW(), NOW()),
 ('from_firewall_active', '1', 0, 0, NOW(), NOW());
 
@@ -1382,3 +1384,36 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
 (1, 'fr_FR', 'Confirmation de commande', 'Commande : {$order_ref}', '{assign var="order_id" value=1}\\r\\n\\r\\n{loop name="order.invoice" type="order" id=$order_id customer="*"}\\r\\n    {loop name="currency.order" type="currency" id=$CURRENCY}\\r\\n        {assign "orderCurrency" $CODE}\\r\\n    {/loop}\\r\\n{loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}\\r\\n{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}\\\\r\\\\n\\r\\n{$ADDRESS1} {$ADDRESS2} {$ADDRESS3}\\\\r\\\\n\\r\\n{$ZIPCODE} {$CITY}\\\\r\\\\n\\r\\n{loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}\\\\r\\\\n\\r\\n{/loop}\\r\\nConfirmation de commande {$REF} du {format_date date=$INVOICE_DATE}\\\\r\\\\n\\\\r\\\\n\\r\\nLes articles commandés:\\\\r\\\\n\\r\\n{loop type="order_product" name="order-products" order=$ID}\\r\\n{if $WAS_IN_PROMO == 1}\\r\\n    {assign "realPrice" $PROMO_PRICE}\\r\\n    {assign "realTax" $PROMO_PRICE_TAX}\\r\\n    {assign "realTaxedPrice" $TAXED_PROMO_PRICE}\\r\\n{else}\\r\\n    {assign "realPrice" $PRICE}\\r\\n    {assign "realTax" $PRICE_TAX}\\r\\n    {assign "realTaxedPrice" $TAXED_PRICE}\\r\\n{/if}\\r\\n    \\\\r\\\\n\\r\\n    Article : {$TITLE}\\r\\n{ifloop rel="combinations"}\\r\\n    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}\\r\\n    {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}\\\\r\\\\n\\r\\n{/loop}\\r\\n{/ifloop}\\\\r\\\\n\\r\\n    Quantité : {$QUANTITY}\\\\r\\\\n\\r\\n    Prix unitaire TTC : {$realTaxedPrice} {$orderCurrency}\\\\r\\\\n\\r\\n{/loop}\\r\\n\\\\r\\\\n-----------------------------------------\\\\r\\\\n\\r\\nMontant total TTC :    {$TOTAL_TAXED_AMOUNT - $POSTAGE} {$orderCurrency} \\\\r\\\\n\\r\\nFrais de port TTC :    {$POSTAGE} {$orderCurrency} \\\\r\\\\n\\r\\nSomme totale:            {$TOTAL_TAXED_AMOUNT} {$orderCurrency} \\\\r\\\\n\\r\\n==================================\\\\r\\\\n\\\\r\\\\n\\r\\nVotre facture est disponible dans la rubrique mon compte sur {config key="url_site"}\\r\\n{/loop}', NULL),
 (2, 'en_US', 'Your new password', 'Your new password', 'Your new passord is : {$password}', NULL),
 (2, 'fr_FR', 'Votre nouveau mot de passe', 'Votre nouveau mot de passe', 'Votre nouveau mot de passe est : {$password}', NULL);
+
+-- Add firewall i18n
+SELECT @bf_time := `id` FROM `config` WHERE `name` =  'form_firewall_bruteforce_time_to_wait';
+SELECT @time := `id` FROM `config` WHERE `name` =  'form_firewall_time_to_wait';
+SELECT @bf_attempts := `id` FROM `config` WHERE `name` =  'form_firewall_bruteforce_attempts';
+SELECT @attempts := `id` FROM `config` WHERE `name` =  'form_firewall_attempts';
+SELECT @active := `id` FROM `config` WHERE `name` =  'from_firewall_active';
+
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@time, 'en_US', '[Firewall] Time to wait between X attempts', NULL, NULL, NULL),
+  (@time, 'fr_FR', '[Pare-feu] Temps à attendre entre X essais', NULL, NULL, NULL)
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@bf_time, 'en_US', '[Firewall/Bruteforce] Time to wait between X attempts', NULL, NULL, NULL),
+  (@bf_time, 'fr_FR', '[Pare-feu/Bruteforce] Temps à attendre entre X essais', NULL, NULL, NULL)
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@attempts, 'en_US', '[Firewall] Number of allowed attemps', NULL, NULL, NULL),
+  (@attempts, 'fr_FR', '[Pare-feu] Nombre de tentatives autorisées', NULL, NULL, NULL)
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@bf_attempts, 'en_US', '[Firewall/Bruteforce] Number of allowed attemps', NULL, NULL, NULL),
+  (@bf_attempts, 'fr_FR', '[Pare-feu/Bruteforce] Nombre de tentatives autorisées', NULL, NULL, NULL)
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@active, 'en_US', '[Firewall] Activate the firewall', NULL, NULL, NULL),
+  (@active, 'fr_FR', '[Pare-feu] Activer le pare-feu', NULL, NULL, NULL)
+;

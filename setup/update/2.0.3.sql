@@ -285,14 +285,19 @@ CREATE TABLE `form_firewall`
 
 
 INSERT INTO `config`(`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+('form_firewall_bruteforce_time_to_wait', '0.166667', 0, 0, NOW(), NOW()),
 ('form_firewall_time_to_wait', '1', 0, 0, NOW(), NOW()),
-('form_firewall_attempts', '6', 0, 0, NOW(), NOW())
+('form_firewall_bruteforce_attempts', '10', 0, 0, NOW(), NOW()),
+('form_firewall_attempts', '6', 0, 0, NOW(), NOW()),
 ('from_firewall_active', '1', 0, 0, NOW(), NOW())
 ;
 
-SELECT @time = `id` FROM `config` WHERE `name` =  'form_firewall_time_to_wait';
-SELECT @attempts = `id` FROM `config` WHERE `name` =  'form_firewall_attempts';
-SELECT @active = `id` FROM `config` WHERE `name` =  'from_firewall_active';
+SELECT @bf_time := `id` FROM `config` WHERE `name` =  'form_firewall_bruteforce_time_to_wait';
+SELECT @time := `id` FROM `config` WHERE `name` =  'form_firewall_time_to_wait';
+SELECT @bf_attempts := `id` FROM `config` WHERE `name` =  'form_firewall_bruteforce_attempts';
+SELECT @attempts := `id` FROM `config` WHERE `name` =  'form_firewall_attempts';
+SELECT @active := `id` FROM `config` WHERE `name` =  'from_firewall_active';
+
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
   (@time, 'en_US', '[Firewall] Time to wait between X attempts', NULL, NULL, NULL),
@@ -300,8 +305,18 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 ;
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@bf_time, 'en_US', '[Firewall/Bruteforce] Time to wait between X attempts', NULL, NULL, NULL),
+  (@bf_time, 'fr_FR', '[Pare-feu/Bruteforce] Temps à attendre entre X essais', NULL, NULL, NULL)
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
   (@attempts, 'en_US', '[Firewall] Number of allowed attemps', NULL, NULL, NULL),
   (@attempts, 'fr_FR', '[Pare-feu] Nombre de tentatives autorisées', NULL, NULL, NULL)
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@bf_attempts, 'en_US', '[Firewall/Bruteforce] Number of allowed attemps', NULL, NULL, NULL),
+  (@bf_attempts, 'fr_FR', '[Pare-feu/Bruteforce] Nombre de tentatives autorisées', NULL, NULL, NULL)
 ;
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES

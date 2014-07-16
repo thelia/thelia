@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
-class AdminLogin extends FirewallForm
+class AdminLogin extends BruteforceForm
 {
     protected function buildForm()
     {
