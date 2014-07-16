@@ -307,6 +307,7 @@ return array(
     'The detailed description.' => 'La description détaillée',
     'The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.' => 'L\'image qui remplace un drapeau de pays manquant (%file) n\'a pas été trouvée. Merci de vérifier la variable de configuration unknown-flag-path.',
     'The loop name \'%name\' is already defined in %className class' => 'La boucle  \'%name\' est déjà définir dans la classe %className',
+    'The product sale elements reference %ref doesn\'t exist' => 'La déclinaison de produit %ref n\'existe pas',
     'This brand is online' => 'Cette marque est en ligne',
     'This category is online.' => 'Cette catégorie est en ligne.',
     'This condition is always true' => 'Cette condition est troujours vérifiée',
@@ -357,7 +358,7 @@ return array(
     'Yes, I have a password :' => 'Oui, j\'ai un mot de passe :',
     'You are already registered!' => 'Vous êtes déjà enregistré !',
     'You don\'t need to use commas or other punctuations.' => 'Vous n\'avez pas besoin d\'utiliser de virgules ou d\'autres signes de ponctuation',
-    'You have too much sent this form. Please wait before trying again.' => 'Vous avez validé ce formulaire un nombre trop important de fois. Veuillez attendre avant de réessayer.',
+    'You\'ve submitted this form too many times. Further submissions will be ignored during %time' => 'Vous avez envoyer ce fomulaire un nombre trop important de fois. Les prochaines soumissions seront ignorées pendant %time',
     'Your Email Address' => 'Votre adresse mail',
     'Your Message' => 'Votre message',
     'Your current password does not match.' => 'Votre mot de passe actuel ne correspond pas',
@@ -375,4 +376,6 @@ return array(
     'this product id does not exists : %d' => 'l\'id du produit %d n\'existe pas',
     'thousands separator' => 'Séparateur des milliers',
     'time format' => 'Format d\'heure',
+    'hour(s)' => 'heure(s)',
+    'minute(s)' => 'minute(s)',
 );

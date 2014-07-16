@@ -307,6 +307,7 @@ return array(
     'The detailed description.' => 'The detailed description.',
     'The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.' => 'The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.',
     'The loop name \'%name\' is already defined in %className class' => 'The loop name \'%name\' is already defined in %className class',
+    'The product sale elements reference %ref doesn\'t exist' => 'The product sale elements reference %ref doesn\'t exist',
     'This brand is online' => 'This brand is online',
     'This category is online.' => 'This category is online.',
     'This condition is always true' => 'This condition is always true',
@@ -357,7 +358,7 @@ return array(
     'Yes, I have a password :' => 'Yes, I have a password :',
     'You are already registered!' => 'You are already registered!',
     'You don\'t need to use commas or other punctuations.' => 'You don\'t need to use commas or other punctuations.',
-    'You have too much sent this form. Please wait before trying again.' => 'You have too much sent this form. Please wait before trying again.',
+    'You\'ve submitted this form too many times. Further submissions will be ignored during %time' => 'You\'ve submitted this form too many times. Further submissions will be ignored during %time',
     'Your Email Address' => 'Your Email Address',
     'Your Message' => 'Your Message',
     'Your current password does not match.' => 'Your current password does not match.',
@@ -375,4 +376,6 @@ return array(
     'this product id does not exists : %d' => 'this product id does not exists : %d',
     'thousands separator' => 'Séparateur de milliers',
     'time format' => 'time format',
+    'hour(s)' => 'hour(s)',
+    'minute(s)' => 'minute(s)',
 );
