@@ -114,7 +114,7 @@ abstract class FirewallForm extends BaseForm
         $minutesName = $translator->trans("minute(s)");
         $text = "";
 
-        if ($minutes > 60) {
+        if ($minutes >= 60) {
             $hour = floor($minutes / 60);
             $minutes %= 60;
             $text = $hour . " " . $translator->trans("hour(s)") . " ";
@@ -122,6 +122,8 @@ abstract class FirewallForm extends BaseForm
 
         if ($minutes !== 0) {
             $text .= $minutes . " " . $minutesName;
+        } else {
+            $text = rtrim($text);
         }
 
         return $text;
