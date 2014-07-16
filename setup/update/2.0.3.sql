@@ -264,6 +264,52 @@ SELECT @max := MAX(`id`) FROM `config`;
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
   (@max, 'en_US', 'Whitespace trim level of the generated HTML code (0 = none, 1 = medium, 2 = maximum)', NULL, NULL, NULL);
 
+-- ---------------------------------------------------------------------
+-- form_firewall
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `form_firewall`;
+
+CREATE TABLE `form_firewall`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `form_name` VARCHAR(255) NOT NULL,
+    `ip_address` VARCHAR(15) NOT NULL,
+    `attempts` TINYINT DEFAULT 1,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_form_firewall_form_name` (`form_name`),
+    INDEX `idx_form_firewall_ip_address` (`ip_address`)
+) ENGINE=InnoDB;
+
+
+INSERT INTO `config`(`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+('form_firewall_time_to_wait', '1', 0, 0, NOW(), NOW()),
+('form_firewall_attempts', '6', 0, 0, NOW(), NOW())
+('from_firewall_active', '1', 0, 0, NOW(), NOW())
+;
+
+SELECT @time = `id` FROM `config` WHERE `name` =  'form_firewall_time_to_wait';
+SELECT @attempts = `id` FROM `config` WHERE `name` =  'form_firewall_attempts';
+SELECT @active = `id` FROM `config` WHERE `name` =  'from_firewall_active';
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@time, 'en_US', '[Firewall] Time to wait between X attempts', NULL, NULL, NULL),
+  (@time, 'fr_FR', '[Pare-feu] Temps à attendre entre X essais', NULL, NULL, NULL)
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@attempts, 'en_US', '[Firewall] Number of allowed attemps', NULL, NULL, NULL),
+  (@attempts, 'fr_FR', '[Pare-feu] Nombre de tentatives autorisées', NULL, NULL, NULL)
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@active, 'en_US', '[Firewall] Activate the firewall', NULL, NULL, NULL),
+  (@active, 'fr_FR', '[Pare-feu] Activer le pare-feu', NULL, NULL, NULL)
+;
+
+
 # Done !
 # ------
 SET FOREIGN_KEY_CHECKS = 1;

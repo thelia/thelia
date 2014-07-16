@@ -23,28 +23,28 @@ use Thelia\Model\FormFirewallQuery;
 abstract class FirewallForm extends BaseForm
 {
     /**
-     * Those values are for a "normal" security context
+     * Those values are for a "normal" security policy
      */
     const DEFAULT_TIME_TO_WAIT = 1;
-    const DEFAULT_ATTEMPTS = 3;
+    const DEFAULT_ATTEMPTS = 6;
 
     /** @var  \Thelia\Model\FormFirewall */
-    protected static $cachedInstance;
+    protected $firewallInstance;
 
     public function __construct(Request $request, $type = "form", $data = array(), $options = array())
     {
-        parent::__construct($request, $type, $data, $options);
-
-        static::$cachedInstance = FormFirewallQuery::create()
+        $this->firewallInstance = FormFirewallQuery::create()
             ->filterByFormName($this->getName())
             ->filterByIpAddress($this->request->getClientIp())
             ->findOne()
         ;
+        parent::__construct($request, $type, $data, $options);
     }
 
     public function isFirewallOk()
     {
-        if (null !== $firewallRow = &static::$cachedInstance) {
+
+        if ($this->isFirewallActive() && null !== $firewallRow = &$this->firewallInstance) {
             /** @var \DateTime $lastRequestDateTime */
             $lastRequestDateTime = $firewallRow->getUpdatedAt();
 
@@ -68,13 +68,12 @@ abstract class FirewallForm extends BaseForm
                 return false;
             }
         } else {
-            $firewallRow = (new FormFirewall())
+            $this->firewallInstance = $firewallRow = (new FormFirewall())
                 ->setIpAddress($this->request->getClientIp())
                 ->setFormName($this->getName())
             ;
             $firewallRow->save();
 
-            static::$cachedInstance = $firewallRow;
         }
 
         return true;
@@ -98,5 +97,10 @@ abstract class FirewallForm extends BaseForm
     public function getConfigAttempts()
     {
         return ConfigQuery::read("form_firewall_attempts", static::DEFAULT_ATTEMPTS);
+    }
+
+    public function isFirewallActive()
+    {
+        return ConfigQuery::read("form_firewall_active", true);
     }
 }

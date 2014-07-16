@@ -53,8 +53,9 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('sitemap_ttl','7200', 1, 1, NOW(), NOW()),
 ('feed_ttl','7200', 1, 1, NOW(), NOW()),
 
-('form_firewall_time_to_wait', '1', 1, 1, NOW(), NOW()),
-('form_firewall_attempts', '3', 1, 1, NOW(), NOW());
+('form_firewall_time_to_wait', '1', 0, 0, NOW(), NOW()),
+('form_firewall_attempts', '6', 0, 0, NOW(), NOW()),
+('from_firewall_active', '1', 0, 0, NOW(), NOW());
 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
