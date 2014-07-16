@@ -155,6 +155,8 @@ class BrandTest extends TestCaseWithURLToolSetup
 
     public function testUpdatePositionUp()
     {
+        $this->resetBrandPosition();
+
         $brand = BrandQuery::create()
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
@@ -178,6 +180,8 @@ class BrandTest extends TestCaseWithURLToolSetup
 
     public function testUpdatePositionDown()
     {
+        $this->resetBrandPosition();
+
         $brand = BrandQuery::create()
             ->filterByPosition(1)
             ->findOne();
@@ -201,6 +205,8 @@ class BrandTest extends TestCaseWithURLToolSetup
 
     public function testUpdatePositionWithSpecificPosition()
     {
+        $this->resetBrandPosition();
+
         $brand = BrandQuery::create()
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
@@ -219,6 +225,23 @@ class BrandTest extends TestCaseWithURLToolSetup
 
         $this->assertEquals(1, $updatedBrand->getPosition(),sprintf("new position is 1, new position expected is %d for brand %d", $updatedBrand->getPosition(), $updatedBrand->getId()));
     }
+
+    /**
+     * Reorder brand to have proper position
+     */
+    protected function resetBrandPosition()
+    {
+        $brands = BrandQuery::create()->find();
+        $counter = 1;
+
+        /** @var \Thelia\Model\Brand $brand */
+        foreach ($brands as $brand) {
+            $brand->setPosition($counter);
+            $brand->save();
+            $counter++;
+        }
+    }
+
     /**
      * @return \Thelia\Model\Brand
      */
