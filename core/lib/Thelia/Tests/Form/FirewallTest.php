@@ -12,7 +12,6 @@
 
 namespace Thelia\Tests\Form;
 use Symfony\Component\DependencyInjection\Container;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
@@ -38,8 +37,18 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
 
         new Translator(new Container());
 
-        $this->request = new Request();
-        $this->request->setSession($session);
+        $this->request = $this->getMock("\Thelia\Core\HttpFoundation\Request");
+        $this->request
+            ->expects($this->any())
+                ->method("getClientIp")
+                    ->willReturn("127.0.0.1")
+        ;
+
+        $this->request
+            ->expects($this->any())
+                ->method("getSession")
+                    ->willReturn($session)
+        ;
 
         /**
          * Get an example form. We
@@ -130,6 +139,35 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             "2 hour(s) 12 minute(s)",
             $this->form->getWaitingTime()
+        );
+    }
+
+    public function testAutoDelete()
+    {
+        /** Add two rows */
+        $this->form->isFirewallOk();
+
+        $this->form
+            ->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue("test_form_firewall_2"))
+        ;
+
+        $this->form->isFirewallOk();
+
+        /** Set the time to 1h and 1s after the limit */
+        FormFirewallQuery::create()
+            ->findOne()
+            ->setUpdatedAt(date("Y-m-d G:i:s", time() - 3601))
+            ->save()
+        ;
+
+        $this->form->isFirewallOk();
+
+        /** Assert that the table is empty */
+        $this->assertEquals(
+            1,
+            FormFirewallQuery::create()->count()
         );
     }
 }

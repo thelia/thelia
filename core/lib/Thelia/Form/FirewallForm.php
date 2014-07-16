@@ -10,6 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 namespace Thelia\Form;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
@@ -31,51 +32,39 @@ abstract class FirewallForm extends BaseForm
     const DEFAULT_TIME_TO_WAIT = 60; // 1 hour
     const DEFAULT_ATTEMPTS = 6;
 
-    /** @var  \Thelia\Model\FormFirewall */
-    protected $firewallInstance;
-
-    public function __construct(Request $request, $type = "form", $data = array(), $options = array())
-    {
-        $this->firewallInstance = FormFirewallQuery::create()
-            ->filterByFormName($this->getName())
-            ->filterByIpAddress($request->getClientIp())
-            ->findOne()
-        ;
-        parent::__construct($request, $type, $data, $options);
-    }
-
     public function isFirewallOk()
     {
+        /**
+         * Empty the firewall
+         */
+        $deleteTime = date("Y-m-d G:i:s", time() - $this->getConfigTime() * 60 );
+        $collection = FormFirewallQuery::create()
+            ->filterByFormName($this->getName())
+            ->filterByUpdatedAt($deleteTime, Criteria::LESS_THAN)
+            ->find();
 
-        if ($this->isFirewallActive() && null !== $firewallRow = &$this->firewallInstance) {
-            /** @var \DateTime $lastRequestDateTime */
-            $lastRequestDateTime = $firewallRow->getUpdatedAt();
+        $collection->delete();
 
-            $lastRequestTimestamp = $lastRequestDateTime->getTimestamp();
+        $firewallInstance = FormFirewallQuery::create()
+            ->filterByFormName($this->getName())
+            ->filterByIpAddress($this->request->getClientIp())
+            ->findOne()
+        ;
 
-            /**
-             * Get the last request execution time in hour.
-             */
-            $lastRequest = (time() - $lastRequestTimestamp) / 60;
-
-            if ($lastRequest > $this->getConfigTime()) {
-                $firewallRow->resetAttempts();
-            }
-
-            if ($firewallRow->getAttempts() < $this->getConfigAttempts()) {
-                $firewallRow->incrementAttempts();
+        if ($this->isFirewallActive() && null !== $firewallInstance) {
+            if ($firewallInstance->getAttempts() < $this->getConfigAttempts()) {
+                $firewallInstance->incrementAttempts();
             } else {
                 /** Set updated_at at NOW() */
-                $firewallRow->save();
-
+                $firewallInstance->save();
                 return false;
             }
         } else {
-            $this->firewallInstance = $firewallRow = (new FormFirewall())
+            $this->firewallInstance = $firewallInstance = (new FormFirewall())
                 ->setIpAddress($this->request->getClientIp())
                 ->setFormName($this->getName())
             ;
-            $firewallRow->save();
+            $firewallInstance->save();
 
         }
 
