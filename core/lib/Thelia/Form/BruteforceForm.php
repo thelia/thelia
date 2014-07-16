@@ -34,4 +34,4 @@ abstract class BruteforceForm extends FirewallForm
         return ConfigQuery::read("form_firewall_bruteforce_attempts", static::DEFAULT_ATTEMPTS);
     }
 
-} 
+}
