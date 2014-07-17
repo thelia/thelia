@@ -14,7 +14,7 @@ namespace Thelia\Core\Event\ImportExport;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
 use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
-use Thelia\ImportExport\ExportHandler;
+use Thelia\ImportExport\Export\ExportHandler;
 
 /**
  * Class Export
@@ -23,7 +23,7 @@ use Thelia\ImportExport\ExportHandler;
  */
 class Export extends ActionEvent
 {
-    /** @var  \Thelia\ImportExport\ExportHandler */
+    /** @var  \Thelia\ImportExport\Export\ExportHandler */
     protected $handler;
 
     /** @var  \Thelia\Core\FileFormat\Formatting\AbstractFormatter */
@@ -34,7 +34,7 @@ class Export extends ActionEvent
 
     public function __construct(
         AbstractFormatter $formatter,
-        ExportHandler $handler,
+        \Thelia\ImportExport\Export\ExportHandler $handler,
         AbstractArchiveBuilder $archiveBuilder = null
     ) {
         $this->archiveBuilder = $archiveBuilder;
@@ -81,7 +81,7 @@ class Export extends ActionEvent
     }
 
     /**
-     * @param  ExportHandler $handler
+     * @param  \Thelia\ImportExport\Export\ExportHandler $handler
      * @return $this
      */
     public function setHandler(ExportHandler $handler)
@@ -92,7 +92,7 @@ class Export extends ActionEvent
     }
 
     /**
-     * @return \Thelia\ImportExport\ExportHandler
+     * @return \Thelia\ImportExport\Export\ExportHandler
      */
     public function getHandler()
     {

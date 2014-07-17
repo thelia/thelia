@@ -14,11 +14,11 @@ namespace Thelia\ImportExport;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Interface ExportHandler
+ * Class AbstractHandler
  * @package Thelia\ImportExport
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-abstract class ExportHandler
+abstract class AbstractHandler
 {
     protected $container;
 
@@ -31,28 +31,21 @@ abstract class ExportHandler
         $this->container = $container;
     }
 
-    /**
-     * @return \Thelia\Core\FileFormat\Formatting\FormatterData
-     *
-     * The method builds the FormatterData for the formatter
-     */
-    abstract public function buildFormatterData();
 
     /**
      * @return string|array
      *
-     * Define all the type of export/formatters that this can handle
+     * Define all the type of formatters that this can handle
      * return a string if it handle a single type ( specific exports ),
      * or an array if multiple.
      *
-     * Thelia types are defined in \Thelia\ImportExport\Export\ExportType
+     * Thelia types are defined in \Thelia\Core\FileFormat\FormatType
      *
      * example:
      * return array(
-     *     ExportType::EXPORT_TABLE,
-     *     ExportType::EXPORT_UNBOUNDED,
+     *     FormatType::TABLE,
+     *     FormatType::UNBOUNDED,
      * );
      */
-    abstract public function getHandledType();
-
+    abstract public function getHandledTypes();
 } 

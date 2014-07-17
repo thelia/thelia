@@ -10,6 +10,7 @@
                 <div class="modal-body">
                     {custom_render_form_field form=$form field="file_upload"}
                         <input type="file" required aria-required="true" name="{$name}" id="{$label_attr.for}" />
+                        <div class="small">Accepted formats: </div>
                     {/custom_render_form_field}
                 </div>
                 <div class="modal-footer">

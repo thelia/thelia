@@ -13,7 +13,7 @@
 namespace Thelia\Tests\ImportExport\Export;
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
-use Thelia\ImportExport\Export\ExportType;
+use Thelia\Core\FileFormat\FormatType;
 use Thelia\ImportExport\Export\MailingExport;
 
 /**
@@ -45,8 +45,8 @@ class MailingExportTest extends \PHPUnit_Framework_TestCase
     public function testType()
     {
         $this->assertEquals(
-            [ExportType::EXPORT_TABLE, ExportType::EXPORT_UNBOUNDED],
-            $this->handler->getHandledType()
+            [\Thelia\Core\FileFormat\FormatType::TABLE, FormatType::UNBOUNDED],
+            $this->handler->getHandledTypes()
         );
     }
 } 

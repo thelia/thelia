@@ -99,4 +99,59 @@ class FormatterManager
             )
         );
     }
+
+    /**
+     * @return array
+     *
+     * Return the extensions handled by archive builders
+     */
+    public function getExtensions()
+    {
+        $extensions = [];
+
+        /** @var AbstractFormatter $formatter */
+        foreach ($this->formatters as $formatter) {
+            $extensions += [$formatter->getName() => $formatter->getExtension()];
+        }
+
+        return $extensions;
+    }
+
+    /**
+     * @param $extension
+     * @return bool|AbstractFormatter
+     */
+    public function getFormatterByExtension($extension)
+    {
+        $extensions = $this->getExtensions();
+
+        if (!in_array($extension, $extensions)) {
+            return false;
+        } else {
+            $flip = array_flip($extensions);
+            $formatterName = $flip[$extension];
+
+            return $this->formatters[$formatterName];
+        }
+    }
+
+    public function getFormattersByTypes($types)
+    {
+        if (!is_array($types)) {
+            $types = [$types];
+        }
+
+        $selectedFormatters = [];
+
+        /** @var AbstractFormatter $formatter */
+        foreach ($this->formatters as $formatter) {
+            $handledType = $formatter->getHandledType();
+
+            if (in_array($handledType, $types)) {
+                $selectedFormatters += [$formatter->getName() => $formatter];
+            }
+        }
+
+        return $selectedFormatters;
+    }
 }

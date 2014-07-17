@@ -14,7 +14,7 @@ namespace Thelia\Core\FileFormat\Formatting\Formatter;
 use Thelia\Core\FileFormat\Formatter\Exception\BadFormattedStringException;
 use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
-use Thelia\ImportExport\Export\ExportType;
+use Thelia\Core\FileFormat\FormatType;
 
 /**
  * Class XMLFormatter
@@ -157,8 +157,8 @@ class XMLFormatter extends AbstractFormatter
         return $data->setData($array);
     }
 
-    public function getExportType()
+    public function getHandledType()
     {
-        return ExportType::EXPORT_UNBOUNDED;
+        return FormatType::UNBOUNDED;
     }
 }

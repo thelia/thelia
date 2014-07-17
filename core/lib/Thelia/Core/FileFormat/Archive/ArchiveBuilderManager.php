@@ -103,4 +103,39 @@ class ArchiveBuilderManager
             )
         );
     }
+
+    /**
+     * @return array
+     *
+     * Return the extensions handled by archive builders
+     */
+    public function getExtensions()
+    {
+        $extensions = [];
+
+        /** @var AbstractArchiveBuilder $archiveBuilder */
+        foreach ($this->archiveBuilders as $archiveBuilder) {
+            $extensions += [$archiveBuilder->getName() => $archiveBuilder->getExtension()];
+        }
+
+        return $extensions;
+    }
+
+    /**
+     * @param $extension
+     * @return bool|AbstractArchiveBuilder
+     */
+    public function getArchiveBuilderByExtension($extension)
+    {
+        $extensions = $this->getExtensions();
+
+        if (!in_array($extension, $extensions)) {
+            return false;
+        } else {
+            $flip = array_flip($extensions);
+            $archiveBuilderName = $flip[$extension];
+
+            return $this->archiveBuilders[$archiveBuilderName];
+        }
+    }
 }

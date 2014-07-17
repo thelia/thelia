@@ -49,7 +49,7 @@ class Formatter extends BaseLoop implements ArraySearchLoopInterface
             if (null !== $export) {
                 $handlerInstance = $export->getHandleClassInstance($this->container);
 
-                $types = $handlerInstance->getHandledType();
+                $types = $handlerInstance->getHandledTypes();
 
                 if (is_scalar($types)) {
                     $types = [$types];
@@ -57,7 +57,7 @@ class Formatter extends BaseLoop implements ArraySearchLoopInterface
 
                 /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
                 foreach ($rawFormatters as $key=>$formatter) {
-                    if (in_array($formatter->getExportType(), $types)) {
+                    if (in_array($formatter->getHandledType(), $types)) {
                         $formatters[$key] = $formatter;
                     }
                 }

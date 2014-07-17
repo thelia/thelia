@@ -43,9 +43,16 @@ class ImportExportController extends BaseAdminController
         $this->formatterManager = $this->container->get("thelia.manager.formatter_manager");
     }
 
+    /**
+     * @param  integer  $id
+     * @return Response
+     *
+     * This method is called when the route /admin/import/{id}
+     * is called with a POST request.
+     */
     public function import($id)
     {
-        if (null === $import = $this->getImport($id))  {
+        if (null === $import = $this->getImport($id)) {
             return $this->render("404");
         }
 
@@ -55,6 +62,13 @@ class ImportExportController extends BaseAdminController
         $this->hydrate();
     }
 
+    /**
+     * @param  integer  $id
+     * @return Response
+     *
+     * This method is called when the route /admin/export/{id}
+     * is called with a POST request.
+     */
     public function export($id)
     {
         if (null === $export = $this->getExport($id)) {
@@ -79,31 +93,15 @@ class ImportExportController extends BaseAdminController
          */
         $handler = $export->getHandleClassInstance($this->container);
 
-        $types = $handler->getHandledType();
+        $types = $handler->getHandledTypes();
 
-        if (!is_array($types)) {
-            $types = [$types];
-        }
-
-        $formatters = [];
-        /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
-        foreach ($this->formatterManager->getAll() as $formatter) {
-            if (in_array($formatter->getExportType(), $types)) {
-                $formatters[$formatter->getName()] = $formatter->getName();
-            }
-        }
+        $formatters = $this->formatterManager->getFormattersByTypes($types);
 
         /**
          * Define and validate the form
          */
-        $form = new ExportForm(
-            $this->getRequest(),
-            "form",
-            array(),
-            array(),
-            $archiveBuilders,
-            $formatters
-        );
+        $form = new ExportForm($this->getRequest());
+
         $errorMessage = null;
 
         try {
@@ -205,9 +203,19 @@ class ImportExportController extends BaseAdminController
         return $this->exportView($id);
     }
 
+    /**
+     * @param  integer  $id
+     * @return Response
+     *
+     * This method is called when the route /admin/import/{id}
+     * is called with a GET request.
+     *
+     * It returns a modal view if the request is an AJAX one,
+     * otherwise it generates a "normal" back-office page
+     */
     public function importView($id)
     {
-        if (null === $import = $this->getImport($id))  {
+        if (null === $import = $this->getImport($id)) {
             return $this->render("404");
         }
 
@@ -236,6 +244,11 @@ class ImportExportController extends BaseAdminController
             }
         }
 
+        /**
+         * Inject allowed formats
+         */
+        $this->archiveBuilderManager;
+
         /** Then render the form */
         if ($this->getRequest()->isXmlHttpRequest()) {
             return $this->render("ajax/import-modal");
@@ -244,6 +257,16 @@ class ImportExportController extends BaseAdminController
         }
     }
 
+    /**
+     * @param  integer  $id
+     * @return Response
+     *
+     * This method is called when the route /admin/export/{id}
+     * is called with a GET request.
+     *
+     * It returns a modal view if the request is an AJAX one,
+     * otherwise it generates a "normal" back-office page
+     */
     public function exportView($id)
     {
         if (null === $export = $this->getExport($id)) {

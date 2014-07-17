@@ -12,8 +12,8 @@
 
 namespace Thelia\ImportExport\Export;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
+use Thelia\Core\FileFormat\FormatType;
 use Thelia\Core\Translation\Translator;
-use Thelia\ImportExport\ExportHandler;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\NewsletterTableMap;
@@ -85,19 +85,19 @@ class MailingExport extends ExportHandler
      * return a string if it handle a single type ( specific exports ),
      * or an array if multiple.
      *
-     * Thelia types are defined in \Thelia\ImportExport\Export\ExportType
+     * Thelia types are defined in \Thelia\Core\FileFormat\FormatType
      *
      * example:
      * return array(
-     *     ExportType::EXPORT_TABLE,
-     *     ExportType::EXPORT_UNBOUNDED,
+     *     FormatType::TABLE,
+     *     FormatType::UNBOUNDED,
      * );
      */
-    public function getHandledType()
+    public function getHandledTypes()
     {
         return array(
-            ExportType::EXPORT_TABLE,
-            ExportType::EXPORT_UNBOUNDED,
+            FormatType::TABLE,
+            FormatType::UNBOUNDED,
         );
     }
 } 

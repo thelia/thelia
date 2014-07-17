@@ -10,24 +10,24 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\ImportExport\Export;
+namespace Thelia\Core\FileFormat;
 
 /**
- * Class ExportType
- * @package Thelia\ImportExport\Export
+ * Class FormatType
+ * @package Thelia\Core\FileFormat
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class ExportType 
+class FormatType
 {
     /**
      * This type is for unbounded formats, in general serialization formats
      * example: XML, json, yaml
      */
-    const EXPORT_UNBOUNDED  = "export.unbounded";
+    const UNBOUNDED  = "export.unbounded";
 
     /**
      * This type is for tabled format ( matrix ), most used by spreadsheet application.
      * example:  CSV, ODS, XLS
      */
-    const EXPORT_TABLE      = "export.table";
-} 
+    const TABLE      = "export.table";
+}

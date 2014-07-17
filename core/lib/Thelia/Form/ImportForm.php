@@ -57,4 +57,4 @@ class ImportForm extends BaseForm
         return "thelia_import";
     }
 
-} 
+}

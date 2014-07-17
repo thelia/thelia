@@ -6,7 +6,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\DocumentsExportInterface;
-use Thelia\ImportExport\ExportHandler;
+use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\ImportExport\ImagesExportInterface;
 use Thelia\Model\Base\Export as BaseExport;
 use Thelia\Model\Map\ExportTableMap;
@@ -97,8 +97,8 @@ class Export extends BaseExport
     }
 
     /**
-     * @param  ContainerInterface $container
-     * @return ExportHandler
+     * @param  ContainerInterface                        $container
+     * @return \Thelia\ImportExport\Export\ExportHandler
      * @throws \ErrorException
      */
     public function getHandleClassInstance(ContainerInterface $container)
@@ -128,7 +128,7 @@ class Export extends BaseExport
                     "The class \"%class\" must implement %interface",
                     [
                         "%class" => $class,
-                        "%interface" => "\\Thelia\\ImportExport\\ExportHandler",
+                        "%interface" => "\\Thelia\\ImportExport\\Export\\ExportHandler",
                     ]
                 )
             );

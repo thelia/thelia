@@ -171,11 +171,10 @@ class URL
 
             // url could contain anchor
             $pos = strrpos($base, '#');
-            if($pos !== false) {
+            if ($pos !== false) {
                 $anchor = substr($base, $pos);
                 $base = substr($base, 0, $pos);
             }
-
 
             $base = rtrim($base, "?&");
 

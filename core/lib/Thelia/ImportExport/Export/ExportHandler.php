@@ -10,43 +10,21 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\FileFormat\Formatting;
+namespace Thelia\ImportExport\Export;
+use Thelia\ImportExport\AbstractHandler;
 
 /**
- * Interface FormatterInterface
- * @package Thelia\Core\FileFormat\Formatter
+ * Interface ExportHandler
+ * @package Thelia\ImportExport
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-interface FormatterInterface
+abstract class ExportHandler extends AbstractHandler
 {
     /**
-     * @param  FormatterData $data
-     * @return mixed
+     * @return \Thelia\Core\FileFormat\Formatting\FormatterData
      *
-     * This method must use a FormatterData object and output
-     * a formatted value.
+     * The method builds the FormatterData for the formatter
      */
-    public function encode(FormatterData $data);
+    abstract public function buildFormatterData();
 
-    /**
-     * @param $rawData
-     * @return FormatterData
-     *
-     * This must takes raw data as argument and outputs
-     * a FormatterData object.
-     */
-    public function decode($rawData);
-
-    /**
-     * @return string
-     *
-     * return a string that defines the handled format type.
-     *
-     * Thelia types are defined in \Thelia\Core\FileFormat\FormatType
-     *
-     * examples:
-     *   return FormatType::TABLE;
-     *   return FormatType::UNBOUNDED;
-     */
-    public function getHandledType();
-}
+} 

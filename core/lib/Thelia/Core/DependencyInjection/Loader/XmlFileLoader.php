@@ -26,8 +26,8 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Thelia\Core\Translation\Translator;
-use Thelia\ImportExport\ExportHandler;
-use Thelia\ImportExport\ImportHandler;
+use Thelia\ImportExport\Export\ExportHandler;
+use Thelia\ImportExport\Import\ImportHandler;
 use Thelia\Model\Export;
 use Thelia\Model\ExportCategory;
 use Thelia\Model\ExportCategoryQuery;
@@ -381,7 +381,7 @@ class XmlFileLoader extends FileLoader
                             "The class \"%class\" must extend %baseClass",
                             [
                                 "%class" => $class,
-                                "%baseClass" => "Thelia\\ImportExport\\ExportHandler",
+                                "%baseClass" => "Thelia\\ImportExport\\Export\\ExportHandler",
                             ]
                         )
                     );
