@@ -35,26 +35,23 @@ class ProductStockImport extends ImportHandler
     {
         $errors = [];
         $translator = Translator::getInstance();
-        $collection = new ObjectCollection();
 
-        while (false !== $row = $data->popRow()) {
+        while (null !== $row = $data->popRow()) {
             $obj = ProductSaleElementsQuery::create()->findOneByRef($row["ref"]);
 
             if ($obj === null) {
-                $errors += [
-                    $translator->trans(
-                        "The product sale elements reference %ref doesn't exist",
-                        [
-                            "%ref" => $row["ref"]
-                        ]
-                    )
-                ];
+                $errorMessage = $translator->trans(
+                    "The product sale element reference %ref doesn't exist",
+                    [
+                        "%ref" => $row["ref"]
+                    ]
+                );
+
+                $errors[] = $errorMessage ;
             } else {
-                $collection->append($obj->setQuantity($row["stock"]));
+                $obj->setQuantity($row["stock"])->save();
             }
         }
-
-        $collection->save();
 
         return $errors;
     }

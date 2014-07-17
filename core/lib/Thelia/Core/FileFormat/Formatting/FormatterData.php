@@ -172,13 +172,9 @@ class FormatterData
      * @param  int        $index
      * @return array|bool
      */
-    public function popRow($index = 0)
+    public function popRow()
     {
-        $row = $this->getRow($index);
-
-        if (false !== $row) {
-            unset($this->data[$index]);
-        }
+        $row = array_pop($this->data);
 
         return $row;
     }

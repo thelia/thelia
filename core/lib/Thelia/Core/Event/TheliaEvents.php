@@ -769,5 +769,9 @@ final class TheliaEvents
 
     // -- Export ----------------------------------------------
 
-    const BEFORE_EXPORT = "Thelia.before.export";
+    const EXPORT_BEFORE_ENCODE = "Thelia.export.encode.before";
+    const EXPORT_AFTER_ENCODE = "Thelia.export.encode.after";
+
+    const IMPORT_BEFORE_DECODE = "Thelia.import.decode.before";
+    const IMPORT_AFTER_DECODE = "Thelia.import.decode.after";
 }

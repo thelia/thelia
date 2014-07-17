@@ -166,12 +166,14 @@ class ExportController extends BaseAdminController
         $filename = $formatter::FILENAME . "." . $formatter->getExtension();
 
         if ($archiveBuilder === null) {
-            $this->dispatch(TheliaEvents::BEFORE_EXPORT, $event);
+            $this->dispatch(TheliaEvents::EXPORT_BEFORE_ENCODE, $event);
 
             $formattedContent = $formatter->encode($data);
 
+            $this->dispatch(TheliaEvents::EXPORT_AFTER_ENCODE, $event->setContent($formattedContent));
+
             return new Response(
-                $formattedContent,
+                $event->getContent(),
                 200,
                 [
                     "Content-Type" => $formatter->getMimeType(),
@@ -181,9 +183,11 @@ class ExportController extends BaseAdminController
             );
         } else {
             $event->setArchiveBuilder($archiveBuilder);
-            $this->dispatch(TheliaEvents::BEFORE_EXPORT, $event);
+            $this->dispatch(TheliaEvents::EXPORT_BEFORE_ENCODE, $event);
 
             $formattedContent = $formatter->encode($data);
+
+            $this->dispatch(TheliaEvents::EXPORT_AFTER_ENCODE, $event->setContent($formattedContent));
 
             if ($includeImages && $handler instanceof ImagesExportInterface) {
                 $this->processExportImages($handler, $archiveBuilder);
@@ -194,7 +198,7 @@ class ExportController extends BaseAdminController
             }
 
             $archiveBuilder->addFileFromString(
-                $formattedContent, $filename
+                $event->getContent(), $filename
             );
 
             return $archiveBuilder->buildArchiveResponse($formatter::FILENAME);

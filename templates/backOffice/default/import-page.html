@@ -30,6 +30,14 @@
         </div>
     {/if}
 
+    {if $success_message}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-success">{$success_message}</div>
+            </div>
+        </div>
+    {/if}
+
     <div class="row">
         <div class="col-md-6">
             <div class="general-block-decorator">
@@ -39,13 +47,17 @@
                 </div>
 
                 <form action="{$URL}" method="post" {form_enctype form=$form}>
-                        {custom_render_form_field form=$form field="file_upload"}
-                            <input type="file" required aria-required="true" name="{$name}" id="{$label_attr.for}" accept="{$ALLOWED_MIME_TYPES}"/>
-                            <div class="small">Accepted formats: {$ALLOWED_EXTENSIONS}</div>
-                        {/custom_render_form_field}
+                    {form_hidden_fields form=$form}
+                    {form_field form=$form field="file_upload"}
+                        <label for="{$label_attr.for}">
+                            {$label}
+                        </label>
 
-                        <button type="submit" class="btn btn-primary" title="{intl l="Import this file"}">{intl l="Import this file"}</button>
+                        <input type="file" required aria-required="true" name="{$name}" id="{$label_attr.for}" accept="{$ALLOWED_MIME_TYPES}"/>
+                        <div class="small">Accepted formats: {$ALLOWED_EXTENSIONS}</div>
+                    {/form_field}
 
+                    <button type="submit" class="btn btn-primary" title="{intl l="Import this file"}">{intl l="Import this file"}</button>
                 </form>
             </div>
         </div>

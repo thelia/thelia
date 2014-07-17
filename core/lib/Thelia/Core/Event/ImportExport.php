@@ -11,10 +11,10 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
-use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
 use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
+use Thelia\ImportExport\AbstractHandler;
 use Thelia\ImportExport\Export\ExportHandler;
 
 /**
@@ -24,7 +24,7 @@ use Thelia\ImportExport\Export\ExportHandler;
  */
 class ImportExport extends ActionEvent
 {
-    /** @var  \Thelia\ImportExport\Export\ExportHandler */
+    /** @var  \Thelia\ImportExport\AbstractHandler */
     protected $handler;
 
     /** @var  \Thelia\Core\FileFormat\Formatting\AbstractFormatter */
@@ -36,10 +36,13 @@ class ImportExport extends ActionEvent
     /** @var  \Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder */
     protected $archiveBuilder;
 
+    /** @var  mixed */
+    protected $content;
+
     public function __construct(
-        AbstractFormatter $formatter,
-        \Thelia\ImportExport\Export\ExportHandler $handler,
-        FormatterData $data,
+        AbstractFormatter $formatter = null,
+        AbstractHandler $handler = null,
+        FormatterData $data = null,
         AbstractArchiveBuilder $archiveBuilder = null
     ) {
         $this->archiveBuilder = $archiveBuilder;
@@ -123,4 +126,25 @@ class ImportExport extends ActionEvent
     {
         return $this->data;
     }
+
+    /**
+     * @param $content
+     * @return $this
+     */
+    public function setContent($content)
+    {
+        $this->content = $content;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+
 }

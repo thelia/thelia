@@ -22,7 +22,7 @@ use Thelia\Log\Tlog;
  */
 abstract class AbstractFormatter implements FormatInterface, FormatterInterface
 {
-    const FILENAME = "export";
+    const FILENAME = "data";
 
     /** @var \Thelia\Core\Translation\Translator  */
     protected $translator;

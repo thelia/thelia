@@ -11,6 +11,8 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\ImportExport as ImportExportEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilderManagerTrait;
 use Thelia\Core\FileFormat\Formatting\FormatterManagerTrait;
 use Thelia\Core\HttpFoundation\Response;
@@ -97,19 +99,20 @@ class ImportController extends BaseAdminController
             /** @var \Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder $archiveBuilder */
             $archiveBuilder = null;
 
-            foreach ($formats as $format) {
+            foreach ($formats as $objectName => $format) {
                 $formatLength = strlen($format);
-                if ($nameLength >= $formatLength  && substr($name, -$formatLength) === $formatLength) {
+                $formatExtension = substr($name, -$formatLength);
+
+                if ($nameLength >= $formatLength  && $formatExtension === $format) {
                     $uploadFormat = $format;
 
-                    $flip = array_flip($format);
 
                     try {
-                        $formatter = $formatterManager->get($flip[$format]);
+                        $formatter = $formatterManager->get($objectName);
                     } catch(\OutOfBoundsException $e) {}
 
                     try {
-                        $archiveBuilder = $archiveBuilderManager->get($flip[$format]);
+                        $archiveBuilder = $archiveBuilderManager->get($objectName);
                     } catch(\OutOfBoundsException $e) {}
 
                     break;
@@ -124,8 +127,6 @@ class ImportController extends BaseAdminController
             }
 
             if ($uploadFormat === null) {
-
-
                 throw new FormValidationException(
                     $this->getTranslator()->trans(
                         "The extension \"%ext\" is not allowed",
@@ -144,14 +145,35 @@ class ImportController extends BaseAdminController
                 $content = null;
 
                 /**
-                 * TODO: HANDLE
+                 * Check expected file names for each formatter
                  */
 
+                $fileNames = [];
+                /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
+                foreach ($formatterManager->getFormattersByTypes($types) as $formatter) {
+                    $fileName = $formatter::FILENAME . "." . $formatter->getExtension();
+                    $fileNames[] = $fileName;
+
+                    if ($archiveBuilder->hasFile($fileName)) {
+                        $content = $archiveBuilder->getFileContent($fileName);
+                        break;
+                    }
+                }
+
+                if ($content === null) {
+                    throw new \ErrorException(
+                        $this->getTranslator()->trans(
+                            "Your archive must contain one of these file and doesn't: %files",
+                            [
+                                "%files" => implode(", ", $fileNames),
+                            ]
+                        )
+                    );
+                }
             } elseif ($formatter !== null) {
                 /**
-                 * If the file isn't
+                 * If the file isn't an archive
                  */
-
                 $content = file_get_contents($file->getPathname());
 
             } else {
@@ -166,11 +188,28 @@ class ImportController extends BaseAdminController
                 );
             }
 
+            $event = new ImportExportEvent($formatter, $handler, null, $archiveBuilder);
+            $event->setContent($content);
+
+            $this->dispatch(TheliaEvents::IMPORT_AFTER_DECODE, $event);
+
             $data = $formatter->decode($content);
 
-            // Dispatch event
+            $event->setContent(null)->setData($data);
+            $this->dispatch(TheliaEvents::IMPORT_AFTER_DECODE, $event);
 
-            $handler->retrieveFromFormatterData($data);
+            $errors = $handler->retrieveFromFormatterData($data);
+
+            if (!empty($errors)) {
+                throw new \Exception(
+                    $this->getTranslator()->trans(
+                        "Errors occurred while importing the file: %errors",
+                        [
+                            "%errors" => implode(", ", $errors),
+                        ]
+                    )
+                );
+            }
 
             $successMessage = $this->getTranslator()->trans("Import successfully done");
 

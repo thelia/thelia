@@ -83,7 +83,7 @@ class JsonFormatter extends AbstractFormatter
      */
     public function decode($rawData)
     {
-        return (new FormatterData($this->getAliases()))->setData(
+        return (new FormatterData())->setData(
             json_decode($rawData, true)
         );
     }
