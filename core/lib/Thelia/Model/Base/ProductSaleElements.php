@@ -498,7 +498,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
     public function getQuantity()
     {
 
-        if (false === ChildConfigQuery::checkAvailableStock()) return 9999;
+        if (false === ChildConfigQuery::checkAvailableStock()) return 100;
         else return $this->quantity;
     }
 
