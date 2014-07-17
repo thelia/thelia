@@ -105,13 +105,28 @@ class FormatterManager
      *
      * Return the extensions handled by archive builders
      */
-    public function getExtensions()
+    public function getExtensions($withDot = false)
     {
         $extensions = [];
 
         /** @var AbstractFormatter $formatter */
         foreach ($this->formatters as $formatter) {
-            $extensions += [$formatter->getName() => $formatter->getExtension()];
+            $extensionName = $withDot ? ".": "";
+            $extensionName .= $formatter->getExtension();
+            $extensions += [$formatter->getName() => $extensionName];
+        }
+
+        return $extensions;
+    }
+
+    public function getExtensionsByTypes($types, $withDot = false) {
+        $extensions = [];
+
+        /** @var AbstractFormatter $formatter */
+        foreach ($this->getFormattersByTypes($types) as $formatter) {
+            $extensionName = $withDot ? ".": "";
+            $extensionName .= $formatter->getExtension();
+            $extensions += [$formatter->getName() => $extensionName];
         }
 
         return $extensions;
@@ -123,6 +138,10 @@ class FormatterManager
      */
     public function getFormatterByExtension($extension)
     {
+        if ($extension[0] === ".") {
+            $extension = substr($extension, 1);
+        }
+
         $extensions = $this->getExtensions();
 
         if (!in_array($extension, $extensions)) {

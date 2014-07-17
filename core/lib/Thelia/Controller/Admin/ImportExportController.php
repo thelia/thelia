@@ -60,6 +60,8 @@ class ImportExportController extends BaseAdminController
          * Get needed services
          */
         $this->hydrate();
+
+
     }
 
     /**
@@ -109,6 +111,7 @@ class ImportExportController extends BaseAdminController
 
             $data = $handler->buildFormatterData();
 
+            /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
             $formatter = $this->formatterManager->get(
                 $boundForm->get("formatter")->getData()
             );
@@ -247,7 +250,18 @@ class ImportExportController extends BaseAdminController
         /**
          * Inject allowed formats
          */
-        $this->archiveBuilderManager;
+        /** @var \Thelia\ImportExport\AbstractHandler $handler */
+        $this->hydrate();
+        $handler = $import->getHandleClassInstance($this->container);
+
+        $formats =
+            $this->formatterManager->getExtensionsByTypes($handler->getHandledTypes(), true) +
+            $this->archiveBuilderManager->getExtensions(true)
+        ;
+
+        $parserContext->set(
+            "ALLOWED_EXTENSIONS", implode(", ", $formats)
+        );
 
         /** Then render the form */
         if ($this->getRequest()->isXmlHttpRequest()) {
@@ -328,4 +342,5 @@ class ImportExportController extends BaseAdminController
 
         return $export;
     }
+
 }

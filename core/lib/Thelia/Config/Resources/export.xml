@@ -12,7 +12,7 @@
     </export_categories>
 
     <exports>
-        <export id="thelia.export.mailing" category_id="thelia.export.customer" class="Thelia\ImportExport\Export\MailingExport">
+        <export id="thelia.export.mailing" category_id="thelia.export.customer" class="Thelia\ImportExport\Export\Type\MailingExport">
             <export_descriptive locale="fr_FR">
                 <title>Mailing</title>
                 <description>Exporter le nom, prénom et adresse mail des clients inscrits et des abonnées à la newsletter</description>

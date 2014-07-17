@@ -109,13 +109,15 @@ class ArchiveBuilderManager
      *
      * Return the extensions handled by archive builders
      */
-    public function getExtensions()
+    public function getExtensions($withDot = false)
     {
         $extensions = [];
 
         /** @var AbstractArchiveBuilder $archiveBuilder */
         foreach ($this->archiveBuilders as $archiveBuilder) {
-            $extensions += [$archiveBuilder->getName() => $archiveBuilder->getExtension()];
+            $extensionName = $withDot ? ".": "";
+            $extensionName .= $archiveBuilder->getExtension();
+            $extensions += [$archiveBuilder->getName() => $extensionName];
         }
 
         return $extensions;

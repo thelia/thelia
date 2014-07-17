@@ -125,10 +125,10 @@ class Export extends BaseExport
         if (!$instance instanceof ExportHandler) {
             throw new \ErrorException(
                 Translator::getInstance()->trans(
-                    "The class \"%class\" must implement %interface",
+                    "The class \"%class\" must extend %baseClass",
                     [
                         "%class" => $class,
-                        "%interface" => "\\Thelia\\ImportExport\\Export\\ExportHandler",
+                        "%baseClass" => "Thelia\\ImportExport\\Export\\ExportHandler",
                     ]
                 )
             );

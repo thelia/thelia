@@ -11,7 +11,7 @@
     </import_categories>
 
     <imports>
-        <import id="thelia.import.stock" class="Thelia\ImportExport\Import\ProductStockImport" category_id="thelia.import.products">
+        <import id="thelia.import.stock" class="Thelia\ImportExport\Import\Type\ProductStockImport" category_id="thelia.import.products">
             <import_descriptive locale="fr_FR">
                 <title>Importez votre stock</title>
             </import_descriptive>

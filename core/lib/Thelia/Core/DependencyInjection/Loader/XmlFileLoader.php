@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\DependencyInjection\Loader;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
@@ -310,6 +311,7 @@ class XmlFileLoader extends FileLoader
         $con->beginTransaction();
 
         try {
+            $refs = [];
             /** @var SimpleXMLElement $exportCategory */
             foreach ($exportCategories as $exportCategory) {
                 $id = (string) $exportCategory->getAttributeAsPhp("id");
@@ -336,7 +338,15 @@ class XmlFileLoader extends FileLoader
                         ->save($con);
                     ;
                 }
+
+                $refs[] = $id;
             }
+
+            ExportCategoryQuery::create()
+                ->filterByRef($refs, Criteria::NOT_IN)
+                ->find()
+                ->delete()
+            ;
 
             $con->commit();
         } catch (\Exception $e) {
@@ -356,6 +366,8 @@ class XmlFileLoader extends FileLoader
         $con->beginTransaction();
 
         try {
+            $refs = [];
+
             /** @var SimpleXMLElement $export */
             foreach ($exports as $export) {
                 $id = (string) $export->getAttributeAsPhp("id");
@@ -441,7 +453,15 @@ class XmlFileLoader extends FileLoader
                         ->save($con)
                     ;
                 }
+
+                $refs[] = $id;
             }
+
+            ExportQuery::create()
+                ->filterByRef($refs, Criteria::NOT_IN)
+                ->find()
+                ->delete()
+            ;
 
             $con->commit();
         } catch (\Exception $e) {
@@ -461,6 +481,8 @@ class XmlFileLoader extends FileLoader
         $con->beginTransaction();
 
         try {
+            $refs = [];
+
             /** @var SimpleXMLElement $importCategory */
             foreach ($importCategories as $importCategory) {
                 $id = (string) $importCategory->getAttributeAsPhp("id");
@@ -487,7 +509,15 @@ class XmlFileLoader extends FileLoader
                         ->save($con);
                     ;
                 }
+
+                $refs[] = $id;
             }
+
+            ImportCategoryQuery::create()
+                ->filterByRef($refs, Criteria::NOT_IN)
+                ->find()
+                ->delete()
+            ;
 
             $con->commit();
         } catch (\Exception $e) {
@@ -507,6 +537,8 @@ class XmlFileLoader extends FileLoader
         $con->beginTransaction();
 
         try {
+            $refs = [];
+
             /** @var SimpleXMLElement $import */
             foreach ($imports as $import) {
                 $id = (string) $import->getAttributeAsPhp("id");
@@ -592,7 +624,15 @@ class XmlFileLoader extends FileLoader
                         ->save($con)
                     ;
                 }
+
+                $refs[] = $id;
             }
+
+            ImportQuery::create()
+                ->filterByRef($refs, Criteria::NOT_IN)
+                ->find()
+                ->delete()
+            ;
 
             $con->commit();
         } catch (\Exception $e) {
