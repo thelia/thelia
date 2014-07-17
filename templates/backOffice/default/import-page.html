@@ -1,0 +1,57 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'tools'}
+{/block}
+
+{block name="page-title"}{intl l='Import'}: {$TITLE}{/block}
+
+{block name="check-resource"}admin.import{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+<div class="container" id="wrapper">
+
+    <nav>
+        <ul class="breadcrumb">
+            <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
+            <li><a href="{url path='admin/tools'}">{intl l='Tools'}</a></li>
+            <li><a href="{url path='admin/import'}">{intl l="Imports"}</a></li>
+            <li>{intl l="Import"}: {$TITLE}</li>
+        </ul>
+    </nav>
+
+    {form name="thelia.import"}
+    {if $form_error}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-danger">{$form_error_message}</div>
+            </div>
+        </div>
+    {/if}
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="general-block-decorator">
+
+                <div class="title title-without-tabs">
+                    {intl l='Import'}: {$TITLE}
+                </div>
+
+                <form action="{$URL}" method="post" {form_enctype form=$form}>
+                        {custom_render_form_field form=$form field="file_upload"}
+                            <input type="file" required aria-required="true" name="{$name}" id="{$label_attr.for}" />
+                        {/custom_render_form_field}
+
+                        <button type="submit" class="btn btn-primary" title="{intl l="Import this file"}">{intl l="Import this file"}</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    {/form}
+{/block}
+
+{block name="javascript-last-call"}
+    {module_include location='configuration-js'}
+{/block}

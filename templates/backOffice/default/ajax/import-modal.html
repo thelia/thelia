@@ -1,0 +1,22 @@
+{form name="thelia.import"}
+<form action="{$URL}" method="post" {form_enctype form=$form}>
+    <div class="modal fade" id="real-import-modal" tabindex="-1" role="dialog" aria-labelledby="import-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="import-modal-label">Import: {$TITLE}</h4>
+                </div>
+                <div class="modal-body">
+                    {custom_render_form_field form=$form field="file_upload"}
+                        <input type="file" required aria-required="true" name="{$name}" id="{$label_attr.for}" />
+                    {/custom_render_form_field}
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" title="{intl l="Import this file"}">{intl l="Import this file"}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{/form}

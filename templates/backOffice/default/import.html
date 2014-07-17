@@ -17,6 +17,7 @@
         {assign url_import "import_order="|cat:$import_order}
     {/if}
 
+    <div id="import-modal"></div>
 
     <div class="configuration">
 
@@ -33,6 +34,7 @@
             {module_include location='tools_top'}
 
             {loop name="import-category" type="import-category" order=$category_order}
+            {assign category_title $TITLE}
                 <div class="row">
                     <div class="col-md-12">
                         <div class="general-block-decorator">
@@ -80,7 +82,7 @@
                                                 {$ID}
                                             </td>
                                             <td>
-                                                <a href="{$URL}">{$TITLE}</a>
+                                                <a href="#category_{$category_title}" class="btn-show-import-modal" data-id="{$ID}" data-url="{$URL}">{$TITLE}</a>
                                             </td>
                                             <td>
                                                 {$DESCRIPTION}
@@ -96,7 +98,7 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group">
-                                                    <a class="btn btn-default btn-xs" href="{$URL}" title="{intl l="Do this import"}">
+                                                    <a class="btn btn-default btn-xs btn-show-import-modal" href="#category_{$category_title}" data-id="{$ID}" data-url="{$URL}" title="{intl l="Do this import"}">
                                                         <span class="glyphicon glyphicon-open"></span>
                                                     </a>
                                                 </div>
@@ -123,35 +125,27 @@
     </div>
 {/block}
 
-
-{block name="javascript-initialization"}
-    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
-{/block}
-
 {block name="javascript-last-call"}
-    <!-- -->
     <script>
         $(document).ready(function() {
-            var compression_switch = $(".import-compression-switch");
-            var compression_row = $(".import-compression-selection-row");
+            var import_modal = $("#import-modal");
 
-            compression_switch.on("switch-change", function(e, data) {
-                var is_checked = data.value;
+            $(".btn-show-import-modal").click(function() {
 
-                if (is_checked) {
-                    compression_row.show();
-                } else {
-                    compression_row.hide();
-                }
+                var import_id = $(this).data("id");
+
+                /**
+                 * If we can't load the modal form, redirect to a page where the form is too.
+                 */
+                $.ajax(
+                    $(this).data("url")
+                ).success(function(data) {
+                    import_modal.html(data);
+                    $("#real-import-modal").modal();
+                }).fail(function() {
+                    window.location.replace("{url path='/admin/import/'}"+import_id);
+                });
             });
-
-            if ($("input[type=checkbox]", compression_switch).is(":checked")) {
-                compression_row.show();
-            } else {
-                compression_row.hide();
-            }
         });
     </script>
     {module_include location='configuration-js'}
