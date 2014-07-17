@@ -10,10 +10,11 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\ImportExport;
+namespace Thelia\Core\Event;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
 use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
+use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\ImportExport\Export\ExportHandler;
 
 /**
@@ -21,7 +22,7 @@ use Thelia\ImportExport\Export\ExportHandler;
  * @package Thelia\Core\Event\ImportExport
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class Export extends ActionEvent
+class ImportExport extends ActionEvent
 {
     /** @var  \Thelia\ImportExport\Export\ExportHandler */
     protected $handler;
@@ -29,17 +30,22 @@ class Export extends ActionEvent
     /** @var  \Thelia\Core\FileFormat\Formatting\AbstractFormatter */
     protected $formatter;
 
+    /** @var  FormatterData */
+    protected $data;
+
     /** @var  \Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder */
     protected $archiveBuilder;
 
     public function __construct(
         AbstractFormatter $formatter,
         \Thelia\ImportExport\Export\ExportHandler $handler,
+        FormatterData $data,
         AbstractArchiveBuilder $archiveBuilder = null
     ) {
         $this->archiveBuilder = $archiveBuilder;
         $this->formatter = $formatter;
         $this->handler = $handler;
+        $this->data = $data;
     }
 
     /**
@@ -97,5 +103,24 @@ class Export extends ActionEvent
     public function getHandler()
     {
         return $this->handler;
+    }
+
+    /**
+     * @param FormatterData $data
+     * @return $this
+     */
+    public function setData(FormatterData $data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * @return \Thelia\Core\FileFormat\Formatting\FormatterData
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 }

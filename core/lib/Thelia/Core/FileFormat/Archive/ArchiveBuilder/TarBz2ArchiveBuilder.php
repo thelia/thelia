@@ -26,7 +26,7 @@ class TarBz2ArchiveBuilder extends TarArchiveBuilder
 
     public function getMimeType()
     {
-        return "application/x-gtar";
+        return "application/x-bzip2";
     }
 
     public function getExtension()

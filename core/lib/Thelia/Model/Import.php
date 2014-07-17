@@ -92,6 +92,11 @@ class Import extends BaseImport
         return $this;
     }
 
+    /**
+     * @param ContainerInterface $container
+     * @return ImportHandler
+     * @throws \ErrorException
+     */
     public function getHandleClassInstance(ContainerInterface $container)
     {
         $class = $this->getHandleClass();

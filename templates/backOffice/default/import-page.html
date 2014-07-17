@@ -40,7 +40,7 @@
 
                 <form action="{$URL}" method="post" {form_enctype form=$form}>
                         {custom_render_form_field form=$form field="file_upload"}
-                            <input type="file" required aria-required="true" name="{$name}" id="{$label_attr.for}" />
+                            <input type="file" required aria-required="true" name="{$name}" id="{$label_attr.for}" accept="{$ALLOWED_MIME_TYPES}"/>
                             <div class="small">Accepted formats: {$ALLOWED_EXTENSIONS}</div>
                         {/custom_render_form_field}
 

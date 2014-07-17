@@ -117,7 +117,7 @@ class ArchiveBuilderManager
         foreach ($this->archiveBuilders as $archiveBuilder) {
             $extensionName = $withDot ? ".": "";
             $extensionName .= $archiveBuilder->getExtension();
-            $extensions += [$archiveBuilder->getName() => $extensionName];
+            $extensions[$archiveBuilder->getName()] = $extensionName;
         }
 
         return $extensions;
@@ -139,5 +139,16 @@ class ArchiveBuilderManager
 
             return $this->archiveBuilders[$archiveBuilderName];
         }
+    }
+
+    public function getMimeTypes() {
+        $mimeTypes = [];
+
+        /** @var AbstractArchiveBuilder $formatter */
+        foreach ($this->archiveBuilders as $formatter) {
+            $mimeTypes[$formatter->getName()] = $formatter->getMimeType();
+        }
+
+        return $mimeTypes;
     }
 }

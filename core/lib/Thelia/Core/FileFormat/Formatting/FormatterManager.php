@@ -113,7 +113,7 @@ class FormatterManager
         foreach ($this->formatters as $formatter) {
             $extensionName = $withDot ? ".": "";
             $extensionName .= $formatter->getExtension();
-            $extensions += [$formatter->getName() => $extensionName];
+            $extensions[$formatter->getName()] = $extensionName;
         }
 
         return $extensions;
@@ -126,7 +126,7 @@ class FormatterManager
         foreach ($this->getFormattersByTypes($types) as $formatter) {
             $extensionName = $withDot ? ".": "";
             $extensionName .= $formatter->getExtension();
-            $extensions += [$formatter->getName() => $extensionName];
+            $extensions[$formatter->getName()] = $extensionName;
         }
 
         return $extensions;
@@ -167,10 +167,25 @@ class FormatterManager
             $handledType = $formatter->getHandledType();
 
             if (in_array($handledType, $types)) {
-                $selectedFormatters += [$formatter->getName() => $formatter];
+                $selectedFormatters[$formatter->getName()] = $formatter;
             }
         }
 
         return $selectedFormatters;
+    }
+
+    public function getMimeTypesByTypes($types) {
+        if (!is_array($types)) {
+            $types = [$types];
+        }
+
+        $mimeTypes = [];
+
+        /** @var AbstractFormatter $formatter */
+        foreach ($this->getFormattersByTypes($types) as $formatter) {
+            $mimeTypes[$formatter->getName()] = $formatter->getMimeType();
+        }
+
+        return $mimeTypes;
     }
 }
