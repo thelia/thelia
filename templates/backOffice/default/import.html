@@ -55,10 +55,13 @@
                                                 {intl l="ID"}
                                             </a>
                                         </th>
-                                        <th class="col-md-8">
+                                        <th class="col-md-2">
                                             <a href="{url path="/admin/import"}?{if $url_category}{$url_category}&{/if}import_order=alpha{if $import_order == "alpha"}_reverse{/if}">
                                                 {intl l="Name"}
                                             </a>
+                                        </th>
+                                        <th class="col-md-6">
+                                            {intl l="Description"}
                                         </th>
                                         <th class="col-md-2">
                                             <a href="{url path="/admin/import"}?{if $url_category}{$url_category}&{/if}import_order=manual{if $import_order == "manual"}_reverse{/if}">
@@ -78,6 +81,9 @@
                                             </td>
                                             <td>
                                                 <a href="{$URL}">{$TITLE}</a>
+                                            </td>
+                                            <td>
+                                                {$DESCRIPTION}
                                             </td>
                                             <td>
                                                 <a href="{url path="/admin/import/position/up/{if $url_category}?{$url_category}{/if}{$ID}"}">

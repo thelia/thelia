@@ -62,7 +62,7 @@
                                                     {intl l="ID"}
                                                 </a>
                                             </th>
-                                            <th class="col-md-8">
+                                            <th class="col-md-2">
                                                 {if $export_order == "alpha"}
                                                     <i class="glyphicon glyphicon-chevron-up"></i>
                                                 {elseif $export_order == "alpha_reverse"}
@@ -71,6 +71,9 @@
                                                 <a href="{url path="/admin/export"}?{if $url_category}{$url_category}&{/if}export_order=alpha{if $export_order == "alpha"}_reverse{/if}#category_{$category_title}">
                                                     {intl l="Name"}
                                                 </a>
+                                            </th>
+                                            <th class="col-md-6">
+                                                {intl l="Description"}
                                             </th>
                                             <th class="col-md-2">
                                                 {if $export_order == "manual"}
@@ -95,6 +98,9 @@
                                                 </td>
                                                 <td>
                                                     <a href="#category_{$category_title}" class="btn-show-export-modal" data-id="{$ID}" data-url="{$URL}">{$TITLE}</a>
+                                                </td>
+                                                <td>
+                                                    {$DESCRIPTION}
                                                 </td>
                                                 <td>
                                                     <a href="{url path="/admin/export/position/up/{if $url_category}?{$url_category}{/if}{$ID}#category_{$category_title}"}">
