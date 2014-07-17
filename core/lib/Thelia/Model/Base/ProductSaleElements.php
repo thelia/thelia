@@ -28,6 +28,7 @@ use Thelia\Model\ProductQuery as ChildProductQuery;
 use Thelia\Model\ProductSaleElements as ChildProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery as ChildProductSaleElementsQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Model\ConfigQuery as ChildConfigQuery;
 
 abstract class ProductSaleElements implements ActiveRecordInterface
 {
@@ -497,7 +498,8 @@ abstract class ProductSaleElements implements ActiveRecordInterface
     public function getQuantity()
     {
 
-        return $this->quantity;
+        if (false === ChildConfigQuery::checkAvailableStock()) return 9999;
+        else return $this->quantity;
     }
 
     /**
