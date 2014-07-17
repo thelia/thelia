@@ -10,11 +10,12 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\ImportExport\Import;
+namespace Thelia\ImportExport\Import\Type;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\Translation\Translator;
 use Thelia\Core\FileFormat\FormatType;
+use Thelia\ImportExport\Import\ImportHandler;
 use Thelia\Model\ProductSaleElementsQuery;
 
 /**

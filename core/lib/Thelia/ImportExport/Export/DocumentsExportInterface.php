@@ -9,22 +9,21 @@
 /*      For the full copyright and license information, please view the LICENSE.txt  */
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
-namespace Thelia\ImportExport;
-
+namespace Thelia\ImportExport\Export;
 
 /**
- * interface ImagesExportInterface
+ * Interface DocumentsExportInterface
  * @package Thelia\ImportExport
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-interface ImagesExportInterface
+interface DocumentsExportInterface
 {
-    const IMAGES_DIRECTORY = "images";
+    const DOCUMENTS_DIRECTORY = "documents";
 
     /**
      * @return array
      *
-     * return an array with the paths to the images to include in the archive
+     * return an array with the paths to the documents to include in the archive
      */
-    public function getImagesPaths();
+    public function getDocumentsPaths();
 } 

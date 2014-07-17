@@ -14,7 +14,7 @@ namespace Thelia\Tests\ImportExport\Export;
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
 use Thelia\Core\FileFormat\FormatType;
-use Thelia\ImportExport\Export\MailingExport;
+use Thelia\ImportExport\Export\Type\MailingExport;
 
 /**
  * Class MailingExportTest
@@ -23,7 +23,7 @@ use Thelia\ImportExport\Export\MailingExport;
  */
 class MailingExportTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var MailingExport $handler */
+    /** @var \Thelia\ImportExport\Export\Type\MailingExport $handler */
     protected $handler;
 
     public function setUp()
@@ -32,7 +32,7 @@ class MailingExportTest extends \PHPUnit_Framework_TestCase
 
         new Translator($container);
 
-        $this->handler = new MailingExport($container);
+        $this->handler = new \Thelia\ImportExport\Export\Type\MailingExport($container);
     }
 
     public function testExport()

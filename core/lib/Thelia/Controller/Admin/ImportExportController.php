@@ -19,8 +19,8 @@ use Thelia\Core\Template\Loop\Export as ExportLoop;
 use Thelia\Core\Template\Loop\Import as ImportLoop;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ExportForm;
-use Thelia\ImportExport\DocumentsExportInterface;
-use Thelia\ImportExport\ImagesExportInterface;
+use Thelia\ImportExport\Export\DocumentsExportInterface;
+use Thelia\ImportExport\Export\ImagesExportInterface;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\ImportQuery;
 

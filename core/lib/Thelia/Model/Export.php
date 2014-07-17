@@ -5,9 +5,9 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\ImportExport\DocumentsExportInterface;
+use Thelia\ImportExport\Export\DocumentsExportInterface;
 use Thelia\ImportExport\Export\ExportHandler;
-use Thelia\ImportExport\ImagesExportInterface;
+use Thelia\ImportExport\Export\ImagesExportInterface;
 use Thelia\Model\Base\Export as BaseExport;
 use Thelia\Model\Map\ExportTableMap;
 
