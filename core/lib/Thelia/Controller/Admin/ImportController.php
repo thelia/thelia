@@ -197,7 +197,7 @@ class ImportController extends BaseAdminController
         return $content;
     }
 
-    protected function retrieveFormatTools(
+    public function retrieveFormatTools(
         $fileName,
         ImportHandler $handler,
         FormatterManager $formatterManager,
@@ -250,7 +250,7 @@ class ImportController extends BaseAdminController
         );
     }
 
-    protected function checkFileExtension($fileName, $uploadFormat)
+    public function checkFileExtension($fileName, $uploadFormat)
     {
         $splitName = explode(".", $fileName);
         $ext = "";
@@ -271,7 +271,7 @@ class ImportController extends BaseAdminController
         }
     }
 
-    protected function processImport(
+    public function processImport(
         $content,
         ImportHandler $handler,
         AbstractFormatter $formatter = null,

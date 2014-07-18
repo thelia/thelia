@@ -152,8 +152,6 @@ class XMLFormatterTest extends \PHPUnit_Framework_TestCase
 
         $data = $this->formatter->decode($raw);
 
-        var_dump($data->getData());
-
         $this->assertEquals(["foo" => "bar"], $data->getData());
     }
 
