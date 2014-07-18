@@ -119,7 +119,8 @@ class FormatterManager
         return $extensions;
     }
 
-    public function getExtensionsByTypes($types, $withDot = false) {
+    public function getExtensionsByTypes($types, $withDot = false)
+    {
         $extensions = [];
 
         /** @var AbstractFormatter $formatter */
@@ -174,7 +175,8 @@ class FormatterManager
         return $selectedFormatters;
     }
 
-    public function getMimeTypesByTypes($types) {
+    public function getMimeTypesByTypes($types)
+    {
         if (!is_array($types)) {
             $types = [$types];
         }

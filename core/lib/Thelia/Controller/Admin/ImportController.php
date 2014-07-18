@@ -75,7 +75,6 @@ class ImportController extends BaseAdminController
         $errorMessage = null;
         $successMessage = null;
 
-
         try {
             $boundForm = $this->validateForm($form);
 
@@ -93,7 +92,6 @@ class ImportController extends BaseAdminController
                 $formatterManager,
                 $archiveBuilderManager
             );
-
 
             /** @var AbstractArchiveBuilder $archiveBuilder */
             $archiveBuilder = $tools["archive_builder"];
@@ -140,9 +138,9 @@ class ImportController extends BaseAdminController
                 $archiveBuilder
             );
 
-        } catch(FormValidationException $e) {
+        } catch (FormValidationException $e) {
             $errorMessage = $this->createStandardFormValidationErrorMessage($e);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
         }
 
@@ -232,11 +230,11 @@ class ImportController extends BaseAdminController
 
                 try {
                     $formatter = $formatterManager->get($objectName);
-                } catch(\OutOfBoundsException $e) {}
+                } catch (\OutOfBoundsException $e) {}
 
                 try {
                     $archiveBuilder = $archiveBuilderManager->get($objectName);
-                } catch(\OutOfBoundsException $e) {}
+                } catch (\OutOfBoundsException $e) {}
 
                 break;
             }
@@ -304,7 +302,6 @@ class ImportController extends BaseAdminController
 
         return $this->getTranslator()->trans("Import successfully done");
     }
-
 
     /**
      * @param  integer  $id
@@ -508,4 +505,4 @@ class ImportController extends BaseAdminController
 
         return $category;
     }
-} 
+}

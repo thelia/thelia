@@ -59,10 +59,9 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
                     ->set("POSITION", $type->getPosition())
                     ->set("CATEGORY_ID", $type->getByName($this->getCategoryName()))
                 ;
-            } catch(ClassNotFoundException $e) {
+            } catch (ClassNotFoundException $e) {
 
-            } catch(\ErrorException $e) {}
-
+            } catch (\ErrorException $e) {}
 
             $loopResult->addRow($loopResultRow);
         }

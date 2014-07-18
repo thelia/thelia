@@ -140,11 +140,11 @@ class ExportController extends BaseAdminController
     }
 
     /**
-     * @param AbstractFormatter $formatter
-     * @param ExportHandler $handler
-     * @param AbstractArchiveBuilder $archiveBuilder
-     * @param bool $includeImages
-     * @param bool $includeDocuments
+     * @param  AbstractFormatter      $formatter
+     * @param  ExportHandler          $handler
+     * @param  AbstractArchiveBuilder $archiveBuilder
+     * @param  bool                   $includeImages
+     * @param  bool                   $includeDocuments
      * @return Response
      *
      * Processes an export by returning a response with the export's content.
@@ -206,7 +206,7 @@ class ExportController extends BaseAdminController
     }
 
     /**
-     * @param ImagesExportInterface $handler
+     * @param ImagesExportInterface  $handler
      * @param AbstractArchiveBuilder $archiveBuilder
      *
      * Procedure that add images in the export's archive
@@ -224,7 +224,7 @@ class ExportController extends BaseAdminController
 
     /**
      * @param DocumentsExportInterface $handler
-     * @param AbstractArchiveBuilder $archiveBuilder
+     * @param AbstractArchiveBuilder   $archiveBuilder
      *
      * Procedure that add documents in the export's archive
      */

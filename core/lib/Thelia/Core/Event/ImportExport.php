@@ -109,7 +109,7 @@ class ImportExport extends ActionEvent
     }
 
     /**
-     * @param FormatterData $data
+     * @param  FormatterData $data
      * @return $this
      */
     public function setData(FormatterData $data)
@@ -145,6 +145,5 @@ class ImportExport extends ActionEvent
     {
         return $this->content;
     }
-
 
 }

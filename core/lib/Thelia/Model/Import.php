@@ -6,13 +6,11 @@ use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\ClassNotFoundException;
-use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Import\ImportHandler;
 use Thelia\Model\Base\Import as BaseImport;
-use Thelia\Model\ImportQuery as ChildImportQuery;
 use Thelia\Model\Map\ImportTableMap;
 
 class Import extends BaseImport
@@ -99,7 +97,7 @@ class Import extends BaseImport
     }
 
     /**
-     * @param ContainerInterface $container
+     * @param  ContainerInterface $container
      * @return ImportHandler
      * @throws \ErrorException
      */
@@ -159,6 +157,5 @@ class Import extends BaseImport
 
         parent::delete($con);
     }
-
 
 }

@@ -141,7 +141,8 @@ class ArchiveBuilderManager
         }
     }
 
-    public function getMimeTypes() {
+    public function getMimeTypes()
+    {
         $mimeTypes = [];
 
         /** @var AbstractArchiveBuilder $formatter */

@@ -12,7 +12,6 @@
 
 namespace Thelia\Core\DependencyInjection\Loader;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;

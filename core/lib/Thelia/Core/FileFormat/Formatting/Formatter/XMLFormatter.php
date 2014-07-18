@@ -12,7 +12,7 @@
 
 namespace Thelia\Core\FileFormat\Formatting\Formatter;
 use Symfony\Component\DependencyInjection\SimpleXMLElement;
-use Thelia\Core\FileFormat\Formatter\Exception\BadFormattedStringException;
+use Thelia\Core\FileFormat\Formatting\Exception\BadFormattedStringException;
 use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
@@ -165,7 +165,8 @@ class XMLFormatter extends AbstractFormatter
         return $parent === null ? $data : $parent;
     }
 
-    public function getValue($name, array &$data) {
+    public function getValue($name, array &$data)
+    {
         $value = $data[$name];
         unset ($data[$name]);
 
@@ -175,7 +176,7 @@ class XMLFormatter extends AbstractFormatter
     /**
      * @param $rawData
      * @return array
-     * @throws \Thelia\Core\FileFormat\Formatter\Exception\BadFormattedStringException
+     * @throws \Thelia\Core\FileFormat\Formatting\Exception\BadFormattedStringException
      */
     public function rawDecode($rawData)
     {

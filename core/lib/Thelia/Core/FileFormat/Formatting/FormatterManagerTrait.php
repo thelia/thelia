@@ -21,11 +21,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 trait FormatterManagerTrait
 {
     /**
-     * @param ContainerInterface $container
+     * @param  ContainerInterface                                  $container
      * @return \Thelia\Core\FileFormat\Formatting\FormatterManager
      */
     public function getFormatterManager(ContainerInterface $container)
     {
         return $container->get("thelia.manager.formatter_manager");
     }
-} 
+}

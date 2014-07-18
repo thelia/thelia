@@ -163,7 +163,6 @@ class Export extends BaseExport
         parent::delete($con);
     }
 
-
     public function hasImages(ContainerInterface $container)
     {
         if (static::$cache === null) {

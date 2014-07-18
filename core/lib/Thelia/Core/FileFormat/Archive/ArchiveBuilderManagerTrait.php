@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 trait ArchiveBuilderManagerTrait
 {
     /**
-     * @param ContainerInterface $container
+     * @param  ContainerInterface                                    $container
      * @return \Thelia\Core\FileFormat\Archive\ArchiveBuilderManager
      */
     public function getArchiveBuilderManager(ContainerInterface $container)
