@@ -19,5 +19,14 @@
                 <title>Import your stock</title>
             </import_descriptive>
         </import>
+
+        <import id="thelia.import.price" class="Thelia\ImportExport\Import\Type\ProductPriceImport" category_id="thelia.import.products">
+            <import_descriptive locale="fr_FR">
+                <title>Importez vos prix</title>
+            </import_descriptive>
+            <import_descriptive locale="en_US">
+                <title>Import your prices</title>
+            </import_descriptive>
+        </import>
     </imports>
 </config>

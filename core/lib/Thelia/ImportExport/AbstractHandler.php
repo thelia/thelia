@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 abstract class AbstractHandler
 {
+    /** @var \Symfony\Component\DependencyInjection\ContainerInterface  */
     protected $container;
 
     /**
@@ -31,6 +32,19 @@ abstract class AbstractHandler
         $this->container = $container;
     }
 
+
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    /**
+     * @return \Thelia\Core\HttpFoundation\Request
+     */
+    public function getRequest()
+    {
+        return $this->container->get("request");
+    }
 
     /**
      * @return string|array
