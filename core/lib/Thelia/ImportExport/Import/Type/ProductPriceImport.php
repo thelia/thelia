@@ -86,12 +86,15 @@ class ProductPriceImport extends ImportHandler
                 }
 
                 $price = ProductPriceQuery::create()
-                    ->filterByProductSaleElements($obj)
-                    ->findOneByCurrencyId($currency->getId());
+                    ->filterByProductSaleElementsId($obj->getId())
+                    ->findOneByCurrencyId($currency->getId())
+                ;
 
                 if ($price === null) {
                     $price = new ProductPrice();
-                    $price->setProductSaleElements($obj)
+
+                    $price
+                        ->setProductSaleElements($obj)
                         ->setCurrency($currency)
                     ;
                 }
@@ -109,4 +112,4 @@ class ProductPriceImport extends ImportHandler
         return $errors;
     }
 
-} 
+}
