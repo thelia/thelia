@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Formatting\Formatter;
+use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Thelia\Core\FileFormat\Formatter\Exception\BadFormattedStringException;
 use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
@@ -24,8 +25,8 @@ use Thelia\Core\FileFormat\FormatType;
 class XMLFormatter extends AbstractFormatter
 {
     public $root = "data";
-    public $nodeName = "node";
     public $rowName = "row";
+    public $nodeName = "entry";
 
     /**
      * @return string
@@ -83,7 +84,7 @@ class XMLFormatter extends AbstractFormatter
 
         foreach ($arrayData as $key=>$entry) {
             if (is_array($entry)) {
-                $node = $container->appendChild(new \DOMElement($this->nodeName));
+                $node = $container->appendChild(new \DOMElement($this->rowName));
                 $this->recursiveBuild($entry, $node);
             } else {
                 $node = new \DOMElement($this->nodeName);
@@ -109,7 +110,7 @@ class XMLFormatter extends AbstractFormatter
                 $newNode = $node->appendChild(new \DOMElement($key));
                 $this->recursiveBuild($entry, $newNode);
             } else {
-                $inputNode = new \DOMElement($this->rowName);
+                $inputNode = new \DOMElement($this->nodeName);
                 $node->appendChild($inputNode);
 
                 /** @var \DOMElement $lastChild */
@@ -129,8 +130,57 @@ class XMLFormatter extends AbstractFormatter
      */
     public function decode($rawData)
     {
+        $raw = $this->rawDecode($rawData);
+
+        return (new FormatterData())->setData($this->recursiveDecode($raw));
+    }
+
+    public function recursiveDecode(array &$data, array &$parent = null)
+    {
+        $row = [];
+
+        foreach ($data as $name => &$child) {
+            if (is_array($child)) {
+                $data = $this->recursiveDecode($child, $data);
+            }
+
+            if ($name === "name" || $name === "value") {
+                $row[$name] = $this->getValue($name, $data);
+            }
+
+            if (count($row) == 2) {
+                reset($parent);
+
+                if (is_int($key = key($parent))) {
+                    $parent[$row["name"]] = $row["value"];
+                    unset($parent[$key]);
+                } else {
+                    $data[$row["name"]] = $row["value"];
+                }
+
+                $row=[];
+            }
+        }
+
+        return $parent === null ? $data : $parent;
+    }
+
+    public function getValue($name, array &$data) {
+        $value = $data[$name];
+        unset ($data[$name]);
+
+        return $value;
+    }
+
+    /**
+     * @param $rawData
+     * @return array
+     * @throws \Thelia\Core\FileFormat\Formatter\Exception\BadFormattedStringException
+     */
+    public function rawDecode($rawData)
+    {
         try {
-            $xml = new \SimpleXMLElement($rawData);
+            $xml = new SimpleXMLElement($rawData);
         } catch (\Exception $e) {
             $errorMessage = $this->translator->trans(
                 "You tried to load a bad formatted XML"
@@ -145,16 +195,40 @@ class XMLFormatter extends AbstractFormatter
             );
         }
 
-        $array = json_decode(json_encode($xml),true);
+        $array = [];
 
-        if (isset($array[$this->nodeName])) {
-            $array += $array[$this->nodeName];
-            unset($array[$this->nodeName]);
+        foreach ($xml->children() as $child) {
+            $this->recursiveRawDecode($array, $child);
         }
 
-        $data = new FormatterData();
+        return $array;
+    }
 
-        return $data->setData($array);
+    protected function recursiveRawDecode(array &$data, \SimpleXMLElement $node)
+    {
+        if ($node->count()) {
+            if (!array_key_exists($node->getName(), $data)) {
+                $data[$node->getName()] = [];
+            }
+            $row = &$data[$node->getName()];
+
+            foreach ($node->children() as $child) {
+                $this->recursiveRawDecode($row, $child);
+            }
+        } else {
+            $newRow = array();
+
+            /** @var SimpleXMLElement $attribute */
+            foreach ($node->attributes() as $attribute) {
+                $newRow[$attribute->getName()] = $node->getAttributeAsPhp($attribute->getName());
+            }
+
+            if ($node->getName() === $this->nodeName) {
+                $data[] = $newRow;
+            } else {
+                $data[$node->getName()] = $newRow;
+            }
+        }
     }
 
     public function getHandledType()

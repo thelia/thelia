@@ -62,8 +62,15 @@ class XMLFormatterTest extends \PHPUnit_Framework_TestCase
         );
 
         $dom = new \DOMDocument("1.0");
-        $dom->appendChild(new \DOMElement("data"))
-            ->appendChild(new \DOMElement("foo", "bar"));
+
+        /** @var \DOMElement $node */
+        $node =$dom->appendChild(new \DOMElement($this->formatter->root))
+            ->appendChild(new \DOMElement($this->formatter->nodeName));
+
+        $node->setAttribute("name", "foo");
+        $node->setAttribute("value", "bar");
+
+
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
 
@@ -76,7 +83,6 @@ class XMLFormatterTest extends \PHPUnit_Framework_TestCase
     public function testComplexEncode()
     {
         $data = new FormatterData();
-        $this->formatter->nodeName = "baz";
 
         $data->setData(
             [
@@ -97,18 +103,29 @@ class XMLFormatterTest extends \PHPUnit_Framework_TestCase
         );
 
         $dom = new \DOMDocument("1.0");
-        $base = $dom->appendChild(new \DOMElement("data"));
-        $base->appendChild(new \DOMElement("foo", "bar"));
+        $base = $dom->appendChild(new \DOMElement($this->formatter->root));
+        /** @var \DOMElement $node */
+        $node = $base->appendChild(new \DOMElement($this->formatter->nodeName));
+        $node->setAttribute("name", "foo");
+        $node->setAttribute("value", "bar");
 
-        $baz = $base->appendChild(new \DOMElement("baz"));
-        $baz->appendChild(new \DOMElement("name", "banana"));
-        $baz->appendChild(new \DOMElement("type", "fruit"));
+        $baz = $base->appendChild(new \DOMElement($this->formatter->rowName));
+        $node = $baz->appendChild(new \DOMElement($this->formatter->nodeName));
+        $node->setAttribute("name", "name");
+        $node->setAttribute("value", "banana");
+        $node = $baz->appendChild(new \DOMElement($this->formatter->nodeName));
+        $node->setAttribute("name", "type");
+        $node->setAttribute("value", "fruit");
 
-        $baz = $base->appendChild(new \DOMElement("baz"));
+        $baz = $base->appendChild(new \DOMElement($this->formatter->rowName));
         $orange = $baz->appendChild(new \DOMElement("orange"));
-        $orange->appendChild(new \DOMElement("type","fruit"));
+        $node = $orange->appendChild(new \DOMElement($this->formatter->nodeName));
+        $node->setAttribute("name","type");
+        $node->setAttribute("value","fruit");
         $banana = $baz->appendChild(new \DOMElement("banana"));
-        $banana->appendChild(new \DOMElement("like", "Yes"));
+        $node = $banana->appendChild(new \DOMElement($this->formatter->nodeName));
+        $node->setAttribute("name", "like");
+        $node->setAttribute("value", "Yes");
 
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
@@ -122,8 +139,12 @@ class XMLFormatterTest extends \PHPUnit_Framework_TestCase
     public function testSimpleDecode()
     {
         $dom = new \DOMDocument("1.0");
-        $dom->appendChild(new \DOMElement("data"))
-            ->appendChild(new \DOMElement("foo", "bar"));
+        $node =$dom->appendChild(new \DOMElement($this->formatter->root))
+            ->appendChild(new \DOMElement($this->formatter->nodeName));
+
+        $node->setAttribute("name", "foo");
+        $node->setAttribute("value", "bar");
+
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
 
@@ -131,46 +152,85 @@ class XMLFormatterTest extends \PHPUnit_Framework_TestCase
 
         $data = $this->formatter->decode($raw);
 
+        var_dump($data->getData());
+
         $this->assertEquals(["foo" => "bar"], $data->getData());
     }
 
     public function testComplexDecode()
     {
         $expectedData =
-        [
+            [
+                [
+                    "name" => "foo",
+                    "value" => "bar",
+                ],
+                "row" => [
+                    [
+                        "name" => "fruit",
+                        "value" => "banana",
+                    ],
+                    [
+                        "name" => "type",
+                        "value" => "fruit",
+                    ],
+                    "orange"=> [
+                        [
+                            "name" => "type",
+                            "value" => "fruit",
+                        ]
+                    ],
+                    "banana"=> [
+                        [
+                            "name" => "like",
+                            "value" => "Yes",
+                        ]
+                    ]
+                ]
+            ];
+
+        $dom = new \DOMDocument("1.0");
+        $base = $dom->appendChild(new \DOMElement($this->formatter->root));
+        /** @var \DOMElement $node */
+        $node = $base->appendChild(new \DOMElement($this->formatter->nodeName));
+        $node->setAttribute("name", "foo");
+        $node->setAttribute("value", "bar");
+
+        $baz = $base->appendChild(new \DOMElement($this->formatter->rowName));
+        $node = $baz->appendChild(new \DOMElement($this->formatter->nodeName));
+        $node->setAttribute("name", "fruit");
+        $node->setAttribute("value", "banana");
+        $node = $baz->appendChild(new \DOMElement($this->formatter->nodeName));
+        $node->setAttribute("name", "type");
+        $node->setAttribute("value", "fruit");
+
+        $baz = $base->appendChild(new \DOMElement($this->formatter->rowName));
+        $orange = $baz->appendChild(new \DOMElement("orange"));
+        $node = $orange->appendChild(new \DOMElement($this->formatter->nodeName));
+        $node->setAttribute("name","type");
+        $node->setAttribute("value","fruit");
+        $banana = $baz->appendChild(new \DOMElement("banana"));
+        $node = $banana->appendChild(new \DOMElement($this->formatter->nodeName));
+        $node->setAttribute("name", "like");
+        $node->setAttribute("value", "Yes");
+
+        $data = $this->formatter->rawDecode($dom->saveXML());
+        $this->assertEquals($expectedData, $data);
+
+        $expectedData = [
             "foo" => "bar",
-            [
-                "name" => "banana",
+            "row" => [
+                "fruit" => "banana",
                 "type" => "fruit",
-            ],
-            [
                 "orange"=>[
                     "type" => "fruit"
                 ],
                 "banana"=>[
                     "like" => "Yes"
                 ]
-            ]
+            ],
         ];
 
-        $dom = new \DOMDocument("1.0");
-        $base = $dom->appendChild(new \DOMElement("data"));
-        $base->appendChild(new \DOMElement("foo", "bar"));
-
-        $baz = $base->appendChild(new \DOMElement("baz"));
-        $baz->appendChild(new \DOMElement("name", "banana"));
-        $baz->appendChild(new \DOMElement("type", "fruit"));
-
-        $baz = $base->appendChild(new \DOMElement("baz"));
-        $orange = $baz->appendChild(new \DOMElement("orange"));
-        $orange->appendChild(new \DOMElement("type","fruit"));
-        $banana = $baz->appendChild(new \DOMElement("banana"));
-        $banana->appendChild(new \DOMElement("like", "Yes"));
-
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-
-        $this->formatter->nodeName = "baz";
         $data = $this->formatter->decode($dom->saveXML());
 
         $this->assertEquals($expectedData, $data->getData());
