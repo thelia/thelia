@@ -146,4 +146,8 @@ class ImportExport extends ActionEvent
         return $this->content;
     }
 
+    public function isArchive()
+    {
+        return $this->archiveBuilder !== null;
+    }
 }
