@@ -25,6 +25,7 @@ use Thelia\Exception\TaxEngineException;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Model\ConfigQuery;
 
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
@@ -189,6 +190,8 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
                 ->set("PROMO_PRICE"       , $promoPrice)
                 ->set("PROMO_PRICE_TAX"   , $taxedPromoPrice - $promoPrice)
                 ->set("TAXED_PROMO_PRICE" , $taxedPromoPrice);
+            $loopResultRow
+                ->set("AVAILABLE_STOCK" , ConfigQuery::checkAvailableStock());
 
             $loopResult->addRow($loopResultRow);
         }
