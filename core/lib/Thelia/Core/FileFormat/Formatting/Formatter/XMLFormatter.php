@@ -152,7 +152,7 @@ class XMLFormatter extends AbstractFormatter
             unset($array[$this->nodeName]);
         }
 
-        $data = new FormatterData($this->getAliases());
+        $data = new FormatterData();
 
         return $data->setData($array);
     }

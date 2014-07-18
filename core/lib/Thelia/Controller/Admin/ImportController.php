@@ -141,7 +141,7 @@ class ImportController extends BaseAdminController
                 /**
                  * If the file is an archive
                  */
-                $archiveBuilder->loadArchive($file->getPathname());
+                $archiveBuilder = $archiveBuilder->loadArchive($file->getPathname());
                 $content = null;
 
                 /**
@@ -193,7 +193,7 @@ class ImportController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::IMPORT_AFTER_DECODE, $event);
 
-            $data = $formatter->decode($content);
+            $data = $formatter->decode($event->getContent());
 
             $event->setContent(null)->setData($data);
             $this->dispatch(TheliaEvents::IMPORT_AFTER_DECODE, $event);

@@ -139,7 +139,7 @@ class FormatterData
      * @param array $data
      * @param array $aliases
      */
-    protected function applyAliases(array $data, array $aliases)
+    public function applyAliases(array $data, array $aliases)
     {
         $formattedData = [];
 
