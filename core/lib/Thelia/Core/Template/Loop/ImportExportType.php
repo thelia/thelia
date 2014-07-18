@@ -13,6 +13,7 @@
 namespace Thelia\Core\Template\Loop;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Exception\ClassNotFoundException;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -48,15 +49,20 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
                 $this->getBaseUrl() . DS . $type->getId()
             );
 
-            $loopResultRow
-                ->set("ID", $type->getId())
-                ->set("TITLE", $type->getVirtualColumn("i18n_TITLE"))
-                ->set("DESCRIPTION", $type->getVirtualColumn("i18n_DESCRIPTION"))
-                ->set("URL", $url)
-                ->set("POSITION", $type->getPosition())
-                ->set("CATEGORY_ID", $type->getByName($this->getCategoryName()))
-                ->set("HANDLE_CLASS", $type->getHandleClass())
-            ;
+            try {
+                $loopResultRow
+                    ->set("HANDLE_CLASS", $type->getHandleClass())
+                    ->set("ID", $type->getId())
+                    ->set("TITLE", $type->getVirtualColumn("i18n_TITLE"))
+                    ->set("DESCRIPTION", $type->getVirtualColumn("i18n_DESCRIPTION"))
+                    ->set("URL", $url)
+                    ->set("POSITION", $type->getPosition())
+                    ->set("CATEGORY_ID", $type->getByName($this->getCategoryName()))
+                ;
+            } catch(ClassNotFoundException $e) {
+
+            } catch(\ErrorException $e) {}
+
 
             $loopResult->addRow($loopResultRow);
         }

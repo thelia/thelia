@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\DocumentsExportInterface;
@@ -110,6 +111,8 @@ class Export extends BaseExport
         }
 
         if (!class_exists($class)) {
+            $this->delete();
+
             throw new \ErrorException(
                 Translator::getInstance()->trans(
                     "The class \"%class\" doesn't exist",
@@ -123,6 +126,8 @@ class Export extends BaseExport
         $instance = new $class($container);
 
         if (!$instance instanceof ExportHandler) {
+            $this->delete();
+
             throw new \ErrorException(
                 Translator::getInstance()->trans(
                     "The class \"%class\" must extend %baseClass",
@@ -136,6 +141,28 @@ class Export extends BaseExport
 
         return static::$cache = $instance;
     }
+
+    /**
+     * @param ConnectionInterface $con
+     *
+     * Handle the position of other exports
+     */
+    public function delete(ConnectionInterface $con = null)
+    {
+        $imports = ExportQuery::create()
+            ->filterByPosition($this->getPosition(), Criteria::GREATER_THAN)
+            ->find()
+        ;
+
+        foreach ($imports as $import) {
+            $import->setPosition($import->getPosition() - 1);
+        }
+
+        $imports->save();
+
+        parent::delete($con);
+    }
+
 
     public function hasImages(ContainerInterface $container)
     {

@@ -2,11 +2,17 @@
 
 namespace Thelia\Model;
 
+use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Exception\ClassNotFoundException;
+use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Import\ImportHandler;
 use Thelia\Model\Base\Import as BaseImport;
+use Thelia\Model\ImportQuery as ChildImportQuery;
 use Thelia\Model\Map\ImportTableMap;
 
 class Import extends BaseImport
@@ -102,7 +108,9 @@ class Import extends BaseImport
         $class = $this->getHandleClass();
 
         if (!class_exists($class)) {
-            throw new \ErrorException(
+            $this->delete();
+
+            throw new ClassNotFoundException(
                 Translator::getInstance()->trans(
                     "The class \"%class\" doesn't exist",
                     [
@@ -115,6 +123,8 @@ class Import extends BaseImport
         $instance = new $class($container);
 
         if (!$instance instanceof ImportHandler) {
+            $this->delete();
+
             throw new \ErrorException(
                 Translator::getInstance()->trans(
                     "The class \"%class\" must extend %baseClass",
@@ -128,4 +138,27 @@ class Import extends BaseImport
 
         return $instance;
     }
+
+    /**
+     * @param ConnectionInterface $con
+     *
+     * Handle the position of other imports
+     */
+    public function delete(ConnectionInterface $con = null)
+    {
+        $imports = ImportQuery::create()
+            ->filterByPosition($this->getPosition(), Criteria::GREATER_THAN)
+            ->find()
+        ;
+
+        foreach ($imports as $import) {
+            $import->setPosition($import->getPosition() - 1);
+        }
+
+        $imports->save();
+
+        parent::delete($con);
+    }
+
+
 }
