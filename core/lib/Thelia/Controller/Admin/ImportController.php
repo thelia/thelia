@@ -13,7 +13,11 @@
 namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\ImportExport as ImportExportEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
+use Thelia\Core\FileFormat\Archive\ArchiveBuilderManager;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilderManagerTrait;
+use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
+use Thelia\Core\FileFormat\Formatting\FormatterManager;
 use Thelia\Core\FileFormat\Formatting\FormatterManagerTrait;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
@@ -22,6 +26,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Import as ImportLoop;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ImportForm;
+use Thelia\ImportExport\Import\ImportHandler;
 use Thelia\Model\ImportCategoryQuery;
 use Thelia\Model\ImportQuery;
 
@@ -61,6 +66,7 @@ class ImportController extends BaseAdminController
 
         $archiveBuilderManager = $this->getArchiveBuilderManager($this->container);
         $formatterManager = $this->getFormatterManager($this->container);
+        $handler = $import->getHandleClassInstance($this->container);
 
         /**
          * Get needed services
@@ -80,96 +86,32 @@ class ImportController extends BaseAdminController
              * We have to check the extension manually because of composed file formats as tar.gz or tar.bz2
              */
             $name = $file->getClientOriginalName();
-            $nameLength = strlen($name);
+
+            $tools = $this->retrieveFormatTools(
+                $name,
+                $handler,
+                $formatterManager,
+                $archiveBuilderManager
+            );
 
 
-            $handler = $import->getHandleClassInstance($this->container);
-            $types = $handler->getHandledTypes();
+            /** @var AbstractArchiveBuilder $archiveBuilder */
+            $archiveBuilder = $tools["archive_builder"];
 
-            $formats =
-                $formatterManager->getExtensionsByTypes($types, true) +
-                $archiveBuilderManager->getExtensions(true)
-            ;
-
-            $uploadFormat = null;
-
-            /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
-            $formatter = null;
-
-            /** @var \Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder $archiveBuilder */
-            $archiveBuilder = null;
-
-            foreach ($formats as $objectName => $format) {
-                $formatLength = strlen($format);
-                $formatExtension = substr($name, -$formatLength);
-
-                if ($nameLength >= $formatLength  && $formatExtension === $format) {
-                    $uploadFormat = $format;
-
-
-                    try {
-                        $formatter = $formatterManager->get($objectName);
-                    } catch(\OutOfBoundsException $e) {}
-
-                    try {
-                        $archiveBuilder = $archiveBuilderManager->get($objectName);
-                    } catch(\OutOfBoundsException $e) {}
-
-                    break;
-                }
-            }
-
-            $splitName = explode(".", $name);
-            $ext = "";
-
-            if (1 < $limit = count($splitName)) {
-                $ext = "." . $splitName[$limit-1];
-            }
-
-            if ($uploadFormat === null) {
-                throw new FormValidationException(
-                    $this->getTranslator()->trans(
-                        "The extension \"%ext\" is not allowed",
-                        [
-                            "%ext" => $ext
-                        ]
-                    )
-                );
-            }
+            /** @var AbstractFormatter $formatter */
+            $formatter = $tools["formatter"];
 
             if ($archiveBuilder !== null) {
                 /**
-                 * If the file is an archive
+                 * If the file is an archive, load it and try to find the file.
                  */
                 $archiveBuilder = $archiveBuilder->loadArchive($file->getPathname());
-                $content = null;
 
-                /**
-                 * Check expected file names for each formatter
-                 */
-
-                $fileNames = [];
-                /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
-                foreach ($formatterManager->getFormattersByTypes($types) as $formatter) {
-                    $fileName = $formatter::FILENAME . "." . $formatter->getExtension();
-                    $fileNames[] = $fileName;
-
-                    if ($archiveBuilder->hasFile($fileName)) {
-                        $content = $archiveBuilder->getFileContent($fileName);
-                        break;
-                    }
-                }
-
-                if ($content === null) {
-                    throw new \ErrorException(
-                        $this->getTranslator()->trans(
-                            "Your archive must contain one of these file and doesn't: %files",
-                            [
-                                "%files" => implode(", ", $fileNames),
-                            ]
-                        )
-                    );
-                }
+                $content = $this->getFileContentInArchive(
+                    $archiveBuilder,
+                    $formatterManager,
+                    $tools["types"]
+                );
             } elseif ($formatter !== null) {
                 /**
                  * If the file isn't an archive
@@ -182,36 +124,21 @@ class ImportController extends BaseAdminController
                         "There's a problem, the extension \"%ext\" has been found, ".
                         "but has no formatters nor archive builder",
                         [
-                            "%ext" => $ext
+                            "%ext" => $tools["extension"],
                         ]
                     )
                 );
             }
 
-            $event = new ImportExportEvent($formatter, $handler, null, $archiveBuilder);
-            $event->setContent($content);
-
-            $this->dispatch(TheliaEvents::IMPORT_AFTER_DECODE, $event);
-
-            $data = $formatter->decode($event->getContent());
-
-            $event->setContent(null)->setData($data);
-            $this->dispatch(TheliaEvents::IMPORT_AFTER_DECODE, $event);
-
-            $errors = $handler->retrieveFromFormatterData($data);
-
-            if (!empty($errors)) {
-                throw new \Exception(
-                    $this->getTranslator()->trans(
-                        "Errors occurred while importing the file: %errors",
-                        [
-                            "%errors" => implode(", ", $errors),
-                        ]
-                    )
-                );
-            }
-
-            $successMessage = $this->getTranslator()->trans("Import successfully done");
+            /**
+             * Process the import: dispatch events, format the file content and let the handler do it's job.
+             */
+            $successMessage = $this->processImport(
+                $content,
+                $handler,
+                $formatter,
+                $archiveBuilder
+            );
 
         } catch(FormValidationException $e) {
             $errorMessage = $this->createStandardFormValidationErrorMessage($e);
@@ -233,6 +160,149 @@ class ImportController extends BaseAdminController
         }
 
         return $this->importView($id);
+    }
+
+    protected function getFileContentInArchive(
+        AbstractArchiveBuilder $archiveBuilder,
+        FormatterManager $formatterManager,
+        array $types
+    ) {
+        $content = null;
+
+        /**
+         * Check expected file names for each formatter
+         */
+
+        $fileNames = [];
+        /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
+        foreach ($formatterManager->getFormattersByTypes($types) as $formatter) {
+            $fileName = $formatter::FILENAME . "." . $formatter->getExtension();
+            $fileNames[] = $fileName;
+
+            if ($archiveBuilder->hasFile($fileName)) {
+                $content = $archiveBuilder->getFileContent($fileName);
+                break;
+            }
+        }
+
+        if ($content === null) {
+            throw new \ErrorException(
+                $this->getTranslator()->trans(
+                    "Your archive must contain one of these file and doesn't: %files",
+                    [
+                        "%files" => implode(", ", $fileNames),
+                    ]
+                )
+            );
+        }
+
+        return $content;
+    }
+
+    protected function retrieveFormatTools(
+        $fileName,
+        ImportHandler $handler,
+        FormatterManager $formatterManager,
+        ArchiveBuilderManager $archiveBuilderManager
+    ) {
+        $nameLength = strlen($fileName);
+
+        $types = $handler->getHandledTypes();
+
+        $formats =
+            $formatterManager->getExtensionsByTypes($types, true) +
+            $archiveBuilderManager->getExtensions(true)
+        ;
+
+        $uploadFormat = null;
+
+        /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
+        $formatter = null;
+
+        /** @var \Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder $archiveBuilder */
+        $archiveBuilder = null;
+
+        foreach ($formats as $objectName => $format) {
+            $formatLength = strlen($format);
+            $formatExtension = substr($fileName, -$formatLength);
+
+            if ($nameLength >= $formatLength  && $formatExtension === $format) {
+                $uploadFormat = $format;
+
+
+                try {
+                    $formatter = $formatterManager->get($objectName);
+                } catch(\OutOfBoundsException $e) {}
+
+                try {
+                    $archiveBuilder = $archiveBuilderManager->get($objectName);
+                } catch(\OutOfBoundsException $e) {}
+
+                break;
+            }
+        }
+
+        $this->checkFileExtension($fileName, $uploadFormat);
+
+        return array(
+            "formatter" => $formatter,
+            "archive_builder" => $archiveBuilder,
+            "extension" => $uploadFormat,
+            "types" => $types,
+        );
+    }
+
+    protected function checkFileExtension($fileName, $uploadFormat)
+    {
+        $splitName = explode(".", $fileName);
+        $ext = "";
+
+        if (1 < $limit = count($splitName)) {
+            $ext = "." . $splitName[$limit-1];
+        }
+
+        if ($uploadFormat === null) {
+            throw new FormValidationException(
+                $this->getTranslator()->trans(
+                    "The extension \"%ext\" is not allowed",
+                    [
+                        "%ext" => $ext
+                    ]
+                )
+            );
+        }
+    }
+
+    protected function processImport(
+        $content,
+        ImportHandler $handler,
+        AbstractFormatter $formatter = null,
+        AbstractArchiveBuilder $archiveBuilder = null
+    ) {
+        $event = new ImportExportEvent($formatter, $handler, null, $archiveBuilder);
+        $event->setContent($content);
+
+        $this->dispatch(TheliaEvents::IMPORT_AFTER_DECODE, $event);
+
+        $data = $formatter->decode($event->getContent());
+
+        $event->setContent(null)->setData($data);
+        $this->dispatch(TheliaEvents::IMPORT_AFTER_DECODE, $event);
+
+        $errors = $handler->retrieveFromFormatterData($data);
+
+        if (!empty($errors)) {
+            throw new \Exception(
+                $this->getTranslator()->trans(
+                    "Errors occurred while importing the file: %errors",
+                    [
+                        "%errors" => implode(", ", $errors),
+                    ]
+                )
+            );
+        }
+
+        return $this->getTranslator()->trans("Import successfully done");
     }
 
 
@@ -304,7 +374,7 @@ class ImportController extends BaseAdminController
          * Inject them in smarty
          */
         $parserContext
-            ->set( "ALLOWED_MIME_TYPES", implode(",", $mimeTypes))
+            ->set("ALLOWED_MIME_TYPES", implode(",", $mimeTypes))
             ->set("ALLOWED_EXTENSIONS", implode(", ", $formats))
         ;
 
