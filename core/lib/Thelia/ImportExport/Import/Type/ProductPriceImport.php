@@ -107,6 +107,7 @@ class ProductPriceImport extends ImportHandler
                 }
 
                 $price->save();
+                $this->importedRows++;
             }
         }
 

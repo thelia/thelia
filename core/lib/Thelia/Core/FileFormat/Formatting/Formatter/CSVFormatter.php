@@ -81,7 +81,6 @@ class CSVFormatter extends AbstractFormatter
         $delimiterLength = strlen($this->delimiter);
         $lineReturnLength = strlen($this->lineReturn);
 
-
         if (false !== $firstRow) {
             $rawKeys = array_keys($firstRow);
             $keys = [];
@@ -170,4 +169,4 @@ class CSVFormatter extends AbstractFormatter
     {
         return FormatType::TABLE;
     }
-} 
+}
