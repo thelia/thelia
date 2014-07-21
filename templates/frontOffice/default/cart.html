@@ -71,7 +71,7 @@
                             <div class="product-options">
                                 <dl class="dl-horizontal">
                                     <dt>{intl l="Available"} :</dt>
-                                    {if $STOCK > 0}
+                                    {if $STOCK > 0 || !$AVAILABLE_STOCK}
                                             <dd>{intl l="In Stock"}</dd>
                                         {else}
                                             <dd>{intl l="Out of Stock"}</dd>
@@ -102,7 +102,11 @@
                                     <input type="hidden" name="cart_item" value="{$ITEM_ID}">
                                     <div class="form-group">
                                         <select name="quantity" class="form-control" >
-                                            {for $will=1 to $STOCK}
+                                            {assign "stock" $STOCK}
+                                            {if !$AVAILABLE_STOCK}
+                                              {assign var="stock" value="10"}
+                                            {/if}
+                                            {for $will=1 to $stock}
                                                 <option {if $QUANTITY == $will}selected="selected"{/if}>{$will}</option>
                                             {/for}
                                         </select>
