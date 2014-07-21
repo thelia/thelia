@@ -7,7 +7,7 @@ UPDATE `config` SET `value`='3' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='' WHERE `name`='thelia_extra_version';
 
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
-('quantity-stock-default','10', 0, 0, NOW(), NOW());
+('default-available-stock','10', 0, 0, NOW(), NOW());
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`,  `created_at`, `updated_at`) VALUES
 ('store_description', '', 0, 0, NOW(), NOW());
 
