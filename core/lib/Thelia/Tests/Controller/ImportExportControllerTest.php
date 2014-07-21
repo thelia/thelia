@@ -49,7 +49,7 @@ abstract class ImportExportControllerTest extends ControllerTestBase
             ->add(new CSVFormatter())
         ;
 
-        $container->set("thelia.manager.formatter_manager", $archiveBuilderManager);
+        $container->set("thelia.manager.formatter_manager", $formatterManager);
     }
 
 } 

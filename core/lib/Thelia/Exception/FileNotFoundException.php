@@ -17,7 +17,7 @@ namespace Thelia\Exception;
  * @package Thelia\Exception
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class FileNotFoundException extends \Exception
+class FileNotFoundException extends \ErrorException
 {
 
 }

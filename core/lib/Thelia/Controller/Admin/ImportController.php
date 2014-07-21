@@ -24,6 +24,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Import as ImportLoop;
+use Thelia\Exception\FileNotFoundException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ImportForm;
 use Thelia\ImportExport\Import\ImportHandler;
@@ -160,7 +161,7 @@ class ImportController extends BaseAdminController
         return $this->importView($id);
     }
 
-    protected function getFileContentInArchive(
+    public function getFileContentInArchive(
         AbstractArchiveBuilder $archiveBuilder,
         FormatterManager $formatterManager,
         array $types
@@ -184,7 +185,7 @@ class ImportController extends BaseAdminController
         }
 
         if ($content === null) {
-            throw new \ErrorException(
+            throw new FileNotFoundException(
                 $this->getTranslator()->trans(
                     "Your archive must contain one of these file and doesn't: %files",
                     [
@@ -252,14 +253,14 @@ class ImportController extends BaseAdminController
 
     public function checkFileExtension($fileName, $uploadFormat)
     {
-        $splitName = explode(".", $fileName);
-        $ext = "";
-
-        if (1 < $limit = count($splitName)) {
-            $ext = "." . $splitName[$limit-1];
-        }
-
         if ($uploadFormat === null) {
+            $splitName = explode(".", $fileName);
+            $ext = "";
+
+            if (1 < $limit = count($splitName)) {
+                $ext = "." . $splitName[$limit-1];
+            }
+
             throw new FormValidationException(
                 $this->getTranslator()->trans(
                     "The extension \"%ext\" is not allowed",
