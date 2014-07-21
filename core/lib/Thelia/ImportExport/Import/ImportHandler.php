@@ -43,12 +43,22 @@ abstract class ImportHandler extends AbstractHandler
     protected function checkMandatoryColumns(array $row)
     {
         $mandatoryColumns = $this->getMandatoryColumns();
-        if ($mandatoryColumns !=  $keys = array_keys($row)) {
+        sort($mandatoryColumns);
+
+        $diff = [];
+
+        foreach ($mandatoryColumns as $name) {
+            if (!isset($row[$name]) || empty($row[$name])) {
+                $diff[] = $name;
+            }
+        }
+
+        if (!empty($diff)) {
             throw new \UnexpectedValueException(
                 $this->translator->trans(
                     "The following columns are missing: %columns",
                     [
-                        "%columns" => implode(", ", array_diff($keys, $mandatoryColumns)),
+                        "%columns" => implode(", ", $diff),
                     ]
                 )
             );
