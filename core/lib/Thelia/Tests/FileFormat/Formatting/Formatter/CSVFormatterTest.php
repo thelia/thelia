@@ -35,7 +35,7 @@ class CSVFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function testSimpleEncode()
     {
-        $expected = "\"ref\";\"stock\"\r\n\"foo\";\"bar\"";
+        $expected = "\"ref\";\"stock\"\n\"foo\";\"bar\"";
 
         $data = [
             [
@@ -86,7 +86,7 @@ class CSVFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function testSimpleDecode()
     {
-        $data = "\"ref\";\"stock\"\r\n\"foo\";\"bar\"";
+        $data = "\"ref\";\"stock\"\n\"foo\";\"bar\"";
 
         $expected = [
             [

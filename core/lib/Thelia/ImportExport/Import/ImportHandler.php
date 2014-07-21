@@ -21,6 +21,13 @@ use Thelia\ImportExport\AbstractHandler;
  */
 abstract class ImportHandler extends AbstractHandler
 {
+    protected $importedRows = 0;
+
+    public function getImportedRows()
+    {
+        return $this->importedRows;
+    }
+
     /**
      * @param \Thelia\Core\FileFormat\Formatting\FormatterData
      * @return string|array error messages

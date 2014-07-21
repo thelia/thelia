@@ -12,10 +12,8 @@
 
 namespace Thelia\Core\FileFormat\Formatting\Formatter;
 use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
-use Thelia\Core\FileFormat\Formatting\Exception\BadFormattedStringException;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
-use Thelia\Core\Translation\Translator;
 
 /**
  * Class CSVFormatter
@@ -25,7 +23,7 @@ use Thelia\Core\Translation\Translator;
 class CSVFormatter extends AbstractFormatter
 {
     public $delimiter = ";";
-    public $lineReturn = "\r\n";
+    public $lineReturn = "\n";
     public $stringDelimiter = "\"";
 
     /**
@@ -126,6 +124,7 @@ class CSVFormatter extends AbstractFormatter
 
         if (count($raw) > 0) {
             $keys = explode($this->delimiter, array_shift($raw));
+            $keysLength = count($keys);
 
             foreach ($keys as &$key) {
                 $key = trim($key, $this->stringDelimiter);
@@ -137,18 +136,19 @@ class CSVFormatter extends AbstractFormatter
                 $newRow = [];
                 $row = explode($this->delimiter, $row);
 
-                for ($i = 0; $i < $columns; ++$i) {
-                    $value = trim($row[$i], $this->stringDelimiter);
+                if (count($row) >= $keysLength) {
+                    for ($i = 0; $i < $columns; ++$i) {
+                        $value = trim($row[$i], $this->stringDelimiter);
 
-                    if (false !== $unserialized = @unserialize($row[$i])) {
-                        $value = $unserialized;
+                        if (false !== $unserialized = @unserialize($row[$i])) {
+                            $value = $unserialized;
+                        }
+
+                        $newRow[$keys[$i]] = $value;
                     }
 
-                    $newRow[$keys[$i]] = $value;
+                    $decoded[] = $newRow;
                 }
-
-                $decoded[] = $newRow;
-
             }
         }
 

@@ -25,6 +25,8 @@ use Thelia\Model\ProductSaleElementsQuery;
  */
 class ProductStockImport extends ImportHandler
 {
+
+
     /**
      * @param \Thelia\Core\FileFormat\Formatting\FormatterData
      * @return string|array error messages
@@ -35,6 +37,7 @@ class ProductStockImport extends ImportHandler
     {
         $errors = [];
         $translator = Translator::getInstance();
+
 
         while (null !== $row = $data->popRow()) {
             $obj = ProductSaleElementsQuery::create()->findOneByRef($row["ref"]);
@@ -50,11 +53,14 @@ class ProductStockImport extends ImportHandler
                 $errors[] = $errorMessage ;
             } else {
                 $obj->setQuantity($row["stock"])->save();
+                $this->importedRows++;
             }
         }
 
         return $errors;
     }
+
+
 
     /**
      * @return string|array

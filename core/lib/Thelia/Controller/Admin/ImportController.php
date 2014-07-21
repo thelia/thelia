@@ -301,7 +301,12 @@ class ImportController extends BaseAdminController
             );
         }
 
-        return $this->getTranslator()->trans("Import successfully done");
+        return $this->getTranslator()->trans(
+            "Import successfully done, %numb row(s) have been imported",
+            [
+                "%numb" => $handler->getImportedRows(),
+            ]
+        );
     }
 
     /**
