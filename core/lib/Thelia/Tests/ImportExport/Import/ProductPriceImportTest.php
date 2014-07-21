@@ -14,7 +14,7 @@ namespace Thelia\Tests\ImportExport\Import;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Controller\Admin\ImportController;
 use Thelia\Core\FileFormat\Formatting\Formatter\JsonFormatter;
-use Thelia\ImportExport\Import\Type\ProductPriceImport;
+use Thelia\ImportExport\Import\Type\ProductPricesImport;
 use Thelia\Model\Currency;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Tests\Controller\ControllerTestBase;
@@ -49,7 +49,7 @@ class ProductPriceImportTest extends ControllerTestBase
     {
         parent::setUp();
 
-        $this->import = new ProductPriceImport($this->container);
+        $this->import = new ProductPricesImport($this->container);
 
     }
 

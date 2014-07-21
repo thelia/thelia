@@ -22,11 +22,11 @@ use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 
 /**
- * Class ProductPriceImport
+ * Class ProductPricesImport
  * @package Thelia\ImportExport\Import\Type
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class ProductPriceImport extends ImportHandler
+class ProductPricesImport extends ImportHandler
 {
     /**
      * @return string|array
@@ -63,51 +63,53 @@ class ProductPriceImport extends ImportHandler
         $translator = Translator::getInstance();
 
         while (null !== $row = $data->popRow()) {
-            $obj = ProductSaleElementsQuery::create()->findOneByRef($row["ref"]);
+            if (count($row) > 1) {
+                $obj = ProductSaleElementsQuery::create()->findOneByRef($row["ref"]);
 
-            if ($obj === null) {
-                $errorMessage = $translator->trans(
-                    "The product sale element reference %ref doesn't exist",
-                    [
-                        "%ref" => $row["ref"]
-                    ]
-                );
+                if ($obj === null) {
+                    $errorMessage = $translator->trans(
+                        "The product sale element reference %ref doesn't exist",
+                        [
+                            "%ref" => $row["ref"]
+                        ]
+                    );
 
-                $errors[] = $errorMessage ;
-            } else {
+                    $errors[] = $errorMessage ;
+                } else {
 
-                $currency = null;
+                    $currency = null;
 
-                if (isset($row["currency"])) {
-                    $currency = CurrencyQuery::create()->findOneByCode($row["currency"]);
-                }
+                    if (isset($row["currency"])) {
+                        $currency = CurrencyQuery::create()->findOneByCode($row["currency"]);
+                    }
 
-                if ($currency === null) {
-                    $currency = Currency::getDefaultCurrency();
-                }
+                    if ($currency === null) {
+                        $currency = Currency::getDefaultCurrency();
+                    }
 
-                $price = ProductPriceQuery::create()
-                    ->filterByProductSaleElementsId($obj->getId())
-                    ->findOneByCurrencyId($currency->getId())
-                ;
-
-                if ($price === null) {
-                    $price = new ProductPrice();
-
-                    $price
-                        ->setProductSaleElements($obj)
-                        ->setCurrency($currency)
+                    $price = ProductPriceQuery::create()
+                        ->filterByProductSaleElementsId($obj->getId())
+                        ->findOneByCurrencyId($currency->getId())
                     ;
+
+                    if ($price === null) {
+                        $price = new ProductPrice();
+
+                        $price
+                            ->setProductSaleElements($obj)
+                            ->setCurrency($currency)
+                        ;
+                    }
+
+                    $price->setPrice($row["price"]);
+
+                    if (isset($row["promo_price"])) {
+                        $price->setPromoPrice($row["promo_price"]);
+                    }
+
+                    $price->save();
+                    $this->importedRows++;
                 }
-
-                $price->setPrice($row["price"]);
-
-                if (isset($row["promo_price"])) {
-                    $price->setPromoPrice($row["promo_price"]);
-                }
-
-                $price->save();
-                $this->importedRows++;
             }
         }
 
