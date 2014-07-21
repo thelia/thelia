@@ -63,57 +63,67 @@ class ProductPricesImport extends ImportHandler
         $translator = Translator::getInstance();
 
         while (null !== $row = $data->popRow()) {
-            if (count($row) > 1) {
-                $obj = ProductSaleElementsQuery::create()->findOneByRef($row["ref"]);
 
-                if ($obj === null) {
-                    $errorMessage = $translator->trans(
-                        "The product sale element reference %ref doesn't exist",
-                        [
-                            "%ref" => $row["ref"]
-                        ]
-                    );
+            $this->checkMandatoryColumns($row);
 
-                    $errors[] = $errorMessage ;
-                } else {
+            $obj = ProductSaleElementsQuery::create()->findOneByRef($row["ref"]);
 
-                    $currency = null;
+            if ($obj === null) {
+                $errorMessage = $translator->trans(
+                    "The product sale element reference %ref doesn't exist",
+                    [
+                        "%ref" => $row["ref"]
+                    ]
+                );
 
-                    if (isset($row["currency"])) {
-                        $currency = CurrencyQuery::create()->findOneByCode($row["currency"]);
-                    }
+                $errors[] = $errorMessage ;
+            } else {
 
-                    if ($currency === null) {
-                        $currency = Currency::getDefaultCurrency();
-                    }
+                $currency = null;
 
-                    $price = ProductPriceQuery::create()
-                        ->filterByProductSaleElementsId($obj->getId())
-                        ->findOneByCurrencyId($currency->getId())
-                    ;
-
-                    if ($price === null) {
-                        $price = new ProductPrice();
-
-                        $price
-                            ->setProductSaleElements($obj)
-                            ->setCurrency($currency)
-                        ;
-                    }
-
-                    $price->setPrice($row["price"]);
-
-                    if (isset($row["promo_price"])) {
-                        $price->setPromoPrice($row["promo_price"]);
-                    }
-
-                    $price->save();
-                    $this->importedRows++;
+                if (isset($row["currency"])) {
+                    $currency = CurrencyQuery::create()->findOneByCode($row["currency"]);
                 }
+
+                if ($currency === null) {
+                    $currency = Currency::getDefaultCurrency();
+                }
+
+                $price = ProductPriceQuery::create()
+                    ->filterByProductSaleElementsId($obj->getId())
+                    ->findOneByCurrencyId($currency->getId())
+                ;
+
+                if ($price === null) {
+                    $price = new ProductPrice();
+
+                    $price
+                        ->setProductSaleElements($obj)
+                        ->setCurrency($currency)
+                    ;
+                }
+
+                $price->setPrice($row["price"]);
+
+                if (isset($row["promo_price"])) {
+                    $price->setPromoPrice($row["promo_price"]);
+                }
+
+                $price->save();
+                $this->importedRows++;
             }
         }
 
         return $errors;
     }
+
+    /**
+     * @return array The mandatory columns to have for import
+     */
+    protected function getMandatoryColumns()
+    {
+        return ["ref", "price"];
+    }
+
 
 }

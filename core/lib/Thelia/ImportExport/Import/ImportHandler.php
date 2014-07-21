@@ -11,7 +11,9 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Import;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
+use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\AbstractHandler;
 
 /**
@@ -23,10 +25,40 @@ abstract class ImportHandler extends AbstractHandler
 {
     protected $importedRows = 0;
 
+    /** @var Translator */
+    protected $translator;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->translator = Translator::getInstance();
+
+        parent::__construct($container);
+    }
+
     public function getImportedRows()
     {
         return $this->importedRows;
     }
+
+    protected function checkMandatoryColumns(array $row)
+    {
+        $mandatoryColumns = $this->getMandatoryColumns();
+        if ($mandatoryColumns !=  $keys = array_keys($row)) {
+            throw new \UnexpectedValueException(
+                $this->translator->trans(
+                    "The following columns are missing: %columns",
+                    [
+                        "%columns" => implode(", ", array_diff($keys, $mandatoryColumns)),
+                    ]
+                )
+            );
+        }
+    }
+
+    /**
+     * @return array The mandatory columns to have for import
+     */
+    abstract protected function getMandatoryColumns();
 
     /**
      * @param \Thelia\Core\FileFormat\Formatting\FormatterData
@@ -35,4 +67,4 @@ abstract class ImportHandler extends AbstractHandler
      * The method does the import routine from a FormatterData
      */
     abstract public function retrieveFromFormatterData(FormatterData $data);
-} 
+}

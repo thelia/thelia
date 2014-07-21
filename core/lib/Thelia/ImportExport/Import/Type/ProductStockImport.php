@@ -11,7 +11,6 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Import\Type;
-use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\Translation\Translator;
 use Thelia\Core\FileFormat\FormatType;
@@ -36,23 +35,28 @@ class ProductStockImport extends ImportHandler
     public function retrieveFromFormatterData(FormatterData $data)
     {
         $errors = [];
-        $translator = Translator::getInstance();
-
 
         while (null !== $row = $data->popRow()) {
+            /**
+             * Check for mandatory columns
+             */
+            $this->checkMandatoryColumns($row);
+
             $obj = ProductSaleElementsQuery::create()->findOneByRef($row["ref"]);
 
             if ($obj === null) {
-                $errorMessage = $translator->trans(
+                $errors[] = $this->translator->trans(
                     "The product sale element reference %ref doesn't exist",
                     [
                         "%ref" => $row["ref"]
                     ]
                 );
-
-                $errors[] = $errorMessage ;
             } else {
-                $obj->setQuantity($row["stock"])->save();
+                $obj
+                    ->setQuantity($row["stock"])
+                    ->setEanCode($row["ean"])
+                    ->save()
+                ;
                 $this->importedRows++;
             }
         }
@@ -60,7 +64,10 @@ class ProductStockImport extends ImportHandler
         return $errors;
     }
 
-
+    protected function getMandatoryColumns()
+    {
+        return ["ref", "stock", "ean"];
+    }
 
     /**
      * @return string|array
