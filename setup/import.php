@@ -71,12 +71,13 @@ try {
         ->setAttribute($color)
         ->save($con);
 
+    /*
     $ft = new Thelia\Model\FeatureTemplate();
-
     $ft
         ->setTemplate($template)
         ->setFeature($material)
         ->save($con);
+    */
     echo "end creating templates\n";
 
     createProduct($faker, $categories, $brands, $contents, $template, $color, $material, $con);
