@@ -19,7 +19,7 @@ use Thelia\ImportExport\Import\ImportHandler;
 use Thelia\Model\ProductSaleElementsQuery;
 
 /**
- * Class ImportTestBase
+ * Class ControllerTestBase
  * @package Thelia\ImportExport\Import
  * @author Benjamin Perche <bperche@openstudio.fr>
  */

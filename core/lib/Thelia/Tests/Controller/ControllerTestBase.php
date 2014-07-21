@@ -10,8 +10,9 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Tests\ImportExport\Import;
+namespace Thelia\Tests\Controller;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Controller\Admin\ImportController;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder;
@@ -27,11 +28,11 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 
 /**
- * Class ImportTestBase
+ * Class ControllerTestBase
  * @package Thelia\Tests\ImportExport\Import
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class ImportTestBase extends \PHPUnit_Framework_TestCase
+abstract class ControllerTestBase extends \PHPUnit_Framework_TestCase
 {
     protected $import;
 
@@ -50,20 +51,7 @@ class ImportTestBase extends \PHPUnit_Framework_TestCase
 
         $container->set("event_dispatcher", $dispatcher);
 
-        $archiveBuilderManager = (new ArchiveBuilderManager("dev"))
-            ->add(new ZipArchiveBuilder())
-            ->add(new TarArchiveBuilder())
-            ->add(new TarBz2ArchiveBuilder())
-            ->add(new TarGzArchiveBuilder())
-        ;
-        $container->set("thelia.manager.archive_builder_manager", $archiveBuilderManager);
-
-        $formatterManager = (new FormatterManager())
-            ->add(new XMLFormatter())
-            ->add(new JsonFormatter())
-        ;
-
-        $container->set("thelia.manager.formatter_manager", $archiveBuilderManager);
+        $this->buildContainer($container);
 
         $request = new Request();
         $request->setSession($this->session);
@@ -85,9 +73,19 @@ class ImportTestBase extends \PHPUnit_Framework_TestCase
 
         $this->session = $this->getSession();
         $this->container = $this->getContainer();
-        $this->controller = new ImportController();
+        $this->controller = $this->getController();
         $this->controller->setContainer($this->container);
 
     }
+
+    /**
+     * @return \Thelia\Controller\BaseController The controller you want to test
+     */
+    abstract function getController();
+
+    /**
+     * Use this method to build the container with the services that you need.
+     */
+    abstract function buildContainer(ContainerBuilder $container);
 
 } 

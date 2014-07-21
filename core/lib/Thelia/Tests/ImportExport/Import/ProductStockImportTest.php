@@ -14,15 +14,14 @@ namespace Thelia\Tests\ImportExport\Import;
 use Thelia\Core\FileFormat\Formatting\Formatter\JsonFormatter;
 use Thelia\ImportExport\Import\Type\ProductStockImport;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Tests\Controller\ControllerTestBase;
 
 /**
- * Class ProductStockImportTest
+ * Class ProductStockControllerTest
  * @package Thelia\Tests\ImportExport\Import
  * @author Benjamin Perche <bperche@openstudio.fr>
- *
- * This class tests the import controller too
  */
-class ProductStockImportTest extends ImportTestBase
+class ProductStockControllerTest extends ControllerTestBase
 {
     public function setUp()
     {
