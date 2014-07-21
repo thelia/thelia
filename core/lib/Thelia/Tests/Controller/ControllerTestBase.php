@@ -13,6 +13,7 @@
 namespace Thelia\Tests\Controller;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Controller\Admin\ImportController;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder;
@@ -36,7 +37,10 @@ abstract class ControllerTestBase extends \PHPUnit_Framework_TestCase
 {
     protected $import;
 
+    /** @var ContainerInterface */
     protected $container;
+
+    /** @var  Session */
     protected $session;
 
     /** @var ImportController  */
@@ -51,12 +55,12 @@ abstract class ControllerTestBase extends \PHPUnit_Framework_TestCase
 
         $container->set("event_dispatcher", $dispatcher);
 
-        $this->buildContainer($container);
-
         $request = new Request();
         $request->setSession($this->session);
 
         $container->set("request", $request);
+
+        $this->buildContainer($container);
 
         return $container;
     }

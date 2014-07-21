@@ -15,6 +15,7 @@ use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Import\ImportHandler;
+use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
@@ -82,7 +83,7 @@ class ProductPriceImport extends ImportHandler
                 }
 
                 if ($currency === null) {
-                    $currency = $this->getRequest()->getSession()->getCurrency();
+                    $currency = Currency::getDefaultCurrency();
                 }
 
                 $price = ProductPriceQuery::create()
