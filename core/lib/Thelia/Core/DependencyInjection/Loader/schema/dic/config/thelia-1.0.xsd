@@ -227,7 +227,7 @@
             <xsd:element name="title" type="export_category_title" />
         </xsd:choice>
 
-        <xsd:attribute name="id" type="xsd:string" />
+        <xsd:attribute name="id" use="required" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="export_category_title">
@@ -274,7 +274,7 @@
             <xsd:element name="title" type="import_category_title" />
         </xsd:choice>
 
-        <xsd:attribute name="id" type="xsd:string" />
+        <xsd:attribute name="id" use="required" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="import_category_title">

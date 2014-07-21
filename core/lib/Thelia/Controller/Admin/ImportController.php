@@ -106,11 +106,14 @@ class ImportController extends BaseAdminController
                  */
                 $archiveBuilder = $archiveBuilder->loadArchive($file->getPathname());
 
-                $content = $this->getFileContentInArchive(
+                $contentAndFormat = $this->getFileContentInArchive(
                     $archiveBuilder,
                     $formatterManager,
                     $tools["types"]
                 );
+
+                $formatter = $contentAndFormat["formatter"];
+                $content = $contentAndFormat["content"];
             } elseif ($formatter !== null) {
                 /**
                  * If the file isn't an archive
@@ -195,7 +198,10 @@ class ImportController extends BaseAdminController
             );
         }
 
-        return $content;
+        return array(
+            "formatter" => $formatter,
+            "content" => $content,
+        );
     }
 
     public function retrieveFormatTools(
@@ -302,7 +308,7 @@ class ImportController extends BaseAdminController
         }
 
         return $this->getTranslator()->trans(
-            "Import successfully done, %numb row(s) have been imported",
+            "Import successfully done, %numb row(s) have been changed",
             [
                 "%numb" => $handler->getImportedRows(),
             ]

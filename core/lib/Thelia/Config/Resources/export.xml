@@ -9,6 +9,10 @@
             <title locale="en_US">Customers</title>
             <title locale="fr_FR">Clients</title>
         </export_category>
+        <export_category id="thelia.export.products">
+            <title locale="en_US">Products</title>
+            <title locale="fr_FR">Produits</title>
+        </export_category>
     </export_categories>
 
     <exports>
@@ -20,6 +24,17 @@
             <export_descriptive locale="en_US">
                 <title>Mailing</title>
                 <description>Export the last name, first name and email address of the customers and the newsletter subscribers</description>
+            </export_descriptive>
+        </export>
+
+        <export id="thelia.export.prices" class="Thelia\ImportExport\Export\Type\ProductPricesExport" category_id="thelia.export.products">
+            <export_descriptive locale="fr_FR">
+                <title>Prix des produits</title>
+                <description>Expotez le prix de vos produits</description>
+            </export_descriptive>
+            <export_descriptive locale="en_US">
+                <title>Product prices</title>
+                <description>Export the prices of the products</description>
             </export_descriptive>
         </export>
     </exports>

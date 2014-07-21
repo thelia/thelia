@@ -83,7 +83,13 @@ class ImportControllerTrait extends ControllerTestBase
             [$formatter->getHandledType()]
         );
 
-        $this->assertEquals("foo", $content);
+        $this->assertEquals(
+            [
+                "content" => "foo",
+                "formatter" => $formatter
+            ],
+            $content
+        );
     }
 
     /**

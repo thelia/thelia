@@ -365,12 +365,7 @@ class XmlFileLoader extends FileLoader
 
                 if (!class_exists($class)) {
                     throw new \ErrorException(
-                        Translator::getInstance()->trans(
-                            "The class \"%class\" doesn't exist",
-                            [
-                                "%class" => $class
-                            ]
-                        )
+                        "The class \"$class\" doesn't exist"
                     );
                 }
 
@@ -378,13 +373,7 @@ class XmlFileLoader extends FileLoader
 
                 if (!$classInstance instanceof ExportHandler) {
                     throw new \ErrorException(
-                        Translator::getInstance()->trans(
-                            "The class \"%class\" must extend %baseClass",
-                            [
-                                "%class" => $class,
-                                "%baseClass" => "Thelia\\ImportExport\\Export\\ExportHandler",
-                            ]
-                        )
+                        "The class \"$class\" must extend Thelia\\ImportExport\\Export\\ExportHandler"
                     );
                 }
 
@@ -392,12 +381,7 @@ class XmlFileLoader extends FileLoader
 
                 if (null === $category) {
                     throw new \ErrorException(
-                        Translator::getInstance()->trans(
-                            "The export category \"%category\" doesn't exist",
-                            [
-                                "%category" => $categoryRef
-                            ]
-                        )
+                            "The export category \"$categoryRef\" doesn't exist"
                     );
                 }
 
@@ -518,12 +502,7 @@ class XmlFileLoader extends FileLoader
 
                 if (!class_exists($class)) {
                     throw new \ErrorException(
-                        Translator::getInstance()->trans(
-                            "The class \"%class\" doesn't exist",
-                            [
-                                "%class" => $class
-                            ]
-                        )
+                            "The class \"$class\" doesn't exist"
                     );
                 }
 
@@ -531,13 +510,7 @@ class XmlFileLoader extends FileLoader
 
                 if (!$classInstance instanceof ImportHandler) {
                     throw new \ErrorException(
-                        Translator::getInstance()->trans(
-                            "The class \"%class\" must extend %baseClass",
-                            [
-                                "%class" => $class,
-                                "%baseClass" => "Thelia\\ImportImport\\ImportHandler",
-                            ]
-                        )
+                        "The class \"$class\" must extend Thelia\\ImportImport\\ImportHandler"
                     );
                 }
 
@@ -545,12 +518,7 @@ class XmlFileLoader extends FileLoader
 
                 if (null === $category) {
                     throw new \ErrorException(
-                        Translator::getInstance()->trans(
-                            "The import category \"%category\" doesn't exist",
-                            [
-                                "%category" => $categoryRef
-                            ]
-                        )
+                        "The import category \"$categoryRef\" doesn't exist"
                     );
                 }
 
