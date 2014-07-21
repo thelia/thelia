@@ -326,7 +326,7 @@ class ImportController extends BaseAdminController
         $loop = new ImportLoop($this->container);
 
         $loop->initializeArgs([
-            "export" => $import->getId()
+            "id" => $id
         ]);
 
         $query = $loop->buildModelCriteria();

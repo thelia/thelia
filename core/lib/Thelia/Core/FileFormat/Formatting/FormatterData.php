@@ -184,7 +184,7 @@ class FormatterData
      * @return array|bool
      * @throws \OutOfBoundsException
      */
-    public function getRow($index = 0)
+    public function getRow($index = 0, $reverseAliases = false)
     {
         if (empty($this->data)) {
             return false;
@@ -199,7 +199,11 @@ class FormatterData
             );
         }
 
-        $row = $this->reverseAliases($this->data[$index], $this->aliases);
+        $row = $this->data[$index];
+
+        if ($reverseAliases === true) {
+            $row = $this->reverseAliases($row, $this->aliases);
+        }
 
         return $row;
     }

@@ -78,6 +78,7 @@ class CSVFormatter extends AbstractFormatter
     public function encode(FormatterData $data)
     {
         $string = "";
+
         $firstRow = $data->getRow();
         $delimiterLength = strlen($this->delimiter);
         $lineReturnLength = strlen($this->lineReturn);

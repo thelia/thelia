@@ -175,5 +175,9 @@
         <service id="thelia.formatter.json_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\JsonFormatter">
             <tag name="thelia.formatter" />
         </service>
+
+        <service id="thelia.formatter.csv_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\CSVFormatter">
+            <tag name="thelia.formatter" />
+        </service>
     </services>
 </config>

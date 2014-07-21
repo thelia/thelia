@@ -261,7 +261,7 @@ class ExportController extends BaseAdminController
         $loop = new ExportLoop($this->container);
 
         $loop->initializeArgs([
-            "export" => $export->getId()
+            "id" => $export->getId()
         ]);
 
         $query = $loop->buildModelCriteria();
