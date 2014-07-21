@@ -158,6 +158,7 @@ class ProductController extends AbstractSeoCrudController
 
         $changeEvent
             ->setLocale($formData['locale'])
+            ->setRef($formData['ref'])
             ->setTitle($formData['title'])
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])

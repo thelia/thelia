@@ -92,7 +92,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             $product
                 ->setDispatcher($event->getDispatcher())
-
+                ->setRef($event->getRef())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())

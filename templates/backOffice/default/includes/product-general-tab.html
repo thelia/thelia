@@ -40,9 +40,7 @@
                             {$label} :
                         </label>
                         <div class="control-input">
-                            {* If ref's 'value is not empty the field is disable and the value is sent with an hidden field *}
-                            <input type="text" id="{$label_attr.for}" {if $value}name="{$name}_disabled" disabled{else}name="{$name}"{/if} class="form-control" value="{$value}"{if $required} aria-required="true" required{/if}>
-                            {if $value}<input type="hidden" name="{$name}" value="{$value}">{/if}
+                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if}>
                         </div>
                     </div>
                 {/form_field}
