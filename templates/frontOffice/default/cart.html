@@ -104,7 +104,7 @@
                                         <select name="quantity" class="form-control" >
                                             {assign "stock" $STOCK}
                                             {if !{config key="check-available-stock"}}
-                                              {assign var="stock" value="{config key="quantity-stock-default"}"}
+                                              {assign var="stock" value="{config key="default-available-stock"}"}
                                             {/if}
                                             {for $will=1 to $stock}
                                                 <option {if $QUANTITY == $will}selected="selected"{/if}>{$will}</option>
