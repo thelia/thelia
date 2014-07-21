@@ -19,11 +19,11 @@ use Thelia\Tests\Controller\ControllerTestBase;
 use Thelia\Tests\Controller\ImportExportControllerTrait;
 
 /**
- * Class ProductStockControllerTest
+ * Class ProductStockImportTest
  * @package Thelia\Tests\ImportExport\Import
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class ProductStockControllerTest extends ControllerTestBase
+class ProductStockImportTest extends ControllerTestBase
 {
     use ImportExportControllerTrait;
 
@@ -73,7 +73,7 @@ class ProductStockControllerTest extends ControllerTestBase
         $jsonString = json_encode($jsonData);
 
         $this->assertEquals(
-            "Import successfully done",
+            "Import successfully done, 3 row(s) have been changed",
             $this->controller->processImport(
                 $jsonString,
                 $this->import,
