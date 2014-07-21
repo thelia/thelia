@@ -36,11 +36,7 @@ class Import extends BaseImport
 
     public function downPosition()
     {
-        $max = ImportQuery::create()
-            ->orderByPosition(Criteria::DESC)
-            ->select(ImportTableMap::POSITION)
-            ->findOne()
-        ;
+        $max = $this->getMaxPosition();
 
         $count = $this->getImportCategory()->countImports();
 
@@ -81,11 +77,7 @@ class Import extends BaseImport
 
     public function setPositionToLast()
     {
-        $max = ImportQuery::create()
-            ->orderByPosition(Criteria::DESC)
-            ->select(ImportTableMap::POSITION)
-            ->findOne()
-        ;
+        $max = $this->getMaxPosition();
 
         if (null === $max) {
             $this->setPosition(1);
@@ -158,4 +150,13 @@ class Import extends BaseImport
         parent::delete($con);
     }
 
+    public function getMaxPosition()
+    {
+        return ImportQuery::create()
+            ->filterByImportCategoryId($this->getImportCategoryId())
+            ->orderByPosition(Criteria::DESC)
+            ->select(ImportTableMap::POSITION)
+            ->findOne()
+        ;
+    }
 }

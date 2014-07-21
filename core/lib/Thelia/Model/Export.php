@@ -37,11 +37,7 @@ class Export extends BaseExport
 
     public function downPosition()
     {
-        $max = ExportQuery::create()
-            ->orderByPosition(Criteria::DESC)
-            ->select(ExportTableMap::POSITION)
-            ->findOne()
-        ;
+        $max = $this->getMaxPosition();
 
         $count = $this->getExportCategory()->countExports();
 
@@ -82,11 +78,7 @@ class Export extends BaseExport
 
     public function setPositionToLast()
     {
-        $max = ExportQuery::create()
-            ->orderByPosition(Criteria::DESC)
-            ->select(ExportTableMap::POSITION)
-            ->findOne()
-        ;
+        $max = $this->getMaxPosition();
 
         if (null === $max) {
             $this->setPosition(1);
@@ -179,5 +171,15 @@ class Export extends BaseExport
         }
 
         return static::$cache instanceof DocumentsExportInterface;
+    }
+
+    public function getMaxPosition()
+    {
+        return ExportQuery::create()
+            ->filterByExportCategoryId($this->getExportCategoryId())
+            ->orderByPosition(Criteria::DESC)
+            ->select(ExportTableMap::POSITION)
+            ->findOne()
+        ;
     }
 }

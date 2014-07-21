@@ -25,7 +25,6 @@ use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
-use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\ImportExport\Import\ImportHandler;
 use Thelia\Model\Export;
