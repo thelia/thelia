@@ -105,7 +105,7 @@ class CSVFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $this->formatter->lineReturn = "\n";
         $this->formatter->delimiter = ",";
-        $data = "\"foo\",\"bar\",\"baz\"\n\"1\",\"2\",\"3\"\n\"4\",\"5\",\"6\"\n\"1\",\"2\",\"3\"";
+        $data = "\"foo\",\"bar\",baz\n\"1\",\"2\",3\n\"4\",5,\"6\"\n\"1\",\"2\",\"3\"";
 
         $expected = [
             [
@@ -131,4 +131,4 @@ class CSVFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-} 
+}
