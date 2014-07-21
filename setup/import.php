@@ -45,7 +45,7 @@ try {
 
     $categories = createCategories($con);
     $color = createColors($con);
-    $brand = createBrand($con);
+    $brands = createBrands($con);
 
     echo "creating templates\n";
     $template = new \Thelia\Model\Template();
@@ -63,15 +63,16 @@ try {
         ->setAttribute($color)
         ->save($con);
 
+    /*
     $ft = new Thelia\Model\FeatureTemplate();
-
     $ft
         ->setTemplate($template)
         ->setFeature($brand)
         ->save($con);
+    */
     echo "end creating templates\n";
 
-    createProduct($faker, $categories, $template, $color, $brand, $con);
+    createProduct($faker, $categories, $brands, $template, $color, null, $con);
 
     $con->commit();
 } catch (Exception $e) {
@@ -79,7 +80,7 @@ try {
     $con->rollBack();
 }
 
-function createProduct($faker, $categories, $template, $attribute, $feature, $con)
+function createProduct($faker, $categories, $brands, $template, $attribute, $feature, $con)
 {
     echo "start creating products\n";
     $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
@@ -102,6 +103,11 @@ function createProduct($faker, $categories, $template, $attribute, $feature, $co
                 if (array_key_exists($productCategory, $categories)) {
                     $product->addCategory($categories[$productCategory]);
                 }
+            }
+
+            $brand = $data[11];
+            if (array_key_exists($brand, $brands)) {
+                $product->setBrand($brands[$brand]);
             }
 
             $product
@@ -178,6 +184,7 @@ function createProduct($faker, $categories, $template, $attribute, $feature, $co
             $productSaleElements = $product->getProductSaleElementss()->getFirst();
             $productSaleElements->setIsDefault(1)->save($con);
 
+            /*
             $brand = $data[11];
             $featurAv = \Thelia\Model\FeatureAvI18nQuery::create()
                 ->filterByLocale('en_US')
@@ -190,12 +197,14 @@ function createProduct($faker, $categories, $template, $attribute, $feature, $co
                 ->setFeatureAvId($featurAv->getId())
                 ->save($con)
             ;
+            */
 
         }
     }
     echo "end creating products\n";
 }
 
+/*
 function createBrand($con)
 {
     echo "start creating brands feature\n";
@@ -227,6 +236,64 @@ function createBrand($con)
 
     return $feature;
 }
+*/
+
+
+function createBrands($con)
+{
+    echo "start creating brands\n";
+
+    $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
+
+    $brands = array();
+    if (($handle = fopen(THELIA_ROOT . '/setup/import/brand.csv', "r")) !== FALSE) {
+        $row=0;
+        while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
+            $row++;
+            if ($row == 1) continue;
+
+            $brand = new \Thelia\Model\Brand();
+
+            $brand
+                ->setVisible(1)
+                ->setPosition($row-1)
+                ->setLocale('fr_FR')
+                    ->setTitle(trim($data[0]))
+                ->setLocale('en_US')
+                    ->setTitle(trim($data[0]))
+                ->save($con);
+
+            $brands[trim($data[0])] = $brand;
+
+            $images = explode(';', $data[1]);
+            $logoId = null;
+            foreach ($images as $image) {
+                $image = trim($image);
+                if(empty($image)) continue;
+                $brandImage = new \Thelia\Model\BrandImage();
+                $brandImage
+                    ->setBrandId($brand->getId())
+                    ->setFile($image)
+                    ->save($con);
+                if ($logoId === null) {
+                    $logoId = $brandImage->getId();
+                }
+                $fileSystem->copy(THELIA_ROOT . 'setup/import/images/'.$image, THELIA_ROOT . 'local/media/images/brand/'.$image, true);
+            }
+
+            if ($logoId !== null){
+                $brand->setLogoImageId($logoId);
+                $brand->save($con);
+            }
+
+        }
+        fclose($handle);
+    }
+    echo "brands created successfully\n";
+
+    return $brands;
+}
+
 
 function createCategories($con)
 {
@@ -291,6 +358,8 @@ function createColors($con)
 
 function clearTables($con)
 {
+    echo "Clearing tables\n";
+
     $productAssociatedContent = Thelia\Model\ProductAssociatedContentQuery::create()
         ->find($con);
     $productAssociatedContent->delete($con);
@@ -368,4 +437,7 @@ function clearTables($con)
     $productPrice->delete($con);
 
     \Thelia\Model\ProductImageQuery::create()->find($con)->delete($con);
+
+    echo "Tables cleared with success\n";
+
 }
