@@ -232,7 +232,7 @@ class FormatterData
         return $this->reverseAliases($this->data, $this->aliases);
     }
 
-    public function setLang(Lang $lang)
+    public function setLang(Lang $lang = null)
     {
         $this->lang = $lang;
 
