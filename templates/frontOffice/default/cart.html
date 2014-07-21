@@ -71,7 +71,7 @@
                             <div class="product-options">
                                 <dl class="dl-horizontal">
                                     <dt>{intl l="Available"} :</dt>
-                                    {if $STOCK > 0}
+                                    {if $STOCK > 0 || !$AVAILABLE_STOCK}
                                             <dd>{intl l="In Stock"}</dd>
                                         {else}
                                             <dd>{intl l="Out of Stock"}</dd>
