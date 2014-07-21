@@ -30,6 +30,8 @@ use Thelia\Form\ImportForm;
 use Thelia\ImportExport\Import\ImportHandler;
 use Thelia\Model\ImportCategoryQuery;
 use Thelia\Model\ImportQuery;
+use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 
 /**
  * Class ImportController
@@ -78,6 +80,10 @@ class ImportController extends BaseAdminController
 
         try {
             $boundForm = $this->validateForm($form);
+
+            $lang = LangQuery::create()->findPk(
+                $boundForm->get("language")->getData()
+            );
 
             /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
             $file = $boundForm->get("file_upload")->getData();
@@ -139,7 +145,8 @@ class ImportController extends BaseAdminController
                 $content,
                 $handler,
                 $formatter,
-                $archiveBuilder
+                $archiveBuilder,
+                $lang
             );
 
         } catch (FormValidationException $e) {
@@ -282,14 +289,18 @@ class ImportController extends BaseAdminController
         $content,
         ImportHandler $handler,
         AbstractFormatter $formatter = null,
-        AbstractArchiveBuilder $archiveBuilder = null
+        AbstractArchiveBuilder $archiveBuilder = null,
+        Lang $lang = null
     ) {
         $event = new ImportExportEvent($formatter, $handler, null, $archiveBuilder);
         $event->setContent($content);
 
         $this->dispatch(TheliaEvents::IMPORT_AFTER_DECODE, $event);
 
-        $data = $formatter->decode($event->getContent());
+        $data = $formatter
+            ->decode($event->getContent())
+            ->setLang($lang)
+        ;
 
         $event->setContent(null)->setData($data);
         $this->dispatch(TheliaEvents::IMPORT_AFTER_DECODE, $event);
@@ -385,6 +396,7 @@ class ImportController extends BaseAdminController
         $parserContext
             ->set("ALLOWED_MIME_TYPES", implode(",", $mimeTypes))
             ->set("ALLOWED_EXTENSIONS", implode(", ", $formats))
+            ->set("CURRENT_LANG_ID", $this->getSession()->getLang()->getId())
         ;
 
         /** Then render the form */

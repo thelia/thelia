@@ -14,6 +14,8 @@ namespace Thelia\Core\FileFormat\Formatting;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Lang;
+
 /**
  * Class FormatterData
  * @package Thelia\Core\FileFormat\Formatting
@@ -21,6 +23,8 @@ use Thelia\Core\Translation\Translator;
  */
 class FormatterData
 {
+    protected $lang;
+
     /** @var array */
     protected $data = array();
 
@@ -226,5 +230,17 @@ class FormatterData
     public function getDataReverseAliases()
     {
         return $this->reverseAliases($this->data, $this->aliases);
+    }
+
+    public function setLang(Lang $lang)
+    {
+        $this->lang = $lang;
+
+        return $this;
+    }
+
+    public function getLang()
+    {
+        return $this->lang;
     }
 }

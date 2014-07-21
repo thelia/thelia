@@ -11,8 +11,11 @@
 /*************************************************************************************/
 
 namespace Thelia\Form;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\LangQuery;
 
 /**
  * Class ExportForm
@@ -58,6 +61,18 @@ class ExportForm extends BaseForm
                 "label_attr" => ["for" => "with_documents"],
                 "required" => false,
             ))
+            ->add("language", "integer", array(
+                "label" => $this->translator->trans("Language"),
+                "label_attr" => ["for" => "language"],
+                "required" => true,
+                "constraints" => [
+                    new Callback([
+                        "methods" => [
+                            [$this, "checkLanguage"],
+                        ]
+                    ])
+                ]
+            ))
         ;
     }
 
@@ -65,4 +80,19 @@ class ExportForm extends BaseForm
     {
         return "thelia_export";
     }
+
+    public function checkLanguage($value, ExecutionContextInterface $context)
+    {
+        if (null === LangQuery::create()->findPk($value)) {
+            $context->addViolation(
+                $this->translator->trans(
+                    "The language \"%id\" doesn't exist",
+                    [
+                        "%id" => $value
+                    ]
+                )
+            );
+        }
+    }
+
 }

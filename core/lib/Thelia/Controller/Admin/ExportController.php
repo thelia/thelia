@@ -30,6 +30,8 @@ use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\ImportExport\Export\ImagesExportInterface;
 use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
+use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 
 /**
  * Class ExportController
@@ -88,6 +90,10 @@ class ExportController extends BaseAdminController
         try {
             $boundForm = $this->validateForm($form);
 
+            $lang = LangQuery::create()->findPk(
+                $boundForm->get("language")->getData()
+            );
+
             $archiveBuilder = null;
 
             /**
@@ -115,7 +121,8 @@ class ExportController extends BaseAdminController
                 $export->getHandleClassInstance($this->container),
                 $archiveBuilder,
                 $boundForm->get("images")->getData(),
-                $boundForm->get("documents")->getData()
+                $boundForm->get("documents")->getData(),
+                $lang
             );
 
         } catch (FormValidationException $e) {
@@ -153,6 +160,7 @@ class ExportController extends BaseAdminController
         AbstractFormatter $formatter,
         ExportHandler $handler,
         AbstractArchiveBuilder $archiveBuilder = null,
+        Lang $lang,
         $includeImages = false,
         $includeDocuments = false
     ) {
@@ -160,7 +168,7 @@ class ExportController extends BaseAdminController
          * Build an event containing the formatter and the handler.
          * Used for specific configuration (e.g: XML node names)
          */
-        $data = $handler->buildFormatterData();
+        $data = $handler->buildFormatterData()->setLang($lang);
         $event = new ImportExportEvent($formatter, $handler , $data);
 
         $filename = $formatter::FILENAME . "." . $formatter->getExtension();
@@ -288,6 +296,7 @@ class ExportController extends BaseAdminController
         $this->getParserContext()
             ->set("HAS_IMAGES", $export->hasImages($this->container))
             ->set("HAS_DOCUMENTS", $export->hasDocuments($this->container))
+            ->set("CURRENT_LANG_ID", $this->getSession()->getLang()->getId())
         ;
 
         /** Then render the form */

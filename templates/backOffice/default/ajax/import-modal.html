@@ -9,14 +9,32 @@
                     <h4 class="modal-title" id="import-modal-label">Import: {$TITLE}</h4>
                 </div>
                 <div class="modal-body">
-                    {form_field form=$form field="file_upload"}
-                        <label form="{$label_attr.for}">
-                            {$label}
-                        </label>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {form_field form=$form field="language"}
+                                <label for="{$label_attr.for}">
+                                    {$label}
+                                </label>
+                                <select id="{$label_attr.for}" name="{$name}" required>
+                                    {loop name="import-lang" type="lang"}
+                                        <option value="{$ID}" {if $ID == $CURRENT_LANG_ID}selected{/if}>{$TITLE}</option>
+                                    {/loop}
+                                </select>
+                            {/form_field}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {form_field form=$form field="file_upload"}
+                                <label form="{$label_attr.for}">
+                                    {$label}
+                                </label>
 
-                        <input type="file" required aria-required="true" name="{$name}" id="{$label_attr.for}" accept="{$ALLOWED_MIME_TYPES}"/>
-                        <div class="small">Accepted formats: {$ALLOWED_EXTENSIONS}</div>
-                    {/form_field}
+                                <input type="file" required aria-required="true" name="{$name}" id="{$label_attr.for}" accept="{$ALLOWED_MIME_TYPES}"/>
+                                <div class="small">Accepted formats: {$ALLOWED_EXTENSIONS}</div>
+                            {/form_field}
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary" title="{intl l="Import this file"}">{intl l="Import this file"}</button>
