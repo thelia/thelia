@@ -81,11 +81,11 @@ abstract class ControllerTestBase extends \PHPUnit_Framework_TestCase
     /**
      * @return \Thelia\Controller\BaseController The controller you want to test
      */
-    abstract function getController();
+    abstract protected  function getController();
 
     /**
      * Use this method to build the container with the services that you need.
      */
-    abstract function buildContainer(ContainerBuilder $container);
+    abstract protected function buildContainer(ContainerBuilder $container);
 
 } 

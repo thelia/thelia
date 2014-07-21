@@ -12,7 +12,6 @@
 
 namespace Thelia\Tests\Controller;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Thelia\Controller\Admin\ImportController;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarGzArchiveBuilder;
@@ -28,13 +27,13 @@ use Thelia\Core\FileFormat\Formatting\FormatterManager;
  * @package Thelia\Tests\Controller
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-abstract class ControllerExportControllerTest extends ControllerTestBase
+abstract class ImportExportControllerTest extends ControllerTestBase
 {
 
     /**
      * @return mixed
      */
-    function buildContainer(ContainerBuilder $container)
+    protected function buildContainer(ContainerBuilder $container)
     {
         $archiveBuilderManager = (new ArchiveBuilderManager("dev"))
             ->add(new ZipArchiveBuilder())
