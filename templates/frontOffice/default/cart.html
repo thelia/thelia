@@ -54,6 +54,11 @@
                     <tr>
                         <td class="image">
                             <a href="{$PRODUCT_URL}" class="thumbnail">
+                                {if {config key="check-available-stock"} != 1}
+                                    {assign var="stockMax" value=99}
+                                {else}
+                                    {assign var="stockMax" value={$STOCK}}
+                                {/if}
                                 {assign "cart_count" $LOOP_COUNT}
                                 {ifloop rel='product-image'}
                                     {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
@@ -71,7 +76,7 @@
                             <div class="product-options">
                                 <dl class="dl-horizontal">
                                     <dt>{intl l="Available"} :</dt>
-                                    {if $STOCK > 0}
+                                    {if $stockMax > 0}
                                             <dd>{intl l="In Stock"}</dd>
                                         {else}
                                             <dd>{intl l="Out of Stock"}</dd>
@@ -102,7 +107,7 @@
                                     <input type="hidden" name="cart_item" value="{$ITEM_ID}">
                                     <div class="form-group">
                                         <select name="quantity" class="form-control" >
-                                            {for $will=1 to $STOCK}
+                                            {for $will=1 to $stockMax}
                                                 <option {if $QUANTITY == $will}selected="selected"{/if}>{$will}</option>
                                             {/for}
                                         </select>
