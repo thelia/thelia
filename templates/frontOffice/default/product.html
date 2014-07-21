@@ -219,7 +219,7 @@
                         {/form_field}
 
                         <div class="form-group group-btn">
-                            <button type="submit" class="btn btn_add_to_cart">{intl l="Add to cart"}</button>
+                            <button type="submit" class="btn btn_add_to_cart" {if !$hasSubmit}disabled=disabled{/if}>{intl l="Add to cart"}</button>
                         </div>
                     </fieldset>
                 </form>
