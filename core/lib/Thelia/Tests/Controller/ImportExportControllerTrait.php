@@ -27,7 +27,7 @@ use Thelia\Core\FileFormat\Formatting\FormatterManager;
  * @package Thelia\Tests\Controller
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-abstract class ImportExportControllerTest extends ControllerTestBase
+trait ImportExportControllerTrait
 {
 
     /**

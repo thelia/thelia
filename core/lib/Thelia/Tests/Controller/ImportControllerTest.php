@@ -19,14 +19,15 @@ use Thelia\Core\FileFormat\Formatting\FormatterManagerTrait;
 use Thelia\Core\FileFormat\FormatType;
 
 /**
- * Class ImportControllerTest
+ * Class ImportControllerTrait
  * @package Thelia\Tests\Controller
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class ImportControllerTest extends ImportExportControllerTest
+class ImportControllerTrait extends ControllerTestBase
 {
     use FormatterManagerTrait;
     use ArchiveBuilderManagerTrait;
+    use ImportExportControllerTrait;
 
     /**
      * @return \Thelia\Controller\BaseController The controller you want to test
