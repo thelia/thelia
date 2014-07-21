@@ -18,6 +18,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\ConfigQuery;
 
 use Thelia\Type;
 
@@ -103,6 +104,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
                 ->set("IS_PROMO", $cartItem->getPromo() === 1 ? 1 : 0);
             $loopResultRow->set("PRODUCT_SALE_ELEMENTS_ID", $productSaleElement->getId());
             $loopResultRow->set("PRODUCT_SALE_ELEMENTS_REF", $productSaleElement->getRef());
+            $loopResultRow->set("AVAILABLE_STOCK" , ConfigQuery::checkAvailableStock());
             $loopResult->addRow($loopResultRow);
         }
 
