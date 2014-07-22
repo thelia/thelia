@@ -90,7 +90,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (26, 'en_US', 'Base URL of the shop (e.g. http://www.yourshopdomain.com)', NULL, NULL, NULL),
 (27, 'en_US', 'Name of the invoice view in the current PDF template (without extension)', NULL, NULL, NULL),
 (28, 'en_US', 'Name of the delivery view in the current PDF template (without extension)', NULL, NULL, NULL),
-(29 'en_US', 'The path (relative to the default back-office template) to the image used when no flag image can be found for a country', NULL, NULL, NULL),
+(29, 'en_US', 'The path (relative to the default back-office template) to the image used when no flag image can be found for a country', NULL, NULL, NULL),
 (30, 'en_US', 'Whitespace trim level of the generated HTML code (0 = none, 1 = medium, 2 = maximum)', NULL, NULL, NULL),
 (1, 'fr_FR', 'Nom de la classe du gestionnaire de session', NULL, NULL, NULL),
 (2, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l''ignorer (0) lors de l''affichage et la modification des quantités commandées', NULL, NULL, NULL),
