@@ -183,6 +183,7 @@ abstract class CouponAbstract implements CouponInterface
 
     /**
      * @param true $perCustomerUsageCount
+     * @return $this
      */
     public function setPerCustomerUsageCount($perCustomerUsageCount)
     {
@@ -425,14 +426,14 @@ abstract class CouponAbstract implements CouponInterface
      * This methods checks a field value. If the field has a correct value, this value is returned
      * Otherwise, an InvalidArgumentException describing the problem should be thrown.
      *
-     * This method should be ovveriden to be useful.
+     * This method should be overriden to be useful.
      *
-     * @param $fieldName
-     * @param $fieldValue
+     * @param string $fieldName
+     * @param string $fieldValue
      * @return mixed
-     * @throws \InvalidArgumentException if the field valiue is not valid.
+     * @throws \InvalidArgumentException if the field value is not valid.
      */
-    protected function checkCouponFieldValue($fieldName, $fieldValue)
+    protected function checkCouponFieldValue(/** @noinspection PhpUnusedParameterInspection */ $fieldName, $fieldValue)
     {
         return $fieldValue;
     }
@@ -506,5 +507,12 @@ abstract class CouponAbstract implements CouponInterface
     public function clear()
     {
         // Does nothing. Override this function as needed.
+    }
+
+    public function isInUse() {
+        return in_array(
+            $this->code,
+            $this->facade->getRequest()->getSession()->getConsumedCoupons()
+        );
     }
 }
