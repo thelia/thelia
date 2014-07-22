@@ -74,8 +74,7 @@ class ProductPricesExport extends ExportHandler
             "product_sale_elements_PROMO" => "promo",
         ];
 
-        $locale = $this->real_escape($lang->getLocale());
-        $defaultLocale = $this->real_escape(Lang::getDefaultLanguage()->getLocale());
+        $locale = $lang->getLocale();
 
         $query = AttributeCombinationQuery::create()
             ->useProductSaleElementsQuery()
@@ -113,57 +112,30 @@ class ProductPricesExport extends ExportHandler
                 "product_TITLE",
                 "attribute_av_i18n_ATTRIBUTES",
             ])
-            ->where(
-                "CASE WHEN ".ProductTableMap::ID." IN".
-                    "(SELECT DISTINCT ".ProductI18nTableMap::ID." ".
-                    "FROM `".ProductI18nTableMap::TABLE_NAME."` ".
-                    "WHERE locale=$locale) ".
-
-                "THEN ".ProductI18nTableMap::LOCALE." = $locale ".
-                "ELSE ".ProductI18nTableMap::LOCALE." = $defaultLocale ".
-                "END"
-            )
-            ->_and()
-            ->where(
-                "CASE WHEN ".AttributeAvTableMap::ID." IN".
-                    "(SELECT DISTINCT ".AttributeAvI18nTableMap::ID." ".
-                    "FROM `".AttributeAvI18nTableMap::TABLE_NAME."` ".
-                    "WHERE locale=$locale)".
-                "THEN ".AttributeAvI18nTableMap::LOCALE." = $locale ".
-                "ELSE ".AttributeAvI18nTableMap::LOCALE." = $defaultLocale ".
-                "END"
-            )
             ->groupBy("product_sale_elements_REF")
         ;
+
+        $this->addI18nCondition(
+            $query,
+            ProductI18nTableMap::TABLE_NAME,
+            ProductTableMap::ID,
+            AttributeAvI18nTableMap::ID,
+            ProductI18nTableMap::LOCALE,
+            $locale
+        );
+
+        $this->addI18nCondition(
+            $query,
+            AttributeAvI18nTableMap::TABLE_NAME,
+            AttributeAvTableMap::ID,
+            AttributeAvI18nTableMap::ID,
+            AttributeAvI18nTableMap::LOCALE,
+            $locale
+        );
 
         $data = new FormatterData($aliases);
 
         return $data->loadModelCriteria($query);
-    }
-
-    /**
-     * @param $str
-     * @return string
-     *
-     * Really escapes a string for SQL request.
-     */
-    protected function real_escape($str)
-    {
-        $return = "CONCAT(";
-        $len = strlen($str);
-
-        for($i = 0; $i < $len; ++$i) {
-            $return .= "CHAR(".ord($str[$i])."),";
-        }
-
-        if ($i > 0) {
-            $return = substr($return, 0, -1);
-        } else {
-            $return = "\"\"";
-        }
-        $return .= ")";
-
-        return $return;
     }
 
 } 

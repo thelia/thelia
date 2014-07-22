@@ -13,7 +13,6 @@
 namespace Thelia\ImportExport\Export\Type;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
-use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Lang;

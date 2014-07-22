@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Export;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Model\Lang;
 use Thelia\ImportExport\AbstractHandler;
 
@@ -21,6 +22,59 @@ use Thelia\ImportExport\AbstractHandler;
  */
 abstract class ExportHandler extends AbstractHandler
 {
+    public function addI18nCondition(
+        ModelCriteria $query,
+        $i18nTableName,
+        $tableIdColumn,
+        $i18nIdColumn,
+        $localeColumn,
+        $locale
+    ) {
+
+        $locale = $this->real_escape($locale);
+        $defaultLocale = $this->real_escape(Lang::getDefaultLanguage()->getLocale());
+
+        $query
+            ->_and()
+            ->where(
+                "CASE WHEN ".$tableIdColumn." IN".
+                    "(SELECT DISTINCT ".$i18nIdColumn." ".
+                    "FROM `".$i18nTableName."` ".
+                    "WHERE locale=$locale) ".
+
+                "THEN ".$localeColumn." = $locale ".
+                "ELSE ".$localeColumn." = $defaultLocale ".
+                "END"
+            )
+        ;
+    }
+
+
+    /**
+     * @param $str
+     * @return string
+     *
+     * Really escapes a string for SQL request.
+     */
+    protected function real_escape($str)
+    {
+        $return = "CONCAT(";
+        $len = strlen($str);
+
+        for($i = 0; $i < $len; ++$i) {
+            $return .= "CHAR(".ord($str[$i])."),";
+        }
+
+        if ($i > 0) {
+            $return = substr($return, 0, -1);
+        } else {
+            $return = "\"\"";
+        }
+        $return .= ")";
+
+        return $return;
+    }
+
     /**
      * @param \Thelia\Model\Lang $lang
      * @return \Thelia\Core\FileFormat\Formatting\FormatterData
