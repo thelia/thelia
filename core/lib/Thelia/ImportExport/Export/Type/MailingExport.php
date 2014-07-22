@@ -35,11 +35,9 @@ class MailingExport extends ExportHandler
      */
     public function buildFormatterData(Lang $lang)
     {
-        $translator = Translator::getInstance();
-
-        $email = $translator->trans("email");
-        $lastName = $translator->trans("last name");
-        $firstName = $translator->trans("first name");
+        $email = "email";
+        $lastName = "last_name";
+        $firstName = "first_name";
 
 
         $aliases = [
