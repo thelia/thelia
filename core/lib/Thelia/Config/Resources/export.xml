@@ -29,12 +29,12 @@
 
         <export id="thelia.export.prices" class="Thelia\ImportExport\Export\Type\ProductPricesExport" category_id="thelia.export.products">
             <export_descriptive locale="fr_FR">
-                <title>Prix des produits</title>
-                <description>Expotez le prix de vos produits</description>
+                <title>Prix des produits Hors-Taxes</title>
+                <description>Expotez le prix hors taxes de vos produits</description>
             </export_descriptive>
             <export_descriptive locale="en_US">
-                <title>Product prices</title>
-                <description>Export the prices of the products</description>
+                <title>Product prices excluding taxes</title>
+                <description>Export the prices of the products excluding taxes</description>
             </export_descriptive>
         </export>
     </exports>

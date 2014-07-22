@@ -22,10 +22,10 @@
 
         <import id="thelia.import.price" class="Thelia\ImportExport\Import\Type\ProductPricesImport" category_id="thelia.import.products">
             <import_descriptive locale="fr_FR">
-                <title>Importez vos prix</title>
+                <title>Importez vos prix Hors-Taxes</title>
             </import_descriptive>
             <import_descriptive locale="en_US">
-                <title>Import your prices</title>
+                <title>Import your prices excluding taxes</title>
             </import_descriptive>
         </import>
     </imports>
