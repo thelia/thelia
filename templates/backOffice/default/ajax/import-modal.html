@@ -9,6 +9,15 @@
                     <h4 class="modal-title" id="import-modal-label">Import: {$TITLE}</h4>
                 </div>
                 <div class="modal-body">
+                    {if $DESCRIPTION}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-info">
+                                    {$DESCRIPTION nofilter}
+                                </div>
+                            </div>
+                        </div>
+                    {/if}
                     <div class="row">
                         <div class="col-md-12">
                             {form_field form=$form field="language"}

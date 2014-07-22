@@ -9,6 +9,15 @@
                     <h4 class="modal-title" id="export-modal-label">Export: {$TITLE}</h4>
                 </div>
                 <div class="modal-body">
+                    {if $DESCRIPTION}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-info">
+                                    {$DESCRIPTION nofilter}
+                                </div>
+                            </div>
+                        </div>
+                    {/if}
                     <div class="row">
                         <div class="col-md-12">
                         {ifloop rel="export-formatters"}

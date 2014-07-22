@@ -12,7 +12,6 @@
 
 namespace Thelia\ImportExport\Import\Type;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
-use Thelia\Core\Translation\Translator;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\ImportExport\Import\ImportHandler;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -24,8 +23,6 @@ use Thelia\Model\ProductSaleElementsQuery;
  */
 class ProductStockImport extends ImportHandler
 {
-
-
     /**
      * @param \Thelia\Core\FileFormat\Formatting\FormatterData
      * @return string|array error messages
@@ -52,11 +49,13 @@ class ProductStockImport extends ImportHandler
                     ]
                 );
             } else {
-                $obj
-                    ->setQuantity($row["stock"])
-                    ->setEanCode($row["ean"])
-                    ->save()
-                ;
+                $obj->setQuantity($row["stock"]);
+
+                if (isset($row["ean"]) && !empty($row["ean"])) {
+                    $obj->setEanCode($row["ean"]);
+                }
+
+                $obj->save();
                 $this->importedRows++;
             }
         }
@@ -66,7 +65,7 @@ class ProductStockImport extends ImportHandler
 
     protected function getMandatoryColumns()
     {
-        return ["ref", "stock", "ean"];
+        return ["ref", "stock"];
     }
 
     /**

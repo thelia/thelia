@@ -100,7 +100,7 @@
                                                     <a href="#category_{$category_title}" class="btn-show-export-modal" data-id="{$ID}" data-url="{$URL}">{$TITLE}</a>
                                                 </td>
                                                 <td>
-                                                    {$DESCRIPTION}
+                                                    {$DESCRIPTION nofilter}
                                                 </td>
                                                 <td>
                                                     <a href="{url path="/admin/export/position/up/{if $url_category}?{$url_category}{/if}{$ID}#category_{$category_title}"}">
