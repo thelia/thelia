@@ -109,6 +109,14 @@ class ProductPricesImport extends ImportHandler
                     $price->setPromoPrice($row["promo_price"]);
                 }
 
+                if (isset($row["promo"])) {
+                    $price
+                        ->getProductSaleElements()
+                        ->setPromo((int)$row["promo"])
+                        ->save()
+                    ;
+                }
+
                 $price->save();
                 $this->importedRows++;
             }

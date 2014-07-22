@@ -71,6 +71,7 @@ class ProductPricesExport extends ExportHandler
             "currency_CODE" => "currency",
             "product_TITLE" => "title",
             "attribute_av_i18n_ATTRIBUTES" => "attributes",
+            "product_sale_elements_PROMO" => "promo",
         ];
 
         $locale = $this->real_escape($lang->getLocale());
@@ -92,6 +93,7 @@ class ProductPricesExport extends ExportHandler
                 ->endUse()
                 ->addAsColumn("product_sale_elements_REF", ProductSaleElementsTableMap::REF)
                 ->addAsColumn("product_sale_elements_EAN_CODE", ProductSaleElementsTableMap::EAN_CODE)
+                ->addAsColumn("product_sale_elements_PROMO", ProductSaleElementsTableMap::PROMO)
             ->endUse()
             ->useAttributeAvQuery()
                 ->useAttributeAvI18nQuery(null, Criteria::INNER_JOIN)
@@ -104,6 +106,7 @@ class ProductPricesExport extends ExportHandler
             ->select([
                 "product_sale_elements_REF",
                 "product_sale_elements_EAN_CODE",
+                "product_sale_elements_PROMO",
                 "price_PRICE",
                 "price_PROMO_PRICE",
                 "currency_CODE",

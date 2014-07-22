@@ -78,6 +78,7 @@ class ProductPricesImportTest extends ControllerTestBase
              */
             while ($pse->getPricesByCurrency($currency)->getPrice() === $entry["price"] = rand(0, 1000));
             while ($pse->getPricesByCurrency($currency)->getPromoPrice() === $entry["promo_price"] = rand(0, 1000));
+            while ($pse->getPromo() === $entry["promo_price"] = rand(0, 1000));
 
             $data[$pse->getId()] = $entry;
 

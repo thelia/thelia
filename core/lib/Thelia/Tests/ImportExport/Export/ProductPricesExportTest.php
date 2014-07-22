@@ -33,7 +33,7 @@ class ProductPricesExportTest extends \PHPUnit_Framework_TestCase
 
         $data = $export->buildFormatterData(Lang::getDefaultLanguage());
 
-        $keys = ["attributes","currency","ean","price","promo_price","ref","title"];
+        $keys = ["attributes","currency","ean","price","promo","promo_price","ref","title"];
 
         $rawData = $data->getData();
 
@@ -62,6 +62,7 @@ class ProductPricesExportTest extends \PHPUnit_Framework_TestCase
 
             $this->assertNotNull($pse);
             $this->assertEquals($pse->getEanCode(),$row["ean"]);
+            $this->assertEquals($pse->getPromo(),$row["promo"]);
 
             $currency = CurrencyQuery::create()->findOneByCode($row["currency"]);
             $this->assertNotNull($currency);
