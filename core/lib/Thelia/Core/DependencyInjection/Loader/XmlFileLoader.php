@@ -368,14 +368,6 @@ class XmlFileLoader extends FileLoader
                     );
                 }
 
-                $classInstance = new $class($this->container);
-
-                if (!$classInstance instanceof ExportHandler) {
-                    throw new \ErrorException(
-                        "The class \"$class\" must extend Thelia\\ImportExport\\Export\\ExportHandler"
-                    );
-                }
-
                 $category = ExportCategoryQuery::create()->findOneByRef($categoryRef);
 
                 if (null === $category) {
@@ -502,14 +494,6 @@ class XmlFileLoader extends FileLoader
                 if (!class_exists($class)) {
                     throw new \ErrorException(
                             "The class \"$class\" doesn't exist"
-                    );
-                }
-
-                $classInstance = new $class($this->container);
-
-                if (!$classInstance instanceof ImportHandler) {
-                    throw new \ErrorException(
-                        "The class \"$class\" must extend Thelia\\ImportImport\\ImportHandler"
                     );
                 }
 

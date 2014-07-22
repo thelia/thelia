@@ -16,6 +16,7 @@ use Thelia\Core\FileFormat\FormatType;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\NewsletterTableMap;
 use Thelia\Model\NewsletterQuery;
@@ -32,7 +33,7 @@ class MailingExport extends ExportHandler
      *
      * The method builds
      */
-    public function buildFormatterData()
+    public function buildFormatterData(Lang $lang)
     {
         $translator = Translator::getInstance();
 
