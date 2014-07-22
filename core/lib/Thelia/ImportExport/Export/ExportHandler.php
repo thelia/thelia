@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Export;
+use Thelia\Model\Lang;
 use Thelia\ImportExport\AbstractHandler;
 
 /**
@@ -21,10 +22,11 @@ use Thelia\ImportExport\AbstractHandler;
 abstract class ExportHandler extends AbstractHandler
 {
     /**
+     * @param \Thelia\Model\Lang $lang
      * @return \Thelia\Core\FileFormat\Formatting\FormatterData
      *
      * The method builds the FormatterData for the formatter
      */
-    abstract public function buildFormatterData();
+    abstract public function buildFormatterData(Lang $lang);
 
 } 

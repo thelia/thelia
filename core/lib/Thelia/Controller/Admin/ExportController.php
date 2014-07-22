@@ -120,9 +120,9 @@ class ExportController extends BaseAdminController
                 $formatter,
                 $export->getHandleClassInstance($this->container),
                 $archiveBuilder,
+                $lang,
                 $boundForm->get("images")->getData(),
-                $boundForm->get("documents")->getData(),
-                $lang
+                $boundForm->get("documents")->getData()
             );
 
         } catch (FormValidationException $e) {
@@ -168,7 +168,11 @@ class ExportController extends BaseAdminController
          * Build an event containing the formatter and the handler.
          * Used for specific configuration (e.g: XML node names)
          */
-        $data = $handler->buildFormatterData()->setLang($lang);
+        $data = $handler
+            ->buildFormatterData($lang)
+            ->setLang($lang)
+        ;
+
         $event = new ImportExportEvent($formatter, $handler , $data);
 
         $filename = $formatter::FILENAME . "." . $formatter->getExtension();
