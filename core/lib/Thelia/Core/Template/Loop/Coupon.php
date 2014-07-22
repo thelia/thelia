@@ -164,9 +164,6 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->container->get('thelia.condition.factory');
 
-        /** @var array $consumedCoupons an array of coupon code currently in use */
-        $consumedCoupons = $this->request->getSession()->getConsumedCoupons();
-
         /** @var MCoupon $coupon */
         foreach ($loopResult->getResultDataCollection() as $coupon) {
 
