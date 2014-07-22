@@ -846,7 +846,7 @@ return array(
     'Template title' => 'Titre du gabarit',
     'Templates' => 'Gabarits de produit',
     'Text version of this message' => 'Version texte du message',
-    'The default pricing is used when no combination is defined.' => 'Le prix par défaut est utilisée lorsqu\'aucune combinaison n\'est utilisée',
+    'The default pricing is used when no combination is defined.' => 'Le prix par défaut est utilisé lorsqu\'aucune combinaison n\'est utilisée',
     'The destinations processes logs to display, store or send them. You can select and configure zero, one or more destinations below.' => 'Les destinations permettent d\'afficher, stocker ou bien envoyer les logs. Vous pouvez en sélectionner zéro, un ou plusieurs dans la liste ci-dessous',
     'The detailed description.' => 'La description détaillée.',
     'The mailing template in HTML format.' => 'Le template de mailing au format HTML',
