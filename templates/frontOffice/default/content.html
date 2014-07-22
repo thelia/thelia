@@ -13,8 +13,7 @@
 {* Meta *}
 {block name="meta"}
     {loop name="content.seo.meta" type="content" id="{content attr="id"}"}
-    {if $META_DESCRIPTION}<meta name="description" content="{$META_DESCRIPTION}">{/if}
-    {if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
+    {include file="includes/meta-seo.html"}
     {/loop}
 {/block}
 

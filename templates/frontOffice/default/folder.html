@@ -13,8 +13,7 @@
 {* Meta *}
 {block name="meta"}
     {loop name="folder.seo.meta" type="folder" id="{folder attr="id"}"}
-    {if $META_DESCRIPTION}<meta name="description" content="{$META_DESCRIPTION}">{/if}
-    {if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
+    {include file="includes/meta-seo.html"}
     {/loop}
 {/block}
 

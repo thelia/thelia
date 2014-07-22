@@ -5,7 +5,7 @@
 
 {* Page Title *}
 {block name='no-return-functions' append}
-    {loop name="product.seo.title" type="product" id="{product attr="id"}" with_prev_next_info="1"}
+    {loop name="product.seo.title" type="product" id="{product attr="id"}" limit="1" with_prev_next_info="1"}
     {$page_title = {$META_TITLE}}
     {/loop}
 {/block}
@@ -13,8 +13,7 @@
 {* Meta *}
 {block name="meta"}
     {loop name="product.seo.meta" type="product" id="{product attr="id"}" limit="1" with_prev_next_info="1"}
-    {if $META_DESCRIPTION}<meta name="description" content="{$META_DESCRIPTION}">{/if}
-    {if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
+    {include file="includes/meta-seo.html"}
     {/loop}
 {/block}
 
