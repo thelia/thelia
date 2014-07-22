@@ -64,7 +64,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (1, 'en_US', 'Class name of the session handler', NULL, NULL, NULL),
 (2, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
-(3, 'en_US', 'If the presence of products in stock is ignored, enter the quantity maximun possible to order', NULL, NULL, NULL),
+(3, 'en_US', 'If the product availability is ignored, enter the maximum possible to order quantity', NULL, NULL, NULL),
 (4, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
 (5, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
 (6, 'en_US', 'Name of the active PDF template', NULL, NULL, NULL),
