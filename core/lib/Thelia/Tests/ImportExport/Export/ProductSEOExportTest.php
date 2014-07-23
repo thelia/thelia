@@ -35,7 +35,7 @@ class ProductSEOExportTest extends \PHPUnit_Framework_TestCase
 
         $data = $export->buildFormatterData(Lang::getDefaultLanguage());
 
-        $keys=["ref","visible","product_title","url","content_title","meta_description","meta_keywords",];
+        $keys=["ref","visible","product_title","url","page_title","meta_description","meta_keywords",];
         sort($keys);
         $rawData = $data->getData();
 
@@ -60,26 +60,13 @@ class ProductSEOExportTest extends \PHPUnit_Framework_TestCase
             $product = ProductQuery::create()->findOneByRef($row["ref"]);
             $this->assertNotNull($product);
 
-            $contentI18n = ContentI18nQuery::create()
-                ->filterByTitle($row["content_title"])
-                ->filterByLocale("en_US")
-                ->findOne();
-
-            $contentsObj = ProductAssociatedContentQuery::create()
-                ->filterByProduct($product)
-            ;
-
-            if (null !== $contentI18n) {
-                $contentsObj->filterByContentId($contentI18n->getId());
-            }
-
-            $contentsObj->findOne();
-
             $this->assertEquals($product->getVisible(), $row["visible"]);
             $this->assertEquals($product->getTitle(), $row["product_title"]);
 
-            $this->assertEquals($contentI18n->getMetaDescription(), $row["meta_description"]);
-            $this->assertEquals($contentI18n->getMetaKeywords(), $row["meta_keywords"]);
+            $this->assertEquals($product->getMetaTitle(), $row["page_title"]);
+            $this->assertEquals($product->getMetaDescription(), $row["meta_description"]);
+            $this->assertEquals($product->getMetaKeywords(), $row["meta_keywords"]);
+            $this->assertEquals($product->getRewrittenUrl("en_US"), $row["url"]);
         }
     }
 } 

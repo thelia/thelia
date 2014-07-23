@@ -68,9 +68,9 @@ class ProductSEOExport extends ExportHandler
             "product_VISIBLE" => "visible",
             "product_i18n_TITLE" => "product_title",
             "product_URL" => "url",
-            "content_TITLE" => "content_title",
-            "content_META_DESCRIPTION" => "meta_description",
-            "content_META_KEYWORDS" => "meta_keywords",
+            "product_seo_TITLE" => "page_title",
+            "product_seo_META_DESCRIPTION" => "meta_description",
+            "product_seo_META_KEYWORDS" => "meta_keywords",
         ];
 
         $locale = $this->locale = $lang->getLocale();
@@ -79,23 +79,18 @@ class ProductSEOExport extends ExportHandler
          * Join objects
          */
         $urlJoin = new Join(ProductTableMap::ID, RewritingUrlTableMap::VIEW_ID, Criteria::LEFT_JOIN);
-        $contentJoin = new Join(ContentTableMap::ID, ContentI18nTableMap::ID, Criteria::LEFT_JOIN);
         $productJoin = new Join(ProductTableMap::ID, ProductI18nTableMap::ID, Criteria::LEFT_JOIN);
 
         $query = ProductAssociatedContentQuery::create()
-            ->useContentQuery()
-                ->addJoinObject($contentJoin, "content_join")
-                ->addJoinCondition("content_join", ContentI18nTableMap::LOCALE . "=" . $this->real_escape($locale))
-                ->addAsColumn("content_TITLE", ContentI18nTableMap::TITLE)
-                ->addAsColumn("content_META_DESCRIPTION", ContentI18nTableMap::META_DESCRIPTION)
-                ->addAsColumn("content_META_KEYWORDS", ContentI18nTableMap::META_KEYWORDS)
-            ->endUse()
             ->useProductQuery()
                 ->addJoinObject($productJoin, "product_join")
                 ->addJoinCondition("product_join", ProductI18nTableMap::LOCALE . "=" . $this->real_escape($locale))
                 ->addAsColumn("product_i18n_TITLE", ProductI18nTableMap::TITLE)
                 ->addAsColumn("product_REF", ProductTableMap::REF)
                 ->addAsColumn("product_VISIBLE", ProductTableMap::VISIBLE)
+                ->addAsColumn("product_seo_TITLE", ProductI18nTableMap::META_TITLE)
+                ->addAsColumn("product_seo_META_DESCRIPTION", ProductI18nTableMap::META_DESCRIPTION)
+                ->addAsColumn("product_seo_META_KEYWORDS", ProductI18nTableMap::META_KEYWORDS)
             ->endUse()
             ->addJoinObject($urlJoin, "rewriting_url_join")
             ->addJoinCondition("rewriting_url_join", RewritingUrlTableMap::VIEW_LOCALE . "=" . $this->real_escape($locale))
@@ -110,9 +105,9 @@ class ProductSEOExport extends ExportHandler
                 "product_VISIBLE",
                 "product_i18n_TITLE",
                 "product_URL",
-                "content_TITLE",
-                "content_META_DESCRIPTION",
-                "content_META_KEYWORDS",
+                "product_seo_TITLE",
+                "product_seo_META_DESCRIPTION",
+                "product_seo_META_KEYWORDS",
             ])
         ;
 
@@ -128,7 +123,7 @@ class ProductSEOExport extends ExportHandler
             "product_title",
             "visible",
             "url",
-            "content_title",
+            "page_title",
             "meta_description",
             "meta_keywords",
         ];
