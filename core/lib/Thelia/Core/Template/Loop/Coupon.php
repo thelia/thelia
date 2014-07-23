@@ -49,6 +49,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createBooleanOrBothTypeArgument('is_enabled'),
+            Argument::createBooleanTypeArgument('in_use'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -84,6 +85,18 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if (isset($isEnabled)) {
             $search->filterByIsEnabled($isEnabled ? true : false);
+        }
+
+        $inUse = $this->getInUse();
+
+        if ($inUse !== null) {
+            // Get the code of coupons currently in use
+            $consumedCoupons = $this->request->getSession()->getConsumedCoupons();
+
+            // Get only matching coupons.
+            $criteria = $inUse ? Criteria::IN : Criteria::NOT_IN;
+
+            $search->filterByCode($consumedCoupons, $criteria);
         }
 
         $search->addAsColumn('days_left', 'DATEDIFF('.CouponTableMap::EXPIRATION_DATE.', CURDATE()) - 1');
@@ -202,6 +215,12 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 $freeShippingForModulesIds[] = $couponModule->getModuleId();
             }
 
+            // If and only if the coupon is currently in use, get the coupon discount. Calling exec() on a coupon
+            // which is not currently in use may apply coupon on the cart. This is true for coupons such as FreeProduct,
+            // which adds a product to the cart.
+            $discount = $couponManager->isInUse() ? $couponManager->exec() : 0;
+
+
             $loopResultRow
                 ->set("ID", $coupon->getId())
                 ->set("IS_TRANSLATED", $coupon->getVirtualColumn('IS_TRANSLATED'))
@@ -224,6 +243,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("SERVICE_ID", $couponManager->getServiceId())
                 ->set("FREE_SHIPPING_FOR_COUNTRIES_LIST", implode(',', $freeShippingForCountriesIds))
                 ->set("FREE_SHIPPING_FOR_MODULES_LIST", implode(',', $freeShippingForModulesIds))
+                ->set("DISCOUNT_AMOUNT", $discount)
             ;
 
             $loopResult->addRow($loopResultRow);
