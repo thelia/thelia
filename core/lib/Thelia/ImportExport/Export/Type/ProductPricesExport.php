@@ -12,6 +12,7 @@
 
 namespace Thelia\ImportExport\Export\Type;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\ImportExport\Export\ExportHandler;
@@ -76,6 +77,9 @@ class ProductPricesExport extends ExportHandler
 
         $locale = $lang->getLocale();
 
+        $productJoin = new Join(ProductTableMap::ID, ProductI18nTableMap::ID, Criteria::LEFT_JOIN);
+        $attributeAvJoin = new Join(AttributeAvTableMap::ID, AttributeAvI18nTableMap::ID, Criteria::LEFT_JOIN);
+
         $query = AttributeCombinationQuery::create()
             ->useProductSaleElementsQuery()
                 ->useProductPriceQuery()
@@ -86,21 +90,24 @@ class ProductPricesExport extends ExportHandler
                     ->addAsColumn("price_PROMO_PRICE", ProductPriceTableMap::PROMO_PRICE)
                 ->endUse()
                 ->useProductQuery()
-                    ->useProductI18nQuery()
-                        ->addAsColumn("product_TITLE", ProductI18nTableMap::TITLE)
-                    ->endUse()
+                    ->addJoinObject($productJoin, "product_join")
+                    ->addJoinCondition("product_join", ProductI18nTableMap::LOCALE . "=" . $this->real_escape($locale))
+                    ->addAsColumn("product_TITLE", ProductI18nTableMap::TITLE)
                 ->endUse()
                 ->addAsColumn("product_sale_elements_REF", ProductSaleElementsTableMap::REF)
                 ->addAsColumn("product_sale_elements_EAN_CODE", ProductSaleElementsTableMap::EAN_CODE)
                 ->addAsColumn("product_sale_elements_PROMO", ProductSaleElementsTableMap::PROMO)
             ->endUse()
             ->useAttributeAvQuery()
-                ->useAttributeAvI18nQuery(null, Criteria::INNER_JOIN)
-                    ->addAsColumn(
-                        "attribute_av_i18n_ATTRIBUTES",
-                        "GROUP_CONCAT(DISTINCT ".AttributeAvI18nTableMap::TITLE.")"
-                    )
-                ->endUse()
+                ->addJoinObject($attributeAvJoin, "attribute_av_join")
+                ->addJoinCondition(
+                    "attribute_av_join",
+                    AttributeAvI18nTableMap::LOCALE . "=" . $this->real_escape($locale)
+                )
+                ->addAsColumn(
+                    "attribute_av_i18n_ATTRIBUTES",
+                    "GROUP_CONCAT(DISTINCT ".AttributeAvI18nTableMap::TITLE.")"
+                )
             ->endUse()
             ->select([
                 "product_sale_elements_REF",
@@ -114,24 +121,6 @@ class ProductPricesExport extends ExportHandler
             ])
             ->groupBy("product_sale_elements_REF")
         ;
-
-        $this->addI18nCondition(
-            $query,
-            ProductI18nTableMap::TABLE_NAME,
-            ProductTableMap::ID,
-            AttributeAvI18nTableMap::ID,
-            ProductI18nTableMap::LOCALE,
-            $locale
-        );
-
-        $this->addI18nCondition(
-            $query,
-            AttributeAvI18nTableMap::TABLE_NAME,
-            AttributeAvTableMap::ID,
-            AttributeAvI18nTableMap::ID,
-            AttributeAvI18nTableMap::LOCALE,
-            $locale
-        );
 
         $data = new FormatterData($aliases);
 

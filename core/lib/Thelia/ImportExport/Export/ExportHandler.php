@@ -11,6 +11,8 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Export;
+use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Model\Lang;
 use Thelia\ImportExport\AbstractHandler;
@@ -22,6 +24,8 @@ use Thelia\ImportExport\AbstractHandler;
  */
 abstract class ExportHandler extends AbstractHandler
 {
+    protected $locale;
+
     public function addI18nCondition(
         ModelCriteria $query,
         $i18nTableName,
@@ -49,7 +53,6 @@ abstract class ExportHandler extends AbstractHandler
         ;
     }
 
-
     /**
      * @param $str
      * @return string
@@ -58,6 +61,8 @@ abstract class ExportHandler extends AbstractHandler
      */
     protected function real_escape($str)
     {
+        $str = trim($str, "\"'");
+
         $return = "CONCAT(";
         $len = strlen($str);
 
