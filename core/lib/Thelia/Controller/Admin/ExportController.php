@@ -169,7 +169,7 @@ class ExportController extends BaseAdminController
          * Used for specific configuration (e.g: XML node names)
          */
         $data = $handler
-            ->buildFormatterData($lang)
+            ->buildData($lang)
             ->setLang($lang)
         ;
 

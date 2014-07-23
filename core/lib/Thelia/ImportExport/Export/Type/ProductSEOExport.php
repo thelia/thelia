@@ -16,8 +16,6 @@ use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\ImportExport\Export\ExportHandler;
-use Thelia\Model\Map\ContentI18nTableMap;
-use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\Map\ProductI18nTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Map\RewritingUrlTableMap;
@@ -56,23 +54,11 @@ class ProductSEOExport extends ExportHandler
     }
 
     /**
-     * @param \Thelia\Model\Lang $lang
-     * @return \Thelia\Core\FileFormat\Formatting\FormatterData
-     *
-     * The method builds the FormatterData for the formatter
+     * @param Lang $lang
+     * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria
      */
-    public function buildFormatterData(Lang $lang)
+    public function buildDataSet(Lang $lang)
     {
-        $aliases = [
-            "product_REF" => "ref",
-            "product_VISIBLE" => "visible",
-            "product_i18n_TITLE" => "product_title",
-            "product_URL" => "url",
-            "product_seo_TITLE" => "page_title",
-            "product_seo_META_DESCRIPTION" => "meta_description",
-            "product_seo_META_KEYWORDS" => "meta_keywords",
-        ];
-
         $locale = $this->locale = $lang->getLocale();
 
         /**
@@ -111,9 +97,7 @@ class ProductSEOExport extends ExportHandler
             ])
         ;
 
-        $data = new FormatterData($aliases);
-
-        return $data->loadModelCriteria($query);
+        return $query;
     }
 
     protected function getDefaultOrder()
@@ -129,6 +113,17 @@ class ProductSEOExport extends ExportHandler
         ];
     }
 
-
+    protected function getAliases()
+    {
+        return [
+            "product_REF" => "ref",
+            "product_VISIBLE" => "visible",
+            "product_i18n_TITLE" => "product_title",
+            "product_URL" => "url",
+            "product_seo_TITLE" => "page_title",
+            "product_seo_META_DESCRIPTION" => "meta_description",
+            "product_seo_META_KEYWORDS" => "meta_keywords",
+        ];
+    }
 
 } 

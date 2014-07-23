@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\ImportExport\Export\Type\MailingExport;
+use Thelia\Model\Lang;
 
 /**
  * Class MailingExportTest
@@ -37,8 +38,7 @@ class MailingExportTest extends \PHPUnit_Framework_TestCase
 
     public function testExport()
     {
-        $data = $this->handler->buildFormatterData();
-
+        $data = $this->handler->buildData(Lang::getDefaultLanguage());
 
     }
 

@@ -33,7 +33,7 @@ class ProductSEOExportTest extends \PHPUnit_Framework_TestCase
         new Translator(new Container());
         $export = new ProductSEOExport(new Container());
 
-        $data = $export->buildFormatterData(Lang::getDefaultLanguage());
+        $data = $export->buildData(Lang::getDefaultLanguage());
 
         $keys=["ref","visible","product_title","url","page_title","meta_description","meta_keywords",];
         sort($keys);

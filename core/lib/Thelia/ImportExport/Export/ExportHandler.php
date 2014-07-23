@@ -11,7 +11,10 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Export;
+use Propel\Runtime\ActiveQuery\Criterion\Exception\InvalidValueException;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\FileFormat\Formatting\FormatterData;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
 use Thelia\ImportExport\AbstractHandler;
 
@@ -123,6 +126,40 @@ abstract class ExportHandler extends AbstractHandler
      *
      * The method builds the FormatterData for the formatter
      */
-    abstract public function buildFormatterData(Lang $lang);
+    public function buildData(Lang $lang)
+    {
+        $data = new FormatterData($this->getAliases());
 
+        $query = $this->buildDataSet($lang);
+
+        if ($query instanceof ModelCriteria) {
+            return $data->loadModelCriteria($query);
+        } elseif (is_array($query)) {
+            return $data->setData($query);
+        }
+        
+        throw new InvalidValueException(
+            Translator::getInstance()->trans(
+                "The method \"%class\"::buildDataSet must return an array or a ModelCriteria",
+                [
+                    "%class" => get_class($this),
+                ]
+            )
+        );
+    }
+
+    /**
+     * @return null|array
+     *
+     */
+    protected function getAliases()
+    {
+        return null;
+    }
+
+    /**
+     * @param Lang $lang
+     * @return ModelCriteria|array
+     */
+    abstract protected function  buildDataSet(Lang $lang);
 } 

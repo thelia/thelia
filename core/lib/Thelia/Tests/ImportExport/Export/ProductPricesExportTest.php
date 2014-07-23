@@ -31,7 +31,7 @@ class ProductPricesExportTest extends \PHPUnit_Framework_TestCase
         new Translator(new Container());
         $export = new ProductPricesExport(new Container());
 
-        $data = $export->buildFormatterData(Lang::getDefaultLanguage());
+        $data = $export->buildData(Lang::getDefaultLanguage());
 
         $keys = ["attributes","currency","ean","price","promo","promo_price","ref","title"];
 

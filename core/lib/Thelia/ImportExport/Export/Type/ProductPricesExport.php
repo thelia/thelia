@@ -58,23 +58,10 @@ class ProductPricesExport extends ExportHandler
 
     /**
      * @param Lang $lang
-     * @return \Thelia\Core\FileFormat\Formatting\FormatterData
-     *
-     * The method builds the FormatterData for the formatter
+     * @return FormatterData
      */
-    public function buildFormatterData(Lang $lang)
+    protected function buildDataSet(Lang $lang)
     {
-        $aliases = [
-            "product_sale_elements_REF" => "ref",
-            "product_sale_elements_EAN_CODE" => "ean",
-            "price_PRICE" => "price",
-            "price_PROMO_PRICE" => "promo_price",
-            "currency_CODE" => "currency",
-            "product_TITLE" => "title",
-            "attribute_av_i18n_ATTRIBUTES" => "attributes",
-            "product_sale_elements_PROMO" => "promo",
-        ];
-
         $locale = $lang->getLocale();
 
         $productJoin = new Join(ProductTableMap::ID, ProductI18nTableMap::ID, Criteria::LEFT_JOIN);
@@ -122,9 +109,22 @@ class ProductPricesExport extends ExportHandler
             ->groupBy("product_sale_elements_REF")
         ;
 
-        $data = new FormatterData($aliases);
-
-        return $data->loadModelCriteria($query);
+        return $query;
     }
+
+    protected function getAliases()
+    {
+        return [
+            "product_sale_elements_REF" => "ref",
+            "product_sale_elements_EAN_CODE" => "ean",
+            "price_PRICE" => "price",
+            "price_PROMO_PRICE" => "promo_price",
+            "currency_CODE" => "currency",
+            "product_TITLE" => "title",
+            "attribute_av_i18n_ATTRIBUTES" => "attributes",
+            "product_sale_elements_PROMO" => "promo",
+        ];
+    }
+
 
 } 

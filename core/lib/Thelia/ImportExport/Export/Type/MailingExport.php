@@ -28,30 +28,11 @@ use Thelia\Model\NewsletterQuery;
 class MailingExport extends ExportHandler
 {
     /**
-     * @return \Thelia\Core\FileFormat\Formatting\FormatterData
-     *
-     * The method builds
+     * @param Lang $lang
+     * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria
      */
-    public function buildFormatterData(Lang $lang)
+    public function buildDataSet(Lang $lang)
     {
-        $email = "email";
-        $lastName = "last_name";
-        $firstName = "first_name";
-
-
-        $aliases = [
-            NewsletterTableMap::EMAIL       => $email,
-            CustomerTableMap::EMAIL         => $email,
-
-            NewsletterTableMap::LASTNAME    => $lastName,
-            CustomerTableMap::LASTNAME      => $lastName,
-
-            NewsletterTableMap::FIRSTNAME   => $firstName,
-            CustomerTableMap::FIRSTNAME     => $firstName,
-        ];
-
-        $data = new FormatterData($aliases);
-
         $newsletter = NewsletterQuery::create()
             ->select([
                 NewsletterTableMap::EMAIL,
@@ -72,9 +53,25 @@ class MailingExport extends ExportHandler
             ->toArray()
         ;
 
-        $both = $newsletter + $customers;
+        return $customers + $newsletter;
+    }
 
-        return $data->setData($both);
+    protected function getAliases()
+    {
+        $email = "email";
+        $lastName = "last_name";
+        $firstName = "first_name";
+
+        return [
+            NewsletterTableMap::EMAIL       => $email,
+            CustomerTableMap::EMAIL         => $email,
+
+            NewsletterTableMap::LASTNAME    => $lastName,
+            CustomerTableMap::LASTNAME      => $lastName,
+
+            NewsletterTableMap::FIRSTNAME   => $firstName,
+            CustomerTableMap::FIRSTNAME     => $firstName,
+        ];
     }
 
     /**
