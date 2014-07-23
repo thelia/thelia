@@ -77,9 +77,17 @@ class CSVFormatter extends AbstractFormatter
     {
         $string = "";
 
+        /**
+         * Get the first row and delimiters lengths
+         */
         $firstRow = $data->getRow();
         $delimiterLength = strlen($this->delimiter);
         $lineReturnLength = strlen($this->lineReturn);
+
+        /**
+         * check if $this->order doesn't have non-existing rows
+         */
+        $this->checkOrders($firstRow);
 
         if (false !== $firstRow) {
             $rawKeys = array_keys($firstRow);
@@ -93,20 +101,43 @@ class CSVFormatter extends AbstractFormatter
             array_unshift($values, $keys);
 
             while (null !== $row = array_shift($values)) {
-                foreach ($keys as $key) {
-                    if (!is_scalar($row[$key])) {
-                        $row[$key] = serialize($row[$key]);
-                    }
+                /**
+                 * First put the sorted ones
+                 */
+                foreach ($this->order as $order) {
+                    $string .= $this->formatField($row[$order]);
+                    unset($row[$order]);
+                }
 
-                    $string .= $this->stringDelimiter . addslashes($row[$key]) . $this->stringDelimiter . $this->delimiter;
+                /**
+                 * Then place the fields,
+                 * order by name
+                 */
+                ksort($row);
+
+                foreach ($keys as $key) {
+                    $string .= $this->formatField($row[$key]);
                 }
 
                 $string = substr($string,0, -$delimiterLength) . $this->lineReturn;
             }
 
+        } else {
+            $lineReturnLength = 0;
         }
 
-        return substr($string,0, -$lineReturnLength);
+        return substr($string, 0, -$lineReturnLength);
+    }
+
+    protected function formatField($value)
+    {
+        if($value === null) {
+            $value = "";
+        } else if (!is_scalar($value)) {
+            $value = serialize($value);
+        }
+
+        return $this->stringDelimiter . addslashes($value) . $this->stringDelimiter . $this->delimiter;
     }
 
     /**

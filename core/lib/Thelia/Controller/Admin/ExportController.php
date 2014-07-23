@@ -180,7 +180,10 @@ class ExportController extends BaseAdminController
         if ($archiveBuilder === null) {
             $this->dispatch(TheliaEvents::EXPORT_BEFORE_ENCODE, $event);
 
-            $formattedContent = $formatter->encode($data);
+            $formattedContent = $formatter
+                ->setOrder($handler->getOrder())
+                ->encode($data)
+            ;
 
             $this->dispatch(TheliaEvents::EXPORT_AFTER_ENCODE, $event->setContent($formattedContent));
 
@@ -197,7 +200,10 @@ class ExportController extends BaseAdminController
             $event->setArchiveBuilder($archiveBuilder);
             $this->dispatch(TheliaEvents::EXPORT_BEFORE_ENCODE, $event);
 
-            $formattedContent = $formatter->encode($data);
+            $formattedContent = $formatter
+                ->setOrder($handler->getOrder())
+                ->encode($data)
+            ;
 
             $this->dispatch(TheliaEvents::EXPORT_AFTER_ENCODE, $event->setContent($formattedContent));
 

@@ -37,5 +37,21 @@
                 <description>Export the prices of the products excluding taxes</description>
             </export_descriptive>
         </export>
+        
+        <export id="thelia.export.product_seo" class="Thelia\ImportExport\Export\Type\ProductSEOExport" category_id="thelia.export.products">
+            <export_descriptive locale="en_US">
+                <title>Product SEO information</title>
+                <description>
+                    Export the SEO information ( rewritten url, meta description and keywords, page title ) of your products
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Informations SEO des produits</title>
+                <description>
+                    Exportez les informations SEO de vos produits
+                    ( url réécrites, meta description et mots clés, titre ) de vos produits
+                </description>
+            </export_descriptive>
+        </export>
     </exports>
 </config>

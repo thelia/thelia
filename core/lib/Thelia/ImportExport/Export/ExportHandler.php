@@ -11,8 +11,6 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Export;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Model\Lang;
 use Thelia\ImportExport\AbstractHandler;
@@ -25,6 +23,9 @@ use Thelia\ImportExport\AbstractHandler;
 abstract class ExportHandler extends AbstractHandler
 {
     protected $locale;
+
+    /** @var  array */
+    protected $order;
 
     public function addI18nCondition(
         ModelCriteria $query,
@@ -78,6 +79,42 @@ abstract class ExportHandler extends AbstractHandler
         $return .= ")";
 
         return $return;
+    }
+
+    /**
+     * @return array
+     *
+     * You may override this method to return an array, containing
+     * the order that you want to have for your columns.
+     * The order appliance depends on the formatter
+     */
+    protected function getDefaultOrder()
+    {
+        return array();
+    }
+
+    /**
+     * @return array
+     *
+     * Use this method to access the order.
+     *
+     */
+    public function getOrder()
+    {
+        $order = $this->getDefaultOrder();
+
+        if (empty($order)) {
+            $order = $this->order;
+        }
+
+        return $order;
+    }
+
+    public function setOrder(array $order)
+    {
+        $this->order = $order;
+
+        return $this;
     }
 
     /**

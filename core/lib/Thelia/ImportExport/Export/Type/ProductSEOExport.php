@@ -116,11 +116,24 @@ class ProductSEOExport extends ExportHandler
             ])
         ;
 
-        $a = $query->toString();
-
         $data = new FormatterData($aliases);
 
         return $data->loadModelCriteria($query);
     }
+
+    protected function getDefaultOrder()
+    {
+        return  [
+            "ref",
+            "product_title",
+            "visible",
+            "url",
+            "content_title",
+            "meta_description",
+            "meta_keywords",
+        ];
+    }
+
+
 
 } 

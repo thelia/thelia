@@ -30,10 +30,41 @@ abstract class AbstractFormatter implements FormatInterface, FormatterInterface
     /** @var \Thelia\Log\Tlog */
     protected $logger;
 
+    /** @var array */
+    protected  $order;
+
     public function __construct()
     {
         $this->translator = Translator::getInstance();
 
         $this->logger = Tlog::getInstance();
+    }
+
+    public function getOrder()
+    {
+        return $this->order;
+    }
+
+    public function setOrder(array $order)
+    {
+        $this->order = $order;
+
+        return $this;
+    }
+
+    public function checkOrders(array $values)
+    {
+        foreach($this->order as $order) {
+            if (!array_key_exists($order, $values)) {
+                throw new \ErrorException(
+                    $this->translator->trans(
+                        "The column %column that you want to sort doesn't exist",
+                        [
+                            "%column" => $order
+                        ]
+                    )
+                );
+            }
+        }
     }
 }
