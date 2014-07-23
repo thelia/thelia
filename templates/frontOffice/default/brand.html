@@ -25,9 +25,14 @@
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = []}
-    {loop type="brand" name="brand-breadcrumb" id="{brand attr="id"}"}
-    {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
-    {/loop}
+    {$brand_id={brand attr="id"}}
+    {if $brand_id}
+        {loop type="brand" name="brand-breadcrumb" id="{brand attr="id"}"}
+        {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
+        {/loop}
+    {else}
+        {$breadcrumbs[] = ['title' => {intl l="All brands"}, 'url'=> '']}
+    {/if}
 {/block}
 
 {block name="main-content"}
