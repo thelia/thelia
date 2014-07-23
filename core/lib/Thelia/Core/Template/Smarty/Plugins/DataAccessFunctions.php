@@ -20,6 +20,8 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
+use Thelia\Model\Base\BrandQuery;
+use Thelia\Model\Brand;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentQuery;
@@ -139,12 +141,12 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
     public function brandDataAccess($params, &$smarty)
     {
-        $contentId = $this->request->get('brand_id');
+        $brandId = $this->request->get('brand_id');
 
-        if ($contentId !== null) {
+        if ($brandId !== null) {
 
-            $search = ContentQuery::create()
-                ->filterById($contentId);
+            $search = BrandQuery::create()
+                ->filterById($brandId);
 
             return $this->dataAccessWithI18n("Brand",  $params, $search);
         }
