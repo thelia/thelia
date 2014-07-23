@@ -29,7 +29,7 @@ trait UrlRewritingTrait
     /**
      * @returns string the view name of the rewritten object (e.g., 'category', 'product')
      */
-    abstract protected function getRewrittenUrlViewName();
+    abstract public function getRewrittenUrlViewName();
 
     /**
      * Get the object URL for the given locale, rewritten if rewriting is enabled.

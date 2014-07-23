@@ -25,7 +25,7 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName()
+    public function getRewrittenUrlViewName()
     {
         return 'product';
     }
