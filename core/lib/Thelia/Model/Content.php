@@ -170,7 +170,7 @@ class Content extends BaseContent implements FileModelParentInterface
 
     public function postDelete(ConnectionInterface $con = null)
     {
-        $this->markRewritenUrlObsolete();
+        $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECONTENT, new ContentEvent($this));
     }

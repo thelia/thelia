@@ -166,7 +166,7 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-        $this->markRewritenUrlObsolete();
+        $this->markRewrittenUrlObsolete();
 
         //delete all subcategories
         $subCategories = CategoryQuery::findAllChild($this->getId());
