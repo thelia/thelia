@@ -131,9 +131,9 @@ class CSVFormatter extends AbstractFormatter
 
     protected function formatField($value)
     {
-        if($value === null) {
+        if ($value === null) {
             $value = "";
-        } else if (!is_scalar($value)) {
+        } elseif (!is_scalar($value)) {
             $value = serialize($value);
         }
 

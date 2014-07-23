@@ -37,7 +37,7 @@
                 <description>Export the prices of the products excluding taxes</description>
             </export_descriptive>
         </export>
-        
+
         <export id="thelia.export.product_seo" class="Thelia\ImportExport\Export\Type\ProductSEOExport" category_id="thelia.export.products">
             <export_descriptive locale="en_US">
                 <title>Product SEO information</title>
