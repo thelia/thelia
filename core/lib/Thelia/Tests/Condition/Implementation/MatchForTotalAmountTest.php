@@ -48,7 +48,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $stubFacade->expects($this->any())
-            ->method('getCartTotalPrice')
+            ->method('getCartTotalTaxPrice')
             ->will($this->returnValue($cartTotalPrice));
 
         $stubFacade->expects($this->any())
