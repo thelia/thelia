@@ -14,6 +14,7 @@ namespace Thelia\ImportExport\Export;
 use Propel\Runtime\ActiveQuery\Criterion\Exception\InvalidValueException;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
+use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
 use Thelia\ImportExport\AbstractHandler;
@@ -30,60 +31,6 @@ abstract class ExportHandler extends AbstractHandler
     /** @var  array */
     protected $order;
 
-    public function addI18nCondition(
-        ModelCriteria $query,
-        $i18nTableName,
-        $tableIdColumn,
-        $i18nIdColumn,
-        $localeColumn,
-        $locale
-    ) {
-
-        $locale = $this->real_escape($locale);
-        $defaultLocale = $this->real_escape(Lang::getDefaultLanguage()->getLocale());
-
-        $query
-            ->_and()
-            ->where(
-                "CASE WHEN ".$tableIdColumn." IN".
-                    "(SELECT DISTINCT ".$i18nIdColumn." ".
-                    "FROM `".$i18nTableName."` ".
-                    "WHERE locale=$locale) ".
-
-                "THEN ".$localeColumn." = $locale ".
-                "ELSE ".$localeColumn." = $defaultLocale ".
-                "END"
-            )
-        ;
-    }
-
-    /**
-     * @param $str
-     * @return string
-     *
-     * Really escapes a string for SQL request.
-     */
-    protected function real_escape($str)
-    {
-        $str = trim($str, "\"'");
-
-        $return = "CONCAT(";
-        $len = strlen($str);
-
-        for($i = 0; $i < $len; ++$i) {
-            $return .= "CHAR(".ord($str[$i])."),";
-        }
-
-        if ($i > 0) {
-            $return = substr($return, 0, -1);
-        } else {
-            $return = "\"\"";
-        }
-        $return .= ")";
-
-        return $return;
-    }
-
     /**
      * @return array
      *
@@ -94,6 +41,17 @@ abstract class ExportHandler extends AbstractHandler
     protected function getDefaultOrder()
     {
         return array();
+    }
+
+    /**
+     * @return null|array
+     *
+     * You may override this method to return an array, containing
+     * the aliases to use.
+     */
+    protected function getAliases()
+    {
+        return null;
     }
 
     /**
@@ -133,11 +91,24 @@ abstract class ExportHandler extends AbstractHandler
         $query = $this->buildDataSet($lang);
 
         if ($query instanceof ModelCriteria) {
+
             return $data->loadModelCriteria($query);
         } elseif (is_array($query)) {
+
             return $data->setData($query);
+        } elseif ($query instanceof BaseLoop) {
+            $pagination = null;
+            $results = $query->exec($pagination);
+
+            for ($results->rewind(); $results->valid(); $results->next() ) {
+                $current = $results->current();
+
+                $data->addRow($current->getVarVal());
+            }
+
+            return $data;
         }
-        
+
         throw new InvalidValueException(
             Translator::getInstance()->trans(
                 "The method \"%class\"::buildDataSet must return an array or a ModelCriteria",
@@ -148,18 +119,63 @@ abstract class ExportHandler extends AbstractHandler
         );
     }
 
+    public function addI18nCondition(
+        ModelCriteria $query,
+        $i18nTableName,
+        $tableIdColumn,
+        $i18nIdColumn,
+        $localeColumn,
+        $locale
+    ) {
+
+        $locale = $this->real_escape($locale);
+        $defaultLocale = $this->real_escape($this->defaultLocale);
+
+        $query
+            ->_and()
+            ->where(
+                "CASE WHEN ".$tableIdColumn." IN".
+                "(SELECT DISTINCT ".$i18nIdColumn." ".
+                "FROM `".$i18nTableName."` ".
+                "WHERE locale=$locale) ".
+
+                "THEN ".$localeColumn." = $locale ".
+                "ELSE ".$localeColumn." = $defaultLocale ".
+                "END"
+            )
+        ;
+    }
+
     /**
-     * @return null|array
+     * @param $str
+     * @return string
      *
+     * Really escapes a string for SQL request.
      */
-    protected function getAliases()
+    protected function real_escape($str)
     {
-        return null;
+        $str = trim($str, "\"'");
+
+        $return = "CONCAT(";
+        $len = strlen($str);
+
+        for($i = 0; $i < $len; ++$i) {
+            $return .= "CHAR(".ord($str[$i])."),";
+        }
+
+        if ($i > 0) {
+            $return = substr($return, 0, -1);
+        } else {
+            $return = "\"\"";
+        }
+        $return .= ")";
+
+        return $return;
     }
 
     /**
      * @param Lang $lang
-     * @return ModelCriteria|array
+     * @return ModelCriteria|array|BaseLoop
      */
     abstract protected function  buildDataSet(Lang $lang);
 } 

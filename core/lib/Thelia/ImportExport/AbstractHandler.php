@@ -12,6 +12,7 @@
 
 namespace Thelia\ImportExport;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Model\Lang;
 
 /**
  * Class AbstractHandler
@@ -23,12 +24,15 @@ abstract class AbstractHandler
     /** @var \Symfony\Component\DependencyInjection\ContainerInterface  */
     protected $container;
 
+    protected $defaultLocale;
     /**
      * @param ContainerInterface $container
      *
      * Dependency injection: load the container to be able to get parameters and services
      */
     public function __construct(ContainerInterface $container) {
+        $this->defaultLocale = Lang::getDefaultLanguage()->getLocale();
+
         $this->container = $container;
     }
 

@@ -27,6 +27,17 @@
             </export_descriptive>
         </export>
 
+        <export id="thelia.export.complete" category_id="thelia.export.customer" class="Thelia\ImportExport\Export\Type\CustomerExport">
+            <export_descriptive locale="fr_FR">
+                <title>Clients</title>
+                <description>Exporter toutes les informations à propos de vos clients</description>
+            </export_descriptive>
+            <export_descriptive locale="en_US">
+                <title>Customers</title>
+                <description>Export all the information about your customers</description>
+            </export_descriptive>
+        </export>
+
         <export id="thelia.export.prices" class="Thelia\ImportExport\Export\Type\ProductPricesExport" category_id="thelia.export.products">
             <export_descriptive locale="fr_FR">
                 <title>Prix des produits Hors-Taxes</title>
