@@ -106,6 +106,9 @@ INSERT INTO `order_version`(
 ALTER TABLE `coupon` ADD `version_created_at` DATE AFTER `version`;
 ALTER TABLE `coupon` ADD `version_created_by` VARCHAR(100) AFTER `version_created_at`;
 
+ALTER TABLE `coupon_version` ADD `version_created_at` DATE AFTER `version`;
+ALTER TABLE `coupon_version` ADD `version_created_by` VARCHAR(100) AFTER `version_created_at`;
+
 # Add Brand tables and related resources
 
 # Add the "brand" resource
