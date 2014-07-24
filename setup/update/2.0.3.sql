@@ -109,7 +109,31 @@ ALTER TABLE `coupon` ADD `version_created_by` VARCHAR(100) AFTER `version_create
 ALTER TABLE `coupon_version` ADD `version_created_at` DATE AFTER `version`;
 ALTER TABLE `coupon_version` ADD `version_created_by` VARCHAR(100) AFTER `version_created_at`;
 
+# Add coupon_customer_count table
+# -------------------------------
+
+CREATE TABLE `coupon_customer_count`
+(
+  `coupon_id` INTEGER NOT NULL,
+  `customer_id` INTEGER NOT NULL,
+  `count` INTEGER DEFAULT 0 NOT NULL,
+  INDEX `fk_coupon_customer_customer_id_idx` (`customer_id`),
+  INDEX `fk_coupon_customer_coupon_id_idx` (`coupon_id`),
+  CONSTRAINT `fk_coupon_customer_customer_id`
+  FOREIGN KEY (`customer_id`)
+  REFERENCES `customer` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE,
+  CONSTRAINT `fk_coupon_customer_coupon_id`
+  FOREIGN KEY (`coupon_id`)
+  REFERENCES `coupon` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+# ---------------------------------------------------------------------
 # Add Brand tables and related resources
+# ---------------------------------------------------------------------
 
 # Add the "brand" resource
 INSERT INTO resource (`code`, `created_at`, `updated_at`) VALUES ('admin.brand', NOW(), NOW());
