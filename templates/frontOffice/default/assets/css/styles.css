@@ -5174,7 +5174,7 @@ body.modal-open,
   left: 100%;
 }
 .carousel-inner > .prev {
-  left: -99.99999999%;
+  left: -100%;
 }
 .carousel-inner > .next.left,
 .carousel-inner > .prev.right {
@@ -12626,6 +12626,7 @@ td.product .name > a:focus,
 #product-details .product-info .pse-name {
   color: #555555;
   font-size: 14px;
+  margin-left: 10px;
 }
 #product-details .product-price .price-container {
   margin-left: -15px;
