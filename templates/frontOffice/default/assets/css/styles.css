@@ -5174,7 +5174,7 @@ body.modal-open,
   left: 100%;
 }
 .carousel-inner > .prev {
-  left: -99.99999999%;
+  left: -100%;
 }
 .carousel-inner > .next.left,
 .carousel-inner > .prev.right {
@@ -12260,7 +12260,7 @@ td.product .name > a:focus,
   display: block;
   font-size: 14px;
   line-height: 25px;
-  font-style: italic;
+  font-style: normal;
   font-weight: 400;
 }
 .product-price .old-price .price {
@@ -12604,6 +12604,11 @@ td.product .name > a:focus,
   font-size: 14px;
   margin-top: -8px;
   margin-bottom: 20px;
+}
+#product-details .product-info .pse-name {
+  color: #555555;
+  font-size: 14px;
+  margin-left: 10px;
 }
 #product-details .product-price .price-container {
   margin-left: -15px;

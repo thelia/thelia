@@ -137,11 +137,227 @@
         });
 
         // Product AddtoCard - OnSubmit
-        $(document).on('submit.form-product', '.form-product', function () { 
+        if (typeof window.PSE_FORM !== "undefined"){
+            // cache dom elements
+            var $pse = {
+                    "id": $("#pse-id"),
+                    "product": $("#product"),
+                    "name": $("#pse-name"),
+                    "ref": $("#pse-ref"),
+                    "ean": $("#pse-ean"),
+                    "availability": $("#pse-availability"),
+                    "quantity": $("#pse-quantity"),
+                    "promo": $("#pse-promo"),
+                    "new": $("#pse-new"),
+                    "weight": $("#pse-weight"),
+                    "price": $("#pse-price"),
+                    "priceOld": $("#pse-price-old"),
+                    "submit": $(".btn_add_to_cart"),
+                    "options": {},
+                    "pseId": null
+                };
+
+            var buildProductForm = function buildProductForm() {
+                var pse = null,
+                    combinationId = null,
+                    combinationValue = null,
+                    combinationValueId = null;
+
+                // get the select for options
+                $("#pse-options .pse-option").each(function(){
+                    var $option = $(this);
+                    $pse['options'][$option.data("attribute")] = $option;
+                    $option.on("change", updateProductForm);
+                });
+
+                // build select
+                for (combinationValueId in PSE_COMBINATIONS_VALUE) {
+                    combinationValue = PSE_COMBINATIONS_VALUE[combinationValueId];
+                    $pse.options[combinationValue[1]]
+                        .append("<option value='" + combinationValueId + "'>"
+                                    + combinationValue[0] + "</option>");
+                }
+
+                // initialization for the first default pse
+                $pse.pseId = $pse.id.val();
+                setPseForm();
+            };
+
+            var setPseForm = function setPseForm(id) {
+                var i = 0,
+                    pse = null,
+                    combinationValueId;
+                pse = PSE[id || $pse.pseId];
+                for (var i=0; i<pse.combinations.length; i++){
+                    combinationValueId = pse.combinations[i];
+                    $pse['options'][PSE_COMBINATIONS_VALUE[combinationValueId][1]].val(pse.combinations[i])
+                }
+            };
+
+            var updateProductForm = function updateProductForm() {
+                var pseId = null,
+                    selection;
+
+                // get form data
+                selection = getFormSelection();
+                // get the pse
+                pseId = pseExist(selection);
+
+                if ( ! pseId ) {
+                    // not exists, revert
+                    setPseForm();
+                } else {
+                    $pse.pseId = pseId;
+                }
+
+                // Update UI
+                updateProductUI();
+            }
+
+            var updateProductUI = function updateProductUI() {
+                var pse = PSE[$pse.pseId],
+                    name = [],
+                    pseValueId,
+                    i
+                    ;
+
+                $pse.ref.html(pse.ref);
+                // $pse.ean.html(pse.ean);
+                // name
+                for (i = 0; i < pse.combinations.length; i++){
+                    pseValueId = pse.combinations[i]
+                    name.push(
+                        //PSE_COMBINATIONS[PSE_COMBINATIONS_VALUE[pseValueId][1]].name +
+                        //":" +
+                        PSE_COMBINATIONS_VALUE[pseValueId][0]
+                    )
+                }
+                $pse.name.html(" - " + name.join(", ") + "");
+
+                // promo
+                if (pse.promo) {
+                    $pse.product.addClass("product--is-promo");
+                } else {
+                    $pse.product.removeClass("product--is-promo");
+                }
+
+                // new
+                if (pse.new) {
+                    $pse.new.addClass("product--is-new");
+                } else {
+                    $pse.new.removeClass("product--is-new");
+                }
+
+                // availability
+                if (pse.quantite > 0 || ! PSE_CHECK_AVAILABILITY) {
+                    $pse.availability
+                        .removeClass("out-of-stock")
+                        .addClass("in-stock")
+                        .attr("href", "http://schema.org/InStock");
+
+                    $pse.quantity.val(pse.quantity);
+
+                    $pse.submit.attr("disabled", false);
+                } else {
+                    $pse.new.removeClass("in-stock")
+                            .addClass("out-of-stock")
+                            .attr("href", "http://schema.org/OutOfStock");
+
+                    $pse.submit.attr("disabled", true);
+                }
+
+                // price
+                $pse.priceOld.html(pse.promo);
+                $pse.price.html(pse.price);
+            }
+
+            /*
+            if (qty == 0) {
+                // Disable button
+                $btnAddToCart.attr("disabled", true);
+
+                // Update stock information
+                $stockInformation
+                    .removeClass("in-stock")
+                    .addClass("out-of-stock")
+                    .attr("href", "http://schema.org/OutOfStock");
+
+            } else {
+                // Active button
+                $btnAddToCart.attr("disabled", false);
+
+                // Update Field Quantity if the current value is over Max
+                if (parseInt($quantityInput.val()) > parseInt(qty)) {
+                    $quantityInput.val(qty);
+                }
+
+                // Update stock information
+                $stockInformation
+                    .removeClass("out-of-stock")
+                    .addClass("in-stock")
+                    .attr("href", "http://schema.org/InStock");
+            }
+
+            // HTML5 number attribute
+            $quantityInput.attr("max", qty);
+
+            // Update Prices
+            $(".old-price > .price", $productDetails).html($current.data('old-price'));
+            $(".special-price > .price, .regular-price > .price", $productDetails).html($current.data('price'));
+            */
+
+            var pseExist = function pseExist(selection) {
+                var pseId,
+                    pse = null,
+                    combinations,
+                    i,
+                    j,
+                    existCombination;
+
+                for (pse in PSE){
+                    pseId = pse;
+                    combinations = PSE[pse].combinations;
+                    for (i = 0; i < selection.length; i++){
+                        existCombination = false;
+                        for (j = 0; j < combinations.length; j++){
+                            if (selection[i] == combinations[j]){
+                                existCombination = true;
+                                break;
+                            }
+                        }
+                        if (existCombination === false) {
+                            break;
+                        }
+                    }
+                    if (existCombination) {
+                        return pseId;
+                    }
+                }
+
+                return false;
+            }
+
+            var getFormSelection = function getFormSelection() {
+                var selection = [],
+                    combinationId;
+
+                for (combinationId in $pse.options){
+                    selection.push($pse.options[combinationId].val());
+                }
+
+                return selection;
+            }
+
+            buildProductForm();
+            updateProductForm();
+
+        }
+
+        $(document).on('submit.form-product', '.form-product', function () {
             if (doAjax) {
                 var url_action  = $(this).attr("action"),
                     product_id  = $("input[name$='product_id']",this).val();
-                    
+
                 $.ajax({type: "POST", data: $(this).serialize(), url: url_action,
                     success: function(data){
                         $(".cart-container").html($(data).html());
@@ -167,6 +383,9 @@
             }
             return;
         });
+
+        /*
+
             
         $(document).on('change.quantity', 'select:has([data-quantity])', function () { 
             var $productDetails         = $(this).closest("#product-details"),
@@ -212,6 +431,8 @@
             $(".special-price > .price, .regular-price > .price", $productDetails).html($current.data('price'));
 
         });
+        */
+
 
         // Toolbar
         var $category_products = $ ('#category-products');
@@ -352,6 +573,7 @@
         });
 
     });
+
 
 })(jQuery);
 
