@@ -73,7 +73,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $this->conditionFactory = $conditionFactory;
     }
 
-     /**
+    /**
      * Occurring when a Coupon is about to be created
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
@@ -118,6 +118,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $this->couponManager->clear();
 
         $this->request->getSession()->setConsumedCoupons(array());
+
+        $this->updateOrderDiscount(null);
     }
 
     /**
@@ -165,7 +167,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                     ->getOrder()
                     ->setDiscount($totalDiscount)
                 ;
-             }
+            }
         }
 
         $event->setIsValid($isValid);
