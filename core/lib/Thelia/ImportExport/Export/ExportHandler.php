@@ -29,7 +29,7 @@ abstract class ExportHandler extends AbstractHandler
     protected $locale;
 
     /** @var  array */
-    protected $order;
+    protected $order = array();
 
     /**
      * @return array
