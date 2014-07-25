@@ -269,12 +269,12 @@ class Product extends BaseAction implements EventSubscriberInterface
             $product = $event->getProduct();
 
             // Delete all product feature relations
-            if(null != $feature_products = FeatureProductQuery::create()->findByProductId($product->getId())){
-                /** @var \Thelia\Model\FeatureProduct $feature_product */
-                foreach($feature_products as $feature_product){
-                    $event_delete = new FeatureProductDeleteEvent($product->getId(), $feature_product->getFeatureId());
+            if(null !== $featureProducts = FeatureProductQuery::create()->findByProductId($product->getId())){
+                /** @var \Thelia\Model\FeatureProduct $featureProduct */
+                foreach($featureProducts as $featureProduct){
+                    $eventDelete = new FeatureProductDeleteEvent($product->getId(), $featureProduct->getFeatureId());
 
-                    $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $event_delete);
+                    $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $eventDelete);
                 }
             }
 
