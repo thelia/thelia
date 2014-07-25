@@ -132,8 +132,8 @@
                         <meta itemprop="priceCurrency" content="{currency attr="symbol"}">
 
                         <span id="pse-promo">
-                            <span id="pse-price" class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$TAXED_PROMO_PRICE}"} {currency attr="symbol"}</span></span>
-                            <span id="pse-price-old" class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
+                            <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span id="pse-price" class="price">{format_number number="{$TAXED_PROMO_PRICE}"} {currency attr="symbol"}</span></span>
+                            <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span id="pse-price-old" class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
                         </span>
                     </div>
                 </div>
@@ -186,7 +186,7 @@
                         {/form_field}
 
                         <div class="form-group group-btn">
-                            <button type="submit" class="btn btn_add_to_cart">{intl l="Add to cart"}</button>
+                            <button id="pse-submit" type="submit" class="btn btn_add_to_cart">{intl l="Add to cart"}</button>
                         </div>
                     </fieldset>
 
@@ -267,6 +267,42 @@
                     {/if}
                 </div>
             </section>
+{* javascript confiuguration to display pse *}
+{$pse=[]}
+{$combination_label=[]}
+{$combination_values=[]}
+{loop name="pse" type="product_sale_elements" product="{product attr="id"}"}
+{$pse[$ID]=["id" => $ID, "isDefault" => $IS_DEFAULT, "isPromo" => $IS_PROMO, "isNew" => $IS_NEW, "ref" => "{$REF}", "ean" => "{$EAN}", "quantity" => {$QUANTITY}, "price" => "{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}", "promo" => "{format_number number="{$TAXED_PROMO_PRICE}"} {currency attr="symbol"}" ]}
+{$pse_combination=[]}
+{loop name="combi" type="attribute_combination" product_sale_elements="$ID"}
+{if ! $combination_label[$ATTRIBUTE_ID]}
+{$combination_label[$ATTRIBUTE_ID]=["name" => "{$ATTRIBUTE_TITLE}", "values" => []]}
+{/if}
+{if ! $combination_values[$ATTRIBUTE_AVAILABILITY_ID]}
+{$combination_label[$ATTRIBUTE_ID]["values"][]=$ATTRIBUTE_AVAILABILITY_ID}
+{$combination_values[$ATTRIBUTE_AVAILABILITY_ID]=["{$ATTRIBUTE_AVAILABILITY_TITLE}", $ATTRIBUTE_ID]}
+{/if}
+{$pse_combination[]=$ATTRIBUTE_AVAILABILITY_ID}
+{/loop}
+{$pse[$ID]["combinations"]=$pse_combination}
+{/loop}
+<script type="text/javascript">
+    // Product sale elements
+    var PSE_FORM = true;
+    var PSE_COUNT = {$pse_count};
+    {if $check_availability}
+        var PSE_CHECK_AVAILABILITY = true;
+        {else}
+        var PSE_CHECK_AVAILABILITY = false;
+        {/if};
+            var PSE_DEFAULT_AVAILABLE_STOCK = {config key="default-available-stock" default="100"};
+        var PSE = {$pse|json_encode nofilter};
+    var PSE_COMBINATIONS = {$combination_label|json_encode nofilter};
+    var PSE_COMBINATIONS_VALUE = {$combination_values|json_encode nofilter};
+</script>
+{if $pse_count > 1}
+{/if}
+
         </article><!-- /#product -->
 
         <ul class="pager">
@@ -287,32 +323,6 @@
 {/block}
 
 {block name="javascript-initialization"}
-    {if $pse_count > 1}
-        {$pse=[]}
-        {$combination_label=[]}
-        {$combination_values=[]}
-        {loop name="pse" type="product_sale_elements" product="{product attr="id"}"}
-        {$pse[$ID]=["id" => $ID, "default" => $IS_DEFAULT, "promo" => $IS_PROMO, "new" => $IS_NEW, "ref" => "{$REF}", "ean" => "{$EAN}", "quantity" => {$QUANTITY}, "price" => "{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}", "promo" => "{format_number number="{$TAXED_PROMO_PRICE}"} {currency attr="symbol"}" ]}
-            {$pse_combination=[]}
-            {loop name="combi" type="attribute_combination" product_sale_elements="$ID"}
-                {if ! $combination_label[$ATTRIBUTE_ID]}
-                    {$combination_label[$ATTRIBUTE_ID]=["name" => "{$ATTRIBUTE_TITLE}", "values" => []]}
-                {/if}
-                {if ! $combination_values[$ATTRIBUTE_AVAILABILITY_ID]}
-                    {$combination_label[$ATTRIBUTE_ID]["values"][]=$ATTRIBUTE_AVAILABILITY_ID}
-                    {$combination_values[$ATTRIBUTE_AVAILABILITY_ID]=["{$ATTRIBUTE_AVAILABILITY_TITLE}", $ATTRIBUTE_ID]}
-                {/if}
-                {$pse_combination[]=$ATTRIBUTE_AVAILABILITY_ID}
-            {/loop}
-            {$pse[$ID]["combinations"]=$pse_combination}
-        {/loop}
-        <script type="text/javascript">
-            // Product sale elements
-            var PSE_FORM = true;
-            var PSE_CHECK_AVAILABILITY = {if $check_availability}true{else}false{/if};
-            var PSE = {$pse|json_encode nofilter};
-            var PSE_COMBINATIONS = {$combination_label|json_encode nofilter};
-            var PSE_COMBINATIONS_VALUE = {$combination_values|json_encode nofilter};
-        </script>
-    {/if}
+
+
 {/block}

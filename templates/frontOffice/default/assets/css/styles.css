@@ -5174,7 +5174,7 @@ body.modal-open,
   left: 100%;
 }
 .carousel-inner > .prev {
-  left: -100%;
+  left: -99.99999999%;
 }
 .carousel-inner > .next.left,
 .carousel-inner > .prev.right {
@@ -10939,7 +10939,7 @@ td.products-grid .item .product-info .description {
   display: block;
 }
 .availability .in-stock {
-  color: #44B661;
+  color: #5cb85c;
   font-style: italic;
   font-weight: bold;
   text-transform: uppercase;
@@ -10954,7 +10954,7 @@ td.products-grid .item .product-info .description {
   font-style: italic;
 }
 .availability .out-of-stock {
-  color: #FF0000;
+  color: #f0ad4e;
   font-style: italic;
   font-weight: bold;
   text-transform: uppercase;
@@ -12608,7 +12608,6 @@ td.product .name > a:focus,
 #product-details .product-info .pse-name {
   color: #555555;
   font-size: 14px;
-  margin-left: 10px;
 }
 #product-details .product-price .price-container {
   margin-left: -15px;
