@@ -57,8 +57,13 @@ var pseManager = (function($){
         // get the select for options
         $("#pse-options .pse-option").each(function(){
             var $option = $(this);
-            $pse['options'][$option.data("attribute")] = $option;
-            $option.on("change", updateProductForm);
+            if ( $option.data("attribute") in PSE_COMBINATIONS){
+                $pse['options'][$option.data("attribute")] = $option;
+                $option.on("change", updateProductForm);
+            } else {
+                // not affected to this product -> remove
+                $option.closest(".option").remove();
+            }
         });
 
         // build select

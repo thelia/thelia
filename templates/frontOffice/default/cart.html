@@ -65,9 +65,7 @@
                                 {/elseloop}
                         </td>
                         <td class="product" >
-                            <h3 class="name"><a href="{$PRODUCT_URL}">
-                                    {$TITLE}
-                                </a></h3>
+                            <h3 class="name"><a href="{$PRODUCT_URL}">{$TITLE}</a></h3>
                             <div class="product-options">
                                 <dl class="dl-horizontal">
                                     <dt>{intl l="Available"} :</dt>
@@ -198,7 +196,6 @@
                         {loop name="product_upsell" type="product" promo="yes" limit="5"}
                             {include file="includes/single-product.html" product_id=$ID hasBtn=false hasDescription=true width="218" height="146"}
                         {/loop}
-
                     </ul>
                 </div>
             </aside><!-- #products-upsell -->
