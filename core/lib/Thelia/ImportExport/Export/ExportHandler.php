@@ -15,6 +15,7 @@ use Propel\Runtime\ActiveQuery\Criterion\Exception\InvalidValueException;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\Exception\LoopException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
 use Thelia\ImportExport\AbstractHandler;
@@ -173,9 +174,46 @@ abstract class ExportHandler extends AbstractHandler
         return $return;
     }
 
+    public function renderLoop($type, array $args = array())
+    {
+        $loopsDefinition = $this->container->getParameter("thelia.parser.loops");
+
+        if (!isset($loopsDefinition[$type])) {
+            throw new LoopException(
+                Translator::getInstance()->trans(
+                    "The loop \"%loop\" doesn't exist",
+                    [
+                        "%loop" => $type
+                    ]
+                )
+            );
+        }
+
+        $reflection = new \ReflectionClass($loopsDefinition[$type]);
+
+        if (!$reflection->isSubclassOf("Thelia\\Core\\Template\\Element\\BaseLoop")) {
+            throw new LoopException(
+                Translator::getInstance()->trans(
+                    "The class \"%class\" must be a subclass of %baseClass",
+                    [
+                        "%class" => $loopsDefinition[$type],
+                        "%baseClass" => "Thelia\\Core\\Template\\Element\\BaseLoop",
+                    ]
+                )
+            );
+        }
+
+        /** @var BaseLoop $loopInstance */
+        $loopInstance = $reflection->newInstance($this->container);
+
+        $loopInstance->initializeArgs($args);
+
+        return $loopInstance;
+    }
+
     /**
      * @param Lang $lang
      * @return ModelCriteria|array|BaseLoop
      */
-    abstract protected function  buildDataSet(Lang $lang);
+    abstract public function buildDataSet(Lang $lang);
 } 

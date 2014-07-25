@@ -60,7 +60,7 @@ class ProductPricesExport extends ExportHandler
      * @param Lang $lang
      * @return FormatterData
      */
-    protected function buildDataSet(Lang $lang)
+    public function buildDataSet(Lang $lang)
     {
         $locale = $lang->getLocale();
 
