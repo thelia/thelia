@@ -26,4 +26,4 @@ interface DocumentsExportInterface
      * return an array with the paths to the documents to include in the archive
      */
     public function getDocumentsPaths();
-} 
+}

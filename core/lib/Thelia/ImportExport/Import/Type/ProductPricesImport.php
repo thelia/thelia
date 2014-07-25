@@ -112,7 +112,7 @@ class ProductPricesImport extends ImportHandler
                 if (isset($row["promo"])) {
                     $price
                         ->getProductSaleElements()
-                        ->setPromo((int)$row["promo"])
+                        ->setPromo((int) $row["promo"])
                         ->save()
                     ;
                 }
@@ -132,6 +132,5 @@ class ProductPricesImport extends ImportHandler
     {
         return ["ref", "price"];
     }
-
 
 }

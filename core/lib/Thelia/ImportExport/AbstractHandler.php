@@ -30,12 +30,12 @@ abstract class AbstractHandler
      *
      * Dependency injection: load the container to be able to get parameters and services
      */
-    public function __construct(ContainerInterface $container) {
+    public function __construct(ContainerInterface $container)
+    {
         $this->defaultLocale = Lang::getDefaultLanguage()->getLocale();
 
         $this->container = $container;
     }
-
 
     public function getContainer()
     {
@@ -66,4 +66,4 @@ abstract class AbstractHandler
      * );
      */
     abstract public function getHandledTypes();
-} 
+}

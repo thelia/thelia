@@ -11,7 +11,6 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Export\Type;
-use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\Model\CustomerQuery;
@@ -28,7 +27,7 @@ use Thelia\Model\NewsletterQuery;
 class MailingExport extends ExportHandler
 {
     /**
-     * @param Lang $lang
+     * @param  Lang                                            $lang
      * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria
      */
     public function buildDataSet(Lang $lang)
@@ -42,7 +41,7 @@ class MailingExport extends ExportHandler
             ->find()
             ->toArray()
         ;
-        
+
         $customers = CustomerQuery::create()
             ->select([
                 CustomerTableMap::EMAIL,
@@ -96,4 +95,4 @@ class MailingExport extends ExportHandler
             FormatType::UNBOUNDED,
         );
     }
-} 
+}

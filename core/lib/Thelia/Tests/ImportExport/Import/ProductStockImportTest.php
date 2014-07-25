@@ -35,7 +35,6 @@ class ProductStockImportTest extends ControllerTestBase
         return new ImportController();
     }
 
-
     public function setUp()
     {
         parent::setUp();
@@ -92,4 +91,4 @@ class ProductStockImportTest extends ControllerTestBase
             );
         }
     }
-} 
+}

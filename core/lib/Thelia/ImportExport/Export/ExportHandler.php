@@ -80,7 +80,7 @@ abstract class ExportHandler extends AbstractHandler
     }
 
     /**
-     * @param \Thelia\Model\Lang $lang
+     * @param  \Thelia\Model\Lang                               $lang
      * @return \Thelia\Core\FileFormat\Formatting\FormatterData
      *
      * The method builds the FormatterData for the formatter
@@ -92,10 +92,8 @@ abstract class ExportHandler extends AbstractHandler
         $query = $this->buildDataSet($lang);
 
         if ($query instanceof ModelCriteria) {
-
             return $data->loadModelCriteria($query);
         } elseif (is_array($query)) {
-
             return $data->setData($query);
         } elseif ($query instanceof BaseLoop) {
             $pagination = null;
@@ -160,7 +158,7 @@ abstract class ExportHandler extends AbstractHandler
         $return = "CONCAT(";
         $len = strlen($str);
 
-        for($i = 0; $i < $len; ++$i) {
+        for ($i = 0; $i < $len; ++$i) {
             $return .= "CHAR(".ord($str[$i])."),";
         }
 
@@ -212,8 +210,8 @@ abstract class ExportHandler extends AbstractHandler
     }
 
     /**
-     * @param Lang $lang
+     * @param  Lang                         $lang
      * @return ModelCriteria|array|BaseLoop
      */
     abstract public function buildDataSet(Lang $lang);
-} 
+}

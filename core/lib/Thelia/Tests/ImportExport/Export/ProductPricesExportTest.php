@@ -17,7 +17,6 @@ use Thelia\ImportExport\Export\Type\ProductPricesExport;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Lang;
-use Thelia\Model\LangQuery;
 
 /**
  * Class ProductPricesExportTest
@@ -47,8 +46,7 @@ class ProductPricesExportTest extends \PHPUnit_Framework_TestCase
             $max = 50;
         }
 
-        for ($i = 0; $i < $max; ++$i)
-        {
+        for ($i = 0; $i < $max; ++$i) {
             $row = $rawData[$i];
 
             $rowKeys = array_keys($row);
@@ -87,4 +85,4 @@ class ProductPricesExportTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($attributes, $rowAttributes);
         }
     }
-} 
+}

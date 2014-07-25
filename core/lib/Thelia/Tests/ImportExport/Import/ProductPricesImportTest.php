@@ -18,7 +18,6 @@ use Thelia\ImportExport\Import\Type\ProductPricesImport;
 use Thelia\Model\Currency;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Tests\Controller\ControllerTestBase;
-use Thelia\Tests\Controller\ImportExportControllerTrait;
 
 /**
  * Class ProductPricesImportTest
@@ -35,7 +34,6 @@ class ProductPricesImportTest extends ControllerTestBase
 
     }
 
-
     /**
      * @return \Thelia\Controller\BaseController The controller you want to test
      */
@@ -43,7 +41,6 @@ class ProductPricesImportTest extends ControllerTestBase
     {
         return new ImportController();
     }
-
 
     public function setUp()
     {
@@ -112,4 +109,4 @@ class ProductPricesImportTest extends ControllerTestBase
         }
     }
 
-} 
+}

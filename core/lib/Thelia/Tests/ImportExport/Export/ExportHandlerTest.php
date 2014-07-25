@@ -16,7 +16,6 @@ use Thelia\Core\FileFormat\FormatType;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Lang;
-use Thelia\Model\Map\AddressTableMap;
 use Thelia\Tests\ContainerAwareTestCase;
 
 /**
@@ -41,11 +40,9 @@ class ExportHandlerTest extends ContainerAwareTestCase
         );
     }
 
-
     public function setUp()
     {
         parent::setUp();
-
 
         $this->handler = $this->getMock(
             "Thelia\\ImportExport\\Export\\ExportHandler",
@@ -121,4 +118,4 @@ class ExportHandlerTest extends ContainerAwareTestCase
         }
 
     }
-} 
+}

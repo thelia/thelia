@@ -14,11 +14,7 @@ namespace Thelia\Tests\ImportExport\Export;
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\Type\ProductSEOExport;
-use Thelia\Model\Base\ProductAssociatedContentQuery;
-use Thelia\Model\ContentI18nQuery;
-use Thelia\Model\ContentQuery;
 use Thelia\Model\Lang;
-use Thelia\Model\ProductAssociatedContent;
 use Thelia\Model\ProductQuery;
 
 /**
@@ -49,8 +45,7 @@ class ProductSEOExportTest extends \PHPUnit_Framework_TestCase
             $max = 50;
         }
 
-        for ($i = 0; $i < $max; ++$i)
-        {
+        for ($i = 0; $i < $max; ++$i) {
             $row = $rawData[$i];
             $rowKeys = array_keys($row);
 
@@ -69,4 +64,4 @@ class ProductSEOExportTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($product->getRewrittenUrl("en_US"), $row["url"]);
         }
     }
-} 
+}

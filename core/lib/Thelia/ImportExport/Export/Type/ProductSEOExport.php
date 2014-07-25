@@ -13,7 +13,6 @@
 namespace Thelia\ImportExport\Export\Type;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\Model\Map\ProductI18nTableMap;
@@ -54,7 +53,7 @@ class ProductSEOExport extends ExportHandler
     }
 
     /**
-     * @param Lang $lang
+     * @param  Lang                                            $lang
      * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria
      */
     public function buildDataSet(Lang $lang)
@@ -126,4 +125,4 @@ class ProductSEOExport extends ExportHandler
         ];
     }
 
-} 
+}

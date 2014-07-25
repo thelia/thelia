@@ -57,7 +57,7 @@ class ProductPricesExport extends ExportHandler
     }
 
     /**
-     * @param Lang $lang
+     * @param  Lang          $lang
      * @return FormatterData
      */
     public function buildDataSet(Lang $lang)
@@ -126,5 +126,4 @@ class ProductPricesExport extends ExportHandler
         ];
     }
 
-
-} 
+}

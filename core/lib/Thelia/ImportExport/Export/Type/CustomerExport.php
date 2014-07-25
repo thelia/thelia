@@ -23,7 +23,6 @@ use Thelia\Model\Map\CountryI18nTableMap;
 use Thelia\Model\Map\CountryTableMap;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\CustomerTitleI18nTableMap;
-use Thelia\Model\Map\CustomerTitleTableMap;
 use Thelia\Model\Map\NewsletterTableMap;
 use Thelia\Model\OrderQuery;
 
@@ -214,7 +213,6 @@ class CustomerExport extends ExportHandler
                 $date = $currentCustomer[CustomerTableMap::CREATED_AT];
                 $dateTime = new \DateTime($date);
                 $currentCustomer[CustomerTableMap::CREATED_AT] = $dateTime->format($lang->getDatetimeFormat());
-
 
                 /**
                  * Then compute everything about the orders

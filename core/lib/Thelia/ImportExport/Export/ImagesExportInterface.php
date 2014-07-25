@@ -11,7 +11,6 @@
 /*************************************************************************************/
 namespace Thelia\ImportExport\Export;
 
-
 /**
  * interface ImagesExportInterface
  * @package Thelia\ImportExport
@@ -27,4 +26,4 @@ interface ImagesExportInterface
      * return an array with the paths to the images to include in the archive
      */
     public function getImagesPaths();
-} 
+}

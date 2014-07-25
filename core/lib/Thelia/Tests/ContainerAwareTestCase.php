@@ -75,4 +75,4 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
      * Use this method to build the container with the services that you need.
      */
     abstract protected function buildContainer(ContainerBuilder $container);
-} 
+}
