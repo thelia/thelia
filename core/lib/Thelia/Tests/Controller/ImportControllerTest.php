@@ -116,7 +116,11 @@ class ImportControllerTrait extends ControllerTestBase
         $handler = $this
             ->getMock(
                 "\\Thelia\\ImportExport\\Import\\ImportHandler",
-                [],
+                [
+                    "getMandatoryColumns",
+                    "retrieveFromFormatterData",
+                    "getHandledTypes"
+                ],
                 [
                     $this->container
                 ]
@@ -157,7 +161,11 @@ class ImportControllerTrait extends ControllerTestBase
         $handler = $this
             ->getMock(
                 "\\Thelia\\ImportExport\\Import\\ImportHandler",
-                [],
+                [
+                    "getMandatoryColumns",
+                    "retrieveFromFormatterData",
+                    "getHandledTypes"
+                ],
                 [
                     $this->container
                 ]
@@ -204,7 +212,11 @@ class ImportControllerTrait extends ControllerTestBase
         $handler = $this
             ->getMock(
                 "\\Thelia\\ImportExport\\Import\\ImportHandler",
-                [],
+                [
+                    "getMandatoryColumns",
+                    "retrieveFromFormatterData",
+                    "getHandledTypes"
+                ],
                 [
                     $this->container
                 ]

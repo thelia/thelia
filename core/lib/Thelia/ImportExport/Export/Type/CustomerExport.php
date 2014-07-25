@@ -224,16 +224,15 @@ class CustomerExport extends ExportHandler
                 $lastOrderDate = null;
                 $lastOrder = null;
                 $lastOrderCurrencyCode = null;
+                $lastOrderId = 0;
 
                 $defaultCurrency = Currency::getDefaultCurrency();
                 $defaultCurrencyCode = $defaultCurrency
-                    ->setLocale($locale)
                     ->getCode()
                 ;
 
                 if (empty($defaultCurrencyCode)) {
                     $defaultCurrencyCode = $defaultCurrency
-                        ->setLocale($defaultLocale)
                         ->getCode()
                     ;
                 }
@@ -256,9 +255,10 @@ class CustomerExport extends ExportHandler
                     /** @var \DateTime $date */
                     $date = $currentOrder->getCreatedAt();
 
-                    if (null === $lastOrderDate || $date > $lastOrderDate) {
+                    if (null === $lastOrderDate || ($date >= $lastOrderDate && $lastOrderId < $currentOrder->getId())) {
                         $lastOrder = $currentOrder;
                         $lastOrderDate = $date;
+                        $lastOrderId = $currentOrder->getId();
                     }
 
                     $orders->next();
@@ -269,13 +269,11 @@ class CustomerExport extends ExportHandler
 
                     $orderCurrency = $lastOrder->getCurrency();
                     $lastOrderCurrencyCode = $orderCurrency
-                        ->setLocale($locale)
                         ->getCode()
                     ;
 
                     if (empty($lastOrderCurrencyCode)) {
                         $lastOrderCurrencyCode = $orderCurrency
-                            ->setLocale($defaultLocale)
                             ->getCode()
                         ;
                     }

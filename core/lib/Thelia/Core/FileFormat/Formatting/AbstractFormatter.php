@@ -31,7 +31,7 @@ abstract class AbstractFormatter implements FormatInterface, FormatterInterface
     protected $logger;
 
     /** @var array */
-    protected $order;
+    protected $order = array();
 
     public function __construct()
     {
@@ -54,7 +54,7 @@ abstract class AbstractFormatter implements FormatInterface, FormatterInterface
 
     public function checkOrders(array $values)
     {
-        foreach ($this->order as $order) {
+        foreach ($this->getOrder() as $order) {
             if (!array_key_exists($order, $values)) {
                 throw new \ErrorException(
                     $this->translator->trans(

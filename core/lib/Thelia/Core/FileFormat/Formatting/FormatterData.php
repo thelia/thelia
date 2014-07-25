@@ -77,12 +77,6 @@ class FormatterData
      */
     public function setData(array $data)
     {
-        if (empty($this->aliases)) {
-            $this->data = $data;
-
-            return $this;
-        }
-
         $this->data = $this->applyAliases($data, $this->aliases);
 
         return $this;

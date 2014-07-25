@@ -100,6 +100,7 @@ class CustomerExportTest extends \PHPUnit_Framework_TestCase
             $lastOrder = OrderQuery::create()
                 ->filterByCustomer($customer)
                 ->orderByCreatedAt(Criteria::DESC)
+                ->orderById(Criteria::DESC)
                 ->findOne()
             ;
 
@@ -135,15 +136,7 @@ class CustomerExportTest extends \PHPUnit_Framework_TestCase
                     ->filterByCustomer($customer)
                     ->filterByAddress1($rawData[$i]["address1"])
                     ->filterByAddress2($rawData[$i]["address2"])
-                        ->_if(empty($rawData[$i]["address2"]))
-                            ->_or()
-                            ->filterByAddress2(null, Criteria::ISNULL)
-                        ->_endif()
                     ->filterByAddress3($rawData[$i]["address3"])
-                        ->_if(empty($rawData[$i]["address2"]))
-                            ->_or()
-                            ->filterByAddress2(null, Criteria::ISNULL)
-                        ->_endif()
                     ->filterByFirstname($rawData[$i]["address_first_name"])
                     ->filterByLastname($rawData[$i]["address_last_name"])
                     ->filterByCountryId(
@@ -163,20 +156,28 @@ class CustomerExportTest extends \PHPUnit_Framework_TestCase
                     ->filterByCellphone($rawData[$i]["cellphone"])
                         ->_if(empty($rawData[$i]["cellphone"]))
                             ->_or()
-                            ->filterByCompany(null, Criteria::ISNULL)
+                            ->filterByCellphone(null, Criteria::ISNULL)
                         ->_endif()
                     ->filterByPhone($rawData[$i]["phone"])
+                        ->_if(empty($rawData[$i]["phone"]))
+                            ->_or()
+                            ->filterByPhone(null, Criteria::ISNULL)
+                        ->_endif()
                     ->filterByLabel($rawData[$i]["label"])
+                        ->_if(empty($rawData[$i]["label"]))
+                            ->_or()
+                            ->filterByLabel(null, Criteria::ISNULL)
+                        ->_endif()
                     ->filterByTitleId(
                         CustomerTitleI18nQuery::create()
                             ->filterByLocale($lang->getLocale())
                             ->findOneByShort($rawData[$i]["address_title"])
                             ->getId()
                     )
-                    ->find()
+                    ->findOne()
                 ;
 
-                $this->assertEquals(1, $address->count());
+                $this->assertNotNull($address);
 
                 $rowKeys = array_keys($rawData[$i]);
                 sort($rowKeys);
