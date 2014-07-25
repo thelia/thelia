@@ -102,6 +102,7 @@ var pseManager = (function($){
                 // not exists, revert
                 setPseForm();
             } else {
+                $pse.id.val(pseId);
                 $pse.pseId = pseId;
             }
         }
@@ -359,12 +360,13 @@ var pseManager = (function($){
         $(document).on('submit.form-product', '.form-product', function () {
             if (doAjax) {
                 var url_action  = $(this).attr("action"),
-                    product_id  = $("input[name$='product_id']",this).val();
+                    product_id  = $("input[name$='product_id']",this).val(),
+                    pse_id  = $("input#pse-id",this).val();
 
                 $.ajax({type: "POST", data: $(this).serialize(), url: url_action,
                     success: function(data){
                         $(".cart-container").html($(data).html());
-                        $.ajax({url:"ajax/addCartMessage", data:{ product_id: product_id },
+                        $.ajax({url:"ajax/addCartMessage", data:{ product_id: product_id, pse_id: pse_id },
                             success: function (data) {
                                 // Hide all currently active bootbox dialogs
                                 bootbox.hideAll();

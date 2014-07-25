@@ -1,34 +1,38 @@
 {default_translation_domain domain='fo.default'}
 {loop type="product" name="add_product_to_cart" id={product attr="id"}}
 <div class="clearfix">
-        <table>
-            <tr>
-                <td class="col-md-4">
-                    {loop name="product_thumbnail" type="image" product=$ID width="218" height="146" resize_mode="borders" limit="1"}
-                        <img itemprop="image" src="{$IMAGE_URL}" alt="Product #{$LOOP_COUNT}">
-                    {/loop}
-                </td>
-                <td class="col-md-4">
-                    <h2>{$TITLE}</h2>
-                    {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
-                        <p>{$ATTRIBUTE_TITLE}</p>
-                        <p>{$ATTRIBUTE_AVAILABILITY_TITLE}</p>
-                    {/loop}
-                </td>
-                <td class="col-md-4">
+    <table>
+        <tr>
+            <td colspan="3">
+                <h3 class="text-center">{intl l="The product has been added to your cart" }</h3>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-md-4">
+                {loop name="product_thumbnail" type="image" product=$ID width="218" height="146" resize_mode="borders" limit="1"}
+                    <img itemprop="image" src="{$IMAGE_URL}" alt="Product #{$LOOP_COUNT}">
+                {/loop}
+            </td>
+            <td class="col-md-4">
+                <h2>{$TITLE}</h2>
+                {loop type="attribute_combination" name="product_options" product_sale_elements="{$smarty.get.pse_id}"}
+                    <p>{$ATTRIBUTE_TITLE} : {$ATTRIBUTE_AVAILABILITY_TITLE}</p>
+                {/loop}
+            </td>
+            <td class="col-md-4">
 
-                    {if $IS_PROMO == 1}
-                        {assign "real_price" $TAXED_PROMO_PRICE}
-                        <div class="special-price"><span class="price">{$TAXED_PROMO_PRICE} {currency attr="symbol"}</span></div>
-                        <small class="old-price"> <span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></small>
-                    {else}
-                        {assign "real_price" $TAXED_PRICE}
-                        <div class="special-price"><span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></div>
-                    {/if}
+                {if $IS_PROMO == 1}
+                    {assign "real_price" $TAXED_PROMO_PRICE}
+                    <div class="special-price"><span class="price">{$TAXED_PROMO_PRICE} {currency attr="symbol"}</span></div>
+                    <small class="old-price"> <span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></small>
+                {else}
+                    {assign "real_price" $TAXED_PRICE}
+                    <div class="special-price"><span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></div>
+                {/if}
 
-                </td>
-            </tr>
-        </table>
+            </td>
+        </tr>
+    </table>
     <a href="{url path="/cart"}" role="button" class="btn btn_add_to_cart pull-right"><span>{intl l="View Cart"}</span></a>
     <button type="button" class="btn btn-checkout pull-right" data-dismiss="modal"><span>{intl l="Continue Shopping"}</span></button>
 </div>
