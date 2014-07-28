@@ -114,7 +114,7 @@ class MimeTypesToolsTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals(
-            MimeTypeTools::TYPE_UNKNOWN,
+            MimeTypeTools::TYPE_MATCH,
             $this->tool->validateMimeTypeExtension(
                 "text/x-php", "foo.php"
             ));
