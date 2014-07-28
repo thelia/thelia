@@ -89,19 +89,27 @@ class MimeTypesToolsTest extends \PHPUnit_Framework_TestCase
 
     public function testValidation()
     {
-        $this->assertTrue($this->tool->validateMimeTypeExtension(
+        $this->assertEquals(
+            MimeTypeTools::TYPE_MATCH,
+            $this->tool->validateMimeTypeExtension(
             "image/png", "foo.png"
         ));
 
-        $this->assertTrue($this->tool->validateMimeTypeExtension(
+        $this->assertEquals(
+            MimeTypeTools::TYPE_MATCH,
+            $this->tool->validateMimeTypeExtension(
             "image/png", "foo.PNg"
         ));
 
-        $this->assertFalse($this->tool->validateMimeTypeExtension(
+        $this->assertEquals(
+            MimeTypeTools::TYPE_NOT_MATCH,
+            $this->tool->validateMimeTypeExtension(
             "image/png", "foo.jpeg"
         ));
 
-        $this->assertFalse($this->tool->validateMimeTypeExtension(
+        $this->assertEquals(
+            MimeTypeTools::TYPE_UNKNOWN,
+            $this->tool->validateMimeTypeExtension(
             "thismimetype/doesntexists", "foo.bar"
         ));
     }
