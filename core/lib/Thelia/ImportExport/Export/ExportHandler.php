@@ -219,7 +219,10 @@ abstract class ExportHandler extends AbstractHandler
         $path = $model->getUploadDir() . DS . $model->getFile();
 
         if (is_file($path) && is_readable($path)) {
-            $paths[$model->getTitle() . DS . $model->getFile()] = $path;
+            $parent = $model->getParentFileModel();
+
+            $name = constant($parent::TABLE_MAP . "::TABLE_NAME");
+            $paths[$name . DS . $model->getFile()] = $path;
         }
     }
 

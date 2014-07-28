@@ -183,10 +183,8 @@ class CustomerExportTest extends \PHPUnit_Framework_TestCase
                 sort($rowKeys);
 
                 $this->assertEquals($rowKeys, $keys);
-
-                ++$i;
             } while (
-                isset($rawData[$i]["ref"]) &&
+                isset($rawData[++$i]["ref"]) &&
                 $rawData[$i-1]["ref"] === $rawData[$i]["ref"] &&
                 ++$max
             );
