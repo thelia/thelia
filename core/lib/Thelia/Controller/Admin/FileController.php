@@ -26,6 +26,7 @@ use Thelia\Files\FileModelInterface;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Lang;
+use Thelia\Tools\MimeTypeTools;
 use Thelia\Tools\Rest\ResponseRest;
 use Thelia\Tools\URL;
 
@@ -60,12 +61,20 @@ class FileController extends BaseAdminController
      * @param string $parentType     Parent Type owning files being saved (product, category, content, etc.)
      * @param string $objectType     Object type, e.g. image or document
      * @param array  $validMimeTypes an array of valid mime types. If empty, any mime type is allowed.
-     *
+     * @param array  $blackList      an array of blacklisted mime types.
      * @return Response
      */
-    public function saveFileAjaxAction($parentId, $parentType, $objectType, $validMimeTypes = array())
-    {
-        $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
+    public function saveFileAjaxAction(
+        $parentId,
+        $parentType,
+        $objectType,
+        $validMimeTypes = array(),
+        $blackList = array()
+    ) {
+        if (null !== $response = $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
         $this->checkXmlHttpRequest();
 
         if ($this->getRequest()->isMethod('POST')) {
@@ -87,12 +96,31 @@ class FileController extends BaseAdminController
                 return new ResponseRest($message, 'text', 403);
             }
 
+            $mimeType = $fileBeingUploaded->getMimeType();
+            $mimeTypeTools = MimeTypeTools::getInstance();
+            $validateMimeType = $mimeTypeTools
+                ->validateMimeTypeExtension(
+                    $mimeType,
+                    $fileBeingUploaded->getClientOriginalName()
+            );
+
+            $message = null;
+
+            if ($validateMimeType === $mimeTypeTools::TYPE_NOT_MATCH) {
+                $message = $this->getTranslator()
+                    ->trans(
+                        "There's a conflict between your file extension \"%ext\" and the mime type \"%mime\"",
+                        [
+                            '%mime' => $mimeType,
+                            '%ext' => $fileBeingUploaded->getClientOriginalExtension()
+                        ]
+                    );
+            }
+
             if (! empty($validMimeTypes)) {
 
                 // Check if we have the proper file type
                 $isValid = false;
-
-                $mimeType = $fileBeingUploaded->getMimeType();
 
                 if (in_array($mimeType, $validMimeTypes)) {
                     $isValid = true;
@@ -104,9 +132,21 @@ class FileController extends BaseAdminController
                             'Only files having the following mime type are allowed: %types%',
                             [ '%types%' => implode(', ', $validMimeTypes)]
                         );
-
-                    return new ResponseRest($message, 'text', 415);
                 }
+            }
+
+            if (!empty($blackList)) {
+                if (in_array($mimeType, $blackList)) {
+                    $message = $this->getTranslator()
+                        ->trans(
+                            'Files with the following mime type are not allowed: %type, please do an archive of the file if you want to upload it',
+                            [ '%type' => $mimeType]
+                        );
+                }
+            }
+
+            if ($message !== null) {
+                return new ResponseRest($message, 'text', 415);
             }
 
             $fileModel = $fileManager->getModelInstance($objectType, $parentType);
@@ -182,7 +222,19 @@ class FileController extends BaseAdminController
      */
     public function saveDocumentAjaxAction($parentId, $parentType)
     {
-        return $this->saveFileAjaxAction($parentId, $parentType, 'document');
+        return $this->saveFileAjaxAction(
+            $parentId,
+            $parentType,
+            'document',
+            [],
+            [
+                'text/x-php',
+                'application/x-httpd-php',
+                'application/x-httpd-php3',
+                'application/x-httpd-php4',
+                'application/x-httpd-php5',
+            ]
+        );
     }
 
     /**
