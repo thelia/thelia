@@ -27,21 +27,7 @@ class MimeTypeTools
     const TYPE_NOT_MATCH = 1;
     const TYPE_MATCH = 2;
 
-    protected static $instance;
-
     protected static $typesCache;
-
-    /**
-     * @return $this
-     */
-    public static function getInstance()
-    {
-        if (null === static::$instance) {
-            static::$instance = new static();
-        }
-
-        return static::$instance;
-    }
 
     /**
      * @param $mimeType

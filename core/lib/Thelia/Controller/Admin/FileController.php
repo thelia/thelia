@@ -55,6 +55,16 @@ class FileController extends BaseAdminController
     }
 
     /**
+     * Get the mime type tools
+     *
+     * @return MimeTypeTools
+     */
+    public function getMimeTypeTools()
+    {
+        return $this->container->get('tools.mime_type');
+    }
+
+    /**
      * Manage how a file collection has to be saved
      *
      * @param  int      $parentId       Parent id owning files being saved
@@ -97,7 +107,7 @@ class FileController extends BaseAdminController
             }
 
             $mimeType = $fileBeingUploaded->getMimeType();
-            $mimeTypeTools = MimeTypeTools::getInstance();
+            $mimeTypeTools = $this->getMimeTypeTools();
             $validateMimeType = $mimeTypeTools
                 ->validateMimeTypeExtension(
                     $mimeType,
