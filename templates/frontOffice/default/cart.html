@@ -16,7 +16,7 @@
 
             <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
 
-            {nocache}
+
             {ifloop rel="cartloop"}
             {include file="misc/checkout-progress.tpl" step="cart"}
 
@@ -182,7 +182,7 @@
                     <strong>{intl l="Warning"}!</strong> {intl l="You have no items in your shopping cart."}
                 </div>
             {/elseloop}
-            {/nocache}
+
         </article>
 
         {ifloop rel="product_upsell"}

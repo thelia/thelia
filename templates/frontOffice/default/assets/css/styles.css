@@ -8258,6 +8258,10 @@ fieldset[disabled] .checkout-progress .btn-step.active {
 .table-cart tbody td.unitprice .old-price .price {
   font-size: 14px;
 }
+.table-cart tbody td.unitprice .secondary-price .price {
+  font-size: 14px;
+  font-weight: normal;
+}
 .table-cart tbody td.qty .group-qty {
   margin-bottom: 0;
 }
@@ -8272,6 +8276,20 @@ fieldset[disabled] .checkout-progress .btn-step.active {
   font-size: 19px;
 }
 .table-cart tfoot td.empty {
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+}
+.table-cart-total td {
+  width: 50%;
+}
+.table-cart-total td.shipping .price {
+  color: #7a7a7a;
+  font-size: 19px;
+}
+.table-cart-total td.total .price {
+  font-size: 19px;
+}
+.table-cart-total td.empty {
   border-bottom-color: transparent;
   border-left-color: transparent;
 }

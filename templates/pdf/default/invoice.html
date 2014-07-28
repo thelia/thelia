@@ -67,7 +67,10 @@
             </tbody>
         </table>
     </page_footer>
-{loop name="order.invoice" type="order" id=$order_id customer="*"}
+
+    {$taxes = []}
+
+    {loop name="order.invoice" type="order" id=$order_id customer="*"}
     {loop name="currency.order" type="currency" id=$CURRENCY}
     {assign "orderCurrency" $SYMBOL}
     {/loop}
@@ -153,13 +156,18 @@
         {assign "realTax" $PRICE_TAX}
         {assign "realTaxedPrice" $TAXED_PRICE}
     {/if}
+
+    {$taxes[{$TAX_RULE_TITLE}][] = $realTax * $QUANTITY}
+
     <tr class="table-2">
-        <td><p>{$TITLE}</p>
-                {ifloop rel="combinations"}
-                {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+        <td>
+            <p>{$TITLE}</p>
+            {ifloop rel="combinations"}
+            {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
                 {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
-                {/loop}
-                {/ifloop}
+            {/loop}
+            {/ifloop}
+            [[ {$TAX_RULE_TITLE} = {$realTax * $QUANTITY} ]]
         </td>
         <td><p>{$orderCurrency} {$realPrice}</p></td>
         <td><p>{$orderCurrency} {$realTax}</p></td>
@@ -199,6 +207,27 @@
         <td class="table-3-1" style="background:#f6993c;"><h3 style="color:white;">{intl l="Total"}</h3></td>
         <td class="table-3-1" style="background:#f6993c;"><h3 style="color:white;">{$orderCurrency} {$TOTAL_TAXED_AMOUNT}</h3></td>
     </tr>
+</table>
+
+<table class="table-3" cellspacing="0" cellpadding="0" tyle="padding-top: 5mm;">
+    <col style="width: 60%; padding: 1mm;" />
+    <col style="width: 40%; padding: 1mm;" />
+    {foreach $taxes as $name=>$prices}
+        {assign var="_price_taxe_" value="0"}
+        {foreach $prices as $price}
+            {$_price_taxe_= $_price_taxe_ + $price}
+        {/foreach}
+        {if $_price_taxe_ != 0}
+        <tr>
+            <td>
+                {$name}
+            </td>
+            <td>
+                {format_number number={$_price_taxe_}} {$orderCurrency}
+            </td>
+        </tr>
+        {/if}
+    {/foreach}
 </table>
 {/loop}
 </page>

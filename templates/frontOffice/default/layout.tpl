@@ -181,6 +181,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     </form>
                 </div>
 
+                {if {count type="lang" exclude="{lang attr='id'}"} != 0 }
                 <div class="language-switch" aria-labelledby="language-label" role="form">
                     <span id="language-label" class="dropdown-label">{intl l="Language:"}</span>
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/language"}">{lang attr="title"}</a>
@@ -190,7 +191,9 @@ GNU General Public License : http://www.gnu.org/licenses/
                         {/loop}
                     </ul>
                 </div>
+                {/if}
 
+                {if {count type="currency" exclude="{currency attr='id'}"} != 0 }
                 <div class="currency-switch" aria-labelledby="currency-label" role="form">
                     <span id="currency-label" class="dropdown-label">{intl l="Currency:"}</span>
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/currency"}">{currency attr="code"}</a>
@@ -200,6 +203,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                         {/loop}
                     </ul>
                 </div>
+                {/if}
             </div>
         </div>
 
