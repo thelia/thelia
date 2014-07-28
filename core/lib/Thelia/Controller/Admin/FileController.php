@@ -57,11 +57,11 @@ class FileController extends BaseAdminController
     /**
      * Manage how a file collection has to be saved
      *
-     * @param int    $parentId       Parent id owning files being saved
-     * @param string $parentType     Parent Type owning files being saved (product, category, content, etc.)
-     * @param string $objectType     Object type, e.g. image or document
-     * @param array  $validMimeTypes an array of valid mime types. If empty, any mime type is allowed.
-     * @param array  $blackList      an array of blacklisted mime types.
+     * @param  int      $parentId       Parent id owning files being saved
+     * @param  string   $parentType     Parent Type owning files being saved (product, category, content, etc.)
+     * @param  string   $objectType     Object type, e.g. image or document
+     * @param  array    $validMimeTypes an array of valid mime types. If empty, any mime type is allowed.
+     * @param  array    $blackList      an array of blacklisted mime types.
      * @return Response
      */
     public function saveFileAjaxAction(

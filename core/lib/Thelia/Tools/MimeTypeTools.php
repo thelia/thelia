@@ -19,7 +19,7 @@ use Thelia\Exception\FileException;
  * @package Thelia\Tools
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class MimeTypeTools 
+class MimeTypeTools
 {
     const TYPES_FILE = "local/config/mime.types";
 
@@ -65,7 +65,8 @@ class MimeTypeTools
      * @param $fileName
      * @return bool
      */
-    public function validateMimeTypeExtension($mimeType, $fileName) {
+    public function validateMimeTypeExtension($mimeType, $fileName)
+    {
         $mimeType = strtolower($mimeType);
 
         $extensions = $this->guessExtensionsFromMimeType($mimeType);
@@ -79,11 +80,11 @@ class MimeTypeTools
             $oneMatch &= !!preg_match("#\.$extension$#i", $fileName);
         }
 
-        return (bool)$oneMatch ? static::TYPE_MATCH : static::TYPE_NOT_MATCH;
+        return (bool) $oneMatch ? static::TYPE_MATCH : static::TYPE_NOT_MATCH;
     }
 
     /**
-     * @param null $filePath
+     * @param  null                            $filePath
      * @return array
      * @throws \Thelia\Exception\FileException
      */
@@ -138,7 +139,7 @@ class MimeTypeTools
 
     /**
      * @param $string
-     * @param string $characterMask
+     * @param  string       $characterMask
      * @return mixed|string
      */
     public function realTrim($string, $characterMask = "\t\n\r ")
@@ -154,4 +155,4 @@ class MimeTypeTools
 
         return $string;
     }
-} 
+}
