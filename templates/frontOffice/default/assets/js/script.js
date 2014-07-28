@@ -36,6 +36,7 @@ var pseManager = (function($){
             "ref": $("#pse-ref"),
             "ean": $("#pse-ean"),
             "availability": $("#pse-availability"),
+            "validity": $("#pse-validity"),
             "quantity": $("#quantity"),
             "promo": $("#pse-promo"),
             "new": $("#pse-new"),
@@ -105,8 +106,10 @@ var pseManager = (function($){
 
             if ( ! pseId ) {
                 // not exists, revert
+                displayNotice();
                 setPseForm();
             } else {
+                $pse.validity.hide();
                 $pse.id.val(pseId);
                 $pse.pseId = pseId;
             }
@@ -114,6 +117,15 @@ var pseManager = (function($){
 
         // Update UI
         updateProductUI();
+    }
+
+    function displayNotice() {
+        var $validity = $pse.validity;
+        $validity.show('fast', function(){
+            setTimeout(function(){
+                $validity.hide('fast');
+            }, 3000);
+        });
     }
 
     function updateProductUI() {

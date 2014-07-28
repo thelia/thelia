@@ -38,17 +38,17 @@
         <div class="product-price">
             <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
                 <meta itemprop="category" content="{category attr="title"}">
-                <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
-                <meta itemprop="priceCurrency" content="{currency attr="symbol"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                {* List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition *}
+                <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition">
+                {* List of currency : The currency used to describe the product price, in three-letter ISO format. *}
+                <meta itemprop="priceCurrency" content="{currency attr="symbol"}">
                 <link itemprop="availability" href="{$current_stock_href}" content="{$current_stock_content}" />
-
                 {if $IS_PROMO }
                     <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number=$TAXED_PROMO_PRICE} {currency attr="symbol"}</span></span>
                     <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number=$TAXED_PRICE} {currency attr="symbol"}</span></span>
                 {else}
                     <span class="regular-price"><span itemprop="price" class="price">{format_number number=$BEST_TAXED_PRICE} {currency attr="symbol"}</span></span>
                 {/if}
-
             </div>
 
             {if $hasBtn == true}
@@ -80,16 +80,11 @@
                                     {/if}
                                 </div>
                             {/form_field}
-
-                            <div class="form-group group-btn">
-
-                            </div>
                             <div>
                                 <div class="product-btn">
                                     <button type="submit" class="btn btn-cart">{intl l="Add to cart"}</button>
                                 </div>
                             </div>
-
                         </fieldset>
                     </form>
                     {/form}

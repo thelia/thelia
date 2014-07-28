@@ -136,6 +136,11 @@
                             <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span id="pse-price-old" class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
                         </span>
                     </div>
+
+                    <div id="pse-validity" class="validity alert alert-warning" style="display: none;" >
+                        {intl l="Sorry but this combination does not exist."}
+                    </div>
+
                 </div>
 
                 {form name="thelia.cart.add" }
