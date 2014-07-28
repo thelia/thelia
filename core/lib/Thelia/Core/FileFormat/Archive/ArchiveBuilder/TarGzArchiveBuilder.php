@@ -34,14 +34,10 @@ class TarGzArchiveBuilder extends TarArchiveBuilder
         return "tar.gz";
     }
 
-    public function setEnvironment($environment)
+    protected function compressionEntryPoint()
     {
-        parent::setEnvironment($environment);
-
-        $this->previousFile = $this->cacheFile;
-
         if ($this->compression != \Phar::GZ) {
-            $this->tar = $this->tar->compress(\Phar::BZ2, $this->getExtension());
+            $this->tar = $this->tar->compress(\Phar::GZ, $this->getExtension());
         }
 
         $this->compression = \Phar::GZ;

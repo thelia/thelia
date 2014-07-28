@@ -74,6 +74,10 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      */
     public function addFile($filePath, $directoryInArchive = null, $name = null, $isOnline = false)
     {
+        if (!empty($name)) {
+            $directoryInArchive .= DS . dirname($name) ;
+        }
+
         $directoryInArchive = $this->formatDirectoryPath($directoryInArchive);
 
         /**
@@ -86,6 +90,8 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
         if (empty($name) || !is_scalar($name)) {
             $name = basename($filePath);
+        } else {
+            $name = basename($name);
         }
 
         /**
@@ -178,7 +184,10 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
         $directoryInArchive = $this->formatDirectoryPath($directoryPath);
 
         if (!empty($directoryInArchive)) {
-            if (!$this->zip->addEmptyDir($directoryInArchive)) {
+            $this->zip->addEmptyDir($directoryInArchive);
+            $this->commit();
+
+            if (!$this->hasDirectory($directoryInArchive)) {
                 throw new \ErrorException(
                     $this->translator->trans(
                         "The directory %dir has not been created in the archive",

@@ -116,7 +116,9 @@ class CSVFormatter extends AbstractFormatter
                 ksort($row);
 
                 foreach ($keys as $key) {
-                    $string .= $this->formatField($row[$key]);
+                    if (array_key_exists($key, $row)) {
+                        $string .= $this->formatField($row[$key]);
+                    }
                 }
 
                 $string = substr($string,0, -$delimiterLength) . $this->lineReturn;

@@ -13,6 +13,10 @@
             <title locale="en_US">Products</title>
             <title locale="fr_FR">Produits</title>
         </export_category>
+        <export_category id="thelia.export.content">
+            <title locale="en_US">Content</title>
+            <title locale="fr_FR">Contenu</title>
+        </export_category>
     </export_categories>
 
     <exports>
@@ -61,6 +65,21 @@
                 <description>
                     Exportez les informations SEO de vos produits
                     ( url réécrites, meta description et mots clés, titre ) de vos produits
+                </description>
+            </export_descriptive>
+        </export>
+
+        <export id="thelia.export.content" class="Thelia\ImportExport\Export\Type\ContentExport" category_id="thelia.export.content">
+            <export_descriptive locale="en_US">
+                <title>Contents and folder</title>
+                <description>
+                    Export your contents and their related folders
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Contenus et dossiers</title>
+                <description>
+                    Exportez vos contenus et les dossiers associés
                 </description>
             </export_descriptive>
         </export>

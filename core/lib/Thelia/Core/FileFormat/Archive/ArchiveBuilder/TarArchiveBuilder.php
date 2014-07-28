@@ -72,8 +72,14 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
      */
     public function addFile($filePath, $directoryInArchive = "/", $name = null, $isOnline = false)
     {
+        if (!empty($name)) {
+            $directoryInArchive .= DS . dirname($name);
+        }
+
         if (empty($name) || !is_scalar($name)) {
             $name = basename($filePath);
+        } else {
+            $name = basename($name);
         }
 
         /**
