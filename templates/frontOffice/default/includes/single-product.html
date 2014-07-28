@@ -34,10 +34,13 @@
             {/if}
         </div>
 
+        {if {config key="check-available-stock"} != 1}
+            {assign var="current_stock_content" value = "online_only"}
+            {assign var="current_stock_href" value = "http://schema.org/OnlineOnly"}
+        {else}
         {* Default value *}
         {assign var="current_stock_content" value = "in_stock"}
         {assign var="current_stock_href" value = "http://schema.org/InStock"}
-        
         {loop name="stock_meta" type="product_sale_elements" product=$product_id}
             {loop name="combi_meta" type="attribute_combination" product_sale_elements="$ID"}
                {if $LOOP_COUNT == 0}
@@ -48,6 +51,7 @@
                {/if}
             {/loop}
         {/loop}
+        {/if}
 
         <div class="product-price">
             <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
@@ -106,7 +110,12 @@
                                         {assign var="hasSubmit" value = true}
                                     {/if}
                                     {loop name="combi" type="attribute_combination" product_sale_elements="$product_id" order="alpha"}
-                                            <option value="{$ID}" data-quantity="{$QUANTITY}" data-price="{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}" data-old-price="{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}">{$ATTRIBUTE_AVAILABILITY_TITLE}</small></option>
+                                        {if {config key="check-available-stock"} != 1}
+                                            {assign var="dataQt" value=99}
+                                        {else}
+                                            {assign var="dataQt" value={$QUANTITY}}
+                                        {/if}
+                                        <option value="{$ID}" data-quantity="{$dataQt}" data-price="{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}" data-old-price="{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}">{$ATTRIBUTE_AVAILABILITY_TITLE}</small></option>
                                         {/loop}
                                     {/loop}
                                 </select>
