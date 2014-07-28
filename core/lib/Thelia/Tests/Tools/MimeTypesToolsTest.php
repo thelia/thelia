@@ -29,7 +29,7 @@ class MimeTypesToolsTest extends \PHPUnit_Framework_TestCase
     {
         new Translator(new Container());
 
-        $this->tool = MimeTypeTools::getInstance();
+        $this->tool = new MimeTypeTools();
     }
 
     public function testTrim()
