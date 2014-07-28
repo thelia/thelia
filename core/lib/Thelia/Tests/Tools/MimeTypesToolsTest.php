@@ -112,5 +112,11 @@ class MimeTypesToolsTest extends \PHPUnit_Framework_TestCase
             $this->tool->validateMimeTypeExtension(
             "thismimetype/doesntexists", "foo.bar"
         ));
+
+        $this->assertEquals(
+            MimeTypeTools::TYPE_UNKNOWN,
+            $this->tool->validateMimeTypeExtension(
+                "text/x-php", "foo.php"
+            ));
     }
 }

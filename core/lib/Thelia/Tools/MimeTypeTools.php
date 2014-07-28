@@ -75,10 +75,9 @@ class MimeTypeTools
             return static::TYPE_UNKNOWN;
         }
 
-        $oneMatch = true;
-        foreach ($extensions as $extension) {
-            $oneMatch &= !!preg_match("#\.$extension$#i", $fileName);
-        }
+        $extensions = implode("|", $extensions);
+
+        $oneMatch = preg_match("#\.$extensions{1}$#i", $fileName);
 
         return (bool) $oneMatch ? static::TYPE_MATCH : static::TYPE_NOT_MATCH;
     }

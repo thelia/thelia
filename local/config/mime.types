@@ -1586,7 +1586,7 @@ video/x-msvideo					avi
 video/x-sgi-movie				movie
 video/x-smv					smv
 x-conference/x-cooltalk				ice
-text/x-php              php, php3, php4, php5
+text/x-php              php php3 php4 php5
 application/x-httpd-php			phtml pht php
 application/x-httpd-php-source			phps
 application/x-httpd-php3			php3
