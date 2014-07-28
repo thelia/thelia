@@ -17,6 +17,7 @@ use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\Exception\LoopException;
 use Thelia\Core\Translation\Translator;
+use Thelia\Files\FileModelInterface;
 use Thelia\Model\Lang;
 use Thelia\ImportExport\AbstractHandler;
 
@@ -31,6 +32,10 @@ abstract class ExportHandler extends AbstractHandler
 
     /** @var  array */
     protected $order = array();
+
+    protected $isImageExport = false;
+
+    protected $isDocumentExport = false;
 
     /**
      * @return array
@@ -207,6 +212,39 @@ abstract class ExportHandler extends AbstractHandler
         $loopInstance->initializeArgs($args);
 
         return $loopInstance;
+    }
+
+    protected function addFileToArray(FileModelInterface $model, array &$paths)
+    {
+        $path = $model->getUploadDir() . DS . $model->getFile();
+
+        if (is_file($path) && is_readable($path)) {
+            $paths[$model->getTitle() . DS . $model->getFile()] = $path;
+        }
+    }
+
+    public function setDocumentExport($bool)
+    {
+        $this->isDocumentExport = (bool) $bool;
+
+        return $this;
+    }
+
+    public function setImageExport($bool)
+    {
+        $this->isImageExport = (bool) $bool;
+
+        return $this;
+    }
+
+    public function isDocumentExport()
+    {
+        return $this->isDocumentExport;
+    }
+
+    public function isImageExport()
+    {
+        return $this->isImageExport;
     }
 
     /**

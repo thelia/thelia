@@ -168,16 +168,15 @@ class ExportController extends BaseAdminController
          * Build an event containing the formatter and the handler.
          * Used for specific configuration (e.g: XML node names)
          */
-        $data = $handler
-            ->buildData($lang)
-            ->setLang($lang)
-        ;
 
-        $event = new ImportExportEvent($formatter, $handler , $data);
+        $event = new ImportExportEvent($formatter, $handler);
 
         $filename = $formatter::FILENAME . "." . $formatter->getExtension();
 
         if ($archiveBuilder === null) {
+            $data = $handler->buildData($lang);
+
+            $event->setData($data);
             $this->dispatch(TheliaEvents::EXPORT_BEFORE_ENCODE, $event);
 
             $formattedContent = $formatter
@@ -198,6 +197,24 @@ class ExportController extends BaseAdminController
             );
         } else {
             $event->setArchiveBuilder($archiveBuilder);
+
+            if ($includeImages && $handler instanceof ImagesExportInterface) {
+                $this->processExportImages($handler, $archiveBuilder);
+
+                $handler->setImageExport(true);
+            }
+
+            if ($includeDocuments && $handler instanceof DocumentsExportInterface) {
+                $this->processExportDocuments($handler, $archiveBuilder);
+
+                $handler->setDocumentExport(true);
+            }
+
+            $data = $handler
+                ->buildData($lang)
+                ->setLang($lang)
+            ;
+
             $this->dispatch(TheliaEvents::EXPORT_BEFORE_ENCODE, $event);
 
             $formattedContent = $formatter
@@ -207,13 +224,6 @@ class ExportController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::EXPORT_AFTER_ENCODE, $event->setContent($formattedContent));
 
-            if ($includeImages && $handler instanceof ImagesExportInterface) {
-                $this->processExportImages($handler, $archiveBuilder);
-            }
-
-            if ($includeDocuments && $handler instanceof DocumentsExportInterface) {
-                $this->processExportDocuments($handler, $archiveBuilder);
-            }
 
             $archiveBuilder->addFileFromString(
                 $event->getContent(), $filename
