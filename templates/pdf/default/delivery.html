@@ -15,33 +15,39 @@
 <style>
     h1, h2, h3, h4 {
         color:#f6993c;
+        margin: .5em 0;
     }
 
     h1 {
-        font-size: 60px;
+        font-size: 48px;
+    }
+
+    h2 {
+        font-size: 16px;
     }
 
     h3 {
         font-size: 14px;
     }
 
-    p {
-        font-size: 9px;
+    h4 {
+        color:#58585a;
+        font-size: 12px;
     }
 
     p, td {
         color:#58585a;
+        font-size: 9px;
     }
 
-    li {
-        list-style: none;
+    p {
+        margin: .5em 0;
     }
 
-    footer p{
-        color: #bcbdc0;
+    span {
+        font-size: 9px;
     }
 
-    <!--
     table {
         border-collapse: collapse;
         width: 100%;
@@ -50,6 +56,62 @@
     tr {
         width: 100%;
     }
+
+    td {
+        vertical-align: top;
+    }
+
+    .table-info h3 {
+        font-size: 18px;
+        color: #58585a;
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+
+    .table-info h3 span {
+        font-size: 18px;
+        color: #f6993c;
+    }
+
+    .table-1 td {
+        background: #f1f3f4;
+        border:solid 1px #bcbdc0;
+    }
+
+    .table-2 td {
+        border:solid 1px #bcbdc0;
+    }
+
+
+    .table-3-1, .table-3-2 {
+        border: solid 1px #bcbdc0;
+    }
+    .table-3-1 p {
+        font-size: 10px;
+    }
+    .table-3-2 p {
+        font-size: 9px;
+        color: #747475;
+    }
+
+    .table-3-module h3 {
+        margin-top: 1.5em;
+    }
+
+    .table-3-module span {
+        font-size: 11px;
+    }
+
+    .align-left {
+        text-align: left;
+    }
+    .align-center {
+        text-align: center;
+    }
+    .align-right{
+        text-align: right;
+    }
+
     .clear {
         padding: 0.5%;
         border-bottom:solid 1px #dddddd;
@@ -58,7 +120,6 @@
     .clear-none {
         padding: 0.5%;
     }
-
 </style>
 {/literal}
 <page backtop="10mm" backleft="10mm" backright="10mm" backbottom="10mm">
@@ -67,19 +128,30 @@
 
     <page_footer>
         <table>
-            <col style="width: 80%; padding: 3mm; border: none; text-align: left;" />
-            <col style="width: 20%; padding: 3mm; border: none; text-align: right;" />
+            <col style="width: 80%; padding: 1mm; border: none; text-align: left;" />
+            <col style="width: 20%; padding: 1mm; border: none; text-align: right;" />
             <tbody>
             <tr>
                 <td>
-                    <h1 style="color:#58585a;font-size:34px;">{intl l="THANK YOU"}</h1>
+                    <!-- Imprint -->
+                    {config key="store_name"}
+                    - {config key="store_address1"} {config key="store_address2"} {config key="store_address3"}
+                    - {config key="store_zipcode"} {config key="store_city"}
+                    {if {config key="store_country"} }
+                    {loop type="country" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
+                    {/if}
+                    {if {config key="store_business_id"} }
+                    - {config key="store_business_id"}
+                    {/if}
+                    <br>
+                    {if {config key="store_phone"} }
+                    {intl l="Phone: "}{config key="store_phone"}
+                    {/if}
+                    {if {config key="store_email"} }
+                    {intl l="Email: "}{config key="store_email"}
+                    {/if}
+
                 </td>
-                <td style="text-align:right;">
-                    <h4>{config key="store_name"}</h4>
-                </td>
-            </tr>
-            <tr>
-                <td><!-- Insérer ici les mentions légales --></td>
                 <td>{intl l="page"} [[page_cu]]/[[page_nb]]</td>
             </tr>
             </tbody>
@@ -91,68 +163,53 @@
     {assign "orderCurrency" $SYMBOL}
     {/loop}
 
-<table style="padding-top: 5mm;">
-    <col style="width: 50%;" />
-    <col style="width: 50%;" />
-
-    <tr >
-        <td colspan="2">
-            <h1>{intl l="DELIVERY"}</h1>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <h3>{intl l="Invoice date"}</h3>
-            <p>{format_date date=$INVOICE_DATE}</p>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <h3>{intl l="Invoice REF"}</h3>
-            <p>{$REF}</p>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <h3>{intl l="Custmer Number"}</h3>
-            <p>{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}{$REF}{/loop}</p>
-        </td>
-    </tr>
-
-    <tr>
-        <td class="clear" colspan="2"></td>
-        <td class="clear"></td>
-    </tr>
-    <tr>
-        <td class="clear-none" colspan="2"></td>
-        <td class="clear-none"></td>
-    </tr>
-
-    <tr>
-        <td style="border-left:solid 3px #f6993c;" >
-            <h3 style="margin-left:1%">{intl l="delivery adress"}</h3>
-            <p style="margin-left:1%">
-                {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
-                {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}<br />
-                {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
-                {$ZIPCODE} {$CITY}<br/>
-                {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
-                {/loop}
-            </p>
-        </td>
-        <td style="border-left:solid 3px #f6993c;">
-            <h3 style="margin-left:1%">{intl l="invoice address"}</h3>
-            <p style="margin-left:1%">
-                {loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
-                {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}<br />
-                {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
-                {$ZIPCODE} {$CITY}<br/>
-                {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
-                {/loop}
-            </p>
-        </td>
-    </tr>
+    <table class="table-info">
+        <col style="width: 100%; padding: 0mm;" />
+        <tr>
+            <td>
+                <h1>{intl l="DELIVERY"}</h1>
+            </td>
+        </tr>
+        <tr>
+            <td><h3>{intl l="Invoice date"} : <span>{format_date date=$INVOICE_DATE}</span></h3></td>
+        </tr>
+        <tr>
+            <td><h3>{intl l="Invoice REF"} : <span>{$REF}</span></h3></td>
+        </tr>
+        <tr>
+            <td><h3>{intl l="Customer Number"} : <span>{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}{$REF}{/loop}</span></h3></td>
+        </tr>
     </table>
+
+    <table class="table-address">
+        <col style="width: 50%; padding: 3mm;" />
+        <col style="padding: 3mm;" />
+        <tr>
+            <td style="border-left: solid 1mm #f6993c;" >
+                <h3>{intl l="Delivery address"}</h3>
+                <p>
+                    {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                    {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}<br />
+                    {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
+                    {$ZIPCODE} {$CITY}<br/>
+                    {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                    {/loop}
+                </p>
+            </td>
+            <td style="border-left: solid 1mm #f6993c;">
+                <h3>{intl l="Invoice address"}</h3>
+                <p>
+                    {loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
+                    {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}<br />
+                    {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
+                    {$ZIPCODE} {$CITY}<br/>
+                    {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                    {/loop}
+                </p>
+            </td>
+        </tr>
+    </table>
+
 
     <table style="padding-top: 5mm;">
         <col style="width: 40%; padding: 3mm;" />
@@ -182,17 +239,21 @@
             </td>
         </tr>
         {/loop}
+    </table>
 
-    <tr>
-        <td style="border-left:solid 3px #f6993c;padding-top: 2mm">
-            <h3>{intl l='Delivery module'}</h3>
-            <p>{$DELIVERY_REF}</p>
-        </td>
-    </tr>
-    <tr>
-        <td class="clear-none"></td>
-    </tr>
-
-</table>
+    <table style="padding-top: 5mm;">
+        <col style="width: 40%; padding: 3mm;" />
+        <tr>
+            <td  class="table-3-module" style="border-left:solid 3px #f6993c; padding-top: 2mm">
+                <h3>{intl l="Delivery module"}</h3>
+                <p>
+                    <span>{loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}</span>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td class="clear-none"></td>
+        </tr>
+    </table>
 {/loop}
 </page>
