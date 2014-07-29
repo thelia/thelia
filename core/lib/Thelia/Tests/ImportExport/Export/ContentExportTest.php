@@ -85,6 +85,11 @@ class ContentExportTest extends \PHPUnit_Framework_TestCase
                         $folder->getTitle(),
                         $data[$i]["folder_title"]
                     );
+
+                    $this->assertEquals(
+                        $contentFolder->getDefaultFolder(),
+                        (bool)((int)$data[$i]["is_default_folder"])
+                    );
                 }
             } while (
                 isset($data[++$i]["id"]) &&
@@ -121,7 +126,7 @@ class ContentExportTest extends \PHPUnit_Framework_TestCase
                 $j = 1;
                 while ($data[$i-$j]["id"] === $data[$i]["id"]) {
                     if (!empty($data[$i - $j++]["content_images"])) {
-                        $data[$i]["content_images"] = $data[$i-$j-1]["content_images"];
+                        $data[$i]["content_images"] = $data[$i-$j+1]["content_images"];
                         break;
                     }
                 }
@@ -133,6 +138,7 @@ class ContentExportTest extends \PHPUnit_Framework_TestCase
                 ->useFolderQuery()
                     ->useContentFolderQuery()
                         ->filterByContentId($data[$i]["id"])
+                        ->filterByFolderId($data[$i]["folder_id"])
                     ->endUse()
                 ->endUse()
                 ->select(FolderImageTableMap::FILE)

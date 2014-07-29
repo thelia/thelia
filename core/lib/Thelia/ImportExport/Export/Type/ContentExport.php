@@ -28,6 +28,7 @@ use Thelia\Model\FolderDocumentQuery;
 use Thelia\Model\FolderImageQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\Map\ContentDocumentTableMap;
+use Thelia\Model\Map\ContentFolderTableMap;
 use Thelia\Model\Map\ContentI18nTableMap;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\Map\FolderDocumentTableMap;
@@ -84,14 +85,31 @@ class ContentExport extends ExportHandler implements
 
 
         $query = ContentQuery::create()
+            ->select([
+                ContentTableMap::ID,
+                ContentTableMap::VISIBLE,
+                "content_TITLE",
+                "content_CHAPO",
+                "content_DESCRIPTION",
+                "content_CONCLUSION",
+                "content_seo_TITLE",
+                "content_seo_DESCRIPTION",
+                "content_seo_KEYWORDS",
+                "url_URL",
+                "folder_TITLE",
+                "folder_ID",
+                "folder_IS_DEFAULT"
+            ])
             ->_if($this->isImageExport())
                 ->useContentImageQuery("content_image_join", Criteria::LEFT_JOIN)
                     ->addAsColumn("content_IMAGES", "GROUP_CONCAT(DISTINCT `content_image_join`.FILE)")
+                    ->addSelectColumn("content_IMAGES")
                 ->endUse()
             ->_endif()
             ->_if($this->isDocumentExport())
                 ->useContentDocumentQuery()
                     ->addAsColumn("content_DOCUMENTS", "GROUP_CONCAT(DISTINCT ".ContentDocumentTableMap::FILE.")")
+                    ->addSelectColumn("content_DOCUMENTS")
                 ->endUse()
             ->_endif()
             ->useContentFolderQuery(null, Criteria::LEFT_JOIN)
@@ -99,11 +117,13 @@ class ContentExport extends ExportHandler implements
                     ->_if($this->isDocumentExport())
                         ->useFolderDocumentQuery()
                             ->addAsColumn("folder_DOCUMENTS", "GROUP_CONCAT(DISTINCT ".FolderDocumentTableMap::FILE.")")
+                            ->addSelectColumn("folder_DOCUMENTS")
                         ->endUse()
                     ->_endif()
                     ->_if($this->isImageExport())
                         ->useFolderImageQuery(null, Criteria::LEFT_JOIN)
                             ->addAsColumn("folder_IMAGES", "GROUP_CONCAT(DISTINCT ".FolderImageTableMap::FILE.")")
+                            ->addSelectColumn("folder_IMAGES")
                         ->endUse()
                     ->_endif()
                     ->addJoinObject($folderI18nJoin, "folder_i18n_join")
@@ -111,6 +131,7 @@ class ContentExport extends ExportHandler implements
                     ->addAsColumn("folder_TITLE", FolderI18nTableMap::TITLE)
                     ->addAsColumn("folder_ID", FolderTableMap::ID)
                 ->endUse()
+                ->addAsColumn("folder_IS_DEFAULT", ContentFolderTableMap::DEFAULT_FOLDER)
             ->endUse()
             ->addJoinObject($contentI18nJoin, "content_i18n_join")
             ->addJoinCondition("content_i18n_join", ContentI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
@@ -137,43 +158,9 @@ class ContentExport extends ExportHandler implements
                 \PDO::PARAM_STR
             )
             ->addAsColumn("url_URL", RewritingUrlTableMap::URL)
-            ->select([
-                ContentTableMap::ID,
-                ContentTableMap::VISIBLE,
-                "content_TITLE",
-                "content_CHAPO",
-                "content_DESCRIPTION",
-                "content_CONCLUSION",
-                "content_seo_TITLE",
-                "content_seo_DESCRIPTION",
-                "content_seo_KEYWORDS",
-                "url_URL",
-                "folder_TITLE",
-                "folder_ID",
-            ])
             ->groupBy(ContentTableMap::ID)
             ->groupBy("folder_ID")
         ;
-
-        /**
-         * @var ContentQuery $query
-         */
-        if ($this->isDocumentExport()) {
-            $query->select($query->getSelect() + [
-                "folder_DOCUMENTS",
-                "content_DOCUMENTS",
-            ]);
-        }
-
-        /**
-         * @var ContentQuery $query
-         */
-        if ($this->isImageExport()) {
-            $query->select($query->getSelect() + [
-                "folder_IMAGES",
-                "content_IMAGES",
-            ]);
-        }
 
         $dataSet = $query
             ->find()
@@ -227,6 +214,7 @@ class ContentExport extends ExportHandler implements
             "seo_keywords",
             "url",
             "folder_id",
+            "is_default_folder",
             "folder_title",
         ];
     }
@@ -246,6 +234,7 @@ class ContentExport extends ExportHandler implements
             "url_URL" => "url",
             "folder_TITLE" => "folder_title",
             "folder_ID" => "folder_id",
+            "folder_IS_DEFAULT" => "is_default_folder"
         ];
     }
 
