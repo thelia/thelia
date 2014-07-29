@@ -101,11 +101,15 @@
                                 <form action="{url path="/cart/update"}" class="form-inline" method="post">
                                     <input type="hidden" name="cart_item" value="{$ITEM_ID}">
                                     <div class="form-group">
-                                        <select name="quantity" class="form-control" >
-                                            {for $will=1 to $STOCK}
-                                                <option {if $QUANTITY == $will}selected="selected"{/if}>{$will}</option>
-                                            {/for}
-                                        </select>
+                                        {if $STOCK <= 500}
+                                            <select name="quantity" class="form-control" >
+                                                {for $will=1 to $STOCK}
+                                                    <option {if $QUANTITY == $will}selected="selected"{/if}>{$will}</option>
+                                                {/for}
+                                            </select>
+                                        {else}
+                                            <input name="quantity" class="form-control" type="number" min="1" max="{$STOCK}" value ="{$QUANTITY}">
+                                        {/if}
                                     </div>
                                     <button type="submit" title="{intl l="Update Quantity"}" class="btn btn-cart-update">{intl l="+"}</button>
                                 </form>
@@ -207,6 +211,9 @@
 <script>
     $(document).ready(function(){
         $("select[name=quantity]").change(function(){
+            $(this).parents('form').submit();
+        });
+        $("input[name=quantity]").change(function(){
             $(this).parents('form').submit();
         });
         $(".btn-change-country").click(function(e){
