@@ -31,7 +31,7 @@
 {block name="main-content"}
     <div class="main layout-col-2-left">
 
-        <article class="col-main" role="main" aria-labelledby="main-label">
+        <article id="content-main" class="col-main" role="main" aria-labelledby="main-label">
             {loop name="blog.content"  type="content" current="yes"}
                 <h1 id="main-label" class="page-header">{$TITLE}</h1>
                 {if $CHAPO}

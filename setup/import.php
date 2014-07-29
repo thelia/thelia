@@ -81,6 +81,12 @@ try {
 
     createProduct($faker, $categories, $brands, $contents, $template, $color, $material, $con);
 
+    createCustomer($faker, $con);
+
+    // set some config key
+    createConfig($faker, $folders, $contents, $con);
+
+
     $con->commit();
 } catch (Exception $e) {
     echo "error : ".$e->getMessage()."\n";
@@ -228,6 +234,61 @@ function createProduct($faker, $categories, $brands, $contents, $template, $attr
     echo "end creating products\n";
 }
 
+function createConfig($faker, $folders, $contents, $con){
+
+    // Store
+    \Thelia\Model\ConfigQuery::write("store_name", "Thelia");
+    \Thelia\Model\ConfigQuery::write("store_description", "E-commerce solution based on Symfony 2");
+    \Thelia\Model\ConfigQuery::write("store_email", "Thelia");
+    \Thelia\Model\ConfigQuery::write("store_address1", "5 rue Rochon");
+    \Thelia\Model\ConfigQuery::write("store_city", "Clermont-Ferrrand");
+    \Thelia\Model\ConfigQuery::write("store_phone", "+(33)444053102");
+    \Thelia\Model\ConfigQuery::write("store_email", "contact@thelia.net");
+    // Contents
+    \Thelia\Model\ConfigQuery::write("information_folder_id", $folders['Information']->getId());
+    \Thelia\Model\ConfigQuery::write("terms_conditions_content_id", $contents["Terms and Conditions"]->getId());
+}
+
+function createCustomer($faker, $con){
+
+    echo "Creating customer\n";
+
+    //customer
+    $customer = new Thelia\Model\Customer();
+    $customer->createOrUpdate(
+        1,
+        "thelia",
+        "thelia",
+        "5 rue rochon",
+        "",
+        "",
+        "0102030405",
+        "0601020304",
+        "63000",
+        "Clermont-Ferrand",
+        64,
+        "test@thelia.net",
+        "azerty"
+    );
+    for ($j = 0; $j <= 2; $j++) {
+        $address = new Thelia\Model\Address();
+        $address->setLabel($faker->text(20))
+            ->setTitleId(rand(1,3))
+            ->setFirstname($faker->firstname)
+            ->setLastname($faker->lastname)
+            ->setAddress1($faker->streetAddress)
+            ->setAddress2($faker->streetAddress)
+            ->setAddress3($faker->streetAddress)
+            ->setCellphone($faker->phoneNumber)
+            ->setPhone($faker->phoneNumber)
+            ->setZipcode($faker->postcode)
+            ->setCity($faker->city)
+            ->setCountryId(64)
+            ->setCustomer($customer)
+            ->save($con)
+        ;
+    }
+}
 
 function createMaterials($con)
 {
@@ -382,12 +443,12 @@ function createFolders($faker, $con)
                 ->setPosition($row-1)
                 ->setLocale('fr_FR')
                     ->setTitle(trim($data[0]))
-                    ->setChapo(trim($data[2]) || $faker->text(20))
-                    ->setDescription(trim($data[4]) || $faker->text(100))
+                    ->setChapo($faker->text(20))
+                    ->setDescription($faker->text(100))
                 ->setLocale('en_US')
                     ->setTitle(trim($data[1]))
-                    ->setChapo(trim($data[3]) || $faker->text(20))
-                    ->setDescription(trim($data[5]) || $faker->text(100))
+                    ->setChapo($faker->text(20))
+                    ->setDescription($faker->text(100))
                 ->save($con);
 
             $folders[trim($data[1])] = $folder;
@@ -432,12 +493,12 @@ function createContents($faker, $folders, $con)
                 ->setPosition($row-1)
                 ->setLocale('fr_FR')
                     ->setTitle(trim($data[0]))
-                    ->setChapo(trim($data[2]))
-                    ->setDescription(trim($data[4]))
+                    ->setChapo($faker->text(20))
+                    ->setDescription($faker->text(200))
                 ->setLocale('en_US')
                     ->setTitle(trim($data[1]))
-                    ->setChapo(trim($data[3]))
-                    ->setDescription(trim($data[5]));
+                    ->setChapo($faker->text(20))
+                    ->setDescription($faker->text(200));
 
             // folder
             $contentFolders = explode(';', $data[7]);
@@ -565,7 +626,6 @@ function clearTables($con)
         ->find($con);
     $brand->delete($con);
 
-
     $category = Thelia\Model\CategoryQuery::create()
         ->find($con);
     $category->delete($con);
@@ -611,6 +671,10 @@ function clearTables($con)
     $productPrice->delete($con);
 
     \Thelia\Model\ProductImageQuery::create()->find($con)->delete($con);
+
+    $customer = Thelia\Model\CustomerQuery::create()
+        ->find();
+    $customer->delete();
 
     echo "Tables cleared with success\n";
 
