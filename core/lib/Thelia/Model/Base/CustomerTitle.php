@@ -25,6 +25,8 @@ use Thelia\Model\CustomerTitle as ChildCustomerTitle;
 use Thelia\Model\CustomerTitleI18n as ChildCustomerTitleI18n;
 use Thelia\Model\CustomerTitleI18nQuery as ChildCustomerTitleI18nQuery;
 use Thelia\Model\CustomerTitleQuery as ChildCustomerTitleQuery;
+use Thelia\Model\OrderAddress as ChildOrderAddress;
+use Thelia\Model\OrderAddressQuery as ChildOrderAddressQuery;
 use Thelia\Model\Map\CustomerTitleTableMap;
 
 abstract class CustomerTitle implements ActiveRecordInterface
@@ -105,6 +107,12 @@ abstract class CustomerTitle implements ActiveRecordInterface
     protected $collAddressesPartial;
 
     /**
+     * @var        ObjectCollection|ChildOrderAddress[] Collection to store aggregation of ChildOrderAddress objects.
+     */
+    protected $collOrderAddresses;
+    protected $collOrderAddressesPartial;
+
+    /**
      * @var        ObjectCollection|ChildCustomerTitleI18n[] Collection to store aggregation of ChildCustomerTitleI18n objects.
      */
     protected $collCustomerTitleI18ns;
@@ -143,6 +151,12 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $addressesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $orderAddressesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -733,6 +747,8 @@ abstract class CustomerTitle implements ActiveRecordInterface
 
             $this->collAddresses = null;
 
+            $this->collOrderAddresses = null;
+
             $this->collCustomerTitleI18ns = null;
 
         } // if (deep)
@@ -896,6 +912,24 @@ abstract class CustomerTitle implements ActiveRecordInterface
 
                 if ($this->collAddresses !== null) {
             foreach ($this->collAddresses as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->orderAddressesScheduledForDeletion !== null) {
+                if (!$this->orderAddressesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->orderAddressesScheduledForDeletion as $orderAddress) {
+                        // need to save related object because we set the relation to null
+                        $orderAddress->save($con);
+                    }
+                    $this->orderAddressesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collOrderAddresses !== null) {
+            foreach ($this->collOrderAddresses as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1110,6 +1144,9 @@ abstract class CustomerTitle implements ActiveRecordInterface
             if (null !== $this->collAddresses) {
                 $result['Addresses'] = $this->collAddresses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collOrderAddresses) {
+                $result['OrderAddresses'] = $this->collOrderAddresses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collCustomerTitleI18ns) {
                 $result['CustomerTitleI18ns'] = $this->collCustomerTitleI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1292,6 +1329,12 @@ abstract class CustomerTitle implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getOrderAddresses() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addOrderAddress($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getCustomerTitleI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCustomerTitleI18n($relObj->copy($deepCopy));
@@ -1344,6 +1387,9 @@ abstract class CustomerTitle implements ActiveRecordInterface
         }
         if ('Address' == $relationName) {
             return $this->initAddresses();
+        }
+        if ('OrderAddress' == $relationName) {
+            return $this->initOrderAddresses();
         }
         if ('CustomerTitleI18n' == $relationName) {
             return $this->initCustomerTitleI18ns();
@@ -1837,6 +1883,249 @@ abstract class CustomerTitle implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collOrderAddresses collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addOrderAddresses()
+     */
+    public function clearOrderAddresses()
+    {
+        $this->collOrderAddresses = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collOrderAddresses collection loaded partially.
+     */
+    public function resetPartialOrderAddresses($v = true)
+    {
+        $this->collOrderAddressesPartial = $v;
+    }
+
+    /**
+     * Initializes the collOrderAddresses collection.
+     *
+     * By default this just sets the collOrderAddresses collection to an empty array (like clearcollOrderAddresses());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initOrderAddresses($overrideExisting = true)
+    {
+        if (null !== $this->collOrderAddresses && !$overrideExisting) {
+            return;
+        }
+        $this->collOrderAddresses = new ObjectCollection();
+        $this->collOrderAddresses->setModel('\Thelia\Model\OrderAddress');
+    }
+
+    /**
+     * Gets an array of ChildOrderAddress objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCustomerTitle is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildOrderAddress[] List of ChildOrderAddress objects
+     * @throws PropelException
+     */
+    public function getOrderAddresses($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOrderAddressesPartial && !$this->isNew();
+        if (null === $this->collOrderAddresses || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOrderAddresses) {
+                // return empty collection
+                $this->initOrderAddresses();
+            } else {
+                $collOrderAddresses = ChildOrderAddressQuery::create(null, $criteria)
+                    ->filterByCustomerTitle($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collOrderAddressesPartial && count($collOrderAddresses)) {
+                        $this->initOrderAddresses(false);
+
+                        foreach ($collOrderAddresses as $obj) {
+                            if (false == $this->collOrderAddresses->contains($obj)) {
+                                $this->collOrderAddresses->append($obj);
+                            }
+                        }
+
+                        $this->collOrderAddressesPartial = true;
+                    }
+
+                    reset($collOrderAddresses);
+
+                    return $collOrderAddresses;
+                }
+
+                if ($partial && $this->collOrderAddresses) {
+                    foreach ($this->collOrderAddresses as $obj) {
+                        if ($obj->isNew()) {
+                            $collOrderAddresses[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collOrderAddresses = $collOrderAddresses;
+                $this->collOrderAddressesPartial = false;
+            }
+        }
+
+        return $this->collOrderAddresses;
+    }
+
+    /**
+     * Sets a collection of OrderAddress objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $orderAddresses A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCustomerTitle The current object (for fluent API support)
+     */
+    public function setOrderAddresses(Collection $orderAddresses, ConnectionInterface $con = null)
+    {
+        $orderAddressesToDelete = $this->getOrderAddresses(new Criteria(), $con)->diff($orderAddresses);
+
+
+        $this->orderAddressesScheduledForDeletion = $orderAddressesToDelete;
+
+        foreach ($orderAddressesToDelete as $orderAddressRemoved) {
+            $orderAddressRemoved->setCustomerTitle(null);
+        }
+
+        $this->collOrderAddresses = null;
+        foreach ($orderAddresses as $orderAddress) {
+            $this->addOrderAddress($orderAddress);
+        }
+
+        $this->collOrderAddresses = $orderAddresses;
+        $this->collOrderAddressesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related OrderAddress objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related OrderAddress objects.
+     * @throws PropelException
+     */
+    public function countOrderAddresses(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOrderAddressesPartial && !$this->isNew();
+        if (null === $this->collOrderAddresses || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOrderAddresses) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getOrderAddresses());
+            }
+
+            $query = ChildOrderAddressQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCustomerTitle($this)
+                ->count($con);
+        }
+
+        return count($this->collOrderAddresses);
+    }
+
+    /**
+     * Method called to associate a ChildOrderAddress object to this object
+     * through the ChildOrderAddress foreign key attribute.
+     *
+     * @param    ChildOrderAddress $l ChildOrderAddress
+     * @return   \Thelia\Model\CustomerTitle The current object (for fluent API support)
+     */
+    public function addOrderAddress(ChildOrderAddress $l)
+    {
+        if ($this->collOrderAddresses === null) {
+            $this->initOrderAddresses();
+            $this->collOrderAddressesPartial = true;
+        }
+
+        if (!in_array($l, $this->collOrderAddresses->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddOrderAddress($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param OrderAddress $orderAddress The orderAddress object to add.
+     */
+    protected function doAddOrderAddress($orderAddress)
+    {
+        $this->collOrderAddresses[]= $orderAddress;
+        $orderAddress->setCustomerTitle($this);
+    }
+
+    /**
+     * @param  OrderAddress $orderAddress The orderAddress object to remove.
+     * @return ChildCustomerTitle The current object (for fluent API support)
+     */
+    public function removeOrderAddress($orderAddress)
+    {
+        if ($this->getOrderAddresses()->contains($orderAddress)) {
+            $this->collOrderAddresses->remove($this->collOrderAddresses->search($orderAddress));
+            if (null === $this->orderAddressesScheduledForDeletion) {
+                $this->orderAddressesScheduledForDeletion = clone $this->collOrderAddresses;
+                $this->orderAddressesScheduledForDeletion->clear();
+            }
+            $this->orderAddressesScheduledForDeletion[]= $orderAddress;
+            $orderAddress->setCustomerTitle(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this CustomerTitle is new, it will return
+     * an empty collection; or if this CustomerTitle has previously
+     * been saved, it will retrieve related OrderAddresses from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in CustomerTitle.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrderAddress[] List of ChildOrderAddress objects
+     */
+    public function getOrderAddressesJoinCountry($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderAddressQuery::create(null, $criteria);
+        $query->joinWith('Country', $joinBehavior);
+
+        return $this->getOrderAddresses($query, $con);
+    }
+
+    /**
      * Clears out the collCustomerTitleI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2101,6 +2390,11 @@ abstract class CustomerTitle implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collOrderAddresses) {
+                foreach ($this->collOrderAddresses as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collCustomerTitleI18ns) {
                 foreach ($this->collCustomerTitleI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -2114,6 +2408,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
 
         $this->collCustomers = null;
         $this->collAddresses = null;
+        $this->collOrderAddresses = null;
         $this->collCustomerTitleI18ns = null;
     }
 

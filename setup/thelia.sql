@@ -775,7 +775,19 @@ CREATE TABLE `order_address`
     `country_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    INDEX `FI_order_address_customer_title_id` (`customer_title_id`),
+    INDEX `FI_order_address_country_id` (`country_id`),
+    CONSTRAINT `fk_order_address_customer_title_id`
+        FOREIGN KEY (`customer_title_id`)
+        REFERENCES `customer_title` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_address_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

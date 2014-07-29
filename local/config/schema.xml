@@ -662,6 +662,12 @@
     <column name="city" required="true" size="255" type="VARCHAR" />
     <column name="phone" size="20" type="VARCHAR" />
     <column name="country_id" required="true" type="INTEGER" />
+      <foreign-key foreignTable="customer_title" name="fk_order_address_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+          <reference foreign="id" local="customer_title_id" />
+      </foreign-key>
+      <foreign-key foreignTable="country" name="fk_order_address_country_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+          <reference foreign="id" local="country_id" />
+      </foreign-key>
     <behavior name="timestampable" />
   </table>
   <table name="order_product" namespace="Thelia\Model">

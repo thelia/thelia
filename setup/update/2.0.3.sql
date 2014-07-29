@@ -15,6 +15,21 @@ ALTER TABLE `order` ADD `version` INT DEFAULT 0 AFTER `updated_at`;
 ALTER TABLE `order` ADD `version_created_at` DATE AFTER `version`;
 ALTER TABLE `order` ADD `version_created_by` VARCHAR(100) AFTER `version_created_at`;
 
+ALTER TABLE `order_address`
+  ADD CONSTRAINT `fk_order_address_customer_title_id`
+  FOREIGN KEY (`customer_title_id`)
+    REFERENCES `customer_title` (`id`)
+      ON UPDATE RESTRICT
+      ON DELETE RESTRICT
+;
+ALTER TABLE `order_address`
+  ADD CONSTRAINT `fk_order_address_country_id`
+  FOREIGN KEY (`country_id`)
+    REFERENCES `country` (`id`)
+      ON UPDATE RESTRICT
+      ON DELETE RESTRICT
+;
+
 DROP TABLE IF EXISTS `order_version`;
 
 CREATE TABLE `order_version`
