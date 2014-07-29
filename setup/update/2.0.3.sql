@@ -9,6 +9,18 @@ UPDATE `config` SET `value`='' WHERE `name`='thelia_extra_version';
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`,  `created_at`, `updated_at`) VALUES
 ('store_description', '', 0, 0, NOW(), NOW());
 
+# default available stock
+
+INSERT INTO `config` (`name`, `value`, `secured`, `hidden`,  `created_at`, `updated_at`) VALUES
+('default_available_stock', '100', 0, 0, NOW(), NOW());
+
+SELECT @max := MAX(`id`) FROM `config`;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max, 'en_US', 'Default available stock when check-available-stock is set to 0.', NULL, NULL, NULL),
+(@max, 'fr_FR', 'Stock disponible par défaut quand check-available-stock est à 0.', NULL, NULL, NULL);
+
+
 # Add new column to order (version, version_created_at, version_created_by)
 
 ALTER TABLE `order` ADD `version` INT DEFAULT 0 AFTER `updated_at`;
