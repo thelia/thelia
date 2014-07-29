@@ -79,6 +79,17 @@ class Order extends BaseOrder
         return $this->choosenInvoiceAddress;
     }
 
+    public function preSave(ConnectionInterface $con = null)
+    {
+        if ($this->isPaid() && null === $this->getInvoiceDate()) {
+            $this
+                ->setInvoiceDate(time());
+        }
+
+        return parent::preSave($con);
+    }
+
+
     /**
      * {@inheritDoc}
      */
@@ -98,15 +109,6 @@ class Order extends BaseOrder
             ->setDisableVersioning(true)
             ->save($con);
         $this->dispatchEvent(TheliaEvents::ORDER_AFTER_CREATE, new OrderEvent($this));
-    }
-
-    public function postSave(ConnectionInterface $con = null)
-    {
-        if ($this->isPaid() && null === $this->getInvoiceDate()) {
-            $this
-                ->setInvoiceDate(time())
-                ->save($con);
-        }
     }
 
     public function generateRef()
