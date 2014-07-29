@@ -48,6 +48,7 @@ use Thelia\Model\Map\ImportTableMap;
  */
 class XmlFileLoader extends FileLoader
 {
+
     /**
      * Loads an XML file.
      *
@@ -77,13 +78,43 @@ class XmlFileLoader extends FileLoader
 
         $this->parseDefinitions($xml, $path);
 
-        $this->parseExportCategories($xml);
+        $this->propelOnlyRun(
+            [$this, "parseExportCategories"],
+            $xml,
+            ExportCategoryTableMap::DATABASE_NAME
+        );
 
-        $this->parseExports($xml);
+        $this->propelOnlyRun(
+            [$this, "parseExports"],
+            $xml,
+            ExportTableMap::DATABASE_NAME
+        );
 
-        $this->parseImportCategories($xml);
+        $this->propelOnlyRun(
+            [$this, "parseExportCategories"],
+            $xml,
+            ImportCategoryTableMap::DATABASE_NAME
+        );
 
-        $this->parseImports($xml);
+        $this->propelOnlyRun(
+            [$this, "parseExports"],
+            $xml,
+            ImportTableMap::DATABASE_NAME
+        );
+    }
+
+    public function propelOnlyRun(callable $method, $arg, $name)
+    {
+        $doRun = false;
+
+        try {
+            Propel::getConnection($name);
+            $doRun = true;
+        } catch (\ErrorException $e) {}
+
+        if ($doRun) {
+            call_user_func($method, $arg);
+        }
     }
 
     protected function parseCommands(SimpleXMLElement $xml)
