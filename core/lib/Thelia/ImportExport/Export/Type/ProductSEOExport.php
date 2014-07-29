@@ -69,7 +69,7 @@ class ProductSEOExport extends ExportHandler
         $query = ProductAssociatedContentQuery::create()
             ->useProductQuery()
                 ->addJoinObject($productJoin, "product_join")
-                ->addJoinCondition("product_join", ProductI18nTableMap::LOCALE . "=" . $this->real_escape($locale))
+                ->addJoinCondition("product_join", ProductI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
                 ->addAsColumn("product_i18n_TITLE", ProductI18nTableMap::TITLE)
                 ->addAsColumn("product_REF", ProductTableMap::REF)
                 ->addAsColumn("product_VISIBLE", ProductTableMap::VISIBLE)
@@ -78,10 +78,12 @@ class ProductSEOExport extends ExportHandler
                 ->addAsColumn("product_seo_META_KEYWORDS", ProductI18nTableMap::META_KEYWORDS)
             ->endUse()
             ->addJoinObject($urlJoin, "rewriting_url_join")
-            ->addJoinCondition("rewriting_url_join", RewritingUrlTableMap::VIEW_LOCALE . "=" . $this->real_escape($locale))
+            ->addJoinCondition("rewriting_url_join", RewritingUrlTableMap::VIEW_LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
             ->addJoinCondition(
                 "rewriting_url_join",
-                RewritingUrlTableMap::VIEW . "=" . $this->real_escape((new Product())->getRewrittenUrlViewName())
+                RewritingUrlTableMap::VIEW . " = ?",(new Product())->getRewrittenUrlViewName(),
+                null,
+                \PDO::PARAM_STR
             )
             ->addJoinCondition("rewriting_url_join", "ISNULL(".RewritingUrlTableMap::REDIRECTED.")")
             ->addAsColumn("product_URL", RewritingUrlTableMap::URL)

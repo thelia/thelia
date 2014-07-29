@@ -78,7 +78,13 @@ class ProductPricesExport extends ExportHandler
                 ->endUse()
                 ->useProductQuery()
                     ->addJoinObject($productJoin, "product_join")
-                    ->addJoinCondition("product_join", ProductI18nTableMap::LOCALE . "=" . $this->real_escape($locale))
+                    ->addJoinCondition(
+                        "product_join",
+                        ProductI18nTableMap::LOCALE . " = ?",
+                        $locale,
+                        null,
+                        \PDO::PARAM_STR
+                    )
                     ->addAsColumn("product_TITLE", ProductI18nTableMap::TITLE)
                 ->endUse()
                 ->addAsColumn("product_sale_elements_REF", ProductSaleElementsTableMap::REF)
@@ -89,7 +95,7 @@ class ProductPricesExport extends ExportHandler
                 ->addJoinObject($attributeAvJoin, "attribute_av_join")
                 ->addJoinCondition(
                     "attribute_av_join",
-                    AttributeAvI18nTableMap::LOCALE . "=" . $this->real_escape($locale)
+                    AttributeAvI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR
                 )
                 ->addAsColumn(
                     "attribute_av_i18n_ATTRIBUTES",

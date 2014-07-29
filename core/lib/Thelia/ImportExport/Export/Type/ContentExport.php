@@ -107,13 +107,13 @@ class ContentExport extends ExportHandler implements
                         ->endUse()
                     ->_endif()
                     ->addJoinObject($folderI18nJoin, "folder_i18n_join")
-                    ->addJoinCondition("folder_i18n_join", FolderI18nTableMap::LOCALE . "=" . $this->real_escape($locale))
+                    ->addJoinCondition("folder_i18n_join", FolderI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
                     ->addAsColumn("folder_TITLE", FolderI18nTableMap::TITLE)
                     ->addAsColumn("folder_ID", FolderTableMap::ID)
                 ->endUse()
             ->endUse()
             ->addJoinObject($contentI18nJoin, "content_i18n_join")
-            ->addJoinCondition("content_i18n_join", ContentI18nTableMap::LOCALE . "=" . $this->real_escape($locale))
+            ->addJoinCondition("content_i18n_join", ContentI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
             ->addAsColumn("content_TITLE", ContentI18nTableMap::TITLE)
             ->addAsColumn("content_CHAPO", ContentI18nTableMap::CHAPO)
             ->addAsColumn("content_DESCRIPTION", ContentI18nTableMap::DESCRIPTION)
@@ -124,12 +124,17 @@ class ContentExport extends ExportHandler implements
             ->addJoinObject($urlJoin, "url_rewriting_join")
             ->addJoinCondition(
                 "url_rewriting_join",
-                RewritingUrlTableMap::VIEW . "=" .
-                $this->real_escape((new Content())->getRewrittenUrlViewName())
+                RewritingUrlTableMap::VIEW . " = ?",
+                (new Content())->getRewrittenUrlViewName(),
+                null,
+                \PDO::PARAM_STR
             )
             ->addJoinCondition(
                 "url_rewriting_join",
-                RewritingUrlTableMap::VIEW_LOCALE . "=" . $this->real_escape($locale)
+                RewritingUrlTableMap::VIEW_LOCALE . " = ?",
+                $locale,
+                null,
+                \PDO::PARAM_STR
             )
             ->addAsColumn("url_URL", RewritingUrlTableMap::URL)
             ->select([
@@ -184,7 +189,7 @@ class ContentExport extends ExportHandler implements
                  * Do not repeat content values
                  */
                 $line["content_TITLE"] = "";
-                $line["content_VISIBLE"] = "";
+                $line[ContentTableMap::VISIBLE] = "";
                 $line["content_CHAPO"] = "";
                 $line["content_DESCRIPTION"] = "";
                 $line["content_CONCLUSION"] = "";

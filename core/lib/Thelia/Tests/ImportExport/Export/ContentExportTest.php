@@ -117,6 +117,16 @@ class ContentExportTest extends \PHPUnit_Framework_TestCase
 
             $imagesString = implode(",", $images);
 
+            if (empty($data[$i]["content_images"])) {
+                $j = 1;
+                while ($data[$i-$j]["id"] === $data[$i]["id"]) {
+                    if (!empty($data[$i - $j++]["content_images"])) {
+                        $data[$i]["content_images"] = $data[$i-$j-1]["content_images"];
+                        break;
+                    }
+                }
+            }
+
             $this->assertEquals($imagesString, $data[$i]["content_images"]);
 
             $folderImages = FolderImageQuery::create()

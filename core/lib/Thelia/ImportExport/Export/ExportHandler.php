@@ -150,33 +150,6 @@ abstract class ExportHandler extends AbstractHandler
         ;
     }
 
-    /**
-     * @param $str
-     * @return string
-     *
-     * Really escapes a string for SQL request.
-     */
-    protected function real_escape($str)
-    {
-        $str = trim($str, "\"'");
-
-        $return = "CONCAT(";
-        $len = strlen($str);
-
-        for ($i = 0; $i < $len; ++$i) {
-            $return .= "CHAR(".ord($str[$i])."),";
-        }
-
-        if ($i > 0) {
-            $return = substr($return, 0, -1);
-        } else {
-            $return = "\"\"";
-        }
-        $return .= ")";
-
-        return $return;
-    }
-
     public function renderLoop($type, array $args = array())
     {
         $loopsDefinition = $this->container->getParameter("thelia.parser.loops");
