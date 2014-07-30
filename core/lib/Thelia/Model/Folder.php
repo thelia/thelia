@@ -20,7 +20,7 @@ class Folder extends BaseFolder implements FileModelParentInterface
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName()
+    public function getRewrittenUrlViewName()
     {
         return 'folder';
     }

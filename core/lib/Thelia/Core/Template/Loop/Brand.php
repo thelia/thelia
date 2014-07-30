@@ -22,6 +22,7 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\BrandQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\BrandTableMap;
 use Thelia\Model\Map\RewritingUrlTableMap;
 use Thelia\Model\ProductQuery;
@@ -185,18 +186,20 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         $search->addJoinObject($join, "brand_url_rewriting_join")
             ->addJoinCondition(
                 "brand_url_rewriting_join",
-                RewritingUrlTableMap::VIEW_LOCALE,
+                RewritingUrlTableMap::VIEW_LOCALE . " = ?",
                 $this->locale,
-                Criteria::EQUAL,
+                null,
                 \PDO::PARAM_STR
             )
             ->addJoinCondition(
                 "brand_url_rewriting_join",
-                RewritingUrlTableMap::VIEW,
+                RewritingUrlTableMap::VIEW . " = ?",
                 (new \Thelia\Model\Brand())->getRewrittenUrlViewName(),
-                Criteria::EQUAL,
+                null,
                 \PDO::PARAM_STR
-            );
+            )
+            ->addAsColumn("url_URL", RewritingUrlTableMap::URL)
+        ;
 
         return $search;
 
@@ -204,9 +207,17 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
 
     public function parseResults(LoopResult $loopResult)
     {
+        $isRewritingEnabled = ConfigQuery::isRewritingEnable();
+
         /** @var \Thelia\Model\Brand $brand */
         foreach ($loopResult->getResultDataCollection() as $brand) {
             $loopResultRow = new LoopResultRow($brand);
+
+            $url = $brand->getVirtualColumn("url_URL");
+
+            if (!$isRewritingEnabled || empty($rewrittenUrl)) {
+                $url = $brand->getUrl($this->locale);
+            }
 
             $loopResultRow->set("ID"            , $brand->getId())
                 ->set("IS_TRANSLATED"           , $brand->getVirtualColumn('IS_TRANSLATED'))
@@ -215,7 +226,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                 ->set("CHAPO"                   , $brand->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION"             , $brand->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM"            , $brand->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL"                     , $brand->getUrl($this->locale))
+                ->set("URL"                     , $url)
                 ->set("META_TITLE"              , $brand->getVirtualColumn('i18n_META_TITLE'))
                 ->set("META_DESCRIPTION"        , $brand->getVirtualColumn('i18n_META_DESCRIPTION'))
                 ->set("META_KEYWORDS"            , $brand->getVirtualColumn('i18n_META_KEYWORDS'))
