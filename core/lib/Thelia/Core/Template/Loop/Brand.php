@@ -13,6 +13,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -21,6 +22,8 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\BrandQuery;
+use Thelia\Model\Map\BrandTableMap;
+use Thelia\Model\Map\RewritingUrlTableMap;
 use Thelia\Model\ProductQuery;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type;
@@ -176,6 +179,24 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
+
+        $join = new Join(BrandTableMap::ID, RewritingUrlTableMap::VIEW_ID, Criteria::LEFT_JOIN);
+
+        $search->addJoinObject($join, "brand_url_rewriting_join")
+            ->addJoinCondition(
+                "brand_url_rewriting_join",
+                RewritingUrlTableMap::VIEW_LOCALE,
+                $this->locale,
+                Criteria::EQUAL,
+                \PDO::PARAM_STR
+            )
+            ->addJoinCondition(
+                "brand_url_rewriting_join",
+                RewritingUrlTableMap::VIEW,
+                (new \Thelia\Model\Brand())->getRewrittenUrlViewName(),
+                Criteria::EQUAL,
+                \PDO::PARAM_STR
+            );
 
         return $search;
 
