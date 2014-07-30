@@ -358,20 +358,21 @@ class FileController extends BaseAdminController
 
             $file->setLocale($data['locale']);
 
-            if (isset($data['title'])) {
+            if (array_key_exists('title', $data)) {
                 $file->setTitle($data['title']);
             }
-            if (isset($data['chapo'])) {
+            if (array_key_exists('chapo', $data)) {
                 $file->setChapo($data['chapo']);
             }
-            if (isset($data['description'])) {
+            if (array_key_exists('description', $data)) {
                 $file->setDescription($data['description']);
             }
+            if (array_key_exists('postscriptum', $data)) {
+                $file->setPostscriptum($data['postscriptum']);
+            }
+
             if (isset($data['file'])) {
                 $file->setFile($data['file']);
-            }
-            if (isset($data['postscriptum'])) {
-                $file->setPostscriptum($data['postscriptum']);
             }
 
             $event->setModel($file);
