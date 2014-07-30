@@ -220,7 +220,6 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
             // which adds a product to the cart.
             $discount = $couponManager->isInUse() ? $couponManager->exec() : 0;
 
-
             $loopResultRow
                 ->set("ID", $coupon->getId())
                 ->set("IS_TRANSLATED", $coupon->getVirtualColumn('IS_TRANSLATED'))
