@@ -46,6 +46,10 @@ use Thelia\Model\Map\CustomerTitleTableMap;
  * @method     ChildCustomerTitleQuery rightJoinAddress($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Address relation
  * @method     ChildCustomerTitleQuery innerJoinAddress($relationAlias = null) Adds a INNER JOIN clause to the query using the Address relation
  *
+ * @method     ChildCustomerTitleQuery leftJoinOrderAddress($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderAddress relation
+ * @method     ChildCustomerTitleQuery rightJoinOrderAddress($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderAddress relation
+ * @method     ChildCustomerTitleQuery innerJoinOrderAddress($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderAddress relation
+ *
  * @method     ChildCustomerTitleQuery leftJoinCustomerTitleI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerTitleI18n relation
  * @method     ChildCustomerTitleQuery rightJoinCustomerTitleI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerTitleI18n relation
  * @method     ChildCustomerTitleQuery innerJoinCustomerTitleI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerTitleI18n relation
@@ -582,6 +586,79 @@ abstract class CustomerTitleQuery extends ModelCriteria
         return $this
             ->joinAddress($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Address', '\Thelia\Model\AddressQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\OrderAddress object
+     *
+     * @param \Thelia\Model\OrderAddress|ObjectCollection $orderAddress  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerTitleQuery The current query, for fluid interface
+     */
+    public function filterByOrderAddress($orderAddress, $comparison = null)
+    {
+        if ($orderAddress instanceof \Thelia\Model\OrderAddress) {
+            return $this
+                ->addUsingAlias(CustomerTitleTableMap::ID, $orderAddress->getCustomerTitleId(), $comparison);
+        } elseif ($orderAddress instanceof ObjectCollection) {
+            return $this
+                ->useOrderAddressQuery()
+                ->filterByPrimaryKeys($orderAddress->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByOrderAddress() only accepts arguments of type \Thelia\Model\OrderAddress or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the OrderAddress relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCustomerTitleQuery The current query, for fluid interface
+     */
+    public function joinOrderAddress($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('OrderAddress');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'OrderAddress');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the OrderAddress relation OrderAddress object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\OrderAddressQuery A secondary query class using the current class as primary query
+     */
+    public function useOrderAddressQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinOrderAddress($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderAddress', '\Thelia\Model\OrderAddressQuery');
     }
 
     /**
