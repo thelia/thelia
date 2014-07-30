@@ -31,6 +31,7 @@ use Thelia\Model\Map\FolderTableMap;
  */
 class ContentExportTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var Lang */
     protected $lang;
 
     /** @var ContentExport */
@@ -48,6 +49,7 @@ class ContentExportTest extends \PHPUnit_Framework_TestCase
     {
         $data = $this->handler->buildData($this->lang)->getData();
 
+
         $max = count($data);
         if ($max > 50) {
             $max = 50;
@@ -57,6 +59,8 @@ class ContentExportTest extends \PHPUnit_Framework_TestCase
             $content = ContentQuery::create()->findPk($data[$i]["id"]);
 
             $this->assertNotNull($content);
+
+            $content->setLocale($this->lang->getLocale());
 
             $this->assertEquals($content->getTitle(), $data[$i]["title"]);
             $this->assertEquals($content->getDescription(), $data[$i]["description"]);
@@ -80,6 +84,8 @@ class ContentExportTest extends \PHPUnit_Framework_TestCase
                     ;
 
                     $this->assertNotNull($contentFolder);
+
+                    $folder->setLocale($this->lang->getLocale());
 
                     $this->assertEquals(
                         $folder->getTitle(),
