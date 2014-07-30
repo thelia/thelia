@@ -5,22 +5,23 @@
 
 {* Page Title *}
 {block name='no-return-functions' append}
-    {loop name="content.seo.title" type="content" id="{content attr="id"}"}
-    {$page_title = {$META_TITLE}}
+    {$content_id={content attr="id"}}
+    {loop name="content.seo.title" type="content" id=$content_id}
+        {$page_title = {$META_TITLE}}
     {/loop}
 {/block}
 
 {* Meta *}
 {block name="meta"}
-    {loop name="content.seo.meta" type="content" id="{content attr="id"}"}
-    {include file="includes/meta-seo.html"}
+    {loop name="content.seo.meta" type="content" id=$content_id}
+        {include file="includes/meta-seo.html"}
     {/loop}
 {/block}
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = []}
-    {loop type="content" name="content-breadcrumb" id="{content attr="id"}"}
+    {loop type="content" name="content-breadcrumb" id=$content_id}
         {loop name="folder_path" type="folder-path" folder="{$DEFAULT_FOLDER}"}
             {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
         {/loop}

@@ -5,7 +5,8 @@
 
 {* Page Title *}
 {block name='no-return-functions' append}
-    {loop name="folder.seo.title" type="folder" id="{folder attr="id"}"}
+    {$folder_id={folder attr="id"}}
+    {loop name="folder.seo.title" type="folder" id=$folder_id}
     {$page_title = {$META_TITLE}}
     {/loop}
 {/block}
