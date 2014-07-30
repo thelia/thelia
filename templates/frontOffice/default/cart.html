@@ -102,7 +102,11 @@
                                     <input type="hidden" name="cart_item" value="{$ITEM_ID}">
                                     <div class="form-group">
                                         <select name="quantity" class="form-control" >
-                                            {for $will=1 to $STOCK}
+                                            {assign "stock" $STOCK}
+                                            {if !{config key="check-available-stock"}}
+                                              {assign var="stock" value="{config key="default-available-stock"}"}
+                                            {/if}
+                                            {for $will=1 to $stock}
                                                 <option {if $QUANTITY == $will}selected="selected"{/if}>{$will}</option>
                                             {/for}
                                         </select>
