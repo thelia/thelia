@@ -118,6 +118,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $this->couponManager->clear();
 
         $this->request->getSession()->setConsumedCoupons(array());
+
+        $this->updateOrderDiscount(null);
     }
 
     /**
