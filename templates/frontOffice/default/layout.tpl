@@ -24,7 +24,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 
 {* -- Define some stuff for Smarty ------------------------------------------ *}
 {config_load file='variables.conf'}
-
+{block name="init"}{/block}
 {block name="no-return-functions"}{/block}
 {assign var="store_name" value="{config key="store_name"}"}
 {assign var="store_description" value="{config key="store_description"}"}
@@ -295,7 +295,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                             <p>{intl l="Follow us introduction"}</p>
                             <ul role="presentation">
                                 <li>
-                                    <a href="http://facebook.com" rel="nofollow" class="facebook" data-toggle="tooltip" data-placement="top" title="{intl l="Facebook"}" target="_blank">
+                                    <a href="https://www.facebook.com/theliaecommerce" rel="nofollow" class="facebook" data-toggle="tooltip" data-placement="top" title="{intl l="Facebook"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-facebook icon-light"></span>
@@ -304,7 +304,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://twitter.com" rel="nofollow" class="twitter" data-toggle="tooltip" data-placement="top" title="{intl l="Twitter"}" target="_blank">
+                                    <a href="https://twitter.com/theliaecommerce" rel="nofollow" class="twitter" data-toggle="tooltip" data-placement="top" title="{intl l="Twitter"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-twitter icon-light"></span>
@@ -322,7 +322,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://www.google.com" rel="nofollow" class="google-plus" data-toggle="tooltip" data-placement="top" title="{intl l="Google+"}" target="_blank">
+                                    <a href="https://plus.google.com/+TheliaNet" rel="nofollow" class="google-plus" data-toggle="tooltip" data-placement="top" title="{intl l="Google+"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-google-plus icon-light"></span>
@@ -340,7 +340,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#rss" class="rss" rel="nofollow" data-toggle="tooltip" data-placement="top" title="{intl l="RSS"}" target="_blank">
+                                    <a href="http://thelia.net/feed/" class="rss" rel="nofollow" data-toggle="tooltip" data-placement="top" title="{intl l="RSS"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-rss icon-light"></span>
