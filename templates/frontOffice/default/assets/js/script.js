@@ -55,29 +55,30 @@ var pseManager = (function($){
             combinationValue = null,
             combinationValueId = null;
 
-        // get the select for options
-        $("#pse-options .pse-option").each(function(){
-            var $option = $(this);
-            if ( $option.data("attribute") in PSE_COMBINATIONS){
-                $pse['options'][$option.data("attribute")] = $option;
-                $option.on("change", updateProductForm);
-            } else {
-                // not affected to this product -> remove
-                $option.closest(".option").remove();
-            }
-        });
-
-        // build select
-        for (combinationValueId in PSE_COMBINATIONS_VALUE) {
-            combinationValue = PSE_COMBINATIONS_VALUE[combinationValueId];
-            $pse.options[combinationValue[1]]
-                .append("<option value='" + combinationValueId + "'>"
-                    + combinationValue[0] + "</option>");
-        }
-
         // initialization for the first default pse
         $pse.pseId = $pse.id.val();
+
         if (PSE_COUNT > 1) {
+            // get the select for options
+            $("#pse-options .pse-option").each(function(){
+                var $option = $(this);
+                if ( $option.data("attribute") in PSE_COMBINATIONS){
+                    $pse['options'][$option.data("attribute")] = $option;
+                    $option.on("change", updateProductForm);
+                } else {
+                    // not affected to this product -> remove
+                    $option.closest(".option").remove();
+                }
+            });
+
+            // build select
+            for (combinationValueId in PSE_COMBINATIONS_VALUE) {
+                combinationValue = PSE_COMBINATIONS_VALUE[combinationValueId];
+                $pse.options[combinationValue[1]]
+                    .append("<option value='" + combinationValueId + "'>"
+                        + combinationValue[0] + "</option>");
+            }
+
             setPseForm();
         }
     }

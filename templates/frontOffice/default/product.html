@@ -32,24 +32,28 @@
 {block name="main-content"}
 
     {$product_id={product attr="id"}}
-    {$pse_count={count type="product_sale_elements" product="$product_id"}}
+    {$pse_count=1}
     {$check_availability={config key="check-available-stock" default="1"}}
 
     <div class="main">
         {loop name="product.details" type="product" id="{product attr="id"}" limit="1" with_prev_next_info="1"}
         <article id="product" class="col-main" role="main" itemscope itemtype="http://schema.org/Product">
 
+            {$pse_count=$PSE_COUNT}
+
             <!-- Use the meta tag to specify content that is not visible on the page in any way -->
             {loop name="brand.feature" type="brand" product="{$ID}"}
                 <meta itemprop="brand" content="{$TITLE}">
             {/loop}
+
+            {*
 
             {loop name="isbn.feature" type="feature" product="{$ID}" title="isbn"}
                 {loop name="isbn.value" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
                     <meta itemprop="productID" content="isbn:{$TITLE}">
                 {/loop}
             {/loop}
-
+            *}
             <section id="product-gallery">
                 {ifloop rel="image.main"}
                 <figure class="product-image">
@@ -166,15 +170,15 @@
                     {if $pse_count > 1}
                         {* We have more than 1 combination: custom form *}
                         <fieldset id="pse-options" class="product-options">
-                        {loop name="attributes" type="attribute" product="$product_id" order="manual"}
-                        <div class="option">
-                            <label for="option-{$ID}" class="option-heading">{$TITLE}</label>
-                            <div class="option-content">
-                                <select id="option-{$ID}" name="option-{$ID}" class="form-control pse-option" data-attribute="{$ID}"></select>
+                            {loop name="attributes" type="attribute" product="$product_id" order="manual"}
+                            <div class="option">
+                                <label for="option-{$ID}" class="option-heading">{$TITLE}</label>
+                                <div class="option-content">
+                                    <select id="option-{$ID}" name="option-{$ID}" class="form-control pse-option" data-attribute="{$ID}"></select>
+                                </div>
                             </div>
-                        </div>
-                        {/loop}
-                    </fieldset>
+                            {/loop}
+                        </fieldset>
                     {/if}
 
                     <fieldset class="product-cart form-inline">
@@ -277,19 +281,19 @@
 {$combination_label=[]}
 {$combination_values=[]}
 {loop name="pse" type="product_sale_elements" product="{product attr="id"}"}
-{$pse[$ID]=["id" => $ID, "isDefault" => $IS_DEFAULT, "isPromo" => $IS_PROMO, "isNew" => $IS_NEW, "ref" => "{$REF}", "ean" => "{$EAN}", "quantity" => {$QUANTITY}, "price" => "{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}", "promo" => "{format_number number="{$TAXED_PROMO_PRICE}"} {currency attr="symbol"}" ]}
-{$pse_combination=[]}
-{loop name="combi" type="attribute_combination" product_sale_elements="$ID"}
-{if ! $combination_label[$ATTRIBUTE_ID]}
-{$combination_label[$ATTRIBUTE_ID]=["name" => "{$ATTRIBUTE_TITLE}", "values" => []]}
-{/if}
-{if ! $combination_values[$ATTRIBUTE_AVAILABILITY_ID]}
-{$combination_label[$ATTRIBUTE_ID]["values"][]=$ATTRIBUTE_AVAILABILITY_ID}
-{$combination_values[$ATTRIBUTE_AVAILABILITY_ID]=["{$ATTRIBUTE_AVAILABILITY_TITLE}", $ATTRIBUTE_ID]}
-{/if}
-{$pse_combination[]=$ATTRIBUTE_AVAILABILITY_ID}
-{/loop}
-{$pse[$ID]["combinations"]=$pse_combination}
+    {$pse[$ID]=["id" => $ID, "isDefault" => $IS_DEFAULT, "isPromo" => $IS_PROMO, "isNew" => $IS_NEW, "ref" => "{$REF}", "ean" => "{$EAN}", "quantity" => {$QUANTITY}, "price" => "{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}", "promo" => "{format_number number="{$TAXED_PROMO_PRICE}"} {currency attr="symbol"}" ]}
+    {$pse_combination=[]}
+    {loop name="combi" type="attribute_combination" product_sale_elements="$ID"}
+        {if ! $combination_label[$ATTRIBUTE_ID]}
+            {$combination_label[$ATTRIBUTE_ID]=["name" => "{$ATTRIBUTE_TITLE}", "values" => []]}
+        {/if}
+        {if ! $combination_values[$ATTRIBUTE_AVAILABILITY_ID]}
+            {$combination_label[$ATTRIBUTE_ID]["values"][]=$ATTRIBUTE_AVAILABILITY_ID}
+            {$combination_values[$ATTRIBUTE_AVAILABILITY_ID]=["{$ATTRIBUTE_AVAILABILITY_TITLE}", $ATTRIBUTE_ID]}
+        {/if}
+        {$pse_combination[]=$ATTRIBUTE_AVAILABILITY_ID}
+    {/loop}
+    {$pse[$ID]["combinations"]=$pse_combination}
 {/loop}
 <script type="text/javascript">
     // Product sale elements
