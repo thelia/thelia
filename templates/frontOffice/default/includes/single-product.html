@@ -1,5 +1,9 @@
 <li class="item">
-    {assign var="hasSubmit" value = false}
+    {if $PSE_COUNT > 1}
+        {assign var="hasSubmit" value = false}
+    {else}
+        {assign var="hasSubmit" value = true}
+    {/if}
     {assign var="productTitle" value="{$TITLE}"}
 	{if not $product_id}
 	   {assign var="product_id" value=$ID}
