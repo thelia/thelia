@@ -20,6 +20,7 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ProductAssociatedContent;
 
 if (php_sapi_name() != 'cli') {
@@ -502,12 +503,23 @@ function createContents($faker, $folders, $con)
 
             // folder
             $contentFolders = explode(';', $data[7]);
+            $defaultFolder = null;
             foreach ($contentFolders as $contentFolder) {
                 $contentFolder = trim($contentFolder);
                 if (array_key_exists($contentFolder, $folders)) {
                     $content->addFolder($folders[$contentFolder]);
+                    if (null === $defaultFolder) {
+                        $defaultFolder = $folders[$contentFolder]->getId();
+                    }
                 }
             }
+
+            $content
+                ->getContentFolders()
+                ->getFirst()
+                ->setDefaultFolder(true)
+                ->save($con)
+            ;
 
             $content->save($con);
 
