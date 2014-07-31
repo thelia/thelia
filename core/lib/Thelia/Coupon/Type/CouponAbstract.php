@@ -182,7 +182,7 @@ abstract class CouponAbstract implements CouponInterface
     }
 
     /**
-     * @param true $perCustomerUsageCount
+     * @param  true  $perCustomerUsageCount
      * @return $this
      */
     public function setPerCustomerUsageCount($perCustomerUsageCount)
@@ -428,8 +428,8 @@ abstract class CouponAbstract implements CouponInterface
      *
      * This method should be overriden to be useful.
      *
-     * @param string $fieldName
-     * @param string $fieldValue
+     * @param  string                    $fieldName
+     * @param  string                    $fieldValue
      * @return mixed
      * @throws \InvalidArgumentException if the field value is not valid.
      */
@@ -509,7 +509,8 @@ abstract class CouponAbstract implements CouponInterface
         // Does nothing. Override this function as needed.
     }
 
-    public function isInUse() {
+    public function isInUse()
+    {
         return in_array(
             $this->code,
             $this->facade->getRequest()->getSession()->getConsumedCoupons()

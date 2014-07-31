@@ -22,7 +22,7 @@ class Brand extends BaseBrand implements FileModelParentInterface
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName()
+    public function getRewrittenUrlViewName()
     {
         return 'brand';
     }

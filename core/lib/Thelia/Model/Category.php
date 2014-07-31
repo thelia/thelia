@@ -31,7 +31,7 @@ class Category extends BaseCategory implements FileModelParentInterface
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName()
+    public function getRewrittenUrlViewName()
     {
         return 'category';
     }

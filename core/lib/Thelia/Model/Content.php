@@ -27,7 +27,7 @@ class Content extends BaseContent implements FileModelParentInterface
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName()
+    public function getRewrittenUrlViewName()
     {
         return 'content';
     }
