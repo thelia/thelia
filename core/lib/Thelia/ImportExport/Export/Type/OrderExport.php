@@ -28,6 +28,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Map\OrderStatusI18nTableMap;
+use Thelia\Model\Map\OrderStatusTableMap;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderQuery;
 
@@ -61,11 +62,7 @@ class OrderExport extends ExportHandler
         );
     }
 
-    /**
-     * @param  Lang $lang
-     * @return ModelCriteria|array|BaseLoop
-     */
-    public function buildDataSet(Lang $lang)
+    protected function getQuery(Lang $lang)
     {
         $locale = $lang->getLocale();
 
@@ -85,15 +82,16 @@ class OrderExport extends ExportHandler
                             "SUM(".OrderProductTaxTableMap::AMOUNT.")".
                         ")"
                     )
-                    ->addAsColumn("tax_TITLE", OrderProductTaxTableMap::TITLE)
+                    ->addAsColumn("tax_TITLE", OrderProductTableMap::TAX_RULE_TITLE)
                 ->endUse()
                 ->addAsColumn("product_TITLE", OrderProductTableMap::TITLE)
                 ->addAsColumn(
                     "product_PRICE",
                     "IF(".OrderProductTableMap::WAS_IN_PROMO.",".
                         OrderProductTableMap::PROMO_PRICE .",".
-                        OrderProductTableMap::PRICE .")"
-                    )
+                        OrderProductTableMap::PRICE .
+                    ")"
+                )
                 ->addAsColumn("product_QUANTITY", OrderProductTableMap::QUANTITY)
                 ->addAsColumn("product_WAS_IN_PROMO", OrderProductTableMap::WAS_IN_PROMO)
                 ->groupById()
@@ -120,16 +118,16 @@ class OrderExport extends ExportHandler
                     ->useCountryI18nQuery("delivery_address_country_i18n_join")
                         ->addAsColumn("delivery_address_country_TITLE", "`delivery_address_country_i18n_join`.TITLE")
                     ->endUse()
+                    ->addAsColumn("delivery_address_COMPANY", "`delivery_address_join`.COMPANY")
+                    ->addAsColumn("delivery_address_FIRSTNAME", "`delivery_address_join`.FIRSTNAME")
+                    ->addAsColumn("delivery_address_LASTNAME", "`delivery_address_join`.LASTNAME")
+                    ->addAsColumn("delivery_address_ADDRESS1", "`delivery_address_join`.ADDRESS1")
+                    ->addAsColumn("delivery_address_ADDRESS2", "`delivery_address_join`.ADDRESS2")
+                    ->addAsColumn("delivery_address_ADDRESS3", "`delivery_address_join`.ADDRESS3")
+                    ->addAsColumn("delivery_address_ZIPCODE", "`delivery_address_join`.ZIPCODE")
+                    ->addAsColumn("delivery_address_CITY", "`delivery_address_join`.CITY")
+                    ->addAsColumn("delivery_address_PHONE", "`delivery_address_join`.PHONE")
                 ->endUse()
-                ->addAsColumn("delivery_address_COMPANY", "`delivery_address_join`.COMPANY")
-                ->addAsColumn("delivery_address_FIRSTNAME", "`delivery_address_join`.FIRSTNAME")
-                ->addAsColumn("delivery_address_LASTNAME", "`delivery_address_join`.LASTNAME")
-                ->addAsColumn("delivery_address_ADDRESS1", "`delivery_address_join`.ADDRESS1")
-                ->addAsColumn("delivery_address_ADDRESS2", "`delivery_address_join`.ADDRESS2")
-                ->addAsColumn("delivery_address_ADDRESS3", "`delivery_address_join`.ADDRESS3")
-                ->addAsColumn("delivery_address_ZIPCODE", "`delivery_address_join`.ZIPCODE")
-                ->addAsColumn("delivery_address_CITY", "`delivery_address_join`.CITY")
-                ->addAsColumn("delivery_address_PHONE", "`delivery_address_join`.PHONE")
             ->endUse()
             ->useOrderAddressRelatedByInvoiceOrderAddressIdQuery("invoice_address_join")
                 ->useCustomerTitleQuery("invoice_address_customer_title_join")
@@ -175,6 +173,7 @@ class OrderExport extends ExportHandler
                 // total ttc +postage
                 "payment_module_TITLE",
                 OrderTableMap::INVOICE_REF,
+                OrderTableMap::DELIVERY_REF,
                 "delivery_module_TITLE",
                 "delivery_address_TITLE",
                 "delivery_address_COMPANY",
@@ -238,6 +237,27 @@ class OrderExport extends ExportHandler
             "`invoice_address_country_i18n_join`.LOCALE",
             $locale
         );
+
+        $this->addI18nCondition(
+            $query,
+            OrderStatusI18nTableMap::TABLE_NAME,
+            OrderStatusI18nTableMap::ID,
+            OrderStatusTableMap::ID,
+            OrderStatusI18nTableMap::LOCALE,
+            $locale
+        );
+
+        return $query;
+    }
+
+    /**
+     * @param  Lang $lang
+     * @return ModelCriteria|array|BaseLoop
+     */
+    public function buildDataSet(Lang $lang)
+    {
+
+        $query = $this->getQuery($lang);
 
         $dataSet = $query
             ->find()
@@ -315,4 +335,101 @@ class OrderExport extends ExportHandler
         return $dataSet;
     }
 
+    protected function getAliases()
+    {
+        return [
+            OrderTableMap::REF => "ref",
+            "customer_REF" => "customer_ref",
+            "product_TITLE" => "product_title",
+            "product_PRICE" => "price",
+            "product_TAX" => "tax_amount",
+            "tax_TITLE" => "tax_title",
+            "order_TOTAL_TTC" => "total_including_taxes",
+            "product_QUANTITY" => "quantity",
+            "product_WAS_IN_PROMO" => "was_in_promo",
+            "order_TOTAL_WITH_DISCOUNT" => "total_with_discount",
+            OrderTableMap::DISCOUNT => "discount",
+            "coupon_COUPONS" => "coupons",
+            "order_TOTAL_WITH_DISCOUNT_AND_POSTAGE" => "total_discount_and_postage",
+            OrderTableMap::POSTAGE => "postage",
+            "product_TAXED_PRICE" => "taxed_price",
+            "payment_module_TITLE" => "payment_module",
+            OrderTableMap::INVOICE_REF => "invoice_ref",
+            OrderTableMap::DELIVERY_REF => "delivery_ref",
+            "delivery_module_TITLE" => "delivery_module",
+            "delivery_address_TITLE" => "delivery_title",
+            "delivery_address_COMPANY" => "delivery_company",
+            "delivery_address_FIRSTNAME" => "delivery_first_name",
+            "delivery_address_LASTNAME" => "delivery_last_name",
+            "delivery_address_ADDRESS1" => "delivery_address1",
+            "delivery_address_ADDRESS2" => "delivery_address2",
+            "delivery_address_ADDRESS3" => "delivery_address3",
+            "delivery_address_ZIPCODE" => "delivery_zip_code",
+            "delivery_address_CITY" => "delivery_city",
+            "delivery_address_country_TITLE" => "delivery_country",
+            "delivery_address_PHONE" => "delivery_phone",
+            "invoice_address_TITLE" => "invoice_title",
+            "invoice_address_COMPANY" => "invoice_company",
+            "invoice_address_FIRSTNAME" => "invoice_first_name",
+            "invoice_address_LASTNAME" => "invoice_last_name",
+            "invoice_address_ADDRESS1" => "invoice_address1",
+            "invoice_address_ADDRESS2" => "invoice_address2",
+            "invoice_address_ADDRESS3" => "invoice_address3",
+            "invoice_address_ZIPCODE" => "invoice_zip_code",
+            "invoice_address_CITY" => "invoice_city",
+            "invoice_address_country_TITLE" => "invoice_country",
+            "invoice_address_PHONE" => "invoice_phone",
+            "order_status_TITLE" => "status",
+            "currency_CODE" => "currency",
+        ];
+    }
+
+    public function getOrder()
+    {
+        return [
+            "ref",
+            "customer_ref",
+            "discount",
+            "coupons",
+            "postage",
+            "total_including_taxes",
+            "total_with_discount",
+            "total_discount_and_postage",
+            "delivery_module",
+            "delivery_ref",
+            "payment_module",
+            "invoice_ref",
+            "status",
+            "delivery_title",
+            "delivery_company",
+            "delivery_first_name",
+            "delivery_last_name",
+            "delivery_address1",
+            "delivery_address2",
+            "delivery_address3",
+            "delivery_zip_code",
+            "delivery_city",
+            "delivery_country",
+            "delivery_phone",
+            "invoice_title",
+            "invoice_company",
+            "invoice_first_name",
+            "invoice_last_name",
+            "invoice_address1",
+            "invoice_address2",
+            "invoice_address3",
+            "invoice_zip_code",
+            "invoice_city",
+            "invoice_country",
+            "invoice_phone",
+            "product_title",
+            "price",
+            "taxed_price",
+            "currency",
+            "was_in_promo",
+            "quantity",
+            "tax_amount",
+            "tax_title",
+        ];
+    }
 } 
