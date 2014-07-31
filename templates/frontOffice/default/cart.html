@@ -36,7 +36,7 @@
                         <span class="visible-xs">{intl l="Name"}</span>
                     </th>
                     <th class="unitprice">
-                        <span class="hidden-xs">{intl l="Unit Price"}</span>
+                        <span class="hidden-xs">{intl l="Unit Price incl. taxes"}</span>
                         <span class="visible-xs">{intl l="Price"}</span>
                     </th>
                     <th class="qty">
@@ -44,7 +44,7 @@
                         <span class="visible-xs">{intl l="Qty"}</span>
                     </th>
                     <th class="subprice">
-                        <span class="hidden-xs">{intl l="Total"}</span>
+                        <span class="hidden-xs">{intl l="Total incl. taxes"}</span>
                         <span class="visible-xs">{intl l="Total"}</span>
                     </th>
                 </tr>
@@ -53,16 +53,14 @@
                     {loop type="cart" name="cartloop"}
                     <tr>
                         <td class="image">
+                            {ifloop rel='product-image'}
                             <a href="{$PRODUCT_URL}" class="thumbnail">
                                 {assign "cart_count" $LOOP_COUNT}
-                                {ifloop rel='product-image'}
-                                    {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
-                                        <img src="{$IMAGE_URL}" alt="Product #{$cart_count}"></a>
-                                    {/loop}
-                                {/ifloop}
-                                {elseloop rel="product-image"}
-                                    {images file='assets/img/product/1/118x85.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{$cart_count}">{/images}
-                                {/elseloop}
+                                {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
+                                    <img src="{$IMAGE_URL}" alt="Product #{$cart_count}">
+                                {/loop}
+                            </a>
+                            {/ifloop}
                         </td>
                         <td class="product" >
                             <h3 class="name"><a href="{$PRODUCT_URL}">{$TITLE}</a></h3>
@@ -162,7 +160,7 @@
                 <tfoot>
                 <tr>
                     <td colspan="3" class="empty">&nbsp;</td>
-                    <th class="total">{intl l="Total"}</th>
+                    <th class="total">{intl l="Total incl. taxes"}</th>
                     <td class="total">
                         <div class="total-price">
                             {assign var="totalAmount" value={cart attr='total_taxed_price_without_discount'} + $postageAmount }
