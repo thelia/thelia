@@ -1,0 +1,10 @@
+{if ! $title_empty}
+    {$title={intl l="The page cannot be found"}}
+{/if}
+<h1 id="main-label" class="page-header">{$title}</h1>
+
+{if ! $message_empty}
+<div class="description">
+    {$message_empty nofilter}
+</div>
+{/if}

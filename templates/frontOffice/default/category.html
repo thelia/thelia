@@ -1,39 +1,52 @@
 {extends file='layout.tpl'}
 
+{block name="init"}
+{$category_id={category attr="id"}}
+{/block}
+
+
 {* Body Class *}
 {block name="body-class"}page-category{/block}
 
 {* Page Title *}
 {block name='no-return-functions' append}
-    {loop name="category.seo.title" type="category" current="yes"}
-    {$page_title = {$META_TITLE}}
+{if $category_id}
+    {loop name="category.seo.title" type="category" id=$category_id limit="1"}
+        {$page_title = {$META_TITLE}}
     {/loop}
+{/if}
 {/block}
 
 {* Meta *}
 {block name="meta"}
-    {loop name="category.seo.meta" type="category" category="{category attr="id"}"}
-    {include file="includes/meta-seo.html"}
+{if $category_id}
+    {loop name="category.seo.meta" type="category" id=$category_id limit="1"}
+        {include file="includes/meta-seo.html"}
     {/loop}
+{/if}
 {/block}
 
 {* Feeds *}
 {block name="feeds"}
+{if $category_id}
     <link rel="alternate" type="application/rss+xml" title="{intl l='All products in'} {category attr='title'}" href="{url path="/feed/catalog/{lang attr="locale"}/{category attr="id"}"}" />
+{/if}
 {/block}
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
+{if $category_id}
     {$breadcrumbs = []}
-    {loop name="category_path" type="category-path" category="{category attr="id"}"}
+    {loop name="category_path" type="category-path" category=$category_id}
         {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
     {/loop}
+{/if}
 {/block}
 
 {* Content *}
 {block name="main-content"}
 
-    {$category_id={category attr="id"}}
+
     {$limit={$smarty.get.limit|default:8}}
     {$product_page={$smarty.get.page|default:1}}
     {$product_order={$smarty.get.order|default:'alpha'}}
@@ -43,21 +56,21 @@
 
             {if #category_display_detail# && $category_id}
             <section class="category-description">
-                {loop name="category.description" type="category" id={$category_id} }
-                <h1 id="main-label" class="page-header">{category attr="title"}</h1>
-                {loop name="category.image" type="image" source="category" id={$ID} width=218 height=146 resize_mode="borders"}
-                <p><img itemprop="image" src="{$IMAGE_URL}" alt="{$TITLE}"></p>
-                {/loop}
-                {if $DESCRIPTION}
-                <div class="description">
-                    {$DESCRIPTION nofilter}
-                </div>
-                {/if}
-                {if $POSTSCRIPTUM}
-                <small class="postscriptum">
-                    {$POSTSCRIPTUM}
-                </small>
-                {/if}
+                {loop name="category.description" type="category" id={$category_id} limit="1" }
+                    <h1 id="main-label" class="page-header">{category attr="title"}</h1>
+                    {loop name="category.image" type="image" source="category" id={$ID} width=218 height=146 resize_mode="borders"}
+                    <p><img itemprop="image" src="{$IMAGE_URL}" alt="{$TITLE}"></p>
+                    {/loop}
+                    {if $DESCRIPTION}
+                    <div class="description">
+                        {$DESCRIPTION nofilter}
+                    </div>
+                    {/if}
+                    {if $POSTSCRIPTUM}
+                    <small class="postscriptum">
+                        {$POSTSCRIPTUM}
+                    </small>
+                    {/if}
                 {/loop}
             </section>
             <hr/>
@@ -80,7 +93,7 @@
             {/if}
 
             {ifloop rel="product_list"}
-                {assign var="amount" value="{count type="product" category="$category_id"}"}
+                {assign var="amount" value="{count type="product" category=$category_id}"}
                 <div class="toolbar toolbar-top" role="toolbar">
                     <div class="sorter-container">
                     <span class="amount">{if ($amount > 1)}{intl l="%nb Items" nb="{$amount}"}{else}{intl l="%nb Item" nb="{$amount}"}{/if}</span>

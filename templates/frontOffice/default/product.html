@@ -1,18 +1,24 @@
 {extends file="layout.tpl"}
 
+{block name="init"}
+    {$product_id={product attr="id"}}
+    {$pse_count=1}
+    {$check_availability={config key="check-available-stock" default="1"}}
+{/block}
+
 {* Body Class *}
 {block name="body-class"}page-product{/block}
 
 {* Page Title *}
 {block name='no-return-functions' append}
-    {loop name="product.seo.title" type="product" id="{product attr="id"}" limit="1" with_prev_next_info="1"}
+    {loop name="product.seo.title" type="product" id=$product_id limit="1" with_prev_next_info="1"}
     {$page_title = {$META_TITLE}}
     {/loop}
 {/block}
 
 {* Meta *}
 {block name="meta"}
-    {loop name="product.seo.meta" type="product" id="{product attr="id"}" limit="1" with_prev_next_info="1"}
+    {loop name="product.seo.meta" type="product" id=$product_id limit="1" with_prev_next_info="1"}
     {include file="includes/meta-seo.html"}
     {/loop}
 {/block}
@@ -20,7 +26,7 @@
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = []}
-    {loop type="product" name="product_breadcrumb" id="{product attr="id"}" limit="1" with_prev_next_info="1"}
+    {loop type="product" name="product_breadcrumb" id=$product_id limit="1" with_prev_next_info="1"}
         {loop name="category_path" type="category-path" category="{$DEFAULT_CATEGORY}"}
             {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
         {/loop}
@@ -30,30 +36,26 @@
 
 {* Content *}
 {block name="main-content"}
-
-    {$product_id={product attr="id"}}
-    {$pse_count=1}
-    {$check_availability={config key="check-available-stock" default="1"}}
-
+    {if $product_id}
     <div class="main">
-        {loop name="product.details" type="product" id="{product attr="id"}" limit="1" with_prev_next_info="1"}
+        {loop name="product.details" type="product" id=$product_id limit="1" with_prev_next_info="1"}
         <article id="product" class="col-main" role="main" itemscope itemtype="http://schema.org/Product">
 
             {$pse_count=$PSE_COUNT}
 
-            <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+            {* Use the meta tag to specify content that is not visible on the page in any way *}
             {loop name="brand.feature" type="brand" product="{$ID}"}
                 <meta itemprop="brand" content="{$TITLE}">
             {/loop}
 
-            {*
-
+            {* Add custom feature if needed
             {loop name="isbn.feature" type="feature" product="{$ID}" title="isbn"}
                 {loop name="isbn.value" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
                     <meta itemprop="productID" content="isbn:{$TITLE}">
                 {/loop}
             {/loop}
             *}
+
             <section id="product-gallery">
                 {ifloop rel="image.main"}
                 <figure class="product-image">
@@ -108,7 +110,7 @@
                     <h1 class="name"><span itemprop="name">{$TITLE}</span><span id="pse-name" class="pse-name"></span></h1>
                     {if $REF}<span itemprop="sku" class="sku">{intl l='Ref.'}: <span id="pse-ref">{$REF}</span></span>{/if}
 
-                    {loop name="brand_info" type="brand" product="{$ID}"}
+                    {loop name="brand_info" type="brand" product="{$ID}" limit="1"}
                         <p><a href="{$URL}" title="{intl l="More information about this brand"}"><span itemprop="brand">{$TITLE}</span></a></p>
                     {/loop}
 
@@ -206,7 +208,6 @@
             {strip}
                 {capture "additional"}
                     {ifloop rel="feature_info"}
-
                         <ul>
                             {loop name="feature_info" type="feature" product="{$ID}"}
                             {ifloop rel="feature_value_info"}
@@ -220,14 +221,13 @@
                             {/ifloop}
                             {/loop}
                         </ul>
-
                     {/ifloop}
                 {/capture}
             {/strip}
 
             {strip}
                 {capture "brand_info"}
-                    {loop name="brand_info" type="brand" product="{$ID}"}
+                    {loop name="brand_info" type="brand" product="{$ID}" limit="1"}
                         <p><strong><a href="{$URL}">{$TITLE}</a></strong></p>
 
                         {loop name="brand.image" type="image" source="brand" id={$LOGO_IMAGE_ID} width=218 height=146 resize_mode="borders"}
@@ -295,22 +295,21 @@
     {/loop}
     {$pse[$ID]["combinations"]=$pse_combination}
 {/loop}
+
 <script type="text/javascript">
     // Product sale elements
     var PSE_FORM = true;
     var PSE_COUNT = {$pse_count};
     {if $check_availability}
         var PSE_CHECK_AVAILABILITY = true;
-        {else}
-        var PSE_CHECK_AVAILABILITY = false;
-        {/if};
-            var PSE_DEFAULT_AVAILABLE_STOCK = {config key="default-available-stock" default="100"};
-        var PSE = {$pse|json_encode nofilter};
+    {else}
+    var PSE_CHECK_AVAILABILITY = false;
+    {/if};
+    var PSE_DEFAULT_AVAILABLE_STOCK = {config key="default-available-stock" default="100"};
+    var PSE = {$pse|json_encode nofilter};
     var PSE_COMBINATIONS = {$combination_label|json_encode nofilter};
     var PSE_COMBINATIONS_VALUE = {$combination_values|json_encode nofilter};
 </script>
-{if $pse_count > 1}
-{/if}
 
         </article><!-- /#product -->
 
@@ -329,9 +328,12 @@
        {/loop}
 
     </div><!-- /.main -->
+    {else}
+    <div class="main">
+        <article id="content-main" class="col-main" role="main" aria-labelledby="main-label">
+            {include file="includes/empty.html"}
+        </article>
+    </div><!-- /.layout -->
+    {/if}
 {/block}
 
-{block name="javascript-initialization"}
-
-
-{/block}

@@ -1,39 +1,48 @@
 {extends file="layout.tpl"}
 
+{block name='init'}
+    {assign var="content_id" value={content attr="id"}}
+{/block}
+
 {* Body Class *}
 {block name="body-class"}page-content{/block}
 
 {* Page Title *}
 {block name='no-return-functions' append}
-    {$content_id={content attr="id"}}
-    {loop name="content.seo.title" type="content" id=$content_id}
-        {$page_title = {$META_TITLE}}
-    {/loop}
+    {if {$content_id}}
+        {loop name="content.seo.title" type="content" id={$content_id} limit="1"}
+            {$page_title = {$META_TITLE}}
+        {/loop}
+    {/if}
 {/block}
 
 {* Meta *}
 {block name="meta"}
-    {loop name="content.seo.meta" type="content" id=$content_id}
-        {include file="includes/meta-seo.html"}
-    {/loop}
+    {if $content_id}
+        {loop name="content.seo.meta" type="content" id=$content_id limit="1"}
+            {include file="includes/meta-seo.html"}
+        {/loop}
+    {/if}
 {/block}
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
-    {$breadcrumbs = []}
-    {loop type="content" name="content-breadcrumb" id=$content_id}
-        {loop name="folder_path" type="folder-path" folder="{$DEFAULT_FOLDER}"}
+    {if $content_id}
+        {$breadcrumbs = []}
+        {loop type="content" name="content-breadcrumb" id=$content_id limit="1"}
+            {loop name="folder_path" type="folder-path" folder="{$DEFAULT_FOLDER}"}
+                {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
+            {/loop}
             {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
         {/loop}
-        {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
-    {/loop}
+    {/if}
 {/block}
 
 {block name="main-content"}
+{if $content_id}
     <div class="main layout-col-2-left">
-
         <article id="content-main" class="col-main" role="main" aria-labelledby="main-label">
-            {loop name="blog.content"  type="content" current="yes"}
+            {loop name="blog.content" type="content" id=$content_id limit="1"}
                 <h1 id="main-label" class="page-header">{$TITLE}</h1>
                 {if $CHAPO}
                     <div class="chapo">
@@ -48,14 +57,19 @@
                 {if $POSTSCRIPTUM}
                     <small class="postscriptum">
                         {$POSTSCRIPTUM}
-                    </small>
+                   </small>
                 {/if}
             {/loop}
         </article>
-
         <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
             {include file="includes/asides/articles.html"}
         </aside>
-
     </div><!-- /.layout -->
+{else}
+    <div class="main">
+        <article id="content-main" class="col-main" role="main" aria-labelledby="main-label">
+            {include file="includes/empty.html"}
+        </article>
+    </div><!-- /.layout -->
+{/if}
 {/block}
