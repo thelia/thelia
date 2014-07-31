@@ -16,8 +16,6 @@ use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\Type\OrderExport;
 use Thelia\Model\Lang;
 use Thelia\Model\Map\OrderCouponTableMap;
-use Thelia\Model\Map\OrderProductTableMap;
-use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\OrderCouponQuery;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
@@ -47,11 +45,10 @@ class OrderExportTest extends \PHPUnit_Framework_TestCase
         $count = $ordersProductQuery->count();
         $this->assertEquals(count($data), $count);
 
-
         /**
          * For the rest of the test, 50 orders are much enough
          */
-        if  ($count > 50) {
+        if ($count > 50) {
             $count = 50;
         }
 
@@ -97,7 +94,6 @@ class OrderExportTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($order->getTotalAmount($tax, false, true), $row["total_with_discount"]);
             $this->assertEquals($order->getTotalAmount($tax, true, true), $row["total_discount_and_postage"]);
 
-
             $invoiceAddress = $order->getOrderAddressRelatedByInvoiceOrderAddressId();
             $deliveryAddress = $order->getOrderAddressRelatedByDeliveryOrderAddressId();
 
@@ -127,7 +123,7 @@ class OrderExportTest extends \PHPUnit_Framework_TestCase
                     ->filterByTitle($data[$i]["product_title"])
                     ->filterByTaxRuleTitle($data[$i]["tax_title"])
                     ->filterByWasInPromo($data[$i]["was_in_promo"])
-                    ->_if((bool)((int)$data[$i]["was_in_promo"]))
+                    ->_if((bool) ((int) $data[$i]["was_in_promo"]))
                         ->filterByPromoPrice($data[$i]["price"])
                     ->_else()
                         ->filterByPrice($data[$i]["price"])
@@ -146,4 +142,4 @@ class OrderExportTest extends \PHPUnit_Framework_TestCase
             }
         }
     }
-} 
+}

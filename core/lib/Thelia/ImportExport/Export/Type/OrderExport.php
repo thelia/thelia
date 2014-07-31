@@ -12,7 +12,6 @@
 
 namespace Thelia\ImportExport\Export\Type;
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -22,8 +21,6 @@ use Thelia\Model\Map\CountryI18nTableMap;
 use Thelia\Model\Map\CurrencyTableMap;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\CustomerTitleI18nTableMap;
-use Thelia\Model\Map\ModuleTableMap;
-use Thelia\Model\Map\OrderAddressTableMap;
 use Thelia\Model\Map\OrderCouponTableMap;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
@@ -251,7 +248,7 @@ class OrderExport extends ExportHandler
     }
 
     /**
-     * @param  Lang $lang
+     * @param  Lang                         $lang
      * @return ModelCriteria|array|BaseLoop
      */
     public function buildDataSet(Lang $lang)
@@ -279,7 +276,6 @@ class OrderExport extends ExportHandler
             $line["order_TOTAL_TTC"] = "";
             $line["order_TOTAL_WITH_DISCOUNT"] = "";
             $line["order_TOTAL_WITH_DISCOUNT_AND_POSTAGE"] = "";
-
 
             if (null === $previous || $previous !== $line[OrderTableMap::REF]) {
                 $previous = $line[OrderTableMap::REF];
@@ -432,4 +428,4 @@ class OrderExport extends ExportHandler
             "tax_title",
         ];
     }
-} 
+}
