@@ -84,6 +84,10 @@ class CSVFormatter extends AbstractFormatter
         $delimiterLength = strlen($this->delimiter);
         $lineReturnLength = strlen($this->lineReturn);
 
+        if ($firstRow === null) {
+            return "";
+        }
+
         /**
          * check if $this->order doesn't have non-existing rows
          */
