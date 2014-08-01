@@ -84,7 +84,7 @@ class CSVFormatter extends AbstractFormatter
         $delimiterLength = strlen($this->delimiter);
         $lineReturnLength = strlen($this->lineReturn);
 
-        if ($firstRow === null) {
+        if ($firstRow === false) {
             return "";
         }
 
@@ -93,43 +93,38 @@ class CSVFormatter extends AbstractFormatter
          */
         $this->checkOrders($firstRow);
 
-        if (false !== $firstRow) {
-            $rawKeys = array_keys($firstRow);
-            $keys = [];
+        $rawKeys = array_keys($firstRow);
+        $keys = [];
 
-            foreach ($rawKeys as $key) {
-                $keys[$key] = $key;
+        foreach ($rawKeys as $key) {
+            $keys[$key] = $key;
+        }
+
+        $values = $data->getData();
+        array_unshift($values, $keys);
+
+        while (null !== $row = array_shift($values)) {
+            /**
+             * First put the sorted ones
+             */
+            foreach ($this->order as $order) {
+                $string .= $this->formatField($row[$order]);
+                unset($row[$order]);
             }
 
-            $values = $data->getData();
-            array_unshift($values, $keys);
+            /**
+             * Then place the fields,
+             * order by name
+             */
+            ksort($row);
 
-            while (null !== $row = array_shift($values)) {
-                /**
-                 * First put the sorted ones
-                 */
-                foreach ($this->order as $order) {
-                    $string .= $this->formatField($row[$order]);
-                    unset($row[$order]);
+            foreach ($keys as $key) {
+                if (array_key_exists($key, $row)) {
+                    $string .= $this->formatField($row[$key]);
                 }
-
-                /**
-                 * Then place the fields,
-                 * order by name
-                 */
-                ksort($row);
-
-                foreach ($keys as $key) {
-                    if (array_key_exists($key, $row)) {
-                        $string .= $this->formatField($row[$key]);
-                    }
-                }
-
-                $string = substr($string,0, -$delimiterLength) . $this->lineReturn;
             }
 
-        } else {
-            $lineReturnLength = 0;
+            $string = substr($string,0, -$delimiterLength) . $this->lineReturn;
         }
 
         return substr($string, 0, -$lineReturnLength);
