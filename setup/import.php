@@ -143,7 +143,7 @@ function createProduct($faker, $categories, $brands, $contents, $template, $attr
                 ->save($con);
 
             // Set the position
-            $product->setPosition($product->getNextPosition())->save();
+            $product->setPosition($product->getNextPosition())->save($con);
 
             $images = explode(';', $data[10]);
 
@@ -269,7 +269,7 @@ function createCustomer($faker, $con){
         "Clermont-Ferrand",
         64,
         "test@thelia.net",
-        "azerty"
+        "thelia"
     );
     for ($j = 0; $j <= 2; $j++) {
         $address = new Thelia\Model\Address();
@@ -685,8 +685,8 @@ function clearTables($con)
     \Thelia\Model\ProductImageQuery::create()->find($con)->delete($con);
 
     $customer = Thelia\Model\CustomerQuery::create()
-        ->find();
-    $customer->delete();
+        ->find($con);
+    $customer->delete($con);
 
     echo "Tables cleared with success\n";
 
