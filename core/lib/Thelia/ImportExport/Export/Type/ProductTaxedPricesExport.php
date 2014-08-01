@@ -13,18 +13,14 @@
 namespace Thelia\ImportExport\Export\Type;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-use Thelia\Model\Country;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\Map\AttributeCombinationTableMap;
-use Thelia\Model\Map\CurrencyTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Map\TaxRuleI18nTableMap;
 use Thelia\Model\Map\TaxRuleTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
-use Thelia\Model\TaxRuleQuery;
-use Thelia\TaxEngine\Calculator;
 
 /**
  * Class ProductTaxedPricesExport

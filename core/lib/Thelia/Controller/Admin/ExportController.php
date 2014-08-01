@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilderManagerTrait;
 use Thelia\Core\FileFormat\Formatting\FormatterManagerTrait;
 use Thelia\Core\Security\AccessManager;
@@ -328,72 +329,57 @@ class ExportController extends BaseAdminController
     }
 
 
-    public function changePosition($action, $id)
+    public function changePosition()
     {
         if (null !== $response = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE])) {
             return $response;
         }
 
-        $export = $this->getExport($id);
+        $mode = $this->getRequest()->get("mode");
+        $id = $this->getRequest()->get("id");
+        $value = $this->getRequest()->get("value");
 
-        if ($action === "up") {
-            $export->upPosition();
-        } elseif ($action === "down") {
-            $export->downPosition();
-        }
+        $this->getExport($id);
+
+        $event = new UpdatePositionEvent($id, $this->getMode($mode), $value);
+        $this->dispatch(TheliaEvents::EXPORT_CHANGE_POSITION, $event);
 
         $this->setOrders(null, "manual");
 
         return $this->render('export');
     }
 
-    public function updatePosition($id, $value)
+    public function changeCategoryPosition()
     {
         if (null !== $response = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE])) {
             return $response;
         }
 
-        $export = $this->getExport($id);
+        $mode = $this->getRequest()->get("mode");
+        $id = $this->getRequest()->get("id");
+        $value = $this->getRequest()->get("value");
 
-        $export->updatePosition($value);
+        $this->getCategory($id);
 
-        $this->setOrders(null, "manual");
+        $event = new UpdatePositionEvent($id, $this->getMode($mode), $value);
+        $this->dispatch(TheliaEvents::EXPORT_CATEGORY_CHANGE_POSITION, $event);
+
+        $this->setOrders("manual");
 
         return $this->render('export');
     }
 
-    public function changeCategoryPosition($action, $id)
+    public function getMode($action)
     {
-        if (null !== $response = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE])) {
-            return $response;
-        }
-
-        $category = $this->getCategory($id);
-
         if ($action === "up") {
-            $category->upPosition();
+            $mode = UpdatePositionEvent::POSITION_UP;
         } elseif ($action === "down") {
-            $category->downPosition();
+            $mode = UpdatePositionEvent::POSITION_DOWN;
+        } else {
+            $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
         }
 
-        $this->setOrders("manual");
-
-        return $this->render('export');
-    }
-
-    public function updateCategoryPosition($id, $value)
-    {
-        if (null !== $response = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE])) {
-            return $response;
-        }
-
-        $category = $this->getCategory($id);
-
-        $category->updatePosition($value);
-
-        $this->setOrders("manual");
-
-        return $this->render('export');
+        return $mode;
     }
 
     protected function setOrders($category = null, $export = null)

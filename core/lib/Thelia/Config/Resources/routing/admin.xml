@@ -1158,86 +1158,6 @@
         <default key="_controller">Thelia\Controller\Admin\TranslationsController::updateAction</default>
     </route>
 
-    <!-- export management -->
-
-    <route id="export.list" path="/admin/export">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::indexAction</default>
-    </route>
-
-    <route id="export.position" path="/admin/export/position/{action}/{id}">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::changePosition</default>
-        <requirement key="action">up|down</requirement>
-        <requirement key="id">\d+</requirement>
-    </route>
-
-    <route id="export.position.update" path="/admin/export/position/update/{id}/{value}">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::updatePosition</default>
-        <requirement key="id">\d+</requirement>
-        <requirement key="value">\d+</requirement>
-    </route>
-
-    <route id="export.category.position" path="/admin/export/position/category/{action}/{id}">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::changeCategoryPosition</default>
-        <requirement key="action">up|down</requirement>
-        <requirement key="id">\d+</requirement>
-    </route>
-
-    <route id="export.category.position.update" path="/admin/export/position/category/update/{id}/{value}">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::updateCategoryPosition</default>
-        <requirement key="id">\d+</requirement>
-        <requirement key="value">\d+</requirement>
-    </route>
-
-    <route id="export.action" path="/admin/export/{id}" methods="post">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::export</default>
-        <requirement key="id">\d+</requirement>
-    </route>
-
-    <route id="export.view" path="/admin/export/{id}" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::exportView</default>
-        <requirement key="id">\d+</requirement>
-    </route>
-
-    <!-- import management -->
-
-    <route id="import.list" path="/admin/import">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::indexAction</default>
-    </route>
-
-    <route id="import.position" path="/admin/import/position/{action}/{id}">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::changePosition</default>
-        <requirement key="action">up|down</requirement>
-        <requirement key="id">\d+</requirement>
-    </route>
-
-    <route id="import.position.update" path="/admin/import/position/update/{id}/{value}">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::updatePosition</default>
-        <requirement key="id">\d+</requirement>
-        <requirement key="value">\d+</requirement>
-    </route>
-
-    <route id="import.category.position" path="/admin/import/position/category/{action}/{id}">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::changeCategoryPosition</default>
-        <requirement key="action">up|down</requirement>
-        <requirement key="id">\d+</requirement>
-    </route>
-
-    <route id="import.category.position.update" path="/admin/import/position/category/update/{id}/{value}">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::updateCategoryPosition</default>
-        <requirement key="id">\d+</requirement>
-        <requirement key="value">\d+</requirement>
-    </route>
-
-    <route id="import.action" path="/admin/import/{id}" methods="post">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::import</default>
-        <requirement key="id">\d+</requirement>
-    </route>
-
-    <route id="import.view" path="/admin/import/{id}" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::importView</default>
-        <requirement key="id">\d+</requirement>
-    </route>
-
     <!-- Routes to the Brands controller -->
 
     <route id="admin.brand.default" path="/admin/brand">
@@ -1272,6 +1192,54 @@
 
     <route id="admin.brand.delete" path="/admin/brand/delete">
         <default key="_controller">Thelia\Controller\Admin\BrandController::deleteAction</default>
+    </route>
+
+    <!-- export management -->
+
+    <route id="export.list" path="/admin/export">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::indexAction</default>
+    </route>
+
+    <route id="export.position" path="/admin/export/position">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::changePosition</default>
+    </route>
+
+    <route id="export.category.position" path="/admin/export/position/category">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::changeCategoryPosition</default>
+    </route>
+
+    <route id="export.mode" path="/admin/export/{id}" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::export</default>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="export.view" path="/admin/export/{id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::exportView</default>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <!-- import management -->
+
+    <route id="import.list" path="/admin/import">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::indexAction</default>
+    </route>
+
+    <route id="import.position" path="/admin/import/position">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::changePosition</default>
+    </route>
+
+    <route id="import.category.position" path="/admin/import/position/category">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::changeCategoryPosition</default>
+    </route>
+
+    <route id="import.mode" path="/admin/import/{id}" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::import</default>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="import.view" path="/admin/import/{id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::importView</default>
+        <requirement key="id">\d+</requirement>
     </route>
 
     <!-- The default route, to display a template -->

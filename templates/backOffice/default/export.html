@@ -38,16 +38,18 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="general-block-decorator">
-                            <div class="table-responsive" id="category_{$category_title}">
+                            <div class="table-responsive">
                                 <table class="table table-striped table-condensed table-left-aligned">
                                     <caption class="clearfix">
-                                        <a href="{url path="/admin/export/position/category/up/{$ID}{if $url_export}?{$url_export}{/if}#category_{$category_title}"}">
-                                            <span class="glyphicon glyphicon-arrow-up"></span>
-                                        </a>
-                                        {$POSITION}
-                                        <a href="{url path="/admin/export/position/category/down/{$ID}{if $url_export}?{$url_export}{/if}#category_{$category_title}"}">
-                                            <span class="glyphicon glyphicon-arrow-down"></span>
-                                        </a>
+                                        {admin_position_block
+                                            resource="admin.export"
+                                            access="UPDATE"
+                                            path={url path="admin/export/position/category"}
+                                            url_parameter="id"
+                                            in_place_edit_class="exportCategoryPositionChange"
+                                            position=$POSITION
+                                            id=$ID
+                                        }
                                         {$TITLE}
                                     </caption>
                                     <thead>
@@ -103,13 +105,15 @@
                                                     {$DESCRIPTION nofilter}
                                                 </td>
                                                 <td>
-                                                    <a href="{url path="/admin/export/position/up/{if $url_category}?{$url_category}{/if}{$ID}#category_{$category_title}"}">
-                                                        <span class="glyphicon glyphicon-arrow-up"></span>
-                                                    </a>
-                                                    {$POSITION}
-                                                    <a href="{url path="/admin/export/position/down/{$ID}{if $url_category}?{$url_category}{/if}#category_{$category_title}"}">
-                                                        <span class="glyphicon glyphicon-arrow-down"></span>
-                                                    </a>
+                                                    {admin_position_block
+                                                        resource="admin.export"
+                                                        access="UPDATE"
+                                                        path={url path="admin/export/position"}
+                                                        url_parameter="id"
+                                                        in_place_edit_class="exportPositionChange"
+                                                        position=$POSITION
+                                                        id=$ID
+                                                    }
                                                 </td>
                                                 <td>
                                                     <div class="btn-group">
@@ -144,11 +148,54 @@
     {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
+
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
 {/block}
 
 {block name="javascript-last-call"}
     <script>
         $(document).ready(function() {
+
+            $('.exportPositionChange').editable({
+                type        : 'text',
+                title       : "{intl l="Enter new export position"}",
+                mode        : 'popup',
+                inputclass  : 'input-mini',
+                placement   : 'left',
+                success     : function(response, newValue) {
+                    // The URL template
+                    var url = "{url noamp='1' path='/admin/export/position' id='__ID__' value='__POS__'}";
+
+                    // Perform subtitutions
+                    url = url.replace('__ID__', $(this).data('id'))
+                            .replace('__POS__', newValue);
+
+                    // Reload the page
+                    location.href = url;
+                }
+            });
+
+            $('.exportCategoryPositionChange').editable({
+                type        : 'text',
+                title       : "{intl l="Enter new export category position"}",
+                mode        : 'popup',
+                inputclass  : 'input-mini',
+                placement   : 'left',
+                success     : function(response, newValue) {
+                    // The URL template
+                    var url = "{url noamp='1' path='/admin/export/position/category' id='__ID__' value='__POS__'}";
+
+                    // Perform subtitutions
+                    url = url.replace('__ID__', $(this).data('id'))
+                            .replace('__POS__', newValue);
+
+                    // Reload the page
+                    location.href = url;
+                }
+            });
 
             var export_modal = $("#export-modal");
 

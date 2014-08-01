@@ -12,81 +12,13 @@ use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Import\ImportHandler;
 use Thelia\Model\Base\Import as BaseImport;
 use Thelia\Model\Map\ImportTableMap;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\Model\Tools\PositionManagementTrait;
 
 class Import extends BaseImport
 {
-    public function upPosition()
-    {
-
-        if (($position = $this->getPosition()) > 1) {
-
-            $previous = ImportQuery::create()
-                ->filterByPosition($position - 1)
-                ->findOneByImportCategoryId($this->getImportCategoryId());
-
-            if (null !== $previous) {
-                $previous->setPosition($position)->save();
-            }
-
-            $this->setPosition($position - 1)->save();
-        }
-
-        return $this;
-    }
-
-    public function downPosition()
-    {
-        $max = $this->getMaxPosition();
-
-        $count = $this->getImportCategory()->countImports();
-
-        if ($count > $max) {
-            $max = $count;
-        }
-
-        $position = $this->getPosition();
-
-        if ($position < $max) {
-
-            $next = ImportQuery::create()
-                ->filterByPosition($position + 1)
-                ->findOneByImportCategoryId($this->getImportCategoryId());
-
-            if (null !== $next) {
-                $next->setPosition($position)->save();
-            }
-
-            $this->setPosition($position + 1)->save();
-        }
-
-        return $this;
-    }
-
-    public function updatePosition($position)
-    {
-        $reverse = ImportQuery::create()
-            ->findOneByPosition($position)
-        ;
-
-        if (null !== $reverse) {
-            $reverse->setPosition($this->getPosition())->save();
-        }
-
-        $this->setPosition($position)->save();
-    }
-
-    public function setPositionToLast()
-    {
-        $max = $this->getMaxPosition();
-
-        if (null === $max) {
-            $this->setPosition(1);
-        } else {
-            $this->setPosition($max+1);
-        }
-
-        return $this;
-    }
+    use PositionManagementTrait;
+    use ModelEventDispatcherTrait;
 
     /**
      * @param  ContainerInterface $container
@@ -127,36 +59,5 @@ class Import extends BaseImport
         }
 
         return $instance;
-    }
-
-    /**
-     * @param ConnectionInterface $con
-     *
-     * Handle the position of other imports
-     */
-    public function delete(ConnectionInterface $con = null)
-    {
-        $imports = ImportQuery::create()
-            ->filterByPosition($this->getPosition(), Criteria::GREATER_THAN)
-            ->find()
-        ;
-
-        foreach ($imports as $import) {
-            $import->setPosition($import->getPosition() - 1);
-        }
-
-        $imports->save();
-
-        parent::delete($con);
-    }
-
-    public function getMaxPosition()
-    {
-        return ImportQuery::create()
-            ->filterByImportCategoryId($this->getImportCategoryId())
-            ->orderByPosition(Criteria::DESC)
-            ->select(ImportTableMap::POSITION)
-            ->findOne()
-        ;
     }
 }

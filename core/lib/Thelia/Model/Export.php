@@ -11,83 +11,15 @@ use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\ImportExport\Export\ImagesExportInterface;
 use Thelia\Model\Base\Export as BaseExport;
 use Thelia\Model\Map\ExportTableMap;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\Model\Tools\PositionManagementTrait;
 
 class Export extends BaseExport
 {
+    use PositionManagementTrait;
+    use ModelEventDispatcherTrait;
+
     protected static $cache;
-
-    public function upPosition()
-    {
-
-        if (($position = $this->getPosition()) > 1) {
-
-            $previous = ExportQuery::create()
-                ->filterByPosition($position - 1)
-                ->findOneByExportCategoryId($this->getExportCategoryId());
-
-            if (null !== $previous) {
-                $previous->setPosition($position)->save();
-            }
-
-            $this->setPosition($position - 1)->save();
-        }
-
-        return $this;
-    }
-
-    public function downPosition()
-    {
-        $max = $this->getMaxPosition();
-
-        $count = $this->getExportCategory()->countExports();
-
-        if ($count > $max) {
-            $max = $count;
-        }
-
-        $position = $this->getPosition();
-
-        if ($position < $max) {
-
-            $next = ExportQuery::create()
-                ->filterByPosition($position + 1)
-                ->findOneByExportCategoryId($this->getExportCategoryId());
-
-            if (null !== $next) {
-                $next->setPosition($position)->save();
-            }
-
-            $this->setPosition($position + 1)->save();
-        }
-
-        return $this;
-    }
-
-    public function updatePosition($position)
-    {
-        $reverse = ExportQuery::create()
-            ->findOneByPosition($position)
-        ;
-
-        if (null !== $reverse) {
-            $reverse->setPosition($this->getPosition())->save();
-        }
-
-        $this->setPosition($position)->save();
-    }
-
-    public function setPositionToLast()
-    {
-        $max = $this->getMaxPosition();
-
-        if (null === $max) {
-            $this->setPosition(1);
-        } else {
-            $this->setPosition($max+1);
-        }
-
-        return $this;
-    }
 
     /**
      * @param  ContainerInterface                        $container
@@ -134,27 +66,6 @@ class Export extends BaseExport
         return static::$cache = $instance;
     }
 
-    /**
-     * @param ConnectionInterface $con
-     *
-     * Handle the position of other exports
-     */
-    public function delete(ConnectionInterface $con = null)
-    {
-        $imports = ExportQuery::create()
-            ->filterByPosition($this->getPosition(), Criteria::GREATER_THAN)
-            ->find()
-        ;
-
-        foreach ($imports as $import) {
-            $import->setPosition($import->getPosition() - 1);
-        }
-
-        $imports->save();
-
-        parent::delete($con);
-    }
-
     public function hasImages(ContainerInterface $container)
     {
         if (static::$cache === null) {
@@ -173,13 +84,13 @@ class Export extends BaseExport
         return static::$cache instanceof DocumentsExportInterface;
     }
 
-    public function getMaxPosition()
+    /**
+     * {@inheritDoc}
+     */
+    public function preInsert(ConnectionInterface $con = null)
     {
-        return ExportQuery::create()
-            ->filterByExportCategoryId($this->getExportCategoryId())
-            ->orderByPosition(Criteria::DESC)
-            ->select(ExportTableMap::POSITION)
-            ->findOne()
-        ;
+        $this->setPosition($this->getNextPosition());
+
+        return true;
     }
 }

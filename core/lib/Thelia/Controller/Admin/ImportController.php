@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\ImportExport as ImportExportEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilderManager;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilderManagerTrait;
@@ -426,72 +427,54 @@ class ImportController extends BaseAdminController
         ;
     }
 
-    public function changePosition($action, $id)
+    public function changePosition()
     {
         if (null !== $response = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE])) {
             return $response;
         }
 
-        $import = $this->getImport($id);
+        $mode = $this->getRequest()->get("mode");
+        $id = $this->getRequest()->get("id");
+        $value = $this->getRequest()->get("value");
 
-        if ($action === "up") {
-            $import->upPosition();
-        } elseif ($action === "down") {
-            $import->downPosition();
-        }
+        $this->getImport($id);
 
-        $this->setOrders(null, "manual");
+        $event = new UpdatePositionEvent($id, $this->getMode($mode), $value);
+        $this->dispatch(TheliaEvents::IMPORT_CHANGE_POSITION, $event);
 
-        return $this->render('import');
     }
 
-    public function updatePosition($id, $value)
+    public function changeCategoryPosition()
     {
         if (null !== $response = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE])) {
             return $response;
         }
 
-        $import = $this->getImport($id);
+        $mode = $this->getRequest()->get("mode");
+        $id = $this->getRequest()->get("id");
+        $value = $this->getRequest()->get("value");
 
-        $import->updatePosition($value);
+        $this->getCategory($id);
 
-        $this->setOrders(null, "manual");
-
-        return $this->render('import');
-    }
-
-    public function changeCategoryPosition($action, $id)
-    {
-        if (null !== $response = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE])) {
-            return $response;
-        }
-
-        $category = $this->getCategory($id);
-
-        if ($action === "up") {
-            $category->upPosition();
-        } elseif ($action === "down") {
-            $category->downPosition();
-        }
+        $event = new UpdatePositionEvent($id, $this->getMode($mode), $value);
+        $this->dispatch(TheliaEvents::IMPORT_CATEGORY_CHANGE_POSITION, $event);
 
         $this->setOrders("manual");
 
         return $this->render('import');
     }
 
-    public function updateCategoryPosition($id, $value)
+    public function getMode($action)
     {
-        if (null !== $response = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE])) {
-            return $response;
+        if ($action === "up") {
+            $mode = UpdatePositionEvent::POSITION_UP;
+        } elseif ($action === "down") {
+            $mode = UpdatePositionEvent::POSITION_DOWN;
+        } else {
+            $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
         }
 
-        $category = $this->getCategory($id);
-
-        $category->updatePosition($value);
-
-        $this->setOrders("manual");
-
-        return $this->render('import');
+        return $mode;
     }
 
     protected function getImport($id)
