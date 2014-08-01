@@ -348,7 +348,6 @@ class XmlFileLoader extends FileLoader
                     $exportCategoryModel = new ExportCategory();
                     $exportCategoryModel
                         ->setRef($id)
-                        ->setPositionToLast()
                         ->save($con)
                     ;
                 }
@@ -411,7 +410,6 @@ class XmlFileLoader extends FileLoader
                     $exportModel = new Export();
                     $exportModel
                         ->setRef($id)
-                        ->setPositionToLast()
                     ;
                 }
 
@@ -477,7 +475,6 @@ class XmlFileLoader extends FileLoader
                     $importCategoryModel = new ImportCategory();
                     $importCategoryModel
                         ->setRef($id)
-                        ->setPositionToLast()
                         ->save($con)
                     ;
                 }
@@ -540,7 +537,6 @@ class XmlFileLoader extends FileLoader
                     $importModel = new Import();
                     $importModel
                         ->setRef($id)
-                        ->setPositionToLast()
                     ;
                 }
 
