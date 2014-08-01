@@ -3,15 +3,12 @@
 namespace Thelia\Model;
 
 use Exception;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\ClassNotFoundException;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Import\ImportHandler;
 use Thelia\Model\Base\Import as BaseImport;
-use Thelia\Model\Map\ImportTableMap;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 use Thelia\Model\Tools\PositionManagementTrait;
 
