@@ -11,6 +11,21 @@
 - Fix bugs on customer change password form and module "order by title"
 - Add the ability to place a firewall on forms. To use this in a module, extend Thelia\Form\FirewallForm instead of BaseForm
 - Add Exports and Imports management
+- Default front office template:
+     - Display enhancement
+     - Optimization of the uses of Thelia loops to gain performances and consistency
+     - Optimization for SEO : meta description fallback, ti>>>>>>> Updated Changelog
+tle on category page, ...
+     - new PSE layout in product page, attributes are separated
+     - Support of 'check-available-stock' config variable
+     - Terms and conditions agreement is now in the order process
+- Default pdf template:
+     - Added list of amount by tax rule
+     - Display enhancement
+     - Added legal information about the store
+- Demo:
+     - Support for brand
+     - Added folders and contents data.
 
 #2.0.2
 - Coupon UI has been redesigned.
