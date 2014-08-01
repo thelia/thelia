@@ -25,7 +25,7 @@ use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\SessionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model;
-use Thelia\Model\ConfigQuery;
+
 
 /**
  *
