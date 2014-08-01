@@ -217,7 +217,7 @@ class TheliaHttpKernel extends HttpKernel
         $request->setSession($session);
 
         // set previous URL
-        if (null !== $referer = $request->headers->get('referer')){
+        if (null !== $referer = $request->headers->get('referer')) {
             if (Model\ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
                 $components = parse_url($referer);
                 $lang = Model\LangQuery::create()
@@ -227,7 +227,7 @@ class TheliaHttpKernel extends HttpKernel
                     $session->setReturnToUrl($referer);
                 }
             } else {
-                if ( false !== strpos($referer, $request->getSchemeAndHttpHost())){
+                if ( false !== strpos($referer, $request->getSchemeAndHttpHost())) {
                     $session->setReturnToUrl($referer);
                 }
             }
