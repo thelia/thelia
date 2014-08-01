@@ -17,6 +17,11 @@
             <title locale="en_US">Content</title>
             <title locale="fr_FR">Contenu</title>
         </export_category>
+
+        <export_category id="thelia.export.orders">
+            <title locale="en_US">Orders</title>
+            <title locale="fr_FR">Commandes</title>
+        </export_category>
     </export_categories>
 
     <exports>
@@ -53,6 +58,17 @@
             </export_descriptive>
         </export>
 
+        <export id="thelia.export.taxed_prices" class="Thelia\ImportExport\Export\Type\ProductTaxedPricesExport" category_id="thelia.export.products">
+            <export_descriptive locale="fr_FR">
+                <title>Prix des produits TTC</title>
+                <description>Expotez le prix TTC de vos produits</description>
+            </export_descriptive>
+            <export_descriptive locale="en_US">
+                <title>Product prices including taxes</title>
+                <description>Export the prices of the products including taxes</description>
+            </export_descriptive>
+        </export>
+
         <export id="thelia.export.product_seo" class="Thelia\ImportExport\Export\Type\ProductSEOExport" category_id="thelia.export.products">
             <export_descriptive locale="en_US">
                 <title>Product SEO information</title>
@@ -80,6 +96,21 @@
                 <title>Contenus et dossiers</title>
                 <description>
                     Exportez vos contenus et les dossiers associés
+                </description>
+            </export_descriptive>
+        </export>
+
+        <export id="thelia.export.orders" class="Thelia\ImportExport\Export\Type\OrderExport" category_id="thelia.export.orders">
+            <export_descriptive locale="en_US">
+                <title>Full orders</title>
+                <description>
+                    Export your orders.
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Commandes complètes</title>
+                <description>
+                    Exportez vos commandes
                 </description>
             </export_descriptive>
         </export>

@@ -57,8 +57,8 @@ class ProductPricesExport extends ExportHandler
     }
 
     /**
-     * @param  Lang          $lang
-     * @return FormatterData
+     * @param Lang $lang
+     * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria|\Thelia\Core\Template\Element\BaseLoop
      */
     public function buildDataSet(Lang $lang)
     {
@@ -86,6 +86,7 @@ class ProductPricesExport extends ExportHandler
                         \PDO::PARAM_STR
                     )
                     ->addAsColumn("product_TITLE", ProductI18nTableMap::TITLE)
+                    ->addAsColumn("product_ID", ProductTableMap::ID)
                 ->endUse()
                 ->addAsColumn("product_sale_elements_REF", ProductSaleElementsTableMap::REF)
                 ->addAsColumn("product_sale_elements_EAN_CODE", ProductSaleElementsTableMap::EAN_CODE)
@@ -116,6 +117,21 @@ class ProductPricesExport extends ExportHandler
         ;
 
         return $query;
+    }
+
+    public function getOrder()
+    {
+        return [
+            "product_id",
+            "ref",
+            "title",
+            "attributes",
+            "ean",
+            "price",
+            "promo_price",
+            "currency",
+            "promo",
+        ];
     }
 
     protected function getAliases()
