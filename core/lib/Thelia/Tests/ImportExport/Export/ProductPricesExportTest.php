@@ -32,7 +32,7 @@ class ProductPricesExportTest extends \PHPUnit_Framework_TestCase
 
         $data = $export->buildData(Lang::getDefaultLanguage());
 
-        $keys = ["attributes","currency","ean","price","promo","promo_price","ref","title"];
+        $keys = ["attributes","currency","ean","price","product_id","promo","promo_price","ref","title"];
 
         $rawData = $data->getData();
 
