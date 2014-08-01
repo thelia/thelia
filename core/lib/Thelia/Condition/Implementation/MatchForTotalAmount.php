@@ -93,7 +93,7 @@ class MatchForTotalAmount extends ConditionAbstract
     public function isMatching()
     {
         $condition1 = $this->conditionValidator->variableOpComparison(
-            $this->facade->getCartTotalPrice(),
+            $this->facade->getCartTotalTaxPrice(),
             $this->operators[self::CART_TOTAL],
             $this->values[self::CART_TOTAL]
         );
