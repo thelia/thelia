@@ -106,7 +106,7 @@ class ContentExport extends ExportHandler implements
                 ->endUse()
             ->_endif()
             ->_if($this->isDocumentExport())
-                ->useContentDocumentQuery()
+                ->useContentDocumentQuery(null, Criteria::LEFT_JOIN)
                     ->addAsColumn("content_DOCUMENTS", "GROUP_CONCAT(DISTINCT ".ContentDocumentTableMap::FILE.")")
                     ->addSelectColumn("content_DOCUMENTS")
                 ->endUse()
