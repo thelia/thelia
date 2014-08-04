@@ -45,7 +45,9 @@ var pseManager = (function($){
             "priceOld": $("#pse-price-old"),
             "submit": $("#pse-submit"),
             "options": {},
-            "pseId": null
+            "pseId": null,
+            "useFallback": false,
+            "fallback": $("#pse-options .pse-fallback")
         };
     }
 
@@ -53,33 +55,61 @@ var pseManager = (function($){
         var pse = null,
             combinationId = null,
             combinationValue = null,
-            combinationValueId = null;
+            combinationValueId = null,
+            combinations = null,
+            combinationName = [],
+            i;
 
         // initialization for the first default pse
         $pse.pseId = $pse.id.val();
 
         if (PSE_COUNT > 1) {
-            // get the select for options
-            $("#pse-options .pse-option").each(function(){
-                var $option = $(this);
-                if ( $option.data("attribute") in PSE_COMBINATIONS){
-                    $pse['options'][$option.data("attribute")] = $option;
-                    $option.on("change", updateProductForm);
-                } else {
-                    // not affected to this product -> remove
-                    $option.closest(".option").remove();
+            // Use fallback method ?
+            $pse.useFallback = useFallback();
+
+            if ($pse.useFallback) {
+                $("#pse-options .option-option").remove();
+
+                for (pse in PSE){
+                    combinations = PSE[pse].combinations;
+                    combinationName = [];
+                    for (i = 0; i < combinations.length; i++){
+                        combinationName.push(PSE_COMBINATIONS_VALUE[combinations[i]][0]);
+                    }
+                    $pse.fallback
+                        .append("<option value='" + pse + "'>"
+                            + combinationName.join(', ') + "</option>");
                 }
-            });
 
-            // build select
-            for (combinationValueId in PSE_COMBINATIONS_VALUE) {
-                combinationValue = PSE_COMBINATIONS_VALUE[combinationValueId];
-                $pse.options[combinationValue[1]]
-                    .append("<option value='" + combinationValueId + "'>"
-                        + combinationValue[0] + "</option>");
+                $("#pse-options .pse-fallback").on("change",function(){
+                    updateProductForm();
+                });
+
+            } else {
+                $("#pse-options .option-fallback").remove();
+
+                // get the select for options
+                $("#pse-options .pse-option").each(function(){
+                    var $option = $(this);
+                    if ( $option.data("attribute") in PSE_COMBINATIONS){
+                        $pse['options'][$option.data("attribute")] = $option;
+                        $option.on("change", updateProductForm);
+                    } else {
+                        // not affected to this product -> remove
+                        $option.closest(".option").remove();
+                    }
+                });
+
+                // build select
+                for (combinationValueId in PSE_COMBINATIONS_VALUE) {
+                    combinationValue = PSE_COMBINATIONS_VALUE[combinationValueId];
+                    $pse.options[combinationValue[1]]
+                        .append("<option value='" + combinationValueId + "'>"
+                            + combinationValue[0] + "</option>");
+                }
+
+                setPseForm();
             }
-
-            setPseForm();
         }
     }
 
@@ -88,9 +118,13 @@ var pseManager = (function($){
             pse = null,
             combinationValueId;
         pse = PSE[id || $pse.pseId];
-        for (var i=0; i<pse.combinations.length; i++){
-            combinationValueId = pse.combinations[i];
-            $pse['options'][PSE_COMBINATIONS_VALUE[combinationValueId][1]].val(pse.combinations[i])
+        if ($pse.useFallback) {
+            $pse.fallbak.val(pse.id);
+        } else {
+            for (var i=0; i<pse.combinations.length; i++){
+                combinationValueId = pse.combinations[i];
+                $pse['options'][PSE_COMBINATIONS_VALUE[combinationValueId][1]].val(pse.combinations[i])
+            }
         }
     }
 
@@ -100,20 +134,25 @@ var pseManager = (function($){
 
         if (PSE_COUNT > 1) {
 
-            // get form data
-            selection = getFormSelection();
-            // get the pse
-            pseId = pseExist(selection);
-
-            if ( ! pseId ) {
-                // not exists, revert
-                displayNotice();
-                setPseForm();
+            if ($pse.useFallback) {
+                pseId = $pse.fallback.val();
             } else {
-                $pse.validity.hide();
-                $pse.id.val(pseId);
-                $pse.pseId = pseId;
+                // get form data
+                selection = getFormSelection();
+                // get the pse
+                pseId = pseExist(selection);
+
+                if ( ! pseId ) {
+                    // not exists, revert
+                    displayNotice();
+                    setPseForm();
+                } else {
+                    $pse.validity.hide();
+                }
             }
+
+            $pse.id.val(pseId);
+            $pse.pseId = pseId;
         }
 
         // Update UI
@@ -140,6 +179,7 @@ var pseManager = (function($){
         // $pse.ean.html(pse.ean);
         // name
         if (PSE_COUNT > 1) {
+
             for (i = 0; i < pse.combinations.length; i++){
                 pseValueId = pse.combinations[i]
                 name.push(
@@ -148,6 +188,7 @@ var pseManager = (function($){
                     PSE_COMBINATIONS_VALUE[pseValueId][0]
                 )
             }
+
             $pse.name.html(" - " + name.join(", ") + "");
         }
 
@@ -230,6 +271,29 @@ var pseManager = (function($){
         }
 
         return false;
+    }
+
+    function useFallback() {
+        var pse = null,
+            count = -1,
+            pseCount = 0,
+            combinations,
+            i;
+
+        for (pse in PSE){
+            combinations = PSE[pse].combinations;
+            pseCount = 0;
+            for (i = 0; i < combinations.length; i++) {
+                pseCount += PSE_COMBINATIONS_VALUE[combinations[i]][1];
+            }
+            if (count == -1){
+                count = pseCount;
+            } else if (count != pseCount) {
+                return true;
+            }
+        }
+
+        return (count <= 0);
     }
 
     function getFormSelection() {

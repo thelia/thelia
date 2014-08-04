@@ -173,14 +173,22 @@
                         {* We have more than 1 combination: custom form *}
                         <fieldset id="pse-options" class="product-options">
                             {loop name="attributes" type="attribute" product="$product_id" order="manual"}
-                            <div class="option">
+                            <div class="option option-option">
                                 <label for="option-{$ID}" class="option-heading">{$TITLE}</label>
                                 <div class="option-content">
                                     <select id="option-{$ID}" name="option-{$ID}" class="form-control pse-option" data-attribute="{$ID}"></select>
                                 </div>
                             </div>
                             {/loop}
+                            <div class="option option-fallback">
+                                <label for="option-fallback" class="option-heading">{intl l="Options"}</label>
+                                <div class="option-content">
+                                    <select id="option-fallback" name="option-fallback" class="form-control pse-option pse-fallback" data-attribute="0"></select>
+                                </div>
+                            </div>
                         </fieldset>
+
+
                     {/if}
 
                     <fieldset class="product-cart form-inline">
