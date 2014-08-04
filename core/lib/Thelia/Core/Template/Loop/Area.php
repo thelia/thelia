@@ -67,7 +67,8 @@ class Area extends BaseLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('id'),
             Argument::createIntTypeArgument('with_zone'),
             Argument::createIntTypeArgument('without_zone'),
-            Argument::createBooleanOrBothTypeArgument('unassigned')
+            Argument::createBooleanOrBothTypeArgument('unassigned'),
+            Argument::createIntListTypeArgument('module_id')
         );
     }
 
@@ -102,6 +103,15 @@ class Area extends BaseLoop implements PropelSearchLoopInterface
             $search
                 ->joinAreaDeliveryModule('unassigned', Criteria::LEFT_JOIN)
                 ->where('`unassigned`.delivery_module_id ' . Criteria::ISNULL);
+        }
+
+        $modules = $this->getModuleId();
+
+        if ($modules) {
+            $search
+                ->useAreaDeliveryModuleQuery()
+                ->filterByDeliveryModuleId($modules, Criteria::IN)
+                ->endUse();
         }
 
         return $search;
