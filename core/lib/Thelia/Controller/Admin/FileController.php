@@ -207,9 +207,9 @@ class FileController extends BaseAdminController
             $parentType,
             'image',
             [
-                'image/jpeg' => ["jpg", "jpeg"],
-                'image/png' => ["png"],
-                'image/gif' => ["gif"],
+                'image/jpeg' => [".jpg", ".jpeg"],
+                'image/png' => [".png"],
+                'image/gif' => [".gif"],
             ]
         );
     }
@@ -230,13 +230,13 @@ class FileController extends BaseAdminController
             'document',
             [],
             [
-                "php",
-                "php3",
-                "php4",
-                "php5",
-                "php6",
-                "asp",
-                "aspx",
+                ".php",
+                ".php3",
+                ".php4",
+                ".php5",
+                ".php6",
+                ".asp",
+                ".aspx",
             ]
         );
     }
