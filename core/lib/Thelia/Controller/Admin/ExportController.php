@@ -335,9 +335,11 @@ class ExportController extends BaseAdminController
             return $response;
         }
 
-        $mode = $this->getRequest()->get("mode");
-        $id = $this->getRequest()->get("id");
-        $value = $this->getRequest()->get("value");
+        $query = $this->getRequest()->query;
+
+        $mode = $query->get("mode");
+        $id = $query->get("id");
+        $value = $query->get("value");
 
         $this->getExport($id);
 
@@ -355,9 +357,11 @@ class ExportController extends BaseAdminController
             return $response;
         }
 
-        $mode = $this->getRequest()->get("mode");
-        $id = $this->getRequest()->get("id");
-        $value = $this->getRequest()->get("value");
+        $query = $this->getRequest()->query;
+
+        $mode = $query->get("mode");
+        $id = $query->get("id");
+        $value = $query->get("value");
 
         $this->getCategory($id);
 
