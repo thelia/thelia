@@ -165,12 +165,12 @@
         </service>
 
         <service id="thelia.export.change_position" class="Thelia\Action\Export">
-            <argument type="service" id="service_container" />
+            <argument>%kernel.cache_dir%</argument>
             <tag name="kernel.event_subscriber" />
         </service>
 
         <service id="thelia.import.change_position" class="Thelia\Action\Import">
-            <argument type="service" id="service_container" />
+            <argument>%kernel.cache_dir%</argument>
             <tag name="kernel.event_subscriber" />
         </service>
     </services>

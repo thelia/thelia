@@ -27,14 +27,11 @@ use Thelia\Model\ExportQuery;
  */
 class Export extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    protected $environment;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct($environment)
     {
-        $this->container = $container;
+        $this->environment = $environment;
     }
 
     public function changeCategoryPosition(UpdatePositionEvent $event)
@@ -54,7 +51,7 @@ class Export extends BaseAction implements EventSubscriberInterface
     protected function cacheClear(EventDispatcherInterface $dispatcher)
     {
         $cacheEvent = new CacheEvent(
-            $this->container->getParameter('kernel.cache_dir')
+            $this->environment
         );
 
         $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);

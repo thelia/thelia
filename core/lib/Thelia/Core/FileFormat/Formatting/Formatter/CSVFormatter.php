@@ -138,7 +138,9 @@ class CSVFormatter extends AbstractFormatter
             $value = serialize($value);
         }
 
-        return $this->stringDelimiter . addslashes($value) . $this->stringDelimiter . $this->delimiter;
+        $value = str_replace($this->stringDelimiter, "\\" . $this->stringDelimiter, $value);
+
+        return $this->stringDelimiter . $value . $this->stringDelimiter . $this->delimiter;
     }
 
     /**
