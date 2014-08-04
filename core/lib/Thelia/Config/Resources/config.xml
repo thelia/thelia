@@ -137,8 +137,7 @@
         <service id="session.listener" class="Thelia\Core\EventListener\SessionListener">
             <tag name="kernel.event_subscriber"/>
         </service>
-
-        <service id="tools.mime_type" class="Thelia\Tools\MimeTypeTools" />
+        
         <!-- Archive builders -->
 
         <service id="thelia.manager.archive_builder_manager" class="Thelia\Core\FileFormat\Archive\ArchiveBuilderManager">

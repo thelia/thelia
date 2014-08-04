@@ -55,23 +55,13 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Get the mime type tools
-     *
-     * @return MimeTypeTools
-     */
-    public function getMimeTypeTools()
-    {
-        return $this->container->get('tools.mime_type');
-    }
-
-    /**
      * Manage how a file collection has to be saved
      *
      * @param  int      $parentId       Parent id owning files being saved
      * @param  string   $parentType     Parent Type owning files being saved (product, category, content, etc.)
      * @param  string   $objectType     Object type, e.g. image or document
      * @param  array    $validMimeTypes an array of valid mime types. If empty, any mime type is allowed.
-     * @param  array    $blackList      an array of blacklisted mime types.
+     * @param  array    $extBlackList      an array of blacklisted extensions.
      * @return Response
      */
     public function saveFileAjaxAction(
@@ -79,7 +69,7 @@ class FileController extends BaseAdminController
         $parentType,
         $objectType,
         $validMimeTypes = array(),
-        $blackList = array()
+        $extBlackList = array()
     ) {
         if (null !== $response = $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE)) {
             return $response;
@@ -106,51 +96,44 @@ class FileController extends BaseAdminController
                 return new ResponseRest($message, 'text', 403);
             }
 
-            $mimeType = $fileBeingUploaded->getMimeType();
-            $mimeTypeTools = $this->getMimeTypeTools();
-            $validateMimeType = $mimeTypeTools
-                ->validateMimeTypeExtension(
-                    $mimeType,
-                    $fileBeingUploaded->getClientOriginalName()
-            );
-
             $message = null;
-
-            if ($validateMimeType === $mimeTypeTools::TYPE_NOT_MATCH) {
-                $message = $this->getTranslator()
-                    ->trans(
-                        "There's a conflict between your file extension \"%ext\" and the mime type \"%mime\"",
-                        [
-                            '%mime' => $mimeType,
-                            '%ext' => $fileBeingUploaded->getClientOriginalExtension()
-                        ]
-                    );
-            }
+            $realFileName = $fileBeingUploaded->getClientOriginalName();
 
             if (! empty($validMimeTypes)) {
+                $mimeType = $fileBeingUploaded->getMimeType();
 
-                // Check if we have the proper file type
-                $isValid = false;
-
-                if (in_array($mimeType, $validMimeTypes)) {
-                    $isValid = true;
-                }
-
-                if (! $isValid) {
+                if (!isset($validMimeTypes[$mimeType])) {
                     $message = $this->getTranslator()
                         ->trans(
                             'Only files having the following mime type are allowed: %types%',
                             [ '%types%' => implode(', ', $validMimeTypes)]
                         );
                 }
-            }
 
-            if (!empty($blackList)) {
-                if (in_array($mimeType, $blackList)) {
+                $regex = "#(".implode("|", $validMimeTypes[$mimeType]).")$#i";
+
+                if (!preg_match($regex, $realFileName)) {
                     $message = $this->getTranslator()
                         ->trans(
-                            'Files with the following mime type are not allowed: %type, please do an archive of the file if you want to upload it',
-                            [ '%type' => $mimeType]
+                            "There's a conflict between your file extension \"%ext\" and the mime type \"%mime\"",
+                            [
+                                '%mime' => $mimeType,
+                                '%ext' => $fileBeingUploaded->getClientOriginalExtension()
+                            ]
+                        );
+                }
+            }
+
+            if (!empty($extBlackList)) {
+                $regex = "#(".implode("|", $extBlackList).")$#i";
+
+                if (preg_match($regex, $realFileName)) {
+                    $message = $this->getTranslator()
+                        ->trans(
+                            'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
+                            [
+                                '%extension' => $fileBeingUploaded->getClientOriginalExtension(),
+                            ]
                         );
                 }
             }
@@ -219,7 +202,16 @@ class FileController extends BaseAdminController
      */
     public function saveImageAjaxAction($parentId, $parentType)
     {
-        return $this->saveFileAjaxAction($parentId, $parentType, 'image', ['image/jpeg' , 'image/png' ,'image/gif']);
+        return $this->saveFileAjaxAction(
+            $parentId,
+            $parentType,
+            'image',
+            [
+                'image/jpeg' => ["jpg", "jpeg"],
+                'image/png' => ["png"],
+                'image/gif' => ["gif"],
+            ]
+        );
     }
 
     /**
@@ -238,11 +230,13 @@ class FileController extends BaseAdminController
             'document',
             [],
             [
-                'text/x-php',
-                'application/x-httpd-php',
-                'application/x-httpd-php3',
-                'application/x-httpd-php4',
-                'application/x-httpd-php5',
+                "php",
+                "php3",
+                "php4",
+                "php5",
+                "php6",
+                "asp",
+                "aspx",
             ]
         );
     }
