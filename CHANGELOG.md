@@ -1,4 +1,4 @@
-#2.0.3
+#2.0.3-beta
 - New coupon type: Free product if selected products are in the cart.
 - New feature: Product Brands / Suppliers management
 - New 'brand' loop and substitution. product, image and document loop have been updated.
