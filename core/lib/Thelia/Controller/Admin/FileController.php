@@ -110,7 +110,7 @@ class FileController extends BaseAdminController
                         );
                 }
 
-                $regex = "#(".implode("|", $validMimeTypes[$mimeType]).")$#i";
+                $regex = "#^(.+)\.(".implode("|", $validMimeTypes[$mimeType]).")$#i";
 
                 if (!preg_match($regex, $realFileName)) {
                     $message = $this->getTranslator()
@@ -125,7 +125,7 @@ class FileController extends BaseAdminController
             }
 
             if (!empty($extBlackList)) {
-                $regex = "#(".implode("|", $extBlackList).")$#i";
+                $regex = "#^(.+)\.(".implode("|", $extBlackList).")$#i";
 
                 if (preg_match($regex, $realFileName)) {
                     $message = $this->getTranslator()
@@ -207,9 +207,9 @@ class FileController extends BaseAdminController
             $parentType,
             'image',
             [
-                'image/jpeg' => [".jpg", ".jpeg"],
-                'image/png' => [".png"],
-                'image/gif' => [".gif"],
+                'image/jpeg' => ["jpg", "jpeg"],
+                'image/png' => ["png"],
+                'image/gif' => ["gif"],
             ]
         );
     }
@@ -230,13 +230,13 @@ class FileController extends BaseAdminController
             'document',
             [],
             [
-                ".php",
-                ".php3",
-                ".php4",
-                ".php5",
-                ".php6",
-                ".asp",
-                ".aspx",
+                "php",
+                "php3",
+                "php4",
+                "php5",
+                "php6",
+                "asp",
+                "aspx",
             ]
         );
     }
