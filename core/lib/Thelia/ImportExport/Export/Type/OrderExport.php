@@ -196,8 +196,10 @@ class OrderExport extends ExportHandler
                 "invoice_address_country_TITLE",
                 "invoice_address_PHONE",
                 "order_status_TITLE",
-                "currency_CODE"
+                "currency_CODE",
+                OrderTableMap::CREATED_AT,
             ])
+            ->orderByCreatedAt(Criteria::DESC)
         ;
 
         I18n::addI18nCondition(
@@ -288,6 +290,15 @@ class OrderExport extends ExportHandler
                 $line["order_TOTAL_WITH_DISCOUNT"] = $order->getTotalAmount($tax, false, true);
                 $line["order_TOTAL_WITH_DISCOUNT_AND_POSTAGE"] = $order->getTotalAmount($tax, true, true);
 
+                /**
+                 * Format the date
+                 */
+
+                $date = new \DateTime($line[OrderTableMap::CREATED_AT]);
+
+
+                $line[OrderTableMap::CREATED_AT] = $date->format($lang->getDatetimeFormat());
+
                 $current++;
             } else {
                 /**
@@ -324,6 +335,7 @@ class OrderExport extends ExportHandler
                 $line["invoice_address_country_TITLE"]  = "";
                 $line["invoice_address_PHONE"]  = "";
                 $line["order_status_TITLE"]  = "";
+                $line[OrderTableMap::CREATED_AT]  = "";
             }
 
             $line["product_TAXED_PRICE"] = $line["product_PRICE"] + $line["product_TAX"];
@@ -378,6 +390,7 @@ class OrderExport extends ExportHandler
             "invoice_address_PHONE" => "invoice_phone",
             "order_status_TITLE" => "status",
             "currency_CODE" => "currency",
+            OrderTableMap::CREATED_AT => "date",
         ];
     }
 
@@ -385,6 +398,7 @@ class OrderExport extends ExportHandler
     {
         return [
             "ref",
+            "date",
             "customer_ref",
             "discount",
             "coupons",

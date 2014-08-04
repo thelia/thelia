@@ -81,6 +81,11 @@ class OrderExportTest extends \PHPUnit_Framework_TestCase
                     $coupons === $row["coupons"]
             );
 
+            $this->assertEquals(
+                $order->getCreatedAt()->format($lang->getDatetimeFormat()),
+                $row["date"]
+            );
+
             $this->assertEquals($order->getCurrency()->getCode(), $row["currency"]);
             $this->assertEquals($order->getCustomer()->getRef(), $row["customer_ref"]);
             $this->assertEquals($order->getOrderStatus()->setLocale($locale)->getTitle(), $row["status"]);
