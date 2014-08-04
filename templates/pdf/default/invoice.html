@@ -136,8 +136,10 @@
                 <td>
                     <!-- Imprint -->
                     {config key="store_name"}
-                    - {config key="store_address1"} {config key="store_address2"} {config key="store_address3"}
-                    - {config key="store_zipcode"} {config key="store_city"}
+                    {$addresses="{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}"}
+                    {$city="{config key="store_zipcode"} {config key="store_city"}"}
+                    {if $addresses != "  "}- {$addresses}{/if}
+                    {if $city != " " }- {$city}{/if}
                     {if {config key="store_country"} }
                         {loop type="country" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
                     {/if}
@@ -291,22 +293,29 @@
                         <td class="table-3-1"><p>{intl l="Total without tax"}</p></td>
                         <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE} symbol=$orderCurrency}</p></td>
                     </tr>
+                    {strip}
+                        {capture name="Tax"}
+                            {foreach $taxes as $name=>$prices}
+                                {assign var="_price_taxe_" value="0"}
+                                {foreach $prices as $price}
+                                    {$_price_taxe_= $_price_taxe_ + $price}
+                                {/foreach}
+                                {if $_price_taxe_ != 0}
+                                <tr>
+                                    <td class="table-3-2"><p>{$name}</p></td>
+                                    <td class="table-3-2 align-right"><P>{format_money number=$_price_taxe_ symbol=$orderCurrency}</P></td>
+                                </tr>
+                                {/if}
+                            {/foreach}
+                        {/capture}
+                    {/strip}
+                    {if $smarty.capture.tax ne ""}
                     <tr>
                         <td class="table-3-1"><p>{intl l="Tax"}</p></td>
                         <td class="table-3-1 align-right"><P>{format_money number=$TOTAL_TAX symbol=$orderCurrency}</P></td>
                     </tr>
-                    {foreach $taxes as $name=>$prices}
-                        {assign var="_price_taxe_" value="0"}
-                        {foreach $prices as $price}
-                            {$_price_taxe_= $_price_taxe_ + $price}
-                        {/foreach}
-                        {if $_price_taxe_ != 0}
-                        <tr>
-                            <td class="table-3-2"><p>{$name}</p></td>
-                            <td class="table-3-2 align-right"><P>{format_money number=$_price_taxe_ symbol=$orderCurrency}</P></td>
-                        </tr>
-                        {/if}
-                    {/foreach}
+                    {$smarty.capture.tax}
+                    {/if}
                     <tr>
                         <td class="table-3-1"><p>{intl l="Total with tax"}</p></td>
                         <td class="table-3-1 align-right"><P>{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} symbol=$orderCurrency}</P></td>

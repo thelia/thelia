@@ -135,8 +135,10 @@
                 <td>
                     <!-- Imprint -->
                     {config key="store_name"}
-                    - {config key="store_address1"} {config key="store_address2"} {config key="store_address3"}
-                    - {config key="store_zipcode"} {config key="store_city"}
+                    {$addresses="{config key='store_address1'} {config key='store_address2'} {config key='store_address3'}"}
+                    {$city="{config key='store_zipcode'} {config key='store_city'}"}
+                    {if $addresses != "  "}- {$addresses}{/if}
+                    {if $city != " " }- {$city}{/if}
                     {if {config key="store_country"} }
                     {loop type="country" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
                     {/if}
