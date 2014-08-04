@@ -14,13 +14,17 @@ namespace Thelia\Tests\ImportExport\Export;
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\Type\ContentExport;
+use Thelia\Model\ContentDocumentQuery;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentImageQuery;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\FolderDocumentQuery;
 use Thelia\Model\FolderImageQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Lang;
+use Thelia\Model\Map\ContentDocumentTableMap;
 use Thelia\Model\Map\ContentImageTableMap;
+use Thelia\Model\Map\FolderDocumentTableMap;
 use Thelia\Model\Map\FolderImageTableMap;
 use Thelia\Model\Map\FolderTableMap;
 
@@ -155,6 +159,59 @@ class ContentExportTest extends \PHPUnit_Framework_TestCase
             $folderImages = implode(",", $folderImages);
 
             $this->assertEquals($folderImages, $data[$i]["folder_images"]);
+        }
+    }
+
+    public function testQueryDocument()
+    {
+        $data = $this->handler
+            ->setDocumentExport(true)
+            ->buildData($this->lang)
+            ->getData()
+        ;
+
+        $max = count($data);
+        if ($max > 50) {
+            $max = 50;
+        }
+
+        for ($i = 0; $i < $max; ++$i) {
+            $documents = ContentDocumentQuery::create()
+                ->filterByContentId($data[$i]["id"])
+                ->select(ContentDocumentTableMap::FILE)
+                ->find()
+                ->toArray()
+            ;
+
+            $documentsString = implode(",", $documents);
+
+            if (empty($data[$i]["content_documents"])) {
+                $j = 1;
+                while ($data[$i-$j]["id"] === $data[$i]["id"]) {
+                    if (!empty($data[$i - $j++]["content_documents"])) {
+                        $data[$i]["content_documents"] = $data[$i-$j+1]["content_documents"];
+                        break;
+                    }
+                }
+            }
+
+            $this->assertEquals($documentsString, $data[$i]["content_documents"]);
+
+            $folderDocuments = FolderDocumentQuery::create()
+                ->useFolderQuery()
+                    ->useContentFolderQuery()
+                        ->filterByContentId($data[$i]["id"])
+                        ->filterByFolderId($data[$i]["folder_id"])
+                    ->endUse()
+                ->endUse()
+                ->select(FolderDocumentTableMap::FILE)
+                ->find()
+                ->toArray()
+            ;
+
+            $folderDocuments = implode(",", $folderDocuments);
+
+            $this->assertEquals($folderDocuments, $data[$i]["folder_documents"]);
         }
     }
 } 

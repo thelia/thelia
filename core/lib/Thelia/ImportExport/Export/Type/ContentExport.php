@@ -103,18 +103,20 @@ class ContentExport extends ExportHandler implements
                 ->useContentImageQuery("content_image_join", Criteria::LEFT_JOIN)
                     ->addAsColumn("content_IMAGES", "GROUP_CONCAT(DISTINCT `content_image_join`.FILE)")
                     ->addSelectColumn("content_IMAGES")
+                    ->groupByContentId()
                 ->endUse()
             ->_endif()
             ->_if($this->isDocumentExport())
-                ->useContentDocumentQuery()
-                    ->addAsColumn("content_DOCUMENTS", "GROUP_CONCAT(DISTINCT ".ContentDocumentTableMap::FILE.")")
+                ->useContentDocumentQuery("content_document_join", Criteria::LEFT_JOIN)
+                    ->addAsColumn("content_DOCUMENTS", "GROUP_CONCAT(DISTINCT `content_document_join`.FILE)")
                     ->addSelectColumn("content_DOCUMENTS")
+                    ->groupByContentId()
                 ->endUse()
             ->_endif()
             ->useContentFolderQuery(null, Criteria::LEFT_JOIN)
                 ->useFolderQuery(null, Criteria::LEFT_JOIN)
                     ->_if($this->isDocumentExport())
-                        ->useFolderDocumentQuery()
+                        ->useFolderDocumentQuery(null, Criteria::LEFT_JOIN)
                             ->addAsColumn("folder_DOCUMENTS", "GROUP_CONCAT(DISTINCT ".FolderDocumentTableMap::FILE.")")
                             ->addSelectColumn("folder_DOCUMENTS")
                         ->endUse()
@@ -159,6 +161,7 @@ class ContentExport extends ExportHandler implements
             ->addAsColumn("url_URL", RewritingUrlTableMap::URL)
             ->groupBy(ContentTableMap::ID)
             ->groupBy("folder_ID")
+            ->orderById()
         ;
 
         return $query;
@@ -202,7 +205,7 @@ class ContentExport extends ExportHandler implements
                 }
 
                 if (isset($line["content_DOCUMENTS"])) {
-                    $line["content_IMAGES"] = "";
+                    $line["content_DOCUMENTS"] = "";
                 }
             }
         }
