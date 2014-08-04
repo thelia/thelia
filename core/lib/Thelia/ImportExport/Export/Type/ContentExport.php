@@ -72,10 +72,9 @@ class ContentExport extends ExportHandler implements
     }
 
     /**
-     * @param  Lang $lang
-     * @return ModelCriteria|array|BaseLoop
+     * @return ContentQuery
      */
-    public function buildDataSet(Lang $lang)
+    public function getQuery(Lang $lang)
     {
         $locale = $lang->getLocale();
 
@@ -161,6 +160,17 @@ class ContentExport extends ExportHandler implements
             ->groupBy(ContentTableMap::ID)
             ->groupBy("folder_ID")
         ;
+
+        return $query;
+    }
+
+    /**
+     * @param  Lang $lang
+     * @return ModelCriteria|array|BaseLoop
+     */
+    public function buildDataSet(Lang $lang)
+    {
+        $query = $this->getQuery($lang);
 
         $dataSet = $query
             ->find()

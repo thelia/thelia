@@ -25,6 +25,7 @@ use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\CustomerTitleI18nTableMap;
 use Thelia\Model\Map\NewsletterTableMap;
 use Thelia\Model\OrderQuery;
+use Thelia\Tools\I18n;
 
 /**
  * Class CustomerExport
@@ -132,7 +133,7 @@ class CustomerExport extends ExportHandler
             ->orderById()
         ;
 
-        $this->addI18nCondition(
+        I18n::addI18nCondition(
             $query,
             CountryI18nTableMap::TABLE_NAME,
             CountryTableMap::ID,
@@ -141,7 +142,7 @@ class CustomerExport extends ExportHandler
             $locale
         );
 
-        $this->addI18nCondition(
+        I18n::addI18nCondition(
             $query,
             CustomerTitleI18nTableMap::TABLE_NAME,
             "`customer_title_`.ID",
@@ -150,7 +151,7 @@ class CustomerExport extends ExportHandler
             $locale
         );
 
-        $this->addI18nCondition(
+        I18n::addI18nCondition(
             $query,
             CustomerTitleI18nTableMap::TABLE_NAME,
             "`address_title`.ID",

@@ -21,6 +21,7 @@ use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Map\TaxRuleI18nTableMap;
 use Thelia\Model\Map\TaxRuleTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Tools\I18n;
 
 /**
  * Class ProductTaxedPricesExport
@@ -58,7 +59,7 @@ class ProductTaxedPricesExport extends ProductPricesExport
             ])
         ;
 
-        $this->addI18nCondition(
+        I18n::addI18nCondition(
             $query,
             TaxRuleI18nTableMap::TABLE_NAME,
             TaxRuleTableMap::ID,

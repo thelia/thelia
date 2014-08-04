@@ -28,6 +28,7 @@ use Thelia\Model\Map\OrderStatusI18nTableMap;
 use Thelia\Model\Map\OrderStatusTableMap;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderQuery;
+use Thelia\Tools\I18n;
 
 /**
  * Class OrderExport
@@ -199,7 +200,7 @@ class OrderExport extends ExportHandler
             ])
         ;
 
-        $this->addI18nCondition(
+        I18n::addI18nCondition(
             $query,
             CustomerTitleI18nTableMap::TABLE_NAME,
             "`delivery_address_customer_title_join`.ID",
@@ -208,7 +209,7 @@ class OrderExport extends ExportHandler
             $locale
         );
 
-        $this->addI18nCondition(
+        I18n::addI18nCondition(
             $query,
             CustomerTitleI18nTableMap::TABLE_NAME,
             "`invoice_address_customer_title_join`.ID",
@@ -217,7 +218,7 @@ class OrderExport extends ExportHandler
             $locale
         );
 
-        $this->addI18nCondition(
+        I18n::addI18nCondition(
             $query,
             CountryI18nTableMap::TABLE_NAME,
             "`delivery_address_country_join`.ID",
@@ -226,7 +227,7 @@ class OrderExport extends ExportHandler
             $locale
         );
 
-        $this->addI18nCondition(
+        I18n::addI18nCondition(
             $query,
             CountryI18nTableMap::TABLE_NAME,
             "`invoice_address_country_join`.ID",
@@ -235,7 +236,7 @@ class OrderExport extends ExportHandler
             $locale
         );
 
-        $this->addI18nCondition(
+        I18n::addI18nCondition(
             $query,
             OrderStatusI18nTableMap::TABLE_NAME,
             OrderStatusI18nTableMap::ID,
