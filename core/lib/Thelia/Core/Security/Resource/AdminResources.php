@@ -105,7 +105,7 @@ final class AdminResources
 
     const EXPORT = "admin.export";
 
-    const EXPORT_CUSTOMER_NEWSLETTER = "admin.export.customer.newsletter";
+    const IMPORT = "admin.import";
 
     const TOOLS = "admin.tools";
 }

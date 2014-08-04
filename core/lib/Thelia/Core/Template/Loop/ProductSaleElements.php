@@ -84,7 +84,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
                     break;
                 case "quantity_reverse":
                     $search->orderByQuantity(Criteria::DESC);
-                    break;                
+                    break;
                 case "min_price":
                     $search->addAscendingOrderByColumn('price_FINAL_PRICE', Criteria::ASC);
                     break;

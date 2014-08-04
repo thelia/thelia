@@ -22,7 +22,7 @@ class Brand extends BaseBrand implements FileModelParentInterface
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName()
+    public function getRewrittenUrlViewName()
     {
         return 'brand';
     }
@@ -81,7 +81,7 @@ class Brand extends BaseBrand implements FileModelParentInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-        $this->markRewritenUrlObsolete();
+        $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEBRAND, new BrandEvent($this));
     }

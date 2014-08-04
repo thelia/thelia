@@ -163,6 +163,16 @@
         <service id="thelia.action.lang" class="Thelia\Action\Lang">
             <tag name="kernel.event_subscriber"/>
         </service>
+
+        <service id="thelia.export.change_position" class="Thelia\Action\Export">
+            <argument>%kernel.cache_dir%</argument>
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="thelia.import.change_position" class="Thelia\Action\Import">
+            <argument>%kernel.cache_dir%</argument>
+            <tag name="kernel.event_subscriber" />
+        </service>
     </services>
 
 </config>

@@ -329,6 +329,91 @@ CREATE TABLE `form_firewall`
     INDEX `idx_form_firewall_ip_address` (`ip_address`)
 ) ENGINE=InnoDB;
 
+-- ---------------------------------------------------------------------
+-- import_category
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `import_category`;
+
+CREATE TABLE `import_category`
+(
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `ref` VARCHAR(255) NOT NULL,
+  `position` INTEGER NOT NULL,
+  `created_at` DATETIME,
+  `updated_at` DATETIME,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `ref_UNIQUE` (`ref`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- export_category
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `export_category`;
+
+CREATE TABLE `export_category`
+(
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `ref` VARCHAR(255) NOT NULL,
+  `position` INTEGER NOT NULL,
+  `created_at` DATETIME,
+  `updated_at` DATETIME,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `ref_UNIQUE` (`ref`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- import
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `import`;
+
+CREATE TABLE `import`
+(
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `ref` VARCHAR(255) NOT NULL,
+  `import_category_id` INTEGER NOT NULL,
+  `position` INTEGER NOT NULL,
+  `handle_class` LONGTEXT NOT NULL,
+  `created_at` DATETIME,
+  `updated_at` DATETIME,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `ref_UNIQUE` (`ref`),
+  INDEX `idx_import_import_category_id` (`import_category_id`),
+  CONSTRAINT `fk_import_import_category_id`
+  FOREIGN KEY (`import_category_id`)
+  REFERENCES `import_category` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- export
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `export`;
+
+CREATE TABLE `export`
+(
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `ref` VARCHAR(255) NOT NULL,
+  `export_category_id` INTEGER NOT NULL,
+  `position` INTEGER NOT NULL,
+  `handle_class` LONGTEXT NOT NULL,
+  `created_at` DATETIME,
+  `updated_at` DATETIME,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `ref_UNIQUE` (`ref`),
+  INDEX `idx_export_export_category_id` (`export_category_id`),
+  CONSTRAINT `fk_export_export_category_id`
+  FOREIGN KEY (`export_category_id`)
+  REFERENCES `export_category` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+
 
 INSERT INTO `config`(`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 ('form_firewall_bruteforce_time_to_wait', '10', 0, 0, NOW(), NOW()),

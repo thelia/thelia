@@ -25,7 +25,7 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName()
+    public function getRewrittenUrlViewName()
     {
         return 'product';
     }
@@ -268,7 +268,7 @@ class Product extends BaseProduct implements FileModelParentInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-        $this->markRewritenUrlObsolete();
+        $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
     }

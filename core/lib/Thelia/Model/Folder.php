@@ -20,7 +20,7 @@ class Folder extends BaseFolder implements FileModelParentInterface
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName()
+    public function getRewrittenUrlViewName()
     {
         return 'folder';
     }
@@ -129,7 +129,7 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
     public function postDelete(ConnectionInterface $con = null)
     {
-        $this->markRewritenUrlObsolete();
+        $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEFOLDER, new FolderEvent($this));
     }
