@@ -294,7 +294,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Free product when buying one or more selected products', array(), 'coupon');
+            ->trans('Free product when buying one or more selected products', array());
     }
 
     /**
@@ -306,8 +306,7 @@ class FreeProduct extends AbstractRemoveOnProducts
             ->getTranslator()
             ->trans(
                 'This coupon adds a free product to the cart if one of the selected products is in the cart.',
-                array(),
-                'coupon'
+                array()
             );
 
         return $toolTip;

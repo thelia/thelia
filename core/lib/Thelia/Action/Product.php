@@ -92,7 +92,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             $product
                 ->setDispatcher($event->getDispatcher())
-
+                ->setRef($event->getRef())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())
@@ -269,9 +269,9 @@ class Product extends BaseAction implements EventSubscriberInterface
             $product = $event->getProduct();
 
             // Delete all product feature relations
-            if(null !== $featureProducts = FeatureProductQuery::create()->findByProductId($product->getId())){
+            if (null !== $featureProducts = FeatureProductQuery::create()->findByProductId($product->getId())) {
                 /** @var \Thelia\Model\FeatureProduct $featureProduct */
-                foreach($featureProducts as $featureProduct){
+                foreach ($featureProducts as $featureProduct) {
                     $eventDelete = new FeatureProductDeleteEvent($product->getId(), $featureProduct->getFeatureId());
 
                     $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $eventDelete);

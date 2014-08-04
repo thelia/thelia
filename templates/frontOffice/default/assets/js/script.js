@@ -21,6 +21,303 @@
     }
 }());
 
+
+var pseManager = (function($){
+
+    // cache dom elements
+    var manager = {};
+    var $pse = {};
+
+    function init(){
+        $pse = {
+            "id": $("#pse-id"),
+            "product": $("#product"),
+            "name": $("#pse-name"),
+            "ref": $("#pse-ref"),
+            "ean": $("#pse-ean"),
+            "availability": $("#pse-availability"),
+            "validity": $("#pse-validity"),
+            "quantity": $("#quantity"),
+            "promo": $("#pse-promo"),
+            "new": $("#pse-new"),
+            "weight": $("#pse-weight"),
+            "price": $("#pse-price"),
+            "priceOld": $("#pse-price-old"),
+            "submit": $("#pse-submit"),
+            "options": {},
+            "pseId": null,
+            "useFallback": false,
+            "fallback": $("#pse-options .pse-fallback")
+        };
+    }
+
+    function buildProductForm() {
+        var pse = null,
+            combinationId = null,
+            combinationValue = null,
+            combinationValueId = null,
+            combinations = null,
+            combinationName = [],
+            i;
+
+        // initialization for the first default pse
+        $pse.pseId = $pse.id.val();
+
+        if (PSE_COUNT > 1) {
+            // Use fallback method ?
+            $pse.useFallback = useFallback();
+
+            if ($pse.useFallback) {
+                $("#pse-options .option-option").remove();
+
+                for (pse in PSE){
+                    combinations = PSE[pse].combinations;
+                    combinationName = [];
+                    for (i = 0; i < combinations.length; i++){
+                        combinationName.push(PSE_COMBINATIONS_VALUE[combinations[i]][0]);
+                    }
+                    $pse.fallback
+                        .append("<option value='" + pse + "'>"
+                            + combinationName.join(', ') + "</option>");
+                }
+
+                $("#pse-options .pse-fallback").on("change",function(){
+                    updateProductForm();
+                });
+
+            } else {
+                $("#pse-options .option-fallback").remove();
+
+                // get the select for options
+                $("#pse-options .pse-option").each(function(){
+                    var $option = $(this);
+                    if ( $option.data("attribute") in PSE_COMBINATIONS){
+                        $pse['options'][$option.data("attribute")] = $option;
+                        $option.on("change", updateProductForm);
+                    } else {
+                        // not affected to this product -> remove
+                        $option.closest(".option").remove();
+                    }
+                });
+
+                // build select
+                for (combinationValueId in PSE_COMBINATIONS_VALUE) {
+                    combinationValue = PSE_COMBINATIONS_VALUE[combinationValueId];
+                    $pse.options[combinationValue[1]]
+                        .append("<option value='" + combinationValueId + "'>"
+                            + combinationValue[0] + "</option>");
+                }
+
+                setPseForm();
+            }
+        }
+    }
+
+    function setPseForm(id) {
+        var i = 0,
+            pse = null,
+            combinationValueId;
+        pse = PSE[id || $pse.pseId];
+        if ($pse.useFallback) {
+            $pse.fallbak.val(pse.id);
+        } else {
+            for (var i=0; i<pse.combinations.length; i++){
+                combinationValueId = pse.combinations[i];
+                $pse['options'][PSE_COMBINATIONS_VALUE[combinationValueId][1]].val(pse.combinations[i])
+            }
+        }
+    }
+
+    function updateProductForm() {
+        var pseId = null,
+            selection;
+
+        if (PSE_COUNT > 1) {
+
+            if ($pse.useFallback) {
+                pseId = $pse.fallback.val();
+            } else {
+                // get form data
+                selection = getFormSelection();
+                // get the pse
+                pseId = pseExist(selection);
+
+                if ( ! pseId ) {
+                    // not exists, revert
+                    displayNotice();
+                    setPseForm();
+                } else {
+                    $pse.validity.hide();
+                }
+            }
+
+            $pse.id.val(pseId);
+            $pse.pseId = pseId;
+        }
+
+        // Update UI
+        updateProductUI();
+    }
+
+    function displayNotice() {
+        var $validity = $pse.validity;
+        $validity.show('fast', function(){
+            setTimeout(function(){
+                $validity.hide('fast');
+            }, 3000);
+        });
+    }
+
+    function updateProductUI() {
+        var pse = PSE[$pse.pseId],
+            name = [],
+            pseValueId,
+            i
+            ;
+
+        $pse.ref.html(pse.ref);
+        // $pse.ean.html(pse.ean);
+        // name
+        if (PSE_COUNT > 1) {
+
+            for (i = 0; i < pse.combinations.length; i++){
+                pseValueId = pse.combinations[i]
+                name.push(
+                    //PSE_COMBINATIONS[PSE_COMBINATIONS_VALUE[pseValueId][1]].name +
+                    //":" +
+                    PSE_COMBINATIONS_VALUE[pseValueId][0]
+                )
+            }
+
+            $pse.name.html(" - " + name.join(", ") + "");
+        }
+
+        // promo
+        if (pse.isPromo) {
+            $pse.product.addClass("product--is-promo");
+        } else {
+            $pse.product.removeClass("product--is-promo");
+        }
+
+        // new
+        if (pse.isNew) {
+            $pse.product.addClass("product--is-new");
+        } else {
+            $pse.product.removeClass("product--is-new");
+        }
+
+        // availability
+        if (pse.quantity > 0 || ! PSE_CHECK_AVAILABILITY) {
+            $pse.availability
+                .removeClass("out-of-stock")
+                .addClass("in-stock")
+                .attr("href", "http://schema.org/InStock");
+
+            if (parseInt($pse.quantity.val()) > pse.quantity){
+                $pse.quantity.val(pse.quantity);
+            }
+
+            if (PSE_CHECK_AVAILABILITY) {
+                $pse.quantity.attr("max", pse.quantity);
+            } else {
+                $pse.quantity.attr("max", PSE_DEFAULT_AVAILABLE_STOCK);
+            }
+            $pse.submit.prop("disabled", false);
+
+        } else {
+            $pse.availability.removeClass("in-stock")
+                .addClass("out-of-stock")
+                .attr("href", "http://schema.org/OutOfStock");
+
+            $pse.submit.prop("disabled", true);
+        }
+
+        // price
+        if (pse.isPromo){
+            $pse.priceOld.html(pse.price);
+            $pse.price.html(pse.promo);
+        } else {
+            $pse.priceOld.html("");
+            $pse.price.html(pse.price);
+        }
+    }
+
+    function pseExist(selection) {
+        var pseId,
+            pse = null,
+            combinations,
+            i,
+            j,
+            existCombination;
+
+        for (pse in PSE){
+            pseId = pse;
+            combinations = PSE[pse].combinations;
+            for (i = 0; i < selection.length; i++){
+                existCombination = false;
+                for (j = 0; j < combinations.length; j++){
+                    if (selection[i] == combinations[j]){
+                        existCombination = true;
+                        break;
+                    }
+                }
+                if (existCombination === false) {
+                    break;
+                }
+            }
+            if (existCombination) {
+                return pseId;
+            }
+        }
+
+        return false;
+    }
+
+    function useFallback() {
+        var pse = null,
+            count = -1,
+            pseCount = 0,
+            combinations,
+            i;
+
+        for (pse in PSE){
+            combinations = PSE[pse].combinations;
+            pseCount = 0;
+            for (i = 0; i < combinations.length; i++) {
+                pseCount += PSE_COMBINATIONS_VALUE[combinations[i]][1];
+            }
+            if (count == -1){
+                count = pseCount;
+            } else if (count != pseCount) {
+                return true;
+            }
+        }
+
+        return (count <= 0);
+    }
+
+    function getFormSelection() {
+        var selection = [],
+            combinationId;
+
+        for (combinationId in $pse.options){
+            selection.push($pse.options[combinationId].val());
+        }
+
+        return selection;
+    }
+
+    manager.load = function(){
+        init();
+        buildProductForm();
+        updateProductForm();
+    }
+
+    return manager;
+
+}(jQuery));
+
+
 /* JQUERY PREVENT CONFLICT */
 (function ($) {
 
@@ -129,6 +426,7 @@
                                 bootbox.hideAll();
                             }
                         });
+                        window.pseManager.load();
                     }
                 ); 
                 return false; 
@@ -137,15 +435,20 @@
         });
 
         // Product AddtoCard - OnSubmit
-        $(document).on('submit.form-product', '.form-product', function () { 
+        if (typeof window.PSE_FORM !== "undefined"){
+            window.pseManager.load();
+        }
+
+        $(document).on('submit.form-product', '.form-product', function () {
             if (doAjax) {
                 var url_action  = $(this).attr("action"),
-                    product_id  = $("input[name$='product_id']",this).val();
-                    
+                    product_id  = $("input[name$='product_id']",this).val(),
+                    pse_id  = $("input#pse-id",this).val();
+
                 $.ajax({type: "POST", data: $(this).serialize(), url: url_action,
                     success: function(data){
                         $(".cart-container").html($(data).html());
-                        $.ajax({url:"ajax/addCartMessage", data:{ product_id: product_id },
+                        $.ajax({url:"ajax/addCartMessage", data:{ product_id: product_id, pse_id: pse_id },
                             success: function (data) {
                                 // Hide all currently active bootbox dialogs
                                 bootbox.hideAll();
@@ -167,51 +470,7 @@
             }
             return;
         });
-            
-        $(document).on('change.quantity', 'select:has([data-quantity])', function () { 
-            var $productDetails         = $(this).closest("#product-details"),
-                $stockInformation       = $("#stock-information", $productDetails),
-                $quantityInput          = $("#quantity", $productDetails),
-                $btnAddToCart           = $(".btn_add_to_cart", $productDetails);                
 
-            var $current = $(":selected", this); 
-            var qty = $current.data("quantity"); 
-            
-            // Show Out Of Stock OR In Stock
-            if (qty == 0) { 
-                // Disable button
-                $btnAddToCart.attr("disabled", true);
-
-                // Update stock information
-                $stockInformation
-                    .removeClass("in-stock")
-                    .addClass("out-of-stock")
-                    .attr("href", "http://schema.org/OutOfStock");
-
-            } else {
-                // Active button
-                $btnAddToCart.attr("disabled", false);
-
-                // Update Field Quantity if the current value is over Max
-                if (parseInt($quantityInput.val()) > parseInt(qty)) {
-                    $quantityInput.val(qty);
-                }
-
-                // Update stock information
-                $stockInformation
-                    .removeClass("out-of-stock")
-                    .addClass("in-stock")
-                    .attr("href", "http://schema.org/InStock");
-            }
-
-            // HTML5 number attribute
-            $quantityInput.attr("max", qty);
-
-            // Update Prices
-            $(".old-price > .price", $productDetails).html($current.data('old-price'));
-            $(".special-price > .price, .regular-price > .price", $productDetails).html($current.data('price'));
-
-        });
 
         // Toolbar
         var $category_products = $ ('#category-products');
@@ -352,6 +611,7 @@
         });
 
     });
+
 
 })(jQuery);
 

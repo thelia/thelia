@@ -113,8 +113,7 @@ class CartContainsProducts extends ConditionAbstract
     {
         return $this->translator->trans(
             'Cart contains specific products',
-            [],
-            'condition'
+            []
         );
     }
 
@@ -125,8 +124,7 @@ class CartContainsProducts extends ConditionAbstract
     {
         $toolTip = $this->translator->trans(
             'The coupon applies if the cart contains at least one product of the specified product list',
-            [],
-            'condition'
+            []
         );
 
         return $toolTip;
@@ -159,7 +157,7 @@ class CartContainsProducts extends ConditionAbstract
             'Cart contains at least a product %op% <strong>%products_list%</strong>', [
                 '%products_list%' => $prodStrList,
                 '%op%' => $i18nOperator
-            ], 'condition'
+            ]
         );
 
         return $toolTip;

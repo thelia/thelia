@@ -50,8 +50,7 @@ class MatchDeliveryCountries extends AbstractMatchCountries
     {
         return $this->translator->trans(
             'Delivery country',
-            [],
-            'condition'
+            []
         );
     }
 
@@ -62,8 +61,7 @@ class MatchDeliveryCountries extends AbstractMatchCountries
     {
         $toolTip = $this->translator->trans(
             'The coupon applies to the selected delivery countries',
-            [],
-            'condition'
+            []
         );
 
         return $toolTip;
@@ -75,14 +73,14 @@ class MatchDeliveryCountries extends AbstractMatchCountries
             'Only if order shipping country is %op% <strong>%countries_list%</strong>', [
                 '%countries_list%' => $cntryStrList,
                 '%op%' => $i18nOperator
-            ], 'condition'
+            ]
         );
     }
 
     protected function getFormLabel()
     {
         return $this->translator->trans(
-            'Delivery coutry is', [], 'condition'
+            'Delivery country is', []
         );
     }
 }

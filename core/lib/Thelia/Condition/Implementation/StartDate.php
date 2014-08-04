@@ -103,8 +103,7 @@ class StartDate extends ConditionAbstract
     {
         return $this->translator->trans(
             'Start date',
-            [],
-            'condition'
+            []
         );
     }
 
@@ -115,8 +114,7 @@ class StartDate extends ConditionAbstract
     {
         $toolTip = $this->translator->trans(
             'The coupon is valid after a given date',
-            [],
-            'condition'
+            []
         );
 
         return $toolTip;

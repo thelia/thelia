@@ -1,39 +1,53 @@
 {extends file="layout.tpl"}
 
+{block name="init"}
+{$brand_id={brand attr="id"}}
+{/block}
+
 {* Body Class *}
-{block name="body-class"}page-content{/block}
+{block name="body-class"}page-brand{/block}
 
 {* Page Title *}
 {block name='no-return-functions' append}
-    {loop name="brand.seo.title" type="brand" id="{brand attr="id"}"}
+{if $brand_id}
+    {loop name="brand.seo.title" type="brand" id=$brand_id limit="1"}
     {$page_title = {$META_TITLE}}
     {/loop}
+{/if}
 {/block}
 
 {* Meta *}
 {block name="meta"}
-    {loop name="brand.seo.meta" type="brand" id="{brand attr="id"}"}
-    {if $META_DESCRIPTION}
-        <meta name="description" content="{$META_DESCRIPTION}">{/if}
-    {if $META_KEYWORDS}
-        <meta name="keywords" content="{$META_KEYWORDS}">{/if}
+{if $brand_id}
+    {loop name="brand.seo.meta" type="brand" id=$brand_id limit="1"}
+        {include file="includes/meta-seo.html"}
     {/loop}
+{/if}
 {/block}
 
 {* Feeds *}
 {block name="feeds"}
-    <link rel="alternate" type="application/rss+xml" title="{intl l='All product in brand %title' title={brand attr='title'}}" href="{url path="/feed/brand/{lang attr='locale'}/{brand attr='id'}"}"/>
+{if $brand_id}
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All product in brand %title' title={brand attr='title'}}" href="{url path="/feed/brand/{lang attr='locale'}/{$brand_id}"}"/>
+{/if}
 {/block}
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
+{if $brand_id}
     {$breadcrumbs = []}
-    {loop type="brand" name="brand-breadcrumb" id="{brand attr="id"}"}
-    {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
-    {/loop}
+    {if $brand_id}
+        {loop type="brand" name="brand-breadcrumb" id=$brand_id limit="1"}
+        {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
+        {/loop}
+    {else}
+        {$breadcrumbs[] = ['title' => {intl l="All brands"}, 'url'=> '']}
+    {/if}
+{/if}
 {/block}
 
 {block name="main-content"}
+    {if $brand_id}
     <div class="main layout-col-2-left">
         {$limit={$smarty.get.limit|default:8}}
         {$product_page={$smarty.get.page|default:1}}
@@ -41,7 +55,7 @@
         {$mode=$smarty.get.mode|default:'grid'}
 
         <article class="col-main {$mode}" role="main" aria-labelledby="main-label">
-            {loop name="brand.info" type="brand" current="yes"}
+            {loop name="brand.info" type="brand" id=$brand_id limit="1"}
                 <section class="brand-description">
                     <h1 id="main-label" class="page-header">{$TITLE}</h1>
 
@@ -154,4 +168,40 @@
         </aside>
 
     </div><!-- /.layout -->
+    {else}
+    <div class="main" id="brands">
+        <div class="col-main brands" role="main" aria-labelledby="main-label">
+            {ifloop rel="brands"}
+            <ul>
+                {loop name="brands" type="brand"}
+                <li class="item">
+                    <article>
+                        <div class="brand-info">
+                            {ifloop rel="brand_logo"}
+                            <a href="{$URL}" tabindex="-1" class="brand-image">
+                                {loop name="brand_logo" type="image" source="brand" id={$LOGO_IMAGE_ID} width=218 height=146 resize_mode="borders" limit="1"}
+                                <img src="{$IMAGE_URL}" alt="{$TITLE}">
+                                {/loop}
+                                <span class="mask"></span>
+                            </a>
+                            {/ifloop}
+
+                            <h2 class="name"><a href="{$URL}">{$TITLE}</a></h2>
+                            {if $CHAPO}
+                            <div class="short-description">
+                                {$CHAPO}
+                            </div>
+                            {/if}
+                        </div>
+                    </article>
+                </li>
+                {/loop}
+            </ul>
+            {/ifloop}
+            {elseloop rel="brand_logo"}
+
+            {/elseloop}
+        </div>
+    </div>
+    {/if}
 {/block}

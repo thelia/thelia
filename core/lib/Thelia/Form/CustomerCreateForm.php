@@ -86,17 +86,8 @@ class CustomerCreateForm extends AddressCreateForm
                     "for" => "newsletter"
                 ),
                 "required" => false
-            ))
-            // Add terms & conditions
-            ->add("agreed", "checkbox", array(
-                "constraints" => array(
-                    new Constraints\True(array("message" => Translator::getInstance()->trans("Please accept the Terms and conditions in order to register.")))
-                ),
-                "label"=>"Test",
-                "label_attr" => array(
-                    "for" => "agreed"
-                )
             ));
+
     }
 
     public function verifyPasswordField($value, ExecutionContextInterface $context)

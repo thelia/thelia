@@ -43,9 +43,7 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
             ->remove("country")
             // Remove Login Information
             ->remove("password")
-            ->remove("password_confirm")
-            // Remove Terms & conditions
-            ->remove("agreed");
+            ->remove("password_confirm");
     }
 
     /**

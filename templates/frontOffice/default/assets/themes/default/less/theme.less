@@ -330,17 +330,18 @@ td.product,
     .special-price {
         .price {
             display: block;
-            font-size: 20px; line-height: 25px;
-            font-style: italic;
+            font-size: 14px; line-height: 25px;
+            font-style: normal;
+            font-weight: 400;
         }
     }
 
     .old-price {
         .price {
             display: block;
-            font-size: 18px; line-height: 25px;
+            font-size: 14px; line-height: 25px;
             font-style: italic;
-            font-weight: 600;
+            font-weight: 400;
             text-decoration: line-through;
         }
     }
@@ -606,6 +607,12 @@ td.product,
             font-size: ceil(@font-size-base * 0.94);
             margin-top: -8px; margin-bottom: 20px;
         }
+        .pse-name {
+            color: @gray;
+            font-size: ceil(@font-size-base * 0.94);
+            //margin-left: 10px;
+        }
+
     }
     .product-price {
         .price-container {

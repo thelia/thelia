@@ -103,8 +103,7 @@ class MatchForXArticles extends ConditionAbstract
     {
         return $this->translator->trans(
             'Cart item count',
-            [],
-            'condition'
+            []
         );
     }
 
@@ -115,8 +114,7 @@ class MatchForXArticles extends ConditionAbstract
     {
         $toolTip = $this->translator->trans(
             'The cart item count should match the condition',
-            [],
-            'condition'
+            []
         );
 
         return $toolTip;
@@ -136,8 +134,7 @@ class MatchForXArticles extends ConditionAbstract
             array(
                 '%operator%' => $i18nOperator,
                 '%quantity%' => $this->values[self::CART_QUANTITY]
-            ),
-            'condition'
+            )
         );
 
         return $toolTip;
@@ -164,7 +161,7 @@ class MatchForXArticles extends ConditionAbstract
     {
         $labelQuantity = $this->facade
             ->getTranslator()
-            ->trans('Cart item count is', [], 'condition');
+            ->trans('Cart item count is');
 
         $html = $this->drawBackOfficeBaseInputsText($labelQuantity, self::CART_QUANTITY);
 

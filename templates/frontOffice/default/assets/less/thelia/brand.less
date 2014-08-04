@@ -1,0 +1,99 @@
+// Thelia : Brand
+
+// Brand Info
+.brand-chapo {}
+.brand-description {
+  margin-bottom: 20px;
+}
+
+// Content List
+#brands {
+  .brands > ul { .brands-list; }
+}
+
+.brands-grid,
+.brands-list {
+  // Animation
+  @media (min-width: @screen-tablet) {
+    .brand-image {
+      display: block;
+      overflow: hidden;
+      position: relative;
+      > .mask {
+        background-color: @brand-primary;
+        background-color: rgba(red(@brand-primary), green(@brand-primary), blue(@brand-primary), .4);
+        display: block;
+        .opacity(0);
+        overflow: visible;
+        position: absolute;
+        top: 0; left: 0;
+        visibility: hidden;
+        width: 100%; height: 100%;
+        .transition(opacity 300ms ease-in-out 50ms);
+      }
+      &:hover,
+      &:focus {
+        .mask {
+          visibility: visible;
+          .opacity(1);
+        }
+      }
+
+    }
+  }
+}
+
+
+// Contents Grid
+.brands-grid {
+  .make-row();
+  .list-unstyled();
+  .item { .make-sm-column(4); .make-md-column(4); .clearfix(); } // default
+  &.content-col-2 > .item { .make-md-column(6); }
+  &.content-col-3 > .item { .make-md-column(4); }
+  &.content-col-4 > .item { .make-md-column(3); }
+  &.content-col-5 > .item { .make-md-column(2.4); }
+  &.content-col-6 > .item { .make-md-column(2); }
+
+  .item {
+    margin-bottom: @line-height-computed;
+
+    .brand-image {
+      > img  { .img-responsive(); width: 100%; }
+      > .mask {}
+    }
+
+    .brand-info {
+      .name { margin: 4px 0; }
+      .description { .visible-xs; }
+      .short-description { display: block; margin-bottom: 5px; }
+    }
+  }
+}
+
+// Content List
+.brands-list {
+  .list-unstyled();
+  .item {
+    padding-bottom: 15px;
+    + .item { border-top: 1px solid #ededed; padding-top: 15px; }
+    > article {
+      .make-row();
+      margin-left: 0;
+
+      .brand-image {
+        .make-sm-column(2);
+        margin-bottom: 15px; padding: 0;
+        > img { .img-responsive(); width: 100%; }
+        > .mask {}
+      }
+
+      .brand-info {
+        .make-sm-column(7);
+        .name { margin-top: 0; }
+        .description {}
+        .short-description {}
+      }
+    }
+  }
+}

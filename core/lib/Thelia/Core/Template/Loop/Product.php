@@ -179,6 +179,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $search->innerJoinProductSaleElements('pse');
         $search->addJoinCondition('pse', '`pse`.IS_DEFAULT=1');
 
+        $search->innerJoinProductSaleElements('pse_count');
+
         $priceJoin = new Join();
         $priceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'price');
         $priceJoin->setJoinType(Criteria::LEFT_JOIN);
@@ -396,6 +398,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $search->withColumn('`pse`.WEIGHT', 'weight');
         $search->withColumn('`pse`.EAN_CODE', 'ean_code');
 
+        $search->withColumn('COUNT(`pse_count`.ID)', 'pse_count');
+
         $orders  = $this->getOrder();
 
         foreach ($orders as $order) {
@@ -518,6 +522,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("TAXED_PROMO_PRICE"       , $taxedPromoPrice)
                 ->set("IS_PROMO"                , $product->getVirtualColumn('is_promo'))
                 ->set("IS_NEW"                  , $product->getVirtualColumn('is_new'))
+                ->set("PSE_COUNT"               , $product->getVirtualColumn('pse_count'))
             ;
 
 
@@ -571,8 +576,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->where(" CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
         }
 
-
-
+        /* number of pse
+        $search->innerJoinProductSaleElements('pse_count');
+        $search->withColumn('COUNT(`pse_count`.ID)', 'pse_count');
+        */
 
         $category = $this->getCategory();
         $categoryDefault = $this->getCategoryDefault();
@@ -985,8 +992,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("BEST_PRICE"       , $price)
                 ->set("BEST_PRICE_TAX"   , $taxedPrice - $price)
                 ->set("BEST_TAXED_PRICE" , $taxedPrice)
-                ->set("IS_PROMO"                , $product->getVirtualColumn('is_promo'))
-                ->set("IS_NEW"                  , $product->getVirtualColumn('is_new'))
+                ->set("IS_PROMO"         , $product->getVirtualColumn('is_promo'))
+                ->set("IS_NEW"           , $product->getVirtualColumn('is_new'))
             ;
 
 

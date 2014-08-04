@@ -53,6 +53,10 @@
                             <span class="hidden-xs">{intl l="Unit Price"}</span>
                             <span class="visible-xs">{intl l="Price"}</span>
                         </th>
+                        <th class="unitprice">
+                            <span class="hidden-xs">{intl l="Unit Taxed Price"}</span>
+                            <span class="visible-xs">{intl l="Taxed Price"}</span>
+                        </th>
                         <th class="qty">
                             <span class="hidden-xs">{intl l="Quantity"}</span>
                             <span class="visible-xs">{intl l="Qty"}</span>
@@ -68,8 +72,8 @@
                     {loop type="cart" name="cartloop"}
                     <tr>
                         <td class="image">
-
                             {assign "cart_count" $LOOP_COUNT}
+                            <a href="{$PRODUCT_URL}">
                             {ifloop rel='product-image'}
                                 {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
                                     <img src="{$IMAGE_URL}" alt="Product #{$cart_count}">
@@ -78,10 +82,11 @@
                             {elseloop rel="product-image"}
                                 {images file='assets/img/product/1/118x85.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{$cart_count}">{/images}
                             {/elseloop}
+                            </a>
                         </td>
                         <td class="product" >
                             <h3 class="name">
-                                {$TITLE}
+                                <a href="{$PRODUCT_URL}">{$TITLE}</a>
                             </h3>
                             <div class="product-options">
                                 <dl class="dl-horizontal">
@@ -101,13 +106,22 @@
                             </div>
                         </td>
                         <td class="unitprice">
+                            <div class="secondary-price">
+                            {if $IS_PROMO == 1}
+                                <small><span class="price">{$PROMO_PRICE} {currency attr="symbol"}</span></small>
+                            {else}
+                                <small><span class="price">{$PRICE} {currency attr="symbol"}</span></small>
+                            {/if}
+                            </div>
+                        </td>
+                        <td class="unitprice">
                             {if $IS_PROMO == 1}
                                 {assign "real_price" $PROMO_TAXED_PRICE}
                                 <div class="special-price"><span class="price">{$PROMO_TAXED_PRICE} {currency attr="symbol"}</span></div>
                                 <small class="old-price">{intl l="instead of"} <span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></small>
                             {else}
                                 {assign "real_price" $TAXED_PRICE}
-                                <div class="special-price"><span class="price">{$TAXED_PRICE} {currency attr="symbol"} </span></div>
+                                <div class="special-price"><span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></div>
                             {/if}
                         </td>
                         <td class="qty">
@@ -121,56 +135,72 @@
                     {/loop}
 
                     </tbody>
-                    <tfoot>
-
-                    <tr >
-                        <td rowspan="4" colspan="3" class="empty">&nbsp;</td>
-                        <th class="shipping">{intl l="Discount"}</th>
-                        <td class="shipping">
-                            <div class="shipping-price">
-                                <span class="price">{order attr="discount"} {currency attr="symbol"}</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr >
-                        <th class="shipping">{intl l="Shipping Tax"}</th>
-                        <td class="shipping">
-                            <div class="shipping-price">
-                                <span class="price">{order attr="postage"} {currency attr="symbol"}</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr >
-                        <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
-                        <td class="coupon">
-                            {form_field form=$form field='success_url'}
-                                <input type="hidden" name="{$name}" value="{url path="/order/invoice"}" />
-                            {/form_field}
-                            {form_field form=$form field='coupon-code'}
-                                <div class="{if $error}has-error{/if}">
-                                    <div class="input-group">
-                                        <label class="control-label sr-only" for="code">{intl l='Code :'}</label>
-                                        <input id="coupon" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='Coupon code'}" required>
-                                        <span class="input-group-btn">
-                                            <button type="submit" class="btn btn-coupon">{intl l="Ok"}</button>
-                                        </span>
-                                    </div>
-                                    {if $error}<span class="help-block">{$message}</span>{/if}
-                                </div>
-                            {/form_field}
-                            <!-- /input-group -->
-                        </td>
-                    </tr>
-                    <tr >
-                        <th class="total">{intl l="Total"}</th>
-                        <td class="total">
-                            <div class="total-price">
-                                <span class="price">{{cart attr="total_taxed_price"} + {order attr="postage"}} {currency attr="symbol"}</span>
-                            </div>
-                        </td>
-                    </tr>
-                    </tfoot>
                 </table>
+
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-6 col-sm-9 col-sm-offset-3 col-xs-12">
+                        <table class="table table-cart table-cart-total">
+                            <tfoot>
+                            {$discount={order attr="discount"}}
+                            {if $discount}
+                            <tr>
+                                <th class="discount">{intl l="Discount"}</th>
+                                <td class="shipping">
+                                    <div class="shipping-price">
+                                        <span class="price">{$discount} {currency attr="symbol"}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {/if}
+                            <tr>
+                                <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
+                                <td class="coupon">
+                                    {form_field form=$form field='success_url'}
+                                    <input type="hidden" name="{$name}" value="{url path="/order/invoice"}" />
+                                    {/form_field}
+                                    {form_field form=$form field='coupon-code'}
+                                    <div class="{if $error}has-error{/if}">
+                                        <div class="input-group">
+                                            <label class="control-label sr-only" for="code">{intl l='Code :'}</label>
+                                            <input id="coupon" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='Coupon code'}" required>
+                                            <span class="input-group-btn">
+                                                <button type="submit" class="btn btn-coupon">{intl l="Ok"}</button>
+                                            </span>
+                                        </div>
+                                        {if $error}<span class="help-block">{$message}</span>{/if}
+                                    </div>
+                                    {/form_field}
+                                    <!-- /input-group -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="shipping">{intl l="Shipping Tax"}</th>
+                                <td class="shipping">
+                                    <div class="shipping-price">
+                                        <span class="price">{order attr="postage"} {currency attr="symbol"}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>{intl l="Total excl. taxes"}</th>
+                                <td>
+                                    <div>
+                                        <span class="price">{{cart attr="total_price"} + {order attr="postage"}} {currency attr="symbol"}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="total">{intl l="Total incl. taxes"}</th>
+                                <td class="total">
+                                    <div class="total-price">
+                                        <span class="price">{{cart attr="total_taxed_price"} + {order attr="postage"}} {currency attr="symbol"}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
                 </form>
             {/form}
             
@@ -244,7 +274,6 @@
                         {/loop}
 
                             <a href="#" class="btn btn-change-address hidden">{intl l="Change address"}</a>
-
                         </div>
 
                     </div>
@@ -266,21 +295,44 @@
                             {loop type="payment" name="payments" force_return="true"}
                                 {assign "paymentModuleId" $ID}
                                 <li class="list-group-item text-left">
-                                        <label for="payment_{$paymentModuleId}">
-                                            <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}" {if $LOOP_TOTAL ==1 && $LOOP_COUNT == 1}checked{/if}>
+                                    <label for="payment_{$paymentModuleId}">
+                                        <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}" {if $LOOP_TOTAL ==1 && $LOOP_COUNT == 1}checked{/if}>
 
-                                            {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
-                                                <img src="{$IMAGE_URL}" alt="{intl l="Pay with %module_title" module_title={$TITLE}}">
-                                            {/loop}
+                                        {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
+                                            <img src="{$IMAGE_URL}" alt="{intl l="Pay with %module_title" module_title={$TITLE}}">
+                                        {/loop}
 
-                                            {$TITLE}
-                                        </label>
+                                        {$TITLE}
+                                    </label>
                                 </li>
                             {/loop}
                         </ul>
                     </div>
                 </div>
+                {/form_field}
 
+                {form_field form=$form field="agreed"}
+                <div class="well">
+                    <div class="form-group group-agreed{if $error} has-error{/if}">
+                        <div class="control-input">
+                            <div class="checkbox">
+                                <label class="control-label" for="{$label_attr.for}">
+                                    <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="{$value}"{if $checked} checked{/if}  {if $required} aria-required="true" required{/if}>
+                                    {$termsAndConditionsId={config key="terms_conditions_content_id"}}
+                                    {if $termsAndConditionsId}
+                                        {loop name="content-terms" type="content" id=$termsAndConditionsId}
+                                            {$termsAndConditionsUrl=$URL}
+                                        {/loop}
+                                    {/if}
+                                    {intl l="I've read and agreed on <a href='%link' class='terms-quickview'>Terms &amp; Conditions</a>" link="$termsAndConditionsUrl"}.
+                                </label>
+                                {if $error }
+                                    <span class="help-block">{$message}</span>
+                                {/if}
+                            </div>
+                        </div>
+                    </div><!--/.form-group-->
+                </div>
                 {/form_field}
 
                 <a href="{url path="/order/delivery"}" role="button" class="btn btn-back"><span>{intl l="Back"}</span></a>
@@ -309,6 +361,25 @@ jQuery(function($) {
                 return false;
             });
     });
+
+    $(".terms-quickview").on('click', function (ev) {
+        ev.preventDefault();
+
+        $.get(this.href, function (data) {
+            // Hide all currently active bootbox dialogs
+            bootbox.hideAll();
+            // Show dialog
+            bootbox.dialog({
+                message : $("#content-main",data),
+                onEscape: function() {
+                    bootbox.hideAll();
+                }
+            });
+        });
+
+        return false;
+    });
+
 });
 </script>
 {/block}

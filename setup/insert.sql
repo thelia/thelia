@@ -36,6 +36,9 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('pdf_delivery_file', 'delivery', 0, 0, NOW(), NOW()),
 ('unknown-flag-path','assets/img/flags/unknown.png', 0, 0, NOW(), NOW()),
 ('html_output_trim_level','1', 0, 0, NOW(), NOW()),
+('default_available_stock', '100', 0, 0, NOW(), NOW()),
+('information_folder_id', '', 0, 0, NOW(), NOW()),
+('terms_conditions_content_id', '', 0, 0, NOW(), NOW()),
 
 ('session_config.default', '1', 1, 1, NOW(), NOW()),
 ('default_lang_without_translation', '1', 1, 1, NOW(), NOW()),
@@ -58,7 +61,6 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('form_firewall_bruteforce_attempts', '10', 0, 0, NOW(), NOW()),
 ('form_firewall_attempts', '6', 0, 0, NOW(), NOW()),
 ('from_firewall_active', '1', 0, 0, NOW(), NOW());
-
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (1, 'en_US', 'Class name of the session handler', NULL, NULL, NULL),
@@ -90,6 +92,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (27, 'en_US', 'Name of the delivery view in the current PDF template (without extension)', NULL, NULL, NULL),
 (28, 'en_US', 'The path (relative to the default back-office template) to the image used when no flag image can be found for a country', NULL, NULL, NULL),
 (29, 'en_US', 'Whitespace trim level of the generated HTML code (0 = none, 1 = medium, 2 = maximum)', NULL, NULL, NULL),
+(30, 'en_US', 'Default available stock when check-available-stock is set to 0.', NULL, NULL, NULL),
+(31, 'en_US', 'The ID of the folder containing your information pages : terms, imprint, ...', NULL, NULL, NULL),
+(32, 'en_US', 'The ID of the ''Terms & Conditions'' content.', NULL, NULL, NULL),
 (1, 'fr_FR', 'Nom de la classe du gestionnaire de session', NULL, NULL, NULL),
 (2, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l''ignorer (0) lors de l''affichage et la modification des quantités commandées', NULL, NULL, NULL),
 (3, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
@@ -118,7 +123,11 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (26, 'fr_FR', 'Nom de la vue de la facture dans le modèle PDF en cours (sans extension)', NULL, NULL, NULL),
 (27, 'fr_FR', 'Nom de la vue de la livraison dans le modèle PDF en cours (sans extension)', NULL, NULL, NULL),
 (28, 'fr_FR', 'Le chemin (par rapport au modèle de back-office par défaut) vers l''image utilisée lorsque aucune image de drapeau ne peut être trouvée pour un pays', NULL, NULL, NULL),
-(29, 'fr_FR', 'Niveau de découpe des espaces dans le code HTML généré (0 = aucun, 1 = moyen, 2 = maximum)', NULL, NULL, NULL);
+(29, 'fr_FR', 'Niveau de découpe des espaces dans le code HTML généré (0 = aucun, 1 = moyen, 2 = maximum)', NULL, NULL, NULL),
+(30, 'fr_FR', 'Stock disponible par défaut quand check-available-stock est à 0.', NULL, NULL, NULL),
+(31, 'fr_FR', 'L''ID du dossier contenant vos pages d''informations : CGV, mentions légales, ...', NULL, NULL, NULL),
+(32, 'fr_FR', 'L''ID du contenu de vos ''CGV''.', NULL, NULL, NULL);
+
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
 (1, 'TheliaDebugBar', 1, 1, 1, 'TheliaDebugBar\\TheliaDebugBar', NOW(), NOW()),

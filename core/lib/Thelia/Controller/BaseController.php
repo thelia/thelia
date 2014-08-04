@@ -218,13 +218,13 @@ abstract class BaseController extends ContainerAware
                 if ($form->get("error_message")->getData() != null) {
                     $errorMessage = $form->get("error_message")->getData();
                 } else {
-                    $errorMessage = sprintf("Missing or invalid data: %s", $this->getErrorMessages($form));
+                    $errorMessage = sprintf($this->getTranslator()->trans("Missing or invalid data: %s"), $this->getErrorMessages($form));
                 }
 
                 throw new FormValidationException($errorMessage);
             }
         } else {
-            throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
+            throw new FormValidationException(sprintf($this->getTranslator()->trans("Wrong form method, %s expected."), $expectedMethod));
         }
     }
 
