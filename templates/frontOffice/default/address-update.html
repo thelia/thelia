@@ -26,11 +26,6 @@
     {loop name="customer.update" type="address" customer="current" id="{$address_id}"}
         <form id="form-address" class="form-horizontal" action="{url path="/address/update/{$address_id}"}" method="post">
         {form_field form=$form field='success_url'}
-            <p>
-                next: {$smarty.get.next}<br />
-                default: {url path="/account"}<br />
-                successs: {$value}
-            </p>
             {if $value}
                 {$next_url=$value}
             {else}
