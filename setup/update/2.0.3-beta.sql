@@ -2,7 +2,7 @@
 # It "suspends judgement" for fkey relationships until are tables are set.
 SET FOREIGN_KEY_CHECKS = 0;
 
-UPDATE `config` SET `value`='2.0.3' WHERE `name`='thelia_version';
+UPDATE `config` SET `value`='2.0.3-beta' WHERE `name`='thelia_version';
 UPDATE `config` SET `value`='3' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='beta' WHERE `name`='thelia_extra_version';
 
