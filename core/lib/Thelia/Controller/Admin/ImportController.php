@@ -65,7 +65,7 @@ class ImportController extends BaseAdminController
     public function import($id)
     {
         if (null === $import = $this->getImport($id)) {
-            return $this->render("404");
+            return $this->pageNotFound();
         }
 
         $archiveBuilderManager = $this->getArchiveBuilderManager($this->container);
@@ -339,7 +339,7 @@ class ImportController extends BaseAdminController
     public function importView($id)
     {
         if (null === $import = $this->getImport($id)) {
-            return $this->render("404");
+            return $this->pageNotFound();
         }
 
         /**

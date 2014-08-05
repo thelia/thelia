@@ -65,7 +65,7 @@ class ExportController extends BaseAdminController
     public function export($id)
     {
         if (null === $export = $this->getExport($id)) {
-            return $this->render("404");
+            return $this->pageNotFound();
         }
 
         /**
@@ -281,7 +281,7 @@ class ExportController extends BaseAdminController
     public function exportView($id)
     {
         if (null === $export = $this->getExport($id)) {
-            return $this->render("404");
+            return $this->pageNotFound();
         }
 
         /**
