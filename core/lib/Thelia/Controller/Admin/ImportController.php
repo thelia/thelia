@@ -444,6 +444,8 @@ class ImportController extends BaseAdminController
         $event = new UpdatePositionEvent($id, $this->getMode($mode), $value);
         $this->dispatch(TheliaEvents::IMPORT_CHANGE_POSITION, $event);
 
+
+        return $this->render('import');
     }
 
     public function changeCategoryPosition()

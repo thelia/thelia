@@ -41,13 +41,15 @@
                             <div class="table-responsive">
                                 <table class="table table-striped table-condensed table-left-aligned">
                                     <caption class="clearfix">
-                                        <a href="{url path="/admin/import/position/category/up/{$ID}{if $url_import}?{$url_import}{/if}"}">
-                                            <span class="glyphicon glyphicon-arrow-up"></span>
-                                        </a>
-                                        {$POSITION}
-                                        <a href="{url path="/admin/import/position/category/down/{$ID}{if $url_import}?{$url_import}{/if}"}">
-                                            <span class="glyphicon glyphicon-arrow-down"></span>
-                                        </a>
+                                        {admin_position_block
+                                            resource="admin.import"
+                                            access="UPDATE"
+                                            path={url path="admin/import/position/category"}
+                                            url_parameter="id"
+                                            in_place_edit_class="importCategoryPositionChange"
+                                            position=$POSITION
+                                            id=$ID
+                                        }
                                         {$TITLE}
                                     </caption>
                                     <thead>
@@ -82,13 +84,15 @@
                                                 <a href="#category_{$category_title}" class="btn-show-import-modal" data-id="{$ID}" data-url="{$URL}">{$TITLE}</a>
                                             </td>
                                             <td>
-                                                <a href="{url path="/admin/import/position/up/{if $url_category}?{$url_category}{/if}{$ID}"}">
-                                                    <span class="glyphicon glyphicon-arrow-up"></span>
-                                                </a>
-                                                {$POSITION}
-                                                <a href="{url path="/admin/import/position/down/{$ID}{if $url_category}?{$url_category}{/if}"}">
-                                                    <span class="glyphicon glyphicon-arrow-down"></span>
-                                                </a>
+                                                {admin_position_block
+                                                    resource="admin.import"
+                                                    access="UPDATE"
+                                                    path={url path="admin/import/position"}
+                                                    url_parameter="id"
+                                                    in_place_edit_class="importPositionChange"
+                                                    position=$POSITION
+                                                    id=$ID
+                                                }
                                             </td>
                                             <td>
                                                 <div class="btn-group">
@@ -119,9 +123,56 @@
     </div>
 {/block}
 
+{block name="javascript-initialization"}
+
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+{/block}
+
 {block name="javascript-last-call"}
     <script>
         $(document).ready(function() {
+
+            $('.importPositionChange').editable({
+                type        : 'text',
+                title       : "{intl l="Enter new import position"}",
+                mode        : 'popup',
+                inputclass  : 'input-mini',
+                placement   : 'left',
+                success     : function(response, newValue) {
+                    // The URL template
+                    var url = "{url noamp='1' path='/admin/import/position' id='__ID__' value='__POS__'}";
+
+                    // Perform subtitutions
+                    url = url.replace('__ID__', $(this).data('id'))
+                            .replace('__POS__', newValue);
+
+                    // Reload the page
+                    location.href = url;
+                }
+            });
+
+            $('.importCategoryPositionChange').editable({
+                type        : 'text',
+                title       : "{intl l="Enter new import category position"}",
+                mode        : 'popup',
+                inputclass  : 'input-mini',
+                placement   : 'left',
+                success     : function(response, newValue) {
+                    // The URL template
+                    var url = "{url noamp='1' path='/admin/import/position/category' id='__ID__' value='__POS__'}";
+
+                    // Perform subtitutions
+                    url = url.replace('__ID__', $(this).data('id'))
+                            .replace('__POS__', newValue);
+
+                    // Reload the page
+                    location.href = url;
+                }
+            });
+
             var import_modal = $("#import-modal");
 
             $(".btn-show-import-modal").click(function() {
