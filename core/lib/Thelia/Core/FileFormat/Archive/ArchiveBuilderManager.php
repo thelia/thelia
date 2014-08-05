@@ -33,7 +33,7 @@ class ArchiveBuilderManager
      * @param  AbstractArchiveBuilder $archiveBuilder
      * @return $this
      */
-    public function add(AbstractArchiveBuilder $archiveBuilder)
+    public function add(AbstractArchiveBuilder $archiveBuilder = null)
     {
         if (null !== $archiveBuilder) {
             $archiveBuilder->setEnvironment($this->environment);

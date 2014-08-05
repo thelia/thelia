@@ -19,6 +19,16 @@ namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder;
  */
 class TarBz2ArchiveBuilder extends TarArchiveBuilder
 {
+    public function __construct()
+    {
+        if (!extension_loaded("bzip2")) {
+            return null;
+        }
+
+        parent::__construct();
+    }
+
+
     public function getName()
     {
         return "tar.bz2";
