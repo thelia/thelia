@@ -130,8 +130,7 @@ class ImportController extends BaseAdminController
             } else {
                 throw new \ErrorException(
                     $this->getTranslator()->trans(
-                        "There's a problem, the extension \"%ext\" has been found, ".
-                        "but has no formatters nor archive builder",
+                        "There's a problem, the extension \"%ext\" has been found, but has no formatters nor archive builder",
                         [
                             "%ext" => $tools["extension"],
                         ]
