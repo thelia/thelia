@@ -77,6 +77,7 @@ phar.readonly = Off
 ```
 
 For tar.bz2 archives, you need tar's dependencies and the extension "bzip2". See [PHP Doc](http://php.net/manual/fr/book.bzip2.php)
+
 For tar.gz archives, you need tar's dependencies and the extension "zlib". See [PHP Doc](http://fr2.php.net/manual/fr/book.zlib.php)
 
 ## Download Thelia 2
