@@ -10,7 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Tests\Type;
+namespace Thelia\Tests\Tools;
 
 use Thelia\Tools\URL;
 

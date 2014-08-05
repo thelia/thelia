@@ -26,6 +26,7 @@ use Thelia\Files\FileModelInterface;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Lang;
+use Thelia\Tools\MimeTypeTools;
 use Thelia\Tools\Rest\ResponseRest;
 use Thelia\Tools\URL;
 
@@ -56,16 +57,24 @@ class FileController extends BaseAdminController
     /**
      * Manage how a file collection has to be saved
      *
-     * @param int    $parentId       Parent id owning files being saved
-     * @param string $parentType     Parent Type owning files being saved (product, category, content, etc.)
-     * @param string $objectType     Object type, e.g. image or document
-     * @param array  $validMimeTypes an array of valid mime types. If empty, any mime type is allowed.
-     *
+     * @param  int      $parentId       Parent id owning files being saved
+     * @param  string   $parentType     Parent Type owning files being saved (product, category, content, etc.)
+     * @param  string   $objectType     Object type, e.g. image or document
+     * @param  array    $validMimeTypes an array of valid mime types. If empty, any mime type is allowed.
+     * @param  array    $extBlackList      an array of blacklisted extensions.
      * @return Response
      */
-    public function saveFileAjaxAction($parentId, $parentType, $objectType, $validMimeTypes = array())
-    {
-        $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
+    public function saveFileAjaxAction(
+        $parentId,
+        $parentType,
+        $objectType,
+        $validMimeTypes = array(),
+        $extBlackList = array()
+    ) {
+        if (null !== $response = $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
         $this->checkXmlHttpRequest();
 
         if ($this->getRequest()->isMethod('POST')) {
@@ -87,26 +96,50 @@ class FileController extends BaseAdminController
                 return new ResponseRest($message, 'text', 403);
             }
 
+            $message = null;
+            $realFileName = $fileBeingUploaded->getClientOriginalName();
+
             if (! empty($validMimeTypes)) {
-
-                // Check if we have the proper file type
-                $isValid = false;
-
                 $mimeType = $fileBeingUploaded->getMimeType();
 
-                if (in_array($mimeType, $validMimeTypes)) {
-                    $isValid = true;
-                }
-
-                if (! $isValid) {
+                if (!isset($validMimeTypes[$mimeType])) {
                     $message = $this->getTranslator()
                         ->trans(
                             'Only files having the following mime type are allowed: %types%',
                             [ '%types%' => implode(', ', $validMimeTypes)]
                         );
-
-                    return new ResponseRest($message, 'text', 415);
                 }
+
+                $regex = "#^(.+)\.(".implode("|", $validMimeTypes[$mimeType]).")$#i";
+
+                if (!preg_match($regex, $realFileName)) {
+                    $message = $this->getTranslator()
+                        ->trans(
+                            "There's a conflict between your file extension \"%ext\" and the mime type \"%mime\"",
+                            [
+                                '%mime' => $mimeType,
+                                '%ext' => $fileBeingUploaded->getClientOriginalExtension()
+                            ]
+                        );
+                }
+            }
+
+            if (!empty($extBlackList)) {
+                $regex = "#^(.+)\.(".implode("|", $extBlackList).")$#i";
+
+                if (preg_match($regex, $realFileName)) {
+                    $message = $this->getTranslator()
+                        ->trans(
+                            'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
+                            [
+                                '%extension' => $fileBeingUploaded->getClientOriginalExtension(),
+                            ]
+                        );
+                }
+            }
+
+            if ($message !== null) {
+                return new ResponseRest($message, 'text', 415);
             }
 
             $fileModel = $fileManager->getModelInstance($objectType, $parentType);
@@ -169,7 +202,16 @@ class FileController extends BaseAdminController
      */
     public function saveImageAjaxAction($parentId, $parentType)
     {
-        return $this->saveFileAjaxAction($parentId, $parentType, 'image', ['image/jpeg' , 'image/png' ,'image/gif']);
+        return $this->saveFileAjaxAction(
+            $parentId,
+            $parentType,
+            'image',
+            [
+                'image/jpeg' => ["jpg", "jpeg"],
+                'image/png' => ["png"],
+                'image/gif' => ["gif"],
+            ]
+        );
     }
 
     /**
@@ -182,7 +224,21 @@ class FileController extends BaseAdminController
      */
     public function saveDocumentAjaxAction($parentId, $parentType)
     {
-        return $this->saveFileAjaxAction($parentId, $parentType, 'document');
+        return $this->saveFileAjaxAction(
+            $parentId,
+            $parentType,
+            'document',
+            [],
+            [
+                "php",
+                "php3",
+                "php4",
+                "php5",
+                "php6",
+                "asp",
+                "aspx",
+            ]
+        );
     }
 
     /**
