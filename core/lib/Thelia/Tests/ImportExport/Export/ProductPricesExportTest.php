@@ -74,7 +74,9 @@ class ProductPricesExportTest extends \PHPUnit_Framework_TestCase
             $attributes = [];
 
             foreach ($attributeCombinations as $attributeCombination) {
-                $attributes[] = $attributeCombination->getAttributeAv()->getTitle();
+                if (!in_array($attributeCombination->getAttributeAv()->getTitle(), $attributes)) {
+                    $attributes[] = $attributeCombination->getAttributeAv()->getTitle();
+                }
             }
 
             $rowAttributes = explode(",", $row["attributes"]);
