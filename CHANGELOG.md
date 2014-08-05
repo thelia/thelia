@@ -25,6 +25,10 @@
 - Demo:
      - Support for brand
      - Added folders and contents data.
+- Added `module_id` parameter to Area loop
+- Added "Shipping configuration" button to the delivery module list, with a warning if no shipping zone is assigned to the module.
+- Added the `show_label` parameter to the `render_form_field Smarty` function.
+
 
 #2.0.2
 - Coupon UI has been redesigned.

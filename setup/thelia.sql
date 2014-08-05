@@ -776,8 +776,8 @@ CREATE TABLE `order_address`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `FI_order_address_customer_title_id` (`customer_title_id`),
-    INDEX `FI_order_address_country_id` (`country_id`),
+    INDEX `fk_order_address_customer_title_id_idx` (`customer_title_id`),
+    INDEX `fk_order_address_country_id_idx` (`country_id`),
     CONSTRAINT `fk_order_address_customer_title_id`
         FOREIGN KEY (`customer_title_id`)
         REFERENCES `customer_title` (`id`)
@@ -1928,6 +1928,51 @@ CREATE TABLE `import`
     CONSTRAINT `fk_import_import_category_id`
         FOREIGN KEY (`import_category_id`)
         REFERENCES `import_category` (`id`)
+      ON UPDATE RESTRICT
+      ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- sale
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale`;
+
+CREATE TABLE `sale`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `active` TINYINT(1) DEFAULT 0 NOT NULL,
+    `display_initial_price` TINYINT(1) DEFAULT 1 NOT NULL,
+    `start_date` DATETIME,
+    `end_date` DATETIME,
+    `price_offset_type` TINYINT,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_sales_active_start_end_date` (`active`, `start_date`, `end_date`),
+    INDEX `idx_sales_active` (`active`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- sale_offset_currency
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_offset_currency`;
+
+CREATE TABLE `sale_offset_currency`
+(
+    `sales_id` INTEGER NOT NULL,
+    `currency_id` INTEGER NOT NULL,
+    `price_offset_value` FLOAT DEFAULT 0,
+    PRIMARY KEY (`sales_id`,`currency_id`),
+    INDEX `fk_sale_offset_currency_currency1_idx` (`currency_id`),
+    CONSTRAINT `fk_sale_offset_currency_sales_id`
+        FOREIGN KEY (`sales_id`)
+        REFERENCES `sale` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_offset_currency_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -1953,6 +1998,38 @@ CREATE TABLE `export`
     CONSTRAINT `fk_export_export_category_id`
         FOREIGN KEY (`export_category_id`)
         REFERENCES `export_category` (`id`)
+      ON UPDATE RESTRICT
+      ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- sale_product
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_product`;
+
+CREATE TABLE `sale_product`
+(
+    `sales_id` INTEGER NOT NULL,
+    `product_id` INTEGER NOT NULL,
+    `attribute_av_id` INTEGER NOT NULL,
+    PRIMARY KEY (`sales_id`,`product_id`,`attribute_av_id`),
+    INDEX `fk_sale_product_product1_idx` (`product_id`),
+    INDEX `fk_sale_product_attribute_av1_idx` (`attribute_av_id`),
+    INDEX `idx_sale_product_sales_id_product_id` (`sales_id`, `product_id`),
+    CONSTRAINT `fk_sale_product_sales_id`
+        FOREIGN KEY (`sales_id`)
+        REFERENCES `sale` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_product_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_product_attribute_av_id`
+        FOREIGN KEY (`attribute_av_id`)
+        REFERENCES `attribute_av` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -2723,6 +2800,28 @@ CREATE TABLE `export_i18n`
     CONSTRAINT `export_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `export` (`id`)
+      ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- sale_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_i18n`;
+
+CREATE TABLE `sale_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    `sale_label` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `sale_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `sale` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

@@ -108,4 +108,6 @@ final class AdminResources
     const IMPORT = "admin.import";
 
     const TOOLS = "admin.tools";
+
+    const SALES = "admin.sales";
 }
