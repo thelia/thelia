@@ -144,7 +144,7 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
         $cacheFileName = md5(uniqid());
 
         $cacheFile  = $this->getArchiveBuilderCacheDirectory($environment) . DS;
-        $cacheFile .= $cacheFileName . "." . $this->getExtension();
+        $cacheFile .= $cacheFileName . "." . $this->getCacheExtension();
 
         return $cacheFile;
     }
@@ -198,6 +198,11 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
     public function getCacheFile()
     {
         return $this->cacheFile;
+    }
+
+    public function getCacheExtension()
+    {
+        return $this->getExtension();
     }
 
     /**
