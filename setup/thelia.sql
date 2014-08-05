@@ -1928,8 +1928,33 @@ CREATE TABLE `import`
     CONSTRAINT `fk_import_import_category_id`
         FOREIGN KEY (`import_category_id`)
         REFERENCES `import_category` (`id`)
-      ON UPDATE RESTRICT
-      ON DELETE CASCADE
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- export
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `export`;
+
+CREATE TABLE `export`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `ref` VARCHAR(255) NOT NULL,
+    `export_category_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
+    `handle_class` LONGTEXT NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`),
+    INDEX `idx_export_export_category_id` (`export_category_id`),
+    CONSTRAINT `fk_export_export_category_id`
+        FOREIGN KEY (`export_category_id`)
+        REFERENCES `export_category` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1975,31 +2000,6 @@ CREATE TABLE `sale_offset_currency`
         REFERENCES `currency` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- export
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `export`;
-
-CREATE TABLE `export`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `ref` VARCHAR(255) NOT NULL,
-    `export_category_id` INTEGER NOT NULL,
-    `position` INTEGER NOT NULL,
-    `handle_class` LONGTEXT NOT NULL,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
-    UNIQUE INDEX `ref_UNIQUE` (`ref`),
-    INDEX `idx_export_export_category_id` (`export_category_id`),
-    CONSTRAINT `fk_export_export_category_id`
-        FOREIGN KEY (`export_category_id`)
-        REFERENCES `export_category` (`id`)
-      ON UPDATE RESTRICT
-      ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -2800,7 +2800,7 @@ CREATE TABLE `export_i18n`
     CONSTRAINT `export_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `export` (`id`)
-      ON DELETE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
