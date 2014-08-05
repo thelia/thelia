@@ -1,4 +1,4 @@
-#2.0.3
+#2.0.3-beta
 - New coupon type: Free product if selected products are in the cart.
 - New feature: Product Brands / Suppliers management
 - New 'brand' loop and substitution. product, image and document loop have been updated.
@@ -14,8 +14,7 @@
 - Default front office template:
      - Display enhancement
      - Optimization of the uses of Thelia loops to gain performances and consistency
-     - Optimization for SEO : meta description fallback, ti>>>>>>> Updated Changelog
-tle on category page, ...
+     - Optimization for SEO : meta description fallback, title on category page, ...
      - new PSE layout in product page, attributes are separated
      - Support of 'check-available-stock' config variable
      - Terms and conditions agreement is now in the order process
