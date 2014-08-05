@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Exception;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\ClassNotFoundException;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -56,5 +57,15 @@ class Import extends BaseImport
         }
 
         return $instance;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preInsert(ConnectionInterface $con = null)
+    {
+        $this->setPosition($this->getNextPosition());
+
+        return true;
     }
 }
