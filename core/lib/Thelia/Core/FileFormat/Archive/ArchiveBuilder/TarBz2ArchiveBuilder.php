@@ -36,7 +36,7 @@ class TarBz2ArchiveBuilder extends TarArchiveBuilder
 
     public function getCacheExtension()
     {
-        return "tar.bz";
+        return "tar.bz2";
     }
 
     protected function compressionEntryPoint()
