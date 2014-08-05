@@ -47,15 +47,6 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     /** @var \Thelia\Log\Tlog */
     protected $logger;
 
-    public function __construct()
-    {
-        if (false !== (bool) ini_get("phar.readonly") || !class_exists("\\PharData")) {
-            return null;
-        }
-
-        parent::__construct();
-    }
-
     public function __destruct()
     {
         if ($this->tar instanceof \PharData) {
@@ -511,5 +502,10 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     public function getCompression()
     {
         return $this->compression;
+    }
+
+    public function isAvailable()
+    {
+        return false === (bool) ini_get("phar.readonly") && class_exists("\\PharData");
     }
 }

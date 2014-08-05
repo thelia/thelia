@@ -112,4 +112,10 @@ interface ArchiveBuilderInterface
      */
     public function hasDirectory($directory);
 
+    /**
+     * @return bool
+     *
+     * Returns conditions for archive builder to be available ( loaded libraries )
+     */
+    public function isAvailable();
 }

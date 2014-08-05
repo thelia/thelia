@@ -19,15 +19,6 @@ namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder;
  */
 class TarGzArchiveBuilder extends TarArchiveBuilder
 {
-    public function __construct()
-    {
-        if (!extension_loaded("zlib")) {
-            return null;
-        }
-
-        parent::__construct();
-    }
-
     public function getName()
     {
         return "tar.gz";
@@ -54,4 +45,8 @@ class TarGzArchiveBuilder extends TarArchiveBuilder
         return $this;
     }
 
+    public function isAvailable()
+    {
+        return parent::isAvailable() && extension_loaded("zlib");
+    }
 }

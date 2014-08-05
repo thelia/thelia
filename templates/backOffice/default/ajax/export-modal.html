@@ -48,59 +48,61 @@
                                         </select>
                                     {/form_field}
                                 </div>
-                                <div class="col-md-1"></div>
-                                <div class="col-md-4">
-                                    {form_field form=$form field="do_compress"}
-                                    <label for="{$label_attr.for}">
-                                        {$label}
-                                    </label>
-                                    <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;" data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;" data-on="success" class="make-switch switch-small" id="export-compression-switch">
-                                        <input type="checkbox" name="{$name}" id="{$label_attr.for}"/>
+                                {ifloop rel="export-archive-builder"}
+                                    <div class="col-md-1"></div>
+                                    <div class="col-md-4">
+                                        {form_field form=$form field="do_compress"}
+                                        <label for="{$label_attr.for}">
+                                            {$label}
+                                        </label>
+                                        <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;" data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;" data-on="success" class="make-switch switch-small" id="export-compression-switch">
+                                            <input type="checkbox" name="{$name}" id="{$label_attr.for}"/>
+                                        </div>
+                                        {/form_field}
                                     </div>
-                                    {/form_field}
                                 </div>
-                            </div>
-                            <div class="row export-compression-selection-row">
-                                <div class="col-md-4">
-                                    {form_field form=$form field="archive_builder"}
-                                        <label for="{$label_attr.for}">
-                                            {$label}
-                                        </label>
-                                        <select name="{$name}" id="{$label_attr.for}">
-                                            {loop name="export-archive-builder" type="archive-builder"}
-                                                <option value="{$NAME}" {if $value == $NAME}selected{/if}>
-                                                    {$NAME} (.{$EXTENSION})
-                                                </option>
-                                            {/loop}
-                                        </select>
-                                    {/form_field}
-                                </div>
-                                {if $HAS_IMAGES}
-                                <div class="col-md-4">
-                                    {form_field form=$form field="images"}
-                                        <label for="{$label_attr.for}">
-                                            {$label}
-                                        </label>
+                                <div class="row export-compression-selection-row">
+                                    <div class="col-md-4">
+                                        {form_field form=$form field="archive_builder"}
+                                            <label for="{$label_attr.for}">
+                                                {$label}
+                                            </label>
+                                            <select name="{$name}" id="{$label_attr.for}">
+                                                {loop name="export-archive-builder" type="archive-builder"}
+                                                    <option value="{$NAME}" {if $value == $NAME}selected{/if}>
+                                                        {$NAME} (.{$EXTENSION})
+                                                    </option>
+                                                {/loop}
+                                            </select>
+                                        {/form_field}
+                                    </div>
+                                    {if $HAS_IMAGES}
+                                    <div class="col-md-4">
+                                        {form_field form=$form field="images"}
+                                            <label for="{$label_attr.for}">
+                                                {$label}
+                                            </label>
 
-                                        <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;" data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;" data-on="success" class="make-switch switch-small">
-                                            <input type="checkbox" name="{$name}" id="{$label_attr.for}" />
-                                        </div>
-                                    {/form_field}
-                                </div>
-                                {/if}
-                                {if $HAS_DOCUMENTS}
-                                <div class="col-md-4">
-                                    {form_field form=$form field="documents"}
-                                        <label for="{$label_attr.for}">
-                                            {$label}
-                                        </label>
+                                            <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;" data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;" data-on="success" class="make-switch switch-small">
+                                                <input type="checkbox" name="{$name}" id="{$label_attr.for}" />
+                                            </div>
+                                        {/form_field}
+                                    </div>
+                                    {/if}
+                                    {if $HAS_DOCUMENTS}
+                                    <div class="col-md-4">
+                                        {form_field form=$form field="documents"}
+                                            <label for="{$label_attr.for}">
+                                                {$label}
+                                            </label>
 
-                                        <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;" data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;" data-on="success" class="make-switch switch-small">
-                                            <input type="checkbox" name="{$name}" id="{$label_attr.for}" />
-                                        </div>
-                                    {/form_field}
-                                </div>
-                                {/if}
+                                            <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;" data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;" data-on="success" class="make-switch switch-small">
+                                                <input type="checkbox" name="{$name}" id="{$label_attr.for}" />
+                                            </div>
+                                        {/form_field}
+                                    </div>
+                                    {/if}
+                                {/ifloop}
                             </div>
                         {/ifloop}
                         {elseloop rel="export-formatters"}

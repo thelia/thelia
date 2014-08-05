@@ -19,15 +19,6 @@ namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder;
  */
 class TarBz2ArchiveBuilder extends TarArchiveBuilder
 {
-    public function __construct()
-    {
-        if (!extension_loaded("bzip2")) {
-            return null;
-        }
-
-        parent::__construct();
-    }
-
     public function getName()
     {
         return "tar.bz2";
@@ -52,5 +43,10 @@ class TarBz2ArchiveBuilder extends TarArchiveBuilder
         $this->compression = \Phar::BZ2;
 
         return $this;
+    }
+
+    public function isAvailable()
+    {
+        return parent::isAvailable() && extension_loaded("bzip2");
     }
 }

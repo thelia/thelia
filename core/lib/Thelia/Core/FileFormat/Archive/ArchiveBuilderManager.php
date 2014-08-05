@@ -33,9 +33,9 @@ class ArchiveBuilderManager
      * @param  AbstractArchiveBuilder $archiveBuilder
      * @return $this
      */
-    public function add(AbstractArchiveBuilder $archiveBuilder = null)
+    public function add(AbstractArchiveBuilder $archiveBuilder)
     {
-        if (null !== $archiveBuilder) {
+        if ($archiveBuilder->isAvailable()) {
             $archiveBuilder->setEnvironment($this->environment);
 
             $this->archiveBuilders[$archiveBuilder->getName()] = $archiveBuilder;
