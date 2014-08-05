@@ -503,4 +503,9 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     {
         return $this->compression;
     }
+
+    public function isAvailable()
+    {
+        return false === (bool) ini_get("phar.readonly") && class_exists("\\PharData");
+    }
 }

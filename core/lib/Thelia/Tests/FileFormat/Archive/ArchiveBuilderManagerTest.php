@@ -39,7 +39,34 @@ class ArchiveBuilderManagerTest extends \PHPUnit_Framework_TestCase
     public function testAddArchiveBuilder()
     {
         /** @var AbstractArchiveBuilder $instance */
-        $instance = $this->getMock("Thelia\\Core\\FileFormat\\Archive\\AbstractArchiveBuilder");
+        $instance = $this->getMock(
+            "Thelia\\Core\\FileFormat\\Archive\\AbstractArchiveBuilder",
+            [
+                "isAvailable",
+                "getName",
+                "getExtension",
+                "getMimeType",
+                "addFile",
+                "addFileFromString",
+                "getFileContent",
+                "deleteFile",
+                "addDirectory",
+                "buildArchiveResponse",
+                "loadArchive",
+                "hasFile",
+                "hasDirectory",
+            ]
+        );
+
+        $instance->expects($this->any())
+            ->method("isAvailable")
+            ->willReturn(true)
+        ;
+
+        $instance->expects($this->any())
+            ->method("getName")
+            ->willReturn("foo")
+        ;
 
         $this->manager->add($instance);
 
@@ -53,7 +80,34 @@ class ArchiveBuilderManagerTest extends \PHPUnit_Framework_TestCase
     public function testDeleteArchiveBuilder()
     {
         /** @var AbstractArchiveBuilder $instance */
-        $instance = $this->getMock("Thelia\\Core\\FileFormat\\Archive\\AbstractArchiveBuilder");
+        $instance = $this->getMock(
+            "Thelia\\Core\\FileFormat\\Archive\\AbstractArchiveBuilder",
+            [
+                "isAvailable",
+                "getName",
+                "getExtension",
+                "getMimeType",
+                "addFile",
+                "addFileFromString",
+                "getFileContent",
+                "deleteFile",
+                "addDirectory",
+                "buildArchiveResponse",
+                "loadArchive",
+                "hasFile",
+                "hasDirectory",
+            ]
+        );
+
+        $instance->expects($this->any())
+            ->method("isAvailable")
+            ->willReturn(true)
+        ;
+
+        $instance->expects($this->any())
+            ->method("getName")
+            ->willReturn("foo")
+        ;
 
         $this->manager->add($instance);
 

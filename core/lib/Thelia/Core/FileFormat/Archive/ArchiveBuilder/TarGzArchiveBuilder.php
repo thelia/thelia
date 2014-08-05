@@ -45,4 +45,8 @@ class TarGzArchiveBuilder extends TarArchiveBuilder
         return $this;
     }
 
+    public function isAvailable()
+    {
+        return parent::isAvailable() && extension_loaded("zlib");
+    }
 }

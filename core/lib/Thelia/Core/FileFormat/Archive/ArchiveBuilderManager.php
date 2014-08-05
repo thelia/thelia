@@ -35,7 +35,7 @@ class ArchiveBuilderManager
      */
     public function add(AbstractArchiveBuilder $archiveBuilder)
     {
-        if (null !== $archiveBuilder) {
+        if ($archiveBuilder->isAvailable()) {
             $archiveBuilder->setEnvironment($this->environment);
 
             $this->archiveBuilders[$archiveBuilder->getName()] = $archiveBuilder;

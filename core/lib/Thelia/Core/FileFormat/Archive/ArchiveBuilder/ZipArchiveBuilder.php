@@ -610,4 +610,14 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     {
         return $this->zip;
     }
+
+    /**
+     * @return bool
+     *
+     * Returns conditions for archive builder to be available ( loaded libraries )
+     */
+    public function isAvailable()
+    {
+        return class_exists('\\ZipArchive');
+    }
 }

@@ -44,4 +44,9 @@ class TarBz2ArchiveBuilder extends TarArchiveBuilder
 
         return $this;
     }
+
+    public function isAvailable()
+    {
+        return parent::isAvailable() && extension_loaded("bz2");
+    }
 }
