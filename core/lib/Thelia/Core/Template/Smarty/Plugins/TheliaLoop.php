@@ -349,9 +349,9 @@ class TheliaLoop extends AbstractSmartyPlugin
         $loopName = $this->getParam($params, 'rel');
 
         if (null == $loopName)
-             throw new \InvalidArgumentException(
-                 $this->translator->trans("Missing 'rel' parameter in ifloop/elseloop arguments")
-             );
+            throw new \InvalidArgumentException(
+                $this->translator->trans("Missing 'rel' parameter in ifloop/elseloop arguments")
+            );
 
         if (! isset($this->loopstack[$loopName]))
             throw new \InvalidArgumentException(
@@ -420,7 +420,7 @@ class TheliaLoop extends AbstractSmartyPlugin
                     $this->translator->trans("The loop name '%name' is already defined in %className class", [
                             '%name' => $name,
                             '%className' => $className
-                    ])
+                        ])
                 );
             }
 
@@ -443,5 +443,5 @@ class TheliaLoop extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('block'   , 'ifloop'   , $this, 'theliaIfLoop'),
             new SmartyPluginDescriptor('block'   , 'pageloop' , $this, 'theliaPageLoop'),
         );
-     }
+    }
 }

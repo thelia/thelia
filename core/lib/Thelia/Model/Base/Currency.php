@@ -27,6 +27,8 @@ use Thelia\Model\Order as ChildOrder;
 use Thelia\Model\OrderQuery as ChildOrderQuery;
 use Thelia\Model\ProductPrice as ChildProductPrice;
 use Thelia\Model\ProductPriceQuery as ChildProductPriceQuery;
+use Thelia\Model\SaleOffsetCurrency as ChildSaleOffsetCurrency;
+use Thelia\Model\SaleOffsetCurrencyQuery as ChildSaleOffsetCurrencyQuery;
 use Thelia\Model\Map\CurrencyTableMap;
 
 abstract class Currency implements ActiveRecordInterface
@@ -130,6 +132,12 @@ abstract class Currency implements ActiveRecordInterface
     protected $collProductPricesPartial;
 
     /**
+     * @var        ObjectCollection|ChildSaleOffsetCurrency[] Collection to store aggregation of ChildSaleOffsetCurrency objects.
+     */
+    protected $collSaleOffsetCurrencies;
+    protected $collSaleOffsetCurrenciesPartial;
+
+    /**
      * @var        ObjectCollection|ChildCurrencyI18n[] Collection to store aggregation of ChildCurrencyI18n objects.
      */
     protected $collCurrencyI18ns;
@@ -174,6 +182,12 @@ abstract class Currency implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $productPricesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $saleOffsetCurrenciesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -854,6 +868,8 @@ abstract class Currency implements ActiveRecordInterface
 
             $this->collProductPrices = null;
 
+            $this->collSaleOffsetCurrencies = null;
+
             $this->collCurrencyI18ns = null;
 
         } // if (deep)
@@ -1034,6 +1050,23 @@ abstract class Currency implements ActiveRecordInterface
 
                 if ($this->collProductPrices !== null) {
             foreach ($this->collProductPrices as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->saleOffsetCurrenciesScheduledForDeletion !== null) {
+                if (!$this->saleOffsetCurrenciesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\SaleOffsetCurrencyQuery::create()
+                        ->filterByPrimaryKeys($this->saleOffsetCurrenciesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->saleOffsetCurrenciesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collSaleOffsetCurrencies !== null) {
+            foreach ($this->collSaleOffsetCurrencies as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1281,6 +1314,9 @@ abstract class Currency implements ActiveRecordInterface
             if (null !== $this->collProductPrices) {
                 $result['ProductPrices'] = $this->collProductPrices->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collSaleOffsetCurrencies) {
+                $result['SaleOffsetCurrencies'] = $this->collSaleOffsetCurrencies->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collCurrencyI18ns) {
                 $result['CurrencyI18ns'] = $this->collCurrencyI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1487,6 +1523,12 @@ abstract class Currency implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getSaleOffsetCurrencies() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addSaleOffsetCurrency($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getCurrencyI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCurrencyI18n($relObj->copy($deepCopy));
@@ -1542,6 +1584,9 @@ abstract class Currency implements ActiveRecordInterface
         }
         if ('ProductPrice' == $relationName) {
             return $this->initProductPrices();
+        }
+        if ('SaleOffsetCurrency' == $relationName) {
+            return $this->initSaleOffsetCurrencies();
         }
         if ('CurrencyI18n' == $relationName) {
             return $this->initCurrencyI18ns();
@@ -2481,6 +2526,252 @@ abstract class Currency implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collSaleOffsetCurrencies collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addSaleOffsetCurrencies()
+     */
+    public function clearSaleOffsetCurrencies()
+    {
+        $this->collSaleOffsetCurrencies = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collSaleOffsetCurrencies collection loaded partially.
+     */
+    public function resetPartialSaleOffsetCurrencies($v = true)
+    {
+        $this->collSaleOffsetCurrenciesPartial = $v;
+    }
+
+    /**
+     * Initializes the collSaleOffsetCurrencies collection.
+     *
+     * By default this just sets the collSaleOffsetCurrencies collection to an empty array (like clearcollSaleOffsetCurrencies());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initSaleOffsetCurrencies($overrideExisting = true)
+    {
+        if (null !== $this->collSaleOffsetCurrencies && !$overrideExisting) {
+            return;
+        }
+        $this->collSaleOffsetCurrencies = new ObjectCollection();
+        $this->collSaleOffsetCurrencies->setModel('\Thelia\Model\SaleOffsetCurrency');
+    }
+
+    /**
+     * Gets an array of ChildSaleOffsetCurrency objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCurrency is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildSaleOffsetCurrency[] List of ChildSaleOffsetCurrency objects
+     * @throws PropelException
+     */
+    public function getSaleOffsetCurrencies($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collSaleOffsetCurrenciesPartial && !$this->isNew();
+        if (null === $this->collSaleOffsetCurrencies || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collSaleOffsetCurrencies) {
+                // return empty collection
+                $this->initSaleOffsetCurrencies();
+            } else {
+                $collSaleOffsetCurrencies = ChildSaleOffsetCurrencyQuery::create(null, $criteria)
+                    ->filterByCurrency($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collSaleOffsetCurrenciesPartial && count($collSaleOffsetCurrencies)) {
+                        $this->initSaleOffsetCurrencies(false);
+
+                        foreach ($collSaleOffsetCurrencies as $obj) {
+                            if (false == $this->collSaleOffsetCurrencies->contains($obj)) {
+                                $this->collSaleOffsetCurrencies->append($obj);
+                            }
+                        }
+
+                        $this->collSaleOffsetCurrenciesPartial = true;
+                    }
+
+                    reset($collSaleOffsetCurrencies);
+
+                    return $collSaleOffsetCurrencies;
+                }
+
+                if ($partial && $this->collSaleOffsetCurrencies) {
+                    foreach ($this->collSaleOffsetCurrencies as $obj) {
+                        if ($obj->isNew()) {
+                            $collSaleOffsetCurrencies[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collSaleOffsetCurrencies = $collSaleOffsetCurrencies;
+                $this->collSaleOffsetCurrenciesPartial = false;
+            }
+        }
+
+        return $this->collSaleOffsetCurrencies;
+    }
+
+    /**
+     * Sets a collection of SaleOffsetCurrency objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $saleOffsetCurrencies A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCurrency The current object (for fluent API support)
+     */
+    public function setSaleOffsetCurrencies(Collection $saleOffsetCurrencies, ConnectionInterface $con = null)
+    {
+        $saleOffsetCurrenciesToDelete = $this->getSaleOffsetCurrencies(new Criteria(), $con)->diff($saleOffsetCurrencies);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->saleOffsetCurrenciesScheduledForDeletion = clone $saleOffsetCurrenciesToDelete;
+
+        foreach ($saleOffsetCurrenciesToDelete as $saleOffsetCurrencyRemoved) {
+            $saleOffsetCurrencyRemoved->setCurrency(null);
+        }
+
+        $this->collSaleOffsetCurrencies = null;
+        foreach ($saleOffsetCurrencies as $saleOffsetCurrency) {
+            $this->addSaleOffsetCurrency($saleOffsetCurrency);
+        }
+
+        $this->collSaleOffsetCurrencies = $saleOffsetCurrencies;
+        $this->collSaleOffsetCurrenciesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related SaleOffsetCurrency objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related SaleOffsetCurrency objects.
+     * @throws PropelException
+     */
+    public function countSaleOffsetCurrencies(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collSaleOffsetCurrenciesPartial && !$this->isNew();
+        if (null === $this->collSaleOffsetCurrencies || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collSaleOffsetCurrencies) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getSaleOffsetCurrencies());
+            }
+
+            $query = ChildSaleOffsetCurrencyQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCurrency($this)
+                ->count($con);
+        }
+
+        return count($this->collSaleOffsetCurrencies);
+    }
+
+    /**
+     * Method called to associate a ChildSaleOffsetCurrency object to this object
+     * through the ChildSaleOffsetCurrency foreign key attribute.
+     *
+     * @param    ChildSaleOffsetCurrency $l ChildSaleOffsetCurrency
+     * @return   \Thelia\Model\Currency The current object (for fluent API support)
+     */
+    public function addSaleOffsetCurrency(ChildSaleOffsetCurrency $l)
+    {
+        if ($this->collSaleOffsetCurrencies === null) {
+            $this->initSaleOffsetCurrencies();
+            $this->collSaleOffsetCurrenciesPartial = true;
+        }
+
+        if (!in_array($l, $this->collSaleOffsetCurrencies->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddSaleOffsetCurrency($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param SaleOffsetCurrency $saleOffsetCurrency The saleOffsetCurrency object to add.
+     */
+    protected function doAddSaleOffsetCurrency($saleOffsetCurrency)
+    {
+        $this->collSaleOffsetCurrencies[]= $saleOffsetCurrency;
+        $saleOffsetCurrency->setCurrency($this);
+    }
+
+    /**
+     * @param  SaleOffsetCurrency $saleOffsetCurrency The saleOffsetCurrency object to remove.
+     * @return ChildCurrency The current object (for fluent API support)
+     */
+    public function removeSaleOffsetCurrency($saleOffsetCurrency)
+    {
+        if ($this->getSaleOffsetCurrencies()->contains($saleOffsetCurrency)) {
+            $this->collSaleOffsetCurrencies->remove($this->collSaleOffsetCurrencies->search($saleOffsetCurrency));
+            if (null === $this->saleOffsetCurrenciesScheduledForDeletion) {
+                $this->saleOffsetCurrenciesScheduledForDeletion = clone $this->collSaleOffsetCurrencies;
+                $this->saleOffsetCurrenciesScheduledForDeletion->clear();
+            }
+            $this->saleOffsetCurrenciesScheduledForDeletion[]= clone $saleOffsetCurrency;
+            $saleOffsetCurrency->setCurrency(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Currency is new, it will return
+     * an empty collection; or if this Currency has previously
+     * been saved, it will retrieve related SaleOffsetCurrencies from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Currency.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildSaleOffsetCurrency[] List of ChildSaleOffsetCurrency objects
+     */
+    public function getSaleOffsetCurrenciesJoinSale($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildSaleOffsetCurrencyQuery::create(null, $criteria);
+        $query->joinWith('Sale', $joinBehavior);
+
+        return $this->getSaleOffsetCurrencies($query, $con);
+    }
+
+    /**
      * Clears out the collCurrencyI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2752,6 +3043,11 @@ abstract class Currency implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collSaleOffsetCurrencies) {
+                foreach ($this->collSaleOffsetCurrencies as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collCurrencyI18ns) {
                 foreach ($this->collCurrencyI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -2766,6 +3062,7 @@ abstract class Currency implements ActiveRecordInterface
         $this->collOrders = null;
         $this->collCarts = null;
         $this->collProductPrices = null;
+        $this->collSaleOffsetCurrencies = null;
         $this->collCurrencyI18ns = null;
     }
 

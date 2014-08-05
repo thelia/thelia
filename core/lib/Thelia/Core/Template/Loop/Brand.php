@@ -30,10 +30,9 @@ use Thelia\Type\TypeCollection;
  *
  * Brand loop
  *
- *
  * Class Brand
  * @package Thelia\Core\Template\Loop
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * @author Franck Allimant <franck@cqfdev.fr>
  */
 class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {

@@ -43,6 +43,8 @@ use Thelia\Model\ProductSaleElements as ChildProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery as ChildProductSaleElementsQuery;
 use Thelia\Model\ProductVersion as ChildProductVersion;
 use Thelia\Model\ProductVersionQuery as ChildProductVersionQuery;
+use Thelia\Model\SaleProduct as ChildSaleProduct;
+use Thelia\Model\SaleProductQuery as ChildSaleProductQuery;
 use Thelia\Model\TaxRule as ChildTaxRule;
 use Thelia\Model\TaxRuleQuery as ChildTaxRuleQuery;
 use Thelia\Model\Template as ChildTemplate;
@@ -229,6 +231,12 @@ abstract class Product implements ActiveRecordInterface
     protected $collProductAssociatedContentsPartial;
 
     /**
+     * @var        ObjectCollection|ChildSaleProduct[] Collection to store aggregation of ChildSaleProduct objects.
+     */
+    protected $collSaleProducts;
+    protected $collSaleProductsPartial;
+
+    /**
      * @var        ObjectCollection|ChildProductI18n[] Collection to store aggregation of ChildProductI18n objects.
      */
     protected $collProductI18ns;
@@ -356,6 +364,12 @@ abstract class Product implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $productAssociatedContentsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $saleProductsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -1257,6 +1271,8 @@ abstract class Product implements ActiveRecordInterface
 
             $this->collProductAssociatedContents = null;
 
+            $this->collSaleProducts = null;
+
             $this->collProductI18ns = null;
 
             $this->collProductVersions = null;
@@ -1669,6 +1685,23 @@ abstract class Product implements ActiveRecordInterface
                 }
             }
 
+            if ($this->saleProductsScheduledForDeletion !== null) {
+                if (!$this->saleProductsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\SaleProductQuery::create()
+                        ->filterByPrimaryKeys($this->saleProductsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->saleProductsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collSaleProducts !== null) {
+            foreach ($this->collSaleProducts as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->productI18nsScheduledForDeletion !== null) {
                 if (!$this->productI18nsScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\ProductI18nQuery::create()
@@ -1994,6 +2027,9 @@ abstract class Product implements ActiveRecordInterface
             if (null !== $this->collProductAssociatedContents) {
                 $result['ProductAssociatedContents'] = $this->collProductAssociatedContents->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collSaleProducts) {
+                $result['SaleProducts'] = $this->collSaleProducts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collProductI18ns) {
                 $result['ProductI18ns'] = $this->collProductI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -2263,6 +2299,12 @@ abstract class Product implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getSaleProducts() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addSaleProduct($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getProductI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addProductI18n($relObj->copy($deepCopy));
@@ -2495,6 +2537,9 @@ abstract class Product implements ActiveRecordInterface
         }
         if ('ProductAssociatedContent' == $relationName) {
             return $this->initProductAssociatedContents();
+        }
+        if ('SaleProduct' == $relationName) {
+            return $this->initSaleProducts();
         }
         if ('ProductI18n' == $relationName) {
             return $this->initProductI18ns();
@@ -4620,6 +4665,277 @@ abstract class Product implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collSaleProducts collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addSaleProducts()
+     */
+    public function clearSaleProducts()
+    {
+        $this->collSaleProducts = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collSaleProducts collection loaded partially.
+     */
+    public function resetPartialSaleProducts($v = true)
+    {
+        $this->collSaleProductsPartial = $v;
+    }
+
+    /**
+     * Initializes the collSaleProducts collection.
+     *
+     * By default this just sets the collSaleProducts collection to an empty array (like clearcollSaleProducts());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initSaleProducts($overrideExisting = true)
+    {
+        if (null !== $this->collSaleProducts && !$overrideExisting) {
+            return;
+        }
+        $this->collSaleProducts = new ObjectCollection();
+        $this->collSaleProducts->setModel('\Thelia\Model\SaleProduct');
+    }
+
+    /**
+     * Gets an array of ChildSaleProduct objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildProduct is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildSaleProduct[] List of ChildSaleProduct objects
+     * @throws PropelException
+     */
+    public function getSaleProducts($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collSaleProductsPartial && !$this->isNew();
+        if (null === $this->collSaleProducts || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collSaleProducts) {
+                // return empty collection
+                $this->initSaleProducts();
+            } else {
+                $collSaleProducts = ChildSaleProductQuery::create(null, $criteria)
+                    ->filterByProduct($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collSaleProductsPartial && count($collSaleProducts)) {
+                        $this->initSaleProducts(false);
+
+                        foreach ($collSaleProducts as $obj) {
+                            if (false == $this->collSaleProducts->contains($obj)) {
+                                $this->collSaleProducts->append($obj);
+                            }
+                        }
+
+                        $this->collSaleProductsPartial = true;
+                    }
+
+                    reset($collSaleProducts);
+
+                    return $collSaleProducts;
+                }
+
+                if ($partial && $this->collSaleProducts) {
+                    foreach ($this->collSaleProducts as $obj) {
+                        if ($obj->isNew()) {
+                            $collSaleProducts[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collSaleProducts = $collSaleProducts;
+                $this->collSaleProductsPartial = false;
+            }
+        }
+
+        return $this->collSaleProducts;
+    }
+
+    /**
+     * Sets a collection of SaleProduct objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $saleProducts A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProduct The current object (for fluent API support)
+     */
+    public function setSaleProducts(Collection $saleProducts, ConnectionInterface $con = null)
+    {
+        $saleProductsToDelete = $this->getSaleProducts(new Criteria(), $con)->diff($saleProducts);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->saleProductsScheduledForDeletion = clone $saleProductsToDelete;
+
+        foreach ($saleProductsToDelete as $saleProductRemoved) {
+            $saleProductRemoved->setProduct(null);
+        }
+
+        $this->collSaleProducts = null;
+        foreach ($saleProducts as $saleProduct) {
+            $this->addSaleProduct($saleProduct);
+        }
+
+        $this->collSaleProducts = $saleProducts;
+        $this->collSaleProductsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related SaleProduct objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related SaleProduct objects.
+     * @throws PropelException
+     */
+    public function countSaleProducts(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collSaleProductsPartial && !$this->isNew();
+        if (null === $this->collSaleProducts || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collSaleProducts) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getSaleProducts());
+            }
+
+            $query = ChildSaleProductQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByProduct($this)
+                ->count($con);
+        }
+
+        return count($this->collSaleProducts);
+    }
+
+    /**
+     * Method called to associate a ChildSaleProduct object to this object
+     * through the ChildSaleProduct foreign key attribute.
+     *
+     * @param    ChildSaleProduct $l ChildSaleProduct
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
+     */
+    public function addSaleProduct(ChildSaleProduct $l)
+    {
+        if ($this->collSaleProducts === null) {
+            $this->initSaleProducts();
+            $this->collSaleProductsPartial = true;
+        }
+
+        if (!in_array($l, $this->collSaleProducts->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddSaleProduct($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param SaleProduct $saleProduct The saleProduct object to add.
+     */
+    protected function doAddSaleProduct($saleProduct)
+    {
+        $this->collSaleProducts[]= $saleProduct;
+        $saleProduct->setProduct($this);
+    }
+
+    /**
+     * @param  SaleProduct $saleProduct The saleProduct object to remove.
+     * @return ChildProduct The current object (for fluent API support)
+     */
+    public function removeSaleProduct($saleProduct)
+    {
+        if ($this->getSaleProducts()->contains($saleProduct)) {
+            $this->collSaleProducts->remove($this->collSaleProducts->search($saleProduct));
+            if (null === $this->saleProductsScheduledForDeletion) {
+                $this->saleProductsScheduledForDeletion = clone $this->collSaleProducts;
+                $this->saleProductsScheduledForDeletion->clear();
+            }
+            $this->saleProductsScheduledForDeletion[]= clone $saleProduct;
+            $saleProduct->setProduct(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related SaleProducts from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildSaleProduct[] List of ChildSaleProduct objects
+     */
+    public function getSaleProductsJoinSale($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildSaleProductQuery::create(null, $criteria);
+        $query->joinWith('Sale', $joinBehavior);
+
+        return $this->getSaleProducts($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related SaleProducts from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildSaleProduct[] List of ChildSaleProduct objects
+     */
+    public function getSaleProductsJoinAttributeAv($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildSaleProductQuery::create(null, $criteria);
+        $query->joinWith('AttributeAv', $joinBehavior);
+
+        return $this->getSaleProducts($query, $con);
+    }
+
+    /**
      * Clears out the collProductI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -5696,6 +6012,11 @@ abstract class Product implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collSaleProducts) {
+                foreach ($this->collSaleProducts as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collProductI18ns) {
                 foreach ($this->collProductI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -5736,6 +6057,7 @@ abstract class Product implements ActiveRecordInterface
         $this->collAccessoriesRelatedByAccessory = null;
         $this->collCartItems = null;
         $this->collProductAssociatedContents = null;
+        $this->collSaleProducts = null;
         $this->collProductI18ns = null;
         $this->collProductVersions = null;
         $this->collCategories = null;

@@ -662,12 +662,19 @@
     <column name="city" required="true" size="255" type="VARCHAR" />
     <column name="phone" size="20" type="VARCHAR" />
     <column name="country_id" required="true" type="INTEGER" />
-      <foreign-key foreignTable="customer_title" name="fk_order_address_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
-          <reference foreign="id" local="customer_title_id" />
-      </foreign-key>
-      <foreign-key foreignTable="country" name="fk_order_address_country_id" onDelete="RESTRICT" onUpdate="RESTRICT">
-          <reference foreign="id" local="country_id" />
-      </foreign-key>
+
+    <foreign-key foreignTable="customer_title" name="fk_order_address_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_title_id" />
+    </foreign-key>
+    <foreign-key foreignTable="country" name="fk_order_address_country_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="country_id" />
+    </foreign-key>
+    <index name="fk_order_address_customer_title_id_idx">
+      <index-column name="customer_title_id" />
+    </index>
+    <index name="fk_order_address_country_id_idx">
+      <index-column name="country_id" />
+    </index>
     <behavior name="timestampable" />
   </table>
   <table name="order_product" namespace="Thelia\Model">
@@ -1500,8 +1507,8 @@
   </table>
   <table name="form_firewall" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="form_name" required="true" type="VARCHAR" size="255" />
-    <column name="ip_address" required="true" type="VARCHAR" size="15" />
+    <column name="form_name" required="true" size="255" type="VARCHAR" />
+    <column name="ip_address" required="true" size="15" type="VARCHAR" />
     <column defaultValue="1" name="attempts" type="TINYINT" />
     <index name="idx_form_firewall_form_name">
       <index-column name="form_name" />
@@ -1509,9 +1516,9 @@
     <index name="idx_form_firewall_ip_address">
       <index-column name="ip_address" />
     </index>
-
     <behavior name="timestampable" />
   </table>
+
   <table name="import_category" namespace="Thelia\Model">
     <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
     <column name="ref" required="true" type="VARCHAR" size="255" />
@@ -1581,5 +1588,69 @@
       <parameter name="i18n_columns" value="title, description" />
     </behavior>
     <behavior name="timestampable" />
+</table>
+
+  <table name="sale" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
+    <column defaultValue="NULL" name="sale_label" size="255" type="VARCHAR" />
+    <column defaultValue="NULL" name="description" type="CLOB" />
+    <column defaultValue="NULL" name="chapo" type="LONGVARCHAR" />
+    <column defaultValue="NULL" name="postscriptum" type="LONGVARCHAR" />
+    <column defaultValue="0" name="active" required="true" type="BOOLEAN" />
+    <column defaultValue="1" name="display_initial_price" required="true" type="BOOLEAN" />
+    <column defaultValue="NULL" name="start_date" type="TIMESTAMP" />
+    <column defaultValue="NULL" name="end_date" type="TIMESTAMP" />
+    <column defaultValue="NULL" name="price_offset_type" type="TINYINT" />
+    <index name="idx_sales_active_start_end_date">
+      <index-column name="active" />
+      <index-column name="start_date" />
+      <index-column name="end_date" />
+    </index>
+    <index name="idx_sales_active">
+      <index-column name="active" />
+    </index>
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description, chapo, postscriptum,sale_label" />
+    </behavior>
+    <behavior name="timestampable" />
+  </table>
+  <table name="sale_offset_currency" namespace="Thelia\Model">
+    <column name="sales_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="currency_id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="0" name="price_offset_value" type="FLOAT" />
+    <foreign-key foreignTable="sale" name="fk_sale_offset_currency_sales_id" onDelete="CASCADE">
+      <reference foreign="id" local="sales_id" />
+    </foreign-key>
+    <foreign-key foreignTable="currency" name="fk_sale_offset_currency_currency_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="currency_id" />
+    </foreign-key>
+    <index name="fk_sale_offset_currency_currency1_idx">
+      <index-column name="currency_id" />
+    </index>
+  </table>
+  <table name="sale_product" namespace="Thelia\Model">
+    <column name="sales_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="product_id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="NULL" name="attribute_av_id" primaryKey="true" required="true" type="INTEGER" />
+    <foreign-key foreignTable="sale" name="fk_sale_product_sales_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="sales_id" />
+    </foreign-key>
+    <foreign-key foreignTable="product" name="fk_sale_product_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_id" />
+    </foreign-key>
+    <foreign-key foreignTable="attribute_av" name="fk_sale_product_attribute_av_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="attribute_av_id" />
+    </foreign-key>
+    <index name="fk_sale_product_product1_idx">
+      <index-column name="product_id" />
+    </index>
+    <index name="fk_sale_product_attribute_av1_idx">
+      <index-column name="attribute_av_id" />
+    </index>
+    <index name="idx_sale_product_sales_id_product_id">
+      <index-column name="sales_id" />
+      <index-column name="product_id" />
+    </index>
   </table>
 </database>

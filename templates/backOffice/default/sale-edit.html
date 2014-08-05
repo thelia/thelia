@@ -1,0 +1,125 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'sales'}
+{/block}
+
+{block name="page-title"}{intl l='Change sale configuration'}{/block}
+
+{block name="check-resource"}admin.sales{/block}
+{block name="check-access"}update{/block}
+
+{block name="main-content"}
+
+<div class="edit-sale">
+
+    <div id="wrapper" class="container">
+
+        <ul class="breadcrumb">
+            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+            <li><a href="{url path='/admin/sales'}">{intl l="Sales management"}</a></li>
+            <li>{intl l='Sale configuration'}</li>
+        </ul>
+
+        {loop type="sale" name="sale" active='*' id=$sale_id backend_context="1" lang=$edit_language_id}
+
+        <div class="row">
+            <div class="col-md-12 general-block-decorator clearfix">
+
+                <div class="form-container">
+
+                {form name="thelia.admin.sale.modification"}
+
+                <form method="POST" action="{url path="/admin/sale/save/{$ID}"}" {form_enctype form=$form} >
+
+                    {include
+                        file = "includes/inner-form-toolbar.html"
+                        hide_submit_buttons = false
+
+                        page_url  = {url path="/admin/sale/update/$ID"}
+                        close_url = {url path="/admin/sales"}
+                    }
+
+                    {* Be sure to get the sale ID, even if the form could not be validated *}
+                    <input type="hidden" name="sale_id" value="{$ID}" />
+
+                    {form_hidden_fields form=$form}
+
+                    {render_form_field form=$form field="success_url" value={url path="/admin/sales"}}
+                    {render_form_field form=$form field="locale" value={$edit_language_locale}}
+
+                    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="title title-without-tabs">{intl l='Sale operation features'}</p>
+
+                            {render_form_field form=$form field='label'}
+                            {render_form_field form=$form field='active'}
+                            {render_form_field form=$form field='display_initial_price'}
+                            {render_form_field form=$form field='price_offset_type'}
+
+                            <div class="well well-sm">
+                                {loop type="currency" name="sale.currencies" backend_context="1" lang=$edit_language_id}
+                                    {$aff=($LOOP_COUNT == 1)}
+                                    {custom_render_form_field form=$form field='price_offset' value_key=$ID show_label=$aff}
+                                        <div class="input-group">
+                                            <input type="text" {form_field_attributes form=$form field="price_offset" value_key=$ID}>
+                                            <span class="input-group-addon">{intl l='For prices in %currency' currency=$SYMBOL}</span>
+                                        </div>
+                                    {/custom_render_form_field}
+                                {/loop}
+                                <p>{intl l='You can define here a specific price offset for each of the shop currencies, as a percentage or a constant amount, depending on the selected offset type.'}</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <p class="title title-without-tabs">{intl l='Products selection'}</p>
+
+                            {custom_render_form_field form=$form field='categories'}
+                                <select {form_field_attributes form=$form field='categories'}'>
+                                    {loop type="category-tree" category=0 name="list-of-categories" backend_context=1}
+                                        <option style="padding-left: {$LEVEL * 20}px" value="{$ID}" {if in_array($ID, $value)}selected="selected"{/if}>{$TITLE}</option>
+                                    {/loop}
+                                </select>
+                            {/custom_render_form_field}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p class="title title-without-tabs">{intl l='Sale operation description'}</p>
+
+                            {include file="includes/standard-description-form-fields.html" form=$form}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="control-group">
+                                <label>&nbsp;</label>
+                                <div class="controls">
+                                    <p>{intl l='Sale created on %date_create. Last modification: %date_change' date_create={format_date date=$CREATE_DATE} date_change={format_date date=$UPDATE_DATE}}</p>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+
+                    </form>
+                    {/form}
+                </div>
+
+            </div>
+        </div>
+
+        {/loop}
+
+    </div>
+
+</div>
+
+{/block}
+
+{block name="javascript-last-call"}
+    {module_include location='sale-edit-js'}
+{/block}
