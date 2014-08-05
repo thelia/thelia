@@ -26,7 +26,6 @@ use Thelia\Files\FileModelInterface;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Lang;
-use Thelia\Tools\MimeTypeTools;
 use Thelia\Tools\Rest\ResponseRest;
 use Thelia\Tools\URL;
 
@@ -61,7 +60,7 @@ class FileController extends BaseAdminController
      * @param  string   $parentType     Parent Type owning files being saved (product, category, content, etc.)
      * @param  string   $objectType     Object type, e.g. image or document
      * @param  array    $validMimeTypes an array of valid mime types. If empty, any mime type is allowed.
-     * @param  array    $extBlackList      an array of blacklisted extensions.
+     * @param  array    $extBlackList   an array of blacklisted extensions.
      * @return Response
      */
     public function saveFileAjaxAction(
