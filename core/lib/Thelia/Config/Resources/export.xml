@@ -17,10 +17,13 @@
             <title locale="en_US">Content</title>
             <title locale="fr_FR">Contenu</title>
         </export_category>
-
         <export_category id="thelia.export.orders">
             <title locale="en_US">Orders</title>
             <title locale="fr_FR">Commandes</title>
+        </export_category>
+        <export_category id="thelia.export.modules">
+            <title locale="en_US">Modules</title>
+            <title locale="fr_FR">Modules</title>
         </export_category>
     </export_categories>
 

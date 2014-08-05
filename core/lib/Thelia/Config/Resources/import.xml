@@ -8,6 +8,10 @@
             <title locale="fr_FR">Produits</title>
             <title locale="en_US">Products</title>
         </import_category>
+        <import_category id="thelia.import.modules">
+            <title locale="en_US">Modules</title>
+            <title locale="fr_FR">Modules</title>
+        </import_category>
     </import_categories>
 
     <imports>

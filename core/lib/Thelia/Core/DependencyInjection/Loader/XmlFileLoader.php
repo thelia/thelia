@@ -91,13 +91,13 @@ class XmlFileLoader extends FileLoader
         );
 
         $this->propelOnlyRun(
-            [$this, "parseExportCategories"],
+            [$this, "parseImportCategories"],
             $xml,
             ImportCategoryTableMap::DATABASE_NAME
         );
 
         $this->propelOnlyRun(
-            [$this, "parseExports"],
+            [$this, "parseImports"],
             $xml,
             ImportTableMap::DATABASE_NAME
         );

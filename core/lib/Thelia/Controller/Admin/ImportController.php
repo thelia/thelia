@@ -65,7 +65,7 @@ class ImportController extends BaseAdminController
     public function import($id)
     {
         if (null === $import = $this->getImport($id)) {
-            return $this->render("404");
+            return $this->pageNotFound();
         }
 
         $archiveBuilderManager = $this->getArchiveBuilderManager($this->container);
@@ -130,8 +130,7 @@ class ImportController extends BaseAdminController
             } else {
                 throw new \ErrorException(
                     $this->getTranslator()->trans(
-                        "There's a problem, the extension \"%ext\" has been found, ".
-                        "but has no formatters nor archive builder",
+                        "There's a problem, the extension \"%ext\" has been found, but has no formatters nor archive builder",
                         [
                             "%ext" => $tools["extension"],
                         ]
@@ -340,7 +339,7 @@ class ImportController extends BaseAdminController
     public function importView($id)
     {
         if (null === $import = $this->getImport($id)) {
-            return $this->render("404");
+            return $this->pageNotFound();
         }
 
         /**
@@ -444,6 +443,8 @@ class ImportController extends BaseAdminController
         $event = new UpdatePositionEvent($id, $this->getMode($mode), $value);
         $this->dispatch(TheliaEvents::IMPORT_CHANGE_POSITION, $event);
 
+
+        return $this->render('import');
     }
 
     public function changeCategoryPosition()
