@@ -11,7 +11,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder;
-use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
 
 /**
  * Class TarGzArchiveBuilder
@@ -28,7 +27,6 @@ class TarGzArchiveBuilder extends TarArchiveBuilder
 
         parent::__construct();
     }
-
 
     public function getName()
     {

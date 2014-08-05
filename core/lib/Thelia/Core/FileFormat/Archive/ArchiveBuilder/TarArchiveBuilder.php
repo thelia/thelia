@@ -49,13 +49,12 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
 
     public function __construct()
     {
-        if (false !== (bool)ini_get("phar.readonly") || !class_exists("\\PharData")) {
+        if (false !== (bool) ini_get("phar.readonly") || !class_exists("\\PharData")) {
             return null;
         }
 
         parent::__construct();
     }
-
 
     public function __destruct()
     {

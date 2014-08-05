@@ -28,7 +28,6 @@ class TarBz2ArchiveBuilder extends TarArchiveBuilder
         parent::__construct();
     }
 
-
     public function getName()
     {
         return "tar.bz2";
