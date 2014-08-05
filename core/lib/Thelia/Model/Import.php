@@ -68,4 +68,9 @@ class Import extends BaseImport
 
         return true;
     }
+
+    public function addCriteriaToPositionQuery($query)
+    {
+        $query->filterByImportCategoryId($this->getImportCategoryId());
+    }
 }

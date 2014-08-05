@@ -91,4 +91,10 @@ class Export extends BaseExport
 
         return true;
     }
+
+
+    public function addCriteriaToPositionQuery($query)
+    {
+        $query->filterByExportCategoryId($this->getExportCategoryId());
+    }
 }
