@@ -34,10 +34,15 @@ class TarBz2ArchiveBuilder extends TarArchiveBuilder
         return "tbz2";
     }
 
+    public function getCacheExtension()
+    {
+        return "tar.bz";
+    }
+
     protected function compressionEntryPoint()
     {
         if ($this->compression != \Phar::BZ2) {
-            $this->tar = $this->tar->compress(\Phar::BZ2, $this->getExtension());
+            $this->tar = $this->tar->compress(\Phar::BZ2, $this->getCacheExtension());
         }
 
         $this->compression = \Phar::BZ2;

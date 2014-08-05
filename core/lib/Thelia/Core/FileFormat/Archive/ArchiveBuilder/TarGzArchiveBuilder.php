@@ -34,10 +34,16 @@ class TarGzArchiveBuilder extends TarArchiveBuilder
         return "tgz";
     }
 
+    public function getCacheExtension()
+    {
+        return "tar.gz";
+    }
+
+
     protected function compressionEntryPoint()
     {
         if ($this->compression != \Phar::GZ) {
-            $this->tar = $this->tar->compress(\Phar::GZ, $this->getExtension());
+            $this->tar = $this->tar->compress(\Phar::GZ, $this->getCacheExtension());
         }
 
         $this->compression = \Phar::GZ;
