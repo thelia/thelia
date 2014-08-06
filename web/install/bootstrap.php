@@ -23,19 +23,5 @@
 define('THELIA_INSTALL_MODE', true);
 include __DIR__ . "/../../core/bootstrap.php";
 
-$thelia = new \Thelia\Core\Thelia("install", false);
-
-        foreach (array('cache' => $thelia->getCacheDir(), 'logs' => $thelia->getLogDir()) as $name => $dir) {
-		if (!is_dir($dir)) {
-   			if (false === @mkdir($dir, 0777, true)) {
-			        $errors[$i] = "Unable to create the $dir directory";
-				$i++;
-			}
-		} elseif (!is_writable($dir)) {
-			        $errors[$i] = "Unable to write the $dir directory";
-				$i++;
-		}
-	}
-if(!$errors){
-    $thelia->boot();
-}
+$thelia = new \Thelia\Core\Thelia("install", true);
+$thelia->boot();

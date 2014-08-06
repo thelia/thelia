@@ -25,24 +25,12 @@
     $step = 1;
     include("header.php");
 ?>
-
-
-
-		<div class="well">
-
-<?php
-	if($errors){
-		foreach($errors as $error){
-			print_r("<p style='color:red'>".$error."<p>");
-		}
-	exit();
-	}
-?>
-
+					<div class="well">
                         <div class="clearfix">
                             <a href="?lang=fr_FR"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('French'); ?></a>
                             <a href="?lang=en_US"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('English'); ?></a>
                         </div>
+
 						<p class="lead text-center">
 <?php echo $trans->trans('Welcome in the Thelia installation wizard.'); ?>
 						</p>
@@ -52,5 +40,5 @@
 					</div>
 					<div class="clearfix">
 						<a href="permission.php" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('Continue'); ?></a>
-		</div>
+					</div>
 <?php include("footer.php"); ?>
