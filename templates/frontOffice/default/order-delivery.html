@@ -145,12 +145,14 @@
             $('#delivery-module-list-block').load('{url path="/order/deliveryModuleList"}');
 
             $('.js-change-delivery-address').change(function(e) {
-                $('#delivery-module-list-block').load(
-                    '{url path="/order/deliveryModuleList"}',
-{literal}
-                    {country_id: $(this).data('country')}
-{/literal}
-                );
+                if (this.checked) {
+                    $('#delivery-module-list-block').load(
+                        '{url path="/order/deliveryModuleList"}',
+    {literal}
+                        {country_id: $(this).data('country')}
+    {/literal}
+                    );
+                )
             });
         });
     </script>
