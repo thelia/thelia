@@ -95,6 +95,17 @@
                                                     </div>
                                                 {/form_field}
 
+                                                {form_field form=$form field='reseller'}
+                                                    <div class="form-group {if $error}has-error{/if}">
+                                                            <div class="checkbox">
+                                                                <label>
+                                                                    <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+                                                                    {$label}
+                                                                </label>
+                                                            </div>
+                                                    </div>
+                                                {/form_field}
+                                                
                                                 {form_field form=$form field='password'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label} (leave blank to keep current customer password) {if $required} <span class="required">*</span>{/if} : </label>
@@ -275,7 +286,7 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {loop type="order" name="order-list" customer="{$customer_id}" backend_context="1" status='*'}
+                                        {loop type="order" name="order-list" customer="{$customer_id}" backend_context="1" status='*' page={$page} limit=10}
                                         {loop type="order-status" name="order-status" id=$STATUS}
                                         {assign "orderStatus" $TITLE}
                                         {assign "orderStatusLabel" "order_$CODE"}
@@ -290,6 +301,20 @@
                                             </tr>
                                         {/loop}
                                         </tbody>
+                                        <tfoot>
+                                        <tr>
+                                            <td colspan="7">
+                                                {include
+                                                file = "includes/pagination.html"
+
+                                                loop_ref       = "order-list"
+                                                max_page_count = 10
+                                                page_url       = "{url path="/admin/customer/update" customer_id=$customer_id}"
+                                                }
+
+                                            </td>
+                                        </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                             </div>

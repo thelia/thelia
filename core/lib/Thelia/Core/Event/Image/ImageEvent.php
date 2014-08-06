@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Event\Image;
 
+use Imagine\Image\ImageInterface;
 use Thelia\Core\Event\CachedFileEvent;
 
 class ImageEvent extends CachedFileEvent
@@ -70,6 +71,11 @@ class ImageEvent extends CachedFileEvent
      * @var int the quality of the result image, from 0 (!) to 100
      */
     protected $quality = null;
+
+    /**
+     * @var ImageInterface
+     */
+    protected $imageObject;
 
     /**
      * @return boolean true if the required image is the original image (resize_mode and background_color are not significant)
@@ -208,5 +214,24 @@ class ImageEvent extends CachedFileEvent
         $this->cache_original_filepath = $cache_original_filepath;
 
         return $this;
+    }
+
+    /**
+     * @param  ImageInterface $imageObject
+     * @return $this
+     */
+    public function setImageObject($imageObject)
+    {
+        $this->imageObject = $imageObject;
+
+        return $this;
+    }
+
+    /**
+     * @return ImageInterface
+     */
+    public function getImageObject()
+    {
+        return $this->imageObject;
     }
 }

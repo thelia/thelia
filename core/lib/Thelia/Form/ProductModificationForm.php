@@ -12,8 +12,12 @@
 
 namespace Thelia\Form;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ProductQuery;
 
 class ProductModificationForm extends ProductCreationForm
 {
@@ -33,10 +37,36 @@ class ProductModificationForm extends ProductCreationForm
                     "label"       => Translator::getInstance()->trans("Product template"),
                     "label_attr"  => array("for" => "product_template_field")
             ))
+            ->add("brand_id", "integer", [
+                'constraints' => [ new NotBlank() ],
+                'required'    => true,
+                'label'       => Translator::getInstance()->trans('Brand / Supplier'),
+                'label_attr'  => [
+                    'for' => 'mode',
+                    'help' => Translator::getInstance()->trans("Select the product brand, or supplier."),
+                ],
+            ])
         ;
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class
         $this->addStandardDescFields(array('title', 'locale'));
+    }
+
+    public function checkDuplicateRef($value, ExecutionContextInterface $context)
+    {
+        $data = $context->getRoot()->getData();
+
+        $count = ProductQuery::create()
+                ->filterById($data['id'], Criteria::NOT_EQUAL)
+                ->filterByRef($value)->count();
+
+        if ($count > 0) {
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    "A product with reference %ref already exists. Please choose another reference.",
+                    array('%ref' => $value)
+                ));
+        }
     }
 
     public function getName()

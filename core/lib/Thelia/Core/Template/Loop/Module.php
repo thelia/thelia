@@ -69,7 +69,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'code', 'code_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'enabled', 'enabled_reverse'))
+                    new Type\EnumListType(array('id', 'id_reverse', 'code', 'code_reverse', 'title', 'title_reverse', 'manual', 'manual_reverse', 'enabled', 'enabled_reverse'))
                 ),
                 'manual'
             ),
@@ -133,10 +133,10 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 case "id_reverse":
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case "title":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha_reverse":
+                case "title_reverse":
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "code":

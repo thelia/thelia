@@ -8,7 +8,7 @@
 
 // Content List
 #folder-contents {
-    .contents > ul { .contents-grid; }
+    .contents > ul { .contents-list; }
 }
 
 .contents-grid,
@@ -75,20 +75,21 @@
 .contents-list {
     .list-unstyled();
     .item {
+        padding-bottom: 15px;
         + .item { border-top: 1px solid #ededed; padding-top: 15px; }
         > article {
             .make-row();
             margin-left: 0;
 
             .content-image {
-                .make-sm-column(3);
+                .make-sm-column(2);
                 margin-bottom: 15px; padding: 0;
                 > img { .img-responsive(); width: 100%; }
                 > .mask {}
             }
 
             .content-info {
-                .make-sm-column(6);
+                .make-sm-column(7);
                 .name { margin-top: 0; }
                 .description {}
                 .short-description {}

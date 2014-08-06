@@ -16,6 +16,8 @@ class Country extends BaseCountry
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
+    protected static $defaultCountry = null;
+
     /**
      *
      * Put the current country as the default one.
@@ -93,16 +95,19 @@ class Country extends BaseCountry
     /**
      * Return the default country
      *
-     * @throws LogicException if no default country is defined
+     * @throws \LogicException if no default country is defined
      */
     public static function getDefaultCountry()
     {
-        $dc = CountryQuery::create()->findOneByByDefault(true);
+        if (null === self::$defaultCountry) {
+            self::$defaultCountry = CountryQuery::create()->findOneByByDefault(true);
 
-        if ($dc == null)
-            throw new \LogicException(Translator::getInstance()->trans("Cannot find a default country. Please define one."));
+            if (null === self::$defaultCountry) {
+                throw new \LogicException(Translator::getInstance()->trans("Cannot find a default country. Please define one."));
+            }
+        }
 
-        return $dc;
+        return self::$defaultCountry;
     }
 
     /**

@@ -12,7 +12,6 @@
 
 namespace Thelia\Core\Event\Image;
 
-use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\CategoryImage;
 use Thelia\Model\ContentImage;
 use Thelia\Model\FolderImage;
@@ -27,27 +26,21 @@ use Thelia\Model\ProductImage;
  *
  * @package Image
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
+ * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
  */
-class ImageDeleteEvent extends ActionEvent
+class ImageDeleteEvent extends FileDeleteEvent
 {
-    /** @var string Image type */
-    protected $imageType = null;
-
-    /** @var CategoryImage|ProductImage|ContentImage|FolderImage Image about to be deleted */
-    protected $imageToDelete = null;
-
     /**
      * Constructor
      *
      * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageToDelete Image about to be deleted
      * @param string                                              $imageType     Image type
      *                                                                           ex : FileManager::TYPE_CATEGORY
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
     public function __construct($imageToDelete, $imageType)
     {
-        $this->imageToDelete = $imageToDelete;
-        $this->imageType = $imageType;
+        parent::__construct($imageToDelete);
     }
 
     /**
@@ -56,11 +49,10 @@ class ImageDeleteEvent extends ActionEvent
      * @param string $imageType Image type
      *
      * @return $this
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
     public function setImageType($imageType)
     {
-        $this->imageType = $imageType;
-
         return $this;
     }
 
@@ -68,10 +60,11 @@ class ImageDeleteEvent extends ActionEvent
      * Get picture type
      *
      * @return string
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
     public function getImageType()
     {
-        return $this->imageType;
+        throw new \RuntimeException("getImageType() is deprecated and no longer supported");
     }
 
     /**
@@ -80,10 +73,11 @@ class ImageDeleteEvent extends ActionEvent
      * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageToDelete Image about to be deleted
      *
      * @return $this
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
     public function setImageToDelete($imageToDelete)
     {
-        $this->imageToDelete = $imageToDelete;
+        parent::setFileToDelete($imageToDelete);
 
         return $this;
     }
@@ -92,10 +86,11 @@ class ImageDeleteEvent extends ActionEvent
      * Get Image about to be deleted
      *
      * @return CategoryImage|ProductImage|ContentImage|FolderImage
+     * @deprecated deprecated since version 2.0.3. Use FileDeleteEvent instead
      */
     public function getImageToDelete()
     {
-        return $this->imageToDelete;
+        return parent::getFileToDelete();
     }
 
 }

@@ -103,6 +103,8 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
             $loopResultRow = new LoopResultRow($attributeCombination);
 
             $loopResultRow
+                ->set("ATTRIBUTE_ID", $attributeCombination->getAttributeId())
+                ->set("ATTRIBUTE_AVAILABILITY_ID", $attributeCombination->getAttributeAvId())
                 ->set("LOCALE",$this->locale)
                 ->set("ATTRIBUTE_TITLE", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE'))
                 ->set("ATTRIBUTE_CHAPO", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_CHAPO'))

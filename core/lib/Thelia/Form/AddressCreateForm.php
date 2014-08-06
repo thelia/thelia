@@ -21,7 +21,7 @@ use Thelia\Core\Translation\Translator;
  * @package Thelia\Form
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class AddressCreateForm extends BaseForm
+class AddressCreateForm extends FirewallForm
 {
 
     /**

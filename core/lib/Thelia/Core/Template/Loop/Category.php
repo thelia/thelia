@@ -190,9 +190,6 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             }
         }
 
-        /* @todo */
-        $notEmpty  = $this->getNot_empty();
-
         return $search;
 
     }
@@ -217,6 +214,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                 ->set("DESCRIPTION"             , $category->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM"            , $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("PARENT"                  , $category->getParent())
+                ->set("ROOT"                    , $category->getRoot($category->getId()))
                 ->set("URL"                     , $category->getUrl($this->locale))
                 ->set("META_TITLE"              , $category->getVirtualColumn('i18n_META_TITLE'))
                 ->set("META_DESCRIPTION"        , $category->getVirtualColumn('i18n_META_DESCRIPTION'))

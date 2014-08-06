@@ -25,6 +25,7 @@ use Symfony\Component\Routing\Router;
 
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
+use Thelia\Form\FirewallForm;
 use Thelia\Model\OrderQuery;
 
 use Thelia\Tools\Redirect;
@@ -200,19 +201,30 @@ abstract class BaseController extends ContainerAware
             $form->bind($aBaseForm->getRequest());
 
             if ($form->isValid()) {
+                if ($aBaseForm instanceof FirewallForm && !$aBaseForm->isFirewallOk()) {
+                    throw new FormValidationException(
+                        $this->getTranslator()->trans(
+                            "You've submitted this form too many times. Further submissions will be ignored during %time",
+                            [
+                                "%time" => $aBaseForm->getWaitingTime(),
+                            ]
+                        )
+                    );
+                }
+
                 return $form;
             } else {
                 $errorMessage = null;
                 if ($form->get("error_message")->getData() != null) {
                     $errorMessage = $form->get("error_message")->getData();
                 } else {
-                    $errorMessage = sprintf("Missing or invalid data: %s", $this->getErrorMessages($form));
+                    $errorMessage = sprintf($this->getTranslator()->trans("Missing or invalid data: %s"), $this->getErrorMessages($form));
                 }
 
                 throw new FormValidationException($errorMessage);
             }
         } else {
-            throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
+            throw new FormValidationException(sprintf($this->getTranslator()->trans("Wrong form method, %s expected."), $expectedMethod));
         }
     }
 
@@ -291,13 +303,22 @@ abstract class BaseController extends ContainerAware
     protected function getRouteFromRouter($routerName, $routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_URL)
     {
         /** @var Router $router */
-        $router =  $this->container->get($routerName);
+        $router =  $this->getRouter($routerName);
 
         if ($router == null) {
             throw new \InvalidArgumentException(sprintf("Router '%s' does not exists.", $routerName));
         }
 
         return $router->generate($routeId, $parameters, $referenceType);
+    }
+
+    /**
+     * @param $routerName
+     * @return Router
+     */
+    protected function getRouter($routerName)
+    {
+        return $this->container->get($routerName);
     }
 
     /**

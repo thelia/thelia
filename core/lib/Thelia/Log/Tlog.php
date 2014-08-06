@@ -78,7 +78,7 @@ class Tlog Implements LoggerInterface
 
     protected $mode_back_office = false;
     protected $level = self::MUET;
-    protected $prefixe = "";
+    protected $prefix = "";
     protected $files = array();
     protected $all_files = false;
     protected $show_redirect = false;
@@ -194,9 +194,9 @@ class Tlog Implements LoggerInterface
         return $this;
     }
 
-    public function setPrefix($prefixe)
+    public function setPrefix($prefix)
     {
-        $this->prefixe = $prefixe;
+        $this->prefix = $prefix;
 
         return $this;
     }
@@ -609,7 +609,7 @@ class Tlog Implements LoggerInterface
 
     private function findOrigin()
     {
-        $origine = array();
+        $origin = array();
 
         if (function_exists('debug_backtrace')) {
 
@@ -624,8 +624,8 @@ class Tlog Implements LoggerInterface
                     $className = $hop['class'];
 
                     if (! empty($className) && ($className == ltrim(__CLASS__,'\\') || strtolower(get_parent_class($className)) == ltrim(__CLASS__,'\\'))) {
-                            $origine['line'] = $hop['line'];
-                            $origine['file'] = $hop['file'];
+                            $origin['line'] = $hop['line'];
+                            $origin['file'] = $hop['file'];
                             break;
                     }
                 }
@@ -633,7 +633,7 @@ class Tlog Implements LoggerInterface
                 $hop = array_pop($trace);
             }
 
-            $origine['class'] = isset($prevHop['class']) ? $prevHop['class'] : 'main';
+            $origin['class'] = isset($prevHop['class']) ? $prevHop['class'] : 'main';
 
             if(isset($prevHop['function']) &&
                 $prevHop['function'] !== 'include' &&
@@ -641,13 +641,13 @@ class Tlog Implements LoggerInterface
                 $prevHop['function'] !== 'require' &&
                 $prevHop['function'] !== 'require_once') {
 
-                $origine['function'] = $prevHop['function'];
+                $origin['function'] = $prevHop['function'];
             } else {
-                $origine['function'] = 'main';
+                $origin['function'] = 'main';
             }
         }
 
-        return $origine;
+        return $origin;
     }
 
     protected function interpolate($message, array $context = array())
@@ -676,22 +676,22 @@ class Tlog Implements LoggerInterface
 
         $text = $this->interpolate($text, $context);
 
-        $origine = $this->findOrigin();
+        $origin = $this->findOrigin();
 
-        $file = basename($origine['file']);
+        $file = basename($origin['file']);
 
         if ($this->isActivedFile($file)) {
 
-            $function = $origine['function'];
-            $line = $origine['line'];
+            $function = $origin['function'];
+            $line = $origin['line'];
 
-            $prefixe = str_replace(
+            $prefix = str_replace(
                 array("#INDEX", "#LEVEL", "#FILE", "#FUNCTION", "#LINE", "#DATE", "#HOUR"),
                 array(1+$this->linecount, $level, $file, $function, $line, date("Y-m-d"), date("G:i:s")),
-                $this->prefixe
+                $this->prefix
             );
 
-            $trace = $prefixe . $text;
+            $trace = $prefix . $text;
 
             foreach ($this->destinations as $dest) {
                 $dest->add($trace);
@@ -706,7 +706,7 @@ class Tlog Implements LoggerInterface
      * @param type  $destinations
      * @param array $actives      array containing classes instanceof AbstractTlogDestination
      */
-    protected function loadDestinations(&$destinations, array $actives = NULL)
+    protected function loadDestinations(&$destinations, array $actives = null)
     {
         foreach ($actives as $active) {
             if (class_exists($active)) {

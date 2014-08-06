@@ -55,57 +55,49 @@ abstract class Operators
         case self::INFERIOR:
             $ret = $translator->trans(
                 'Less than',
-                [],
-                'condition'
+                []
             );
             break;
         case self::INFERIOR_OR_EQUAL:
             $ret = $translator->trans(
                 'Less than or equals',
-                [],
-                'condition'
+                []
             );
             break;
         case self::EQUAL:
             $ret = $translator->trans(
                 'Equal to',
-                [],
-                'condition'
+                []
             );
             break;
         case self::SUPERIOR_OR_EQUAL:
             $ret = $translator->trans(
                 'Greater than or equals',
-                [],
-                'condition'
+                []
             );
             break;
         case self::SUPERIOR:
             $ret = $translator->trans(
                 'Greater than',
-                [],
-                'condition'
+                []
             );
             break;
         case self::DIFFERENT:
             $ret = $translator->trans(
                 'Not equal to',
-                [],
-                'condition'
+                []
             );
             break;
         case self::IN:
             $ret = $translator->trans(
                 'In',
-                [],
-                'condition'
+                []
             );
             break;
         case self::OUT:
             $ret = $translator->trans(
                 'Not in',
-                [],
-                'condition'
+                []
             );
             break;
         default:

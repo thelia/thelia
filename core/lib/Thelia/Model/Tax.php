@@ -59,12 +59,14 @@ class Tax extends BaseTax
         if (!class_exists($class)) {
             throw new TaxEngineException('Recorded type `' . $class . '` does not exists', TaxEngineException::BAD_RECORDED_TYPE);
         }
-
+    /** @var \Thelia\TaxEngine\BaseTaxType $instance */
         $instance = new $class;
 
         if (!$instance instanceof BaseTaxType) {
             throw new TaxEngineException('Recorded type `' . $class . '` does not extends BaseTaxType', TaxEngineException::BAD_RECORDED_TYPE);
         }
+
+    $instance->loadRequirements($this->getRequirements());
 
         return $instance;
     }

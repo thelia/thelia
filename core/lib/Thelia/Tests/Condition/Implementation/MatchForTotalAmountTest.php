@@ -12,13 +12,12 @@
 
 namespace Thelia\Tests\Condition\Implementation;
 
+use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Operators;
-use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
-
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
@@ -49,7 +48,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $stubFacade->expects($this->any())
-            ->method('getCartTotalPrice')
+            ->method('getCartTotalTaxPrice')
             ->will($this->returnValue($cartTotalPrice));
 
         $stubFacade->expects($this->any())

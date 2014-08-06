@@ -17,6 +17,10 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
+use Thelia\Model\Country as ChildCountry;
+use Thelia\Model\CountryQuery as ChildCountryQuery;
+use Thelia\Model\CustomerTitle as ChildCustomerTitle;
+use Thelia\Model\CustomerTitleQuery as ChildCustomerTitleQuery;
 use Thelia\Model\Order as ChildOrder;
 use Thelia\Model\OrderAddress as ChildOrderAddress;
 use Thelia\Model\OrderAddressQuery as ChildOrderAddressQuery;
@@ -140,6 +144,16 @@ abstract class OrderAddress implements ActiveRecordInterface
      * @var        string
      */
     protected $updated_at;
+
+    /**
+     * @var        CustomerTitle
+     */
+    protected $aCustomerTitle;
+
+    /**
+     * @var        Country
+     */
+    protected $aCountry;
 
     /**
      * @var        ObjectCollection|ChildOrder[] Collection to store aggregation of ChildOrder objects.
@@ -641,6 +655,10 @@ abstract class OrderAddress implements ActiveRecordInterface
             $this->modifiedColumns[OrderAddressTableMap::CUSTOMER_TITLE_ID] = true;
         }
 
+        if ($this->aCustomerTitle !== null && $this->aCustomerTitle->getId() !== $v) {
+            $this->aCustomerTitle = null;
+        }
+
 
         return $this;
     } // setCustomerTitleId()
@@ -851,6 +869,10 @@ abstract class OrderAddress implements ActiveRecordInterface
             $this->modifiedColumns[OrderAddressTableMap::COUNTRY_ID] = true;
         }
 
+        if ($this->aCountry !== null && $this->aCountry->getId() !== $v) {
+            $this->aCountry = null;
+        }
+
 
         return $this;
     } // setCountryId()
@@ -1011,6 +1033,12 @@ abstract class OrderAddress implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aCustomerTitle !== null && $this->customer_title_id !== $this->aCustomerTitle->getId()) {
+            $this->aCustomerTitle = null;
+        }
+        if ($this->aCountry !== null && $this->country_id !== $this->aCountry->getId()) {
+            $this->aCountry = null;
+        }
     } // ensureConsistency
 
     /**
@@ -1050,6 +1078,8 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aCustomerTitle = null;
+            $this->aCountry = null;
             $this->collOrdersRelatedByInvoiceOrderAddressId = null;
 
             $this->collOrdersRelatedByDeliveryOrderAddressId = null;
@@ -1175,6 +1205,25 @@ abstract class OrderAddress implements ActiveRecordInterface
         $affectedRows = 0; // initialize var to track total num of affected rows
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
+
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCustomerTitle !== null) {
+                if ($this->aCustomerTitle->isModified() || $this->aCustomerTitle->isNew()) {
+                    $affectedRows += $this->aCustomerTitle->save($con);
+                }
+                $this->setCustomerTitle($this->aCustomerTitle);
+            }
+
+            if ($this->aCountry !== null) {
+                if ($this->aCountry->isModified() || $this->aCountry->isNew()) {
+                    $affectedRows += $this->aCountry->save($con);
+                }
+                $this->setCountry($this->aCountry);
+            }
 
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
@@ -1496,6 +1545,12 @@ abstract class OrderAddress implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
+            if (null !== $this->aCustomerTitle) {
+                $result['CustomerTitle'] = $this->aCustomerTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aCountry) {
+                $result['Country'] = $this->aCountry->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->collOrdersRelatedByInvoiceOrderAddressId) {
                 $result['OrdersRelatedByInvoiceOrderAddressId'] = $this->collOrdersRelatedByInvoiceOrderAddressId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1763,6 +1818,108 @@ abstract class OrderAddress implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
+    }
+
+    /**
+     * Declares an association between this object and a ChildCustomerTitle object.
+     *
+     * @param                  ChildCustomerTitle $v
+     * @return                 \Thelia\Model\OrderAddress The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCustomerTitle(ChildCustomerTitle $v = null)
+    {
+        if ($v === null) {
+            $this->setCustomerTitleId(NULL);
+        } else {
+            $this->setCustomerTitleId($v->getId());
+        }
+
+        $this->aCustomerTitle = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCustomerTitle object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOrderAddress($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildCustomerTitle object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCustomerTitle The associated ChildCustomerTitle object.
+     * @throws PropelException
+     */
+    public function getCustomerTitle(ConnectionInterface $con = null)
+    {
+        if ($this->aCustomerTitle === null && ($this->customer_title_id !== null)) {
+            $this->aCustomerTitle = ChildCustomerTitleQuery::create()->findPk($this->customer_title_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCustomerTitle->addOrderAddresses($this);
+             */
+        }
+
+        return $this->aCustomerTitle;
+    }
+
+    /**
+     * Declares an association between this object and a ChildCountry object.
+     *
+     * @param                  ChildCountry $v
+     * @return                 \Thelia\Model\OrderAddress The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCountry(ChildCountry $v = null)
+    {
+        if ($v === null) {
+            $this->setCountryId(NULL);
+        } else {
+            $this->setCountryId($v->getId());
+        }
+
+        $this->aCountry = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCountry object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOrderAddress($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildCountry object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCountry The associated ChildCountry object.
+     * @throws PropelException
+     */
+    public function getCountry(ConnectionInterface $con = null)
+    {
+        if ($this->aCountry === null && ($this->country_id !== null)) {
+            $this->aCountry = ChildCountryQuery::create()->findPk($this->country_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCountry->addOrderAddresses($this);
+             */
+        }
+
+        return $this->aCountry;
     }
 
 
@@ -2572,6 +2729,8 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         $this->collOrdersRelatedByInvoiceOrderAddressId = null;
         $this->collOrdersRelatedByDeliveryOrderAddressId = null;
+        $this->aCustomerTitle = null;
+        $this->aCountry = null;
     }
 
     /**

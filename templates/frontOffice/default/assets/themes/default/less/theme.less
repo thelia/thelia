@@ -330,17 +330,18 @@ td.product,
     .special-price {
         .price {
             display: block;
-            font-size: 20px; line-height: 25px;
-            font-style: italic;
+            font-size: 14px; line-height: 25px;
+            font-style: normal;
+            font-weight: 400;
         }
     }
 
     .old-price {
         .price {
             display: block;
-            font-size: 18px; line-height: 25px;
+            font-size: 14px; line-height: 25px;
             font-style: italic;
-            font-weight: 600;
+            font-weight: 400;
             text-decoration: line-through;
         }
     }
@@ -349,12 +350,11 @@ td.product,
 // Availibility
 .availibity-label { .sr-only; }
 
-
 .products-grid,
 .products-list {
     // Animation
     @media (min-width: @screen-tablet) {
-        .product-image {
+        .product-image { 
             > .mask {
                 .border-radius(@border-radius-base);
             }
@@ -375,6 +375,16 @@ td.product,
                         margin-top: -10px; margin-left: -20px;
                         width: 40px; height: 40px;
                         z-index: 100;
+                    }
+                }
+            }
+            &.product-quickview {
+                &:hover,
+                &:focus {
+                    .mask:before {
+                        .icon(@search);
+                        font-size: 40px;
+                        margin-top: 0;
                     }
                 }
             }
@@ -597,6 +607,12 @@ td.product,
             font-size: ceil(@font-size-base * 0.94);
             margin-top: -8px; margin-bottom: 20px;
         }
+        .pse-name {
+            color: @gray;
+            font-size: ceil(@font-size-base * 0.94);
+            //margin-left: 10px;
+        }
+
     }
     .product-price {
         .price-container {
@@ -1242,7 +1258,10 @@ td.product,
 
 // Page Contact
 #google-map {
+  border: none;
+  display: block;
   margin-bottom: @line-height-computed;
+  width: 100%; height: 350px;
   @filter-map: ~"grayscale(100%)";
   -webkit-filter: @filter-map;
   -moz-filter: @filter-map;

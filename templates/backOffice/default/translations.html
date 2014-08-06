@@ -52,7 +52,7 @@
                                                     <option value="ma" {if $item_to_translate=='ma'}selected="selected"{/if}>{intl l='E-mail templates'}</option>
 			                                        <option value="bo" {if $item_to_translate=='bo'}selected="selected"{/if}>{intl l='Back-office templates'}</option>
                                                     <option value="mo" {if $item_to_translate=='mo'}selected="selected"{/if}>{intl l='Modules'}</option>
-                                                   <option value="co" {if $item_to_translate=='co'}selected="selected"{/if}>{intl l='Thelia core'}</option>
+                                                    <option value="co" {if $item_to_translate=='co'}selected="selected"{/if}>{intl l='Thelia core'}</option>
 												</select>
 			                                </div>
 		                                </div>
@@ -64,7 +64,7 @@
 
 		                                            <select id="item_name" required="required" name="item_name" class="submit-on-change form-control">
 		                                                <option value="">{intl l='Please select the module to translate'}</option>
-					                                    {loop type="module" name="translate-module" backend_context=1 order="alpha"}
+					                                    {loop type="module" name="translate-module" backend_context=1 order="title"}
 					                                        <option value="{$ID}" {if $item_name == $ID}selected="selected"{/if}>{$TITLE}</option>
 					                                    {/loop}
 					                                </select>
@@ -303,6 +303,7 @@
 
         $('#item_to_translate').change(function() {
             $('#item-id').val('');
+            $('#item_name').val('');
             $('.item-id-selector').hide();
         });
 
@@ -325,7 +326,7 @@
         	translation_changed = true;
 
         	ev.preventDefault();
-        })
+        });
 
         $('#translation_form').submit(function(ev) {
 

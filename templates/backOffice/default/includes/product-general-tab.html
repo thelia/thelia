@@ -40,9 +40,7 @@
                             {$label} :
                         </label>
                         <div class="control-input">
-                            {* If ref's 'value is not empty the field is disable and the value is sent with an hidden field *}
-                            <input type="text" id="{$label_attr.for}" {if $value}name="{$name}_disabled" disabled{else}name="{$name}"{/if} class="form-control" value="{$value}"{if $required} aria-required="true" required{/if}>
-                            {if $value}<input type="hidden" name="{$name}" value="{$value}">{/if}
+                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if}>
                         </div>
                     </div>
                 {/form_field}
@@ -70,6 +68,16 @@
                         <span class="help-block">{intl l='You can attach this product to more categories in the details tab.'}</span>
                      </div>
                 {/form_field}
+
+                {custom_render_form_field form=$form field='brand_id'}
+                    <select {form_field_attributes form=$form field='brand_id'}>
+                        <option value="0">{intl l="No brand"}</option>
+
+                        {loop name="brand-list" type="brand" visible="*"}
+                            <option value="{$ID}" {if $BRAND_ID == $ID}selected="selected"{/if}>{$TITLE}</option>
+                        {/loop}
+                    </select>
+                {/custom_render_form_field}
 
                 {form_field form=$form field='visible'}
                     <div class="form-group {if $error}has-error{/if}">

@@ -192,7 +192,7 @@ class OrderAddressTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('CUSTOMER_TITLE_ID', 'CustomerTitleId', 'INTEGER', false, null, null);
+        $this->addForeignKey('CUSTOMER_TITLE_ID', 'CustomerTitleId', 'INTEGER', 'customer_title', 'ID', false, null, null);
         $this->addColumn('COMPANY', 'Company', 'VARCHAR', false, 255, null);
         $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 255, null);
         $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 255, null);
@@ -202,7 +202,7 @@ class OrderAddressTableMap extends TableMap
         $this->addColumn('ZIPCODE', 'Zipcode', 'VARCHAR', true, 10, null);
         $this->addColumn('CITY', 'City', 'VARCHAR', true, 255, null);
         $this->addColumn('PHONE', 'Phone', 'VARCHAR', false, 20, null);
-        $this->addColumn('COUNTRY_ID', 'CountryId', 'INTEGER', true, null, null);
+        $this->addForeignKey('COUNTRY_ID', 'CountryId', 'INTEGER', 'country', 'ID', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -212,6 +212,8 @@ class OrderAddressTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('CustomerTitle', '\\Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array('customer_title_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_ONE, array('country_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('OrderRelatedByInvoiceOrderAddressId', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'invoice_order_address_id', ), 'RESTRICT', 'RESTRICT', 'OrdersRelatedByInvoiceOrderAddressId');
         $this->addRelation('OrderRelatedByDeliveryOrderAddressId', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'delivery_order_address_id', ), 'RESTRICT', 'RESTRICT', 'OrdersRelatedByDeliveryOrderAddressId');
     } // buildRelations()

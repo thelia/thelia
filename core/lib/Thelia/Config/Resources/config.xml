@@ -9,7 +9,35 @@
         <parameter key="esi_listener.class">Symfony\Component\HttpKernel\EventListener\EsiListener</parameter>
         <parameter key="fragment.renderer.esi.class">Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer</parameter>
         <parameter key="fragment.renderer.inline.class">Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
+
+        <!--
+        The list of Model classes which suppoorts image or document management.
+
+        The key should have form type.parent, where type is the file type (document or image)
+        and parent is the parent object of the file, form example product, brand, folder, etc.
+        -->
+
+        <parameter key="file_model.classes" type="collection">
+            <parameter key="document.product">Thelia\Model\ProductDocument</parameter>
+            <parameter key="image.product">Thelia\Model\ProductImage</parameter>
+
+            <parameter key="document.category">Thelia\Model\CategoryDocument</parameter>
+            <parameter key="image.category">Thelia\Model\CategoryImage</parameter>
+
+            <parameter key="document.content">Thelia\Model\ContentDocument</parameter>
+            <parameter key="image.content">Thelia\Model\ContentImage</parameter>
+
+            <parameter key="document.folder">Thelia\Model\FolderDocument</parameter>
+            <parameter key="image.folder">Thelia\Model\FolderImage</parameter>
+
+            <parameter key="document.brand">Thelia\Model\BrandDocument</parameter>
+            <parameter key="image.brand">Thelia\Model\BrandImage</parameter>
+        </parameter>
+
+        <parameter key="import.base_url">/admin/import</parameter>
+        <parameter key="export.base_url">/admin/export</parameter>
     </parameters>
+
 
     <services>
 
@@ -80,6 +108,11 @@
             <argument >%kernel.debug%</argument>
         </service>
 
+        <!-- The file manager -->
+        <service id="thelia.file_manager" class="Thelia\Files\FileManager">
+            <argument>%file_model.classes%</argument>
+        </service>
+
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="service_container" />
@@ -104,6 +137,47 @@
         <service id="session.listener" class="Thelia\Core\EventListener\SessionListener">
             <tag name="kernel.event_subscriber"/>
         </service>
-    </services>
 
+        <!-- Archive builders -->
+
+        <service id="thelia.manager.archive_builder_manager" class="Thelia\Core\FileFormat\Archive\ArchiveBuilderManager">
+            <argument>%kernel.environment%</argument>
+        </service>
+
+        <!-- zip -->
+        <service id="thelia.archive_builder.zip" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
+            <tag name="thelia.archive_builder" />
+        </service>
+
+        <!-- tar -->
+        <service id="thelia.archive_builder.tar" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarArchiveBuilder">
+            <tag name="thelia.archive_builder" />
+        </service>
+
+        <!-- tar.gz -->
+        <service id="thelia.archive_builder.tar_gz" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarGzArchiveBuilder">
+            <tag name="thelia.archive_builder" />
+        </service>
+
+        <!-- tar.bz2 -->
+        <service id="thelia.archive_builder.tar_bz2" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder">
+            <tag name="thelia.archive_builder" />
+        </service>
+
+        <!-- Formatters -->
+
+        <service id="thelia.manager.formatter_manager" class="Thelia\Core\FileFormat\Formatting\FormatterManager" />
+
+        <service id="thelia.formatter.xml_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\XMLFormatter">
+            <tag name="thelia.formatter" />
+        </service>
+
+        <service id="thelia.formatter.json_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\JsonFormatter">
+            <tag name="thelia.formatter" />
+        </service>
+
+        <service id="thelia.formatter.csv_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\CSVFormatter">
+            <tag name="thelia.formatter" />
+        </service>
+    </services>
 </config>

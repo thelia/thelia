@@ -14,7 +14,6 @@ namespace Thelia\Core\Event\Coupon;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Model\Coupon;
-use Thelia\Model\Exception\InvalidArgumentException;
 
 /**
  * Occurring when a Coupon is created or updated
@@ -327,10 +326,9 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      */
     public function setEffects(array $effects)
     {
-        if (null === $effects['amount']) {
-            throw new InvalidArgumentException('Missing key \'amount\' in Coupon effect ready to be serialized array');
-        }
-        $this->amount = $effects['amount'];
+        // Amount is now optionnal.
+        $this->amount = isset($effects['amount']) ? $effects['amount'] : 0;
+
         $this->effects = $effects;
     }
 

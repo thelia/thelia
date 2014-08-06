@@ -41,6 +41,9 @@ use Thelia\Model\Tools\ModelEventDispatcherTrait;
 class Coupon extends BaseCoupon
 {
 
+    // Define the value of an unlimited coupon usage.
+    const UNLIMITED_COUPON_USE = -1;
+
     use ModelEventDispatcherTrait;
 
     /**
@@ -184,7 +187,8 @@ class Coupon extends BaseCoupon
      */
     public function getAmount()
     {
-        $amount = $this->getEffects()['amount'];
+        // Amount is now optional
+        $amount = isset($this->getEffects()['amount']) ? $this->getEffects()['amount'] : 0;
 
         return floatval($amount);
     }
@@ -199,10 +203,6 @@ class Coupon extends BaseCoupon
     {
         $effects = $this->unserializeEffects($this->getSerializedEffects());
 
-        if (null === $effects['amount']) {
-            throw new InvalidArgumentException('Missing key \'amount\' in Coupon effect coming from database');
-        }
-
         return $effects;
     }
 
@@ -210,18 +210,12 @@ class Coupon extends BaseCoupon
      * Get the Coupon effects
      *
      * @param array $effects Effect ready to be serialized
-     *                       Needs at least the key 'amount'
-     *                       with the amount removed from the cart
      *
      * @throws Exception\InvalidArgumentException
      * @return $this
      */
     public function setEffects(array $effects)
     {
-        if (null === $effects['amount']) {
-            throw new InvalidArgumentException('Missing key \'amount\' in Coupon effect ready to be serialized array');
-        }
-
         $this->setSerializedEffects($this->serializeEffects($effects));
 
         return $this;
@@ -274,6 +268,10 @@ class Coupon extends BaseCoupon
         return CouponModuleQuery::create()->filterByCouponId($this->getId())->find();
     }
 
+    public function isUsageUnlimited()
+    {
+        return $this->getMaxUsage() == self::UNLIMITED_COUPON_USE;
+    }
     /**
      * Get coupon usage left, either overall, or per customer.
      *

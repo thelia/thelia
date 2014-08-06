@@ -55,6 +55,8 @@ class StartDate extends ConditionAbstract
      */
     public function setValidatorsFromForm(array $operators, array $values)
     {
+        $this->checkComparisonOperatorValue($operators, self::START_DATE);
+
         if (! isset($values[self::START_DATE])) {
             $values[self::START_DATE] = time();
         }
@@ -101,8 +103,7 @@ class StartDate extends ConditionAbstract
     {
         return $this->translator->trans(
             'Start date',
-            [],
-            'condition'
+            []
         );
     }
 
@@ -113,8 +114,7 @@ class StartDate extends ConditionAbstract
     {
         $toolTip = $this->translator->trans(
             'The coupon is valid after a given date',
-            [],
-            'condition'
+            []
         );
 
         return $toolTip;
@@ -125,10 +125,6 @@ class StartDate extends ConditionAbstract
      */
     public function getSummary()
     {
-        $i18nOperator = Operators::getI18n(
-            $this->translator, $this->operators[self::START_DATE]
-        );
-
         $date = new \DateTime();
         $date->setTimestamp($this->values[self::START_DATE]);
         $strDate = $date->format($this->getDateFormat());
