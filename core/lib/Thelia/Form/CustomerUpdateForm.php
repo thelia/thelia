@@ -169,7 +169,7 @@ class CustomerUpdateForm extends BaseForm
                 'label_attr' => array(
                     'for' => 'reseller'
                 )
-            ))                
+            ))
         ;
     }
 
