@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
+use Thelia\Log\Tlog;
 use Thelia\Model\Export;
 use Thelia\Model\ExportCategory;
 use Thelia\Model\ExportCategoryQuery;
@@ -369,7 +370,7 @@ class XmlFileLoader extends FileLoader
         } catch (\Exception $e) {
             $con->rollBack();
 
-            throw $e;
+            Tlog::getInstance()->error($e->getMessage());
         }
     }
 
@@ -450,7 +451,7 @@ class XmlFileLoader extends FileLoader
         } catch (\Exception $e) {
             $con->rollBack();
 
-            throw $e;
+            Tlog::getInstance()->error($e->getMessage());
         }
     }
 
@@ -497,7 +498,7 @@ class XmlFileLoader extends FileLoader
         } catch (\Exception $e) {
             $con->rollBack();
 
-            throw $e;
+            Tlog::getInstance()->error($e->getMessage());
         }
     }
 
@@ -577,7 +578,7 @@ class XmlFileLoader extends FileLoader
         } catch (\Exception $e) {
             $con->rollBack();
 
-            throw $e;
+            Tlog::getInstance()->error($e->getMessage());
         }
     }
 
