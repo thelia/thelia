@@ -75,18 +75,7 @@ $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
         </p>
 
         <p class="lead text-center">
-            <?php
-            if (in_array ("mod_rewrite", apache_get_modules())){
-            ?>
-                <a href="<?php echo $request->getSchemeAndHttpHost().$website_url; ?>/admin"><?php echo $trans->trans('Go to back office'); ?></a>
-            <?php
-            }
-            else{
-            ?>
-                <a href="<?php echo $request->getSchemeAndHttpHost().$website_url; ?>/index.php/admin"><?php echo $trans->trans('Go to back office'); ?></a>
-            <?php
-            }
-	    ?>
+            <a href="<?php echo $request->getSchemeAndHttpHost().$website_url; ?>/admin"><?php echo $trans->trans('Go to back office'); ?></a>
         </p>
 
     </div>
