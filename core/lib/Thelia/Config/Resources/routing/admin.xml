@@ -1194,7 +1194,6 @@
         <default key="_controller">Thelia\Controller\Admin\BrandController::deleteAction</default>
     </route>
 
-<<<<<<< HEAD
     <!-- export management -->
 
     <route id="export.list" path="/admin/export">
