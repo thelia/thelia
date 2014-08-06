@@ -211,6 +211,9 @@
                                     {loop name="auth-export" type="auth" role="ADMIN" resource="admin.export"  access="VIEW"}
                                         <li role="menuitem"><a href="{url path='/admin/export'}">{intl l="Export"}</a></li>
                                     {/loop}
+                                    {loop name="auth-import" type="auth" role="ADMIN" resource="admin.import" access="VIEW"}
+                                        <li role="menuitem"><a href="{url path='/admin/import'}">{intl l="Import"}</a></li>
+                                    {/loop}
                                 </ul>
                             </li>
                             {/loop}
