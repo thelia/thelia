@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
+  <vendor type="mysql">
+    <parameter name="Engine" value="InnoDB"/>
+    <parameter name="Charset" value="utf8"/>
+  </vendor>
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="parent" type="INTEGER" />
@@ -1516,8 +1520,8 @@
     </index>
     <behavior name="timestampable" />
   </table>
-  <table name="export_category">
-    <column name="id" primaryKey="true" required="true" type="INTEGER" />
+  <table name="export_category" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="position" required="true" type="INTEGER" />
@@ -1529,7 +1533,7 @@
     </behavior>
     <behavior name="timestampable" />
   </table>
-  <table name="export">
+  <table name="export" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
     <column name="title" required="true" size="255" type="VARCHAR" />
@@ -1551,8 +1555,8 @@
       <parameter name="i18n_columns" value="title,description" />
     </behavior>
   </table>
-  <table name="import_category">
-    <column name="id" primaryKey="true" required="true" type="INTEGER" />
+  <table name="import_category" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="position" required="true" type="INTEGER" />
@@ -1564,7 +1568,7 @@
       <parameter name="i18n_columns" value="title" />
     </behavior>
   </table>
-  <table name="import">
+  <table name="import" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
     <column name="title" required="true" size="255" type="VARCHAR" />

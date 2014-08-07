@@ -81,14 +81,14 @@ class ExportTableMap extends TableMap
     const REF = 'export.REF';
 
     /**
-     * the column name for the EXPORT_CATEGORY_ID field
-     */
-    const EXPORT_CATEGORY_ID = 'export.EXPORT_CATEGORY_ID';
-
-    /**
      * the column name for the POSITION field
      */
     const POSITION = 'export.POSITION';
+
+    /**
+     * the column name for the EXPORT_CATEGORY_ID field
+     */
+    const EXPORT_CATEGORY_ID = 'export.EXPORT_CATEGORY_ID';
 
     /**
      * the column name for the HANDLE_CLASS field
@@ -126,11 +126,11 @@ class ExportTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Ref', 'ExportCategoryId', 'Position', 'HandleClass', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'exportCategoryId', 'position', 'handleClass', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ExportTableMap::ID, ExportTableMap::REF, ExportTableMap::EXPORT_CATEGORY_ID, ExportTableMap::POSITION, ExportTableMap::HANDLE_CLASS, ExportTableMap::CREATED_AT, ExportTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'EXPORT_CATEGORY_ID', 'POSITION', 'HANDLE_CLASS', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'ref', 'export_category_id', 'position', 'handle_class', 'created_at', 'updated_at', ),
+        self::TYPE_PHPNAME       => array('Id', 'Ref', 'Position', 'ExportCategoryId', 'HandleClass', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'position', 'exportCategoryId', 'handleClass', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ExportTableMap::ID, ExportTableMap::REF, ExportTableMap::POSITION, ExportTableMap::EXPORT_CATEGORY_ID, ExportTableMap::HANDLE_CLASS, ExportTableMap::CREATED_AT, ExportTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'POSITION', 'EXPORT_CATEGORY_ID', 'HANDLE_CLASS', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'ref', 'position', 'export_category_id', 'handle_class', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -141,11 +141,11 @@ class ExportTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'ExportCategoryId' => 2, 'Position' => 3, 'HandleClass' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'exportCategoryId' => 2, 'position' => 3, 'handleClass' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(ExportTableMap::ID => 0, ExportTableMap::REF => 1, ExportTableMap::EXPORT_CATEGORY_ID => 2, ExportTableMap::POSITION => 3, ExportTableMap::HANDLE_CLASS => 4, ExportTableMap::CREATED_AT => 5, ExportTableMap::UPDATED_AT => 6, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'EXPORT_CATEGORY_ID' => 2, 'POSITION' => 3, 'HANDLE_CLASS' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'export_category_id' => 2, 'position' => 3, 'handle_class' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'Position' => 2, 'ExportCategoryId' => 3, 'HandleClass' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'position' => 2, 'exportCategoryId' => 3, 'handleClass' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(ExportTableMap::ID => 0, ExportTableMap::REF => 1, ExportTableMap::POSITION => 2, ExportTableMap::EXPORT_CATEGORY_ID => 3, ExportTableMap::HANDLE_CLASS => 4, ExportTableMap::CREATED_AT => 5, ExportTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'POSITION' => 2, 'EXPORT_CATEGORY_ID' => 3, 'HANDLE_CLASS' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'position' => 2, 'export_category_id' => 3, 'handle_class' => 4, 'created_at' => 5, 'updated_at' => 6, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -167,9 +167,9 @@ class ExportTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
-        $this->addForeignKey('EXPORT_CATEGORY_ID', 'ExportCategoryId', 'INTEGER', 'export_category', 'ID', true, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
-        $this->addColumn('HANDLE_CLASS', 'HandleClass', 'CLOB', true, null, null);
+        $this->addForeignKey('EXPORT_CATEGORY_ID', 'ExportCategoryId', 'INTEGER', 'export_category', 'ID', true, null, null);
+        $this->addColumn('HANDLE_CLASS', 'HandleClass', 'LONGVARCHAR', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -179,7 +179,7 @@ class ExportTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ExportCategory', '\\Thelia\\Model\\ExportCategory', RelationMap::MANY_TO_ONE, array('export_category_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('ExportCategory', '\\Thelia\\Model\\ExportCategory', RelationMap::MANY_TO_ONE, array('export_category_id' => 'id', ), null, null);
         $this->addRelation('ExportI18n', '\\Thelia\\Model\\ExportI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ExportI18ns');
     } // buildRelations()
 
@@ -192,8 +192,8 @@ class ExportTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title,description', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
     /**
@@ -346,16 +346,16 @@ class ExportTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(ExportTableMap::ID);
             $criteria->addSelectColumn(ExportTableMap::REF);
-            $criteria->addSelectColumn(ExportTableMap::EXPORT_CATEGORY_ID);
             $criteria->addSelectColumn(ExportTableMap::POSITION);
+            $criteria->addSelectColumn(ExportTableMap::EXPORT_CATEGORY_ID);
             $criteria->addSelectColumn(ExportTableMap::HANDLE_CLASS);
             $criteria->addSelectColumn(ExportTableMap::CREATED_AT);
             $criteria->addSelectColumn(ExportTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.REF');
-            $criteria->addSelectColumn($alias . '.EXPORT_CATEGORY_ID');
             $criteria->addSelectColumn($alias . '.POSITION');
+            $criteria->addSelectColumn($alias . '.EXPORT_CATEGORY_ID');
             $criteria->addSelectColumn($alias . '.HANDLE_CLASS');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');

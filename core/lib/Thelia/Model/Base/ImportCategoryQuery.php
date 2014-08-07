@@ -671,63 +671,6 @@ abstract class ImportCategoryQuery extends ModelCriteria
         }
     }
 
-    // i18n behavior
-
-    /**
-     * Adds a JOIN clause to the query using the i18n relation
-     *
-     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
-     *
-     * @return    ChildImportCategoryQuery The current query, for fluid interface
-     */
-    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $relationName = $relationAlias ? $relationAlias : 'ImportCategoryI18n';
-
-        return $this
-            ->joinImportCategoryI18n($relationAlias, $joinType)
-            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
-    }
-
-    /**
-     * Adds a JOIN clause to the query and hydrates the related I18n object.
-     * Shortcut for $c->joinI18n($locale)->with()
-     *
-     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
-     *
-     * @return    ChildImportCategoryQuery The current query, for fluid interface
-     */
-    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
-    {
-        $this
-            ->joinI18n($locale, null, $joinType)
-            ->with('ImportCategoryI18n');
-        $this->with['ImportCategoryI18n']->setIsWithOneToMany(false);
-
-        return $this;
-    }
-
-    /**
-     * Use the I18n relation query object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
-     *
-     * @return    ChildImportCategoryI18nQuery A secondary query class using the current class as primary query
-     */
-    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinI18n($locale, $relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ImportCategoryI18n', '\Thelia\Model\ImportCategoryI18nQuery');
-    }
-
     // timestampable behavior
 
     /**
@@ -792,6 +735,63 @@ abstract class ImportCategoryQuery extends ModelCriteria
     public function firstCreatedFirst()
     {
         return $this->addAscendingOrderByColumn(ImportCategoryTableMap::CREATED_AT);
+    }
+
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ChildImportCategoryQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'ImportCategoryI18n';
+
+        return $this
+            ->joinImportCategoryI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ChildImportCategoryQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('ImportCategoryI18n');
+        $this->with['ImportCategoryI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ChildImportCategoryI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ImportCategoryI18n', '\Thelia\Model\ImportCategoryI18nQuery');
     }
 
 } // ImportCategoryQuery
