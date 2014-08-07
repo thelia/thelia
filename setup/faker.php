@@ -18,10 +18,20 @@ if (php_sapi_name() != 'cli') {
 
 require __DIR__ . '/../core/bootstrap.php';
 
-$thelia = new Thelia\Core\Thelia("dev", true);
+$thelia = new Thelia\Core\Thelia("prod", false);
 $thelia->boot();
 
-$faker = Faker\Factory::create();
+// The default faker is en_US
+$faker = Faker\Factory::create('en_US');
+
+// Create localized version for content generation
+$localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
+
+$localizedFaker = [];
+
+foreach($localeList as $locale) {
+    $localizedFaker[$locale] = Faker\Factory::create($locale);
+}
 
 $con = \Propel\Runtime\Propel::getConnection(
     Thelia\Model\Map\ProductTableMap::DATABASE_NAME
@@ -187,7 +197,7 @@ try {
     );
     for ($j = 0; $j <= 3; $j++) {
         $address = new Thelia\Model\Address();
-        $address->setLabel($faker->text(20))
+        $address->setLabel(getRealText(20))
             ->setTitleId(rand(1,3))
             ->setFirstname($faker->firstname)
             ->setLastname($faker->lastname)
@@ -235,7 +245,7 @@ try {
 
         for ($j = 0; $j <= 3; $j++) {
             $address = new Thelia\Model\Address();
-            $address->setLabel($faker->text(20))
+            $address->setLabel(getRealText(20))
                 ->setTitleId(rand(1,3))
                 ->setFirstname($faker->firstname)
                 ->setLastname($faker->lastname)
@@ -262,7 +272,7 @@ try {
         $feature = new Thelia\Model\Feature();
         $feature->setVisible(1);
         $feature->setPosition($i);
-        setI18n($faker, $feature);
+        setI18n($feature);
 
         $feature->save();
         $featureId = $feature->getId();
@@ -272,7 +282,7 @@ try {
             $featureAv = new Thelia\Model\FeatureAv();
             $featureAv->setFeature($feature);
             $featureAv->setPosition($j);
-            setI18n($faker, $featureAv);
+            setI18n($featureAv);
 
             $featureAv->save();
             $featureList[$featureId][] = $featureAv->getId();
@@ -286,7 +296,7 @@ try {
     for ($i=0; $i<4; $i++) {
         $attribute = new Thelia\Model\Attribute();
         $attribute->setPosition($i);
-        setI18n($faker, $attribute);
+        setI18n($attribute);
 
         $attribute->save();
         $attributeId = $attribute->getId();
@@ -296,7 +306,7 @@ try {
             $attributeAv = new Thelia\Model\AttributeAv();
             $attributeAv->setAttribute($attribute);
             $attributeAv->setPosition($j);
-            setI18n($faker, $attributeAv);
+            setI18n($attributeAv);
 
             $attributeAv->save();
             $attributeList[$attributeId][] = $attributeAv->getId();
@@ -306,7 +316,7 @@ try {
     echo "Creating templates\n";
 
     $template = new Thelia\Model\Template();
-    setI18n($faker, $template, array("Name" => 20));
+    setI18n($template, array("Name" => 20));
     $template->save();
 
     foreach ($attributeList as $attributeId => $attributeAvId) {
@@ -336,7 +346,7 @@ try {
         $folder->setParent(0);
         $folder->setVisible(1);
         $folder->setPosition($i+1);
-        setI18n($faker, $folder);
+        setI18n($folder);
 
         $folder->save();
 
@@ -353,7 +363,7 @@ try {
             $subfolder->setParent($folder->getId());
             $subfolder->setVisible(1);
             $subfolder->setPosition($j+1);
-            setI18n($faker, $subfolder);
+            setI18n($subfolder);
 
             $subfolder->save();
 
@@ -376,7 +386,7 @@ try {
 
                 $content->setVisible(1);
                 $content->setPosition($k+1);
-                setI18n($faker, $content);
+                setI18n($content);
 
                 $content->save();
                 $contentId = $content->getId();
@@ -403,7 +413,7 @@ try {
 
         $brand->setVisible(1);
         $brand->setPosition($k+1);
-        setI18n($faker, $brand);
+        setI18n($brand);
 
         $brand->save();
         $brandId = $brand->getId();
@@ -478,9 +488,9 @@ try {
             $stock = new \Thelia\Model\ProductSaleElements();
             $stock->setProductId($productId);
             $stock->setRef($productId . '_' . $i . '_' . $faker->randomNumber(8));
-            $stock->setQuantity($faker->randomNumber(1,50));
-            $stock->setPromo($faker->randomNumber(0,1));
-            $stock->setNewness($faker->randomNumber(0,1));
+            $stock->setQuantity($faker->numberBetween(1,50));
+            $stock->setPromo($faker->numberBetween(0,1));
+            $stock->setNewness($faker->numberBetween(0,1));
             $stock->setWeight($faker->randomFloat(2, 1, 5));
             $stock->setIsDefault($i == 0);
             $stock->setEanCode(substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 13));
@@ -522,7 +532,7 @@ try {
                     $featureAvId[array_rand($featureAvId, 1)]
                 );
             } else { //no av
-                $featureProduct->setFreeTextValue($faker->text(10));
+                $featureProduct->setFreeTextValue(getRealText(10));
             }
 
             $featureProduct->save();
@@ -547,7 +557,7 @@ try {
         $deliveryOrderAddress = new OrderAddress();
         $deliveryOrderAddress
             ->setCustomerTitleId(mt_rand(1,3))
-            ->setCompany($faker->text(15))
+            ->setCompany(getRealText(15))
             ->setFirstname($faker->firstname)
             ->setLastname($faker->lastname)
             ->setAddress1($faker->streetAddress)
@@ -563,7 +573,7 @@ try {
         $invoiceOrderAddress = new OrderAddress();
         $invoiceOrderAddress
             ->setCustomerTitleId(mt_rand(1,3))
-            ->setCompany($faker->text(15))
+            ->setCompany(getRealText(15))
             ->setFirstname($faker->firstname)
             ->setLastname($faker->lastname)
             ->setAddress1($faker->streetAddress)
@@ -626,8 +636,8 @@ try {
                 ->setWasNew($pse->getNewness())
                 ->setWasInPromo(rand(0,1) == 1)
                 ->setWeight($pse->getWeight())
-                ->setTaxRuleTitle($faker->text(20))
-                ->setTaxRuleDescription($faker->text(50))
+                ->setTaxRuleTitle(getRealText(20))
+                ->setTaxRuleDescription(getRealText(50))
                 ->setEanCode($pse->getEanCode())
             ->save($con);
         }
@@ -644,7 +654,7 @@ try {
 
 } catch (Exception $e) {
     echo "error : ".$e->getMessage()."\n";
-    echo "Cause: ".$e->getPrevious()->getMessage()."\n";
+    if ($e->getPrevious()) echo "Cause: ".$e->getPrevious()->getMessage()."\n";
     echo $e->getTraceAsString();
 
     $con->rollBack();
@@ -666,7 +676,7 @@ function createProduct($faker, Thelia\Model\Category $category, $position, $temp
     $product->setTemplate($template);
     $product->setBrandId($brandIdList[array_rand($brandIdList, 1)]);
 
-    setI18n($faker, $product);
+    setI18n($product);
 
     $product->save();
     $productId = $product->getId();
@@ -689,7 +699,7 @@ function createCategory($faker, $parent, $position, &$categoryIdList, $contentId
     $category->setParent($parent);
     $category->setVisible(1);
     $category->setPosition($position);
-    setI18n($faker, $category);
+    setI18n($category);
 
     $category->save();
     $categoryId = $category->getId();
@@ -727,10 +737,10 @@ function generate_image($image, $typeobj, $id)
     global $faker;
 
     $image
-        ->setTitle($faker->text(20))
-        ->setDescription($faker->text(250))
-        ->setChapo($faker->text(40))
-        ->setPostscriptum($faker->text(40))
+        ->setTitle(getRealText(20))
+        ->setDescription(getRealText(250))
+        ->setChapo(getRealText(40))
+        ->setPostscriptum(getRealText(40))
         ->setFile(sprintf("sample-image-%s.png", $id))
         ->save()
     ;
@@ -775,10 +785,10 @@ function generate_document($document, $typeobj, $id)
     global $faker;
 
     $document
-    ->setTitle($faker->text(20))
-    ->setDescription($faker->text(250))
-    ->setChapo($faker->text(40))
-    ->setPostscriptum($faker->text(40))
+    ->setTitle(getRealText(20))
+    ->setDescription(getRealText(250))
+    ->setChapo(getRealText(40))
+    ->setPostscriptum(getRealText(40))
     ->setFile(sprintf("sample-document-%s.txt", $id))
     ->save()
     ;
@@ -787,20 +797,35 @@ function generate_document($document, $typeobj, $id)
 
     if (! is_dir(dirname($document_file))) mkdir(dirname($document_file), 0777, true);
 
-    file_put_contents($document_file, $faker->text(256));
+    file_put_contents($document_file, getRealText(256));
 }
 
-function setI18n($faker, &$object, $fields = array('Title' => 20, 'Description' => 50) )
+function getRealText($length, $locale = 'en_US') {
+    global $localizedFaker;
+    
+    $text = $localizedFaker[$locale]->realText($length);
+
+    // Below 20 chars, generate a simple text, without ponctuation nor newlines.
+    if ($length <= 20)
+        $text = ucfirst(strtolower(preg_replace("/[^\pL\pM\pN\ ]/", '', $text)));
+
+    // echo "Generated $locale text ($length) : $locale:$text\n";
+
+    return "$locale:$text";
+}
+
+function setI18n(&$object, $fields = array('Title' => 20, 'Chapo' => 30, 'Postscriptum' => 30, 'Description' => 50) )
 {
-    $localeList = $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
+    global $localeList, $localizedFaker;
 
     foreach ($localeList as $locale) {
+        
         $object->setLocale($locale);
 
         foreach ($fields as $name => $length) {
             $func = "set".ucfirst(strtolower($name));
 
-            $object->$func($locale . ' : ' . $faker->text($length));
+            $object->$func(getRealText($length, $locale));
         }
     }
 }
