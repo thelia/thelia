@@ -54,11 +54,22 @@
                         {$DESCRIPTION nofilter}
                     </div>
                 {/if}
+                
+                {ifloop rel="blog.document"}
+                <div class="documents">
+                    <ul>
+                    {loop name="blog.document"  type="document" content="{$ID}"}
+                    <li><a href="{$DOCUMENT_URL}" target="_blank">{$TITLE}</a></li>
+                    {/loop}  
+                    </ul>
+                </div>    
+                {/ifloop}                    
+                
                 {if $POSTSCRIPTUM}
                     <small class="postscriptum">
                         {$POSTSCRIPTUM}
                    </small>
-                {/if}
+                {/if}                
             {/loop}
         </article>
         <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
