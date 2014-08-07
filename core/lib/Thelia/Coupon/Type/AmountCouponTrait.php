@@ -37,7 +37,7 @@ Trait AmountCouponTrait {
     /**
      * @inheritdoc
      */
-    protected function setFieldsValue($effects)
+    public function setFieldsValue($effects)
     {
         $this->amount = $effects[$this->getAmountFieldName()];
     }
