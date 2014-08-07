@@ -74,8 +74,8 @@
     </behavior>
   </table>
   <table isCrossRef="true" name="product_category" namespace="Thelia\Model">
-    <column autoIncrement="true" name="product_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="category_id" primaryKey="true" type="INTEGER" />
+    <column name="product_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="category_id" primaryKey="true" type="INTEGER" />
     <column name="default_category" type="BOOLEAN" />
     <foreign-key foreignTable="product" name="fk_product_has_category_product1" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
@@ -142,9 +142,9 @@
     </behavior>
   </table>
   <table name="tax_rule_country" namespace="Thelia\Model">
-    <column autoIncrement="true" name="tax_rule_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="country_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="tax_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="tax_rule_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="country_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="tax_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="position" required="true" type="INTEGER" />
     <foreign-key foreignTable="tax" name="fk_tax_rule_country_tax_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_id" />
@@ -290,9 +290,9 @@
     </behavior>
   </table>
   <table name="attribute_combination" namespace="Thelia\Model">
-    <column autoIncrement="true" name="attribute_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="attribute_av_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="attribute_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="attribute_av_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
     <foreign-key foreignTable="attribute" name="fk_attribute_combination_attribute_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_id" />
     </foreign-key>
@@ -859,8 +859,8 @@
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="profile_resource" namespace="Thelia\Model">
-    <column autoIncrement="true" name="profile_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="resource_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="profile_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="resource_id" primaryKey="true" required="true" type="INTEGER" />
     <column defaultValue="0" name="access" required="true" type="INTEGER" />
     <foreign-key foreignTable="profile" name="fk_profile_resource_profile_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="profile_id" />
@@ -877,8 +877,8 @@
     <behavior name="timestampable" />
   </table>
   <table name="profile_module" namespace="Thelia\Model">
-    <column autoIncrement="true" name="profile_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="module_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="profile_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="module_id" primaryKey="true" required="true" type="INTEGER" />
     <column defaultValue="0" name="access" type="TINYINT" />
     <foreign-key foreignTable="profile" name="fk_profile_module_profile_id" onDelete="CASCADE" onUpdate="CASCADE">
       <reference foreign="id" local="profile_id" />
@@ -983,8 +983,8 @@
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="content_folder" namespace="Thelia\Model">
-    <column autoIncrement="true" name="content_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="folder_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="content_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="folder_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="default_folder" type="BOOLEAN" />
     <foreign-key foreignTable="content" name="fk_content_folder_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="content_id" />
@@ -1071,8 +1071,8 @@
     <behavior name="timestampable" />
   </table>
   <table name="product_price" namespace="Thelia\Model">
-    <column autoIncrement="true" name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="currency_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="currency_id" primaryKey="true" required="true" type="INTEGER" />
     <column defaultValue="0" name="price" required="true" type="FLOAT" />
     <column defaultValue="0" name="promo_price" required="true" type="FLOAT" />
     <column defaultValue="1" name="from_default_currency" required="true" type="BOOLEAN" />
@@ -1279,9 +1279,9 @@
     <behavior name="timestampable" />
   </table>
   <table name="rewriting_argument" namespace="Thelia\Model">
-    <column autoIncrement="true" name="rewriting_url_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="parameter" primaryKey="true" required="true" size="255" type="VARCHAR" />
-    <column autoIncrement="true" name="value" primaryKey="true" required="true" size="255" type="VARCHAR" />
+    <column name="rewriting_url_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="parameter" primaryKey="true" required="true" size="255" type="VARCHAR" />
+    <column name="value" primaryKey="true" required="true" size="255" type="VARCHAR" />
     <foreign-key foreignTable="rewriting_url" name="fk_rewriting_argument_rewirting_url_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="rewriting_url_id" />
     </foreign-key>
@@ -1372,8 +1372,8 @@
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="coupon_country" namespace="Thelia\Model">
-    <column autoIncrement="true" name="coupon_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="country_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="coupon_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="country_id" primaryKey="true" required="true" type="INTEGER" />
     <foreign-key foreignTable="country" name="fk_coupon_country_country_id" onDelete="CASCADE">
       <reference foreign="id" local="country_id" />
     </foreign-key>
@@ -1385,8 +1385,8 @@
     </index>
   </table>
   <table isCrossRef="true" name="coupon_module" namespace="Thelia\Model">
-    <column autoIncrement="true" name="coupon_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="module_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="coupon_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="module_id" primaryKey="true" required="true" type="INTEGER" />
     <foreign-key foreignTable="coupon" name="fk_coupon_module_coupon_id" onDelete="CASCADE">
       <reference foreign="id" local="coupon_id" />
     </foreign-key>
@@ -1398,8 +1398,8 @@
     </index>
   </table>
   <table isCrossRef="true" name="order_coupon_country" namespace="Thelia\Model">
-    <column autoIncrement="true" name="coupon_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="country_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="coupon_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="country_id" primaryKey="true" required="true" type="INTEGER" />
     <foreign-key foreignTable="country" name="fk_order_coupon_country_country_id" onDelete="CASCADE">
       <reference foreign="id" local="country_id" />
     </foreign-key>
@@ -1411,8 +1411,8 @@
     </index>
   </table>
   <table isCrossRef="true" name="order_coupon_module" namespace="Thelia\Model">
-    <column autoIncrement="true" name="coupon_id" primaryKey="true" required="true" type="INTEGER" />
-    <column autoIncrement="true" name="module_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="coupon_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="module_id" primaryKey="true" required="true" type="INTEGER" />
     <foreign-key foreignTable="order_coupon" name="fk_coupon_module_coupon_id0" onDelete="CASCADE">
       <reference foreign="id" local="coupon_id" />
     </foreign-key>
@@ -1517,7 +1517,7 @@
     <behavior name="timestampable" />
   </table>
   <table name="export_category">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="position" required="true" type="INTEGER" />
@@ -1552,7 +1552,7 @@
     </behavior>
   </table>
   <table name="import_category">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="position" required="true" type="INTEGER" />
