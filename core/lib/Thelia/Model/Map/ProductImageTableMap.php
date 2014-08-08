@@ -174,7 +174,9 @@ class ProductImageTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('ProductSaleElementsProductImage', '\\Thelia\\Model\\ProductSaleElementsProductImage', RelationMap::ONE_TO_MANY, array('id' => 'product_image_id', ), null, null, 'ProductSaleElementsProductImages');
         $this->addRelation('ProductImageI18n', '\\Thelia\\Model\\ProductImageI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ProductImageI18ns');
+        $this->addRelation('ProductSaleElements', '\\Thelia\\Model\\ProductSaleElements', RelationMap::MANY_TO_MANY, array(), null, null, 'ProductSaleElementss');
     } // buildRelations()
 
     /**
