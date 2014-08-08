@@ -458,3 +458,27 @@ ul.document-list {
 .vertical-row-space {
   margin-bottom: 1em;
 }
+
+// Product image / document association
+
+.product-pse-image-container {
+  position: relative;
+  width: 100px;
+  height: 75px;
+
+  > .is-associated {
+    box-shadow: 0px 0px 5px 0px @associated-color;
+  }
+
+  > img {
+    cursor: pointer;
+  }
+}
+
+.product-pse-image-join-glyphicon {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  color: @associated-color;
+}
+

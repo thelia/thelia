@@ -413,7 +413,75 @@ $(function() {
 
     	$('#number_of_generated_combinations').text(total);
     });
+
+    $(".pse-assoc-image-document").click(function() {
+        var $body = $(".modal-body", $("#associate_images"));
+        var pse_id = $(this).data("id");
+
+        $.ajax(
+            "{url path="/admin/product_sale_elements/ajax_image_document"}/" + pse_id
+        ).done(function(data) {
+            if ("images" in data && "documents" in data) {
+                var $imageTitle = $("<div class='row'><div class='col-md-12'>{intl l='Images'}</div></div>");
+                var $documentTitle = $("<div class='row'><div class='col-md-12'>{intl l='Documents'}</div></div>");
+
+                var images = data["images"];
+                var documents = data["documents"];
+
+                var $imageLinks = $("<div class='images-container'></div>");
+
+                for(i = 0; i < images.length; ++i) {
+                    $imageLinks.append(
+                        "<div class='product-pse-image-container'>" +
+                            (images[i]["is-associated"] == "1" ?"<span class='glyphicon glyphicon-ok product-pse-image-join-glyphicon'></span>":"")+
+                            "<img data-id='"+images[i]["id"]+"' class='img-responsive img-do-associate "+(images[i]["is-associated"] == "1" ?"is-associated":"")+"' src='"+images[i]["url"]+"' alt='"+images[i]["title"]+"' />" +
+                        "</div>"
+                    );
+                }
+
+                var $documentLinks = $("<div class='documents-container'></div>");
+
+                for(i = 0; i < documents.length; ++i) {
+                    $documentLinks.append("<a class='join-document' data-id='"+documents[i]["id"]+"'>"+documents[i]["title"]+"</a>")
+                }
+
+                $body.html("")
+                    .append($imageTitle)
+                    .append($imageLinks)
+                    .append($documentTitle)
+                    .append($documentLinks)
+                ;
+
+                $(".img-do-associate").click(function() {
+                    var $image = $(this);
+                    var image_id = $image.data("id");
+
+                    $.ajax(
+                        "{url path='/admin/product_sale_elements'}/"+pse_id+"/image/"+image_id
+                    ).done(function() {
+                        if ($image.hasClass("is-associated")) {
+                            $image.removeClass("is-associated");
+                            $(".product-pse-image-join-glyphicon", $image.parent()).remove();
+                        } else {
+                            $image.addClass("is-associated");
+                            $image.parent().append("<span class='glyphicon glyphicon-ok product-pse-image-join-glyphicon'></span>");
+                        }
+                    }).fail(function(data) {
+                        $errorMessage = $("<div class='alert alert-danger'>"+data["error"]+"</div>");
+
+                        $body.html($errorMessage + $body.html());
+                    });
+                });
+            } else {
+                $body.html("{intl l="An error occured, please try again"}");
+            }
+        }).fail(function(data) {
+            $body.html(data["error"]);
+        });
+    });
+
 });
+
 </script>
 
 

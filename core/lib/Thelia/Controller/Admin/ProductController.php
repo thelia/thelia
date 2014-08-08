@@ -12,7 +12,6 @@
 
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Propel\Runtime\ActiveQuery\Criteria;
 
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
@@ -35,9 +34,13 @@ use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 
+use Thelia\Core\HttpFoundation\JsonResponse;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
 
+use Thelia\Core\Template\Loop\Document;
+use Thelia\Core\Template\Loop\Image;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\CategoryQuery;
@@ -47,6 +50,9 @@ use Thelia\Model\FolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\Map\ProductSaleElementsProductDocumentTableMap;
+use Thelia\Model\Map\ProductSaleElementsProductImageTableMap;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductQuery;
@@ -1362,6 +1368,8 @@ class ProductController extends AbstractSeoCrudController
                     ->setProductImageId($typeId)
                     ->save()
                 ;
+            } else {
+                $assoc->delete();
             }
         } elseif ($type === "document") {
             $image = ProductDocumentQuery::create()->findPk($typeId);
@@ -1388,9 +1396,144 @@ class ProductController extends AbstractSeoCrudController
                     ->setProductDocumentId($typeId)
                     ->save()
                 ;
+            } else {
+                $assoc->delete();
             }
         }
 
-        return JsonResponse::create($responseData);
+        if (empty($responseData)) {
+            return Response::create('', 204);
+        }
+
+        return JsonResponse::create($responseData, 500);
+    }
+
+    public function getAjaxProductSaleElementsImagesDocuments($id)
+    {
+        if (null !== $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::VIEW)) {
+            return JsonResponse::createAuthError(AccessManager::VIEW);
+        }
+
+        $this->checkXmlHttpRequest();
+
+        $pse = ProductSaleElementsQuery::create()
+            ->findPk($id);
+
+        if (null === $pse) {
+            return JsonResponse::createNotFoundError(ProductSaleElementsTableMap::TABLE_NAME);
+        }
+
+        $data = [];
+
+        /**
+         * Compute images
+         */
+        $imageLoop = new Image($this->container);
+        $imageLoop->initializeArgs([
+            "product" => $pse->getProductId(),
+            "width" => 100,
+            "height"=> 75,
+            "resize_mode" => "borders",
+        ]);
+
+        $images = $imageLoop
+            ->exec($imagePagination)
+        ;
+
+        $imageAssoc = ProductSaleElementsProductImageQuery::create()
+            ->useProductSaleElementsQuery()
+                ->useProductQuery()
+                    ->filterById($pse->getProductId())
+                ->endUse()
+            ->endUse()
+            ->find()
+            ->toArray()
+        ;
+
+        $documentAssoc = ProductSaleElementsProductDocumentQuery::create()
+            ->useProductSaleElementsQuery()
+                ->useProductQuery()
+                    ->filterById($pse->getProductId())
+                ->endUse()
+            ->endUse()
+            ->find()
+            ->toArray()
+        ;
+
+        $data["images"] = [];
+
+        /** @var \Thelia\Core\Template\Element\LoopResultRow $image */
+        for ($images->rewind(); $images->valid(); $images->next()) {
+            $image = $images->current();
+
+            $isAssociated = $this->arrayHasEntries($imageAssoc, [
+                "ProductImageId" => $image->get("ID"),
+                "ProductSaleElementsId" => $pse->getId(),
+            ]);
+
+            $data["images"][] = [
+                "id" => $image->get("ID"),
+                "url" => $image->get("IMAGE_URL"),
+                "title" => $image->get("TITLE"),
+                "is-associated" => $isAssociated
+            ];
+        }
+
+        /**
+         * Compute documents
+         */
+        $documentLoop = new Document($this->container);
+        $documentLoop->initializeArgs([
+            "product" => $pse->getProductId(),
+        ]);
+
+        $documents = $documentLoop
+            ->exec($documentPagination)
+        ;
+
+        $data["documents"] = [];
+
+        /** @var \Thelia\Core\Template\Element\LoopResultRow $document */
+        for ($documents->rewind(); $documents->valid(); $documents->next()) {
+            $document = $documents->current();
+
+            $isAssociated = $this->arrayHasEntries($documentAssoc, [
+                "ProductDocumentId" => $document->get("ID"),
+                "ProductSaleElementsId" => $pse->getId(),
+            ]);
+
+            $data["documents"][] = [
+                "id" => $document->get("ID"),
+                "url" => $document->get("DOCUMENT_URL"),
+                "title" => $document->get("TITLE"),
+                "is-associated" => $isAssociated
+            ];
+        }
+
+        return JsonResponse::create($data);
+    }
+
+    protected function arrayHasEntries(array $data, array $entries) {
+        $status = false;
+        $countEntries = count($entries);
+
+
+        foreach ($data as &$line) {
+            $localMatch = 0;
+
+            foreach ($entries as $key => $entry) {
+                if (isset($line[$key]) && $line[$key] === $entry) {
+                    $localMatch++;
+                }
+            }
+
+            if ($localMatch === $countEntries) {
+                $status = true;
+                unset ($line);
+                break;
+            }
+        }
+
+        return $status;
     }
 }
