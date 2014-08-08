@@ -1,10 +1,13 @@
 #!/bin/bash
 
+## Get mysql password
 if [ $# -eq 5 ]
 then
     password=""
+    mysql_p_arg=""
 elif [ $# -eq 6 ]; then
     password=$6
+    mysql_p_arg="-p$password"
 else
     echo "usage: $0 your_thelia_repo your_branch db_host db_name db_username [db_password]"
     exit 1
@@ -30,16 +33,14 @@ php Thelia thelia:install --db_host=$3 --db_username=$5 --db_password=$password 
 for VERSION in ${versions[@]}; do
     git checkout $VERSION
     composer install
-    php Thelia thelia:update
+    if [ "$VERSION" -eq "2.0.3-beta" ]; then
+        mysql -h$3 -u$5 $mysql_p_arg $4 < setup/update/2.0.3-beta.sql
+    else
+        php Thelia thelia:update
+    fi
 done
 
 ## Delete traces
-if [ -z "$password" ]; then
-    mysql_p_arg=""
-else
-    mysql_p_arg="-p$password"
-fi
-
 mysql -h$3 -u$5 $mysql_p_arg $4 -e "DROP DATABASE $4;"
 cd ..
 rm -rf $test_dir
