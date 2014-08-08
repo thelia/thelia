@@ -24,16 +24,16 @@ use Thelia\Model\Map\ExportTableMap;
  *
  * @method     ChildExportQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildExportQuery orderByRef($order = Criteria::ASC) Order by the ref column
- * @method     ChildExportQuery orderByExportCategoryId($order = Criteria::ASC) Order by the export_category_id column
  * @method     ChildExportQuery orderByPosition($order = Criteria::ASC) Order by the position column
+ * @method     ChildExportQuery orderByExportCategoryId($order = Criteria::ASC) Order by the export_category_id column
  * @method     ChildExportQuery orderByHandleClass($order = Criteria::ASC) Order by the handle_class column
  * @method     ChildExportQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildExportQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildExportQuery groupById() Group by the id column
  * @method     ChildExportQuery groupByRef() Group by the ref column
- * @method     ChildExportQuery groupByExportCategoryId() Group by the export_category_id column
  * @method     ChildExportQuery groupByPosition() Group by the position column
+ * @method     ChildExportQuery groupByExportCategoryId() Group by the export_category_id column
  * @method     ChildExportQuery groupByHandleClass() Group by the handle_class column
  * @method     ChildExportQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildExportQuery groupByUpdatedAt() Group by the updated_at column
@@ -55,16 +55,16 @@ use Thelia\Model\Map\ExportTableMap;
  *
  * @method     ChildExport findOneById(int $id) Return the first ChildExport filtered by the id column
  * @method     ChildExport findOneByRef(string $ref) Return the first ChildExport filtered by the ref column
- * @method     ChildExport findOneByExportCategoryId(int $export_category_id) Return the first ChildExport filtered by the export_category_id column
  * @method     ChildExport findOneByPosition(int $position) Return the first ChildExport filtered by the position column
+ * @method     ChildExport findOneByExportCategoryId(int $export_category_id) Return the first ChildExport filtered by the export_category_id column
  * @method     ChildExport findOneByHandleClass(string $handle_class) Return the first ChildExport filtered by the handle_class column
  * @method     ChildExport findOneByCreatedAt(string $created_at) Return the first ChildExport filtered by the created_at column
  * @method     ChildExport findOneByUpdatedAt(string $updated_at) Return the first ChildExport filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildExport objects filtered by the id column
  * @method     array findByRef(string $ref) Return ChildExport objects filtered by the ref column
- * @method     array findByExportCategoryId(int $export_category_id) Return ChildExport objects filtered by the export_category_id column
  * @method     array findByPosition(int $position) Return ChildExport objects filtered by the position column
+ * @method     array findByExportCategoryId(int $export_category_id) Return ChildExport objects filtered by the export_category_id column
  * @method     array findByHandleClass(string $handle_class) Return ChildExport objects filtered by the handle_class column
  * @method     array findByCreatedAt(string $created_at) Return ChildExport objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildExport objects filtered by the updated_at column
@@ -156,7 +156,7 @@ abstract class ExportQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `REF`, `EXPORT_CATEGORY_ID`, `POSITION`, `HANDLE_CLASS`, `CREATED_AT`, `UPDATED_AT` FROM `export` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `REF`, `POSITION`, `EXPORT_CATEGORY_ID`, `HANDLE_CLASS`, `CREATED_AT`, `UPDATED_AT` FROM `export` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -316,6 +316,47 @@ abstract class ExportQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the position column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPosition(1234); // WHERE position = 1234
+     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
+     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * </code>
+     *
+     * @param     mixed $position The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildExportQuery The current query, for fluid interface
+     */
+    public function filterByPosition($position = null, $comparison = null)
+    {
+        if (is_array($position)) {
+            $useMinMax = false;
+            if (isset($position['min'])) {
+                $this->addUsingAlias(ExportTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($position['max'])) {
+                $this->addUsingAlias(ExportTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ExportTableMap::POSITION, $position, $comparison);
+    }
+
+    /**
      * Filter the query on the export_category_id column
      *
      * Example usage:
@@ -356,47 +397,6 @@ abstract class ExportQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ExportTableMap::EXPORT_CATEGORY_ID, $exportCategoryId, $comparison);
-    }
-
-    /**
-     * Filter the query on the position column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPosition(1234); // WHERE position = 1234
-     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
-     * </code>
-     *
-     * @param     mixed $position The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildExportQuery The current query, for fluid interface
-     */
-    public function filterByPosition($position = null, $comparison = null)
-    {
-        if (is_array($position)) {
-            $useMinMax = false;
-            if (isset($position['min'])) {
-                $this->addUsingAlias(ExportTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($position['max'])) {
-                $this->addUsingAlias(ExportTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ExportTableMap::POSITION, $position, $comparison);
     }
 
     /**
@@ -753,63 +753,6 @@ abstract class ExportQuery extends ModelCriteria
         }
     }
 
-    // i18n behavior
-
-    /**
-     * Adds a JOIN clause to the query using the i18n relation
-     *
-     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
-     *
-     * @return    ChildExportQuery The current query, for fluid interface
-     */
-    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $relationName = $relationAlias ? $relationAlias : 'ExportI18n';
-
-        return $this
-            ->joinExportI18n($relationAlias, $joinType)
-            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
-    }
-
-    /**
-     * Adds a JOIN clause to the query and hydrates the related I18n object.
-     * Shortcut for $c->joinI18n($locale)->with()
-     *
-     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
-     *
-     * @return    ChildExportQuery The current query, for fluid interface
-     */
-    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
-    {
-        $this
-            ->joinI18n($locale, null, $joinType)
-            ->with('ExportI18n');
-        $this->with['ExportI18n']->setIsWithOneToMany(false);
-
-        return $this;
-    }
-
-    /**
-     * Use the I18n relation query object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
-     *
-     * @return    ChildExportI18nQuery A secondary query class using the current class as primary query
-     */
-    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinI18n($locale, $relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ExportI18n', '\Thelia\Model\ExportI18nQuery');
-    }
-
     // timestampable behavior
 
     /**
@@ -874,6 +817,63 @@ abstract class ExportQuery extends ModelCriteria
     public function firstCreatedFirst()
     {
         return $this->addAscendingOrderByColumn(ExportTableMap::CREATED_AT);
+    }
+
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ChildExportQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'ExportI18n';
+
+        return $this
+            ->joinExportI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ChildExportQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('ExportI18n');
+        $this->with['ExportI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ChildExportI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ExportI18n', '\Thelia\Model\ExportI18nQuery');
     }
 
 } // ExportQuery
