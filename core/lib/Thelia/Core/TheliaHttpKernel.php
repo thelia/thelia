@@ -26,6 +26,7 @@ use Thelia\Core\Event\SessionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model;
 
+
 /**
  *
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
@@ -214,6 +215,23 @@ class TheliaHttpKernel extends HttpKernel
 
         $session->start();
         $request->setSession($session);
+
+        // set previous URL
+        if (null !== $referer = $request->headers->get('referer')) {
+            if (Model\ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
+                $components = parse_url($referer);
+                $lang = Model\LangQuery::create()
+                    ->filterByUrl(sprintf("%s://%s", $components["scheme"], $components["host"]), ModelCriteria::LIKE)
+                    ->findOne();
+                if (null !== $lang) {
+                    $session->setReturnToUrl($referer);
+                }
+            } else {
+                if ( false !== strpos($referer, $request->getSchemeAndHttpHost())) {
+                    $session->setReturnToUrl($referer);
+                }
+            }
+        }
 
         return $request;
     }
