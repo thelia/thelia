@@ -47,9 +47,15 @@ use Thelia\Model\FolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\ProductSaleElementsProductDocument;
+use Thelia\Model\ProductSaleElementsProductDocumentQuery;
+use Thelia\Model\ProductSaleElementsProductImage;
+use Thelia\Model\ProductSaleElementsProductImageQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\Currency;
@@ -1286,5 +1292,105 @@ class ProductController extends AbstractSeoCrudController
 
         // Format the number using '.', to perform further calculation
         return NumberFormat::getInstance($this->getRequest())->formatStandardNumber($return_price);
+    }
+
+    /**
+     * @param int $pseId
+     * @param string $type
+     * @param int $typeId
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     */
+    public function productSaleElementsProductImageDocumentAssociation($pseId, $type, $typeId)
+    {
+        /**
+         * Check user's auth
+         */
+        if (null !== $response = $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $this->checkXmlHttpRequest();
+
+        /**
+         * Check given type
+         */
+        $types = ["image", "document"];
+        $responseData = [];
+
+        if (!in_array($type, $types)) {
+            $responseData["error"] = $this->getTranslator()->trans(
+                "The type %type is not valid",
+                [
+                    "%type" => $type,
+                ]
+            );
+        }
+
+        $pse = ProductSaleElementsQuery::create()->findPk($pseId);
+
+        if (null === $pse) {
+            $responseData["error"] = $this->getTranslator()->trans(
+                "The product sale elements id %id doesn't exists",
+                [
+                    "%id" => $pseId,
+                ]
+            );
+        }
+
+        if ($type === "image") {
+            $image = ProductImageQuery::create()->findPk($typeId);
+
+            if (null === $image) {
+                $responseData["error"] = $this->getTranslator()->trans(
+                    "The product image id %id doesn't exists",
+                    [
+                        "%id" => $typeId,
+                    ]
+                );
+            }
+
+            $assoc = ProductSaleElementsProductImageQuery::create()
+                ->filterByProductSaleElementsId($pseId)
+                ->findOneByProductImageId($typeId)
+            ;
+
+            if (null === $assoc) {
+                $assoc = new ProductSaleElementsProductImage();
+
+                $assoc
+                    ->setProductSaleElementsId($pseId)
+                    ->setProductImageId($typeId)
+                    ->save()
+                ;
+            }
+        } elseif ($type === "document") {
+            $image = ProductDocumentQuery::create()->findPk($typeId);
+
+            if (null === $image) {
+                $responseData["error"] = $this->getTranslator()->trans(
+                    "The product document id %id doesn't exists",
+                    [
+                        "%id" => $pseId,
+                    ]
+                );
+            }
+
+            $assoc = ProductSaleElementsProductDocumentQuery::create()
+                ->filterByProductSaleElementsId($pseId)
+                ->findOneByProductDocumentId($typeId)
+            ;
+
+            if (null === $assoc) {
+                $assoc = new ProductSaleElementsProductDocument();
+
+                $assoc
+                    ->setProductSaleElementsId($pseId)
+                    ->setProductDocumentId($typeId)
+                    ->save()
+                ;
+            }
+        }
+
+        return JsonResponse::create($responseData);
     }
 }
