@@ -33,7 +33,7 @@ php Thelia thelia:install --db_host=$3 --db_username=$5 --db_password=$password 
 for VERSION in ${versions[@]}; do
     git checkout $VERSION
     composer install
-    if [ "$VERSION" -eq "2.0.3-beta" ]; then
+    if [ "$VERSION" = "2.0.3-beta" ]; then
         mysql -h$3 -u$5 $mysql_p_arg $4 < setup/update/2.0.3-beta.sql
     else
         php Thelia thelia:update
